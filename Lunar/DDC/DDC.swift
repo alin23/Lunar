@@ -27,8 +27,8 @@ let DDC_MIN_REPLY_DELAY_NVIDIA = 1
 
 struct DDCReadResult {
     var controlID: ControlID
-    var maxValue: UInt8
-    var currentValue: UInt8
+    var maxValue: UInt16
+    var currentValue: UInt16
 }
 
 // MARK: - EDIDTextType
@@ -40,7 +40,7 @@ enum EDIDTextType: UInt8 {
 
 // MARK: - InputSource
 
-enum InputSource: UInt8, CaseIterable {
+enum InputSource: UInt16, CaseIterable {
     case vga1 = 1
     case vga2 = 2
     case dvi1 = 3
@@ -878,7 +878,7 @@ enum DDC {
         )
     }
 
-    static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt8) -> Bool {
+    static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt16) -> Bool {
         #if DEBUG
             guard apply, !isTestID(displayID) else { return true }
         #else
@@ -1270,7 +1270,7 @@ enum DDC {
         read(displayID: displayID, controlID: ControlID.INPUT_SOURCE)
     }
 
-    static func setBrightness(for displayID: CGDirectDisplayID, brightness: UInt8) -> Bool {
+    static func setBrightness(for displayID: CGDirectDisplayID, brightness: UInt16) -> Bool {
         write(displayID: displayID, controlID: ControlID.BRIGHTNESS, newValue: brightness)
     }
 
@@ -1282,23 +1282,23 @@ enum DDC {
         read(displayID: displayID, controlID: ControlID.CONTRAST)
     }
 
-    static func setContrast(for displayID: CGDirectDisplayID, contrast: UInt8) -> Bool {
+    static func setContrast(for displayID: CGDirectDisplayID, contrast: UInt16) -> Bool {
         write(displayID: displayID, controlID: ControlID.CONTRAST, newValue: contrast)
     }
 
-    static func setRedGain(for displayID: CGDirectDisplayID, redGain: UInt8) -> Bool {
+    static func setRedGain(for displayID: CGDirectDisplayID, redGain: UInt16) -> Bool {
         write(displayID: displayID, controlID: ControlID.RED_GAIN, newValue: redGain)
     }
 
-    static func setGreenGain(for displayID: CGDirectDisplayID, greenGain: UInt8) -> Bool {
+    static func setGreenGain(for displayID: CGDirectDisplayID, greenGain: UInt16) -> Bool {
         write(displayID: displayID, controlID: ControlID.GREEN_GAIN, newValue: greenGain)
     }
 
-    static func setBlueGain(for displayID: CGDirectDisplayID, blueGain: UInt8) -> Bool {
+    static func setBlueGain(for displayID: CGDirectDisplayID, blueGain: UInt16) -> Bool {
         write(displayID: displayID, controlID: ControlID.BLUE_GAIN, newValue: blueGain)
     }
 
-    static func setAudioSpeakerVolume(for displayID: CGDirectDisplayID, audioSpeakerVolume: UInt8) -> Bool {
+    static func setAudioSpeakerVolume(for displayID: CGDirectDisplayID, audioSpeakerVolume: UInt16) -> Bool {
         write(displayID: displayID, controlID: ControlID.AUDIO_SPEAKER_VOLUME, newValue: audioSpeakerVolume)
     }
 
@@ -1314,7 +1314,7 @@ enum DDC {
         write(displayID: displayID, controlID: ControlID.RESET, newValue: 100)
     }
 
-    static func getValue(for displayID: CGDirectDisplayID, controlID: ControlID) -> UInt8? {
+    static func getValue(for displayID: CGDirectDisplayID, controlID: ControlID) -> UInt16? {
         log.debug("DDC reading \(controlID) for \(displayID)")
 
         guard let result = DDC.read(displayID: displayID, controlID: controlID) else {
@@ -1329,26 +1329,26 @@ enum DDC {
         return result.currentValue
     }
 
-    static func getMaxValue(for displayID: CGDirectDisplayID, controlID: ControlID) -> UInt8? {
+    static func getMaxValue(for displayID: CGDirectDisplayID, controlID: ControlID) -> UInt16? {
         guard let result = DDC.read(displayID: displayID, controlID: controlID) else {
             return nil
         }
         return result.maxValue
     }
 
-    static func getRedGain(for displayID: CGDirectDisplayID) -> UInt8? {
+    static func getRedGain(for displayID: CGDirectDisplayID) -> UInt16? {
         DDC.getValue(for: displayID, controlID: ControlID.RED_GAIN)
     }
 
-    static func getGreenGain(for displayID: CGDirectDisplayID) -> UInt8? {
+    static func getGreenGain(for displayID: CGDirectDisplayID) -> UInt16? {
         DDC.getValue(for: displayID, controlID: ControlID.GREEN_GAIN)
     }
 
-    static func getBlueGain(for displayID: CGDirectDisplayID) -> UInt8? {
+    static func getBlueGain(for displayID: CGDirectDisplayID) -> UInt16? {
         DDC.getValue(for: displayID, controlID: ControlID.BLUE_GAIN)
     }
 
-    static func getAudioSpeakerVolume(for displayID: CGDirectDisplayID) -> UInt8? {
+    static func getAudioSpeakerVolume(for displayID: CGDirectDisplayID) -> UInt16? {
         DDC.getValue(for: displayID, controlID: ControlID.AUDIO_SPEAKER_VOLUME)
     }
 
@@ -1359,15 +1359,15 @@ enum DDC {
         return mute != 2
     }
 
-    static func getContrast(for displayID: CGDirectDisplayID) -> UInt8? {
+    static func getContrast(for displayID: CGDirectDisplayID) -> UInt16? {
         DDC.getValue(for: displayID, controlID: ControlID.CONTRAST)
     }
 
-    static func getInput(for displayID: CGDirectDisplayID) -> UInt8? {
+    static func getInput(for displayID: CGDirectDisplayID) -> UInt16? {
         DDC.readInput(for: displayID)?.currentValue
     }
 
-    static func getBrightness(for id: CGDirectDisplayID) -> UInt8? {
+    static func getBrightness(for id: CGDirectDisplayID) -> UInt16? {
         log.debug("DDC reading brightness for \(id)")
         return DDC.getValue(for: id, controlID: ControlID.BRIGHTNESS)
     }

@@ -24,16 +24,16 @@ import SwiftDate
 
 let MIN_VOLUME = 0
 let MAX_VOLUME = 100
-let MIN_BRIGHTNESS: UInt8 = 0
-let MAX_BRIGHTNESS: UInt8 = 100
-let MIN_CONTRAST: UInt8 = 0
-let MAX_CONTRAST: UInt8 = 100
+let MIN_BRIGHTNESS: UInt16 = 0
+let MAX_BRIGHTNESS: UInt16 = 100
+let MIN_CONTRAST: UInt16 = 0
+let MAX_CONTRAST: UInt16 = 100
 
-let DEFAULT_MIN_BRIGHTNESS: UInt8 = 0
-let DEFAULT_MAX_BRIGHTNESS: UInt8 = 100
-let DEFAULT_MIN_CONTRAST: UInt8 = 50
-let DEFAULT_MAX_CONTRAST: UInt8 = 75
-let DEFAULT_COLOR_GAIN: UInt8 = 90
+let DEFAULT_MIN_BRIGHTNESS: UInt16 = 0
+let DEFAULT_MAX_BRIGHTNESS: UInt16 = 100
+let DEFAULT_MIN_CONTRAST: UInt16 = 50
+let DEFAULT_MAX_CONTRAST: UInt16 = 75
+let DEFAULT_COLOR_GAIN: UInt16 = 90
 
 let DEFAULT_SENSOR_BRIGHTNESS_CURVE_FACTOR = 0.5
 let DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR = 0.5
@@ -285,7 +285,7 @@ struct GammaTable: Equatable {
         return true
     }
 
-    func adjust(brightness: UInt8, preciseBrightness: Double? = nil) -> GammaTable {
+    func adjust(brightness: UInt16, preciseBrightness: Double? = nil) -> GammaTable {
         let gammaBrightness: Float = mapNumber(
             powf(preciseBrightness?.f ?? (brightness.f / 100), 0.8),
             fromLow: 0.00, fromHigh: 1.00, toLow: 0.08, toHigh: 1.00
@@ -345,17 +345,17 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         active = try container.decode(Bool.self, forKey: .active)
 
         let brightness = isNative ? (AppleNativeControl.readBrightnessDisplayServices(id: id) * 100)
-            .ns : (try container.decode(UInt8.self, forKey: .brightness)).ns
+            .ns : (try container.decode(UInt16.self, forKey: .brightness)).ns
         self.brightness = brightness
-        let contrast = (try container.decode(UInt8.self, forKey: .contrast)).ns
+        let contrast = (try container.decode(UInt16.self, forKey: .contrast)).ns
         self.contrast = contrast
 
-        let minBrightness = isSmartBuiltin ? 0 : (try container.decode(UInt8.self, forKey: .minBrightness)).ns
-        let maxBrightness = isSmartBuiltin ? 100 : (try container.decode(UInt8.self, forKey: .maxBrightness)).ns
+        let minBrightness = isSmartBuiltin ? 0 : (try container.decode(UInt16.self, forKey: .minBrightness)).ns
+        let maxBrightness = isSmartBuiltin ? 100 : (try container.decode(UInt16.self, forKey: .maxBrightness)).ns
         self.minBrightness = minBrightness
         self.maxBrightness = maxBrightness
-        minContrast = isSmartBuiltin ? 0 : (try container.decode(UInt8.self, forKey: .minContrast)).ns
-        maxContrast = isSmartBuiltin ? 100 : (try container.decode(UInt8.self, forKey: .maxContrast)).ns
+        minContrast = isSmartBuiltin ? 0 : (try container.decode(UInt16.self, forKey: .minContrast)).ns
+        maxContrast = isSmartBuiltin ? 100 : (try container.decode(UInt16.self, forKey: .maxContrast)).ns
 
         defaultGammaRedMin = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaRedMin)?.ns) ?? 0.ns
         defaultGammaRedMax = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaRedMax)?.ns) ?? 1.ns
@@ -367,27 +367,27 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         defaultGammaBlueMax = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaBlueMax)?.ns) ?? 1.ns
         defaultGammaBlueValue = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaBlueValue)?.ns) ?? 1.ns
 
-        let _maxDDCBrightness = isSmartBuiltin ? 100 : (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCBrightness)?.ns) ?? 100.ns
-        let _maxDDCContrast = isSmartBuiltin ? 100 : (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCContrast)?.ns) ?? 100.ns
-        maxDDCVolume = isSmartBuiltin ? 100 : (try container.decodeIfPresent(UInt8.self, forKey: .maxDDCVolume)?.ns) ?? 100.ns
+        let _maxDDCBrightness = isSmartBuiltin ? 100 : (try container.decodeIfPresent(UInt16.self, forKey: .maxDDCBrightness)?.ns) ?? 100.ns
+        let _maxDDCContrast = isSmartBuiltin ? 100 : (try container.decodeIfPresent(UInt16.self, forKey: .maxDDCContrast)?.ns) ?? 100.ns
+        maxDDCVolume = isSmartBuiltin ? 100 : (try container.decodeIfPresent(UInt16.self, forKey: .maxDDCVolume)?.ns) ?? 100.ns
         maxDDCBrightness = _maxDDCBrightness
         maxDDCContrast = _maxDDCContrast
 
-        minDDCBrightness = isSmartBuiltin ? 0 : (try container.decodeIfPresent(UInt8.self, forKey: .minDDCBrightness)?.ns) ?? 0.ns
-        minDDCContrast = isSmartBuiltin ? 0 : (try container.decodeIfPresent(UInt8.self, forKey: .minDDCContrast)?.ns) ?? 0.ns
-        minDDCVolume = isSmartBuiltin ? 0 : (try container.decodeIfPresent(UInt8.self, forKey: .minDDCVolume)?.ns) ?? 0.ns
+        minDDCBrightness = isSmartBuiltin ? 0 : (try container.decodeIfPresent(UInt16.self, forKey: .minDDCBrightness)?.ns) ?? 0.ns
+        minDDCContrast = isSmartBuiltin ? 0 : (try container.decodeIfPresent(UInt16.self, forKey: .minDDCContrast)?.ns) ?? 0.ns
+        minDDCVolume = isSmartBuiltin ? 0 : (try container.decodeIfPresent(UInt16.self, forKey: .minDDCVolume)?.ns) ?? 0.ns
 
-        faceLightBrightness = (try container.decodeIfPresent(UInt8.self, forKey: .faceLightBrightness)?.ns) ?? _maxDDCBrightness
-        faceLightContrast = (try container.decodeIfPresent(UInt8.self, forKey: .faceLightContrast)?.ns) ??
+        faceLightBrightness = (try container.decodeIfPresent(UInt16.self, forKey: .faceLightBrightness)?.ns) ?? _maxDDCBrightness
+        faceLightContrast = (try container.decodeIfPresent(UInt16.self, forKey: .faceLightContrast)?.ns) ??
             (_maxDDCContrast.doubleValue * 0.9).intround.ns
 
         cornerRadius = (try container.decodeIfPresent(Int.self, forKey: .cornerRadius)?.ns) ?? 0
 
         reapplyColorGain = (try container.decodeIfPresent(Bool.self, forKey: .reapplyColorGain)) ?? false
         extendedColorGain = (try container.decodeIfPresent(Bool.self, forKey: .extendedColorGain)) ?? false
-        redGain = (try container.decodeIfPresent(UInt8.self, forKey: .redGain)?.ns) ?? DEFAULT_COLOR_GAIN.ns
-        greenGain = (try container.decodeIfPresent(UInt8.self, forKey: .greenGain)?.ns) ?? DEFAULT_COLOR_GAIN.ns
-        blueGain = (try container.decodeIfPresent(UInt8.self, forKey: .blueGain)?.ns) ?? DEFAULT_COLOR_GAIN.ns
+        redGain = (try container.decodeIfPresent(UInt16.self, forKey: .redGain)?.ns) ?? DEFAULT_COLOR_GAIN.ns
+        greenGain = (try container.decodeIfPresent(UInt16.self, forKey: .greenGain)?.ns) ?? DEFAULT_COLOR_GAIN.ns
+        blueGain = (try container.decodeIfPresent(UInt16.self, forKey: .blueGain)?.ns) ?? DEFAULT_COLOR_GAIN.ns
 
         lockedBrightness = (try container.decodeIfPresent(Bool.self, forKey: .lockedBrightness)) ?? false
         lockedContrast = (try container.decodeIfPresent(Bool.self, forKey: .lockedContrast)) ?? false
@@ -400,7 +400,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         alwaysFallbackControl = (try container.decodeIfPresent(Bool.self, forKey: .alwaysFallbackControl)) ?? false
         neverFallbackControl = (try container.decodeIfPresent(Bool.self, forKey: .neverFallbackControl)) ?? false
 
-        let volume = ((try container.decodeIfPresent(UInt8.self, forKey: .volume))?.ns ?? 50.ns)
+        let volume = ((try container.decodeIfPresent(UInt16.self, forKey: .volume))?.ns ?? 50.ns)
         self.volume = volume
         preciseVolume = volume.doubleValue / 100.0
         audioMuted = (try container.decodeIfPresent(Bool.self, forKey: .audioMuted)) ?? false
@@ -408,28 +408,28 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         isSource = try container.decodeIfPresent(Bool.self, forKey: .isSource) ?? DDC.isSmartBuiltinDisplay(id)
         showVolumeOSD = try container.decodeIfPresent(Bool.self, forKey: .showVolumeOSD) ?? true
         applyGamma = try container.decodeIfPresent(Bool.self, forKey: .applyGamma) ?? false
-        input = (try container.decodeIfPresent(UInt8.self, forKey: .input))?.ns ?? InputSource.unknown.rawValue.ns
+        input = (try container.decodeIfPresent(UInt16.self, forKey: .input))?.ns ?? InputSource.unknown.rawValue.ns
 
         hotkeyInput1 = try (
-            (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput1))?
-                .ns ?? (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput))?.ns ?? InputSource.unknown.rawValue.ns
+            (try container.decodeIfPresent(UInt16.self, forKey: .hotkeyInput1))?
+                .ns ?? (try container.decodeIfPresent(UInt16.self, forKey: .hotkeyInput))?.ns ?? InputSource.unknown.rawValue.ns
         )
-        hotkeyInput2 = (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput2))?.ns ?? InputSource.unknown.rawValue.ns
-        hotkeyInput3 = (try container.decodeIfPresent(UInt8.self, forKey: .hotkeyInput3))?.ns ?? InputSource.unknown.rawValue.ns
+        hotkeyInput2 = (try container.decodeIfPresent(UInt16.self, forKey: .hotkeyInput2))?.ns ?? InputSource.unknown.rawValue.ns
+        hotkeyInput3 = (try container.decodeIfPresent(UInt16.self, forKey: .hotkeyInput3))?.ns ?? InputSource.unknown.rawValue.ns
 
         brightnessOnInputChange1 = (
-            try (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange1))?
-                .ns ?? (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange))?.ns ?? 100.ns
+            try (try container.decodeIfPresent(UInt16.self, forKey: .brightnessOnInputChange1))?
+                .ns ?? (try container.decodeIfPresent(UInt16.self, forKey: .brightnessOnInputChange))?.ns ?? 100.ns
         )
-        brightnessOnInputChange2 = (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange2))?.ns ?? 100.ns
-        brightnessOnInputChange3 = (try container.decodeIfPresent(UInt8.self, forKey: .brightnessOnInputChange3))?.ns ?? 100.ns
+        brightnessOnInputChange2 = (try container.decodeIfPresent(UInt16.self, forKey: .brightnessOnInputChange2))?.ns ?? 100.ns
+        brightnessOnInputChange3 = (try container.decodeIfPresent(UInt16.self, forKey: .brightnessOnInputChange3))?.ns ?? 100.ns
 
         contrastOnInputChange1 = try (
-            (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange1))?
-                .ns ?? (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange))?.ns ?? 75.ns
+            (try container.decodeIfPresent(UInt16.self, forKey: .contrastOnInputChange1))?
+                .ns ?? (try container.decodeIfPresent(UInt16.self, forKey: .contrastOnInputChange))?.ns ?? 75.ns
         )
-        contrastOnInputChange2 = (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange2))?.ns ?? 75.ns
-        contrastOnInputChange3 = (try container.decodeIfPresent(UInt8.self, forKey: .contrastOnInputChange3))?.ns ?? 75.ns
+        contrastOnInputChange2 = (try container.decodeIfPresent(UInt16.self, forKey: .contrastOnInputChange2))?.ns ?? 75.ns
+        contrastOnInputChange3 = (try container.decodeIfPresent(UInt16.self, forKey: .contrastOnInputChange3))?.ns ?? 75.ns
 
         applyBrightnessOnInputChange1 = (try container.decodeIfPresent(Bool.self, forKey: .applyBrightnessOnInputChange1)) ?? true
         applyBrightnessOnInputChange2 = (try container.decodeIfPresent(Bool.self, forKey: .applyBrightnessOnInputChange2)) ?? false
@@ -535,31 +535,31 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         blackOutMirroringAllowed = ((try container.decodeIfPresent(Bool.self, forKey: .blackOutMirroringAllowed)) ?? true)
         blackOutEnabled = ((try container.decodeIfPresent(Bool.self, forKey: .blackOutEnabled)) ?? false) && !isIndependentDummy &&
-            (isNative ? (brightness.uint8Value <= 1) : true)
-        if let value = (try container.decodeIfPresent(UInt8.self, forKey: .brightnessBeforeBlackout)?.ns) {
+            (isNative ? (brightness.uint16Value <= 1) : true)
+        if let value = (try container.decodeIfPresent(UInt16.self, forKey: .brightnessBeforeBlackout)?.ns) {
             brightnessBeforeBlackout = value
         }
-        if let value = (try container.decodeIfPresent(UInt8.self, forKey: .contrastBeforeBlackout)?.ns) {
+        if let value = (try container.decodeIfPresent(UInt16.self, forKey: .contrastBeforeBlackout)?.ns) {
             contrastBeforeBlackout = value
         }
-        if let value = (try container.decodeIfPresent(UInt8.self, forKey: .minBrightnessBeforeBlackout)?.ns) {
+        if let value = (try container.decodeIfPresent(UInt16.self, forKey: .minBrightnessBeforeBlackout)?.ns) {
             minBrightnessBeforeBlackout = value
         }
-        if let value = (try container.decodeIfPresent(UInt8.self, forKey: .minContrastBeforeBlackout)?.ns) {
+        if let value = (try container.decodeIfPresent(UInt16.self, forKey: .minContrastBeforeBlackout)?.ns) {
             minContrastBeforeBlackout = value
         }
 
         faceLightEnabled = ((try container.decodeIfPresent(Bool.self, forKey: .faceLightEnabled)) ?? false)
-        if let value = (try container.decodeIfPresent(UInt8.self, forKey: .brightnessBeforeFacelight)?.ns) {
+        if let value = (try container.decodeIfPresent(UInt16.self, forKey: .brightnessBeforeFacelight)?.ns) {
             brightnessBeforeFacelight = value
         }
-        if let value = (try container.decodeIfPresent(UInt8.self, forKey: .contrastBeforeFacelight)?.ns) {
+        if let value = (try container.decodeIfPresent(UInt16.self, forKey: .contrastBeforeFacelight)?.ns) {
             contrastBeforeFacelight = value
         }
-        if let value = (try container.decodeIfPresent(UInt8.self, forKey: .maxBrightnessBeforeFacelight)?.ns) {
+        if let value = (try container.decodeIfPresent(UInt16.self, forKey: .maxBrightnessBeforeFacelight)?.ns) {
             maxBrightnessBeforeFacelight = value
         }
-        if let value = (try container.decodeIfPresent(UInt8.self, forKey: .maxContrastBeforeFacelight)?.ns) {
+        if let value = (try container.decodeIfPresent(UInt16.self, forKey: .maxContrastBeforeFacelight)?.ns) {
             maxContrastBeforeFacelight = value
         }
 
@@ -582,10 +582,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         serial: String? = nil,
         name: String? = nil,
         active: Bool = false,
-        minBrightness: UInt8 = DEFAULT_MIN_BRIGHTNESS,
-        maxBrightness: UInt8 = DEFAULT_MAX_BRIGHTNESS,
-        minContrast: UInt8 = DEFAULT_MIN_CONTRAST,
-        maxContrast: UInt8 = DEFAULT_MAX_CONTRAST,
+        minBrightness: UInt16 = DEFAULT_MIN_BRIGHTNESS,
+        maxBrightness: UInt16 = DEFAULT_MAX_BRIGHTNESS,
+        minContrast: UInt16 = DEFAULT_MIN_CONTRAST,
+        maxContrast: UInt16 = DEFAULT_MAX_CONTRAST,
         adaptive: Bool = true
     ) {
         _id = id
@@ -1151,8 +1151,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Atomic var shouldStopBrightnessTransition = true
     @Atomic var shouldStopContrastTransition = true
-    @Atomic var lastWrittenBrightness: UInt8 = 50
-    @Atomic var lastWrittenContrast: UInt8 = 50
+    @Atomic var lastWrittenBrightness: UInt16 = 50
+    @Atomic var lastWrittenContrast: UInt16 = 50
 
     let DEFAULT_DDC_BLOCKERS = """
     * Disable any **Ambient Light Sensing** feature
@@ -1429,7 +1429,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-    @objc dynamic var name: String {
+    @Published @objc dynamic var name: String {
         didSet {
             context = getContext()
             save()
@@ -1602,7 +1602,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         didSet {
             save()
             guard DDC.apply else { return }
-            if let control = control, !control.setRedGain(redGain.uint8Value) {
+            if let control = control, !control.setRedGain(redGain.uint16Value) {
                 log.warning(
                     "Error writing RedGain using \(control.str)",
                     context: context
@@ -1615,7 +1615,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         didSet {
             save()
             guard DDC.apply else { return }
-            if let control = control, !control.setGreenGain(greenGain.uint8Value) {
+            if let control = control, !control.setGreenGain(greenGain.uint16Value) {
                 log.warning(
                     "Error writing GreenGain using \(control.str)",
                     context: context
@@ -1628,7 +1628,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         didSet {
             save()
             guard DDC.apply else { return }
-            if let control = control, !control.setBlueGain(blueGain.uint8Value) {
+            if let control = control, !control.setBlueGain(blueGain.uint16Value) {
                 log.warning(
                     "Error writing BlueGain using \(control.str)",
                     context: context
@@ -1751,9 +1751,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-    var limitedBrightness: UInt8 {
-        guard maxDDCBrightness.uint8Value != 100 || minDDCBrightness.uint8Value != 0 else {
-            return brightness.uint8Value
+    var limitedBrightness: UInt16 {
+        guard maxDDCBrightness.uint16Value != 100 || minDDCBrightness.uint16Value != 0 else {
+            return brightness.uint16Value
         }
         return mapNumber(
             brightness.doubleValue,
@@ -1761,12 +1761,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             fromHigh: 100,
             toLow: minDDCBrightness.doubleValue,
             toHigh: maxDDCBrightness.doubleValue
-        ).rounded().u8
+        ).rounded().u16
     }
 
-    var limitedContrast: UInt8 {
-        guard maxDDCContrast.uint8Value != 100 || minDDCContrast.uint8Value != 0 else {
-            return contrast.uint8Value
+    var limitedContrast: UInt16 {
+        guard maxDDCContrast.uint16Value != 100 || minDDCContrast.uint16Value != 0 else {
+            return contrast.uint16Value
         }
         return mapNumber(
             contrast.doubleValue,
@@ -1774,12 +1774,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             fromHigh: 100,
             toLow: minDDCContrast.doubleValue,
             toHigh: maxDDCContrast.doubleValue
-        ).rounded().u8
+        ).rounded().u16
     }
 
-    var limitedVolume: UInt8 {
-        guard maxDDCVolume.uint8Value != 100 || minDDCVolume.uint8Value != 0 else {
-            return volume.uint8Value
+    var limitedVolume: UInt16 {
+        guard maxDDCVolume.uint16Value != 100 || minDDCVolume.uint16Value != 0 else {
+            return volume.uint16Value
         }
         return mapNumber(
             volume.doubleValue,
@@ -1787,7 +1787,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             fromHigh: 100,
             toLow: minDDCVolume.doubleValue,
             toHigh: maxDDCVolume.doubleValue
-        ).rounded().u8
+        ).rounded().u16
     }
 
     @objc dynamic var preciseBrightnessContrast = 0.5 {
@@ -1830,8 +1830,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 let brightness = (preciseBrightness * 100)
                 if supportsGamma {
                     setGamma(
-                        brightness: brightness.u8,
-                        oldBrightness: smallDiff ? nil : (oldValue * 100).u8,
+                        brightness: brightness.u16,
+                        oldBrightness: smallDiff ? nil : (oldValue * 100).u16,
                         preciseBrightness: preciseBrightness
                     )
                 } else {
@@ -1951,29 +1951,29 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             guard !isForTesting else { return }
-            var brightness: UInt8
+            var brightness: UInt16
             if displayController.adaptiveModeKey == AdaptiveModeKey.manual || control is GammaControl {
-                brightness = cap(self.brightness.uint8Value, minVal: 0, maxVal: 100)
+                brightness = cap(self.brightness.uint16Value, minVal: 0, maxVal: 100)
             } else {
-                brightness = cap(self.brightness.uint8Value, minVal: minBrightness.uint8Value, maxVal: maxBrightness.uint8Value)
+                brightness = cap(self.brightness.uint16Value, minVal: minBrightness.uint16Value, maxVal: maxBrightness.uint16Value)
             }
 
-            var oldBrightness: UInt8 = oldValue.uint8Value
-            if DDC.applyLimits, maxDDCBrightness.uint8Value != 100 || minDDCBrightness.uint8Value != 0, !(control is GammaControl) {
+            var oldBrightness: UInt16 = oldValue.uint16Value
+            if DDC.applyLimits, maxDDCBrightness.uint16Value != 100 || minDDCBrightness.uint16Value != 0, !(control is GammaControl) {
                 oldBrightness = mapNumber(
                     oldBrightness.d,
                     fromLow: 0,
                     fromHigh: 100,
                     toLow: minDDCBrightness.doubleValue,
                     toHigh: maxDDCBrightness.doubleValue
-                ).rounded().u8
+                ).rounded().u16
                 brightness = mapNumber(
                     brightness.d,
                     fromLow: 0,
                     fromHigh: 100,
                     toLow: minDDCBrightness.doubleValue,
                     toHigh: maxDDCBrightness.doubleValue
-                ).rounded().u8
+                ).rounded().u16
             }
 
             log.verbose("Set BRIGHTNESS to \(brightness) for \(description) (old: \(oldBrightness))", context: context)
@@ -2028,29 +2028,29 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             guard !isForTesting else { return }
-            var contrast: UInt8
+            var contrast: UInt16
             if displayController.adaptiveModeKey == AdaptiveModeKey.manual || control is GammaControl {
-                contrast = cap(self.contrast.uint8Value, minVal: 0, maxVal: 100)
+                contrast = cap(self.contrast.uint16Value, minVal: 0, maxVal: 100)
             } else {
-                contrast = cap(self.contrast.uint8Value, minVal: minContrast.uint8Value, maxVal: maxContrast.uint8Value)
+                contrast = cap(self.contrast.uint16Value, minVal: minContrast.uint16Value, maxVal: maxContrast.uint16Value)
             }
 
-            var oldContrast: UInt8 = oldValue.uint8Value
-            if DDC.applyLimits, maxDDCContrast.uint8Value != 100 || minDDCContrast.uint8Value != 0, !(control is GammaControl) {
+            var oldContrast: UInt16 = oldValue.uint16Value
+            if DDC.applyLimits, maxDDCContrast.uint16Value != 100 || minDDCContrast.uint16Value != 0, !(control is GammaControl) {
                 oldContrast = mapNumber(
                     oldContrast.d,
                     fromLow: 0,
                     fromHigh: 100,
                     toLow: minDDCContrast.doubleValue,
                     toHigh: maxDDCContrast.doubleValue
-                ).rounded().u8
+                ).rounded().u16
                 contrast = mapNumber(
                     contrast.d,
                     fromLow: 0,
                     fromHigh: 100,
                     toLow: minDDCContrast.doubleValue,
                     toHigh: maxDDCContrast.doubleValue
-                ).rounded().u8
+                ).rounded().u16
             }
 
             log.verbose("Set CONTRAST to \(contrast) for \(description) (old: \(oldContrast))", context: context)
@@ -2070,7 +2070,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var volume: NSNumber = 10 {
         didSet {
-            if oldValue.uint8Value > 0 {
+            if oldValue.uint16Value > 0 {
                 lastVolume = oldValue
             }
 
@@ -2082,10 +2082,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             guard !isForTesting else { return }
 
-            var volume = volume.uint8Value
-            if DDC.applyLimits, maxDDCVolume.uint8Value != 100, minDDCVolume.uint8Value != 0, !(control is GammaControl) {
+            var volume = volume.uint16Value
+            if DDC.applyLimits, maxDDCVolume.uint16Value != 100, minDDCVolume.uint16Value != 0, !(control is GammaControl) {
                 volume = mapNumber(volume.d, fromLow: 0, fromHigh: 100, toLow: minDDCVolume.doubleValue, toHigh: maxDDCVolume.doubleValue)
-                    .rounded().u8
+                    .rounded().u16
             }
 
             if let control = control, !control.setVolume(volume) {
@@ -2184,7 +2184,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             save()
 
             guard !isForTesting,
-                  let input = InputSource(rawValue: input.uint8Value),
+                  let input = InputSource(rawValue: input.uint16Value),
                   input != .unknown
             else { return }
             if let control = control, !control.setInput(input) {
@@ -2653,8 +2653,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             guard !AppleNativeControl.sliderTracking, let display = displayController.activeDisplays[id], !display.inSmoothTransition else {
                 return
             }
-            let newBrightness = (value * 100).u8
-            guard display.brightness.uint8Value != newBrightness else {
+            let newBrightness = (value * 100).u16
+            guard display.brightness.uint16Value != newBrightness else {
                 return
             }
 
@@ -2846,8 +2846,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func sliderValueToBrightnessContrast(_ value: Double) -> (Brightness, Contrast) {
-        var brightness = brightness.uint8Value
-        var contrast = contrast.uint8Value
+        var brightness = brightness.uint16Value
+        var contrast = contrast.uint16Value
 
         if !lockedBrightness {
             brightness = (mapNumber(
@@ -2856,7 +2856,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 fromHigh: 1.0,
                 toLow: minBrightness.doubleValue / 100.0,
                 toHigh: maxBrightness.doubleValue / 100.0
-            ) * 100).intround.u8
+            ) * 100).intround.u16
         }
         if !lockedContrast {
             contrast = (mapNumber(
@@ -2865,7 +2865,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 fromHigh: 1.0,
                 toLow: minContrast.doubleValue / 100.0,
                 toHigh: maxContrast.doubleValue / 100.0
-            ) * 100).intround.u8
+            ) * 100).intround.u16
         }
 
         return (brightness, contrast)
@@ -3418,12 +3418,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 #if DEBUG
                     log.debug("Setting brightness to \(self.brightness) for \(self.description)")
                 #endif
-                self.brightness = self.brightness.uint8Value.ns
+                self.brightness = self.brightness.uint16Value.ns
 
                 #if DEBUG
                     log.debug("Setting contrast to \(self.contrast) for \(self.description)")
                 #endif
-                self.contrast = self.contrast.uint8Value.ns
+                self.contrast = self.contrast.uint16Value.ns
             }
         }
     }
@@ -3546,8 +3546,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try container.encode(adaptive, forKey: .adaptive)
             try container.encode(audioMuted, forKey: .audioMuted)
             try container.encode(canChangeVolume, forKey: .canChangeVolume)
-            try container.encode(brightness.uint8Value, forKey: .brightness)
-            try container.encode(contrast.uint8Value, forKey: .contrast)
+            try container.encode(brightness.uint16Value, forKey: .brightness)
+            try container.encode(contrast.uint16Value, forKey: .contrast)
             try container.encode(edidName, forKey: .edidName)
 
             try container.encode(defaultGammaRedMin.floatValue, forKey: .defaultGammaRedMin)
@@ -3560,65 +3560,65 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try container.encode(defaultGammaBlueMax.floatValue, forKey: .defaultGammaBlueMax)
             try container.encode(defaultGammaBlueValue.floatValue, forKey: .defaultGammaBlueValue)
 
-            try container.encode(maxDDCBrightness.uint8Value, forKey: .maxDDCBrightness)
-            try container.encode(maxDDCContrast.uint8Value, forKey: .maxDDCContrast)
-            try container.encode(maxDDCVolume.uint8Value, forKey: .maxDDCVolume)
+            try container.encode(maxDDCBrightness.uint16Value, forKey: .maxDDCBrightness)
+            try container.encode(maxDDCContrast.uint16Value, forKey: .maxDDCContrast)
+            try container.encode(maxDDCVolume.uint16Value, forKey: .maxDDCVolume)
 
-            try container.encode(minDDCBrightness.uint8Value, forKey: .minDDCBrightness)
-            try container.encode(minDDCContrast.uint8Value, forKey: .minDDCContrast)
-            try container.encode(minDDCVolume.uint8Value, forKey: .minDDCVolume)
+            try container.encode(minDDCBrightness.uint16Value, forKey: .minDDCBrightness)
+            try container.encode(minDDCContrast.uint16Value, forKey: .minDDCContrast)
+            try container.encode(minDDCVolume.uint16Value, forKey: .minDDCVolume)
 
-            try container.encode(faceLightBrightness.uint8Value, forKey: .faceLightBrightness)
-            try container.encode(faceLightContrast.uint8Value, forKey: .faceLightContrast)
+            try container.encode(faceLightBrightness.uint16Value, forKey: .faceLightBrightness)
+            try container.encode(faceLightContrast.uint16Value, forKey: .faceLightContrast)
 
             try container.encode(mirroredBeforeBlackOut, forKey: .mirroredBeforeBlackOut)
             try container.encode(blackOutEnabled, forKey: .blackOutEnabled)
             try container.encode(blackOutMirroringAllowed, forKey: .blackOutMirroringAllowed)
-            try container.encode(brightnessBeforeBlackout.uint8Value, forKey: .brightnessBeforeBlackout)
-            try container.encode(contrastBeforeBlackout.uint8Value, forKey: .contrastBeforeBlackout)
-            try container.encode(minBrightnessBeforeBlackout.uint8Value, forKey: .minBrightnessBeforeBlackout)
-            try container.encode(minContrastBeforeBlackout.uint8Value, forKey: .minContrastBeforeBlackout)
+            try container.encode(brightnessBeforeBlackout.uint16Value, forKey: .brightnessBeforeBlackout)
+            try container.encode(contrastBeforeBlackout.uint16Value, forKey: .contrastBeforeBlackout)
+            try container.encode(minBrightnessBeforeBlackout.uint16Value, forKey: .minBrightnessBeforeBlackout)
+            try container.encode(minContrastBeforeBlackout.uint16Value, forKey: .minContrastBeforeBlackout)
 
             try container.encode(faceLightEnabled, forKey: .faceLightEnabled)
-            try container.encode(brightnessBeforeFacelight.uint8Value, forKey: .brightnessBeforeFacelight)
-            try container.encode(contrastBeforeFacelight.uint8Value, forKey: .contrastBeforeFacelight)
-            try container.encode(maxBrightnessBeforeFacelight.uint8Value, forKey: .maxBrightnessBeforeFacelight)
-            try container.encode(maxContrastBeforeFacelight.uint8Value, forKey: .maxContrastBeforeFacelight)
+            try container.encode(brightnessBeforeFacelight.uint16Value, forKey: .brightnessBeforeFacelight)
+            try container.encode(contrastBeforeFacelight.uint16Value, forKey: .contrastBeforeFacelight)
+            try container.encode(maxBrightnessBeforeFacelight.uint16Value, forKey: .maxBrightnessBeforeFacelight)
+            try container.encode(maxContrastBeforeFacelight.uint16Value, forKey: .maxContrastBeforeFacelight)
 
             try container.encode(cornerRadius.intValue, forKey: .cornerRadius)
 
             try container.encode(reapplyColorGain, forKey: .reapplyColorGain)
             try container.encode(extendedColorGain, forKey: .extendedColorGain)
-            try container.encode(redGain.uint8Value, forKey: .redGain)
-            try container.encode(greenGain.uint8Value, forKey: .greenGain)
-            try container.encode(blueGain.uint8Value, forKey: .blueGain)
+            try container.encode(redGain.uint16Value, forKey: .redGain)
+            try container.encode(greenGain.uint16Value, forKey: .greenGain)
+            try container.encode(blueGain.uint16Value, forKey: .blueGain)
 
             try container.encode(id, forKey: .id)
             try container.encode(lockedBrightness, forKey: .lockedBrightness)
             try container.encode(lockedContrast, forKey: .lockedContrast)
             try container.encode(lockedBrightnessCurve, forKey: .lockedBrightnessCurve)
             try container.encode(lockedContrastCurve, forKey: .lockedContrastCurve)
-            try container.encode(maxBrightness.uint8Value, forKey: .maxBrightness)
-            try container.encode(maxContrast.uint8Value, forKey: .maxContrast)
-            try container.encode(minBrightness.uint8Value, forKey: .minBrightness)
-            try container.encode(minContrast.uint8Value, forKey: .minContrast)
+            try container.encode(maxBrightness.uint16Value, forKey: .maxBrightness)
+            try container.encode(maxContrast.uint16Value, forKey: .maxContrast)
+            try container.encode(minBrightness.uint16Value, forKey: .minBrightness)
+            try container.encode(minContrast.uint16Value, forKey: .minContrast)
             try container.encode(name, forKey: .name)
             try container.encode(responsiveDDC, forKey: .responsiveDDC)
             try container.encode(serial, forKey: .serial)
-            try container.encode(volume.uint8Value, forKey: .volume)
-            try container.encode(input.uint8Value, forKey: .input)
+            try container.encode(volume.uint16Value, forKey: .volume)
+            try container.encode(input.uint16Value, forKey: .input)
 
-            try container.encode(hotkeyInput1.uint8Value, forKey: .hotkeyInput1)
-            try container.encode(hotkeyInput2.uint8Value, forKey: .hotkeyInput2)
-            try container.encode(hotkeyInput3.uint8Value, forKey: .hotkeyInput3)
+            try container.encode(hotkeyInput1.uint16Value, forKey: .hotkeyInput1)
+            try container.encode(hotkeyInput2.uint16Value, forKey: .hotkeyInput2)
+            try container.encode(hotkeyInput3.uint16Value, forKey: .hotkeyInput3)
 
-            try container.encode(brightnessOnInputChange1.uint8Value, forKey: .brightnessOnInputChange1)
-            try container.encode(brightnessOnInputChange2.uint8Value, forKey: .brightnessOnInputChange2)
-            try container.encode(brightnessOnInputChange3.uint8Value, forKey: .brightnessOnInputChange3)
+            try container.encode(brightnessOnInputChange1.uint16Value, forKey: .brightnessOnInputChange1)
+            try container.encode(brightnessOnInputChange2.uint16Value, forKey: .brightnessOnInputChange2)
+            try container.encode(brightnessOnInputChange3.uint16Value, forKey: .brightnessOnInputChange3)
 
-            try container.encode(contrastOnInputChange1.uint8Value, forKey: .contrastOnInputChange1)
-            try container.encode(contrastOnInputChange2.uint8Value, forKey: .contrastOnInputChange2)
-            try container.encode(contrastOnInputChange3.uint8Value, forKey: .contrastOnInputChange3)
+            try container.encode(contrastOnInputChange1.uint16Value, forKey: .contrastOnInputChange1)
+            try container.encode(contrastOnInputChange2.uint16Value, forKey: .contrastOnInputChange2)
+            try container.encode(contrastOnInputChange3.uint16Value, forKey: .contrastOnInputChange3)
 
             try container.encode(applyBrightnessOnInputChange1, forKey: .applyBrightnessOnInputChange1)
             try container.encode(applyBrightnessOnInputChange2, forKey: .applyBrightnessOnInputChange2)
@@ -3777,11 +3777,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func smoothTransition(
-        from currentValue: UInt8,
-        to value: UInt8,
+        from currentValue: UInt16,
+        to value: UInt16,
         delay: TimeInterval? = nil,
         onStart: (() -> Void)? = nil,
-        adjust: @escaping ((UInt8) -> Void)
+        adjust: @escaping ((UInt16) -> Void)
     ) -> DispatchWorkItem {
         inSmoothTransition = true
 
@@ -3792,8 +3792,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             log.debug("Smooth transition STEPS=\(steps) for \(self.description) from \(currentValue) to \(value)")
 
             var step: Int
-            let minVal: UInt8
-            let maxVal: UInt8
+            let minVal: UInt16
+            let maxVal: UInt16
             if value < currentValue {
                 step = cap(-self.smoothStep, minVal: -steps, maxVal: -1)
                 minVal = value
@@ -3807,7 +3807,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             let startTime = DispatchTime.now()
 
             onStart?()
-            adjust((currentValue.i + step).u8)
+            adjust((currentValue.i + step).u16)
 
             var elapsedTimeInterval = startTime.distance(to: DispatchTime.now())
             var elapsedSecondsStr = String(format: "%.3f", elapsedTimeInterval.s)
@@ -3830,7 +3830,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             for newValue in stride(from: currentValue.i, through: value.i, by: step) {
-                adjust(cap(newValue.u8, minVal: minVal, maxVal: maxVal))
+                adjust(cap(newValue.u16, minVal: minVal, maxVal: maxVal))
                 if let delay = delay {
                     print("Sleeping for \(delay * 1000)ms")
                     Thread.sleep(forTimeInterval: delay)
@@ -3947,15 +3947,15 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     // MARK: Reading Functions
 
-    func readRedGain() -> UInt8? {
+    func readRedGain() -> UInt16? {
         control?.getRedGain()
     }
 
-    func readGreenGain() -> UInt8? {
+    func readGreenGain() -> UInt16? {
         control?.getGreenGain()
     }
 
-    func readBlueGain() -> UInt8? {
+    func readBlueGain() -> UInt16? {
         control?.getBlueGain()
     }
 
@@ -3963,25 +3963,25 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         control?.getMute()
     }
 
-    func readVolume() -> UInt8? {
+    func readVolume() -> UInt16? {
         control?.getVolume()
     }
 
-    func readContrast() -> UInt8? {
+    func readContrast() -> UInt16? {
         guard !isBuiltin else {
             guard let contrast = SyncMode.readBuiltinContrast() else {
                 return nil
             }
-            return (contrast * 100).u8
+            return (contrast * 100).u16
         }
         return control?.getContrast()
     }
 
-    func readInput() -> UInt8? {
+    func readInput() -> UInt16? {
         control?.getInput()?.rawValue
     }
 
-    func readBrightness() -> UInt8? {
+    func readBrightness() -> UInt16? {
         control?.getBrightness()
     }
 
@@ -3997,16 +3997,16 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             return false
         }
 
-        if let newRedGain = newRedGain, newRedGain != redGain.uint8Value {
-            log.info("Refreshing red gain value: \(redGain.uint8Value) <> \(newRedGain)")
+        if let newRedGain = newRedGain, newRedGain != redGain.uint16Value {
+            log.info("Refreshing red gain value: \(redGain.uint16Value) <> \(newRedGain)")
             withoutSmoothTransition { withoutDDC { redGain = newRedGain.ns } }
         }
-        if let newGreenGain = newGreenGain, newGreenGain != greenGain.uint8Value {
-            log.info("Refreshing green gain value: \(greenGain.uint8Value) <> \(newGreenGain)")
+        if let newGreenGain = newGreenGain, newGreenGain != greenGain.uint16Value {
+            log.info("Refreshing green gain value: \(greenGain.uint16Value) <> \(newGreenGain)")
             withoutSmoothTransition { withoutDDC { greenGain = newGreenGain.ns } }
         }
-        if let newBlueGain = newBlueGain, newBlueGain != blueGain.uint8Value {
-            log.info("Refreshing blue gain value: \(blueGain.uint8Value) <> \(newBlueGain)")
+        if let newBlueGain = newBlueGain, newBlueGain != blueGain.uint16Value {
+            log.info("Refreshing blue gain value: \(blueGain.uint16Value) <> \(newBlueGain)")
             withoutSmoothTransition { withoutDDC { blueGain = newBlueGain.ns } }
         }
 
@@ -4022,8 +4022,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         guard !inSmoothTransition, !isUserAdjusting(), !sendingBrightness else { return }
-        if newBrightness != brightness.uint8Value {
-            log.info("Refreshing brightness: \(brightness.uint8Value) <> \(newBrightness)")
+        if newBrightness != brightness.uint16Value {
+            log.info("Refreshing brightness: \(brightness.uint16Value) <> \(newBrightness)")
 
             if displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
                timeSince(lastConnectionTime) > 10
@@ -4050,8 +4050,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         guard !inSmoothTransition, !isUserAdjusting(), !sendingContrast else { return }
-        if newContrast != contrast.uint8Value {
-            log.info("Refreshing contrast: \(contrast.uint8Value) <> \(newContrast)")
+        if newContrast != contrast.uint16Value {
+            log.info("Refreshing contrast: \(contrast.uint16Value) <> \(newContrast)")
 
             if displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
                timeSince(lastConnectionTime) > 10
@@ -4081,8 +4081,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             log.warning("Can't read input for \(name)")
             return
         }
-        if newInput != input.uint8Value {
-            log.info("Refreshing input: \(input.uint8Value) <> \(newInput)")
+        if newInput != input.uint16Value {
+            log.info("Refreshing input: \(input.uint16Value) <> \(newInput)")
 
             withoutSmoothTransition {
                 withoutDDC {
@@ -4103,8 +4103,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             log.info("Refreshing mute value: \(audioMuted) <> \(newAudioMuted)")
             mainThread { audioMuted = newAudioMuted }
         }
-        if newVolume != volume.uint8Value {
-            log.info("Refreshing volume: \(volume.uint8Value) <> \(newVolume)")
+        if newVolume != volume.uint16Value {
+            log.info("Refreshing volume: \(volume.uint16Value) <> \(newVolume)")
 
             withoutSmoothTransition {
                 withoutDDC {
@@ -4165,8 +4165,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func setGamma(
-        brightness: UInt8? = nil,
-        oldBrightness: UInt8? = nil,
+        brightness: UInt16? = nil,
+        oldBrightness: UInt16? = nil,
         preciseBrightness: Double? = nil,
         onChange: ((Brightness) -> Void)? = nil
     ) {
@@ -4179,7 +4179,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         settingGamma = true
         defer { settingGamma = false }
 
-        let brightness = brightness ?? self.brightness.uint8Value
+        let brightness = brightness ?? self.brightness.uint16Value
         let gammaTable = lunarGammaTable ?? defaultGammaTable
         let newGammaTable = gammaTable.adjust(brightness: brightness, preciseBrightness: preciseBrightness)
 

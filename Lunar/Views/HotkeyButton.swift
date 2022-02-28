@@ -39,7 +39,7 @@ class HotkeyButton: PopoverButton<HotkeyPopoverController> {
         controller.setup(from: display)
 
         controller.onDropdownSelect = { [weak self] dropdown in
-            guard let input = InputSource(rawValue: dropdown.selectedTag().u8), let display = self?.display else { return }
+            guard let input = InputSource(rawValue: dropdown.selectedTag().u16), let display = self?.display else { return }
             switch dropdown.tag {
             case 1:
                 display.hotkeyInput1 = input.rawValue.ns

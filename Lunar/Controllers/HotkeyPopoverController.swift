@@ -65,7 +65,7 @@ class HotkeyPopoverController: NSViewController {
         // #if DEBUG
         //     log.verbose("TRYING CHANGE TO INPUT 1 ON DISPLAY \(display)")
         // #endif
-        guard let display = display, display.hotkeyInput1.uint8Value != InputSource.unknown.rawValue else { return }
+        guard let display = display, display.hotkeyInput1.uint16Value != InputSource.unknown.rawValue else { return }
 
         let inputBrightness = display.brightnessOnInputChange1
         let inputContrast = display.contrastOnInputChange1
@@ -97,7 +97,7 @@ class HotkeyPopoverController: NSViewController {
         // #if DEBUG
         //     log.verbose("TRYING CHANGE TO INPUT 2 ON DISPLAY \(display)")
         // #endif
-        guard let display = display, display.hotkeyInput2.uint8Value != InputSource.unknown.rawValue else { return }
+        guard let display = display, display.hotkeyInput2.uint16Value != InputSource.unknown.rawValue else { return }
 
         let inputBrightness = display.brightnessOnInputChange2
         let inputContrast = display.contrastOnInputChange2
@@ -129,7 +129,7 @@ class HotkeyPopoverController: NSViewController {
         // #if DEBUG
         //     log.verbose("TRYING CHANGE TO INPUT 3 ON DISPLAY \(display)")
         // #endif
-        guard let display = display, display.hotkeyInput3.uint8Value != InputSource.unknown.rawValue else { return }
+        guard let display = display, display.hotkeyInput3.uint16Value != InputSource.unknown.rawValue else { return }
 
         let inputBrightness = display.brightnessOnInputChange3
         let inputContrast = display.contrastOnInputChange3

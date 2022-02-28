@@ -78,8 +78,8 @@ class ManualMode: AdaptiveMode {
                 if CachedDefaults[.mergeBrightnessContrast] {
                     (br, cr) = display.sliderValueToBrightnessContrast(display.preciseBrightnessContrastBeforeAppPreset)
                 } else {
-                    br = display.sliderValueToBrightness(display.preciseBrightnessBeforeAppPreset).uint8Value
-                    cr = display.sliderValueToContrast(display.preciseContrastBeforeAppPreset).uint8Value
+                    br = display.sliderValueToBrightness(display.preciseBrightnessBeforeAppPreset).uint16Value
+                    cr = display.sliderValueToContrast(display.preciseContrastBeforeAppPreset).uint16Value
                 }
                 (brightness, contrast) = (br.i, cr.i)
             }
