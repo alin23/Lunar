@@ -10286,11 +10286,11 @@ in the Quick Actions menu</string>
             <objects>
                 <viewController storyboardIdentifier="ResetPopoverController" id="jkZ-PV-r0a" customClass="ResetPopoverController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" wantsLayer="YES" id="784-nu-gc5">
-                        <rect key="frame" x="0.0" y="0.0" width="321" height="391"/>
+                        <rect key="frame" x="0.0" y="0.0" width="321" height="451"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4ZK-JW-guk">
-                                <rect key="frame" x="13" y="352" width="172" height="25"/>
+                                <rect key="frame" x="13" y="412" width="172" height="25"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Algorithm Curve" id="kXm-Ja-RI2">
                                     <font key="font" metaFont="systemHeavy" size="21"/>
                                     <color key="textColor" name="Caption"/>
@@ -10298,7 +10298,7 @@ in the Quick Actions menu</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Q8Y-pU-swj" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="240" y="354" width="66" height="22"/>
+                                <rect key="frame" x="240" y="414" width="66" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="66" id="Lgw-Ce-Z4W"/>
                                     <constraint firstAttribute="height" constant="22" id="rpD-5h-bMD"/>
@@ -10326,7 +10326,7 @@ in the Quick Actions menu</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pha-fy-8xu">
-                                <rect key="frame" x="13" y="324" width="286" height="26"/>
+                                <rect key="frame" x="13" y="384" width="286" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="282" id="cIg-Jl-hOW"/>
                                     <constraint firstAttribute="height" constant="26" id="e0z-7e-yXd"/>
@@ -10340,7 +10340,7 @@ and contrast for the current active mode.</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lkA-nB-TbI">
-                                <rect key="frame" x="13" y="291" width="110" height="25"/>
+                                <rect key="frame" x="13" y="351" width="110" height="25"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="DDC State" id="wgO-FF-ux5">
                                     <font key="font" metaFont="systemHeavy" size="21"/>
                                     <color key="textColor" name="Caption"/>
@@ -10348,7 +10348,7 @@ and contrast for the current active mode.</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="e1b-Yq-aG5" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="240" y="293" width="66" height="22"/>
+                                <rect key="frame" x="240" y="353" width="66" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="66" id="ZzJ-dt-7GL"/>
                                     <constraint firstAttribute="height" constant="22" id="jl4-Ii-2cq"/>
@@ -10376,7 +10376,7 @@ and contrast for the current active mode.</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="opg-wR-U4d">
-                                <rect key="frame" x="13" y="263" width="286" height="26"/>
+                                <rect key="frame" x="13" y="323" width="286" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="282" id="Ekh-cI-nPe"/>
                                     <constraint firstAttribute="height" constant="26" id="kXx-vj-F59"/>
@@ -10390,7 +10390,7 @@ and retries remaining DDC commands.</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="WSa-Ff-Y1O">
-                                <rect key="frame" x="13" y="230" width="173" height="25"/>
+                                <rect key="frame" x="13" y="290" width="173" height="25"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Network Control" id="Ykd-uz-HIJ">
                                     <font key="font" metaFont="systemHeavy" size="21"/>
                                     <color key="textColor" name="Caption"/>
@@ -10398,7 +10398,7 @@ and retries remaining DDC commands.</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="h5z-gS-3bR" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="240" y="232" width="66" height="22"/>
+                                <rect key="frame" x="240" y="292" width="66" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="22" id="SZl-a9-Zuo"/>
                                     <constraint firstAttribute="width" constant="66" id="YL2-Me-W8c"/>
@@ -10426,7 +10426,7 @@ and retries remaining DDC commands.</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J7I-IP-OQL">
-                                <rect key="frame" x="13" y="202" width="286" height="26"/>
+                                <rect key="frame" x="13" y="262" width="286" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="26" id="IfF-XH-zwv"/>
                                     <constraint firstAttribute="width" constant="282" id="TGV-bh-PqK"/>
@@ -10440,7 +10440,7 @@ a new search for controllers on the local network.</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hcT-AQ-zqf">
-                                <rect key="frame" x="13" y="169" width="213" height="25"/>
+                                <rect key="frame" x="13" y="229" width="213" height="25"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Brightness/Contrast" id="Dn2-iI-McG">
                                     <font key="font" metaFont="systemHeavy" size="21"/>
                                     <color key="textColor" name="Caption"/>
@@ -10448,7 +10448,7 @@ a new search for controllers on the local network.</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6Zk-va-CkO" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="240" y="171" width="66" height="22"/>
+                                <rect key="frame" x="240" y="231" width="66" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="66" id="Blv-E1-qtR"/>
                                     <constraint firstAttribute="height" constant="22" id="dXY-lm-hSw"/>
@@ -10476,7 +10476,7 @@ a new search for controllers on the local network.</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ga2-xO-Y0e">
-                                <rect key="frame" x="13" y="141" width="296" height="26"/>
+                                <rect key="frame" x="13" y="201" width="296" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="292" id="Tc7-QF-RYM"/>
                                     <constraint firstAttribute="height" constant="26" id="oPZ-Wu-2rM"/>
@@ -10490,7 +10490,7 @@ defines as the default value. Doesn't work on all monitors.</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HHV-6f-Kdt">
-                                <rect key="frame" x="13" y="108" width="154" height="25"/>
+                                <rect key="frame" x="13" y="168" width="154" height="25"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Lunar Settings" id="9Fh-m3-tLF">
                                     <font key="font" metaFont="systemHeavy" size="21"/>
                                     <color key="textColor" name="Caption"/>
@@ -10498,7 +10498,7 @@ defines as the default value. Doesn't work on all monitors.</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zqI-zY-XVw" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="240" y="110" width="66" height="22"/>
+                                <rect key="frame" x="240" y="170" width="66" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="22" id="RKE-3F-z1z"/>
                                     <constraint firstAttribute="width" constant="66" id="YsW-Ga-72w"/>
@@ -10526,7 +10526,7 @@ defines as the default value. Doesn't work on all monitors.</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9Tw-fr-5dI">
-                                <rect key="frame" x="13" y="80" width="296" height="26"/>
+                                <rect key="frame" x="13" y="140" width="296" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="26" id="diE-r8-aKe"/>
                                     <constraint firstAttribute="width" constant="292" id="hIN-Ah-3Fl"/>
@@ -10535,6 +10535,56 @@ defines as the default value. Doesn't work on all monitors.</string>
                                     <font key="font" metaFont="systemSemibold" size="10"/>
                                     <string key="title">Resets all Lunar settings for this display only.
 This does not send any reset commands to the monitor.</string>
+                                    <color key="textColor" name="Caption Tertiary"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="BTL-vZ-51v">
+                                <rect key="frame" x="13" y="108" width="158" height="25"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="BlackOut State" id="tb2-6M-Kf1">
+                                    <font key="font" metaFont="systemHeavy" size="21"/>
+                                    <color key="textColor" name="Caption"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="d7s-It-7HT" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="240" y="110" width="66" height="22"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="22" id="oer-yq-OGv"/>
+                                    <constraint firstAttribute="width" constant="66" id="shs-on-vED"/>
+                                </constraints>
+                                <buttonCell key="cell" type="inline" title="Reset" alternateTitle="Extended" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="PyF-GZ-TsO">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="circle" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="roundedness">
+                                        <real key="value" value="10"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="pageType">
+                                        <integer key="value" value="9"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <binding destination="jkZ-PV-r0a" name="target" keyPath="self.displayViewController" id="1Dg-Jr-GBP">
+                                        <dictionary key="options">
+                                            <bool key="NSConditionallySetsEnabled" value="NO"/>
+                                            <string key="NSSelectorName">resetBlackOut</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </button>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lNU-bz-i9h">
+                                <rect key="frame" x="13" y="80" width="296" height="26"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="26" id="rxg-8G-KOD"/>
+                                    <constraint firstAttribute="width" constant="292" id="xl4-Zw-FVm"/>
+                                </constraints>
+                                <textFieldCell key="cell" lineBreakMode="clipping" id="qJy-OF-1n7">
+                                    <font key="font" metaFont="systemSemibold" size="10"/>
+                                    <string key="title">Resets BlackOut internal state to default.
+Helpful when BlackOut behaves weird.</string>
                                     <color key="textColor" name="Caption Tertiary"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
@@ -10591,8 +10641,10 @@ settings for this monitor.</string>
                             </textField>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="lNU-bz-i9h" firstAttribute="leading" secondItem="BTL-vZ-51v" secondAttribute="leading" id="0a5-fa-Thi"/>
                             <constraint firstItem="HHV-6f-Kdt" firstAttribute="leading" secondItem="hcT-AQ-zqf" secondAttribute="leading" id="1vR-TR-cB4"/>
                             <constraint firstItem="A2C-5I-BL3" firstAttribute="leading" secondItem="zqI-zY-XVw" secondAttribute="leading" id="3F9-ED-dWP"/>
+                            <constraint firstItem="d7s-It-7HT" firstAttribute="leading" secondItem="zqI-zY-XVw" secondAttribute="leading" id="3z8-qg-xWh"/>
                             <constraint firstItem="HHV-6f-Kdt" firstAttribute="top" secondItem="ga2-xO-Y0e" secondAttribute="bottom" constant="8" symbolic="YES" id="605-Mj-ehc"/>
                             <constraint firstItem="ga2-xO-Y0e" firstAttribute="top" secondItem="hcT-AQ-zqf" secondAttribute="bottom" constant="2" id="6cq-bK-lF3"/>
                             <constraint firstItem="9Tw-fr-5dI" firstAttribute="top" secondItem="HHV-6f-Kdt" secondAttribute="bottom" constant="2" id="8Ww-mx-ctw"/>
@@ -10603,20 +10655,24 @@ settings for this monitor.</string>
                             <constraint firstItem="h5z-gS-3bR" firstAttribute="leading" secondItem="e1b-Yq-aG5" secondAttribute="leading" id="Mwg-li-Nc9"/>
                             <constraint firstItem="e1b-Yq-aG5" firstAttribute="centerY" secondItem="lkA-nB-TbI" secondAttribute="centerY" id="N90-nE-EMa"/>
                             <constraint firstAttribute="trailing" secondItem="Q8Y-pU-swj" secondAttribute="trailing" constant="15" id="Qjb-zQ-Kjx"/>
+                            <constraint firstItem="BTL-vZ-51v" firstAttribute="leading" secondItem="HHV-6f-Kdt" secondAttribute="leading" id="SXw-Fb-z6y"/>
                             <constraint firstItem="4ZK-JW-guk" firstAttribute="leading" secondItem="784-nu-gc5" secondAttribute="leading" constant="15" id="WNB-jW-I8W"/>
                             <constraint firstItem="lhQ-ai-FCL" firstAttribute="leading" secondItem="HHV-6f-Kdt" secondAttribute="leading" id="WiS-hL-vhw"/>
-                            <constraint firstItem="lhQ-ai-FCL" firstAttribute="top" secondItem="9Tw-fr-5dI" secondAttribute="bottom" constant="7" id="XXP-43-amf"/>
                             <constraint firstItem="9Tw-fr-5dI" firstAttribute="leading" secondItem="HHV-6f-Kdt" secondAttribute="leading" id="YsZ-pY-Ufe"/>
                             <constraint firstItem="hcT-AQ-zqf" firstAttribute="top" secondItem="J7I-IP-OQL" secondAttribute="bottom" constant="8" symbolic="YES" id="Yvg-rU-c8m"/>
                             <constraint firstItem="oEJ-RN-BYb" firstAttribute="top" secondItem="lhQ-ai-FCL" secondAttribute="bottom" constant="2" id="ZAU-yQ-NNm"/>
                             <constraint firstItem="A2C-5I-BL3" firstAttribute="centerY" secondItem="lhQ-ai-FCL" secondAttribute="centerY" id="Zys-5d-uxz"/>
+                            <constraint firstItem="BTL-vZ-51v" firstAttribute="top" secondItem="9Tw-fr-5dI" secondAttribute="bottom" constant="7" id="cfs-cS-5LC"/>
                             <constraint firstItem="J7I-IP-OQL" firstAttribute="top" secondItem="WSa-Ff-Y1O" secondAttribute="bottom" constant="2" id="e3l-q8-2HP"/>
                             <constraint firstAttribute="bottom" secondItem="oEJ-RN-BYb" secondAttribute="bottom" constant="20" symbolic="YES" id="eM8-VL-ab5"/>
                             <constraint firstItem="J7I-IP-OQL" firstAttribute="leading" secondItem="WSa-Ff-Y1O" secondAttribute="leading" id="eY4-D4-bb8"/>
+                            <constraint firstItem="lNU-bz-i9h" firstAttribute="top" secondItem="BTL-vZ-51v" secondAttribute="bottom" constant="2" id="f3F-4F-bgU"/>
                             <constraint firstItem="WSa-Ff-Y1O" firstAttribute="top" secondItem="opg-wR-U4d" secondAttribute="bottom" constant="8" symbolic="YES" id="fc9-kd-HEE"/>
                             <constraint firstItem="e1b-Yq-aG5" firstAttribute="leading" secondItem="Q8Y-pU-swj" secondAttribute="leading" id="g1k-dS-7F5"/>
                             <constraint firstItem="hcT-AQ-zqf" firstAttribute="leading" secondItem="WSa-Ff-Y1O" secondAttribute="leading" id="gRc-Tq-J8E"/>
                             <constraint firstItem="lkA-nB-TbI" firstAttribute="top" secondItem="pha-fy-8xu" secondAttribute="bottom" constant="8" symbolic="YES" id="iX6-GW-SDs"/>
+                            <constraint firstItem="lhQ-ai-FCL" firstAttribute="top" secondItem="lNU-bz-i9h" secondAttribute="bottom" constant="7" id="j8S-No-9Yo"/>
+                            <constraint firstItem="d7s-It-7HT" firstAttribute="centerY" secondItem="BTL-vZ-51v" secondAttribute="centerY" id="jcC-L5-Hi4"/>
                             <constraint firstItem="4ZK-JW-guk" firstAttribute="top" secondItem="784-nu-gc5" secondAttribute="top" constant="14" id="k63-Jd-fAj"/>
                             <constraint firstItem="Q8Y-pU-swj" firstAttribute="centerY" secondItem="4ZK-JW-guk" secondAttribute="centerY" id="lGv-AR-3K1"/>
                             <constraint firstItem="WSa-Ff-Y1O" firstAttribute="leading" secondItem="lkA-nB-TbI" secondAttribute="leading" id="pxC-5t-QIP"/>
