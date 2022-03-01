@@ -872,7 +872,13 @@ class DisplayViewController: NSViewController {
                 }
                 self.view.bringSubviewToFront(button)
             case is GammaControl where display.enabledControls[.gamma] ?? false:
-                if DDCControl.isAvailable(for: display) {
+                #if arch(arm64)
+                    let hasI2C = DDC.hasAVService(displayID: display.id, display: display, ignoreCache: true)
+                #else
+                    let hasI2C = DDC.hasI2CController(displayID: display.id, ignoreCache: true)
+                #endif
+
+                if hasI2C {
                     button.bg = darkMode ? peach : lunarYellow
                     button.attributedTitle = "Hardware DDC".withAttribute(.textColor(darkMauve))
                     button.helpText = HARDWARE_CONTROLS_HELP_TEXT
