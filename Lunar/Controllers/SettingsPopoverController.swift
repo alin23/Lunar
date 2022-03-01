@@ -18,6 +18,7 @@ class SettingsPopoverController: NSViewController {
 
     @objc dynamic var adaptiveBrightnessNotice = ""
     weak var displayViewController: DisplayViewController?
+
     @IBOutlet var resolutionsDropdown: ModePopupButton?
 
     @objc dynamic weak var display: Display? {
@@ -25,9 +26,6 @@ class SettingsPopoverController: NSViewController {
             guard let display = display else { return }
             display.refreshPanel()
             setAdaptiveNotice()
-            if let resolutionsDropdown = resolutionsDropdown {
-                resolutionsDropdown.setItemStyles()
-            }
         }
     }
 

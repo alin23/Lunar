@@ -1611,6 +1611,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         initCacheTransitionLogging()
 
         startTime = Date()
+        lastBlackOutToggleDate = Date()
         Defaults[.secondPhase] = initFirstPhase()
 
         listenForRemoteCommandsPublisher
