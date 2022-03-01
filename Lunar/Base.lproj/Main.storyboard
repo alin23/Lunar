@@ -6436,7 +6436,7 @@ Lunar will continue to check in the background</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TuO-c2-HDu">
-                                            <rect key="frame" x="126" y="85" width="160" height="17"/>
+                                            <rect key="frame" x="116" y="85" width="175" height="17"/>
                                             <segmentedCell key="cell" borderStyle="border" alignment="left" segmentDistribution="fillEqually" style="capsule" trackingMode="selectOne" id="5pK-38-2uV">
                                                 <font key="font" metaFont="systemSemibold" size="12"/>
                                                 <segments>
@@ -6452,7 +6452,7 @@ Lunar will continue to check in the background</string>
                                             </connections>
                                         </segmentedControl>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3pb-zK-Mzz">
-                                            <rect key="frame" x="28" y="85" width="86" height="17"/>
+                                            <rect key="frame" x="23" y="85" width="86" height="17"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="17" id="84V-h8-cge"/>
                                             </constraints>
@@ -6463,7 +6463,7 @@ Lunar will continue to check in the background</string>
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SqA-ee-S0b">
-                                            <rect key="frame" x="28" y="122" width="81" height="15"/>
+                                            <rect key="frame" x="23" y="122" width="81" height="15"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="77" id="X5b-OU-SYw"/>
                                             </constraints>
@@ -6484,8 +6484,8 @@ Lunar will continue to check in the background</string>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <popUpButton focusRingType="none" misplaced="YES" alphaValue="0.80000000000000004" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="r0W-Kk-VpY" customClass="ModePopupButton" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="127" y="117" width="158" height="24"/>
+                                        <popUpButton focusRingType="none" alphaValue="0.80000000000000004" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="r0W-Kk-VpY" customClass="ModePopupButton" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="117" y="118" width="173" height="24"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="24" id="Dtu-re-9w0"/>
                                             </constraints>
@@ -6506,7 +6506,7 @@ Lunar will continue to check in the background</string>
                                             </connections>
                                         </popUpButton>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LCe-cE-8xA">
-                                            <rect key="frame" x="28" y="48" width="149" height="17"/>
+                                            <rect key="frame" x="23" y="48" width="154" height="17"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="17" id="gic-mX-9un"/>
                                             </constraints>
@@ -6568,7 +6568,7 @@ Lunar will continue to check in the background</string>
                                             </connections>
                                         </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JGX-Rb-A3q">
-                                            <rect key="frame" x="28" y="16" width="260" height="26"/>
+                                            <rect key="frame" x="23" y="16" width="260" height="26"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="256" id="Lqi-vo-nhp"/>
                                                 <constraint firstAttribute="height" constant="26" id="uAo-WG-bmd"/>
@@ -6600,12 +6600,12 @@ Lunar will continue to check in the background</string>
                                         <constraint firstItem="JGX-Rb-A3q" firstAttribute="top" secondItem="LCe-cE-8xA" secondAttribute="bottom" constant="6" id="J6k-3R-Pwn"/>
                                         <constraint firstAttribute="bottom" secondItem="JGX-Rb-A3q" secondAttribute="bottom" constant="16" id="KJc-YA-8cA"/>
                                         <constraint firstItem="gHj-If-FqC" firstAttribute="top" secondItem="TuO-c2-HDu" secondAttribute="bottom" constant="20" id="LIH-ac-O3F"/>
-                                        <constraint firstItem="r0W-Kk-VpY" firstAttribute="leading" secondItem="SqA-ee-S0b" secondAttribute="trailing" constant="20" id="Lhb-Un-gdd"/>
+                                        <constraint firstItem="r0W-Kk-VpY" firstAttribute="leading" secondItem="SqA-ee-S0b" secondAttribute="trailing" constant="15" id="Lhb-Un-gdd"/>
                                         <constraint firstItem="xk2-Yb-kYN" firstAttribute="leading" secondItem="yhm-tF-nP1" secondAttribute="leading" constant="23" id="Mcv-pw-FWl"/>
                                         <constraint firstItem="JGX-Rb-A3q" firstAttribute="leading" secondItem="LCe-cE-8xA" secondAttribute="leading" id="Pxe-2W-8KU"/>
                                         <constraint firstItem="SqA-ee-S0b" firstAttribute="top" secondItem="xk2-Yb-kYN" secondAttribute="bottom" constant="18" id="Q9V-eN-AuI"/>
-                                        <constraint firstAttribute="trailing" secondItem="r0W-Kk-VpY" secondAttribute="trailing" constant="13" id="TAw-uT-bSB"/>
-                                        <constraint firstItem="SqA-ee-S0b" firstAttribute="leading" secondItem="yhm-tF-nP1" secondAttribute="leading" constant="30" id="VxQ-L6-3ti"/>
+                                        <constraint firstAttribute="trailing" secondItem="r0W-Kk-VpY" secondAttribute="trailing" constant="8" id="TAw-uT-bSB"/>
+                                        <constraint firstItem="SqA-ee-S0b" firstAttribute="leading" secondItem="yhm-tF-nP1" secondAttribute="leading" constant="25" id="VxQ-L6-3ti"/>
                                         <constraint firstItem="3pb-zK-Mzz" firstAttribute="top" secondItem="SqA-ee-S0b" secondAttribute="bottom" constant="20" id="XtZ-FU-p77"/>
                                         <constraint firstItem="TuO-c2-HDu" firstAttribute="centerX" secondItem="r0W-Kk-VpY" secondAttribute="centerX" id="c5H-V1-eSE"/>
                                         <constraint firstItem="SqA-ee-S0b" firstAttribute="centerY" secondItem="r0W-Kk-VpY" secondAttribute="centerY" id="gdt-vt-Hll"/>

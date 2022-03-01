@@ -898,6 +898,17 @@ class ModePopupButton: NSPopUpButton {
                 guard let item = item, let mode = item.representedObject as? MPDisplayMode else { return }
                 item.attributedTitle = mode.attributedString
             }.store(in: &observers)
+
+        changedItemsPublisher
+            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+            .sink { [weak self] item in
+                guard let mgr = DisplayController.panelManager, mgr.tryLockAccess() else {
+                    mainAsyncAfter(ms: 500) { [weak self] in self?.setItemStyles() }
+                    return
+                }
+                defer { mgr.unlockAccess() }
+                self?.setItemStyles()
+            }.store(in: &observers)
     }
 
     // MARK: Internal
@@ -1365,6 +1376,13 @@ extension NSPopUpButton {
         NotificationCenter.default
             .publisher(for: NSMenu.didSendActionNotification, object: menu)
             .map { _ in self.selectedTag() }
+            .eraseToAnyPublisher()
+    }
+
+    var changedItemsPublisher: AnyPublisher<Notification, Never> {
+        NotificationCenter.default
+            .publisher(for: NSMenu.didAddItemNotification, object: menu)
+            .merge(with: NotificationCenter.default.publisher(for: NSMenu.didRemoveItemNotification, object: menu))
             .eraseToAnyPublisher()
     }
 
