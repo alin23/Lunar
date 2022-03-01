@@ -15,16 +15,16 @@ import Sauce
 import SwiftDate
 
 let NATIVE_CONTROLS_HELP_TEXT = """
-## CoreDisplay
+## Apple Native Protocol
 
-This monitor's brightness can be controlled natively through the **CoreDisplay framework**.
+This monitor's brightness can be controlled natively through the macOS internal **DisplayServices framework**.
 
 ### Advantages
 * Lunar doesn't need to use less stable methods like *DDC* for the brightness
 * Brightness transitions are smoother
 
 ### Disadvantages
-* **Contrast/Volume still needs to be changed through DDC** as there is no API for them in CoreDisplay
+* **Contrast/Volume still needs to be changed through DDC** as there is no API for them in DisplayServices
 * Needs an additional USB connection for older Apple displays like LED Cinema
 """
 let HARDWARE_CONTROLS_HELP_TEXT = """
@@ -1082,6 +1082,11 @@ class DisplayViewController: NSViewController {
     @objc func resetDDC() {
         guard let display = display else { return }
         display.resetDDC()
+    }
+
+    @objc func resetBlackOut() {
+        guard let display = display else { return }
+        display.resetBlackOut()
     }
 
     @objc func resetNetworkController() {
