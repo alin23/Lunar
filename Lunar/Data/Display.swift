@@ -4221,6 +4221,23 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
+    func resetBlackOut() {
+        mainAsync { [weak self] in
+            guard let self = self else { return }
+            self.resetSoftwareControl()
+            displayController.blackOut(display: self.id, state: .off)
+        }
+
+        mainAsyncAfter(ms: 1000) { [weak self] in
+            guard let self = self else { return }
+            self.blackOutEnabled = false
+            self.blackOutMirroringAllowed = true
+            self.mirroredBeforeBlackOut = false
+
+            self.preciseBrightnessContrast = 0.7
+        }
+    }
+
     func reset(resetControl: Bool = true) {
         if isLEDCinema() || isThunderbolt() {
             maxDDCBrightness = 255.ns
@@ -4239,7 +4256,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         faceLightContrast = 90.ns
 
         blackOutEnabled = false
-        blackOutMirroringAllowed = false
+        blackOutMirroringAllowed = true
         mirroredBeforeBlackOut = false
 
         userContrast[displayController.adaptiveModeKey]?.removeAll()
