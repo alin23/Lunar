@@ -103,19 +103,19 @@ extension BinaryInteger {
     }
 
     @inline(__always) var u8: UInt8 {
-        UInt8(cap(self, minVal: UInt8.min, maxVal: UInt8.max))
+        UInt8(self)
     }
 
     @inline(__always) var u16: UInt16 {
-        UInt16(cap(self, minVal: UInt16.min, maxVal: UInt16.max))
+        UInt16(self)
     }
 
     @inline(__always) var u32: UInt32 {
-        UInt32(cap(self, minVal: UInt32.min, maxVal: UInt32.max))
+        UInt32(self)
     }
 
     @inline(__always) var u64: UInt64 {
-        UInt64(cap(self, minVal: UInt64.min, maxVal: UInt64.max))
+        UInt64(self)
     }
 
     @inline(__always) var i: Int {
@@ -123,19 +123,19 @@ extension BinaryInteger {
     }
 
     @inline(__always) var i8: Int8 {
-        Int8(cap(self, minVal: Int8.min, maxVal: Int8.max))
+        Int8(self)
     }
 
     @inline(__always) var i16: Int16 {
-        Int16(cap(self, minVal: Int16.min, maxVal: Int16.max))
+        Int16(self)
     }
 
     @inline(__always) var i32: Int32 {
-        Int32(cap(self, minVal: Int32.min, maxVal: Int32.max))
+        Int32(self)
     }
 
     @inline(__always) var i64: Int64 {
-        Int64(cap(self, minVal: Int64.min, maxVal: Int64.max))
+        Int64(self)
     }
 
     @inline(__always) var s: String {
@@ -380,27 +380,27 @@ extension Double {
     }
 
     @inline(__always) var u8: UInt8 {
-        UInt8(cap(self, minVal: UInt8.min, maxVal: UInt8.max))
+        UInt8(cap(intround, minVal: Int(UInt8.min), maxVal: Int(UInt8.max)))
     }
 
     @inline(__always) var u16: UInt16 {
-        UInt16(cap(self, minVal: UInt16.min, maxVal: UInt16.max))
+        UInt16(cap(intround, minVal: Int(UInt16.min), maxVal: Int(UInt16.max)))
     }
 
     @inline(__always) var u32: UInt32 {
-        UInt32(cap(self, minVal: UInt32.min, maxVal: UInt32.max))
+        UInt32(cap(intround, minVal: Int(UInt32.min), maxVal: Int(UInt32.max)))
     }
 
     @inline(__always) var i8: Int8 {
-        Int8(cap(self, minVal: Int8.min, maxVal: Int8.max))
+        Int8(cap(intround, minVal: Int(Int8.min), maxVal: Int(Int8.max)))
     }
 
     @inline(__always) var i16: Int16 {
-        Int16(cap(self, minVal: Int16.min, maxVal: Int16.max))
+        Int16(cap(intround, minVal: Int(Int16.min), maxVal: Int(Int16.max)))
     }
 
     @inline(__always) var i32: Int32 {
-        Int32(cap(self, minVal: Int32.min, maxVal: Int32.max))
+        Int32(cap(intround, minVal: Int(Int32.min), maxVal: Int(Int32.max)))
     }
 
     @inline(__always) var intround: Int {
@@ -577,15 +577,15 @@ extension Float {
     }
 
     @inline(__always) var u8: UInt8 {
-        UInt8(cap(intround, minVal: UInt8.min, maxVal: UInt8.max))
+        UInt8(cap(intround, minVal: Int(UInt8.min), maxVal: Int(UInt8.max)))
     }
 
     @inline(__always) var u16: UInt16 {
-        UInt16(cap(intround, minVal: UInt16.min, maxVal: UInt16.max))
+        UInt16(cap(intround, minVal: Int(UInt16.min), maxVal: Int(UInt16.max)))
     }
 
     @inline(__always) var u32: UInt32 {
-        UInt32(cap(intround, minVal: UInt32.min, maxVal: UInt32.max))
+        UInt32(cap(intround, minVal: Int(UInt32.min), maxVal: Int(UInt32.max)))
     }
 
     @inline(__always) var intround: Int {
@@ -615,15 +615,15 @@ extension CGFloat {
     }
 
     @inline(__always) var u8: UInt8 {
-        UInt8(cap(intround, minVal: UInt8.min, maxVal: UInt8.max))
+        UInt8(cap(intround, minVal: Int(UInt8.min), maxVal: Int(UInt8.max)))
     }
 
     @inline(__always) var u16: UInt16 {
-        UInt16(cap(intround, minVal: UInt16.min, maxVal: UInt16.max))
+        UInt16(cap(intround, minVal: Int(UInt16.min), maxVal: Int(UInt16.max)))
     }
 
     @inline(__always) var u32: UInt32 {
-        UInt32(cap(intround, minVal: UInt32.min, maxVal: UInt32.max))
+        UInt32(cap(intround, minVal: Int(UInt32.min), maxVal: Int(UInt32.max)))
     }
 
     @inline(__always) var intround: Int {
@@ -1462,25 +1462,6 @@ extension FileManager {
         guard fileExists(atPath: path, isDirectory: &isDir) else { return false }
         guard !isDir.boolValue else { return false }
         return isExecutableFile(atPath: path)
-    }
-}
-
-extension Publisher {
-    func retryWithDelay<T, E>(
-        _ retries: Int,
-        interval: ImmediateScheduler.SchedulerTimeType.Stride,
-        tolerance: ImmediateScheduler.SchedulerTimeType.Stride
-    )
-        -> Publishers.Catch<Self, AnyPublisher<T, E>> where T == Self.Output, E == Self.Failure
-    {
-        self.catch { _ -> AnyPublisher<T, E> in
-            Publishers.Delay(
-                upstream: self,
-                interval: interval,
-                tolerance: tolerance,
-                scheduler: ImmediateScheduler.shared
-            ).retry(retries).eraseToAnyPublisher()
-        }
     }
 }
 
