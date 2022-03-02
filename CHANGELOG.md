@@ -1,3 +1,41 @@
+# 5.4.0
+## Features
+
+### Client-server architecture for the Lunar CLI
+
+The `lunar` command can now control the running Lunar app directly instead of spawning a new instance.
+
+If the Lunar app is not running, the CLI will automatically use the old method of running the command directly.
+
+#### New arguments:
+
+* `--remote` forces the `lunar` command to never spawn a new instance and fail if there's no Lunar app already running
+* `--host` configures the hostname where to send the command
+    * This means you can now also control Lunar apps running on other Macs
+* `--key` configures the API key for authenticating the `lunar` command against the Lunar app server
+    * This is only needed when controlling Lunar instances running on other systems
+* `--new-instance` forces the `lunar` command to always run the command locally and spawn a new instance even if there's a Lunar app already running
+
+### BlackOut improvements
+
+Added **BlackOut without mirroring** on holding `Shift`.
+
+![blackout without mirroring tooltip](https://files.lunar.fyi/blackout-without-mirroring-tooltip.png)
+![blackout without mirroring menuitem](https://files.lunar.fyi/blackout-without-mirroring-menuitem.png)
+
+* Added logic to automatically disable BlackOut when monitors are disconnected and the only remaining display is blacked out
+* Configured mirroring as `.appOnly` so that the system doesn't remember the BlackOut mirroring state after Lunar is quit
+
+## Improvements
+
+* Make the resolutions dropdown more useful with some formatting and pretty colors
+    * ![resolutions dropdown](https://files.lunar.fyi/resolutions-dropdown.png)
+* Add a way to easily toggle between **Software Dimming** and **Hardware DDC**
+    * ![toggle software dimming hardware ddc](https://files.lunar.fyi/toggle-software-hardware.png)
+* Add a way to install Lunar CLI from the command-line
+    * `/Applications/Lunar.app/Contents/MacOS/Lunar install-cli`
+* Allow 2-byte values for DDC commands because some monitors support wider ranges (e.g. ASUS PG32U)
+
 # 5.3.4
 ## Fixes
 
