@@ -103,19 +103,19 @@ extension BinaryInteger {
     }
 
     @inline(__always) var u8: UInt8 {
-        UInt8(cap(self, minVal: 0, maxVal: 255))
+        UInt8(cap(self, minVal: UInt8.min, maxVal: UInt8.max))
     }
 
     @inline(__always) var u16: UInt16 {
-        UInt16(self)
+        UInt16(cap(self, minVal: UInt16.min, maxVal: UInt16.max))
     }
 
     @inline(__always) var u32: UInt32 {
-        UInt32(self)
+        UInt32(cap(self, minVal: UInt32.min, maxVal: UInt32.max))
     }
 
     @inline(__always) var u64: UInt64 {
-        UInt64(self)
+        UInt64(cap(self, minVal: UInt64.min, maxVal: UInt64.max))
     }
 
     @inline(__always) var i: Int {
@@ -123,19 +123,19 @@ extension BinaryInteger {
     }
 
     @inline(__always) var i8: Int8 {
-        Int8(self)
+        Int8(cap(self, minVal: Int8.min, maxVal: Int8.max))
     }
 
     @inline(__always) var i16: Int16 {
-        Int16(self)
+        Int16(cap(self, minVal: Int16.min, maxVal: Int16.max))
     }
 
     @inline(__always) var i32: Int32 {
-        Int32(self)
+        Int32(cap(self, minVal: Int32.min, maxVal: Int32.max))
     }
 
     @inline(__always) var i64: Int64 {
-        Int64(self)
+        Int64(cap(self, minVal: Int64.min, maxVal: Int64.max))
     }
 
     @inline(__always) var s: String {
@@ -380,27 +380,27 @@ extension Double {
     }
 
     @inline(__always) var u8: UInt8 {
-        UInt8(cap(intround, minVal: 0, maxVal: 255))
+        UInt8(cap(self, minVal: UInt8.min, maxVal: UInt8.max))
     }
 
     @inline(__always) var u16: UInt16 {
-        UInt16(self)
+        UInt16(cap(self, minVal: UInt16.min, maxVal: UInt16.max))
     }
 
     @inline(__always) var u32: UInt32 {
-        UInt32(self)
+        UInt32(cap(self, minVal: UInt32.min, maxVal: UInt32.max))
     }
 
     @inline(__always) var i8: Int8 {
-        Int8(cap(intround, minVal: 0, maxVal: 255))
+        Int8(cap(self, minVal: Int8.min, maxVal: Int8.max))
     }
 
     @inline(__always) var i16: Int16 {
-        Int16(self)
+        Int16(cap(self, minVal: Int16.min, maxVal: Int16.max))
     }
 
     @inline(__always) var i32: Int32 {
-        Int32(self)
+        Int32(cap(self, minVal: Int32.min, maxVal: Int32.max))
     }
 
     @inline(__always) var intround: Int {
@@ -577,15 +577,15 @@ extension Float {
     }
 
     @inline(__always) var u8: UInt8 {
-        UInt8(cap(intround, minVal: 0, maxVal: 255))
+        UInt8(cap(intround, minVal: UInt8.min, maxVal: UInt8.max))
     }
 
     @inline(__always) var u16: UInt16 {
-        UInt16(self)
+        UInt16(cap(intround, minVal: UInt16.min, maxVal: UInt16.max))
     }
 
     @inline(__always) var u32: UInt32 {
-        UInt32(self)
+        UInt32(cap(intround, minVal: UInt32.min, maxVal: UInt32.max))
     }
 
     @inline(__always) var intround: Int {
@@ -615,15 +615,15 @@ extension CGFloat {
     }
 
     @inline(__always) var u8: UInt8 {
-        UInt8(self)
+        UInt8(cap(intround, minVal: UInt8.min, maxVal: UInt8.max))
     }
 
     @inline(__always) var u16: UInt16 {
-        UInt16(self)
+        UInt16(cap(intround, minVal: UInt16.min, maxVal: UInt16.max))
     }
 
     @inline(__always) var u32: UInt32 {
-        UInt32(self)
+        UInt32(cap(intround, minVal: UInt32.min, maxVal: UInt32.max))
     }
 
     @inline(__always) var intround: Int {
