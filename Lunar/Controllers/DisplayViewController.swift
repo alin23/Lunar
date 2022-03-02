@@ -668,7 +668,7 @@ class DisplayViewController: NSViewController {
         cornerRadiusField?.onValueChangedInstant = { [weak self] value in
             mainAsync {
                 self?.displayImage?.cornerRadius = CGFloat(value)
-                display.cornerRadius = value.ns
+                self?.display?.cornerRadius = value.ns
             }
         }
         cornerRadiusField?.onMouseEnter = { [weak self] in
@@ -678,9 +678,20 @@ class DisplayViewController: NSViewController {
             self.cornerRadiusFieldCaption?.alphaValue = 0.8
         }
         cornerRadiusField?.onMouseExit = { [weak self] in
-            guard let self = self else { return }
+            guard let self = self, let f = self.cornerRadiusField, !f.editing else { return }
             self.cornerRadiusFieldCaption?.transition(1)
             self.cornerRadiusFieldCaption?.alphaValue = 0.0
+        }
+        cornerRadiusField?.editingTextFieldColor = mauve
+        if let cornerRadiusField = cornerRadiusField {
+            cornerRadiusField.textFieldColor = cornerRadiusField.textFieldColor.withAlphaComponent(0.0)
+        }
+        cornerRadiusField?.onEditStateChange = { [weak self] editing in
+            if editing {
+                self?.cornerRadiusField?.onMouseEnter?()
+            } else {
+                self?.cornerRadiusField?.onMouseExit?()
+            }
         }
 
         deleteEnabled = getDeleteEnabled(display: display)
