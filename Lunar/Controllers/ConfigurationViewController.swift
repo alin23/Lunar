@@ -285,8 +285,7 @@ class ConfigurationViewController: NSViewController {
             field, caption: caption,
             settingKeyInt: Defaults.Keys.brightnessStep,
             lowerLimit: 1, upperLimit: 99,
-            onMouseEnter: nil,
-            onValueChangedInstant: nil
+            onMouseEnter: nil
         )
     }
 
@@ -297,8 +296,7 @@ class ConfigurationViewController: NSViewController {
             field, caption: caption,
             settingKeyInt: Defaults.Keys.syncPollingSeconds,
             lowerLimit: 1, upperLimit: 300,
-            onMouseEnter: nil,
-            onValueChangedInstant: nil
+            onMouseEnter: nil
         )
     }
 
@@ -309,8 +307,7 @@ class ConfigurationViewController: NSViewController {
             field, caption: caption,
             settingKeyInt: Defaults.Keys.sensorPollingSeconds,
             lowerLimit: 1, upperLimit: 300,
-            onMouseEnter: nil,
-            onValueChangedInstant: nil
+            onMouseEnter: nil
         )
     }
 
@@ -321,8 +318,7 @@ class ConfigurationViewController: NSViewController {
             field, caption: caption,
             settingKeyInt: Defaults.Keys.contrastStep,
             lowerLimit: 1, upperLimit: 99,
-            onMouseEnter: nil,
-            onValueChangedInstant: nil
+            onMouseEnter: nil
         )
     }
 
@@ -333,8 +329,7 @@ class ConfigurationViewController: NSViewController {
             field, caption: caption,
             settingKeyInt: Defaults.Keys.volumeStep,
             lowerLimit: 1, upperLimit: 99,
-            onMouseEnter: nil,
-            onValueChangedInstant: nil
+            onMouseEnter: nil
         )
     }
 
@@ -383,8 +378,6 @@ class ConfigurationViewController: NSViewController {
         if let field = field {
             field.onValueChanged = nil
             field.onValueChangedDouble = nil
-            field.onValueChangedInstant = nil
-            field.onValueChangedInstantDouble = nil
             field.onMouseEnter = nil
             field.caption = nil
         }
@@ -397,8 +390,6 @@ class ConfigurationViewController: NSViewController {
         lowerLimit: Double, upperLimit: Double,
         onMouseEnter: ((SettingsPageController?) -> Void)? = nil,
         onMouseExit: ((SettingsPageController?) -> Void)? = nil,
-        onValueChangedInstant: ((Int, SettingsPageController?) -> Void)? = nil,
-        onValueChangedInstantDouble: ((Double, SettingsPageController?) -> Void)? = nil,
         onValueChanged: ((Int, SettingsPageController?) -> Void)? = nil,
         onValueChangedDouble: ((Double, SettingsPageController?) -> Void)? = nil
     ) {
@@ -421,18 +412,6 @@ class ConfigurationViewController: NSViewController {
         }
         field.lowerLimit = lowerLimit
         field.upperLimit = upperLimit
-        if let handler = onValueChangedInstant {
-            field.onValueChangedInstant = { [weak self] value in
-                guard let self = self else { return }
-                handler(value, self.settingsController)
-            }
-        }
-        if let handler = onValueChangedInstantDouble {
-            field.onValueChangedInstantDouble = { [weak self] value in
-                guard let self = self else { return }
-                handler(value, self.settingsController)
-            }
-        }
         if let handler = onValueChanged {
             field.onValueChanged = { [weak self] value in
                 guard let self = self else { return }
