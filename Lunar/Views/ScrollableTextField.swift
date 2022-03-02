@@ -53,6 +53,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     var onValueChangedDouble: ((Double) -> Void)?
     var onValueChangedInstantDouble: ((Double) -> Void)?
 
+    var onEditStateChange: ((Bool) -> Void)?
     var onMouseEnter: (() -> Void)?
     var onMouseExit: (() -> Void)?
 
@@ -181,6 +182,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     var editing = false {
         didSet {
             log.debug("Editing: \(editing)")
+            onEditStateChange?(editing)
         }
     }
 

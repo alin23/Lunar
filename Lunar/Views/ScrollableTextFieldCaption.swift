@@ -63,7 +63,6 @@ class ScrollableTextFieldCaption: NSTextField {
     override func mouseEntered(with _: NSEvent) {
         guard tag == 98 || tag == 99 else { return }
         transition(0.2)
-//        stringValue = "Scroll, type or press ↑/↓"
         stringValue = "Scroll or click to edit"
         alphaValue = 0.5
     }
