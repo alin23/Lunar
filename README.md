@@ -1,9 +1,12 @@
-# Lunar - control your monitors, even on M1
-## [Now with DDC support for M1](https://lunar.fyi/#m1)
+<p align="center">
+    <a href="https://lunar.fyi/"><img width="128" height="128" src="https://static.lunar.fyi/svg/lunar.svg"></a>
+  <h1 align="center"><code>Lunar</code></h1>
+  <h4 align="center">Intelligent adaptive brightness for your external display</h4>
+</p>
 
-### Intelligent adaptive brightness for your external display ###
+### Lunar is a macOS app for controlling monitors, [with native support for M1](https://lunar.fyi/#m1)
 
-[![Support Server](https://img.shields.io/discord/591914197219016707.svg?label=Discord&logo=Discord&colorB=7289da&style=for-the-badge)](https://discord.gg/dJPHpWgAhV)
+[![Support Server](https://img.shields.io/discord/852182428155904010.svg?label=Discord&logo=Discord&colorB=7289da&style=for-the-badge)](https://discord.gg/dJPHpWgAhV)
 
 
 
