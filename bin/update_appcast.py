@@ -71,19 +71,19 @@ CHANGELOG_STYLE = H.style(
     h1, h2 {
         font-weight: 800;
     }
-    h1 {
+    h1, h1 code {
         font-size: 2rem;
     }
-    h2 {
+    h2, h2 code {
         font-size: 1.5rem;
     }
-    h3 {
+    h3, h3 code {
         font-size: 1.25rem;
     }
-    h4 {
+    h4, h4 code {
         font-size: 1.125rem;
     }
-    h5 {
+    h5, h5 code {
         font-size: 1.1rem;
     }
 

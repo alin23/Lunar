@@ -1,3 +1,10 @@
+# 5.4.1
+## Fixes
+
+* Fix sudden brightness changes because of brightness being read incorrectly on some monitors
+* Delay when retrying sensor requests
+* Fix radius value disappearing on editing
+
 # 5.4.0
 ## Features
 
