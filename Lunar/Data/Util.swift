@@ -353,6 +353,54 @@ func query(url: URL, timeout: TimeInterval = 0) -> Publishers.TryMap<URLSession.
         }
 }
 
+func request(
+    from url: URL,
+    method: String = "GET",
+    body: Data? = nil,
+    headers: [String: String]? = nil,
+    timeoutPerTry: TimeInterval = 10,
+    retries: UInt = 1,
+    backoff: Double = 1,
+    sleepBetweenTries: TimeInterval = 0,
+    maxSleepBetweenTries: TimeInterval = 300,
+    _ onResponse: ((String?) -> Void)? = nil
+) -> AnyCancellable {
+    var sleepBetweenTries = sleepBetweenTries
+    let session = session(timeout: timeoutPerTry)
+
+    var urlRequest = URLRequest(url: url, timeoutInterval: timeoutPerTry)
+    urlRequest.httpMethod = method
+    urlRequest.httpBody = body
+    urlRequest.allHTTPHeaderFields = headers
+
+    let request = session.dataTaskPublisher(for: urlRequest)
+        .tryMap { (dataTaskOutput: DataTaskOutput) -> DataTaskResult in
+            guard let response = dataTaskOutput.response as? HTTPURLResponse, (200 ..< 300).contains(response.statusCode) else {
+                throw ResponseError(statusCode: (dataTaskOutput.response as? HTTPURLResponse)?.statusCode ?? 400)
+            }
+            return .success(dataTaskOutput)
+        }
+        .catch { (error: Error) -> AnyPublisher<DataTaskResult, Error> in
+            defer {
+                if sleepBetweenTries > 0 {
+                    sleepBetweenTries = min(sleepBetweenTries * backoff, maxSleepBetweenTries)
+                }
+            }
+            return Fail(error: error)
+                .delay(for: RunLoop.SchedulerTimeType.Stride(sleepBetweenTries), scheduler: RunLoop.current)
+                .eraseToAnyPublisher()
+        }
+        .retry(retries.i)
+        .map { (result: DataTaskResult) -> String? in
+            guard let data = (try? result.get())?.data else { return nil }
+            return String(data: data, encoding: .utf8)
+        }
+        .replaceError(with: nil)
+        .sink { resp in onResponse?(resp) }
+
+    return request
+}
+
 func waitForResponse(
     from url: URL,
     timeoutPerTry: DateComponents = 10.seconds,
