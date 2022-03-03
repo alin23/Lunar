@@ -1084,6 +1084,8 @@ struct Lunar: ParsableCommand {
 
         @Flag(name: .long, help: "Reset Gamma values")
         var reset = false
+        @Flag(name: .long, help: "Restore ColorSync Gamma values")
+        var restoreColorSync = false
 
         @Option(name: .shortAndLong, help: "Red gamma value")
         var red = 0.5
@@ -1150,7 +1152,7 @@ struct Lunar: ParsableCommand {
                 }
             }
 
-            guard write || reset else {
+            guard write || reset || restoreColorSync else {
                 printTable()
                 return
             }
@@ -1162,6 +1164,12 @@ struct Lunar: ParsableCommand {
                     CGDisplayRestoreColorSyncSettings()
                 }
                 cliPrint("Resetting gamma table for \(display)\n")
+                printTable()
+                return
+            }
+            if restoreColorSync {
+                CGDisplayRestoreColorSyncSettings()
+                cliPrint("Restoring ColorSync settings\n")
                 printTable()
                 return
             }

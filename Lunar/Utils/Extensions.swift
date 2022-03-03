@@ -900,7 +900,7 @@ class ModePopupButton: NSPopUpButton {
             }.store(in: &observers)
 
         changedItemsPublisher
-            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+            .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
             .sink { [weak self] item in
                 guard let mgr = DisplayController.panelManager, mgr.tryLockAccess() else {
                     mainAsyncAfter(ms: 500) { [weak self] in self?.setItemStyles() }
