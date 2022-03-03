@@ -4132,6 +4132,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             return
         }
 
+        CGDisplayRestoreColorSyncSettings()
         lunarGammaTable = nil
         defaultGammaTable = GammaTable(for: id)
     }
