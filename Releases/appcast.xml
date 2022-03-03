@@ -8,7 +8,7 @@
             <sparkle:version>5.4.1</sparkle:version>
             <sparkle:shortVersionString>5.4.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.1.dmg" length="16475388" type="application/octet-stream" sparkle:edSignature="tbcYwNBj34ka2n0RBqquBdka9iHTqb9d7au1LVRvm7mYk/Owsfw1B+8iLP4R4yfDc5KZ7zc3wdU5BYN8rMriBw==" sparkle:dsaSignature="MEYCIQCDJ6LEVLjYqFxxz4zh+EMwWs2VZTv4LvwbVQlhA4YCNwIhAJ1KH9mgrvgatlulef6in4favpszj7bec1EsOcluRRej"/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.1.dmg" length="16475388" type="application/octet-stream" sparkle:edSignature="tbcYwNBj34ka2n0RBqquBdka9iHTqb9d7au1LVRvm7mYk/Owsfw1B+8iLP4R4yfDc5KZ7zc3wdU5BYN8rMriBw==" sparkle:dsaSignature="MEUCIEOxdqKCM1j/HXXFWm3MNto/YFXSKl8D6ipixzWYjpVDAiEAhqH22UQE5BeKcA8BufJf8AJ33Dl+ZIMaeH7+lPfSkYI="/>
             <signature>pIF2KBKZjiq.6A0U9PVx8SYcSmo=</signature>
             <signature>pIF2KBKZjiq/6A0U9PVx8SYcSmo=</signature>
             <signature>tE3C3N1sDPEhZSHroaQKxeDbwKs=</signature>
@@ -18,6 +18,10 @@
             <signature>YIERVDG8s01UT1dB/a+ufcXA20E=</signature>
             <signature>nD2iw2IR00BcPr9Qs.6PRwX5Ec0=</signature>
             <signature>nD2iw2IR00BcPr9Qs/6PRwX5Ec0=</signature>
+            <sparkle:deltas>
+                <enclosure url="https://lunar.fyi/delta/5.4.1/5.4.0" sparkle:deltaFrom="5.4.0" length="1917790" type="application/octet-stream" sparkle:edSignature="KNsGs1N4HNXLsPg16Da3yFpSNzHbsqutS0gHbcK89UZ2xTpzn6DPj9hhI0DglprEnhCMpZd27LLBECPHj5o4BA==" sparkle:dsaSignature="MEUCIFy9J8OhF5VbgmDn7CJT0cuhePCwvzJdgs6Pj28KikspAiEAgLva+yZDnxtUQzjOC1nXDRYPYPO2i8Hli8DXaNWnw4A="/>
+                <enclosure url="https://lunar.fyi/delta/5.4.1/5.3.4" sparkle:deltaFrom="5.3.4" length="6046744" type="application/octet-stream" sparkle:edSignature="94FHIvxF5odS7MnbLl1WDb/5Z3/p/ETGvyNRRx+Ee+5HH2Olm9SMtRo0Q26M1K5fGwvuPobV0dQhFfQ+3PIKBw==" sparkle:dsaSignature="MEUCIQCIe31qBNMoDpkUzxWdY0caPmBqcYqUisYfedO0fl/ZzQIgeLXGkqlD924gwU5oSBiypkJGZ8Wv3Sk8CV+CLuHXpOU="/>
+            </sparkle:deltas>
         </item>
         <item>
             <title>5.4.0</title>
@@ -25,7 +29,7 @@
             <sparkle:version>5.4.0</sparkle:version>
             <sparkle:shortVersionString>5.4.0</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.0.dmg" length="16475137" type="application/octet-stream" sparkle:edSignature="CL3JiC7sR9SqGpDMyaZGq3Ub0scxXKJu5RJvUaDhN1CqxvHlScuDpNnpPwsbDNRpsSXwxfbNpofQ5A0PuSqiAQ==" sparkle:dsaSignature="MEQCIEdPeB5PSQxwdjCU//mCwTD/xQhWLfP/bk7D9TygtfvJAiA0W+jryWFNO7iyk5FnKKW+NU/31VzJ1eXB4ICBZTsLaA=="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.0.dmg" length="16475137" type="application/octet-stream" sparkle:edSignature="CL3JiC7sR9SqGpDMyaZGq3Ub0scxXKJu5RJvUaDhN1CqxvHlScuDpNnpPwsbDNRpsSXwxfbNpofQ5A0PuSqiAQ==" sparkle:dsaSignature="MEQCIB99n6L46XkbEwqxjGEZ+GT7PWw6I6okL3UGAOQTbRRtAiAP79rRUtriPU442wXSg1j4AnxXzt6Y7X6FSicraKrNCA=="/>
             <signature>IS++GZr5gwkmBPkd.bDE1ggSOxM=</signature>
             <signature>IS++GZr5gwkmBPkd/bDE1ggSOxM=</signature>
             <signature>kDIFtahjaTW4EEIKGuy.qSVmt2A=</signature>
@@ -1530,7 +1534,7 @@
             <sparkle:version>5.3.4</sparkle:version>
             <sparkle:shortVersionString>5.3.4</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.3.4.dmg" length="16918705" type="application/octet-stream" sparkle:edSignature="GW9t6bMkCRs9iml5hgXs6VELvyLJaEUVMWEiBHG4oskXgURaCBzLKMjcQHieauZ7t6N1x043BFI3DBeWFTpODA==" sparkle:dsaSignature="MEQCIGxuiB0c5Z+Xt6nYCeVMK5rzdCu4akCFTkPW3O9qdOxeAiADGFlJ/ZXWU3yV6tnE9r5YS3JXYTtKnLr5U1C3gqrv5g=="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.3.4.dmg" length="16918705" type="application/octet-stream" sparkle:edSignature="GW9t6bMkCRs9iml5hgXs6VELvyLJaEUVMWEiBHG4oskXgURaCBzLKMjcQHieauZ7t6N1x043BFI3DBeWFTpODA==" sparkle:dsaSignature="MEQCIE9oEZt0IHntDnDGTbFCkSxrWn9HgvW3axVLYUfA0BKiAiAhhcMV3jFdA7A8z+5bCR67tVc4Xu03Dd6MJYOCwMBKRA=="/>
             <signature>5u0Hjawp7sT+2MoGfXjP34RYPNI=</signature>
             <signature>0jrgAIigBcAR3izZAeceO9eU2.8=</signature>
             <signature>0jrgAIigBcAR3izZAeceO9eU2/8=</signature>
