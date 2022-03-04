@@ -22,7 +22,7 @@ let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
             log.verbose("START DEINIT")
             defer { log.verbose("END DEINIT") }
         #endif
-        cancel(self)
+//        cancel(self)
     }
 
     // MARK: Internal
@@ -41,7 +41,7 @@ let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
     @IBOutlet var connectingIndicator: NSProgressIndicator!
     var onInstall: ((SSH) -> Void)?
     var commandChannel: Channel?
-    var cancelled = false
+    var cancelled = true
 
     @objc dynamic var sshKeySelected = false {
         didSet {
@@ -199,8 +199,8 @@ let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
                 let status = try ssh.execute("""
                     mkdir -p \(DDCUTIL_SERVER_INSTALLER_DIR) 2>&1;
                     cd \(DDCUTIL_SERVER_INSTALLER_DIR) 2>&1;
-                    curl -v -O https://static.lunar.fyi/ddcutil-server-installer.tar.gz 2>&1;
-                    tar -xzvf ddcutil-server-installer.tar.gz 2>&1
+                    curl -v -O https://static.lunar.fyi/ddcutil-server-installer-$(uname -m).tar.gz 2>&1;
+                    tar -xzvf ddcutil-server-installer-$(uname -m).tar.gz 2>&1;
                 """, onChannelOpened: { channel in self.commandChannel = channel }) { output in
                     log.verbose(output)
                 }
