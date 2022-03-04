@@ -9,9 +9,16 @@
 import ArgumentParser
 import Foundation
 
+// MARK: - BlackoutState
+
+enum BlackoutState: String, ExpressibleByArgument {
+    case disable
+    case enable
+}
+
 // MARK: - PowerState
 
-enum PowerState {
+enum PowerState: String, ExpressibleByArgument {
     case on
     case off
 }
