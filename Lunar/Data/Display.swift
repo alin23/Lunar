@@ -717,6 +717,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case brightness
         case volume
         case audioMuted
+        case mute
         case canChangeVolume
         case power
         case active
@@ -770,6 +771,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .lockedBrightnessCurve,
             .lockedContrastCurve,
             .audioMuted,
+            .mute,
             .canChangeVolume,
             .power,
             .useOverlay,
@@ -797,6 +799,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .brightness,
             .volume,
             .audioMuted,
+            .mute,
             .power,
             .input,
             .redGain,
@@ -804,6 +807,20 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .blueGain,
         ]
 
+        static var settableCommon: [CodingKeys] = [
+            .brightness,
+            .contrast,
+            .volume,
+
+            .mute,
+            .power,
+            .input,
+            .rotation,
+
+            .redGain,
+            .greenGain,
+            .blueGain,
+        ]
         static var settable: Set<CodingKeys> = [
             .name,
             .adaptive,
@@ -842,6 +859,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .brightness,
             .volume,
             .audioMuted,
+            .mute,
             .canChangeVolume,
             .power,
             .input,
@@ -3220,13 +3238,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
             self.refreshBrightness()
         }
-        asyncEvery(10.seconds, uniqueTaskKey: "Builtin Contrast Refresher", skipIfExists: true, eager: true) { [weak self] timer in
+        asyncEvery(10.seconds, uniqueTaskKey: "Builtin Contrast Refresher", skipIfExists: true, eager: true, queue: .main) { [weak self] in
             guard let self = self, !screensSleeping.load(ordering: .relaxed), !(self.control is GammaControl) else {
-                timer.tolerance = 30
                 return
             }
 
-            if timer.tolerance != 10 { timer.tolerance = 10 }
             self.refreshContrast()
         }
     }

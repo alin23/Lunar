@@ -224,7 +224,7 @@ struct Lunar: ParsableCommand {
             abstract: "Prints code signature of the app."
         )
 
-        @OptionGroup var globals: GlobalOptions
+        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
 
         @Flag(help: "If the output should be printed as hex.")
         var hex = false
@@ -245,7 +245,7 @@ struct Lunar: ParsableCommand {
             abstract: "Prints if lid is closed or opened."
         )
 
-        @OptionGroup var globals: GlobalOptions
+        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
 
         func run() throws {
             Lunar.configureLogging(options: globals)
@@ -264,7 +264,7 @@ struct Lunar: ParsableCommand {
             abstract: "Prints ambient light in lux (or -1 if the sensor can't be read)."
         )
 
-        @OptionGroup var globals: GlobalOptions
+        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
 
         func run() throws {
             Lunar.configureLogging(options: globals)
@@ -312,12 +312,14 @@ struct Lunar: ParsableCommand {
             abstract: "Use CoreDisplay methods on monitors."
         )
 
-        @OptionGroup var globals: GlobalOptions
+        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
 
         @Argument(help: "Method to call. One of (\(AppleNativeMethod.allCases.map(\.rawValue).joined(separator: ", ")))")
         var method: AppleNativeMethod
 
-        @Argument(help: "Display serial/name/id or one of (first, main, all, builtin, source)")
+        @Argument(
+            help: "Display serial or name (without spaces) or one of the following special values (first, main, all, builtin, source)"
+        )
         var display: String
 
         @Argument(help: "Value for the method's second argument")
@@ -414,12 +416,14 @@ struct Lunar: ParsableCommand {
             abstract: "Use DisplayServices methods on monitors."
         )
 
-        @OptionGroup var globals: GlobalOptions
+        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
 
         @Argument(help: "Method to call. One of (\(DisplayServicesMethod.allCases.map(\.rawValue).joined(separator: ", ")))")
         var method: DisplayServicesMethod
 
-        @Argument(help: "Display serial/name/id or one of (first, main, all, builtin, source)")
+        @Argument(
+            help: "Display serial or name (without spaces) or one of the following special values (first, main, all, builtin, source)"
+        )
         var display: String
 
         @Argument(help: "Value for the method's second argument")
@@ -558,15 +562,17 @@ struct Lunar: ParsableCommand {
 
     struct Ddc: ParsableCommand {
         static let configuration = CommandConfiguration(
-            abstract: "Send DDC messages to connected monitors."
+            abstract: "Send raw DDC commands to connected monitors."
         )
 
         static let controlStrings = ControlID.allCases.map { String(describing: $0) }.chunks(ofCount: 2)
         static let longestString = (controlStrings.compactMap(\.first).max(by: { $0.count <= $1.count })?.count ?? 1) + 2
 
-        @OptionGroup var globals: GlobalOptions
+        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
 
-        @Argument(help: "Display serial/name/id or one of (first, main, all)")
+        @Argument(
+            help: "Display serial or name (without spaces) or one of the following special values (first, main, all, builtin, source)"
+        )
         var display: String
 
         @Argument(
@@ -642,7 +648,7 @@ struct Lunar: ParsableCommand {
             abstract: "Prints information about Lunar hotkeys."
         )
 
-        @OptionGroup var globals: GlobalOptions
+        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
 
         @Flag(name: .shortAndLong, help: "Print response as JSON.")
         var json = false
@@ -675,7 +681,7 @@ struct Lunar: ParsableCommand {
             abstract: "Prints information about the built-in display (if it exists)."
         )
 
-        @OptionGroup var globals: GlobalOptions
+        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
 
         @Flag(name: .shortAndLong, help: "Print raw values returned by the system.")
         var raw = false
@@ -744,7 +750,7 @@ struct Lunar: ParsableCommand {
             abstract: "Generates UUID for a display ID."
         )
 
-        @OptionGroup var globals: GlobalOptions
+        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
 
         @Flag(name: .shortAndLong, help: "Fall back to EDID if UUID is not possible to generate")
         var fallback = false
@@ -779,7 +785,7 @@ struct Lunar: ParsableCommand {
             abstract: "Applies Lunar presets."
         )
 
-        @OptionGroup var globals: GlobalOptions
+        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
 
         @Argument(help: "Number between 0 and 100")
         var preset: Int8
@@ -819,7 +825,7 @@ struct Lunar: ParsableCommand {
             abstract: "Configures Lunar mode."
         )
 
-        @OptionGroup var globals: GlobalOptions
+        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
 
         @Argument(help: "Adaptive mode. One of (manual, clock, location, sync, sensor, auto)")
         var mode: AdaptiveModeKey
@@ -836,36 +842,43 @@ struct Lunar: ParsableCommand {
 
     struct Displays: ParsableCommand {
         static let configuration = CommandConfiguration(
-            abstract: "Lists currently active displays and allows for more granular setting/getting of values."
+            abstract: "Control displays or get data about the current state of the displays.",
+            discussion: """
+            \("EXAMPLE".bold()):
+                Set brightness for monitors named Dell to 60%: \("lunar displays dell brightness 60".yellow().bold())
+                Print contrast of monitors with `LG` and `4K` in their name: \("lunar displays lg4k contrast".yellow().bold())
+                Rotate main display to portrait mode: \("lunar displays main rotation 90".yellow().bold())
+                Print details of all displays: \("lunar displays".yellow().bold())
+            """
         )
 
-        @OptionGroup var globals: GlobalOptions
+        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
 
-        @Flag(name: .shortAndLong, help: "If the output should be printed as JSON.")
+        @Flag(name: .shortAndLong, help: "Format output as JSON")
         var json = false
 
-        @Flag(name: .shortAndLong, help: "If both active and inactive displays should be printed.")
+        @Flag(name: .shortAndLong, help: "Include both connected and disconnected displays")
         var all = false
 
-        @Flag(help: "If virtual displays (e.g. DisplayLink) should be included.")
+        @Flag(help: "Include virtual displays (e.g. DisplayLink)")
         var virtual = true
 
-        @Flag(help: "If Airplay displays (e.g. iPad Sidecar, AirPlay) should be included.")
+        @Flag(help: "Include Airplay displays (e.g. iPad Sidecar, AirPlay)")
         var airplay = false
 
-        @Flag(help: "If projectors should be included.")
+        @Flag(help: "Include displays marked as projectors")
         var projector = false
 
-        @Flag(help: "If dummy displays should be included.")
+        @Flag(help: "Include displays marked as dummy (e.g. BetterDummy virtual displays or HDMI dongles)")
         var dummy = false
 
-        @Flag(name: .shortAndLong, help: "Include EDID in the output.")
+        @Flag(name: .shortAndLong, help: "Include EDID in the output")
         var edid = false
 
-        @Flag(help: "Include system info in the output.")
+        @Flag(help: "Include system info in the output")
         var systemInfo = false
 
-        @Flag(help: "Include panel data in the output.")
+        @Flag(help: "Include panel data in the output")
         var panelData = false
 
         @Flag(
@@ -877,11 +890,13 @@ struct Lunar: ParsableCommand {
         @Flag(help: "Controls to try for getting/setting display properties. Default: CoreDisplay, DDC, Network")
         var controls: [DisplayControl] = [.appleNative, .ddc, .network]
 
-        @Argument(help: "Display serial or name or one of (first, main, all, builtin, source)")
+        @Argument(
+            help: "Display serial or name (without spaces) or one of the following special values (first, main, all, builtin, source)"
+        )
         var display: String?
 
         @Argument(
-            help: "Display property to get or set. One of (\(Display.CodingKeys.allCases.filter { !$0.isHidden }.map(\.rawValue).joined(separator: ", ")))"
+            help: "Display property to get or set. Common properties: (\(Display.CodingKeys.settableCommon.filter { !$0.isHidden }.map(\.rawValue).joined(separator: ", ")))"
         )
         var property: Display.CodingKeys?
 
@@ -890,6 +905,7 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
+            let property = property == .mute ? .audioMuted : property
 
             cliGetDisplays(
                 includeVirtual: virtual || all,
@@ -959,7 +975,7 @@ struct Lunar: ParsableCommand {
             abstract: "Gets a property from the first active display."
         )
 
-        @OptionGroup var globals: GlobalOptions
+        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
 
         @Flag(
             name: .shortAndLong,
@@ -971,12 +987,13 @@ struct Lunar: ParsableCommand {
         var controls: [DisplayControl] = [.appleNative, .ddc, .network]
 
         @Argument(
-            help: "Display property to get. One of (\(Display.CodingKeys.allCases.filter { !$0.isHidden }.map(\.rawValue).joined(separator: ", ")))"
+            help: "Display property to get. Common properties: (\(Display.CodingKeys.settableCommon.filter { !$0.isHidden }.map(\.rawValue).joined(separator: ", ")))"
         )
         var property: Display.CodingKeys
 
         func run() throws {
             Lunar.configureLogging(options: globals)
+            let property = property == .mute ? .audioMuted : property
 
             cliGetDisplays(
                 includeVirtual: CachedDefaults[.showVirtualDisplays],
@@ -989,7 +1006,7 @@ struct Lunar: ParsableCommand {
                 d1.key <= d2.key
             }).map(\.value)
 
-            try handleDisplay("first", displays: displays, property: property, controls: controls, read: read)
+            try handleDisplay("best-guess", displays: displays, property: property, controls: controls, read: read)
             return cliExit(0)
         }
     }
@@ -999,7 +1016,7 @@ struct Lunar: ParsableCommand {
             abstract: "Sets a property to a specific value for the first active display."
         )
 
-        @OptionGroup var globals: GlobalOptions
+        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
 
         @Flag(
             name: .shortAndLong,
@@ -1014,7 +1031,7 @@ struct Lunar: ParsableCommand {
         var waitms = 1000
 
         @Argument(
-            help: "Display property to set. One of (\(Display.CodingKeys.settable.map(\.rawValue).joined(separator: ", ")))"
+            help: "Display property to set. Common properties: (\(Display.CodingKeys.settableCommon.map(\.rawValue).joined(separator: ", ")))"
         )
         var property: Display.CodingKeys
 
@@ -1030,6 +1047,7 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
+            let property = property == .mute ? .audioMuted : property
 
             cliGetDisplays(
                 includeVirtual: CachedDefaults[.showVirtualDisplays],
@@ -1046,7 +1064,7 @@ struct Lunar: ParsableCommand {
                 setupNetworkControls(displays: displays, waitms: waitms)
             }
 
-            try handleDisplay("first", displays: displays, property: property, value: value, controls: controls, read: read)
+            try handleDisplay("best-guess", displays: displays, property: property, value: value, controls: controls, read: read)
             return cliExit(0)
         }
     }
@@ -1056,7 +1074,7 @@ struct Lunar: ParsableCommand {
             abstract: "Sets gamma values. The values can only be persisted while the program is running."
         )
 
-        @OptionGroup var globals: GlobalOptions
+        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
 
         @Option(
             name: .shortAndLong,
@@ -1067,7 +1085,10 @@ struct Lunar: ParsableCommand {
         @Flag(name: .shortAndLong, help: "Force gamma setting.")
         var force = false
 
-        @Option(name: .shortAndLong, help: "Display serial/name/id or one of (first, main, all, builtin, source)")
+        @Option(
+            name: .shortAndLong,
+            help: "Display serial or name (without spaces) or one of the following special values (first, main, all, builtin, source)"
+        )
         var display = "best-guess"
 
         @Option(name: .long, help: "How often to send the gamma values to the monitor")
@@ -1209,14 +1230,57 @@ struct Lunar: ParsableCommand {
         }
     }
 
+    struct Blackout: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Turns monitors off without cutting power or closing the lid.",
+            discussion: "\("EXAMPLE".bold()): \("lunar blackout builtin enable".yellow().bold())"
+        )
+
+        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
+
+        @Flag(name: .long, help: "BlackOut without mirroring the screen contents.")
+        var noMirror = false
+
+        @Argument(
+            help: "Display serial or name (without spaces) or one of the following special values (first, main, all, builtin, source)"
+        )
+        var display = "best-guess"
+
+        @Argument(help: "Whether Blackout should be enabled (monitor turned off) or disabled (turn monitor back on)")
+        var state: BlackoutState = .enable
+
+        func run() throws {
+            Lunar.configureLogging(options: globals)
+
+            cliGetDisplays(
+                includeVirtual: CachedDefaults[.showVirtualDisplays],
+                includeAirplay: CachedDefaults[.showAirplayDisplays],
+                includeProjector: CachedDefaults[.showProjectorDisplays],
+                includeDummy: CachedDefaults[.showDummyDisplays]
+            )
+
+            let displays = displayController.activeDisplays.sorted(by: { d1, d2 in
+                d1.key <= d2.key
+            }).map(\.value)
+
+            guard let display = getDisplay(displays: displays, filter: display) else {
+                throw LunarCommandError.displayNotFound(display)
+            }
+
+            displayController.blackOut(display: display.id, state: state == .enable ? .on : .off, mirroringAllowed: !noMirror)
+            cliExit(0)
+        }
+    }
+
     static let configuration = CommandConfiguration(
         abstract: "Lunar CLI.",
         subcommands: [
-            Set.self,
-            Get.self,
             Displays.self,
+            Get.self,
+            Set.self,
             Preset.self,
             Mode.self,
+            Blackout.self,
             Builtin.self,
             Ddc.self,
             Ddcctl.self,
@@ -1297,6 +1361,8 @@ struct Lunar: ParsableCommand {
         case is Launch:
             return nil
         case let cmd as Gamma:
+            return cmd.globals
+        case let cmd as Blackout:
             return cmd.globals
         case let cmd as CoreDisplay:
             return cmd.globals
@@ -1434,6 +1500,7 @@ private func handleDisplay(
 ) throws {
     // MARK: - Apply display filter to get single display
 
+    let property = property == .mute ? .audioMuted : property
     guard let display = getDisplay(displays: displays, filter: displayFilter) else {
         throw LunarCommandError.displayNotFound(displayFilter)
     }
@@ -1567,6 +1634,7 @@ private func spaced(_ key: String, _ longestKeySize: Int) -> String {
 }
 
 private func encodedValue(key: Display.CodingKeys, value: Any) -> String {
+    let key = key == .mute ? .audioMuted : key
     switch key {
     case .defaultGammaRedMin, .defaultGammaRedMax, .defaultGammaRedValue,
          .defaultGammaGreenMin, .defaultGammaGreenMax, .defaultGammaGreenValue,
