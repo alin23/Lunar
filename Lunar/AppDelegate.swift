@@ -2003,12 +2003,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         showWindow()
     }
 
-    @IBAction func buyMeACoffee(_: Any) {
-        if let url = URL(string: "https://www.buymeacoffee.com/alin23") {
-            NSWorkspace.shared.open(url)
-        }
-    }
-
     @IBAction func joinCommunity(_: Any) {
         if let url = URL(string: "https://discord.gg/dJPHpWgAhV") {
             NSWorkspace.shared.open(url)
@@ -2077,7 +2071,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBAction func installCLI(_: Any) {
         let shouldInstall: Bool = ask(
             message: "Lunar CLI",
-            info: "This will install the `lunar` binary into /usr/local/bin.\n\nDo you want to proceed?",
+            info: "This will install the `lunar` script into /usr/local/bin.\n\nDo you want to proceed?",
             okButton: "Yes",
             cancelButton: "No",
             unique: true

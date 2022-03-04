@@ -47,6 +47,7 @@
 		C740A1F826249176004BC1C7 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = C740A1F726249176004BC1C7 /* ArgumentParser */; };
 		C74820FA26DE6CFA00556EA8 /* PageNavigationControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74820F926DE6CFA00556EA8 /* PageNavigationControl.swift */; };
 		C748210426DFA44400556EA8 /* FuzzyFind in Frameworks */ = {isa = PBXBuildFile; productRef = C748210326DFA44400556EA8 /* FuzzyFind */; };
+		C7482C3427D2874D00A12E82 /* ColorizeSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7482C3227D2874D00A12E82 /* ColorizeSwift.swift */; };
 		C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */; };
 		C74D07C8265BA68D00291FC2 /* LoginServiceKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74D07C7265BA68D00291FC2 /* LoginServiceKit.swift */; };
 		C74F8DC425EB94660077DF27 /* DisplayServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C74F8DBE25EB94660077DF27 /* DisplayServices.framework */; };
@@ -239,6 +240,7 @@
 		C73B41F5263E1301006F6783 /* ddcctl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ddcctl; path = bin/ddcctl; sourceTree = SOURCE_ROOT; };
 		C740A1F3262490E1004BC1C7 /* CLI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLI.swift; sourceTree = "<group>"; };
 		C74820F926DE6CFA00556EA8 /* PageNavigationControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageNavigationControl.swift; sourceTree = "<group>"; };
+		C7482C3227D2874D00A12E82 /* ColorizeSwift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorizeSwift.swift; sourceTree = "<group>"; };
 		C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPageController.swift; sourceTree = "<group>"; };
 		C74D07C7265BA68D00291FC2 /* LoginServiceKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginServiceKit.swift; sourceTree = "<group>"; };
 		C74F8DBE25EB94660077DF27 /* DisplayServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DisplayServices.framework; path = ../../../../../System/Library/PrivateFrameworks/DisplayServices.framework; sourceTree = "<group>"; };
@@ -464,6 +466,7 @@
 		C76545231FD8A0E000DBACE9 /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				C7482C3227D2874D00A12E82 /* ColorizeSwift.swift */,
 				C72776EC201F26CB0055934F /* AppException.swift */,
 				C7C1F7081FD639970039507C /* DataStore.swift */,
 				C7C1F7021FD5FD390039507C /* Display.swift */,
@@ -1020,6 +1023,7 @@
 				C740A1F4262490E1004BC1C7 /* CLI.swift in Sources */,
 				C7E80E2F2637060F004718A4 /* FileType.swift in Sources */,
 				C78BD055259B6BAD00FC823F /* SyncMode.swift in Sources */,
+				C7482C3427D2874D00A12E82 /* ColorizeSwift.swift in Sources */,
 				C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */,
 				C7C68F0B201D356800F49A2B /* SettingsViewController.swift in Sources */,
 				C7CFF494271FF280002CB549 /* DDCPopoverController.swift in Sources */,
