@@ -48,7 +48,7 @@ class InstallOutputViewController: NSViewController {
             log.verbose("START DEINIT")
             defer { log.verbose("END DEINIT") }
         #endif
-        cancelInstall(self)
+//        cancelInstall(self)
     }
 
     // MARK: Internal
@@ -97,7 +97,7 @@ class InstallOutputViewController: NSViewController {
 
     func startInstall(ssh: SSH) {
         asyncNow { [weak self] in
-            guard let self = self, let textView = self.outputScrollView.documentView as? NSTextView else { return }
+            guard let self = self, let textView = mainThread({ self.outputScrollView.documentView as? NSTextView }) else { return }
             var status: Int32 = -1
             var newHostname = ssh.host
             do {
@@ -197,7 +197,7 @@ class InstallOutputViewController: NSViewController {
     @IBAction func cancelInstall(_: Any) {
         asyncNow { [weak self] in
             guard let self = self, let channel = self.commandChannel,
-                  let textView = self.outputScrollView.documentView as? NSTextView else { return }
+                  let textView = mainThread({ self.outputScrollView.documentView as? NSTextView }) else { return }
 
             mainThread {
                 self.cancellingCommand = true
