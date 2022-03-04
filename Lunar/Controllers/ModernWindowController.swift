@@ -20,6 +20,21 @@ extension AppDelegate: NSWindowDelegate {
             return
         }
 
+        if let window = n.object as? ModernWindow, window.title == "DDC Server Installer" {
+            if let pc = window.contentView?.nextResponder as? RaspberryPageController {
+                if let sc = pc.viewControllers[pc.sshConnectionViewControllerIdentifier] as? SSHConnectionViewController, !sc.cancelled {
+                    sc.cancel(self)
+                }
+                if let ic = pc.viewControllers[pc.installOutputViewControllerIdentifier] as? InstallOutputViewController,
+                   let ch = ic.commandChannel
+                {
+                    try? ch.cancel()
+                }
+            }
+            appDelegate!.sshWindowController = nil
+            return
+        }
+
         guard let window = n.object as? ModernWindow else {
             return
         }
@@ -89,7 +104,7 @@ class ModernWindowController: NSWindowController {
     func setupWindow() {
         mainThread {
             if let w = window as? ModernWindow {
-                if w.title == "Settings" || w.title == "Ambient Light Sensor" {
+                if w.title == "Settings" || w.title == "Ambient Light Sensor" || w.title == "DDC Server Installer" {
                     w.delegate = appDelegate!
                 }
                 if w.title == "Settings" {
