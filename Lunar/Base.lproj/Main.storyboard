@@ -1031,7 +1031,7 @@ and setting its brightness/contrast to 0</string>
                                 </connections>
                             </containerView>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E8L-4P-FG0">
-                                <rect key="frame" x="387" y="656" width="171" height="29"/>
+                                <rect key="frame" x="389" y="656" width="171" height="29"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="LUNAR" id="imn-dq-JnU">
                                     <font key="font" size="25" name="Menlo-Bold"/>
@@ -3627,7 +3627,7 @@ visible screen left</string>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OZD-Gw-TTp" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="447" y="638" width="53" height="18"/>
+                                <rect key="frame" x="448" y="638" width="53" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Pro" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="ZjS-nc-hfq">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>

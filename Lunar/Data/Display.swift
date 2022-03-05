@@ -1287,6 +1287,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc dynamic var reapplyColorGain = false
     @objc dynamic lazy var maxColorGain = extendedColorGain ? 255 : 100
 
+    @Atomic var applyDisplayServices = true
+
     var preciseBrightnessContrastBeforeAppPreset = 0.5 {
         didSet {
             guard CachedDefaults[.mergeBrightnessContrast] else { return }
@@ -1935,9 +1937,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var brightness: NSNumber = 50 {
         didSet {
             save()
-            userAdjusting = true
+            if applyDisplayServices { userAdjusting = true }
             defer {
-                userAdjusting = false
+                if applyDisplayServices { userAdjusting = false }
             }
 
             mainThread {
@@ -1949,10 +1951,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 applyPreciseValue = true
             }
 
-            guard DDC.apply, !lockedBrightness, force || brightness != oldValue else {
+            guard applyDisplayServices, DDC.apply, !lockedBrightness, force || brightness != oldValue else {
                 log.verbose(
                     "Won't apply brightness to \(description)",
                     context: [
+                        "applyDisplayServices": applyDisplayServices,
                         "DDC.apply": DDC.apply,
                         "lockedBrightness": lockedBrightness,
                         "brightness != oldValue": brightness != oldValue,
@@ -2662,23 +2665,27 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     static func observeBrightnessChangeDS(_ id: CGDirectDisplayID) -> Bool {
-        return false
+        // return false
         guard DisplayServicesCanChangeBrightness(id), !isObservingBrightnessChangeDS(id) else { return true }
 
         let result = DisplayServicesRegisterForBrightnessChangeNotifications(id, id) { _, observer, _, _, userInfo in
-            guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let observer = observer else { return }
-            let id = CGDirectDisplayID(UInt(bitPattern: observer))
-            guard !AppleNativeControl.sliderTracking, let display = displayController.activeDisplays[id], !display.inSmoothTransition else {
-                return
-            }
-            let newBrightness = (value * 100).u16
-            guard display.brightness.uint16Value != newBrightness else {
-                return
-            }
+            OperationQueue.main.addOperation {
+                guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let observer = observer else { return }
+                let id = CGDirectDisplayID(UInt(bitPattern: observer))
+                guard !AppleNativeControl.sliderTracking, let display = displayController.activeDisplays[id],
+                      !display.inSmoothTransition
+                else {
+                    return
+                }
+                let newBrightness = (value * 100).u16
+                guard display.brightness.uint16Value != newBrightness else {
+                    return
+                }
 
-            log.verbose("newBrightness: \(newBrightness) display.isUserAdjusting: \(display.isUserAdjusting())")
-            display.withoutDDC {
-                mainThread { display.brightness = newBrightness.ns }
+                log.verbose("newBrightness: \(newBrightness) display.isUserAdjusting: \(display.isUserAdjusting())")
+                display.withoutDisplayServices {
+                    display.brightness = newBrightness.ns
+                }
             }
         }
         mainThread { Thread.current.threadDictionary["observingBrightnessChangeDS-\(id)"] = (result == KERN_SUCCESS) }
@@ -3227,7 +3234,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         guard isSmartBuiltin else { return }
         let listensForBrightnessChange = observeBrightnessChangeDS() && hasBrightnessChangeObserver
         asyncEvery(
-            listensForBrightnessChange ? 3.seconds : 1.seconds,
+            listensForBrightnessChange ? 5.seconds : 2.seconds,
             uniqueTaskKey: "Builtin Brightness Refresher",
             skipIfExists: true,
             eager: true,
@@ -3238,7 +3245,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
             self.refreshBrightness()
         }
-        asyncEvery(10.seconds, uniqueTaskKey: "Builtin Contrast Refresher", skipIfExists: true, eager: true, queue: .main) { [weak self] in
+        asyncEvery(15.seconds, uniqueTaskKey: "Builtin Contrast Refresher", skipIfExists: true, eager: true, queue: .main) { [weak self] in
             guard let self = self, !screensSleeping.load(ordering: .relaxed), !(self.control is GammaControl) else {
                 return
             }
@@ -4334,6 +4341,19 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             DDC.apply = false
             block()
             DDC.apply = true
+        }
+    }
+
+    @inline(__always) func withoutDisplayServices(_ block: () -> Void) {
+        guard control is AppleNativeControl else {
+            block()
+            return
+        }
+
+        mainThread {
+            applyDisplayServices = false
+            block()
+            applyDisplayServices = true
         }
     }
 
