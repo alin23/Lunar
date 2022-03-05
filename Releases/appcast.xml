@@ -8,7 +8,7 @@
             <sparkle:version>5.4.1</sparkle:version>
             <sparkle:shortVersionString>5.4.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.1.dmg" length="16475388" type="application/octet-stream" sparkle:edSignature="tbcYwNBj34ka2n0RBqquBdka9iHTqb9d7au1LVRvm7mYk/Owsfw1B+8iLP4R4yfDc5KZ7zc3wdU5BYN8rMriBw==" sparkle:dsaSignature="MEUCIEOxdqKCM1j/HXXFWm3MNto/YFXSKl8D6ipixzWYjpVDAiEAhqH22UQE5BeKcA8BufJf8AJ33Dl+ZIMaeH7+lPfSkYI="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.1.dmg" length="16475388" type="application/octet-stream" sparkle:edSignature="tbcYwNBj34ka2n0RBqquBdka9iHTqb9d7au1LVRvm7mYk/Owsfw1B+8iLP4R4yfDc5KZ7zc3wdU5BYN8rMriBw==" sparkle:dsaSignature="MEMCH3viXwsIXXjmb+60Ixwl5BrBHn5qddBAA/5DftAci5YCIBev/qmbaV1FglPGF8hnUxe00Ik7ch9Oxlo3bXe42Ysf"/>
             <signature>pIF2KBKZjiq.6A0U9PVx8SYcSmo=</signature>
             <signature>pIF2KBKZjiq/6A0U9PVx8SYcSmo=</signature>
             <signature>tE3C3N1sDPEhZSHroaQKxeDbwKs=</signature>
@@ -22,6 +22,14 @@
                 <enclosure url="https://lunar.fyi/delta/5.4.1/5.4.0" sparkle:deltaFrom="5.4.0" length="1917790" type="application/octet-stream" sparkle:edSignature="KNsGs1N4HNXLsPg16Da3yFpSNzHbsqutS0gHbcK89UZ2xTpzn6DPj9hhI0DglprEnhCMpZd27LLBECPHj5o4BA==" sparkle:dsaSignature="MEUCIFy9J8OhF5VbgmDn7CJT0cuhePCwvzJdgs6Pj28KikspAiEAgLva+yZDnxtUQzjOC1nXDRYPYPO2i8Hli8DXaNWnw4A="/>
                 <enclosure url="https://lunar.fyi/delta/5.4.1/5.3.4" sparkle:deltaFrom="5.3.4" length="6046744" type="application/octet-stream" sparkle:edSignature="94FHIvxF5odS7MnbLl1WDb/5Z3/p/ETGvyNRRx+Ee+5HH2Olm9SMtRo0Q26M1K5fGwvuPobV0dQhFfQ+3PIKBw==" sparkle:dsaSignature="MEUCIQCIe31qBNMoDpkUzxWdY0caPmBqcYqUisYfedO0fl/ZzQIgeLXGkqlD924gwU5oSBiypkJGZ8Wv3Sk8CV+CLuHXpOU="/>
             </sparkle:deltas>
+            <signature>r8XN4ancuCSlq7.0AGgcf3htomQ=</signature>
+            <signature>r8XN4ancuCSlq7/0AGgcf3htomQ=</signature>
+            <signature>AqDktJRcp9TeRudvUrbEbCteef0=</signature>
+            <signature>RoFN5YGuhsAlX2Y3vfFA+oSpT7M=</signature>
+            <signature>cqXIHsTN4UJ79Bm1TB4aE6qTz6k=</signature>
+            <signature>MIE9lzBmwpM8.FUp0DRP30s8kl8=</signature>
+            <signature>MIE9lzBmwpM8/FUp0DRP30s8kl8=</signature>
+            <signature>857wzRn2C6bu3qw7UV9+0ADGgAs=</signature>
         </item>
         <item>
             <title>5.4.0</title>
