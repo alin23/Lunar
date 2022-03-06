@@ -3,12 +3,28 @@
     <channel>
         <title>Lunar</title>
         <item>
+            <title>5.4.2</title>
+            <pubDate>Sun, 06 Mar 2022 22:06:43 +0200</pubDate>
+            <sparkle:version>5.4.2</sparkle:version>
+            <sparkle:shortVersionString>5.4.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.2.dmg" length="16575155" type="application/octet-stream" sparkle:edSignature="7lJJ7eZSAtX+rTc5bHknR5vQtWDgOh5fmWvBrYDojrG/kusKWHnhBdeOdZJQ/QpR4Gd2wlWpFjvXBHDSGpaHCg==" sparkle:dsaSignature="MEUCIFmSvjVhT4edk84hW58Su4iwGNLZdueHQnUFAi3+9iNDAiEAjMl6mI9RqAS0bjbBRfFaMkVacSpS7lrdGhiXa9y+Ak8="/>
+            <sparkle:deltas>
+                <enclosure url="https://lunar.fyi/delta/5.4.2/5.4.1" sparkle:deltaFrom="5.4.1" length="2533922" type="application/octet-stream" sparkle:edSignature="ZxiLYZb8YExmOr6kXkfe7/X1aZgH1J39lbT2qkIFPqt7Pshy/KxThBsqZ9TxfOxTYKfiRZ0D0sTPIdoobtWgBw==" sparkle:dsaSignature="MEQCIEjQu3aiU2A87KUewYC3kze0QwRhazKOJg8LEofyVADhAiBCUFL5M9kf9kty341Pa8PgO0p/MnCfkbmh4l+az1WmtA=="/>
+            </sparkle:deltas>
+            <signature>.ggNGmOrz5C5Ufk5SI71.giA0tI=</signature>
+            <signature>/ggNGmOrz5C5Ufk5SI71/giA0tI=</signature>
+            <signature>0hdbPVNiH2nsVIWM4VJJh5aoNsg=</signature>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <description><![CDATA[<div><style>    * {        font-family: -apple-system, BlinkMacSystemFont, sans-serif;        font-size: .9rem;    }    img {        width: 80%;        margin: 1rem auto;        object-fit: cover;    }    video {        width: 80%;        margin: 1rem auto;        border-radius: 12px;        box-shadow: 0px 3px 1rem rgba(0, 0, 0, 0.1);    }    code, pre {        font-family: Menlo, monospace;        color: #fda43a;    }    strong {        color: #fda43a;    }    em {        color: #FBAB7E;    }    code {        font-weight: bold;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h1, h2 {        font-weight: 800;    }    h1, h1 code {        font-size: 2rem;    }    h2, h2 code {        font-size: 1.5rem;    }    h3, h3 code {        font-size: 1.25rem;    }    h4, h4 code {        font-size: 1.125rem;    }    h5, h5 code {        font-size: 1.1rem;    }    h1#features, h2#features {        color: #EDB44B;    }    h1#improvements, h2#improvements {        color: #515193;    }    h1#fixes, h2#fixes {        color: #E14283;    }</style><div><h2 id="features">Features</h2><ul><li><strong>Efficient Sync Mode</strong><ul><li>A new internal system API is used to react to built-in display brightness changes instead of polling continuously for them</li><li>This lowers the CPU usage to <code>0.1%</code> on average when no brightness change occurs</li><li>This new method can be disabled by setting the <em>Sync Polling Interval</em> to a value greater than <code>0 seconds</code></li><li><em>If brightness syncing stops working after the update, try setting the Polling Interval to <code>2 seconds</code></em></li></ul></li></ul><p><img src="https://files.lunar.fyi/new-sync-mode.png" alt="New Sync Mode method"></p><ul><li>Add <code>lunar blackout</code> command to CLI</li><li>Add <code>lunar gamma --restore-color-sync</code> command for resetting to system default color settings</li></ul><h2 id="improvements">Improvements</h2><ul><li>Update <code>ddcutil-server</code> for Raspberry Pi OS 64-bit</li><li>Improve Lunar CLI help</li></ul><h2 id="fixes">Fixes</h2><ul><li>Fix software dimming not going back to 100% after app restart on more recent macOS versions</li><li>Fix BlackOut dialog appearing wrongly</li></ul></div></div>]]></description>
+        </item>
+        <item>
             <title>5.4.1</title>
             <pubDate>Wed, 02 Mar 2022 21:40:10 +0200</pubDate>
             <sparkle:version>5.4.1</sparkle:version>
             <sparkle:shortVersionString>5.4.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.1.dmg" length="16475388" type="application/octet-stream" sparkle:edSignature="tbcYwNBj34ka2n0RBqquBdka9iHTqb9d7au1LVRvm7mYk/Owsfw1B+8iLP4R4yfDc5KZ7zc3wdU5BYN8rMriBw==" sparkle:dsaSignature="MEQCIEDyh6bT7tb9MuHfJhVGfSm5eW+epoUoMZowObkuT3jqAiBETnQ4H2j+6hyAMNTRW4y+SVU6B/2ZCh9XMMGMC97zrg=="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.1.dmg" length="16475388" type="application/octet-stream" sparkle:edSignature="tbcYwNBj34ka2n0RBqquBdka9iHTqb9d7au1LVRvm7mYk/Owsfw1B+8iLP4R4yfDc5KZ7zc3wdU5BYN8rMriBw==" sparkle:dsaSignature="MEQCIBp1qgyvnxP29iiH81WaR6nm+HPdH3hJg7NlnHZ+LRI0AiBTrgmamrnRV4CzZpRfAcJKy7+my1vNZ5aMZEr9pxFgqw=="/>
             <signature>pIF2KBKZjiq.6A0U9PVx8SYcSmo=</signature>
             <signature>pIF2KBKZjiq/6A0U9PVx8SYcSmo=</signature>
             <signature>tE3C3N1sDPEhZSHroaQKxeDbwKs=</signature>

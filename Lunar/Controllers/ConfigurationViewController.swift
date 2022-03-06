@@ -295,7 +295,7 @@ class ConfigurationViewController: NSViewController {
         setupScrollableTextField(
             field, caption: caption,
             settingKeyInt: Defaults.Keys.syncPollingSeconds,
-            lowerLimit: 1, upperLimit: 300,
+            lowerLimit: 0, upperLimit: 300,
             onMouseEnter: nil
         )
     }

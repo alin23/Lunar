@@ -150,7 +150,7 @@ class DataStore: NSObject {
     override init() {
         super.init()
 
-        NSUserDefaultsController.shared.appliesImmediately = false
+        NSUserDefaultsController.shared.appliesImmediately = true
 
         log.debug("Checking First Run")
         if Defaults[.firstRun] == nil {
@@ -732,7 +732,7 @@ extension Defaults.Keys {
     static let brightnessStep = Key<Int>("brightnessStep", default: 6)
     static let contrastStep = Key<Int>("contrastStep", default: 6)
     static let volumeStep = Key<Int>("volumeStep", default: 6)
-    static let syncPollingSeconds = Key<Int>("syncPollingSeconds", default: 2)
+    static let syncPollingSeconds = Key<Int>("syncPollingSeconds", default: 0)
     static let ddcSleepFactor = Key<DDCSleepFactor>("ddcSleepFactor", default: .short)
     static let sensorPollingSeconds = Key<Int>("sensorPollingSeconds", default: 2)
     static let adaptiveBrightnessMode = Key<AdaptiveModeKey>("adaptiveBrightnessMode", default: .sync)
