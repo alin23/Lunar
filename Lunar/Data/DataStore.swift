@@ -34,6 +34,8 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .accessibilityPermissionsGranted,
     .cliInstalled,
     .lunarProActive,
+    .lunarProAccessDialogShown,
+    .completedOnboarding,
     .showTwoSchedules,
     .showThreeSchedules,
     .showFourSchedules,
@@ -148,7 +150,7 @@ class DataStore: NSObject {
     override init() {
         super.init()
 
-        NSUserDefaultsController.shared.appliesImmediately = true
+        NSUserDefaultsController.shared.appliesImmediately = false
 
         log.debug("Checking First Run")
         if Defaults[.firstRun] == nil {
@@ -189,6 +191,10 @@ class DataStore: NSObject {
         }
 
         Defaults[.toolTipDelay] = 1
+        if !shouldOnboard, !Defaults[.completedOnboarding] {
+            Defaults[.completedOnboarding] = true
+            Defaults[.lunarProAccessDialogShown] = true
+        }
     }
 
     // MARK: Internal
@@ -580,6 +586,8 @@ func initCache() {
     cacheKey(.showSliderValues)
     cacheKey(.showAdvancedDisplaySettings)
     cacheKey(.lunarProActive)
+    cacheKey(.lunarProAccessDialogShown)
+    cacheKey(.completedOnboarding)
     cacheKey(.showTwoSchedules)
     cacheKey(.showThreeSchedules)
     cacheKey(.showFourSchedules)
@@ -690,6 +698,8 @@ extension Defaults.Keys {
     static let accessibilityPermissionsGranted = Key<Bool>("accessibilityPermissionsGranted", default: false)
     static let cliInstalled = Key<Bool>("cliInstalled", default: false)
     static let lunarProActive = Key<Bool>("lunarProActive", default: true)
+    static let lunarProAccessDialogShown = Key<Bool>("lunarProAccessDialogShown", default: false)
+    static let completedOnboarding = Key<Bool>("completedOnboarding", default: false)
     static let showTwoSchedules = Key<Bool>("showTwoSchedules", default: false)
     static let showThreeSchedules = Key<Bool>("showThreeSchedules", default: false)
     static let showFourSchedules = Key<Bool>("showFourSchedules", default: false)

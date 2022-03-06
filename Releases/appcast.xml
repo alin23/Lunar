@@ -8,7 +8,7 @@
             <sparkle:version>5.4.1</sparkle:version>
             <sparkle:shortVersionString>5.4.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.1.dmg" length="16475388" type="application/octet-stream" sparkle:edSignature="tbcYwNBj34ka2n0RBqquBdka9iHTqb9d7au1LVRvm7mYk/Owsfw1B+8iLP4R4yfDc5KZ7zc3wdU5BYN8rMriBw==" sparkle:dsaSignature="MEMCH3viXwsIXXjmb+60Ixwl5BrBHn5qddBAA/5DftAci5YCIBev/qmbaV1FglPGF8hnUxe00Ik7ch9Oxlo3bXe42Ysf"/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.1.dmg" length="16475388" type="application/octet-stream" sparkle:edSignature="tbcYwNBj34ka2n0RBqquBdka9iHTqb9d7au1LVRvm7mYk/Owsfw1B+8iLP4R4yfDc5KZ7zc3wdU5BYN8rMriBw==" sparkle:dsaSignature="MEQCIEDyh6bT7tb9MuHfJhVGfSm5eW+epoUoMZowObkuT3jqAiBETnQ4H2j+6hyAMNTRW4y+SVU6B/2ZCh9XMMGMC97zrg=="/>
             <signature>pIF2KBKZjiq.6A0U9PVx8SYcSmo=</signature>
             <signature>pIF2KBKZjiq/6A0U9PVx8SYcSmo=</signature>
             <signature>tE3C3N1sDPEhZSHroaQKxeDbwKs=</signature>
@@ -30,6 +30,15 @@
             <signature>MIE9lzBmwpM8.FUp0DRP30s8kl8=</signature>
             <signature>MIE9lzBmwpM8/FUp0DRP30s8kl8=</signature>
             <signature>857wzRn2C6bu3qw7UV9+0ADGgAs=</signature>
+            <signature>gZJs+LJPhpK7D55uAjxNsZVvzmg=</signature>
+            <signature>g33IcR3JLbLZgK.2UW8DOTNzBzc=</signature>
+            <signature>g33IcR3JLbLZgK/2UW8DOTNzBzc=</signature>
+            <signature>sLRr5PEHGfYPFfNUz4h.XMMftJw=</signature>
+            <signature>sLRr5PEHGfYPFfNUz4h/XMMftJw=</signature>
+            <signature>NBuUcOlVm+7OeMNG.GYfAkD5bco=</signature>
+            <signature>NBuUcOlVm+7OeMNG/GYfAkD5bco=</signature>
+            <signature>YmwzIyyPZe1w0T6zixipK5SLyPQ=</signature>
+            <signature>gtxYBLt3amYNyqhWbxiiuC7b398=</signature>
         </item>
         <item>
             <title>5.4.0</title>

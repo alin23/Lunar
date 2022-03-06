@@ -58,14 +58,8 @@ class OnboardWindowController: ModernWindowController, NSWindowDelegate {
     }
 
     func completeOnboarding() {
+        completedOnboarding = true
         appDelegate!.showWindow(after: 100)
-        if !lunarProAccessDialogShown {
-            lunarProAccessDialogShown = true
-            mainAsync {
-                guard let paddle = paddle, let lunarProProduct = lunarProProduct else { return }
-                paddle.showProductAccessDialog(with: lunarProProduct)
-            }
-        }
 
         mainAsyncAfter(ms: 1000) {
             let nc = UNUserNotificationCenter.current()
