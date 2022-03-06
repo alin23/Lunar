@@ -1,3 +1,27 @@
+# 5.4.2
+## Features
+
+* **Efficient Sync Mode**
+    * A new internal system API is used to react to built-in display brightness changes instead of polling continuously for them
+    * This lowers the CPU usage to `0.1%` on average when no brightness change occurs
+    * This new method can be disabled by setting the *Sync Polling Interval* to a value greater than `0 seconds`
+    * *If brightness syncing stops working after the update, try setting the Polling Interval to `2 seconds`*
+
+![New Sync Mode method](https://files.lunar.fyi/new-sync-mode.png)
+
+* Add `lunar blackout` command to CLI
+* Add `lunar gamma --restore-color-sync` command for resetting to system default color settings
+
+## Improvements
+
+* Update `ddcutil-server` for Raspberry Pi OS 64-bit
+* Improve Lunar CLI help
+
+## Fixes
+
+* Fix software dimming not going back to 100% after app restart on more recent macOS versions
+* Fix BlackOut dialog appearing wrongly
+
 # 5.4.1
 ## Fixes
 
