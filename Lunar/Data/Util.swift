@@ -1028,11 +1028,16 @@ func debounce(
 }
 
 func taskManager(_ key: String, _ value: Any?) {
+    guard !Thread.isMainThread else {
+        Thread.current.threadDictionary[key] = value
+        return
+    }
+
     sync(queue: taskManagerQueue) { Thread.current.threadDictionary[key] = value }
 }
 
 @discardableResult func taskManager(_ key: String, delete: Bool = false) -> Any? {
-    sync(queue: taskManagerQueue) {
+    let action: () -> Any? = {
         let value = Thread.current.threadDictionary[key]
         if delete {
             Thread.current.threadDictionary.removeObject(forKey: key)
@@ -1040,6 +1045,12 @@ func taskManager(_ key: String, _ value: Any?) {
 
         return value
     }
+
+    guard !Thread.isMainThread else {
+        return action()
+    }
+
+    return sync(queue: taskManagerQueue, action)
 }
 
 func debounce<T: Equatable>(
