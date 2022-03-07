@@ -1,3 +1,8 @@
+# 5.4.3
+## Fixes
+
+* Fix deadlock on screen wake/reconnection
+
 # 5.4.2
 ## Features
 
