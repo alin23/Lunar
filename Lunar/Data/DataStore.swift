@@ -553,7 +553,7 @@ func cacheKey<Value>(_ key: Defaults.Key<Value>, load: Bool = true) {
         initSecondPhase()
     }
     Defaults.publisher(key).sink { change in
-        log.debug("Caching \(key.name) = \(change.newValue)")
+        // log.debug("Caching \(key.name) = \(change.newValue)")
         CachedDefaults.cache[key.name] = AnyCodable(change.newValue)
     }.store(in: &CachedDefaults.observers)
 }

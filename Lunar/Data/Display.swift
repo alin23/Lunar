@@ -1937,6 +1937,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var brightness: NSNumber = 50 {
         didSet {
             save()
+            guard timeSince(lastConnectionTime) > 1 else { return }
+
             if applyDisplayServices { userAdjusting = true }
             defer {
                 if applyDisplayServices { userAdjusting = false }
@@ -2015,6 +2017,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var contrast: NSNumber = 50 {
         didSet {
             save()
+            guard timeSince(lastConnectionTime) > 1 else { return }
+
             userAdjusting = true
             defer {
                 userAdjusting = false
