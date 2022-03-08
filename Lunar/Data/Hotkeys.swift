@@ -151,7 +151,7 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
                 register()
             }
             hotkey.detectKeyHold = allowsHold
-            log.debug("Created hotkey with handler \(identifier)")
+            // log.debug("Created hotkey with handler \(identifier)")
             return
         }
 
@@ -168,7 +168,7 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
                 register()
             }
             hotkey.detectKeyHold = allowsHold
-            log.debug("Created hotkey with action/target \(identifier)")
+            // log.debug("Created hotkey with action/target \(identifier)")
             return
         }
 
@@ -195,12 +195,12 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
         hotkey.detectKeyHold = allowsHold
     }
 
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT: \(identifier)")
-            do { log.verbose("END DEINIT: \(identifier)") }
-        #endif
-    }
+    // deinit {
+    //     #if DEBUG
+    //         log.verbose("START DEINIT: \(identifier)")
+    //         do { log.verbose("END DEINIT: \(identifier)") }
+    //     #endif
+    // }
 
     init(hotkey: HotKey, isEnabled: Bool = true, register: Bool = true) {
         self.hotkey = hotkey
@@ -211,13 +211,13 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
     }
 
     required convenience init(from decoder: Decoder) throws {
-        log.debug("Initializing hotkey from decoder")
+        // log.debug("Initializing hotkey from decoder")
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         let identifier = try container.decode(String.self, forKey: .identifier)
-        log.debug("Identifier: \(identifier)")
+        // log.debug("Identifier: \(identifier)")
         let enabled = try container.decode(Bool.self, forKey: .enabled)
-        log.debug("Enabled: \(enabled)")
+        // log.debug("Enabled: \(enabled)")
         let modifiers = try container.decode(Int.self, forKey: .modifiers)
         let keyCode = try container.decode(Int.self, forKey: .keyCode)
         let allowsHold = (try? container.decodeIfPresent(Bool.self, forKey: .allowsHold)) ?? Hotkey.allowHold(for: identifier.hk)
@@ -356,15 +356,15 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
     }
 
     func unregister() {
-        log.debug("Unregistered hotkey \(identifier)")
+        // log.debug("Unregistered hotkey \(identifier)")
         HotKeyCenter.shared.unregisterHotKey(with: hotkey.identifier)
     }
 
     func register() {
-        log.debug("Registered hotkey \(identifier)")
-        #if DEBUG
-            mainAsyncAfter(ms: 10) { [weak self] in log.verbose("Registered hotkey \(self?.description ?? "")") }
-        #endif
+        // log.debug("Registered hotkey \(identifier)")
+        // #if DEBUG
+        //     mainAsyncAfter(ms: 10) { [weak self] in log.verbose("Registered hotkey \(self?.description ?? "")") }
+        // #endif
         hotkey.register()
     }
 
