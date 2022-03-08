@@ -2652,6 +2652,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
+    var onlySoftwareDimmingEnabled: Bool { !ddcEnabled && !networkEnabled && !appleNativeEnabled }
+
     static func ambientLightCompensationEnabled(_ id: CGDirectDisplayID) -> Bool {
         guard DisplayServicesHasAmbientLightCompensation(id) else { return false }
 
@@ -2950,7 +2952,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func shade(amount: Double, smooth: Bool = true) {
         guard !isInHardwareMirrorSet, !isIndependentDummy, let screen = screen ?? primaryMirrorScreen,
-              timeSince(lastConnectionTime) >= 5
+              timeSince(lastConnectionTime) >= 5 || onlySoftwareDimmingEnabled
         else {
             shadeWindowController?.close()
             shadeWindowController = nil
@@ -4198,7 +4200,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             guard !isForTesting else { return }
         #endif
 
-        guard enabledControls[.gamma] ?? false, timeSince(lastConnectionTime) >= 5 else { return }
+        guard enabledControls[.gamma] ?? false, timeSince(lastConnectionTime) >= 5 || onlySoftwareDimmingEnabled else { return }
         gammaLock()
         settingGamma = true
         defer { settingGamma = false }
