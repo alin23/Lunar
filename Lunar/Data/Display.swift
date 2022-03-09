@@ -920,6 +920,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case proart = 1715
         case acer = 1138
         case hp = 8718
+        case dummy = 0xF0F0
         case unknown = -1
     }
 
@@ -1278,7 +1279,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     var preciseContrastBeforeAppPreset = 0.5
 
-    @objc dynamic lazy var isDummy: Bool = Self.dummyNamePattern.matches(name) && vendor != .samsung
+    @objc dynamic lazy var isDummy: Bool = (Self.dummyNamePattern.matches(name) || vendor == .dummy) && vendor != .samsung
 
     @objc dynamic lazy var otherDisplays: [Display] = displayController.activeDisplayList.filter { $0.serial != serial }
 
@@ -3957,7 +3958,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             specificBlockers = DEFAULT_DDC_BLOCKERS
         case .proart:
             specificBlockers = DEFAULT_DDC_BLOCKERS
-        case .unknown:
+        case .unknown, .dummy:
             specificBlockers = DEFAULT_DDC_BLOCKERS
         }
 
@@ -4173,7 +4174,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         if apply(gamma: gammaTable) {
             lastGammaTable = gammaTable
         }
-        gammaChanged = true
+        gammaChanged = false
     }
 
     @discardableResult func gammaLock() -> Bool {

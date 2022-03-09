@@ -189,27 +189,6 @@ class ModernWindow: WAYWindow {
         }
     }
 
-    override func flagsChanged(with event: NSEvent) {
-        if event.modifierFlags.contains(.control) {
-            log.verbose("Fastest scroll threshold")
-            scrollDeltaYThreshold = FASTEST_SCROLL_Y_THRESHOLD
-        } else if event.modifierFlags.contains(.command) {
-            log.verbose("Precise scroll threshold")
-            scrollDeltaYThreshold = PRECISE_SCROLL_Y_THRESHOLD
-        } else if event.modifierFlags.contains(.option) {
-            log.verbose("Fast scroll threshold")
-            scrollDeltaYThreshold = FAST_SCROLL_Y_THRESHOLD
-        } else if event.modifierFlags.isDisjoint(with: [.command, .option, .control]) {
-            log.verbose("Normal scroll threshold")
-            scrollDeltaYThreshold = NORMAL_SCROLL_Y_THRESHOLD
-        }
-
-        AppDelegate.optionKeyPressed = event.modifierFlags.contains(.option)
-        AppDelegate.shiftKeyPressed = event.modifierFlags.contains(.shift)
-        log.debug("Option key pressed: \(AppDelegate.optionKeyPressed)")
-        log.debug("Shift key pressed: \(AppDelegate.shiftKeyPressed)")
-    }
-
     func setup() {
         titleBarHeight = 50
         verticallyCenterTitle = true
@@ -218,6 +197,7 @@ class ModernWindow: WAYWindow {
         trafficLightButtonsLeftMargin = 20
         trafficLightButtonsTopMargin = 0
         hideTitleBarInFullScreen = false
+        isMovableByWindowBackground = true
         if let titlebarViews = titlebarAccessoryViewControllers[0].parent?.view.subviews {
             let matchingViews = titlebarViews
                 .filter { $0.frame.origin.x == 0 && $0.frame.origin.y == 0 && $0.frame.width == 950 && $0.frame.height == 28 }

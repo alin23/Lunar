@@ -219,6 +219,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var appPresetHandler: DispatchWorkItem?
 
+    var lastCommandModifierPressedTime: Date?
+    var commandModifierPressedCount = 0
+
     var currentPage: Int = Page.display.rawValue {
         didSet {
             log.verbose("Current Page: \(currentPage)")
@@ -1432,6 +1435,66 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         PFMoveToApplicationsFolderIfNecessary()
     }
 
+    func checkEmergencyBlackoutOff(event: NSEvent) {
+        guard event.modifierFlags.contains(.command) else { return }
+
+        guard lastCommandModifierPressedTime == nil || timeSince(lastCommandModifierPressedTime!) < 1 else {
+            commandModifierPressedCount = 0
+            lastCommandModifierPressedTime = nil
+            return
+        }
+
+        lastCommandModifierPressedTime = Date()
+        commandModifierPressedCount += 1
+
+        if commandModifierPressedCount > 5 {
+            log.warning("Command key pressed 5 times in a row, disabling BlackOut forcefully!")
+            commandModifierPressedCount = 0
+            lastCommandModifierPressedTime = nil
+            displayController.activeDisplayList.forEach {
+                $0.resetSoftwareControl()
+                displayController.blackOut(display: $0.id, state: .off)
+                $0.blackOutEnabled = false
+                $0.mirroredBeforeBlackOut = false
+                $0.brightness = 50
+                $0.contrast = 50
+            }
+        }
+    }
+
+    func handleModifierScrollThreshold(event: NSEvent) {
+        if event.modifierFlags.contains(.control) {
+            log.verbose("Fastest scroll threshold")
+            scrollDeltaYThreshold = FASTEST_SCROLL_Y_THRESHOLD
+        } else if event.modifierFlags.contains(.command) {
+            log.verbose("Precise scroll threshold")
+            scrollDeltaYThreshold = PRECISE_SCROLL_Y_THRESHOLD
+        } else if event.modifierFlags.contains(.option) {
+            log.verbose("Fast scroll threshold")
+            scrollDeltaYThreshold = FAST_SCROLL_Y_THRESHOLD
+        } else if event.modifierFlags.isDisjoint(with: [.command, .option, .control]) {
+            log.verbose("Normal scroll threshold")
+            scrollDeltaYThreshold = NORMAL_SCROLL_Y_THRESHOLD
+        }
+
+        AppDelegate.optionKeyPressed = event.modifierFlags.contains(.option)
+        AppDelegate.shiftKeyPressed = event.modifierFlags.contains(.shift)
+        log.debug("Option key pressed: \(AppDelegate.optionKeyPressed)")
+        log.debug("Shift key pressed: \(AppDelegate.shiftKeyPressed)")
+    }
+
+    func addGlobalModifierMonitor() {
+        NSEvent.addGlobalMonitorForEvents(matching: [.flagsChanged]) { [self] event in
+            checkEmergencyBlackoutOff(event: event)
+        }
+        NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [self] event in
+            checkEmergencyBlackoutOff(event: event)
+            handleModifierScrollThreshold(event: event)
+
+            return event
+        }
+    }
+
     func addGlobalMouseDownMonitor() {
         NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]) { _ in
             guard let menuPopover = menuPopover, menuPopover.isShown else { return }
@@ -1641,6 +1704,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         initMenubarIcon()
 
         addGlobalMouseDownMonitor()
+        addGlobalModifierMonitor()
         initHotkeys()
 
         listenForAdaptiveModeChange()
@@ -2071,10 +2135,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBAction func installCLI(_: Any) {
         let shouldInstall: Bool = ask(
             message: "Lunar CLI",
-            info: "This will install the `lunar` script into /usr/local/bin.\n\nDo you want to proceed?",
+            info: "This will install the `lunar` script into `/usr/local/bin`.\n\nDo you want to proceed?",
             okButton: "Yes",
             cancelButton: "No",
-            unique: true
+            unique: true,
+            markdown: true
         )
         if shouldInstall {
             installCLIAndShowDialog()

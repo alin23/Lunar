@@ -1184,23 +1184,25 @@ class DisplayViewController: NSViewController {
         if display.control is GammaControl {
             guard ask(message: "Monitor Reset", info: """
             This will reset the following settings for this display:
-            • The algorithm curve that Lunar learned from your adjustments
-            • The enabled controls
-            • The "Always Use Network Control" setting
-            • The "Always Fallback to Gamma" setting
-            • The min/max brightness/contrast values
-            """, okButton: "Ok", cancelButton: "Cancel", window: view.window, onCompletion: resetHandler, wide: true)
+
+            * The *algorithm curve* that Lunar learned from your adjustments
+            * The checkboxes for enabled controls
+            * The *"Always Use Network Control"* setting
+            * The *"Always Fallback to Gamma"* setting
+            * The min/max brightness/contrast values
+            """, okButton: "Ok", cancelButton: "Cancel", window: view.window, onCompletion: resetHandler, wide: true, markdown: true)
             else { return }
         } else {
             guard ask(message: "Monitor Reset", info: """
             This will reset the following settings for this display:
-            • Everything you have manually adjusted using the monitor's physical buttons/controls
-            • The algorithm curve that Lunar learned from your adjustments
-            • The enabled controls
-            • The "Always Use Network Control" setting
-            • The "Always Fallback to Gamma" setting
-            • The min/max brightness/contrast values
-            """, okButton: "Ok", cancelButton: "Cancel", window: view.window, onCompletion: resetHandler, wide: true)
+
+            * Everything you have manually adjusted using the monitor's physical buttons/controls
+            * The *algorithm curve* that Lunar learned from your adjustments
+            * The checkboxes for enabled controls
+            * The *"Always Use Network Control"* setting
+            * The *"Always Fallback to Gamma"* setting
+            * The min/max brightness/contrast values
+            """, okButton: "Ok", cancelButton: "Cancel", window: view.window, onCompletion: resetHandler, wide: true, markdown: true)
             else { return }
         }
         if view.window == nil {
@@ -1404,11 +1406,13 @@ class DisplayViewController: NSViewController {
 
             Hold the Option key while clicking the button (or while pressing the hotkey) if you want to power off the monitor completely using DDC.
 
-            Caveats for DDC power offf:
+            Caveats for DDC power off:
               • works only if the monitor can be controlled through DDC
               • can't be used to power on the monitor
               • when a monitor is turned off or in standby, it does not accept commands from a connected device
               • remember to keep holding the Option key for 2 seconds after you pressed the button to account for possible DDC delays
+
+            Emergency Kill Switch: press the ⌘ Command key more than 5 times in a row to force disable BlackOut.
             """
         }
         guard displayController.activeDisplays.count > 1 || CachedDefaults[.allowBlackOutOnSingleScreen] else {
@@ -1425,6 +1429,8 @@ class DisplayViewController: NSViewController {
         Can also be toggled with the keyboard using Ctrl-Cmd-6.
 
         Hold the Shift key while clicking the button (or while pressing the hotkey) if you only want to make the screen black without changing the mirroring state.
+
+        Emergency Kill Switch: press the ⌘ Command key more than 5 times in a row to force disable BlackOut.
         """
     }
 
