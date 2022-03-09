@@ -1275,13 +1275,13 @@ class DisplayController {
         let resp = ask(
             message: "Non-responsive display \"\(display.name)\"",
             info: """
-                This display is not responding to commands in
-                \(display.control!.str) mode.
+                `\(display.name)` is not responding to commands in
+                **\(display.control!.str)** mode.
 
-                Do you want to fallback to adjusting brightness in software?
+                Do you want to fallback to `Software Dimming`?
 
-                Note: adjust the monitor to [BRIGHTNESS: 100%, CONTRAST: 70%] manually
-                using its physical buttons to allow for a full range in software.
+                Note: adjust the monitor to `[BRIGHTNESS: 100%, CONTRAST: 70%]` manually
+                using its physical buttons to allow for a full range in software dimming.
             """,
             okButton: "Yes",
             cancelButton: "Not now",
@@ -1296,7 +1296,8 @@ class DisplayController {
             onCompletion: completionHandler,
             unique: true,
             waitTimeout: 60.seconds,
-            wide: true
+            wide: true,
+            markdown: true
         )
         if window == nil {
             completionHandler(resp)

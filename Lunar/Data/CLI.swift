@@ -464,63 +464,64 @@ struct Lunar: ParsableCommand {
                 displayIDs = [display.id]
             }
 
+            let resultString = { v in v == KERN_SUCCESS ? "Success" : "Failed" }
             for id in displayIDs {
                 var brightness: Float = value.f
                 let type: UInt32 = value2.u32
                 switch method {
                 case .GetLinearBrightness:
-                    DisplayServicesGetLinearBrightness(id, &brightness)
+                    cliPrint(resultString(DisplayServicesGetLinearBrightness(id, &brightness)))
                     cliPrint(value)
                 case .SetLinearBrightness:
                     cliPrint("Setting LinearBrightness to \(brightness) for ID: \(id)")
-                    DisplayServicesSetLinearBrightness(id, brightness)
+                    cliPrint(resultString(DisplayServicesSetLinearBrightness(id, brightness)))
                 case .GetBrightness:
-                    DisplayServicesGetBrightness(id, &brightness)
+                    cliPrint(resultString(DisplayServicesGetBrightness(id, &brightness)))
                     cliPrint(brightness)
                 case .SetBrightness:
                     cliPrint("Setting Brightness to \(brightness) for ID: \(id)")
-                    DisplayServicesSetBrightness(id, brightness)
+                    cliPrint(resultString(DisplayServicesSetBrightness(id, brightness)))
                 case .SetBrightnessSmooth:
                     cliPrint("Setting BrightnessSmooth to \(brightness) for ID: \(id)")
-                    DisplayServicesSetBrightnessSmooth(id, brightness)
+                    cliPrint(resultString(DisplayServicesSetBrightnessSmooth(id, brightness)))
                 case .SetBrightnessWithType:
                     cliPrint("Setting BrightnessWithType to \(brightness) with type \(type) for ID: \(id)")
-                    DisplayServicesSetBrightnessWithType(id, type, brightness)
+                    cliPrint(resultString(DisplayServicesSetBrightnessWithType(id, type, brightness)))
                 case .CanChangeBrightness:
                     cliPrint(DisplayServicesCanChangeBrightness(id))
                 case .IsSmartDisplay:
                     cliPrint(DisplayServicesIsSmartDisplay(id))
                 case .BrightnessChanged:
                     cliPrint("Sending brightness change notification")
-                    DisplayServicesBrightnessChanged(id, value)
+                    cliPrint(DisplayServicesBrightnessChanged(id, value))
 
                 case .GetPowerMode:
                     cliPrint(DisplayServicesGetPowerMode(id))
                 case .SetPowerMode:
-                    cliPrint(DisplayServicesSetPowerMode(id, value.u8))
+                    cliPrint(resultString(DisplayServicesSetPowerMode(id, value.u8)))
 
                 case .GetBrightnessIncrement:
                     cliPrint(DisplayServicesGetBrightnessIncrement(id))
                 case .NeedsBrightnessSmoothing:
                     cliPrint(DisplayServicesNeedsBrightnessSmoothing(id))
                 case .EnableAmbientLightCompensation:
-                    cliPrint(DisplayServicesEnableAmbientLightCompensation(id, value == 1))
+                    cliPrint(resultString(DisplayServicesEnableAmbientLightCompensation(id, value == 1)))
                 case .AmbientLightCompensationEnabled:
                     var enabled = false
-                    cliPrint(DisplayServicesAmbientLightCompensationEnabled(id, &enabled))
+                    cliPrint(resultString(DisplayServicesAmbientLightCompensationEnabled(id, &enabled)))
                     cliPrint(enabled)
                 case .HasAmbientLightCompensation:
                     cliPrint(DisplayServicesHasAmbientLightCompensation(id))
                 case .ResetAmbientLight:
-                    cliPrint(DisplayServicesResetAmbientLight(id, id))
+                    cliPrint(resultString(DisplayServicesResetAmbientLight(id, id)))
                 case .ResetAmbientLightAll:
-                    cliPrint(DisplayServicesResetAmbientLightAll())
+                    cliPrint(resultString(DisplayServicesResetAmbientLightAll()))
                 case .CanResetAmbientLight:
                     cliPrint(DisplayServicesCanResetAmbientLight(id, 1))
                 case .GetLinearBrightnessUsableRange:
                     var min: Int32 = 0
                     var max: Int32 = 0
-                    cliPrint(DisplayServicesGetLinearBrightnessUsableRange(id, &min, &max))
+                    cliPrint(resultString(DisplayServicesGetLinearBrightnessUsableRange(id, &min, &max)))
                     cliPrint("\(min) - \(max)")
                 case .CreateBrightnessTable:
                     guard let table = DisplayServicesCreateBrightnessTable(id, value.i32) as? [Int] else { return cliExit(0) }

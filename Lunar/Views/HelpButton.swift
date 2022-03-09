@@ -49,6 +49,7 @@ func getMD(dark: Bool = false) -> SwiftyMarkdown {
 
 let MD: SwiftyMarkdown = getMD()
 let DARK_MD: SwiftyMarkdown = getMD(dark: true)
+var MARKDOWN: SwiftyMarkdown { darkMode ? DARK_MD : MD }
 
 // MARK: - OnboardingHelpButton
 

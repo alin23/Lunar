@@ -70,27 +70,27 @@ class LockButton: NSButton {
 
     @IBInspectable dynamic var labelOn: NSColor = lockButtonLabelOn {
         didSet {
-            attributedTitle = attributedTitle.withTextColor(labelOff)
-            attributedAlternateTitle = attributedAlternateTitle.withTextColor(labelOn)
+            setAttributedTitleColor(labelOff)
+            setAttributedTitleColor(labelOn, alternate: true)
         }
     }
 
     @IBInspectable dynamic var labelOff: NSColor = lockButtonLabelOff {
         didSet {
-            attributedTitle = attributedTitle.withTextColor(labelOff)
-            attributedAlternateTitle = attributedAlternateTitle.withTextColor(labelOn)
+            setAttributedTitleColor(labelOff)
+            setAttributedTitleColor(labelOn, alternate: true)
         }
     }
 
     override var isEnabled: Bool {
         didSet {
             if isEnabled {
-                attributedAlternateTitle = attributedAlternateTitle.withTextColor(labelOn)
-                attributedTitle = attributedTitle.withTextColor(labelOff)
+                setAttributedTitleColor(labelOn, alternate: true)
+                setAttributedTitleColor(labelOff)
                 bg = state == .on ? bgOn : bgOff
             } else {
-                attributedAlternateTitle = attributedAlternateTitle.withTextColor(labelOn.with(alpha: -0.2))
-                attributedTitle = attributedTitle.withTextColor(labelOff.with(alpha: -0.2))
+                setAttributedTitleColor(labelOn.with(alpha: -0.2), alternate: true)
+                setAttributedTitleColor(labelOff.with(alpha: -0.2))
                 bg = state == .on ? bgOn.with(alpha: -0.2) : bgOff.with(alpha: -0.2)
             }
         }
@@ -122,11 +122,47 @@ class LockButton: NSButton {
         }
     }
 
+    func setAttributedTitleColor(_ color: NSColor, alternate: Bool = false) {
+        var attrTitle = alternate ? attributedAlternateTitle : attributedTitle
+        let s = attrTitle.string
+        guard let newlineIndex = s.distance(of: "\n") else {
+            if alternate {
+                attributedAlternateTitle = attrTitle.withTextColor(color)
+            } else {
+                attributedTitle = attrTitle.withTextColor(color)
+            }
+            return
+        }
+        let titleSubrange = 0 ..< newlineIndex
+        let subtitleSubrange = newlineIndex ..< (s.count)
+        let title = attrTitle.attributedSubstring(from: titleSubrange)
+        let subtitle = attrTitle.attributedSubstring(from: subtitleSubrange)
+
+        let font = (title.fontAttributes(in: titleSubrange).first(where: { $0.keyName == .font })?.value as? NSFont) ?? NSFont
+            .systemFont(ofSize: 11, weight: .bold)
+
+        let subtitleStyle = NSMutableParagraphStyle()
+        subtitleStyle.lineSpacing = 0
+        subtitleStyle.maximumLineHeight = 8
+        subtitleStyle.alignment = .center
+
+        attrTitle = title.withTextColor(color) + subtitle
+            .withTextColor(color)
+            .withFont(font.withSize(font.pointSize - 3))
+            .withParagraphStyle(subtitleStyle)
+
+        if alternate {
+            attributedAlternateTitle = attrTitle
+        } else {
+            attributedTitle = attrTitle
+        }
+    }
+
     func setup(_ locked: Bool = false) {
         wantsLayer = true
 
-        attributedTitle = attributedTitle.withTextColor(labelOff)
-        attributedAlternateTitle = attributedAlternateTitle.withTextColor(labelOn)
+        setAttributedTitleColor(labelOff)
+        setAttributedTitleColor(labelOn, alternate: true)
 
         let size = frameSize
         setFrameSize(NSSize(width: size.width, height: size.height + (size.height * verticalPadding)))
