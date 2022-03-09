@@ -1319,6 +1319,8 @@ func createWindow(
 
 var alertsByMessageSemaphore = DispatchSemaphore(value: 1, name: "alertsByMessageSemaphore")
 var alertsByMessage = [String: Bool]()
+import Regex
+let WHITESPACE_REGEX = "\\s+".r!
 
 func dialog(
     message: String,
@@ -1330,7 +1332,8 @@ func dialog(
     window: NSWindow? = nil,
     suppressionText: String? = nil,
     wide: Bool = false,
-    ultrawide: Bool = false
+    ultrawide: Bool = false,
+    markdown: Bool = false
 ) -> NSAlert {
     mainThread {
         let alert = NSAlert()
@@ -1339,9 +1342,9 @@ func dialog(
         alert.alertStyle = .warning
 
         if ultrawide {
-            alert.accessoryView = NSView(frame: NSRect(origin: .zero, size: NSSize(width: 500, height: 0)))
-        } else if wide {
             alert.accessoryView = NSView(frame: NSRect(origin: .zero, size: NSSize(width: 650, height: 0)))
+        } else if wide {
+            alert.accessoryView = NSView(frame: NSRect(origin: .zero, size: NSSize(width: 500, height: 0)))
         }
 
         if let okButton = okButton {
@@ -1377,8 +1380,19 @@ func dialog(
                 w.makeKeyAndOrderFront(nil)
             }
         }
+
+        if markdown, let infoTextField = textField(alert: alert, containing: info) {
+            infoTextField.attributedStringValue = MARKDOWN.attributedString(from: info)
+        }
         return alert
     }
+}
+
+func textField(alert: NSAlert, containing text: String) -> NSTextField? {
+    alert.window.contentView?.subviews.first { view in
+        guard let s = (view as? NSTextField)?.stringValue else { return false }
+        return WHITESPACE_REGEX.replaceAll(in: s, with: "") == WHITESPACE_REGEX.replaceAll(in: text, with: "")
+    } as? NSTextField
 }
 
 func ask(
@@ -1441,7 +1455,8 @@ func ask(
     unique: Bool = false,
     waitTimeout: DateComponents = 5.seconds,
     wide: Bool = false,
-    ultrawide: Bool = false
+    ultrawide: Bool = false,
+    markdown: Bool = false
 ) -> Bool {
     ask(
         message: message,
@@ -1457,7 +1472,8 @@ func ask(
         unique: unique,
         waitTimeout: waitTimeout,
         wide: wide,
-        ultrawide: ultrawide
+        ultrawide: ultrawide,
+        markdown: markdown
     ) == .alertFirstButtonReturn
 }
 
@@ -1475,7 +1491,8 @@ func ask(
     unique: Bool = false,
     waitTimeout: DateComponents = 5.seconds,
     wide: Bool = false,
-    ultrawide: Bool = false
+    ultrawide: Bool = false,
+    markdown: Bool = false
 ) -> NSApplication.ModalResponse {
     if unique {
         defer { alertsByMessageSemaphore.signal() }
@@ -1502,7 +1519,8 @@ func ask(
             window: window,
             suppressionText: suppressionText,
             wide: wide,
-            ultrawide: ultrawide
+            ultrawide: ultrawide,
+            markdown: markdown
         )
 
         if let window = window {

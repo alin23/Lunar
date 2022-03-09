@@ -20,6 +20,10 @@ let NIGHT_SHIFT_TAB_SCRIPT =
         reveal anchor "displaysNightShiftTab" of pane id "com.apple.preference.displays"
         activate
     end tell
+
+    tell application "System Events" to tell process "System Preferences"
+        click button "Night Shift…" of window 1
+    end tell
     """
 
 var fluxPromptTime: Date?
@@ -49,10 +53,13 @@ class GammaControl: Control {
         else { return }
 
         fluxPromptTime = Date()
+        let displayID = display.id
 
         let completionHandler = { [weak self] (keepFlux: Bool) in
             guard !keepFlux else {
-                self?.display?.useOverlay = true
+                if let display = displayController.activeDisplays[displayID] {
+                    display.useOverlay = true
+                }
                 return
             }
 
@@ -61,6 +68,10 @@ class GammaControl: Control {
                 let client = CBBlueLightClient()
                 client.setMode(1)
                 client.setStrength(0.5, commit: true)
+            }
+
+            if let url = URL(string: "https://shifty.natethompson.io") {
+                NSWorkspace.shared.open(url)
             }
 
             guard let script = NSAppleScript(source: NIGHT_SHIFT_TAB_SCRIPT) else { return }
@@ -74,21 +85,19 @@ class GammaControl: Control {
         let window = mainThread { appDelegate!.windowController?.window }
 
         let resp = ask(
-            message: "F.lux app is conflicting with Lunar",
+            message: "Conflict between F.lux and Lunar detected",
             info: """
-                This display is controlled using gamma tables
+            **F.lux** adjusts the colour temperature of your screen using the same method used by Lunar for *Software Dimming*.
 
-                F.lux uses the same method to adjust the colour temperature of your screen.
+            ### Possible fixes:
 
-                Unfortunately, only one app is allowed to change the gamma tables.
+            1. Set Lunar to dim brightness using a dark overlay
+            2. Stop using f.lux, switch to `Night Shift` + `Shifty`
 
-                For Lunar to work properly, you can either:
-
-                1. Switch to a dark overlay for brightness dimming
-                2. Or stop using f.lux and switch to Night Shift
+            **Note:** `Night Shift` can also get smarter schedules, app exclusion, keyboard temperature control and more using **[Shifty](https://shifty.natethompson.io)**
             """,
             okButton: "Use dark overlay",
-            cancelButton: "Quit f.lux",
+            cancelButton: "Quit f.lux and switch to Night Shift",
             screen: display.screen ?? display.primaryMirrorScreen,
             window: window,
             suppressionText: "Never ask again",
@@ -98,7 +107,8 @@ class GammaControl: Control {
             onCompletion: completionHandler,
             unique: true,
             waitTimeout: 60.seconds,
-            wide: true
+            wide: true,
+            markdown: true
         )
         if window == nil {
             completionHandler(resp)
