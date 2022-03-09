@@ -99,23 +99,23 @@ extension BinaryInteger {
     }
 
     @inline(__always) var u: UInt {
-        UInt(self)
+        UInt(max(self, 0))
     }
 
     @inline(__always) var u8: UInt8 {
-        UInt8(self)
+        UInt8(max(self, 0))
     }
 
     @inline(__always) var u16: UInt16 {
-        UInt16(self)
+        UInt16(max(self, 0))
     }
 
     @inline(__always) var u32: UInt32 {
-        UInt32(self)
+        UInt32(max(self, 0))
     }
 
     @inline(__always) var u64: UInt64 {
-        UInt64(self)
+        UInt64(max(self, 0))
     }
 
     @inline(__always) var i: Int {
