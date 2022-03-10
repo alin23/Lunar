@@ -63,6 +63,9 @@ class GammaControl: Control {
                 return
             }
 
+            if let display = displayController.activeDisplays[displayID] {
+                display.useOverlay = false
+            }
             flux.terminate()
             if CBBlueLightClient.supportsBlueLightReduction() {
                 let client = CBBlueLightClient()
@@ -84,6 +87,7 @@ class GammaControl: Control {
 
         let window = mainThread { appDelegate!.windowController?.window }
 
+        display.useOverlay = true
         let resp = ask(
             message: "Conflict between F.lux and Lunar detected",
             info: """
