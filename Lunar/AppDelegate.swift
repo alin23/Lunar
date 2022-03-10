@@ -1438,7 +1438,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func checkEmergencyBlackoutOff(event: NSEvent) {
         guard event.modifierFlags.contains(.command) else { return }
 
-        guard lastCommandModifierPressedTime == nil || timeSince(lastCommandModifierPressedTime!) < 1 else {
+        guard lastCommandModifierPressedTime == nil || timeSince(lastCommandModifierPressedTime!) < 0.4 else {
             commandModifierPressedCount = 0
             lastCommandModifierPressedTime = nil
             return
@@ -1447,8 +1447,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         lastCommandModifierPressedTime = Date()
         commandModifierPressedCount += 1
 
-        if commandModifierPressedCount > 5 {
-            log.warning("Command key pressed 5 times in a row, disabling BlackOut forcefully!")
+        if commandModifierPressedCount > 8 {
+            log.warning("Command key pressed 8 times in a row, disabling BlackOut forcefully!")
             commandModifierPressedCount = 0
             lastCommandModifierPressedTime = nil
             displayController.activeDisplayList.forEach {
@@ -1456,8 +1456,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 displayController.blackOut(display: $0.id, state: .off)
                 $0.blackOutEnabled = false
                 $0.mirroredBeforeBlackOut = false
-                $0.brightness = 50
-                $0.contrast = 50
+                if $0.brightness.doubleValue <= 10 {
+                    $0.brightness = 50
+                }
+                if $0.contrast.doubleValue <= 10 {
+                    $0.contrast = 50
+                }
             }
         }
     }
