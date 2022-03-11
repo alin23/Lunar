@@ -1412,7 +1412,7 @@ class DisplayViewController: NSViewController {
               • when a monitor is turned off or in standby, it does not accept commands from a connected device
               • remember to keep holding the Option key for 2 seconds after you pressed the button to account for possible DDC delays
 
-            Emergency Kill Switch: press the ⌘ Command key more than 5 times in a row to force disable BlackOut.
+            Emergency Kill Switch: press the ⌘ Command key more than 8 times in a row to force disable BlackOut.
             """
         }
         guard displayController.activeDisplays.count > 1 || CachedDefaults[.allowBlackOutOnSingleScreen] else {
@@ -1430,7 +1430,7 @@ class DisplayViewController: NSViewController {
 
         Hold the Shift key while clicking the button (or while pressing the hotkey) if you only want to make the screen black without changing the mirroring state.
 
-        Emergency Kill Switch: press the ⌘ Command key more than 5 times in a row to force disable BlackOut.
+        Emergency Kill Switch: press the ⌘ Command key more than 8 times in a row to force disable BlackOut.
         """
     }
 
