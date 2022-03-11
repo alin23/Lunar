@@ -2000,7 +2000,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 ).rounded().u16
             }
 
-            log.verbose("Set BRIGHTNESS to \(brightness) for \(description) (old: \(oldBrightness))", context: context)
+            log.info("Set BRIGHTNESS to \(brightness) for \(description) (old: \(oldBrightness))", context: context)
+//            Thread.callStackSymbols.forEach {
+//                log.info($0)
+//            }
 
             if let control = control as? DDCControl {
                 _ = control.setBrightnessDebounced(brightness, oldValue: oldBrightness)
@@ -2079,7 +2082,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 ).rounded().u16
             }
 
-            log.verbose("Set CONTRAST to \(contrast) for \(description) (old: \(oldContrast))", context: context)
+            log.info("Set CONTRAST to \(contrast) for \(description) (old: \(oldContrast))", context: context)
+//            Thread.callStackSymbols.forEach {
+//                log.info($0)
+//            }
 
             if let control = control as? DDCControl {
                 _ = control.setContrastDebounced(contrast, oldValue: oldContrast)

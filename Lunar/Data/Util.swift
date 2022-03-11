@@ -729,7 +729,7 @@ func serialAsyncAfter(ms: Int, _ action: DispatchWorkItem) {
             taskManager(key, nil)
         }
 
-        sync(queue: taskManagerQueue) {
+        taskManagerQueue.async {
             (Thread.current.threadDictionary[key] as? DispatchWorkItem)?.cancel()
             Thread.current.threadDictionary["\(key)-cancelled"] = false
             Thread.current.threadDictionary[key] = task
@@ -890,7 +890,9 @@ func cancelTask(_ key: String, subscriberKey: String? = nil) {
     }
 
     globalObservers.removeValue(forKey: subscriberKey ?? key)
-    taskManager(key, delete: true)
+    taskManagerQueue.async {
+        Thread.current.threadDictionary.removeObject(forKey: key)
+    }
 //    }
 }
 
@@ -1028,29 +1030,13 @@ func debounce(
 }
 
 func taskManager(_ key: String, _ value: Any?) {
-    guard !Thread.isMainThread else {
-        Thread.current.threadDictionary[key] = value
-        return
-    }
-
-    sync(queue: taskManagerQueue) { Thread.current.threadDictionary[key] = value }
+    taskManagerQueue.async { Thread.current.threadDictionary[key] = value }
 }
 
-@discardableResult func taskManager(_ key: String, delete: Bool = false) -> Any? {
-    let action: () -> Any? = {
-        let value = Thread.current.threadDictionary[key]
-        if delete {
-            Thread.current.threadDictionary.removeObject(forKey: key)
-        }
-
-        return value
+func taskManager(_ key: String) -> Any? {
+    sync(queue: taskManagerQueue) {
+        Thread.current.threadDictionary[key]
     }
-
-    guard !Thread.isMainThread else {
-        return action()
-    }
-
-    return sync(queue: taskManagerQueue, action)
 }
 
 func debounce<T: Equatable>(
