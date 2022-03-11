@@ -499,6 +499,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         CachedDefaults[.syncMode] = mode == .sync
 
         adaptiveBrightnessModePublisher.sink { change in
+            log.info("adaptiveBrightnessModePublisher: \(change)")
             SentrySDK.configureScope { scope in
                 scope.setTag(value: change.newValue.str, key: "adaptiveMode")
                 scope.setTag(value: change.oldValue.str, key: "lastAdaptiveMode")
@@ -950,7 +951,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         initMenuPopover()
         DistributedNotificationCenter.default()
             .publisher(for: NSNotification.Name(rawValue: kAppleInterfaceThemeChangedNotification), object: nil)
-            .sink { [self] _ in
+            .sink { [self] notification in
+                log.info("\(notification.name)")
                 mainAsync {
                     initMenuItems()
                     for (key, popover) in POPOVERS {
@@ -1008,9 +1010,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 object: nil
             )
             .sink { n in
+                log.info("\(n.name)")
                 guard let displayUUID = n.userInfo?["DeviceID"] as? String,
                       let display = displayController.activeDisplays.values.first(where: { $0.serial == displayUUID }) else { return }
-                log.debug("ColorSync changed for \(display)")
+                log.info("ColorSync changed for \(display)")
                 display.refreshGamma()
                 display.reapplyGamma()
 
@@ -1022,14 +1025,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .merge(with: NSWorkspace.shared.publisher(for: \.frontmostApplication).map { $0 as Any? }.eraseToAnyPublisher())
             .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
             .sink { [self] notif in
-                log.debug("\(notif.debugDescription)")
-//                if let appPresetHandler = appPresetHandler {
-//                    appPresetHandler.cancel()
-//                }
-//                appPresetHandler = displayController.thrice(uniqueTaskKey: "appPresetHandler") { d in
-//                    guard let appPresetHandler = appPresetHandler, !appPresetHandler.isCancelled else {return}
-//                    d.adaptBrightness(force: true)
-//                }
+                switch notif {
+                case let n as Notification:
+                    log.info("\(n.name)")
+                case let a as NSRunningApplication:
+                    log.info("Frontmost application changed: \(a.localizedName ?? "") \(a.bundleIdentifier ?? "") \(a.processIdentifier)")
+                default:
+                    log.info("\(notif.debugDescription)")
+                }
+
                 guard let apps = CachedDefaults[.appExceptions], !apps.isEmpty else {
                     updateInfoMenuItem()
                     return
@@ -1043,7 +1047,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         NotificationCenter.default
             .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
-            .sink { _ in
+            .sink { notification in
+                log.info("\(notification.name)")
                 displayController.reconfigure()
             }.store(in: &observers)
 
@@ -1051,7 +1056,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
             .debounce(for: .seconds(1), scheduler: RunLoop.main)
             .sink { _ in
-                log.debug("Screen configuration changed")
+                log.info("Screen configuration changed")
                 displayController.activeDisplays.values.forEach { d in
                     d.updateCornerWindow()
                 }

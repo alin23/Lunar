@@ -147,6 +147,8 @@ let log = Logger.self
 import Sentry
 
 func crumb(_ msg: String, level: SentryLevel = .info, category: String) {
+    log.info("\(category): \(msg)")
+
     let crumb = Breadcrumb(level: level, category: category)
     crumb.message = msg
     SentrySDK.addBreadcrumb(crumb: crumb)

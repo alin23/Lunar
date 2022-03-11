@@ -1429,17 +1429,18 @@ class DisplayController {
         NSWorkspace.shared.publisher(for: \.runningApplications, options: [.new])
             .debounce(for: .seconds(1), scheduler: RunLoop.main)
             .sink { [self] change in
-
                 let identifiers = change.compactMap(\.bundleIdentifier)
 
                 if identifiers.contains(FLUX_IDENTIFIER),
                    let app = change.first(where: { app in app.bundleIdentifier == FLUX_IDENTIFIER }),
-                   let display = activeDisplays.values.first(where: { d in d.control is GammaControl })
+                   let display = activeDisplays.values.first(where: { d in d.control is GammaControl }),
+                   let control = display.control as? GammaControl
                 {
-                    (display.control as! GammaControl).fluxChecker(flux: app)
+                    control.fluxChecker(flux: app)
                 }
 
                 runningAppExceptions = datastore.appExceptions(identifiers: Array(identifiers.uniqued())) ?? []
+                log.info("New running applications: \(runningAppExceptions.map(\.name))")
                 adaptBrightness()
             }
             .store(in: &observers)
@@ -1477,6 +1478,10 @@ class DisplayController {
         _ action: @escaping ((DisplayController) -> Void),
         onFinish: ((DisplayController) -> Void)? = nil
     ) -> DispatchWorkItem {
+//        Thread.callStackSymbols.forEach {
+//            log.info($0)
+//        }
+
         asyncAfter(ms: 10, uniqueTaskKey: key) { [self] in
             guard adaptiveMode.available else { return }
             adaptiveMode.withForce {
