@@ -361,30 +361,34 @@ class DisplayController {
     }
 
     func watchModeAvailability() {
-        guard !taskIsRunning(MODE_WATCHER_TASK_KEY) else {
-            return
-        }
+        asyncNow { [self] in
+            guard !taskIsRunning(MODE_WATCHER_TASK_KEY) else {
+                return
+            }
 
-        guard !pausedOverrideAdaptiveModeObserver else { return }
+            guard !pausedOverrideAdaptiveModeObserver else { return }
 
-        pausedOverrideAdaptiveModeObserver = true
-        asyncEvery(5.seconds, uniqueTaskKey: MODE_WATCHER_TASK_KEY, queue: .main) { [weak self] in
-            guard !screensSleeping.load(ordering: .relaxed), let self = self else { return }
-            self.autoAdaptMode()
+            pausedOverrideAdaptiveModeObserver = true
+            asyncEvery(5.seconds, uniqueTaskKey: MODE_WATCHER_TASK_KEY, queue: .main) { [weak self] in
+                guard !screensSleeping.load(ordering: .relaxed), let self = self else { return }
+                self.autoAdaptMode()
+            }
+            pausedOverrideAdaptiveModeObserver = false
         }
-        pausedOverrideAdaptiveModeObserver = false
     }
 
     func watchScreencaptureProcess() {
-        guard !taskIsRunning(SCREENCAPTURE_WATCHER_TASK_KEY) else {
-            return
-        }
+        asyncNow { [self] in
+            guard !taskIsRunning(SCREENCAPTURE_WATCHER_TASK_KEY) else {
+                return
+            }
 
-        asyncEvery(1.seconds, uniqueTaskKey: SCREENCAPTURE_WATCHER_TASK_KEY, queue: .main) { [weak self] in
-            guard !screensSleeping.load(ordering: .relaxed), let self = self,
-                  self.activeDisplayList.contains(where: { $0.hasSoftwareControl && !$0.supportsGamma })
-            else { return }
-            self.screencaptureIsRunning.send(processIsRunning("/usr/sbin/screencapture", nil))
+            asyncEvery(1.seconds, uniqueTaskKey: SCREENCAPTURE_WATCHER_TASK_KEY, queue: .main) { [weak self] in
+                guard !screensSleeping.load(ordering: .relaxed), let self = self,
+                      self.activeDisplayList.contains(where: { $0.hasSoftwareControl && !$0.supportsGamma })
+                else { return }
+                self.screencaptureIsRunning.send(processIsRunning("/usr/sbin/screencapture", nil))
+            }
         }
     }
 
@@ -608,6 +612,7 @@ class DisplayController {
                   let productID = props["ProductID"] as? Int, let manufactureYear = props["YearOfManufacture"] as? Int
             else {
                 log.info("No display matched for service \(service): (displayProps: \(displayProps))")
+                log.verbose("displayProps: \(displayProps)")
                 return nil
             }
 
@@ -1199,16 +1204,22 @@ class DisplayController {
                 log.debug("Disabling BlackOut where the mirror does not exist anymore")
                 for d in activeNewDisplays {
                     let mirror = d.primaryMirrorScreen?.displayID ?? 0
+                    let mirrorExists = activeNewDisplayIDs.contains(mirror)
+
+                    log.debug("\(d): blackOutEnabled=\(d.blackOutEnabled) mirror=\(mirror) mirrorExists=\(mirrorExists)")
+                    guard d.blackOutEnabled, mirror == 0 || !mirrorExists else { continue }
+
                     log
-                        .debug(
-                            "\(d): blackOutEnabled=\(d.blackOutEnabled) mirror=\(mirror) mirrorExists=\(activeNewDisplayIDs.contains(mirror))"
+                        .info(
+                            "Disabling BlackOut for \(d): blackOutEnabled=\(d.blackOutEnabled) mirror=\(mirror) mirrorExists=\(mirrorExists)"
                         )
-                    guard d.blackOutEnabled, mirror == 0 || !activeNewDisplayIDs.contains(mirror) else { continue }
                     mainAsync { displayController.blackOut(display: d.id, state: .off) }
                 }
 
-                if let d = activeNewDisplays.first, activeNewDisplays.count == 1, d.isBuiltin, activeOldDisplays.count > 1 {
-                    log.debug("Disabling BlackOut if we're left with only 1 screen")
+                if let d = activeNewDisplays.first, activeNewDisplays.count == 1, d.isBuiltin, d.blackOutEnabled,
+                   activeOldDisplays.count > 1
+                {
+                    log.info("Disabling BlackOut if we're left with only 1 screen")
                     mainAsync { displayController.blackOut(display: d.id, state: .off) }
                 }
                 guard let autoBlackOut = autoBlackOut, autoBlackOut, lunarProOnTrial || lunarProActive else { return }
@@ -1348,16 +1359,18 @@ class DisplayController {
     }
 
     func watchControlAvailability() {
-        guard !taskIsRunning(CONTROL_WATCHER_TASK_KEY) else {
-            return
-        }
+        asyncNow { [self] in
+            guard !taskIsRunning(CONTROL_WATCHER_TASK_KEY) else {
+                return
+            }
 
-        asyncEvery(15.seconds, uniqueTaskKey: CONTROL_WATCHER_TASK_KEY, queue: .main) { [self] in
-            guard !screensSleeping.load(ordering: .relaxed) else { return }
-            for display in activeDisplays.values {
-                display.control = display.getBestControl()
-                if shouldPromptAboutFallback(display) {
-                    asyncNow { promptAboutFallback(display) }
+            asyncEvery(15.seconds, uniqueTaskKey: CONTROL_WATCHER_TASK_KEY, queue: .main) { [self] in
+                guard !screensSleeping.load(ordering: .relaxed) else { return }
+                for display in activeDisplays.values {
+                    display.control = display.getBestControl()
+                    if shouldPromptAboutFallback(display) {
+                        asyncNow { promptAboutFallback(display) }
+                    }
                 }
             }
         }
@@ -1519,11 +1532,13 @@ class DisplayController {
         _ action: @escaping ((DisplayController) -> Void),
         onFinish: ((DisplayController) -> Void)? = nil
     ) -> DispatchWorkItem {
-//        Thread.callStackSymbols.forEach {
-//            log.info($0)
-//        }
+        if Logger.trace {
+            Thread.callStackSymbols.forEach {
+                log.info($0)
+            }
+        }
 
-        asyncAfter(ms: 10, uniqueTaskKey: key) { [self] in
+        return asyncAfter(ms: 10, uniqueTaskKey: key) { [self] in
             guard adaptiveMode.available else { return }
             adaptiveMode.withForce {
                 guard !isCancelled(key) else { return }

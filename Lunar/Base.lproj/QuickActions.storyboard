@@ -16,7 +16,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="200" usesAutomaticRowHeights="YES" viewBased="YES" id="1sj-jk-KiM">
-                                <rect key="frame" x="25" y="130" width="330" height="20"/>
+                                <rect key="frame" x="25" y="130" width="330" height="40"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="0.0" height="20"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -733,9 +733,9 @@
                                 </connections>
                             </button>
                             <box title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qbu-vX-wt7" customClass="AutoRemovingBox" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="22" y="472" width="336" height="160"/>
+                                <rect key="frame" x="22" y="453" width="336" height="179"/>
                                 <view key="contentView" id="j9b-qV-Iv1">
-                                    <rect key="frame" x="3" y="9" width="330" height="142"/>
+                                    <rect key="frame" x="3" y="9" width="330" height="161"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Gpr-KG-BtL" customClass="Slider" customModule="Lunar" customModuleProvider="target">
@@ -762,7 +762,7 @@
                                             </connections>
                                         </slider>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="GuV-5N-Ajh">
-                                            <rect key="frame" x="127" y="81" width="76" height="24"/>
+                                            <rect key="frame" x="127" y="100" width="76" height="24"/>
                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Built-in" id="RjJ-T2-HEe">
                                                 <font key="font" metaFont="systemHeavy" size="20"/>
                                                 <color key="textColor" name="Caption"/>
@@ -772,6 +772,35 @@
                                                 <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.name" id="h7j-6y-G1m"/>
                                             </connections>
                                         </textField>
+                                        <segmentedControl focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="B7u-jp-wZa" customClass="AutoRemovingConstraintsSegmentedControl" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="131" y="73" width="68" height="28"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="25" id="QlT-f8-7mZ"/>
+                                            </constraints>
+                                            <segmentedCell key="cell" borderStyle="border" focusRingType="none" alignment="left" segmentDistribution="fillEqually" style="capsule" trackingMode="selectOne" id="Jx2-vj-zCr">
+                                                <font key="font" metaFont="systemSemibold" size="10"/>
+                                                <segments>
+                                                    <segment label="SDR" toolTip="Standard Dynamic Range disables XDR and allows the system to limit the brightness to 500nits." imageScaling="proportionallyUpOrDown" selected="YES"/>
+                                                    <segment label="XDR" tag="1">
+                                                        <string key="toolTip">Enable XDR high-dynamic range for getting past the 500nits brightness limit.
+
+It's not recommended to keep this enabled for prolonged periods of time.</string>
+                                                    </segment>
+                                                </segments>
+                                            </segmentedCell>
+                                            <connections>
+                                                <binding destination="XpJ-ho-P7z" name="hidden" keyPath="self.display.supportsEnhance" id="FMO-rG-rKz">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                    </dictionary>
+                                                </binding>
+                                                <binding destination="XpJ-ho-P7z" name="selectedTag" keyPath="self.display.enhanced" id="qPQ-7R-Jeb">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">IntBoolTransformer</string>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </segmentedControl>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="SME-Wy-2pc" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
                                             <rect key="frame" x="82" y="54" width="12" height="12"/>
                                             <constraints>
@@ -850,12 +879,15 @@
                                         <constraint firstItem="ddL-Y9-B9P" firstAttribute="centerX" secondItem="j9b-qV-Iv1" secondAttribute="centerX" id="2he-f4-m8M"/>
                                         <constraint firstAttribute="bottom" secondItem="Gpr-KG-BtL" secondAttribute="bottom" priority="497" constant="20" id="6Nr-zy-jPM"/>
                                         <constraint firstItem="pc0-Ic-fRC" firstAttribute="top" secondItem="Gpr-KG-BtL" secondAttribute="bottom" constant="4" id="936-d9-2aq"/>
+                                        <constraint firstItem="B7u-jp-wZa" firstAttribute="top" secondItem="GuV-5N-Ajh" secondAttribute="bottom" id="BS6-6L-42y"/>
                                         <constraint firstItem="Gpr-KG-BtL" firstAttribute="leading" secondItem="SME-Wy-2pc" secondAttribute="trailing" constant="-16" id="Ch7-G0-7uf"/>
                                         <constraint firstItem="Gpr-KG-BtL" firstAttribute="centerX" secondItem="j9b-qV-Iv1" secondAttribute="centerX" id="DsQ-1B-AQv"/>
                                         <constraint firstItem="pc0-Ic-fRC" firstAttribute="centerX" secondItem="j9b-qV-Iv1" secondAttribute="centerX" id="Enb-Ln-ShL"/>
                                         <constraint firstItem="GuV-5N-Ajh" firstAttribute="centerX" secondItem="j9b-qV-Iv1" secondAttribute="centerX" id="HVC-Cw-iyf"/>
+                                        <constraint firstItem="Gpr-KG-BtL" firstAttribute="top" secondItem="B7u-jp-wZa" secondAttribute="bottom" id="K6Y-ie-IpO"/>
+                                        <constraint firstItem="B7u-jp-wZa" firstAttribute="centerX" secondItem="GuV-5N-Ajh" secondAttribute="centerX" id="Lnj-cj-RAN"/>
                                         <constraint firstItem="C2X-XK-Eid" firstAttribute="top" secondItem="ddL-Y9-B9P" secondAttribute="bottom" constant="1" id="MXy-5f-3fk"/>
-                                        <constraint firstItem="Gpr-KG-BtL" firstAttribute="top" secondItem="GuV-5N-Ajh" secondAttribute="bottom" constant="6" id="NLt-qN-Af8"/>
+                                        <constraint firstItem="Gpr-KG-BtL" firstAttribute="top" secondItem="GuV-5N-Ajh" secondAttribute="bottom" priority="749" constant="6" id="NLt-qN-Af8"/>
                                         <constraint firstItem="ddL-Y9-B9P" firstAttribute="top" secondItem="Gpr-KG-BtL" secondAttribute="bottom" priority="499" constant="6" id="fss-iT-z4J"/>
                                         <constraint firstAttribute="bottom" secondItem="pc0-Ic-fRC" secondAttribute="bottom" priority="498" constant="20" id="jRl-qM-LaS"/>
                                         <constraint firstItem="SME-Wy-2pc" firstAttribute="centerY" secondItem="Gpr-KG-BtL" secondAttribute="centerY" id="nKM-V3-vbK"/>
@@ -892,13 +924,13 @@
                                 </connections>
                             </box>
                             <box borderType="line" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="J4o-rg-1UD" customClass="AutoRemovingBox" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="22" y="383" width="336" height="249"/>
+                                <rect key="frame" x="22" y="364" width="336" height="268"/>
                                 <view key="contentView" verticalCompressionResistancePriority="747" id="xED-Xy-oTv">
-                                    <rect key="frame" x="3" y="9" width="330" height="231"/>
+                                    <rect key="frame" x="3" y="9" width="330" height="250"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="Hup-6D-J0e">
-                                            <rect key="frame" x="105" y="170" width="120" height="24"/>
+                                            <rect key="frame" x="105" y="189" width="120" height="24"/>
                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="LG Ultrafine" id="8it-gt-vwn">
                                                 <font key="font" metaFont="systemHeavy" size="20"/>
                                                 <color key="textColor" name="Caption"/>
@@ -908,6 +940,35 @@
                                                 <binding destination="XpJ-ho-P7z" name="value" keyPath="self.display.name" id="PLk-Zt-V6X"/>
                                             </connections>
                                         </textField>
+                                        <segmentedControl focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5CD-Zh-f0x" customClass="AutoRemovingConstraintsSegmentedControl" customModule="Lunar" customModuleProvider="target">
+                                            <rect key="frame" x="131" y="162" width="68" height="28"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="25" id="lcC-ye-O35"/>
+                                            </constraints>
+                                            <segmentedCell key="cell" borderStyle="border" focusRingType="none" alignment="left" segmentDistribution="fillEqually" style="capsule" trackingMode="selectOne" id="JcE-uE-275">
+                                                <font key="font" metaFont="systemSemibold" size="10"/>
+                                                <segments>
+                                                    <segment label="SDR" toolTip="Standard Dynamic Range disables XDR and allows the system to limit the brightness to 500nits." imageScaling="proportionallyUpOrDown" selected="YES"/>
+                                                    <segment label="XDR" tag="1">
+                                                        <string key="toolTip">Enable XDR high-dynamic range for getting past the 500nits brightness limit.
+
+It's not recommended to keep this enabled for prolonged periods of time.</string>
+                                                    </segment>
+                                                </segments>
+                                            </segmentedCell>
+                                            <connections>
+                                                <binding destination="XpJ-ho-P7z" name="hidden" keyPath="self.display.supportsEnhance" id="eID-zh-Nx9">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                    </dictionary>
+                                                </binding>
+                                                <binding destination="XpJ-ho-P7z" name="selectedTag" keyPath="self.display.enhanced" id="qYi-Wg-Hxe">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">IntBoolTransformer</string>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </segmentedControl>
                                         <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="0Wk-V9-tNW">
                                             <rect key="frame" x="78" y="49" width="174" height="21"/>
                                             <constraints>
@@ -1330,10 +1391,11 @@
                                         <constraint firstItem="Tqt-X1-RJG" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="I8P-g4-hIO"/>
                                         <constraint firstItem="Emv-k8-sA0" firstAttribute="top" secondItem="Tqt-X1-RJG" secondAttribute="top" constant="6" id="K61-K6-fOU"/>
                                         <constraint firstItem="D87-Cq-r76" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="LEa-dD-8vR"/>
-                                        <constraint firstItem="Tqt-X1-RJG" firstAttribute="top" secondItem="Hup-6D-J0e" secondAttribute="bottom" constant="6" id="Nnz-oO-qw1"/>
+                                        <constraint firstItem="Tqt-X1-RJG" firstAttribute="top" secondItem="Hup-6D-J0e" secondAttribute="bottom" priority="749" constant="6" id="Nnz-oO-qw1"/>
                                         <constraint firstItem="JaP-5h-FMy" firstAttribute="centerY" secondItem="OSL-cA-38n" secondAttribute="centerY" id="RLf-5Z-p6R"/>
                                         <constraint firstItem="0Wk-V9-tNW" firstAttribute="top" secondItem="pRg-MU-0kr" secondAttribute="bottom" priority="495" constant="4" id="Vfo-pT-RZi"/>
                                         <constraint firstItem="0Wk-V9-tNW" firstAttribute="top" secondItem="f0W-zX-TT0" secondAttribute="bottom" priority="496" constant="4" id="WPP-K2-90h"/>
+                                        <constraint firstItem="5CD-Zh-f0x" firstAttribute="top" secondItem="Hup-6D-J0e" secondAttribute="bottom" id="ZyN-PS-bOg"/>
                                         <constraint firstItem="197-x4-S44" firstAttribute="centerY" secondItem="f0W-zX-TT0" secondAttribute="centerY" id="cp5-Sn-nAZ"/>
                                         <constraint firstItem="Tqt-X1-RJG" firstAttribute="leading" secondItem="MNZ-Jn-RAr" secondAttribute="trailing" constant="-16" id="cvs-CK-h0B"/>
                                         <constraint firstItem="MNZ-Jn-RAr" firstAttribute="centerY" secondItem="Tqt-X1-RJG" secondAttribute="centerY" id="dkt-2V-rz0"/>
@@ -1345,12 +1407,14 @@
                                         <constraint firstItem="OSL-cA-38n" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="mxi-wy-m9O"/>
                                         <constraint firstItem="0Wk-V9-tNW" firstAttribute="top" secondItem="OSL-cA-38n" secondAttribute="bottom" constant="4" id="oOH-qL-hq9"/>
                                         <constraint firstItem="Emv-k8-sA0" firstAttribute="leading" secondItem="Tqt-X1-RJG" secondAttribute="trailing" constant="8" symbolic="YES" id="oig-r5-72D"/>
+                                        <constraint firstItem="Tqt-X1-RJG" firstAttribute="top" secondItem="5CD-Zh-f0x" secondAttribute="bottom" id="psg-hb-L7a"/>
                                         <constraint firstItem="7cg-qs-QAJ" firstAttribute="bottom" secondItem="Tqt-X1-RJG" secondAttribute="bottom" constant="-4" id="qNt-Xh-QFr"/>
                                         <constraint firstItem="5Z8-Q7-p7U" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="qW5-xo-Qe0"/>
                                         <constraint firstItem="5Z8-Q7-p7U" firstAttribute="bottom" secondItem="D87-Cq-r76" secondAttribute="top" constant="6" id="sJi-Og-IwV"/>
                                         <constraint firstItem="OSL-cA-38n" firstAttribute="top" secondItem="f0W-zX-TT0" secondAttribute="bottom" id="sOI-9Y-bEC"/>
                                         <constraint firstItem="f0W-zX-TT0" firstAttribute="centerX" secondItem="xED-Xy-oTv" secondAttribute="centerX" id="uoD-7p-cZO"/>
                                         <constraint firstItem="5Z8-Q7-p7U" firstAttribute="top" secondItem="0Wk-V9-tNW" secondAttribute="bottom" constant="8" id="wr5-uK-0dY"/>
+                                        <constraint firstItem="5CD-Zh-f0x" firstAttribute="centerX" secondItem="Hup-6D-J0e" secondAttribute="centerX" id="xgY-wf-TNV"/>
                                         <constraint firstItem="Emv-k8-sA0" firstAttribute="leading" secondItem="7cg-qs-QAJ" secondAttribute="leading" id="zPT-qf-Pob"/>
                                     </constraints>
                                 </view>

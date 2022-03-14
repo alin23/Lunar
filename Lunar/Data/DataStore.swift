@@ -23,6 +23,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .adaptiveBrightnessMode,
     .colorScheme,
     .advancedSettingsShown,
+    .xdrWarningShown,
     .workaroundBuiltinDisplay,
     .autoBlackoutBuiltin,
     .streamLogs,
@@ -60,6 +61,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .clamshellModeDetection,
     .contrastStep,
     .debug,
+    .trace,
     .didScrollTextField,
     .didSwipeLeft,
     .didSwipeRight,
@@ -578,6 +580,7 @@ func initCache() {
     cacheKey(.showProjectorDisplays)
     cacheKey(.showDisconnectedDisplays)
     cacheKey(.advancedSettingsShown)
+    cacheKey(.xdrWarningShown)
     cacheKey(.autoBlackoutBuiltin)
     cacheKey(.workaroundBuiltinDisplay)
     cacheKey(.streamLogs)
@@ -610,6 +613,7 @@ func initCache() {
     cacheKey(.scheduleTransition)
     cacheKey(.refreshValues)
     cacheKey(.debug)
+    cacheKey(.trace)
     cacheKey(.showQuickActions)
     cacheKey(.manualLocation)
     cacheKey(.startAtLogin)
@@ -687,6 +691,7 @@ extension Defaults.Keys {
     static let showProjectorDisplays = Key<Bool>("showProjectorDisplays", default: true)
     static let showDisconnectedDisplays = Key<Bool>("showDisconnectedDisplays", default: false)
     static let advancedSettingsShown = Key<Bool>("advancedSettingsShown", default: false)
+    static let xdrWarningShown = Key<Bool>("xdrWarningShown", default: false)
     static let autoBlackoutBuiltin = Key<Bool>("autoBlackoutBuiltin", default: false)
     static let workaroundBuiltinDisplay = Key<Bool>("workaroundBuiltinDisplay", default: false)
     static let streamLogs = Key<Bool>("streamLogs", default: false)
@@ -722,6 +727,7 @@ extension Defaults.Keys {
     static let scheduleTransition = Key<ScheduleTransition>("scheduleTransition", default: .minutes30)
     static let refreshValues = Key<Bool>("refreshValues", default: false)
     static let debug = Key<Bool>("debug", default: false)
+    static let trace = Key<Bool>("trace", default: false)
     static let showQuickActions = Key<Bool>("showQuickActions", default: true)
     static let manualLocation = Key<Bool>("manualLocation", default: false)
     static let startAtLogin = Key<Bool>("startAtLogin", default: true)
@@ -849,6 +855,7 @@ let volumeStepPublisher = Defaults.publisher(.volumeStep).removeDuplicates().fil
 let appExceptionsPublisher = Defaults.publisher(.appExceptions).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let securePublisher = Defaults.publisher(.secure).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let debugPublisher = Defaults.publisher(.debug).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let tracePublisher = Defaults.publisher(.trace).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let overrideAdaptiveModePublisher = Defaults.publisher(.overrideAdaptiveMode).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let dayMomentsPublisher = Defaults.publisher(keys: .sunrise, .sunset, .solarNoon)
 let brightnessKeysEnabledPublisher = Defaults.publisher(.brightnessKeysEnabled).removeDuplicates().filter { $0.oldValue != $0.newValue }

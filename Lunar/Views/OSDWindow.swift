@@ -37,7 +37,7 @@ open class OSDWindow: NSWindow {
         } else {
             let wsize = frame.size
             let sframe = screen.visibleFrame
-            setFrameOrigin(CGPoint(x: (sframe.width / 2 - wsize.width / 2) + sframe.origin.x, y: sframe.origin.y + wsize.height))
+            setFrameOrigin(CGPoint(x: (sframe.width / 2 - wsize.width / 2) + sframe.origin.x, y: sframe.origin.y))
         }
 
         contentView?.alphaValue = 1
@@ -172,7 +172,7 @@ public struct BigSurSlider: View {
                             .frame(width: sliderHeight, height: sliderHeight, alignment: .trailing)
 
                         Text((percentage * 100).str(decimals: 0))
-                            .foregroundColor(colorScheme == .dark ? Colors.darkGray : Color.white)
+                            .foregroundColor(colors.fg.primary)
                             .font(.system(size: 9, weight: .heavy))
                             .allowsHitTesting(false)
                     }.offset(
@@ -243,7 +243,7 @@ public struct BigSurSlider: View {
 public struct Colors {
     // MARK: Lifecycle
 
-    public init(_ colorScheme: ColorScheme = .light, accent: Color) {
+    public init(_ colorScheme: SwiftUI.ColorScheme = .light, accent: Color) {
         self.accent = accent
         self.colorScheme = colorScheme
         bg = BG(colorScheme: colorScheme)
@@ -255,7 +255,7 @@ public struct Colors {
     public struct FG {
         // MARK: Public
 
-        public var colorScheme: ColorScheme
+        public var colorScheme: SwiftUI.ColorScheme
 
         public var isDark: Bool { colorScheme == .dark }
         public var isLight: Bool { colorScheme == .light }
@@ -269,7 +269,7 @@ public struct Colors {
     public struct BG {
         // MARK: Public
 
-        public var colorScheme: ColorScheme
+        public var colorScheme: SwiftUI.ColorScheme
 
         public var isDark: Bool { colorScheme == .dark }
         public var isLight: Bool { colorScheme == .light }
@@ -280,8 +280,8 @@ public struct Colors {
         var primary: Color { isDark ? .white : .black }
     }
 
-    public static var light = Colors(.light, accent: Colors.red)
-    public static var dark = Colors(.dark, accent: Colors.red)
+    public static var light = Colors(.light, accent: Colors.lunarYellow)
+    public static var dark = Colors(.dark, accent: Colors.peach)
 
     public static let darkGray = Color(hue: 0, saturation: 0.01, brightness: 0.32)
     public static let blackGray = Color(hue: 0.03, saturation: 0.12, brightness: 0.18)
@@ -292,11 +292,13 @@ public struct Colors {
     public static let mauve = Color(hue: 252 / 360, saturation: 0.29, brightness: 0.23)
     public static let blackMauve = Color(hue: 252 / 360, saturation: 0.08, brightness: 0.12)
     public static let yellow = Color(hue: 39 / 360, saturation: 1.0, brightness: 0.64)
+    public static let lunarYellow = Color(hue: 0.11, saturation: 0.47, brightness: 1.00)
+    public static let peach = Color(hue: 0.08, saturation: 0.42, brightness: 1.00)
     public static let blue = Color(hue: 214 / 360, saturation: 1.0, brightness: 0.54)
     public static let green = Color(hue: 141 / 360, saturation: 0.59, brightness: 0.58)
 
     public var accent: Color
-    public var colorScheme: ColorScheme
+    public var colorScheme: SwiftUI.ColorScheme
 
     public var bg: BG
     public var fg: FG
@@ -362,10 +364,12 @@ struct BrightnessOSDView: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(colors.fg.primary)
+                .fill(colorScheme == .dark ? Colors.blackMauve : .white)
+                .shadow(color: Colors.blackMauve.opacity(0.3), radius: 10, x: 0, y: 6)
         )
-        .padding()
+        .padding(40)
         .opacity(display.lastSoftwareBrightness != display.softwareBrightness ? 1 : 0)
+        .colors(colorScheme == .dark ? .dark : .light)
     }
 }
 

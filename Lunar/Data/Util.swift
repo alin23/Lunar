@@ -769,7 +769,7 @@ func asyncEvery(
     _ action: @escaping () -> Void
 ) {
     let queue = queue ?? concurrentQueue
-    queue.async {
+    taskManagerQueue.async {
         if skipIfExists, let key = uniqueTaskKey, let timer = taskManager(key) as? DispatchSourceTimer, !timer.isCancelled {
             return
         }
@@ -782,14 +782,14 @@ func asyncEvery(
         )
         timer.setEventHandler {
             action()
-            guard let key = uniqueTaskKey,
-                  let runs = taskManager("\(key)-runs") as? Int,
-                  let maxRuns = taskManager("\(key)-maxRuns") as? Int
-            else {
-                return
-            }
-
             taskManagerQueue.async {
+                guard let key = uniqueTaskKey,
+                      let runs = taskManager("\(key)-runs") as? Int,
+                      let maxRuns = taskManager("\(key)-maxRuns") as? Int
+                else {
+                    return
+                }
+
                 if runs >= maxRuns || isCancelled(key) {
                     cancelTask(key)
                 } else {
@@ -798,28 +798,31 @@ func asyncEvery(
             }
         }
         timer.setCancelHandler {
-            guard let key = uniqueTaskKey,
-                  let runs = taskManager("\(key)-runs") as? Int,
-                  let maxRuns = taskManager("\(key)-maxRuns") as? Int
-            else {
-                return
-            }
+            taskManagerQueue.async {
+                guard let key = uniqueTaskKey,
+                      let runs = taskManager("\(key)-runs") as? Int,
+                      let maxRuns = taskManager("\(key)-maxRuns") as? Int
+                else {
+                    return
+                }
 
-            if runs >= maxRuns {
-                onSuccess?()
-            } else {
-                onCancelled?()
+                if runs >= maxRuns {
+                    queue.async { onSuccess?() }
+                } else {
+                    queue.async { onCancelled?() }
+                }
             }
         }
 
         if let key = uniqueTaskKey {
-//            taskQueueLock.around { taskQueue[key] = queue }
-            (taskManager(key) as? DispatchSourceTimer)?.cancel()
-            taskManager(key, timer)
+            taskManagerQueue.async {
+                (taskManager(key) as? DispatchSourceTimer)?.cancel()
+                taskManager(key, timer)
 
-            if let runs = runs {
-                taskManager("\(key)-maxRuns", runs)
-                taskManager("\(key)-runs", 0)
+                if let runs = runs {
+                    taskManager("\(key)-maxRuns", runs)
+                    taskManager("\(key)-runs", 0)
+                }
             }
         }
         timer.activate()

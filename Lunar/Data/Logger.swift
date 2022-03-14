@@ -77,6 +77,13 @@ class Logger: SwiftyBeaver {
 
     // MARK: Internal
 
+    static var observers: Set<AnyCancellable> = []
+
+    @Atomic static var trace: Bool = {
+        tracePublisher.sink { Logger.trace = $0.newValue }.store(in: &observers)
+        return Defaults[.trace]
+    }()
+
     static let console = ConsoleDestination()
     static let file = FileDestination()
     static let cloud = SBPlatformDestination(appID: "WxjbvQ", appSecret: secrets.appSecret, encryptionKey: secrets.encryptionKey)
