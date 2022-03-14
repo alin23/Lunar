@@ -38,6 +38,7 @@ enum HotkeyIdentifier: String, CaseIterable, Codable {
          blackOut,
          blackOutPowerOff,
          blackOutNoMirroring,
+         blackOutOthers,
          preciseBrightnessUp,
          preciseBrightnessDown,
          preciseContrastUp,
@@ -85,6 +86,7 @@ let alternateHotkeysMapping: [String: [NSEvent.ModifierFlags: String]] = [
     HotkeyIdentifier.blackOut.rawValue: [
         .option: HotkeyIdentifier.blackOutPowerOff.rawValue,
         .shift: HotkeyIdentifier.blackOutNoMirroring.rawValue,
+        [.shift, .option]: HotkeyIdentifier.blackOutOthers.rawValue,
     ],
 ]
 let preciseHotkeysMapping: [String: String] = [
@@ -595,6 +597,17 @@ enum Hotkey {
             detectKeyHold: false
         )),
         PersistentHotkey(hotkey: Magnet.HotKey(
+            identifier: HotkeyIdentifier.blackOutOthers.rawValue,
+            keyCombo: KeyCombo(
+                QWERTYKeyCode: kVK_ANSI_6,
+                cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .control, .shift, .option])
+            )!,
+            target: appDelegate!,
+            action: handler(identifier: .blackOutOthers),
+            actionQueue: .main,
+            detectKeyHold: false
+        )),
+        PersistentHotkey(hotkey: Magnet.HotKey(
             identifier: HotkeyIdentifier.preciseBrightnessUp.rawValue,
             keyCombo: KeyCombo(QWERTYKeyCode: kVK_F2, cocoaModifiers: NSEvent.ModifierFlags(arrayLiteral: [.command, .option]))!,
             target: appDelegate!,
@@ -763,6 +776,8 @@ enum Hotkey {
             return #selector(AppDelegate.blackOutPowerOffHotkeyHandler)
         case .blackOutNoMirroring:
             return #selector(AppDelegate.blackOutNoMirroringHotkeyHandler)
+        case .blackOutOthers:
+            return #selector(AppDelegate.blackOutOthersHotkeyHandler)
         case .preciseBrightnessUp:
             return #selector(AppDelegate.preciseBrightnessUpHotkeyHandler)
         case .preciseBrightnessDown:
@@ -1331,6 +1346,13 @@ extension AppDelegate: MediaKeyTapDelegate {
         cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
         blackOutNoMirroring(self)
         log.debug("BlackOut No Mirroring Hotkey pressed")
+    }
+
+    @objc func blackOutOthersHotkeyHandler() {
+        guard lunarProActive else { return }
+        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        blackOutOthers(self)
+        log.debug("BlackOut Other Displays Hotkey pressed")
     }
 
     @objc func orientation0Handler() {

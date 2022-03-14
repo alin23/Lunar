@@ -31,7 +31,7 @@ class DDCPopoverController: NSViewController {
     }
 
     @IBAction func readColors(_ sender: ResetButton) {
-        guard let display = display, display.hasI2C, let control = display.control, !(control is GammaControl) else {
+        guard let display = display, display.hasI2C, let control = display.control, !control.isSoftware else {
             sender.attributedTitle = "DDC support needed".withAttribute(.textColor(sender.labelColor))
             return
         }

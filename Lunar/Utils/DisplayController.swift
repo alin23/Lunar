@@ -34,6 +34,7 @@ class DisplayController {
     init() {
         watchControlAvailability()
         watchModeAvailability()
+        watchScreencaptureProcess()
         initObservers()
     }
 
@@ -44,6 +45,7 @@ class DisplayController {
         #endif
         cancelTask(CONTROL_WATCHER_TASK_KEY)
         cancelTask(MODE_WATCHER_TASK_KEY)
+        cancelTask(SCREENCAPTURE_WATCHER_TASK_KEY)
     }
 
     // MARK: Internal
@@ -78,8 +80,13 @@ class DisplayController {
 
     lazy var currentAudioDisplay: Display? = getCurrentAudioDisplay()
 
+    let SCREENCAPTURE_WATCHER_TASK_KEY = "screencaptureWatcherTask"
     let MODE_WATCHER_TASK_KEY = "modeWatcherTask"
     let CONTROL_WATCHER_TASK_KEY = "controlWatcherTask"
+
+    var displayList: [Display] {
+        displays.values.sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }.reversed()
+    }
 
     var activeDisplayList: [Display] {
         activeDisplays.values.sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }.reversed()
@@ -187,6 +194,21 @@ class DisplayController {
         else { return nil }
 
         return activeDisplays[id]
+    }
+
+    var nonCursorDisplays: [Display] {
+        guard let cursorDisplay = cursorDisplay else { return [] }
+        return activeDisplayList.filter { $0.id != cursorDisplay.id }
+    }
+
+    var mainDisplay: Display? {
+        guard let screenID = NSScreen.main?.displayID else { return nil }
+        return activeDisplays[screenID]
+    }
+
+    var nonMainDisplays: [Display] {
+        guard let mainDisplay = mainDisplay else { return [] }
+        return activeDisplayList.filter { $0.id != mainDisplay.id }
     }
 
     var cursorDisplay: Display? {
@@ -353,6 +375,19 @@ class DisplayController {
         pausedOverrideAdaptiveModeObserver = false
     }
 
+    func watchScreencaptureProcess() {
+        guard !taskIsRunning(SCREENCAPTURE_WATCHER_TASK_KEY) else {
+            return
+        }
+
+        asyncEvery(1.seconds, uniqueTaskKey: SCREENCAPTURE_WATCHER_TASK_KEY, queue: .main) { [weak self] in
+            guard !screensSleeping.load(ordering: .relaxed), let self = self,
+                  self.activeDisplayList.contains(where: { $0.hasSoftwareControl && !$0.supportsGamma })
+            else { return }
+            self.screencaptureIsRunning.send(processIsRunning("/usr/sbin/screencapture", nil))
+        }
+    }
+
     func initObservers() {
         NotificationCenter.default.publisher(for: lunarProStateChanged, object: nil).sink { _ in
             self.autoAdaptMode()
@@ -363,6 +398,7 @@ class DisplayController {
         ).sink { _ in
             self.watchControlAvailability()
             self.watchModeAvailability()
+            self.watchScreencaptureProcess()
         }.store(in: &observers)
 
         NSWorkspace.shared.notificationCenter.publisher(
@@ -370,6 +406,7 @@ class DisplayController {
         ).sink { _ in
             cancelTask(self.CONTROL_WATCHER_TASK_KEY)
             cancelTask(self.MODE_WATCHER_TASK_KEY)
+            cancelTask(self.SCREENCAPTURE_WATCHER_TASK_KEY)
         }.store(in: &observers)
 
         showSliderValuesPublisher.sink { _ in
@@ -756,6 +793,8 @@ class DisplayController {
             return ioAvService
         }
     #endif
+
+    var screencaptureIsRunning: CurrentValueSubject<Bool, Never> = .init(processIsRunning("/usr/sbin/screencapture", nil))
 
     static func allDisplayProperties() -> [[String: Any]] {
         var propList: [[String: Any]] = []
@@ -1194,7 +1233,9 @@ class DisplayController {
             log.info("Resetting software dimming")
             dc.activeDisplays.values.forEach { d in
                 d.updateCornerWindow()
-                d.resetSoftwareControl()
+                if d.softwareBrightness == 1.0 {
+                    d.resetSoftwareControl()
+                }
             }
 
             log.info("Removing old overlays")
@@ -1433,7 +1474,7 @@ class DisplayController {
 
                 if identifiers.contains(FLUX_IDENTIFIER),
                    let app = change.first(where: { app in app.bundleIdentifier == FLUX_IDENTIFIER }),
-                   let display = activeDisplays.values.first(where: { d in d.control is GammaControl }),
+                   let display = activeDisplays.values.first(where: { d in d.hasSoftwareControl }),
                    let control = display.control as? GammaControl
                 {
                     control.fluxChecker(flux: app)
@@ -1595,11 +1636,39 @@ class DisplayController {
 
             var value = getFilledChicletValue(display.brightness.intValue, offset: offset)
 
+            let minBrightness = display.minBrightness.intValue
+            let maxBrightness = display.maxBrightness.intValue
+            let oldValue = display.brightness.intValue
             value = cap(
                 value,
-                minVal: display.minBrightness.intValue,
-                maxVal: display.maxBrightness.intValue
+                minVal: minBrightness,
+                maxVal: maxBrightness
             )
+
+            if !display.hasSoftwareControl, minBrightness <= 1, !display.isForTesting,
+               (value == minBrightness && value == oldValue) ||
+               (oldValue == minBrightness && display.softwareBrightness < 1.0)
+            {
+                display.softwareBrightness = cap(
+                    display.softwareBrightness + (offset.f / 36),
+                    minVal: 0.0,
+                    maxVal: 1.0
+                )
+                return
+            }
+
+            if display.enhanced, !display.hasSoftwareControl, !display.isForTesting,
+               (value == maxBrightness && value == oldValue) ||
+               (oldValue == maxBrightness && display.softwareBrightness > 1.01)
+            {
+                display.softwareBrightness = cap(
+                    display.softwareBrightness + (offset.f / 70),
+                    minVal: 1.01,
+                    maxVal: 1.5
+                )
+                return
+            }
+
             if CachedDefaults[.mergeBrightnessContrast] {
                 let preciseValue = mapNumber(
                     value.d,

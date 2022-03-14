@@ -181,6 +181,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBOutlet var blackOutMenuItem: NSMenuItem!
     @IBOutlet var blackOutNoMirroringMenuItem: NSMenuItem!
     @IBOutlet var blackOutPowerOffMenuItem: NSMenuItem!
+    @IBOutlet var blackOutOthersMenuItem: NSMenuItem!
     @IBOutlet var faceLightExplanationMenuItem: NSMenuItem!
     @IBOutlet var blackOutExplanationMenuItem: NSMenuItem!
     @IBOutlet var infoMenuItem: NSMenuItem!
@@ -877,6 +878,25 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         if displayController.adaptiveMode.available {
             displayController.adaptiveMode.watch()
         }
+
+        displayController.screencaptureIsRunning.removeDuplicates()
+            .debounce(for: .milliseconds(10), scheduler: RunLoop.main)
+            .sink { takingScreenshot in
+                if takingScreenshot, displayController.activeDisplayList.contains(where: { $0.shadeWindowController != nil }) {
+                    displayController.activeDisplayList
+                        .filter { $0.shadeWindowController != nil }
+                        .forEach { d in
+                            d.shadeWindowController?.close()
+                            d.shadeWindowController = nil
+                        }
+                }
+
+                if !takingScreenshot {
+                    displayController.activeDisplayList
+                        .filter { $0.hasSoftwareControl && !$0.supportsGamma }
+                        .forEach { $0.preciseBrightness = $0.preciseBrightness }
+                }
+            }.store(in: &observers)
     }
 
     @discardableResult func initMenuPopover() -> NSPopover {
@@ -977,7 +997,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         asyncEvery(3.seconds, uniqueTaskKey: "zeroGammaChecker") { _ in
             displayController.activeDisplays.values
                 .filter { d in
-                    !d.isForTesting && !d.settingGamma && d.control is GammaControl && !d.blackOutEnabled && GammaTable(for: d.id).isZero
+                    !d.isForTesting && !d.settingGamma && d.hasSoftwareControl && !d.blackOutEnabled && GammaTable(for: d.id).isZero
                 }
                 .forEach { d in
                     log.warning("Gamma tables are zeroed out for display \(d)!\nReverting to last non-zero gamma tables")
@@ -1387,6 +1407,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             return blackOutNoMirroringMenuItem
         case .blackOutPowerOff:
             return blackOutPowerOffMenuItem
+        case .blackOutOthers:
+            return blackOutOthersMenuItem
         case .brightnessUp:
             return brightnessUpMenuItem
         case .brightnessDown:
@@ -1419,6 +1441,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         Hotkey.setKeyEquivalent(HotkeyIdentifier.blackOut.rawValue, menuItem: blackOutMenuItem, hotkeys: hotkeys)
         Hotkey.setKeyEquivalent(HotkeyIdentifier.blackOutNoMirroring.rawValue, menuItem: blackOutNoMirroringMenuItem, hotkeys: hotkeys)
         Hotkey.setKeyEquivalent(HotkeyIdentifier.blackOutPowerOff.rawValue, menuItem: blackOutPowerOffMenuItem, hotkeys: hotkeys)
+        Hotkey.setKeyEquivalent(HotkeyIdentifier.blackOutOthers.rawValue, menuItem: blackOutOthersMenuItem, hotkeys: hotkeys)
 
         Hotkey.setKeyEquivalent(HotkeyIdentifier.brightnessUp.rawValue, menuItem: brightnessUpMenuItem, hotkeys: hotkeys)
         Hotkey.setKeyEquivalent(HotkeyIdentifier.brightnessDown.rawValue, menuItem: brightnessDownMenuItem, hotkeys: hotkeys)
@@ -1453,9 +1476,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         commandModifierPressedCount += 1
 
         if commandModifierPressedCount > 8 {
-            log.warning("Command key pressed 8 times in a row, disabling BlackOut forcefully!")
             commandModifierPressedCount = 0
             lastCommandModifierPressedTime = nil
+
+            guard displayController.activeDisplayList.contains(where: \.blackOutEnabled) else { return }
+
+            log.warning("Command key pressed 8 times in a row, disabling BlackOut forcefully!")
             displayController.activeDisplayList.forEach {
                 $0.resetSoftwareControl()
                 displayController.blackOut(display: $0.id, state: .off)

@@ -91,6 +91,7 @@ protocol Control {
     var display: Display? { get set }
     var str: String { get }
     var displayControl: DisplayControl { get }
+    var isSoftware: Bool { get }
 
     func setBrightness(_ brightness: Brightness, oldValue: Brightness?, onChange: ((Brightness) -> Void)?) -> Bool
     func setContrast(_ contrast: Contrast, oldValue: Contrast?, onChange: ((Contrast) -> Void)?) -> Bool

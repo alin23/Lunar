@@ -103,6 +103,77 @@ private func printDictionary(_ dict: [String: Any], level: Int = 0, longestKeySi
     }
 }
 
+let SERIAL_PATTERN = #"[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}.*"#.r!
+let ID_PATTERN = #"\d+"#.r!
+
+// MARK: - DisplayFilter
+
+enum DisplayFilter: ExpressibleByArgument, Codable {
+    case all
+    case first
+    case mainExternal
+    case main
+    case nonMain
+    case cursor
+    case withoutCursor
+    case bestGuess
+    case builtin
+    case syncSource
+    case syncTargets
+    case serial(String)
+    case name(String)
+    case id(CGDirectDisplayID)
+
+    // MARK: Lifecycle
+
+    init?(argument: String) {
+        switch argument {
+        case "all":
+            self = .all
+        case "first":
+            self = .first
+        case "mainExternal", "main-external", "external":
+            self = .mainExternal
+        case "main":
+            self = .main
+        case "nonMain", "non-main":
+            self = .nonMain
+        case "cursor", "with-cursor", "withCursor":
+            self = .cursor
+        case "withoutCursor", "without-cursor", "no-cursor":
+            self = .withoutCursor
+        case "bestGuess", "best-guess":
+            self = .bestGuess
+        case "syncSource", "sync-source", "source":
+            self = .syncSource
+        case "syncTargets", "sync-targets", "targets", "syncTarget", "sync-target", "target":
+            self = .syncTargets
+        case "builtin", "internal":
+            self = .builtin
+        case SERIAL_PATTERN:
+            self = .serial(argument)
+        case ID_PATTERN:
+            if let id = UInt32(argument) {
+                self = .id(id)
+            } else {
+                self = .name(argument)
+            }
+        default:
+            self = .name(argument)
+        }
+    }
+
+    // MARK: Internal
+
+    static var allValueStrings: [String] {
+        ["first", "main", "cursor", "external", "builtin", "all", "non-main", "without-cursor", "sync-source", "sync-targets", "best-guess"]
+    }
+
+    var s: String {
+        String(describing: self)
+    }
+}
+
 // MARK: - NSDeviceDescriptionKey + Encodable
 
 extension NSDeviceDescriptionKey: Encodable {
@@ -148,29 +219,46 @@ struct ForgivingEncodable: Encodable {
     }
 }
 
-private func getDisplay(displays: [Display], filter: String) -> Display? {
+private func getDisplays(displays: [Display], filter: DisplayFilter) -> [Display] {
     switch filter {
-    case "first":
-        return displays.first
-    case "main":
-        guard let mainDisplayId = displayController.mainExternalDisplay?.id else { return nil }
-        return displays.first(where: { $0.id == mainDisplayId })
-    case "best-guess":
-        guard let currentDisplayId = displayController.mainExternalOrCGMainDisplay?.id else { return nil }
-        return displays.first(where: { $0.id == currentDisplayId })
-    case "builtin":
-        return displayController.activeDisplays.values.first(where: { $0.isBuiltin })
-    default:
-        if let id = filter.u32 {
-            return displays.first(where: { $0.id == id })
-        } else if let display = displays.first(where: { $0.serial == filter }) {
-            return display
-        } else {
-            let alignments = fuzzyFind(queries: [filter], inputs: displays.map(\.name))
-            guard let name = alignments.first?.result.asString else { return nil }
+    case .all:
+        return displays
+    case .first:
+        guard let first = displays.first else { return [] }
+        return [first]
+    case .mainExternal:
+        guard let mainDisplayId = displayController.mainExternalDisplay?.id else { return [] }
+        return displays.filter { $0.id == mainDisplayId }
+    case .main:
+        guard let mainDisplayId = displayController.mainDisplay?.id else { return [] }
+        return displays.filter { $0.id == mainDisplayId }
+    case .nonMain:
+        guard let mainDisplayId = displayController.mainDisplay?.id else { return [] }
+        return displays.filter { $0.id != mainDisplayId }
+    case .cursor:
+        guard let cursorDisplayId = displayController.cursorDisplay?.id else { return [] }
+        return displays.filter { $0.id == cursorDisplayId }
+    case .withoutCursor:
+        guard let cursorDisplayId = displayController.cursorDisplay?.id else { return [] }
+        return displays.filter { $0.id != cursorDisplayId }
+    case .bestGuess:
+        guard let currentDisplayId = displayController.mainExternalOrCGMainDisplay?.id else { return [] }
+        return displays.filter { $0.id == currentDisplayId }
+    case .builtin:
+        return displayController.activeDisplayList.filter(\.isBuiltin)
+    case .syncSource:
+        return displays.filter(\.isSource)
+    case .syncTargets:
+        return displays.filter { !$0.isSource }
+    case let .id(id):
+        return displays.filter { $0.id == id }
+    case let .serial(serial):
+        return displays.filter { $0.serial == serial }
+    case let .name(name):
+        let alignments = fuzzyFind(queries: [name], inputs: displays.map(\.name))
+        guard let name = alignments.first?.result.asString else { return [] }
 
-            return displays.first(where: { $0.name == name })
-        }
+        return displays.filter { $0.name == name }
     }
 }
 
@@ -318,9 +406,9 @@ struct Lunar: ParsableCommand {
         var method: AppleNativeMethod
 
         @Argument(
-            help: "Display serial or name (without spaces) or one of the following special values (first, main, all, builtin, source)"
+            help: "Display serial or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
         )
-        var display: String
+        var display: DisplayFilter
 
         @Argument(help: "Value for the method's second argument")
         var value = 1.0
@@ -334,28 +422,11 @@ struct Lunar: ParsableCommand {
                 includeProjector: false,
                 includeDummy: false
             )
-            let displays = displayController.activeDisplays.values.map { $0 }
-            var displayIDs: [CGDirectDisplayID] = []
-
-            switch display {
-            case "all":
-                displayIDs = displays.map(\.id)
-            case "builtin":
-                guard let id = displayController.builtinDisplay?.id else {
-                    throw LunarCommandError.displayNotFound(display)
-                }
-                displayIDs = [id]
-            case "source":
-                guard let id = displayController.sourceDisplay?.id else {
-                    throw LunarCommandError.displayNotFound(display)
-                }
-                displayIDs = [id]
-            default:
-                guard let display = getDisplay(displays: displays, filter: display) else {
-                    throw LunarCommandError.displayNotFound(display)
-                }
-                displayIDs = [display.id]
+            let displays = getDisplays(displays: displayController.activeDisplayList, filter: display)
+            guard !displays.isEmpty else {
+                throw LunarCommandError.displayNotFound(display.s)
             }
+            let displayIDs = displays.map(\.id)
 
             for id in displayIDs {
                 switch method {
@@ -422,9 +493,9 @@ struct Lunar: ParsableCommand {
         var method: DisplayServicesMethod
 
         @Argument(
-            help: "Display serial or name (without spaces) or one of the following special values (first, main, all, builtin, source)"
+            help: "Display serial or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
         )
-        var display: String
+        var display: DisplayFilter
 
         @Argument(help: "Value for the method's second argument")
         var value = 1.0
@@ -441,28 +512,11 @@ struct Lunar: ParsableCommand {
                 includeProjector: false,
                 includeDummy: false
             )
-            let displays = displayController.activeDisplays.values.map { $0 }
-            var displayIDs: [CGDirectDisplayID] = []
-
-            switch display {
-            case "all":
-                displayIDs = displays.map(\.id)
-            case "builtin":
-                guard let id = displayController.builtinDisplay?.id else {
-                    throw LunarCommandError.displayNotFound(display)
-                }
-                displayIDs = [id]
-            case "source":
-                guard let id = displayController.sourceDisplay?.id else {
-                    throw LunarCommandError.displayNotFound(display)
-                }
-                displayIDs = [id]
-            default:
-                guard let display = getDisplay(displays: displays, filter: display) else {
-                    throw LunarCommandError.displayNotFound(display)
-                }
-                displayIDs = [display.id]
+            let displays = getDisplays(displays: displayController.activeDisplayList, filter: display)
+            guard !displays.isEmpty else {
+                throw LunarCommandError.displayNotFound(display.s)
             }
+            let displayIDs = displays.map(\.id)
 
             let resultString = { v in v == KERN_SUCCESS ? "Success" : "Failed" }
             for id in displayIDs {
@@ -572,9 +626,9 @@ struct Lunar: ParsableCommand {
         @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
 
         @Argument(
-            help: "Display serial or name (without spaces) or one of the following special values (first, main, all, builtin, source)"
+            help: "Display serial or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
         )
-        var display: String
+        var display: DisplayFilter
 
         @Argument(
             help: "DDC control ID (VCP)\n\tCan be passed as hex VCP values (e.g. 0x10, E1) or constants\n\tPossible constants:\n\t\t\(controlStrings.map { $0.joined(separator: String(repeating: " ", count: longestString - ($0.first?.count ?? 0))) }.joined(separator: "\n\t\t"))"
@@ -598,12 +652,10 @@ struct Lunar: ParsableCommand {
                 includeProjector: false,
                 includeDummy: false
             )
-            var displays = displayController.activeDisplays.values.map { $0 }
-            if display != "all" {
-                guard let display = getDisplay(displays: displays, filter: display) else {
-                    throw LunarCommandError.displayNotFound(display)
-                }
-                displays = [display]
+
+            let displays = getDisplays(displays: displayController.activeDisplayList, filter: display)
+            guard !displays.isEmpty else {
+                throw LunarCommandError.displayNotFound(display.s)
             }
 
             if values.isEmpty || values.first!.lowercased() =~ "(read|get|fetch)-?(max|val)?" {
@@ -892,9 +944,9 @@ struct Lunar: ParsableCommand {
         var controls: [DisplayControl] = [.appleNative, .ddc, .network]
 
         @Argument(
-            help: "Display serial or name (without spaces) or one of the following special values (first, main, all, builtin, source)"
+            help: "Display serial or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
         )
-        var display: String?
+        var display: DisplayFilter?
 
         @Argument(
             help: "Display property to get or set. Common properties: (\(Display.CodingKeys.settableCommon.filter { !$0.isHidden }.map(\.rawValue).joined(separator: ", ")))"
@@ -915,29 +967,24 @@ struct Lunar: ParsableCommand {
                 includeDummy: dummy || all
             )
 
-            let displays = (all ? displayController.displays : displayController.activeDisplays).sorted(by: { d1, d2 in
-                d1.key <= d2.key
-            }).map(\.value)
+            let displays = (all ? displayController.displayList : displayController.activeDisplayList)
 
             if let displayFilter = display {
-                let filters = displayFilter != "all" ? [displayFilter] : displays.map(\.serial)
-                for filter in filters {
-                    do {
-                        try handleDisplay(
-                            filter,
-                            displays: displays,
-                            property: property,
-                            value: value,
-                            json: json,
-                            controls: controls,
-                            read: read,
-                            systemInfo: systemInfo,
-                            panelData: panelData,
-                            edid: edid
-                        )
-                    } catch {
-                        cliPrint("\(filter): \(error)")
-                    }
+                do {
+                    try handleDisplays(
+                        displayFilter,
+                        displays: displays,
+                        property: property,
+                        value: value,
+                        json: json,
+                        controls: controls,
+                        read: read,
+                        systemInfo: systemInfo,
+                        panelData: panelData,
+                        edid: edid
+                    )
+                } catch {
+                    cliPrint("\(error)")
                 }
                 return cliExit(0)
             }
@@ -1003,11 +1050,13 @@ struct Lunar: ParsableCommand {
                 includeDummy: CachedDefaults[.showDummyDisplays]
             )
 
-            let displays = displayController.activeDisplays.sorted(by: { d1, d2 in
-                d1.key <= d2.key
-            }).map(\.value)
-
-            try handleDisplay("best-guess", displays: displays, property: property, controls: controls, read: read)
+            try handleDisplays(
+                .bestGuess,
+                displays: displayController.activeDisplayList,
+                property: property,
+                controls: controls,
+                read: read
+            )
             return cliExit(0)
         }
     }
@@ -1057,15 +1106,18 @@ struct Lunar: ParsableCommand {
                 includeDummy: CachedDefaults[.showDummyDisplays]
             )
 
-            let displays = displayController.activeDisplays.sorted(by: { d1, d2 in
-                d1.key <= d2.key
-            }).map(\.value)
-
             if !isServer, controls.contains(.network) {
-                setupNetworkControls(displays: displays, waitms: waitms)
+                setupNetworkControls(displays: displayController.activeDisplayList, waitms: waitms)
             }
 
-            try handleDisplay("best-guess", displays: displays, property: property, value: value, controls: controls, read: read)
+            try handleDisplays(
+                .bestGuess,
+                displays: displayController.activeDisplayList,
+                property: property,
+                value: value,
+                controls: controls,
+                read: read
+            )
             return cliExit(0)
         }
     }
@@ -1087,10 +1139,10 @@ struct Lunar: ParsableCommand {
         var force = false
 
         @Option(
-            name: .shortAndLong,
-            help: "Display serial or name (without spaces) or one of the following special values (first, main, all, builtin, source)"
+            name: .long,
+            help: "Display serial or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
         )
-        var display = "best-guess"
+        var display: DisplayFilter = .bestGuess
 
         @Option(name: .long, help: "How often to send the gamma values to the monitor")
         var refreshSeconds = 1
@@ -1116,9 +1168,7 @@ struct Lunar: ParsableCommand {
         @Option(name: .shortAndLong, help: "Blue gamma value")
         var blue = 0.5
 
-        var foundDisplay: Display!
-
-        mutating func validate() throws {
+        func validate() throws {
             guard !globals.remote else { return }
 
             Lunar.configureLogging(options: globals)
@@ -1129,103 +1179,103 @@ struct Lunar: ParsableCommand {
                 includeDummy: CachedDefaults[.showDummyDisplays]
             )
 
-            let displays = displayController.activeDisplays.sorted(by: { d1, d2 in
-                d1.key <= d2.key
-            }).map(\.value)
+            guard !isServer else { return }
 
-            guard let display = getDisplay(displays: displays, filter: display) else {
-                throw LunarCommandError.displayNotFound(display)
+            let displays = getDisplays(displays: displayController.activeDisplayList, filter: display)
+            guard !displays.isEmpty else {
+                throw LunarCommandError.displayNotFound(display.s)
             }
 
-            let alreadyLocked = !display.gammaLock()
-            if !isServer, alreadyLocked, !force {
+            let alreadyLocked = displays.filter { !$0.gammaLock() }
+            if !alreadyLocked.isEmpty, !force {
                 throw LunarCommandError
                     .gammaError(
-                        "Another instance of Lunar is using the gamma tables. Quit that before using this command (or delete \(display.gammaLockPath) if you think this is incorrect)."
+                        "Another instance of Lunar is using the gamma tables. Quit that before using this command (or delete [\(alreadyLocked.map(\.gammaLockPath).joined(by: ","))] if you think this is incorrect)."
                     )
             }
-
-            foundDisplay = display
         }
 
         func run() throws {
             Lunar.configureLogging(options: globals)
 
-            guard let display = foundDisplay else {
-                return cliExit(0)
+            let displays = getDisplays(displays: displayController.activeDisplayList, filter: display)
+            guard !displays.isEmpty else {
+                throw LunarCommandError.displayNotFound(display.s)
             }
 
-            let printTable = {
-                if readFullTable {
-                    let table = GammaTable(for: display.id)
-                    cliPrint("""
-                    Gamma table for \(display):
-                        Red: \(table.red.str(decimals: 3))
-                        Green: \(table.green.str(decimals: 3))
-                        Blue: \(table.blue.str(decimals: 3))
-                    """)
-                } else {
-                    cliPrint("""
-                    Gamma table for \(display):
-                        Red: \(display.red.str(decimals: 3))
-                        Green: \(display.green.str(decimals: 3))
-                        Blue: \(display.blue.str(decimals: 3))
-                    """)
-                }
-            }
-
-            guard write || reset || restoreColorSync else {
-                printTable()
-                return
-            }
-
-            if reset {
-                if isServer {
-                    display.resetDefaultGamma()
-                } else {
-                    CGDisplayRestoreColorSyncSettings()
-                }
-                cliPrint("Resetting gamma table for \(display)\n")
-                printTable()
-                return
-            }
-            if restoreColorSync {
-                CGDisplayRestoreColorSyncSettings()
-                cliPrint("Restoring ColorSync settings\n")
-                printTable()
-                return
-            }
-
-            cliPrint(
-                "Setting gamma for \(display):\n\tRed: \(red)\n\tGreen: \(green)\n\tBlue: \(blue)"
-            )
-
-            display.applyGamma = true
-            guard !isServer else {
-                display.gammaLock()
-
-                display.red = red
-                display.green = green
-                display.blue = blue
-
-                return
-            }
-
-            var stepsDone = 0
-            _ = asyncEvery(refreshSeconds.seconds, queue: realtimeQueue) { timer in
-                display.gammaLock()
-
-                display.red = red
-                display.green = green
-                display.blue = blue
-
-                stepsDone += 1
-                if stepsDone == wait {
-                    display.gammaUnlock()
-                    if let timer = timer {
-                        realtimeQueue.cancel(timer: timer)
+            for display in displays {
+                let printTable = {
+                    if readFullTable {
+                        let table = GammaTable(for: display.id)
+                        cliPrint("""
+                        Gamma table for \(display):
+                            Red: \(table.red.str(decimals: 3))
+                            Green: \(table.green.str(decimals: 3))
+                            Blue: \(table.blue.str(decimals: 3))
+                        """)
+                    } else {
+                        cliPrint("""
+                        Gamma table for \(display):
+                            Red: \(display.red.str(decimals: 3))
+                            Green: \(display.green.str(decimals: 3))
+                            Blue: \(display.blue.str(decimals: 3))
+                        """)
                     }
-                    return cliExit(0)
+                }
+
+                guard write || reset || restoreColorSync else {
+                    printTable()
+                    continue
+                }
+
+                if reset {
+                    if isServer {
+                        display.resetDefaultGamma()
+                    } else {
+                        CGDisplayRestoreColorSyncSettings()
+                    }
+                    cliPrint("Resetting gamma table for \(display)\n")
+                    printTable()
+                    continue
+                }
+                if restoreColorSync {
+                    CGDisplayRestoreColorSyncSettings()
+                    cliPrint("Restoring ColorSync settings\n")
+                    printTable()
+                    continue
+                }
+
+                cliPrint(
+                    "Setting gamma for \(display):\n\tRed: \(red)\n\tGreen: \(green)\n\tBlue: \(blue)"
+                )
+
+                display.applyGamma = true
+                guard !isServer else {
+                    display.gammaLock()
+
+                    display.red = red
+                    display.green = green
+                    display.blue = blue
+
+                    continue
+                }
+
+                var stepsDone = 0
+                _ = asyncEvery(refreshSeconds.seconds, queue: realtimeQueue) { timer in
+                    display.gammaLock()
+
+                    display.red = red
+                    display.green = green
+                    display.blue = blue
+
+                    stepsDone += 1
+                    if stepsDone == wait {
+                        display.gammaUnlock()
+                        if let timer = timer {
+                            realtimeQueue.cancel(timer: timer)
+                        }
+                        return cliExit(0)
+                    }
                 }
             }
         }
@@ -1243,9 +1293,9 @@ struct Lunar: ParsableCommand {
         var noMirror = false
 
         @Argument(
-            help: "Display serial or name (without spaces) or one of the following special values (first, main, all, builtin, source)"
+            help: "Display serial or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
         )
-        var display = "best-guess"
+        var display = DisplayFilter.bestGuess
 
         @Argument(help: "Whether Blackout should be enabled (monitor turned off) or disabled (turn monitor back on)")
         var state: BlackoutState = .enable
@@ -1260,15 +1310,14 @@ struct Lunar: ParsableCommand {
                 includeDummy: CachedDefaults[.showDummyDisplays]
             )
 
-            let displays = displayController.activeDisplays.sorted(by: { d1, d2 in
-                d1.key <= d2.key
-            }).map(\.value)
-
-            guard let display = getDisplay(displays: displays, filter: display) else {
-                throw LunarCommandError.displayNotFound(display)
+            let displays = getDisplays(displays: displayController.activeDisplayList, filter: display)
+            guard !displays.isEmpty else {
+                throw LunarCommandError.displayNotFound(display.s)
             }
 
-            displayController.blackOut(display: display.id, state: state == .enable ? .on : .off, mirroringAllowed: !noMirror)
+            for display in displays {
+                displayController.blackOut(display: display.id, state: state == .enable ? .on : .off, mirroringAllowed: !noMirror)
+            }
             cliExit(0)
         }
     }
@@ -1487,8 +1536,8 @@ private func printDisplay(
     }
 }
 
-private func handleDisplay(
-    _ displayFilter: String,
+private func handleDisplays(
+    _ displayFilter: DisplayFilter,
     displays: [Display],
     property: Display.CodingKeys? = nil,
     value: String? = nil,
@@ -1502,128 +1551,138 @@ private func handleDisplay(
     // MARK: - Apply display filter to get single display
 
     let property = property == .mute ? .audioMuted : property
-    guard let display = getDisplay(displays: displays, filter: displayFilter) else {
-        throw LunarCommandError.displayNotFound(displayFilter)
+    let displays = getDisplays(displays: displays, filter: displayFilter)
+    guard !displays.isEmpty else {
+        throw LunarCommandError.displayNotFound(displayFilter.s)
     }
 
-    guard let property = property else {
-        try printDisplay(display, json: json, systemInfo: systemInfo, edid: edid)
-        return
+    for display in displays {
+        do {
+            guard let property = property else {
+                try printDisplay(display, json: json, systemInfo: systemInfo, edid: edid)
+                return
+            }
+
+            // MARK: - Enable command-line specified controls
+
+            display.enabledControls = [
+                .network: controls.contains(.network),
+                .appleNative: controls.contains(.appleNative),
+                .ddc: controls.contains(.ddc),
+                .gamma: controls.contains(.gamma),
+            ]
+            display.control = display.getBestControl()
+            if Display.CodingKeys.settableWithControl.contains(property), !display.enabledControls[.gamma]!,
+               display.hasSoftwareControl
+            {
+                throw LunarCommandError.controlNotAvailable(controls.map(\.str).joined(separator: ", "))
+            }
+
+            guard let propertyValue = display.dictionary?[property.rawValue] else {
+                throw LunarCommandError.propertyNotValid(property.rawValue)
+            }
+
+            guard var value = value else {
+                // MARK: - Get display property
+
+                if !read {
+                    log.debug("Fetching value for \(property.rawValue)")
+                    cliPrint(encodedValue(key: property, value: propertyValue))
+                    return
+                }
+
+                // MARK: - Read display property
+
+                log.debug("Reading value for \(property.rawValue)")
+                guard let readValue = display.control?.read(property) else {
+                    throw LunarCommandError.cantReadProperty(property.rawValue)
+                }
+
+                cliPrint(encodedValue(key: property, value: readValue))
+                return
+            }
+
+            // MARK: - Set display property
+
+            log.debug("Changing \(property.rawValue) from \(propertyValue) to \(value)")
+            switch propertyValue {
+            case is String:
+                display.setValue(value, forKey: property.rawValue)
+                display.save(now: true)
+            case is NSNumber
+                where property == .input || property == .hotkeyInput1 || property == .hotkeyInput2 || property == .hotkeyInput3:
+                guard let input = InputSource(stringValue: value) else {
+                    throw LunarCommandError.invalidValue("Unknown input \(value)")
+                }
+                display.setValue(input.rawValue.ns, forKey: property.rawValue)
+                display.save(now: true)
+                display.control?.write(property, input)
+            case let currentValue as Bool where Display.CodingKeys.bool.contains(property):
+                var newValue = currentValue
+                switch value {
+                case "on", "1", "true", "yes", "t", "y":
+                    newValue = true
+                case "off", "0", "false", "no", "f", "n":
+                    newValue = false
+                case "toggle", "switch":
+                    newValue = !currentValue
+                default:
+                    throw LunarCommandError.invalidValue("\(value) is not a boolean")
+                }
+                display.setValue(newValue, forKey: property.rawValue)
+                display.save(now: true)
+                if property == .power {
+                    display.control?.write(property, newValue ? PowerState.on : PowerState.off)
+                } else {
+                    display.control?.write(property, newValue)
+                }
+            case let currentValue as NSNumber:
+                var operation = ""
+                if let firstChar = value.first?.unicodeScalars.first, !CharacterSet.decimalDigits.contains(firstChar) {
+                    operation = String(firstChar)
+                    value = String(value.dropFirst())
+                }
+
+                guard var value = value.d?.ns else { throw LunarCommandError.invalidValue("\(value) is not a number") }
+
+                switch operation {
+                case "+":
+                    value = (currentValue.uint16Value + min(value.uint16Value, UINT16_MAX.u16 - currentValue.uint16Value)).ns
+                case "-":
+                    value = (currentValue.uint16Value - min(value.uint16Value, currentValue.uint16Value)).ns
+                case "":
+                    break
+                default:
+                    throw LunarCommandError.invalidValue("Unknown operation \(operation) for value \(value)")
+                }
+
+                switch property {
+                case .brightness:
+                    display.brightness = value
+                    display.control?.write(property, display.limitedBrightness)
+                case .contrast:
+                    display.contrast = value
+                    display.control?.write(property, display.limitedContrast)
+                case .volume:
+                    display.volume = value
+                    display.control?.write(property, display.limitedVolume)
+                default:
+                    display.setValue(value, forKey: property.rawValue)
+                    display.control?.write(property, value.uint16Value)
+                }
+                display.save(now: true)
+            default:
+                break
+            }
+
+            if display.control is NetworkControl {
+                cliSleep(1)
+            }
+            cliPrint(encodedValue(key: property, value: display.dictionary![property.rawValue]!))
+        } catch {
+            cliPrint("\(display): \(error)")
+        }
     }
-
-    // MARK: - Enable command-line specified controls
-
-    display.enabledControls = [
-        .network: controls.contains(.network),
-        .appleNative: controls.contains(.appleNative),
-        .ddc: controls.contains(.ddc),
-        .gamma: controls.contains(.gamma),
-    ]
-    display.control = display.getBestControl()
-    if Display.CodingKeys.settableWithControl.contains(property), !display.enabledControls[.gamma]!, display.control is GammaControl {
-        throw LunarCommandError.controlNotAvailable(controls.map(\.str).joined(separator: ", "))
-    }
-
-    guard let propertyValue = display.dictionary?[property.rawValue] else {
-        throw LunarCommandError.propertyNotValid(property.rawValue)
-    }
-
-    guard var value = value else {
-        // MARK: - Get display property
-
-        if !read {
-            log.debug("Fetching value for \(property.rawValue)")
-            cliPrint(encodedValue(key: property, value: propertyValue))
-            return
-        }
-
-        // MARK: - Read display property
-
-        log.debug("Reading value for \(property.rawValue)")
-        guard let readValue = display.control?.read(property) else {
-            throw LunarCommandError.cantReadProperty(property.rawValue)
-        }
-
-        cliPrint(encodedValue(key: property, value: readValue))
-        return
-    }
-
-    // MARK: - Set display property
-
-    log.debug("Changing \(property.rawValue) from \(propertyValue) to \(value)")
-    switch propertyValue {
-    case is String:
-        display.setValue(value, forKey: property.rawValue)
-        display.save(now: true)
-    case is NSNumber where property == .input || property == .hotkeyInput1 || property == .hotkeyInput2 || property == .hotkeyInput3:
-        guard let input = InputSource(stringValue: value) else {
-            throw LunarCommandError.invalidValue("Unknown input \(value)")
-        }
-        display.setValue(input.rawValue.ns, forKey: property.rawValue)
-        display.save(now: true)
-        display.control?.write(property, input)
-    case let currentValue as Bool where Display.CodingKeys.bool.contains(property):
-        var newValue = currentValue
-        switch value {
-        case "on", "1", "true", "yes", "t", "y":
-            newValue = true
-        case "off", "0", "false", "no", "f", "n":
-            newValue = false
-        case "toggle", "switch":
-            newValue = !currentValue
-        default:
-            throw LunarCommandError.invalidValue("\(value) is not a boolean")
-        }
-        display.setValue(newValue, forKey: property.rawValue)
-        display.save(now: true)
-        if property == .power {
-            display.control?.write(property, newValue ? PowerState.on : PowerState.off)
-        } else {
-            display.control?.write(property, newValue)
-        }
-    case let currentValue as NSNumber:
-        var operation = ""
-        if let firstChar = value.first?.unicodeScalars.first, !CharacterSet.decimalDigits.contains(firstChar) {
-            operation = String(firstChar)
-            value = String(value.dropFirst())
-        }
-
-        guard var value = value.d?.ns else { throw LunarCommandError.invalidValue("\(value) is not a number") }
-
-        switch operation {
-        case "+":
-            value = (currentValue.uint16Value + min(value.uint16Value, UINT16_MAX.u16 - currentValue.uint16Value)).ns
-        case "-":
-            value = (currentValue.uint16Value - min(value.uint16Value, currentValue.uint16Value)).ns
-        case "":
-            break
-        default:
-            throw LunarCommandError.invalidValue("Unknown operation \(operation) for value \(value)")
-        }
-
-        switch property {
-        case .brightness:
-            display.brightness = value
-            display.control?.write(property, display.limitedBrightness)
-        case .contrast:
-            display.contrast = value
-            display.control?.write(property, display.limitedContrast)
-        case .volume:
-            display.volume = value
-            display.control?.write(property, display.limitedVolume)
-        default:
-            display.setValue(value, forKey: property.rawValue)
-            display.control?.write(property, value.uint16Value)
-        }
-        display.save(now: true)
-    default:
-        break
-    }
-
-    if display.control is NetworkControl {
-        cliSleep(1)
-    }
-    cliPrint(encodedValue(key: property, value: display.dictionary![property.rawValue]!))
 }
 
 private func spacing(longestKeySize: Int, key: String) -> String {
