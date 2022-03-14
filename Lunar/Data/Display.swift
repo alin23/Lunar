@@ -1214,7 +1214,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @AtomicLock var control: Control? = nil {
         didSet {
             context = getContext()
-            supportsEnhance = getSupportsEnhance()
+            mainAsync { self.supportsEnhance = self.getSupportsEnhance() }
             guard let control = control else {
                 hasSoftwareControl = false
                 return
@@ -1936,6 +1936,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 brightness = cap(self.brightness.uint16Value, minVal: minBrightness.uint16Value, maxVal: maxBrightness.uint16Value)
             }
 
+            if brightness > minBrightness.uint16Value, softwareBrightness < 1 {
+                softwareBrightness = 1
+            } else if brightness < maxBrightness.uint16Value, softwareBrightness > 1 {
+                softwareBrightness = 1
+            }
+
             var oldBrightness: UInt16 = oldValue.uint16Value
             if DDC.applyLimits, maxDDCBrightness.uint16Value != 100 || minDDCBrightness.uint16Value != 0, !hasSoftwareControl {
                 oldBrightness = mapNumber(
@@ -1955,9 +1961,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             log.info("Set BRIGHTNESS to \(brightness) for \(description) (old: \(oldBrightness))", context: context)
-//            Thread.callStackSymbols.forEach {
-//                log.info($0)
-//            }
+            if Logger.trace {
+                Thread.callStackSymbols.forEach {
+                    log.info($0)
+                }
+            }
 
             if let control = control as? DDCControl {
                 _ = control.setBrightnessDebounced(brightness, oldValue: oldBrightness)
@@ -2037,9 +2045,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             log.info("Set CONTRAST to \(contrast) for \(description) (old: \(oldContrast))", context: context)
-//            Thread.callStackSymbols.forEach {
-//                log.info($0)
-//            }
+            if Logger.trace {
+                Thread.callStackSymbols.forEach {
+                    log.info($0)
+                }
+            }
 
             if let control = control as? DDCControl {
                 _ = control.setContrastDebounced(contrast, oldValue: oldContrast)
@@ -2923,7 +2933,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         return getScreen()
     }() {
         didSet {
-            supportsEnhance = getSupportsEnhance()
+            mainAsync { self.supportsEnhance = self.getSupportsEnhance() }
         }
     }
 

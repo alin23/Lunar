@@ -1674,6 +1674,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         ValueTransformer.setValueTransformer(UpdateCheckIntervalTransformer(), forName: .updateCheckIntervalTransformerName)
         ValueTransformer.setValueTransformer(SignedIntTransformer(), forName: .signedIntTransformerName)
         ValueTransformer.setValueTransformer(ColorSchemeTransformer(), forName: .colorSchemeTransformerName)
+        ValueTransformer.setValueTransformer(IntBoolTransformer(), forName: .intBoolTransformerName)
     }
 
     func terminateOtherLunarInstances() {

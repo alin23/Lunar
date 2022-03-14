@@ -136,10 +136,11 @@ class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTable
             if let display = self.display {
                 let orientationHeight: CGFloat = (display.showOrientation ? 30 : 0)
                 let appPresetHeight: CGFloat = (display.appPreset != nil ? 30 : 0)
+                let xdrHeight: CGFloat = (display.appPreset != nil ? 30 : 0)
                 if display.hasDDC {
                     let volumeHeight: CGFloat = (display.showVolumeSlider ? 30 : 0)
                     let contrastHeight: CGFloat = (merged ? 0 : 30)
-                    height += 90 + volumeHeight + orientationHeight + appPresetHeight + contrastHeight
+                    height += 90 + volumeHeight + orientationHeight + appPresetHeight + contrastHeight + xdrHeight
                     #if DEBUG
                         log.info(
                             "QuickActions Height for \(display)",
@@ -149,15 +150,21 @@ class QuickActionsViewController: NSViewController, NSTableViewDelegate, NSTable
                                 "orientationHeight": orientationHeight,
                                 "appPresetHeight": appPresetHeight,
                                 "contrastHeight": contrastHeight,
+                                "xdrHeight": xdrHeight,
                             ]
                         )
                     #endif
                 } else {
-                    height += 60 + orientationHeight + appPresetHeight
+                    height += 60 + orientationHeight + appPresetHeight + xdrHeight
                     #if DEBUG
                         log.info(
                             "QuickActions Height for \(display)",
-                            context: ["initial": 60, "orientationHeight": orientationHeight, "appPresetHeight": appPresetHeight]
+                            context: [
+                                "initial": 60,
+                                "orientationHeight": orientationHeight,
+                                "appPresetHeight": appPresetHeight,
+                                "xdrHeight": xdrHeight,
+                            ]
                         )
                     #endif
                 }

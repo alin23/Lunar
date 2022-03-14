@@ -38,6 +38,30 @@ class UpdateCheckIntervalTransformer: ValueTransformer {
     }
 }
 
+// MARK: - IntBoolTransformer
+
+class IntBoolTransformer: ValueTransformer {
+    override class func transformedValueClass() -> AnyClass {
+        NSNumber.self
+    }
+
+    override class func allowsReverseTransformation() -> Bool {
+        true
+    }
+
+    override func reverseTransformedValue(_ value: Any?) -> Any? {
+        guard let segmentIndex = value as? Int else { return false }
+
+        return segmentIndex == 1
+    }
+
+    override func transformedValue(_ value: Any?) -> Any? {
+        guard let condition = value as? Bool else { return 0 }
+
+        return condition ? 1 : 0
+    }
+}
+
 // MARK: - ColorScheme
 
 public enum ColorScheme: Int, DefaultsSerializable {
@@ -121,6 +145,7 @@ class StringNumberTransformer: ValueTransformer {
 extension NSValueTransformerName {
     static let displayTransformerName = NSValueTransformerName(rawValue: "DisplayTransformer")
     static let updateCheckIntervalTransformerName = NSValueTransformerName(rawValue: "UpdateCheckIntervalTransformer")
+    static let intBoolTransformerName = NSValueTransformerName(rawValue: "IntBoolTransformer")
     static let signedIntTransformerName = NSValueTransformerName(rawValue: "SignedIntTransformer")
     static let colorSchemeTransformerName = NSValueTransformerName(rawValue: "ColorSchemeTransformer")
     static let stringNumberTransformerName = NSValueTransformerName(rawValue: "StringNumberTransformer")
