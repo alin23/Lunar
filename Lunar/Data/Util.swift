@@ -789,10 +789,12 @@ func asyncEvery(
                 return
             }
 
-            if runs >= maxRuns || isCancelled(key) {
-                cancelTask(key)
-            } else {
-                taskManager("\(key)-runs", runs + 1)
+            taskManagerQueue.async {
+                if runs >= maxRuns || isCancelled(key) {
+                    cancelTask(key)
+                } else {
+                    taskManager("\(key)-runs", runs + 1)
+                }
             }
         }
         timer.setCancelHandler {
@@ -1089,12 +1091,16 @@ func asyncAfter(ms: Int, _ action: DispatchWorkItem) {
     concurrentQueue.asyncAfter(deadline: deadline, execute: action.workItem)
 }
 
-func mainAsyncAfter(ms: Int, _ action: @escaping () -> Void) {
+@discardableResult
+func mainAsyncAfter(ms: Int, name: String = "mainAsyncAfter", _ action: @escaping () -> Void) -> DispatchWorkItem {
     let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
 
-    DispatchQueue.main.asyncAfter(deadline: deadline) {
+    let workItem = DispatchWorkItem(name: name) {
         action()
     }
+    DispatchQueue.main.asyncAfter(deadline: deadline, execute: workItem.workItem)
+
+    return workItem
 }
 
 func mainAsyncAfter(ms: Int, _ action: DispatchWorkItem) {

@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/Flight-School/AnyCodable",
         "state": {
           "branch": null,
-          "revision": "b1a7a8a6186f2fcb28f7bda67cfc545de48b3c80",
-          "version": "0.6.2"
+          "revision": "22f302d4c048aafcda09a4ab5b8c0b03855316fb",
+          "version": "0.6.3"
         }
       },
       {
@@ -51,8 +51,8 @@
         "repositoryURL": "https://github.com/danielgindi/Charts",
         "state": {
           "branch": null,
-          "revision": "8d134a78bb2cb9e7a0f05ecbd5880bb05cd02863",
-          "version": "4.0.1"
+          "revision": "b61fc9b97829ab9b954d01f96e601d52045ef5dc",
+          "version": "4.0.2"
         }
       },
       {
@@ -150,8 +150,8 @@
         "repositoryURL": "https://github.com/getsentry/sentry-cocoa",
         "state": {
           "branch": null,
-          "revision": "6e20ea06950ea871b70b6a82e8b42248ee2176e5",
-          "version": "7.10.0"
+          "revision": "32f29184d0d8ffd5a7299a37b90ab3cb343db1f3",
+          "version": "7.10.1"
         }
       },
       {
@@ -186,8 +186,8 @@
         "repositoryURL": "https://github.com/apple/swift-algorithms",
         "state": {
           "branch": null,
-          "revision": "2327673b0e9c7e90e6b1826376526ec3627210e4",
-          "version": "0.2.1"
+          "revision": "b14b7f4c528c942f121c8b860b9410b2bf57825e",
+          "version": "1.0.0"
         }
       },
       {
@@ -222,8 +222,8 @@
         "repositoryURL": "https://github.com/apple/swift-numerics",
         "state": {
           "branch": null,
-          "revision": "6583ac70c326c3ee080c1d42d9ca3361dca816cd",
-          "version": "0.1.0"
+          "revision": "0a5bc04095a675662cf24757cc0640aa2204253b",
+          "version": "1.0.2"
         }
       },
       {

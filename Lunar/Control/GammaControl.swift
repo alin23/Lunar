@@ -46,6 +46,8 @@ class GammaControl: Control {
     weak var display: Display?
     let str = "Gamma Control"
 
+    var isSoftware: Bool { true }
+
     func fluxChecker(flux: NSRunningApplication) {
         guard let display = display, display.supportsGamma else { return }
         guard !CachedDefaults[.neverAskAboutFlux], !screensSleeping.load(ordering: .relaxed),
@@ -55,7 +57,7 @@ class GammaControl: Control {
         fluxPromptTime = Date()
         let displayID = display.id
 
-        let completionHandler = { [weak self] (keepFlux: Bool) in
+        let completionHandler = { (keepFlux: Bool) in
             guard !keepFlux else {
                 if let display = displayController.activeDisplays[displayID] {
                     display.useOverlay = true
@@ -156,7 +158,6 @@ class GammaControl: Control {
             return true
         }
 
-        // if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue {
         if let oldValue = oldValue, oldValue != brightness {
             display.setGamma(brightness: brightness, oldBrightness: oldValue, onChange: onChange)
             return true
@@ -169,27 +170,6 @@ class GammaControl: Control {
 
     func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil, onChange: ((Contrast) -> Void)? = nil) -> Bool {
         true
-        // guard let display = display else { return false }
-
-        // guard display.active, let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else {
-        //     return false
-        // }
-
-        // let contrast = cap(contrast, minVal: 0, maxVal: 100)
-
-        // guard display.supportsGamma else {
-        //     return true
-        // }
-
-        // // if CachedDefaults[.smoothTransition], supportsSmoothTransition(for: .CONTRAST), let oldValue = oldValue {
-        // if let oldValue = oldValue, oldValue != contrast {
-        //     display.setGamma(contrast: contrast, oldContrast: oldValue, onChange: onChange)
-        //     return true
-        // }
-
-        // display.setGamma(contrast: contrast)
-        // onChange?(contrast)
-        // return true
     }
 
     func setPower(_: PowerState) -> Bool {

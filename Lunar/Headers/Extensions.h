@@ -9,6 +9,7 @@
 
 #import <AppKit/NSBezierPath.h>
 #import <ApplicationServices/ApplicationServices.h>
+#import <Foundation/Foundation.h>
 
 typedef NS_OPTIONS(NSUInteger, OFRectCorner) {
     OFRectCornerMinXMinY = 1 << 0,
@@ -37,5 +38,8 @@ typedef NS_OPTIONS(NSUInteger, OFRectEdge) {
 
 - (void)appendBezierPathWithRoundedRectangle:(NSRect)rect byRoundingCorners:(OFRectCorner)corners withRadius:(CGFloat)radius includingEdges:(OFRectEdge)edges;
 @end
+
+NSArray* allProcesses(void);
+BOOL processIsRunning(NSString* executableName, NSArray* processes);
 
 #endif /* Extensions_h */

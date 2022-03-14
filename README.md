@@ -4,7 +4,7 @@
   <h4 align="center">Intelligent adaptive brightness for your external display</h4>
 </p>
 
-### Lunar is a macOS app for controlling monitors, [with native support for M1](https://lunar.fyi/#m1)
+### Lunar is a macOS app for controlling monitors, [with native support for both Intel and Apple Silicon](https://lunar.fyi/#m1) ###
 
 [![Support Server](https://img.shields.io/discord/852182428155904010.svg?label=Discord&logo=Discord&colorB=7289da&style=for-the-badge)](https://discord.gg/dJPHpWgAhV)
 

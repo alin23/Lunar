@@ -901,7 +901,7 @@ class ModePopupButton: NSPopUpButton {
 
         changedItemsPublisher
             .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
-            .sink { [weak self] item in
+            .sink { [weak self] _ in
                 guard let mgr = DisplayController.panelManager, mgr.tryLockAccess() else {
                     mainAsyncAfter(ms: 500) { [weak self] in self?.setItemStyles() }
                     return
@@ -1437,6 +1437,50 @@ class AutoRemovingSegmentedControl: NSSegmentedControl {
 class AutoRemovingTextField: NSTextField {
     override var isHidden: Bool {
         didSet { if isHidden { removeFromSuperview() } }
+    }
+}
+
+// MARK: - AutoRemovingConstraintsView
+
+protocol AutoRemovingConstraintsView: NSObjectProtocol {
+    var originalConstraints: [NSLayoutConstraint] { get set }
+    var isHidden: Bool { get set }
+    var constraints: [NSLayoutConstraint] { get }
+    func removeConstraints(_ constraints: [NSLayoutConstraint])
+    func addConstraints(_ constraints: [NSLayoutConstraint])
+    func autoRemoveConstraints()
+}
+
+extension AutoRemovingConstraintsView {
+    func autoRemoveConstraints() {
+        if isHidden {
+            if originalConstraints.isEmpty {
+                originalConstraints = constraints
+            }
+            removeConstraints(constraints)
+        } else {
+            addConstraints(originalConstraints)
+        }
+    }
+}
+
+// MARK: - AutoRemovingConstraintsTextField
+
+class AutoRemovingConstraintsTextField: NSTextField, AutoRemovingConstraintsView {
+    var originalConstraints: [NSLayoutConstraint] = []
+
+    override var isHidden: Bool {
+        didSet { autoRemoveConstraints() }
+    }
+}
+
+// MARK: - AutoRemovingConstraintsLockButton
+
+class AutoRemovingConstraintsLockButton: LockButton, AutoRemovingConstraintsView {
+    var originalConstraints: [NSLayoutConstraint] = []
+
+    override var isHidden: Bool {
+        didSet { autoRemoveConstraints() }
     }
 }
 

@@ -519,7 +519,7 @@ class ControlChoiceViewController: NSViewController {
             setWriteProgress(0.25)
         }
 
-        guard !(control is GammaControl) || display.supportsGamma else {
+        guard !control.isSoftware || display.supportsGamma else {
             setContrast(100)
             setVolume(50)
 
@@ -532,7 +532,7 @@ class ControlChoiceViewController: NSViewController {
         if brightnessWriteWorked {
             setResult(brightnessWriteResult, text: "Write seemed to work", color: peach)
             askQuestion(
-                control is GammaControl ?
+                control.isSoftware ?
                     "Was there any change in brightness on the tested display?" :
                     "Was there any change in brightness on the tested display?\nThe brightness value in the monitor settings should now be set to 67"
             ) { [weak self] itWorked in
@@ -549,7 +549,7 @@ class ControlChoiceViewController: NSViewController {
         }
         guard wait(1.1) else { return .allWorked }
 
-        guard !(control is GammaControl) else {
+        guard !control.isSoftware else {
             setContrast(100)
             setVolume(50)
 
@@ -671,7 +671,7 @@ class ControlChoiceViewController: NSViewController {
 
         let setReadProgress = { value in self.setControlProgress(0.5 * value) }
 
-        guard !(control is GammaControl) else {
+        guard !control.isSoftware else {
             setBrightness(100)
             setContrast(100)
             setVolume(50)
