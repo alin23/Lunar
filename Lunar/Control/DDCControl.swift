@@ -43,18 +43,22 @@ class DDCControl: Control {
             DDC.skipReadingPropertyById[display.id]?.removeAll()
             DDC.writeFaults[display.id]?.removeAll()
             DDC.readFaults[display.id]?.removeAll()
-            display.responsiveDDC = true
-            display.startI2CDetection()
-            display.lastConnectionTime = Date()
+            mainAsync {
+                display.responsiveDDC = true
+                display.startI2CDetection()
+                display.lastConnectionTime = Date()
+            }
         } else {
             DDC.skipWritingPropertyById.removeAll()
             DDC.skipReadingPropertyById.removeAll()
             DDC.writeFaults.removeAll()
             DDC.readFaults.removeAll()
-            for display in displayController.activeDisplays.values {
-                display.responsiveDDC = true
-                display.startI2CDetection()
-                display.lastConnectionTime = Date()
+            mainAsync {
+                for display in displayController.activeDisplays.values {
+                    display.responsiveDDC = true
+                    display.startI2CDetection()
+                    display.lastConnectionTime = Date()
+                }
             }
         }
     }

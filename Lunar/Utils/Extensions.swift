@@ -1484,6 +1484,16 @@ class AutoRemovingConstraintsLockButton: LockButton, AutoRemovingConstraintsView
     }
 }
 
+// MARK: - AutoRemovingConstraintsSegmentedControl
+
+class AutoRemovingConstraintsSegmentedControl: NSSegmentedControl, AutoRemovingConstraintsView {
+    var originalConstraints: [NSLayoutConstraint] = []
+
+    override var isHidden: Bool {
+        didSet { autoRemoveConstraints() }
+    }
+}
+
 // MARK: - AutoRemovingBox
 
 class AutoRemovingBox: NSBox {
