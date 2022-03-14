@@ -40,7 +40,7 @@ class UpdateCheckIntervalTransformer: ValueTransformer {
 
 // MARK: - ColorScheme
 
-enum ColorScheme: Int, DefaultsSerializable {
+public enum ColorScheme: Int, DefaultsSerializable {
     case system
     case light
     case dark

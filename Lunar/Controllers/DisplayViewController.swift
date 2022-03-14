@@ -343,6 +343,7 @@ class DisplayViewController: NSViewController {
     var observers: Set<AnyCancellable> = []
 
     var openedBlackoutPage = false
+    var openedXDRPage = false
 
     @IBOutlet var _inputDropdownHotkeyButton: NSButton? {
         didSet {
@@ -785,7 +786,7 @@ class DisplayViewController: NSViewController {
             mainAsyncAfter(ms: 10) { [weak self] in
                 guard let self = self else { return }
                 self.updateControlsButton(control: control)
-                if control is GammaControl, display.enabledControls[.gamma] ?? false {
+                if control.isSoftware, display.enabledControls[.gamma] ?? false {
                     self.showGammaNotice()
                 } else {
                     self.hideGammaNotice()
@@ -1181,7 +1182,7 @@ class DisplayViewController: NSViewController {
             return
         }
 
-        if display.control is GammaControl {
+        if display.hasSoftwareControl {
             guard ask(message: "Monitor Reset", info: """
             This will reset the following settings for this display:
 
@@ -1402,9 +1403,10 @@ class DisplayViewController: NSViewController {
 
             Can also be toggled with the keyboard using Ctrl-Cmd-6.
 
-            Hold the Shift key while clicking the button (or while pressing the hotkey) if you only want to make the screen black without changing the mirroring state.
-
-            Hold the Option key while clicking the button (or while pressing the hotkey) if you want to power off the monitor completely using DDC.
+            Hold the following keys while clicking the button (or while pressing the hotkey) to change BlackOut behaviour:
+            - Shift: make the screen black without mirroring
+            - Option: turn off monitor completely using DDC
+            - Option and Shift: BlackOut other monitors and keep this one visible
 
             Caveats for DDC power off:
               • works only if the monitor can be controlled through DDC
@@ -1428,7 +1430,9 @@ class DisplayViewController: NSViewController {
 
         Can also be toggled with the keyboard using Ctrl-Cmd-6.
 
-        Hold the Shift key while clicking the button (or while pressing the hotkey) if you only want to make the screen black without changing the mirroring state.
+        Hold the following keys while clicking the button (or while pressing the hotkey) to change BlackOut behaviour:
+        - Shift: make the screen black without mirroring
+        - Option and Shift: BlackOut other monitors and keep this one visible
 
         Emergency Kill Switch: press the ⌘ Command key more than 8 times in a row to force disable BlackOut.
         """
@@ -1444,6 +1448,16 @@ class DisplayViewController: NSViewController {
         guard lunarProOnTrial || lunarProActive || openedBlackoutPage else {
             openedBlackoutPage = true
             if let url = URL(string: "https://lunar.fyi/#blackout") {
+                NSWorkspace.shared.open(url)
+            }
+            return
+        }
+    }
+
+    @IBAction func xdrBrightness(_: Any) {
+        guard lunarProOnTrial || lunarProActive || openedXDRPage else {
+            openedXDRPage = true
+            if let url = URL(string: "https://lunar.fyi/#xdr") {
                 NSWorkspace.shared.open(url)
             }
             return

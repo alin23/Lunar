@@ -157,6 +157,8 @@ class NetworkControl: Control {
 
     var responsiveTryCount = 0
 
+    var isSoftware: Bool { false }
+
     static func setup() {
         displayController.onActiveDisplaysChange = {
             let matchedServices = controllersForDisplay.values.map(\.service)
