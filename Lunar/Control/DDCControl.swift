@@ -35,6 +35,8 @@ class DDCControl: Control {
 
     @Atomic var ignoreFaults = false
 
+    var isSoftware: Bool { false }
+
     static func resetState(display: Display? = nil) {
         if let display = display {
             DDC.skipWritingPropertyById[display.id]?.removeAll()

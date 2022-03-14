@@ -81,6 +81,7 @@
 		C77CC7591FED9ECE009AA718 /* DisplayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */; };
 		C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */; };
 		C780CF98269F241A007FFB58 /* tsl2591.h in Resources */ = {isa = PBXBuildFile; fileRef = C780CF96269F2370007FFB58 /* tsl2591.h */; };
+		C784143827DDFBC400E14941 /* OSDWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C784143727DDFBC400E14941 /* OSDWindow.swift */; };
 		C78AB66720F0C73900863CB1 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78AB66620F0C73900863CB1 /* Logger.swift */; };
 		C78BD044259B2FB100FC823F /* SensorMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD043259B2FB100FC823F /* SensorMode.swift */; };
 		C78BD04A259B33D500FC823F /* Path in Frameworks */ = {isa = PBXBuildFile; productRef = C78BD049259B33D500FC823F /* Path */; };
@@ -271,6 +272,7 @@
 		C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayViewController.swift; sourceTree = "<group>"; };
 		C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayView.swift; sourceTree = "<group>"; };
 		C780CF96269F2370007FFB58 /* tsl2591.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tsl2591.h; sourceTree = "<group>"; };
+		C784143727DDFBC400E14941 /* OSDWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSDWindow.swift; sourceTree = "<group>"; };
 		C78AB66620F0C73900863CB1 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		C78BD043259B2FB100FC823F /* SensorMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorMode.swift; sourceTree = "<group>"; };
 		C78BD04B259B365500FC823F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
@@ -555,6 +557,7 @@
 				C76B775C26445C9B007CAAC5 /* MacToggle.swift */,
 				C74820F926DE6CFA00556EA8 /* PageNavigationControl.swift */,
 				C7AF321A26F62D3B00AC14AF /* Schedule.swift */,
+				C784143727DDFBC400E14941 /* OSDWindow.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1068,6 +1071,7 @@
 				C78BD044259B2FB100FC823F /* SensorMode.swift in Sources */,
 				C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */,
 				C7E80E342637060F004718A4 /* SFTP.swift in Sources */,
+				C784143827DDFBC400E14941 /* OSDWindow.swift in Sources */,
 				C7F862402608A34400704300 /* RunloopQueue.swift in Sources */,
 				C7E80E2C2637060F004718A4 /* FilePermissions.swift in Sources */,
 				C7A82DB7261B779E004146A8 /* SettingsPopoverController.swift in Sources */,
@@ -1212,7 +1216,7 @@
 					"$(PROJECT_DIR)/Frameworks",
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 5.4.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
@@ -1333,7 +1337,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				LLVM_LTO = YES_THIN;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 5.4.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
@@ -1514,7 +1518,7 @@
 					"$(PROJECT_DIR)/Frameworks",
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 5.4.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
@@ -1580,7 +1584,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				LLVM_LTO = YES_THIN;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 5.4.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
