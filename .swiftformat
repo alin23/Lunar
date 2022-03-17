@@ -1,6 +1,6 @@
 --allman false
 --assetliterals visual-width
---beforemarks 
+--beforemarks
 --binarygrouping 4,8
 --categorymark "MARK: %c"
 --classthreshold 0
@@ -28,15 +28,15 @@
 --importgrouping alpha
 --indent 4
 --indentcase false
---lifecycle 
+--lifecycle
 --linebreaks lf
 --markextensions always
 --marktypes always
 --maxwidth 140
---modifierorder 
---nevertrailing 
---nospaceoperators 
---nowrapoperators 
+--modifierorder
+--nevertrailing
+--nospaceoperators
+--nowrapoperators
 --octalgrouping 4,8
 --operatorfunc spaced
 --organizetypes class,enum,struct
@@ -44,14 +44,14 @@
 --ranges spaced
 --redundanttype inferred
 --self remove
---selfrequired 
+--selfrequired
 --semicolons inline
 --shortoptionals always
 --smarttabs enabled
 --stripunusedargs always
 --structthreshold 0
 --tabwidth unspecified
---trailingclosures 
+--trailingclosures
 --trimwhitespace always
 --typeattributes preserve
 --typemark "MARK: - %t"
@@ -66,3 +66,4 @@
 --yodaswap always
 --disable unusedArguments
 --enable markTypes,organizeDeclarations
+--exclude Lunar/Generated/Secrets.generated.swift

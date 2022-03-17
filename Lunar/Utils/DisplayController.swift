@@ -28,7 +28,7 @@ enum AVServiceMatch {
 
 // MARK: - DisplayController
 
-class DisplayController {
+class DisplayController: ObservableObject {
     // MARK: Lifecycle
 
     init() {
@@ -84,196 +84,7 @@ class DisplayController {
     let MODE_WATCHER_TASK_KEY = "modeWatcherTask"
     let CONTROL_WATCHER_TASK_KEY = "controlWatcherTask"
 
-    var displayList: [Display] {
-        displays.values.sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }.reversed()
-    }
-
-    var activeDisplayList: [Display] {
-        activeDisplays.values.sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }.reversed()
-    }
-
-    var externalActiveDisplays: [Display] {
-        activeDisplays.values.filter { !$0.isBuiltin }
-    }
-
-    var nonDummyDisplays: [Display] {
-        activeDisplayList.filter { !$0.isDummy }
-    }
-
-    var nonDummyDisplay: Display? {
-        nonDummyDisplays.first
-    }
-
-    var builtinActiveDisplays: [Display] {
-        activeDisplays.values.filter(\.isBuiltin)
-    }
-
-    var externalDisplays: [Display] {
-        displays.values.filter { !$0.isBuiltin }
-    }
-
-    var builtinDisplays: [Display] {
-        displays.values.filter(\.isBuiltin)
-    }
-
-    var builtinDisplay: Display? {
-        builtinActiveDisplays.first
-    }
-
-    var sourceDisplay: Display? {
-        guard let source = activeDisplays.values.first(where: \.isSource) else {
-            if let builtin = builtinDisplay {
-                mainAsync { builtin.isSource = true }
-                return builtin
-            }
-            return nil
-        }
-
-        return source
-    }
-
-    var targetDisplays: [Display] {
-        activeDisplays.values.filter { !$0.isSource }
-    }
-
-    @AtomicLock var displays: [CGDirectDisplayID: Display] = [:] {
-        didSet {
-            activeDisplays = displays.filter { $1.active }
-            activeDisplaysByReadableID = [String: Display](
-                uniqueKeysWithValues: activeDisplays.map { _, display in
-                    (display.readableID, display)
-                }
-            )
-        }
-    }
-
-    var activeDisplays: [CGDirectDisplayID: Display] {
-        get { _activeDisplaysLock.around(ignoreMainThread: true) { _activeDisplays } }
-        set {
-            _activeDisplaysLock.around {
-                _activeDisplays = newValue
-                CachedDefaults[.hasActiveDisplays] = !_activeDisplays.isEmpty
-                onActiveDisplaysChange?()
-                newValue.values.forEach { d in
-                    d.updateCornerWindow()
-                }
-            }
-        }
-    }
-
-    @AtomicLock var adaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode() {
-        didSet {
-            if adaptiveMode.key != .manual {
-                lastNonManualAdaptiveMode = adaptiveMode
-            }
-            oldValue.stopWatching()
-            if adaptiveMode.available {
-                adaptiveMode.watch()
-            }
-        }
-    }
-
-    var adaptiveModeKey: AdaptiveModeKey {
-        adaptiveMode.key
-    }
-
-    var firstDisplay: Display {
-        if !displays.isEmpty {
-            return displays.values.first(where: { d in d.active }) ?? displays.values.first!
-        } else {
-            #if TEST_MODE
-                return TEST_DISPLAY
-            #endif
-            return GENERIC_DISPLAY
-        }
-    }
-
-    var mainExternalDisplay: Display? {
-        guard let screen = NSScreen.externalWithMouse ?? NSScreen.onlyExternalScreen,
-              let id = screen.displayID
-        else { return nil }
-
-        return activeDisplays[id]
-    }
-
-    var nonCursorDisplays: [Display] {
-        guard let cursorDisplay = cursorDisplay else { return [] }
-        return activeDisplayList.filter { $0.id != cursorDisplay.id }
-    }
-
-    var mainDisplay: Display? {
-        guard let screenID = NSScreen.main?.displayID else { return nil }
-        return activeDisplays[screenID]
-    }
-
-    var nonMainDisplays: [Display] {
-        guard let mainDisplay = mainDisplay else { return [] }
-        return activeDisplayList.filter { $0.id != mainDisplay.id }
-    }
-
-    var cursorDisplay: Display? {
-        guard let screen = NSScreen.withMouse,
-              let id = screen.displayID
-        else { return nil }
-
-        if let d = activeDisplays[id], !d.isDummy {
-            return d
-        }
-        if let secondary = Display.getSecondaryMirrorScreenID(id), let d = activeDisplays[secondary], !d.isDummy {
-            return d
-        }
-        return nil
-    }
-
-    var mainExternalOrCGMainDisplay: Display? {
-        if let display = mainExternalDisplay, !display.isIndependentDummy {
-            return display
-        }
-
-        let displays = activeDisplays.values.map { $0 }
-        if displays.count == 1 {
-            return displays[0]
-        } else {
-            for display in displays {
-                if CGDisplayIsMain(display.id) == 1, !display.isIndependentDummy {
-                    return display
-                }
-            }
-        }
-        return nil
-    }
-
-    static func getAdaptiveMode() -> AdaptiveMode {
-        if CachedDefaults[.overrideAdaptiveMode] {
-            return CachedDefaults[.adaptiveBrightnessMode].mode
-        } else {
-            let mode = autoMode()
-//            if mode.key != CachedDefaults[.adaptiveBrightnessMode] {
-//                CachedDefaults[.adaptiveBrightnessMode] = mode.key
-//            }
-            return mode
-        }
-    }
-
-    static func panel(with id: CGDirectDisplayID) -> MPDisplay? {
-        guard let displays = DisplayController.panelManager?.displays as? [MPDisplay] else { return nil }
-
-        return displays.first { $0.displayID == id }
-    }
-
-    static func autoMode() -> AdaptiveMode {
-        if let mode = SensorMode.specific.ifExternalSensorAvailable() {
-            return mode
-        } else if let mode = SyncMode.shared.ifAvailable() {
-            return mode
-        } else if let mode = SensorMode.specific.ifInternalSensorAvailable() {
-            return mode
-        } else if let mode = LocationMode.shared.ifAvailable() {
-            return mode
-        } else {
-            return ManualMode.shared
-        }
-    }
+    @Published var activeDisplayList: [Display] = []
 
     static func displayInfoDictPartialMatchScore(
         display: Display,
@@ -413,17 +224,16 @@ class DisplayController {
             cancelTask(self.SCREENCAPTURE_WATCHER_TASK_KEY)
         }.store(in: &observers)
 
-        showSliderValuesPublisher.sink { _ in
-            mainAsync { menuPopover?.close() }
-        }.store(in: &observers)
-
-        mergeBrightnessContrastPublisher.sink { _ in
-            mainAsync { menuPopover?.close() }
+        mergeBrightnessContrastPublisher.sink { change in
+            mainAsync { [self] in
+                displays.values.forEach {
+                    $0.noDDCOrMergedBrightnessContrast = !$0.hasDDC || change.newValue
+                }
+            }
         }.store(in: &observers)
 
         showOrientationInQuickActionsPublisher.sink { [self] change in
             mainAsync { [self] in
-                menuPopover?.close()
                 displays.values.forEach {
                     #if DEBUG
                         $0.showOrientation = change.newValue
@@ -436,13 +246,8 @@ class DisplayController {
 
         showVolumeSliderPublisher.sink { [self] change in
             mainAsync { [self] in
-                menuPopover?.close()
                 displays.values.forEach {
-                    // #if DEBUG
-                    //     $0.showVolumeSlider = change.newValue
-                    // #else
                     $0.showVolumeSlider = $0.canChangeVolume && change.newValue
-                    // #endif
                 }
             }
         }.store(in: &observers)
@@ -800,6 +605,195 @@ class DisplayController {
     #endif
 
     var screencaptureIsRunning: CurrentValueSubject<Bool, Never> = .init(processIsRunning("/usr/sbin/screencapture", nil))
+
+    var displayList: [Display] {
+        displays.values.sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }.reversed()
+    }
+
+    var externalActiveDisplays: [Display] {
+        activeDisplays.values.filter { !$0.isBuiltin }
+    }
+
+    var nonDummyDisplays: [Display] {
+        activeDisplayList.filter { !$0.isDummy }
+    }
+
+    var nonDummyDisplay: Display? {
+        nonDummyDisplays.first
+    }
+
+    var builtinActiveDisplays: [Display] {
+        activeDisplays.values.filter(\.isBuiltin)
+    }
+
+    var externalDisplays: [Display] {
+        displays.values.filter { !$0.isBuiltin }
+    }
+
+    var builtinDisplays: [Display] {
+        displays.values.filter(\.isBuiltin)
+    }
+
+    var builtinDisplay: Display? {
+        builtinActiveDisplays.first
+    }
+
+    var sourceDisplay: Display? {
+        guard let source = activeDisplays.values.first(where: \.isSource) else {
+            if let builtin = builtinDisplay {
+                mainAsync { builtin.isSource = true }
+                return builtin
+            }
+            return nil
+        }
+
+        return source
+    }
+
+    var targetDisplays: [Display] {
+        activeDisplays.values.filter { !$0.isSource }
+    }
+
+    @AtomicLock var displays: [CGDirectDisplayID: Display] = [:] {
+        didSet {
+            activeDisplays = displays.filter { $1.active }
+            activeDisplaysByReadableID = [String: Display](
+                uniqueKeysWithValues: activeDisplays.map { _, display in
+                    (display.readableID, display)
+                }
+            )
+        }
+    }
+
+    var activeDisplays: [CGDirectDisplayID: Display] {
+        get { _activeDisplaysLock.around(ignoreMainThread: true) { _activeDisplays } }
+        set {
+            _activeDisplaysLock.around {
+                _activeDisplays = newValue
+                CachedDefaults[.hasActiveDisplays] = !_activeDisplays.isEmpty
+                onActiveDisplaysChange?()
+                newValue.values.forEach { d in
+                    d.updateCornerWindow()
+                }
+
+                activeDisplayList = _activeDisplays.values.sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }.reversed()
+            }
+        }
+    }
+
+    @AtomicLock var adaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode() {
+        didSet {
+            if adaptiveMode.key != .manual {
+                lastNonManualAdaptiveMode = adaptiveMode
+            }
+            oldValue.stopWatching()
+            if adaptiveMode.available {
+                adaptiveMode.watch()
+            }
+        }
+    }
+
+    var adaptiveModeKey: AdaptiveModeKey {
+        adaptiveMode.key
+    }
+
+    var firstDisplay: Display {
+        if !displays.isEmpty {
+            return displays.values.first(where: { d in d.active }) ?? displays.values.first!
+        } else {
+            #if TEST_MODE
+                return TEST_DISPLAY
+            #endif
+            return GENERIC_DISPLAY
+        }
+    }
+
+    var mainExternalDisplay: Display? {
+        guard let screen = NSScreen.externalWithMouse ?? NSScreen.onlyExternalScreen,
+              let id = screen.displayID
+        else { return nil }
+
+        return activeDisplays[id]
+    }
+
+    var nonCursorDisplays: [Display] {
+        guard let cursorDisplay = cursorDisplay else { return [] }
+        return activeDisplayList.filter { $0.id != cursorDisplay.id }
+    }
+
+    var mainDisplay: Display? {
+        guard let screenID = NSScreen.main?.displayID else { return nil }
+        return activeDisplays[screenID]
+    }
+
+    var nonMainDisplays: [Display] {
+        guard let mainDisplay = mainDisplay else { return [] }
+        return activeDisplayList.filter { $0.id != mainDisplay.id }
+    }
+
+    var cursorDisplay: Display? {
+        guard let screen = NSScreen.withMouse,
+              let id = screen.displayID
+        else { return nil }
+
+        if let d = activeDisplays[id], !d.isDummy {
+            return d
+        }
+        if let secondary = Display.getSecondaryMirrorScreenID(id), let d = activeDisplays[secondary], !d.isDummy {
+            return d
+        }
+        return nil
+    }
+
+    var mainExternalOrCGMainDisplay: Display? {
+        if let display = mainExternalDisplay, !display.isIndependentDummy {
+            return display
+        }
+
+        let displays = activeDisplays.values.map { $0 }
+        if displays.count == 1 {
+            return displays[0]
+        } else {
+            for display in displays {
+                if CGDisplayIsMain(display.id) == 1, !display.isIndependentDummy {
+                    return display
+                }
+            }
+        }
+        return nil
+    }
+
+    static func getAdaptiveMode() -> AdaptiveMode {
+        if CachedDefaults[.overrideAdaptiveMode] {
+            return CachedDefaults[.adaptiveBrightnessMode].mode
+        } else {
+            let mode = autoMode()
+//            if mode.key != CachedDefaults[.adaptiveBrightnessMode] {
+//                CachedDefaults[.adaptiveBrightnessMode] = mode.key
+//            }
+            return mode
+        }
+    }
+
+    static func panel(with id: CGDirectDisplayID) -> MPDisplay? {
+        guard let displays = DisplayController.panelManager?.displays as? [MPDisplay] else { return nil }
+
+        return displays.first { $0.displayID == id }
+    }
+
+    static func autoMode() -> AdaptiveMode {
+        if let mode = SensorMode.specific.ifExternalSensorAvailable() {
+            return mode
+        } else if let mode = SyncMode.shared.ifAvailable() {
+            return mode
+        } else if let mode = SensorMode.specific.ifInternalSensorAvailable() {
+            return mode
+        } else if let mode = LocationMode.shared.ifAvailable() {
+            return mode
+        } else {
+            return ManualMode.shared
+        }
+    }
 
     static func allDisplayProperties() -> [[String: Any]] {
         var propList: [[String: Any]] = []
@@ -1407,7 +1401,7 @@ class DisplayController {
             } else {
                 scope.setExtra(value: SyncMode.readBrightnessIOKit(), key: "builtinDisplayBrightnessIOKit")
             }
-            scope.setExtra(value: self?.lidClosed ?? isLidClosed(), key: "lidClosed")
+            scope.setTag(value: String(describing: self?.lidClosed ?? isLidClosed()), key: "lidClosed")
 
             guard let self = self else { return }
             for display in self.displays.values {
@@ -1426,6 +1420,22 @@ class DisplayController {
                 }
                 if display.isCinema() {
                     scope.setTag(value: "true", key: "cinema")
+                    continue
+                }
+                if display.isSidecar {
+                    scope.setTag(value: "true", key: "sidecar")
+                }
+                if display.isAirplay {
+                    scope.setTag(value: "true", key: "airplay")
+                }
+                if display.isVirtual {
+                    scope.setTag(value: "true", key: "virtual")
+                }
+                if display.isProjector {
+                    scope.setTag(value: "true", key: "projector")
+                }
+                if display.isDummy {
+                    scope.setTag(value: "true", key: "dummy")
                     continue
                 }
             }

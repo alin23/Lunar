@@ -15,7 +15,7 @@ open class OSDWindow: NSWindow {
 
         level = NSWindow.Level(CGShieldingWindowLevel().i)
         collectionBehavior = [.stationary, .canJoinAllSpaces, .ignoresCycle, .fullScreenDisallowsTiling]
-        sharingType = .none
+//        sharingType = .none
         ignoresMouseEvents = true
         setAccessibilityRole(.popover)
         setAccessibilitySubrole(.unknown)
@@ -129,7 +129,8 @@ public struct BigSurSlider: View {
         sliderHeight: CGFloat = 22,
         image: String? = nil,
         color: Color? = nil,
-        backgroundColor: Color = .black.opacity(0.1)
+        backgroundColor: Color = .black.opacity(0.1),
+        showValue: Binding<Bool>? = nil
     ) {
         _percentage = percentage
         _sliderWidth = sliderWidth.state
@@ -137,6 +138,7 @@ public struct BigSurSlider: View {
         _image = image.state
         _color = color.state
         _backgroundColor = backgroundColor.state
+        _showValue = showValue ?? .constant(false)
     }
 
     // MARK: Public
@@ -167,14 +169,15 @@ public struct BigSurSlider: View {
                     }
                     ZStack {
                         Circle()
-                            .foregroundColor(colorScheme == .dark ? colors.accent : Colors.darkGray)
+                            .foregroundColor(colorScheme == .dark ? (color ?? colors.accent) : Colors.darkGray)
                             .shadow(color: Colors.blackMauve.opacity(percentage > 0.5 ? 0.5 : percentage.d), radius: 5, x: -1, y: 0)
                             .frame(width: sliderHeight, height: sliderHeight, alignment: .trailing)
-
-                        Text((percentage * 100).str(decimals: 0))
-                            .foregroundColor(colors.fg.primary)
-                            .font(.system(size: 9, weight: .heavy))
-                            .allowsHitTesting(false)
+                        if showValue {
+                            Text((percentage * 100).str(decimals: 0))
+                                .foregroundColor(colors.fg.primary)
+                                .font(.system(size: 9, weight: .heavy))
+                                .allowsHitTesting(false)
+                        }
                     }.offset(
                         x: cgPercentage * w,
                         y: 0
@@ -215,6 +218,7 @@ public struct BigSurSlider: View {
     @State var image: String? = nil
     @State var color: Color? = nil
     @State var backgroundColor: Color = .black.opacity(0.1)
+    @Binding var showValue: Bool
 
     @State var subs = Set<AnyCancellable>()
 
