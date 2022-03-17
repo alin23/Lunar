@@ -8,6 +8,7 @@
 
 import ArgumentParser
 import Cocoa
+import Combine
 import CoreGraphics
 import Foundation
 import FuzzyFind
@@ -42,7 +43,7 @@ enum EDIDTextType: UInt8 {
 
 // MARK: - InputSource
 
-enum InputSource: UInt16, CaseIterable {
+enum InputSource: UInt16, CaseIterable, Nameable {
     case vga1 = 1
     case vga2 = 2
     case dvi1 = 3
@@ -135,6 +136,26 @@ enum InputSource: UInt16, CaseIterable {
             .componentVideoYPrPbYCrCb2,
             .componentVideoYPrPbYCrCb3,
         ]
+    }
+
+    var name: String {
+        get { displayName() }
+        set {}
+    }
+
+    var image: String? {
+        switch self {
+        case .vga1, .vga2: return "vga"
+        case .dvi1, .dvi2: return "dvi"
+        case .compositeVideo1, .compositeVideo2: return "composite"
+        case .sVideo1, .sVideo2: return "svideo"
+        case .tuner1, .tuner2, .tuner3: return "tuner"
+        case .componentVideoYPrPbYCrCb1, .componentVideoYPrPbYCrCb2, .componentVideoYPrPbYCrCb3: return "component"
+        case .displayPort1, .displayPort2: return "displayport"
+        case .hdmi1, .hdmi2: return "hdmi"
+        case .thunderbolt1, .thunderbolt2: return "usbc"
+        case .unknown: return "input"
+        }
     }
 
     var str: String {
@@ -679,10 +700,21 @@ enum DDC {
 
     static var serviceDetectors = [IOServiceDetector]()
 
+    static var observers: Set<AnyCancellable> = []
+    static var ioRegistryTreeChanged: PassthroughSubject<Bool, Never> = {
+        let p = PassthroughSubject<Bool, Never>()
+
+        p.debounce(for: .seconds(1), scheduler: queue)
+            .sink { _ in IORegistryTreeChanged() }
+            .store(in: &observers)
+
+        return p
+    }()
+
     static func IORegistryTreeChanged() {
         #if DEBUG
             print("IORegistryTreeChanged")
-            print("secondPhase", Defaults[.secondPhase])
+            print("secondPhase", Defaults[.secondPhase] as Any)
         #endif
         DDC.sync(barrier: true) {
             #if !DEBUG
@@ -713,13 +745,13 @@ enum DDC {
         #if arch(arm64)
             log.debug("Adding IOKit notification for dispext")
             serviceDetectors += ["AppleCLCD2", "DCPAVServiceProxy"]
-                .compactMap { IOServiceDetector(serviceClass: $0, callback: { _, _, _ in IORegistryTreeChanged() }) }
+                .compactMap { IOServiceDetector(serviceClass: $0, callback: { _, _, _ in ioRegistryTreeChanged.send(true) }) }
             serviceDetectors += ["dispext0", "dispext1", "dispext2", "dispext3", "dispext4", "dispext5", "dispext6", "dispext7"]
-                .compactMap { IOServiceDetector(serviceName: $0, callback: { _, _, _ in IORegistryTreeChanged() }) }
+                .compactMap { IOServiceDetector(serviceName: $0, callback: { _, _, _ in ioRegistryTreeChanged.send(true) }) }
         #else
             log.debug("Adding IOKit notification for IOFRAMEBUFFER_CONFORMSTO")
             serviceDetectors += [IOFRAMEBUFFER_CONFORMSTO]
-                .compactMap { IOServiceDetector(serviceClass: $0, callback: { _, _, _ in IORegistryTreeChanged() }) }
+                .compactMap { IOServiceDetector(serviceClass: $0, callback: { _, _, _ in ioRegistryTreeChanged.send(true) }) }
         #endif
         serviceDetectors.forEach { _ = $0.startDetection() }
     }

@@ -15,10 +15,10 @@ class StatusItemButtonController: NSView, NSPopoverDelegate {
     var backgroundView: PopoverBackgroundView?
 
     func popoverWillShow(_ notification: Notification) {
-        if let menuPopover = menuPopover, let view = menuPopover.contentViewController?.view {
-            removePopoverBackground(view: view, backgroundView: &backgroundView)
-            fixPopoverView(view)
-        }
+//        if let menuPopover = menuPopover, let view = menuPopover.contentViewController?.view {
+//            removePopoverBackground(view: view, backgroundView: &backgroundView)
+//            fixPopoverView(view)
+//        }
     }
 
     func popoverDidClose(_: Notification) {
@@ -43,7 +43,7 @@ class StatusItemButtonController: NSView, NSPopoverDelegate {
         }
         let menuPopover = appDelegate!.initMenuPopover()
 
-        guard let button = statusButton, (menuPopover.contentViewController as? QuickActionsViewController) != nil
+        guard let button = statusButton, menuPopover.contentViewController != nil
         else {
             return
         }

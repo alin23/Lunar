@@ -1436,6 +1436,46 @@ func ask(
     }
 }
 
+func askAndHandle(
+    message: String,
+    info: String,
+    okButton: String = "OK",
+    cancelButton: String = "Cancel",
+    thirdButton: String? = nil,
+    screen: NSScreen? = nil,
+    window: NSWindow? = nil,
+    suppressionText: String? = nil,
+    onSuppression: ((Bool) -> Void)? = nil,
+    unique: Bool = false,
+    waitTimeout: DateComponents = 5.seconds,
+    wide: Bool = false,
+    ultrawide: Bool = false,
+    markdown: Bool = false,
+    onCompletion: ((Bool) -> Void)? = nil
+) {
+    let resp = ask(
+        message: message,
+        info: info,
+        okButton: okButton,
+        cancelButton: cancelButton,
+        thirdButton: thirdButton,
+        screen: screen,
+        window: window,
+        suppressionText: suppressionText,
+        onSuppression: onSuppression,
+        onCompletion: { resp in onCompletion?(resp == .alertFirstButtonReturn) },
+        unique: unique,
+        waitTimeout: waitTimeout,
+        wide: wide,
+        ultrawide: ultrawide,
+        markdown: markdown
+    ) == .alertFirstButtonReturn
+
+    if window == nil {
+        onCompletion?(resp)
+    }
+}
+
 func ask(
     message: String,
     info: String,

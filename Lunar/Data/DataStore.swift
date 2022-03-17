@@ -85,6 +85,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .neverAskAboutFlux,
     .apiKey,
     .listenForRemoteCommands,
+    .neverAskAboutXDR,
     .nonManualMode,
     .clockMode,
     .syncMode,
@@ -100,6 +101,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .showBrightnessMenuBar,
     .showOnlyExternalBrightnessMenuBar,
     .showOrientationInQuickActions,
+    .showInputInQuickActions,
     .sunrise,
     .sunset,
     .syncPollingSeconds,
@@ -620,6 +622,7 @@ func initCache() {
     cacheKey(.showBrightnessMenuBar)
     cacheKey(.showOnlyExternalBrightnessMenuBar)
     cacheKey(.showOrientationInQuickActions)
+    cacheKey(.showInputInQuickActions)
     cacheKey(.clamshellModeDetection)
     cacheKey(.brightnessStep)
     cacheKey(.contrastStep)
@@ -654,6 +657,7 @@ func initCache() {
     cacheKey(.hasActiveDisplays)
     cacheKey(.ignoredVolumes)
     cacheKey(.listenForRemoteCommands)
+    cacheKey(.neverAskAboutXDR)
     cacheKey(.apiKey)
 
     cacheKey(.location)
@@ -734,6 +738,7 @@ extension Defaults.Keys {
     static let showBrightnessMenuBar = Key<Bool>("showBrightnessMenuBar", default: false)
     static let showOnlyExternalBrightnessMenuBar = Key<Bool>("showOnlyExternalBrightnessMenuBar", default: false)
     static let showOrientationInQuickActions = Key<Bool>("showOrientationInQuickActions", default: false)
+    static let showInputInQuickActions = Key<Bool>("showInputInQuickActions", default: true)
     static let clamshellModeDetection = Key<Bool>("clamshellModeDetection", default: true)
     static let brightnessStep = Key<Int>("brightnessStep", default: 6)
     static let contrastStep = Key<Int>("contrastStep", default: 6)
@@ -783,6 +788,7 @@ extension Defaults.Keys {
     static let checkForUpdate = Key<Bool>("SUEnableAutomaticChecks", default: true)
     static let apiKey = Key<String>("apiKey", default: "")
     static let listenForRemoteCommands = Key<Bool>("listenForRemoteCommands", default: false)
+    static let neverAskAboutXDR = Key<Bool>("neverAskAboutXDR", default: false)
 }
 
 let datastore = DataStore()
