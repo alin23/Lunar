@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -10730,14 +10730,6 @@ settings for this monitor.</string>
                 <customObject id="h4x-Kh-r5V" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="99.5" y="3826.5"/>
-        </scene>
-        <!--QuickActionsViewController-->
-        <scene sceneID="gWc-Mv-q1e">
-            <objects>
-                <controllerPlaceholder storyboardIdentifier="QuickActionsViewController" storyboardName="QuickActions" referencedIdentifier="QuickActionsViewController" id="Nm4-O6-0nB" sceneMemberID="viewController"/>
-                <customObject id="tbh-yz-ckn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="788" y="1716"/>
         </scene>
     </scenes>
     <resources>

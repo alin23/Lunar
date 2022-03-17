@@ -29,6 +29,7 @@ import UserNotifications
 import WAYWindow
 
 import Path
+import SwiftUI
 
 let fm = FileManager()
 let simplyCA = SimplyCoreAudio()
@@ -900,23 +901,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     @discardableResult func initMenuPopover() -> NSPopover {
-        guard let storyboard = NSStoryboard.main else { return NSPopover() }
-
         menuPopover = NSPopover()
         guard let menuPopover = menuPopover else { return NSPopover() }
-        menuPopover.contentViewController = storyboard
-            .instantiateController(
-                withIdentifier: NSStoryboard
-                    .SceneIdentifier("QuickActionsViewController")
-            ) as! QuickActionsViewController
-        menuPopover.contentViewController?.loadView()
+        menuPopover.contentViewController = NSViewController()
+        menuPopover.contentViewController?.view = HostingView(rootView: QuickActionsMenuView())
         if let w = menuPopover.contentViewController?.view.window {
             w.setAccessibilityRole(.popover)
             w.setAccessibilitySubrole(.unknown)
         }
 
         menuPopover.animates = false
-        // menuPopover.behavior = .transient
 
         return menuPopover
     }
@@ -973,7 +967,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .publisher(for: NSNotification.Name(rawValue: kAppleInterfaceThemeChangedNotification), object: nil)
             .sink { [self] notification in
                 log.info("\(notification.name)")
-                mainAsync {
+                mainAsync { [self] in
                     initMenuItems()
                     for (key, popover) in POPOVERS {
                         guard let popover = popover else { continue }
@@ -1612,7 +1606,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             options.dsn = secrets.sentryDSN
             options.releaseName = "v\(release)"
             options.dist = release
-            options.environment = "production"
+            #if DEBUG
+                options.environment = "dev"
+            #else
+                options.environment = "production"
+            #endif
         }
 
         let user = User(userId: SERIAL_NUMBER_HASH)
@@ -1777,6 +1775,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 contents: LUNAR_CLI_SCRIPT.data(using: .utf8),
                 attributes: [.posixPermissions: 0o755]
             )
+        // #endif
         #else
             mainAsyncAfter(ms: 30000) {
                 let user = User(userId: SERIAL_NUMBER_HASH)
@@ -1843,6 +1842,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         if let task = valuesReaderThread {
             lowprioQueue.cancel(timer: task)
+        }
+        displayController.activeDisplayList.filter(\.ambientLightCompensationEnabledByUser).forEach { d in
+            d.ambientLightAdaptiveBrightnessEnabled = true
         }
         displayController.activeDisplays.values.filter(\.faceLightEnabled).forEach { display in
             display.disableFaceLight(smooth: false)

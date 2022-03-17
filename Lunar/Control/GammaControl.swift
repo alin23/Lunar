@@ -28,6 +28,62 @@ let NIGHT_SHIFT_TAB_SCRIPT =
 
 var fluxPromptTime: Date?
 
+// MARK: - NightShift
+
+enum NightShift {
+    static let client = CBBlueLightClient()
+
+    static var strength: Float {
+        get {
+            var strength: Float = 0
+            client.getStrength(&strength)
+            return strength
+        }
+
+        set {
+            client.setStrength(newValue, commit: true)
+        }
+    }
+
+    static var mode: Int32 {
+        get { status.mode }
+        set { client.setMode(newValue) }
+    }
+
+    static var isEnabled: Bool {
+        get { status.enabled.boolValue }
+        set { client.setEnabled(newValue) }
+    }
+
+    static var isSupported: Bool { CBBlueLightClient.supportsBlueLightReduction() }
+
+    static var status: Status {
+        var status = Status()
+        client.getBlueLightStatus(&status)
+        return status
+    }
+
+    static func enable(mode: Int32? = nil, strength: Float? = nil) {
+        isEnabled = true
+        if let mode = mode {
+            self.mode = mode
+        }
+        if let strength = strength {
+            self.strength = strength
+        }
+    }
+
+    static func disable() {
+        isEnabled = false
+    }
+
+    static func previewStrength(_ value: Float) {
+        if !isEnabled { isEnabled = true }
+
+        client.setStrength(value, commit: false)
+    }
+}
+
 // MARK: - GammaControl
 
 class GammaControl: Control {
@@ -69,10 +125,8 @@ class GammaControl: Control {
                 display.useOverlay = false
             }
             flux.terminate()
-            if CBBlueLightClient.supportsBlueLightReduction() {
-                let client = CBBlueLightClient()
-                client.setMode(1)
-                client.setStrength(0.5, commit: true)
+            if NightShift.isSupported {
+                NightShift.enable(mode: 1, strength: 0.5)
             }
 
             if let url = URL(string: "https://shifty.natethompson.io") {
