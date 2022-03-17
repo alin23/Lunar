@@ -372,7 +372,8 @@ extension Double {
     }
 
     @inline(__always) var f: Float {
-        Float(self)
+        get { Float(self) }
+        set { self = Double(newValue) }
     }
 
     @inline(__always) var i: Int {
@@ -1390,6 +1391,13 @@ extension NSPopUpButton {
         NotificationCenter.default
             .publisher(for: NSMenu.didSendActionNotification, object: menu)
             .map { _ in self.selectedItem }
+            .eraseToAnyPublisher()
+    }
+
+    var selectedTitlePublisher: AnyPublisher<String?, Never> {
+        NotificationCenter.default
+            .publisher(for: NSMenu.didSendActionNotification, object: menu)
+            .map { _ in self.selectedItem?.title }
             .eraseToAnyPublisher()
     }
 }

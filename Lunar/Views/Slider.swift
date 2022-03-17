@@ -24,10 +24,7 @@ class SliderCell: NSSliderCell {
     @IBInspectable dynamic var bgOpacity: CGFloat = 0.3
 
     var shouldDrawText: Bool {
-        guard tag != QUICK_ACTIONS_SLIDER_CELL_TAG else {
-            return CachedDefaults[.showSliderValues]
-        }
-        return drawText
+        drawText
     }
 
     @IBInspectable dynamic var color = NSColor(named: "Slider")! {

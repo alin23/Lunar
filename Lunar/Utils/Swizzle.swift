@@ -80,40 +80,6 @@ extension NSImage {
     }
 }
 
-func fixPopoverView(_ view: NSView?) {
-    if let view = view {
-        view.layer = nil
-        let backView = NSVisualEffectView(frame: NSRect(
-            x: POPOVER_PADDING / 2,
-            y: POPOVER_PADDING,
-            width: view.frame.width - POPOVER_PADDING,
-            height: view.frame.height - POPOVER_PADDING
-        ))
-        backView.material = .hudWindow
-        backView.blendingMode = .behindWindow
-        backView.state = .active
-        backView.wantsLayer = true
-        backView.layer?.cornerCurve = .continuous
-        backView.maskImage = .mask(withCornerRadius: POPOVER_CORNER_RADIUS)
-        backView.shadow = POPOVER_SHADOW
-
-        let backViewBackground = QuickActionsView(frame: NSRect(
-            x: POPOVER_PADDING / 2,
-            y: POPOVER_PADDING,
-            width: view.frame.width - POPOVER_PADDING,
-            height: view.frame.height - POPOVER_PADDING
-        ))
-        backViewBackground.wantsLayer = true
-        if let l = backViewBackground.layer {
-            l.cornerCurve = .continuous
-            l.backgroundColor = (darkMode ? darkMauve : white).withAlphaComponent(0.4).cgColor
-            l.cornerRadius = POPOVER_CORNER_RADIUS
-        }
-        view.addSubview(backViewBackground, positioned: .below, relativeTo: view.subviews.first)
-        view.addSubview(backView, positioned: .below, relativeTo: view.subviews.first)
-    }
-}
-
 var updateLayerOriginal: Method?
 var updateLayerOriginalIMP: IMP?
 var popoverSwizzled = false
@@ -151,6 +117,99 @@ class NoClippingLayer: CALayer {
         set {}
         get {
             false
+        }
+    }
+}
+
+import SwiftUI
+
+// MARK: - HostingView
+
+class HostingView: NSHostingView<QuickActionsMenuView> {
+    var backgroundView: PopoverBackgroundView?
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        removePopoverBackground(view: self, backgroundView: &backgroundView)
+    }
+}
+
+// MARK: - VisualEffectBlur
+
+public struct VisualEffectBlur: View {
+    // MARK: Lifecycle
+
+    public init(
+        material: NSVisualEffectView.Material = .headerView,
+        blendingMode: NSVisualEffectView.BlendingMode = .withinWindow,
+        state: NSVisualEffectView.State = .followsWindowActiveState
+    ) {
+        self.material = material
+        self.blendingMode = blendingMode
+        self.state = state
+    }
+
+    // MARK: Public
+
+    public var body: some View {
+        Representable(
+            material: material,
+            blendingMode: blendingMode,
+            state: state
+        ).accessibility(hidden: true)
+    }
+
+    // MARK: Private
+
+    private var material: NSVisualEffectView.Material
+    private var blendingMode: NSVisualEffectView.BlendingMode
+    private var state: NSVisualEffectView.State
+}
+
+// MARK: - Representable
+
+extension VisualEffectBlur {
+    struct Representable: NSViewRepresentable {
+        var material: NSVisualEffectView.Material
+        var blendingMode: NSVisualEffectView.BlendingMode
+        var state: NSVisualEffectView.State
+
+        func makeNSView(context: Context) -> NSVisualEffectView {
+            context.coordinator.visualEffectView
+        }
+
+        func updateNSView(_ view: NSVisualEffectView, context: Context) {
+            context.coordinator.update(material: material)
+            context.coordinator.update(blendingMode: blendingMode)
+            context.coordinator.update(state: state)
+        }
+
+        func makeCoordinator() -> Coordinator {
+            Coordinator()
+        }
+    }
+
+    class Coordinator {
+        // MARK: Lifecycle
+
+        init() {
+            visualEffectView.blendingMode = .withinWindow
+        }
+
+        // MARK: Internal
+
+        let visualEffectView = NSVisualEffectView()
+
+        func update(material: NSVisualEffectView.Material) {
+            visualEffectView.material = material
+        }
+
+        func update(blendingMode: NSVisualEffectView.BlendingMode) {
+            visualEffectView.blendingMode = blendingMode
+        }
+
+        func update(state: NSVisualEffectView.State) {
+            visualEffectView.state = state
         }
     }
 }
