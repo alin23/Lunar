@@ -158,9 +158,9 @@ enum InputSource: UInt16, CaseIterable, Nameable {
         }
     }
 
-    var str: String {
-        displayName()
-    }
+    var tag: Int? { rawValue.i }
+    var str: String { displayName() }
+    var enabled: Bool { true }
 
     func displayName() -> String {
         switch self {
@@ -182,8 +182,8 @@ enum InputSource: UInt16, CaseIterable, Nameable {
         case .displayPort2: return "DisplayPort 2"
         case .hdmi1: return "HDMI 1"
         case .hdmi2: return "HDMI 2"
-        case .thunderbolt1: return "Thunderbolt (DDC 25)"
-        case .thunderbolt2: return "Thunderbolt (DDC 27)"
+        case .thunderbolt1: return "USB-C 1"
+        case .thunderbolt2: return "USB-C 2"
         case .unknown: return "Unknown"
         }
     }

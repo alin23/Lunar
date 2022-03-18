@@ -12,161 +12,6 @@ import Defaults
 import Surge
 import SwiftUI
 
-// MARK: - FlatButton
-
-public struct FlatButton: ButtonStyle {
-    // MARK: Lifecycle
-
-    public init(
-        color: Color? = nil,
-        textColor: Color? = nil,
-        hoverColor: Color? = nil,
-        colorBinding: Binding<Color>? = nil,
-        textColorBinding: Binding<Color>? = nil,
-        hoverColorBinding: Binding<Color>? = nil,
-        width: CGFloat? = nil,
-        height: CGFloat? = nil,
-        circle: Bool = false,
-        radius: CGFloat = 8,
-        pressedBinding: Binding<Bool>? = nil
-    ) {
-        _color = colorBinding ?? .constant(color ?? Colors.lightGold)
-        _textColor = textColorBinding ?? .constant(textColor ?? Colors.blackGray)
-        _hoverColor = hoverColorBinding ?? .constant(hoverColor ?? Colors.lightGold)
-        _width = .constant(width)
-        _height = .constant(height)
-        _circle = .constant(circle)
-        _radius = .constant(radius)
-        _pressed = pressedBinding ?? .constant(false)
-    }
-
-    // MARK: Public
-
-    public func makeBody(configuration: Configuration) -> some View {
-        configuration
-            .label
-            .foregroundColor(textColor)
-            .padding(.vertical, 4.0)
-            .padding(.horizontal, 8.0)
-            .frame(minWidth: width, idealWidth: width, minHeight: height, idealHeight: height, alignment: .center)
-            .background(
-                circle
-                    ?
-                    AnyView(
-                        Circle().fill(color)
-                            .frame(minWidth: width, idealWidth: width, minHeight: height, idealHeight: height, alignment: .center)
-                    )
-                    : AnyView(
-                        RoundedRectangle(
-                            cornerRadius: radius,
-                            style: .continuous
-                        ).fill(color).frame(minWidth: width, idealWidth: width, minHeight: height, idealHeight: height, alignment: .center)
-                    )
-
-            ).colorMultiply(configuration.isPressed ? pressedColor : colorMultiply)
-            .scaleEffect(configuration.isPressed ? 1.02 : scale)
-            .onAppear {
-                pressedColor = hoverColor.blended(withFraction: 0.5, of: .white)
-            }
-            .onChange(of: pressed) { newPressed in
-                if newPressed {
-                    withAnimation(.interactiveSpring()) {
-                        colorMultiply = hoverColor
-                        scale = 1.05
-                    }
-                } else {
-                    withAnimation(.interactiveSpring()) {
-                        colorMultiply = .white
-                        scale = 1.0
-                    }
-                }
-            }
-            .onHover(perform: { hover in
-                withAnimation(.easeOut(duration: 0.2)) {
-                    colorMultiply = hover ? hoverColor : .white
-                    scale = hover ? 1.05 : 1
-                }
-            })
-    }
-
-    // MARK: Internal
-
-    @Environment(\.colors) var colors
-
-    @Binding var color: Color
-    @Binding var textColor: Color
-    @State var colorMultiply: Color = .white
-    @State var scale: CGFloat = 1.0
-    @Binding var hoverColor: Color
-    @State var pressedColor: Color = .white
-    @Binding var width: CGFloat?
-    @Binding var height: CGFloat?
-    @Binding var circle: Bool
-    @Binding var radius: CGFloat
-    @Binding var pressed: Bool
-}
-
-// MARK: - PickerButton
-
-public struct PickerButton<T: Equatable>: ButtonStyle {
-    // MARK: Public
-
-    public func makeBody(configuration: Configuration) -> some View {
-        configuration
-            .label
-            .foregroundColor(enumValue == onValue ? (onTextColor ?? colors.accent) : offTextColor)
-            .padding(.vertical, horizontalPadding)
-            .padding(.horizontal, verticalPadding)
-            .background(
-                RoundedRectangle(
-                    cornerRadius: 8,
-                    style: .continuous
-                ).fill(enumValue == onValue ? color : (offColor ?? color.opacity(0.5)))
-
-            ).scaleEffect(scale).colorMultiply(hoverColor)
-            .contentShape(Rectangle())
-            .onHover(perform: { hover in
-                guard enumValue != onValue else {
-                    hoverColor = .white
-                    scale = 1.0
-                    return
-                }
-                withAnimation(.easeOut(duration: 0.1)) {
-                    hoverColor = hover ? colors.accent : .white
-                    scale = hover ? 1.05 : 1.0
-                }
-            })
-    }
-
-    // MARK: Internal
-
-    @Environment(\.colors) var colors
-
-    @State var color = Color.primary.opacity(0.1)
-    @State var offColor: Color? = nil
-    @State var onTextColor: Color? = nil
-    @State var offTextColor = Color.secondary
-    @State var horizontalPadding: CGFloat = 4
-    @State var verticalPadding: CGFloat = 8
-    @State var brightness = 0.0
-    @State var scale: CGFloat = 1
-    @State var hoverColor = Color.white
-    @Binding var enumValue: T
-    @State var onValue: T
-}
-
-public extension Color {
-    func blended(withFraction fraction: CGFloat, of color: Color) -> Color {
-        let color1 = NSColor(self)
-        let color2 = NSColor(color)
-
-        guard let blended = color1.blended(withFraction: fraction, of: color2)
-        else { return self }
-
-        return Color(blended)
-    }
-}
-
 // MARK: - PresetButtonView
 
 struct PresetButtonView: View {
@@ -185,27 +30,28 @@ struct PresetButtonView: View {
 
 struct DisplayRowView: View {
     @ObservedObject var display: Display
+    @Environment(\.colorScheme) var colorScheme
     @Environment(\.colors) var colors
     @Default(.showSliderValues) var showSliderValues
     @Default(.showInputInQuickActions) var showInputInQuickActions
 
     var softwareSliders: some View {
         Group {
-            if display.enhanced {
+            if display.enhanced || SWIFTUI_PREVIEW {
                 BigSurSlider(
                     percentage: $display.xdrBrightness,
                     image: "speedometer",
-                    color: Colors.green.blended(withFraction: 0.2, of: .white),
-                    backgroundColor: Colors.green.opacity(0.1),
+                    color: Colors.blue.blended(withFraction: 0.5, of: .white),
+                    backgroundColor: Colors.blue.opacity(colorScheme == .dark ? 0.1 : 0.2),
                     showValue: $showSliderValues
                 )
             }
-            if display.subzero {
+            if display.subzero || SWIFTUI_PREVIEW {
                 BigSurSlider(
                     percentage: $display.softwareBrightness,
                     image: "moon.circle.fill",
-                    color: Colors.red.blended(withFraction: 0.2, of: .white),
-                    backgroundColor: Colors.red.opacity(0.1),
+                    color: Colors.red.blended(withFraction: 0.3, of: .white),
+                    backgroundColor: Colors.red.opacity(colorScheme == .dark ? 0.1 : 0.2),
                     showValue: $showSliderValues
                 )
             }
@@ -239,6 +85,28 @@ struct DisplayRowView: View {
         .padding(.bottom, 4)
     }
 
+    var inputSelector: some View {
+        Dropdown(
+            selection: $display.inputSource,
+            width: 150,
+            height: 20,
+            noValueText: "Video Input",
+            noValueImage: "input",
+            content: .constant(InputSource.mostUsed)
+        )
+        .frame(width: 150, height: 20, alignment: .center)
+        .padding(.vertical, 2)
+        .padding(.horizontal, 4)
+        .background(
+            RoundedRectangle(
+                cornerRadius: 8,
+                style: .continuous
+            ).fill(Color.primary.opacity(0.15))
+        )
+        .opacity(0.7)
+        .colorMultiply(colors.accent)
+    }
+
     var rotationSelector: some View {
         HStack {
             rotationPicker(0).help("No rotation")
@@ -263,7 +131,7 @@ struct DisplayRowView: View {
                     percentage: $display.preciseBrightnessContrast.f,
                     image: "sun.max.fill",
                     color: colors.accent,
-                    backgroundColor: colors.accent.opacity(0.1),
+                    backgroundColor: colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.3),
                     showValue: $showSliderValues
                 )
                 softwareSliders
@@ -272,7 +140,7 @@ struct DisplayRowView: View {
                     percentage: $display.preciseBrightness.f,
                     image: "sun.max.fill",
                     color: colors.accent,
-                    backgroundColor: colors.accent.opacity(0.1),
+                    backgroundColor: colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.3),
                     showValue: $showSliderValues
                 )
                 softwareSliders
@@ -280,7 +148,7 @@ struct DisplayRowView: View {
                     percentage: $display.preciseContrast.f,
                     image: "circle.righthalf.fill",
                     color: colors.accent,
-                    backgroundColor: colors.accent.opacity(0.1),
+                    backgroundColor: colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.3),
                     showValue: $showSliderValues
                 )
             }
@@ -290,34 +158,31 @@ struct DisplayRowView: View {
                     percentage: $display.preciseVolume.f,
                     image: "speaker.2.fill",
                     color: colors.accent,
-                    backgroundColor: colors.accent.opacity(0.1),
+                    backgroundColor: colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.3),
                     showValue: $showSliderValues
                 )
             }
 
-            if display.hasDDC, showInputInQuickActions {
-                Dropdown(
-                    selection: $display.inputSource,
-                    width: 120,
-                    height: 20,
-                    noValueText: "Video Input",
-                    noValueImage: "input",
-                    content: .constant(InputSource.mostUsed)
-                )
-                .frame(width: 120, height: 20, alignment: .center)
-                .padding(.vertical, 3)
-            }
-
-            if display.showOrientation {
-                rotationSelector.padding(.vertical, 3)
-            }
-
-            if let app = display.appPreset {
-                SwiftUI.Button("App Preset: \(app.name)") {
-                    app.runningApps?.first?.activate()
+            if (display.hasDDC && showInputInQuickActions) || display.showOrientation || display.appPreset != nil {
+                VStack {
+                    if display.hasDDC, showInputInQuickActions { inputSelector }
+                    if display.showOrientation { rotationSelector }
+                    if let app = display.appPreset {
+                        SwiftUI.Button("App Preset: \(app.name)") {
+                            app.runningApps?.first?.activate()
+                        }
+                        .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .secondary.opacity(0.8)))
+                        .font(.system(size: 9, weight: .bold))
+                    }
                 }
-                .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .secondary))
-                .font(.system(size: 9, weight: .bold))
+                .padding(8)
+                .background(
+                    RoundedRectangle(
+                        cornerRadius: 8,
+                        style: .continuous
+                    ).fill(Color.primary.opacity(0.05))
+                )
+                .padding(.vertical, 3)
             }
         }
     }
@@ -330,73 +195,6 @@ struct DisplayRowView: View {
         .font(.system(size: 12, weight: .semibold, design: .monospaced))
         .help("No rotation")
     }
-}
-
-extension NSButton {
-    override open var focusRingType: NSFocusRingType {
-        get { .none }
-        set {}
-    }
-}
-
-// MARK: - CheckboxToggleStyle
-
-struct CheckboxToggleStyle: ToggleStyle {
-    enum Style {
-        case square, circle
-
-        // MARK: Internal
-
-        var sfSymbolName: String {
-            switch self {
-            case .square:
-                return "square"
-            case .circle:
-                return "circle"
-            }
-        }
-    }
-
-    @Environment(\.isEnabled) var isEnabled
-    let style: Style // custom param
-
-    func makeBody(configuration: Configuration) -> some View {
-        SwiftUI.Button(action: {
-            configuration.isOn.toggle() // toggle the state binding
-        }, label: {
-            HStack {
-                Image(systemName: configuration.isOn ? "checkmark.\(style.sfSymbolName).fill" : style.sfSymbolName)
-                    .imageScale(.medium)
-                configuration.label
-            }
-        })
-        .buttonStyle(PlainButtonStyle()) // remove any implicit styling from the button
-        .disabled(!isEnabled)
-    }
-}
-
-// MARK: - SettingsToggle
-
-struct SettingsToggle: View {
-    @State var text: String
-    @Binding var setting: Bool
-
-    var body: some View {
-        Toggle(text, isOn: $setting)
-            .toggleStyle(CheckboxToggleStyle(style: .circle))
-            .foregroundColor(.primary)
-            .padding(.vertical, 0.5)
-    }
-}
-
-extension Animation {
-    #if os(iOS)
-        static var fastTransition = Animation.easeOut(duration: 0.1)
-    #else
-        static var fastTransition = Animation.interactiveSpring(dampingFraction: 0.7)
-    #endif
-    static var fastSpring = Animation.interactiveSpring(dampingFraction: 0.7)
-    static var jumpySpring = Animation.spring(response: 0.4, dampingFraction: 0.45)
 }
 
 // MARK: - QuickActionsLayoutView
@@ -425,125 +223,49 @@ struct QuickActionsLayoutView: View {
     }
 }
 
-// MARK: - Nameable
-
-protocol Nameable {
-    var name: String { get set }
-    var image: String? { get }
-}
-
-// MARK: - SizedPopUpButton
-
-class SizedPopUpButton: NSPopUpButton {
-    var width: CGFloat?
-    var height: CGFloat?
-
-    override var intrinsicContentSize: NSSize {
-        guard let width = width, let height = height else {
-            return super.intrinsicContentSize
-        }
-
-        return NSSize(width: width, height: height)
-    }
-}
-
-// MARK: - Dropdown
-
-struct Dropdown<T: Nameable>: NSViewRepresentable {
-    class Coordinator: NSObject {
-        // MARK: Lifecycle
-
-        init(_ popUpButton: Dropdown) {
-            button = popUpButton
-        }
-
-        // MARK: Internal
-
-        var button: Dropdown
-        var observer: Cancellable?
-        lazy var defaultMenuItem: NSMenuItem = {
-            let m = NSMenuItem(title: button.noValueText ?? "", action: nil, keyEquivalent: "")
-            m.isHidden = true
-            m.isEnabled = true
-            m.identifier = NSUserInterfaceItemIdentifier("DEFAULT_MENU_ITEM")
-            if let image = button.noValueImage {
-                m.image = NSImage(named: image)
-            }
-
-            return m
-        }()
-    }
-
-    @Binding var selection: T
-    @State var width: CGFloat?
-    @State var height: CGFloat?
-    @State var noValueText: String?
-    @State var noValueImage: String?
-
-    @Binding var content: [T]
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-
-    func makeMenuItems(context: Context) -> [NSMenuItem] {
-        content.map { input -> NSMenuItem in
-            let item = NSMenuItem(title: input.name, action: nil, keyEquivalent: "")
-            item.identifier = NSUserInterfaceItemIdentifier(rawValue: input.name)
-            if let image = input.image {
-                item.image = NSImage(named: image)
-            }
-
-            return item
-        } + [context.coordinator.defaultMenuItem]
-    }
-
-    func makeNSView(context: Context) -> SizedPopUpButton {
-        let button = SizedPopUpButton()
-        button.width = width
-        button.height = height
-
-        button.bezelStyle = .inline
-        button.imagePosition = .imageLeading
-        button.usesSingleLineMode = true
-        button.autoenablesItems = false
-        button.alignment = .center
-
-        let menu = NSMenu()
-        menu.items = makeMenuItems(context: context)
-
-        button.menu = menu
-        button.select(menu.items.first(where: { $0.title == selection.name }) ?? context.coordinator.defaultMenuItem)
-        context.coordinator.observer = button.selectedTitlePublisher.sink { inputName in
-            guard let inputName = inputName else { return }
-            selection = content.first(where: { $0.name == inputName }) ?? selection
-        }
-        return button
-    }
-
-    func updateNSView(_ button: SizedPopUpButton, context: Context) {
-        guard let menu = button.menu else { return }
-        menu.items = makeMenuItems(context: context)
-        button.select(menu.items.first(where: { $0.title == selection.name }) ?? context.coordinator.defaultMenuItem)
-        context.coordinator.observer = button.selectedTitlePublisher.sink { inputName in
-            guard let inputName = inputName else { return }
-            selection = content.first(where: { $0.name == inputName }) ?? selection
-        }
-
-        button.width = width
-        button.height = height
-    }
-}
-
 // MARK: - QuickActionsMenuView
 
 struct QuickActionsMenuView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.colors) var colors
     @ObservedObject var dc: DisplayController = displayController
+    @Default(.overrideAdaptiveMode) var overrideAdaptiveMode
     @State var displays: [Display] = displayController.activeDisplayList
     @State var cursorDisplay: Display? = displayController.cursorDisplay
     @State var layoutShown = false
+    @State var adaptiveModes: [AdaptiveModeKey] = [.sensor, .sync, .location, .clock, .manual, .auto]
+
+    var modeSelector: some View {
+        let titleBinding = Binding<String>(
+            get: { overrideAdaptiveMode ? "⁣\(dc.adaptiveModeKey.name)⁣" : "Auto: \(dc.adaptiveModeKey.str)" }, set: { _ in }
+        )
+        let imageBinding = Binding<String>(
+            get: { overrideAdaptiveMode ? dc.adaptiveModeKey.image ?? "automode" : "automode" }, set: { _ in }
+        )
+
+        return Dropdown(
+            selection: $dc.adaptiveModeKey,
+            width: 140,
+            height: 20,
+            noValueText: "Adaptive Mode",
+            noValueImage: "automode",
+            content: $adaptiveModes,
+            title: titleBinding,
+            image: imageBinding,
+            validate: AdaptiveModeButton.validate(_:)
+        )
+        .frame(width: 140, height: 20, alignment: .center)
+        .padding(.vertical, 2)
+        .padding(.horizontal, 4)
+        .background(
+            RoundedRectangle(
+                cornerRadius: 8,
+                style: .continuous
+            ).fill(Color.primary.opacity(0.15))
+        )
+        .opacity(0.7)
+        .colorMultiply(colors.accent)
+    }
 
     var body: some View {
         VStack {
@@ -554,6 +276,7 @@ struct QuickActionsMenuView: View {
             }
 
             HStack {
+                modeSelector
                 Spacer()
                 SwiftUI.Button(
                     action: { withAnimation(.fastSpring) { layoutShown.toggle() } },
@@ -583,7 +306,7 @@ struct QuickActionsMenuView: View {
                 ).buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
             }
 
-            if let d = cursorDisplay {
+            if let d = cursorDisplay, !SWIFTUI_PREVIEW {
                 DisplayRowView(display: d)
                     .padding(.vertical)
             }
@@ -601,7 +324,15 @@ struct QuickActionsMenuView: View {
                 PresetButtonView(percent: 50)
                 PresetButtonView(percent: 75)
                 PresetButtonView(percent: 100)
-            }.padding(.top)
+            }
+            .padding(6)
+            .background(
+                RoundedRectangle(
+                    cornerRadius: 8,
+                    style: .continuous
+                ).fill(Color.primary.opacity(0.05))
+            )
+            .padding(.top)
 
             HStack {
                 SwiftUI.Button("Preferences") {
@@ -624,22 +355,21 @@ struct QuickActionsMenuView: View {
                 .font(.system(size: 12, weight: .medium, design: .monospaced))
             }
         }
-        .frame(width: 300, alignment: .top)
+        .frame(width: 320, alignment: .top)
         .padding(.horizontal, 40)
         .padding(.bottom, 40)
         .padding(.top, 20)
         .background(
             ZStack {
-                VisualEffectBlur(material: colorScheme == .dark ? .hudWindow : .menu, blendingMode: .behindWindow, state: .active)
-                    .cornerRadius(18)
-                    .padding(.horizontal, 20)
+                VisualEffectBlur(material: .hudWindow, blendingMode: .behindWindow, state: .active)
+                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    .padding(.horizontal, 24)
                     .padding(.bottom, 20)
-                    .shadow(color: Colors.blackMauve.opacity(colorScheme == .dark ? 0.5 : 0.3), radius: 4, x: 0, y: 4)
+                    .shadow(color: Colors.blackMauve.opacity(0.2), radius: 8, x: 0, y: 4)
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill((colorScheme == .dark ? Colors.blackMauve : Color.white).opacity(0.4))
-                    .padding(.horizontal, 20)
+                    .fill((colorScheme == .dark ? Colors.blackMauve : Color.white).opacity(0.7))
+                    .padding(.horizontal, 24)
                     .padding(.bottom, 20)
-                    .brightness(colorScheme == .dark ? 0.0 : 0.5)
             }
         ).colors(colorScheme == .dark ? .dark : .light)
         .onAppear {
