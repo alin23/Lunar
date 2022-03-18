@@ -72,6 +72,7 @@
 		C76B775F26447EC6007CAAC5 /* Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76B775E26447EC6007CAAC5 /* Weather.swift */; };
 		C76CB7A525CFD8B7007624DE /* AdvancedSettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76CB7A425CFD8B7007624DE /* AdvancedSettingsController.swift */; };
 		C76CB7A825CFD954007624DE /* ResetButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76CB7A725CFD954007624DE /* ResetButton.swift */; };
+		C7714AF927E4A3A9002E0B2E /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7714AF827E4A3A9002E0B2E /* Components.swift */; };
 		C77200031FF072CB0078E155 /* ScrollableBrightness.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77200021FF072CB0078E155 /* ScrollableBrightness.swift */; };
 		C772BDD725E7A296006A1684 /* NetworkControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C772BDD625E7A296006A1684 /* NetworkControl.swift */; };
 		C7764170272139A100C7C308 /* ResetPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C776416E272139A100C7C308 /* ResetPopoverController.swift */; };
@@ -183,7 +184,6 @@
 		C7F862402608A34400704300 /* RunloopQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F8623F2608A34300704300 /* RunloopQueue.swift */; };
 		C7F99AC727175E0C00FBF192 /* SwiftyMarkdown in Frameworks */ = {isa = PBXBuildFile; productRef = C7F99AC627175E0C00FBF192 /* SwiftyMarkdown */; };
 		C7FE724F238EDFB100EBA6DA /* CoreDisplay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */; };
-		C7FE725423904AE500EBA6DA /* QuickAdaptiveButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7FE725323904AE500EBA6DA /* QuickAdaptiveButton.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -265,6 +265,7 @@
 		C76B775E26447EC6007CAAC5 /* Weather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weather.swift; sourceTree = "<group>"; };
 		C76CB7A425CFD8B7007624DE /* AdvancedSettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsController.swift; sourceTree = "<group>"; };
 		C76CB7A725CFD954007624DE /* ResetButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetButton.swift; sourceTree = "<group>"; };
+		C7714AF827E4A3A9002E0B2E /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Components.swift; path = /Users/alin/Projects/Lunar/Lunar/Views/Components.swift; sourceTree = "<absolute>"; };
 		C77200021FF072CB0078E155 /* ScrollableBrightness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableBrightness.swift; sourceTree = "<group>"; };
 		C772BDD625E7A296006A1684 /* NetworkControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkControl.swift; sourceTree = "<group>"; };
 		C776416E272139A100C7C308 /* ResetPopoverController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResetPopoverController.swift; sourceTree = "<group>"; };
@@ -369,7 +370,6 @@
 		C7E896DC2652C37E0079A328 /* CoreBrightness.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBrightness.framework; path = ../../../../../System/Library/PrivateFrameworks/CoreBrightness.framework; sourceTree = "<group>"; };
 		C7EF9534243F4E2200839A62 /* Sysctl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sysctl.swift; sourceTree = "<group>"; };
 		C7F8623F2608A34300704300 /* RunloopQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RunloopQueue.swift; sourceTree = "<group>"; };
-		C7FE725323904AE500EBA6DA /* QuickAdaptiveButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickAdaptiveButton.swift; sourceTree = "<group>"; };
 		FR_234235089941 /* Secrets.generated.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Secrets.generated.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -527,6 +527,7 @@
 		C77CC75A1FEDB367009AA718 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C7714AF827E4A3A9002E0B2E /* Components.swift */,
 				C722FB9E271AC83200ED4C94 /* Button.swift */,
 				C722FB9C271AC83200ED4C94 /* Slider.swift */,
 				C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */,
@@ -538,7 +539,6 @@
 				C75083632222DC9F0020270E /* HotKeyView.swift */,
 				C7E242642119A65B0020326C /* LockButton.swift */,
 				C76A129B20D795A7005D4BE3 /* ModernWindow.swift */,
-				C7FE725323904AE500EBA6DA /* QuickAdaptiveButton.swift */,
 				C7E4747320CD5C1400B662A9 /* RemoveAppButton.swift */,
 				C77200021FF072CB0078E155 /* ScrollableBrightness.swift */,
 				C7789ADF1FF9029700D326A8 /* ScrollableContrast.swift */,
@@ -997,7 +997,6 @@
 				C7E80E2D2637060F004718A4 /* Channel.swift in Sources */,
 				C76CB7A525CFD8B7007624DE /* AdvancedSettingsController.swift in Sources */,
 				C7E242652119A65B0020326C /* LockButton.swift in Sources */,
-				C7FE725423904AE500EBA6DA /* QuickAdaptiveButton.swift in Sources */,
 				C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */,
 				C7EF9535243F4E2200839A62 /* Sysctl.swift in Sources */,
 				C7520C081FD20CC200756F82 /* DisplayController.swift in Sources */,
@@ -1077,6 +1076,7 @@
 				C7A82DB7261B779E004146A8 /* SettingsPopoverController.swift in Sources */,
 				C7CBEFFD238E81FF00031E93 /* Util.swift in Sources */,
 				C7B6EA10201B41C10090EE0E /* Theme.swift in Sources */,
+				C7714AF927E4A3A9002E0B2E /* Components.swift in Sources */,
 				C7C09CD1256AC09800B4BC5B /* AdaptiveModeButton.swift in Sources */,
 				C72776E9201F1BED0055934F /* ExceptionsView.swift in Sources */,
 				C75083622222DC3C0020270E /* HotKeyViewController.swift in Sources */,

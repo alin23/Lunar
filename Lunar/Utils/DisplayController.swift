@@ -606,6 +606,8 @@ class DisplayController: ObservableObject {
 
     var screencaptureIsRunning: CurrentValueSubject<Bool, Never> = .init(processIsRunning("/usr/sbin/screencapture", nil))
 
+    @Atomic var apply = true
+
     var displayList: [Display] {
         displays.values.sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }.reversed()
     }
@@ -681,8 +683,12 @@ class DisplayController: ObservableObject {
         }
     }
 
-    @AtomicLock var adaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode() {
+    @Published var adaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode() {
         didSet {
+            withoutApply {
+                adaptiveModeKey = adaptiveMode.key
+            }
+
             if adaptiveMode.key != .manual {
                 lastNonManualAdaptiveMode = adaptiveMode
             }
@@ -693,8 +699,22 @@ class DisplayController: ObservableObject {
         }
     }
 
-    var adaptiveModeKey: AdaptiveModeKey {
-        adaptiveMode.key
+    @Published var adaptiveModeKey: AdaptiveModeKey = DisplayController.getAdaptiveMode().key {
+        didSet {
+            guard apply else { return }
+            guard adaptiveModeKey != .auto else {
+                CachedDefaults[.overrideAdaptiveMode] = false
+
+                let key = DisplayController.autoMode().key
+                CachedDefaults[.adaptiveBrightnessMode] = key
+                withoutApply {
+                    adaptiveModeKey = key
+                }
+                return
+            }
+            CachedDefaults[.overrideAdaptiveMode] = true
+            CachedDefaults[.adaptiveBrightnessMode] = adaptiveModeKey
+        }
     }
 
     var firstDisplay: Display {
@@ -978,6 +998,12 @@ class DisplayController: ObservableObject {
             log.debug("Primary mirror for \(d): \(String(describing: primary))")
             log.debug("Secondary mirror for \(d): \(String(describing: secondary))")
         }
+    }
+
+    @inline(__always) func withoutApply(_ block: () -> Void) {
+        apply = false
+        block()
+        apply = true
     }
 
     func getCurrentAudioDisplay() -> Display? {

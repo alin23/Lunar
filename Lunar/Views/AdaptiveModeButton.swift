@@ -10,6 +10,11 @@ import Cocoa
 import Combine
 import Defaults
 import Foundation
+import Regex
+
+let MODE_DISABLED_REASON_PATTERN = "\\sMode.*".r!
+
+// MARK: - AdaptiveModeButton
 
 class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
     // MARK: Lifecycle
@@ -26,9 +31,93 @@ class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
 
     // MARK: Internal
 
+    static var syncDisabledReason: String {
+        if Sysctl.isMacBook, displayController.lidClosed {
+            return "lid needs to be opened"
+        }
+        if let d = displayController.sourceDisplay, d.blackOutEnabled {
+            return "BlackOut has to be disabled"
+        }
+
+        return "no source display"
+    }
+
     let defaultAutoModeTitle = "Auto Mode"
     var adaptiveModeObserver: Cancellable?
     var pausedAdaptiveModeObserver = false
+
+    static func spacer(_ menuItem: NSMenuItem) -> String {
+        menuItem.tag == AdaptiveModeKey.location.rawValue ? "\t" : "\t\t"
+    }
+
+    static func proDisabledString(_ menuItem: NSMenuItem) -> NSAttributedString {
+        disabledString(menuItem, reason: "needs Lunar Pro")
+    }
+
+    static func enabledString(_ menuItem: NSMenuItem) -> NSAttributedString {
+        disabledString(menuItem, reason: "")
+    }
+
+    static func disabledString(_ menuItem: NSMenuItem, reason: String) -> NSAttributedString {
+        MENU_MARKDOWN.attributedString(
+            from: MODE_DISABLED_REASON_PATTERN.replaceAll(
+                in: menuItem.title,
+                with: reason.isEmpty ? " Mode" : " Mode\(spacer(menuItem))`(\(reason))`"
+            )
+        )
+    }
+
+    static func validate(_ menuItem: NSMenuItem) -> Bool {
+        guard menuItem.tag != AUTO_MODE_TAG else {
+            menuItem.attributedTitle = enabledString(menuItem)
+            return true
+        }
+        guard let mode = AdaptiveModeKey(rawValue: menuItem.tag) else {
+            return false
+        }
+
+        guard mode.available else {
+            switch mode {
+            case .location:
+                if lunarProActive || lunarProOnTrial {
+                    menuItem
+                        .toolTip =
+                        "Disabled because location can't be requested.\nCheck if Lunar has access to Location Services in System Preferences -> Security & Privacy"
+                    menuItem.attributedTitle = disabledString(menuItem, reason: "missing permissions")
+                } else {
+                    menuItem.attributedTitle = proDisabledString(menuItem)
+                    menuItem.toolTip = "Only available with a Lunar Pro license"
+                }
+            case .sensor:
+                if lunarProActive || lunarProOnTrial {
+                    menuItem.toolTip = "Disabled because there is no light sensor connected to this \(Sysctl.device)"
+                    menuItem.attributedTitle = disabledString(menuItem, reason: "no sensor available")
+                } else {
+                    menuItem.attributedTitle = proDisabledString(menuItem)
+                    menuItem.toolTip = "Only available with a Lunar Pro license"
+                }
+            case .sync:
+                if lunarProActive || lunarProOnTrial {
+                    menuItem
+                        .toolTip =
+                        "Disabled because no source display was found"
+                    menuItem.attributedTitle = disabledString(menuItem, reason: syncDisabledReason)
+                } else {
+                    menuItem.attributedTitle = proDisabledString(menuItem)
+                    menuItem.toolTip = "Only available with a Lunar Pro license"
+                }
+            case .clock:
+                menuItem.toolTip = "Only available with a Lunar Pro license"
+                menuItem.attributedTitle = proDisabledString(menuItem)
+            default:
+                break
+            }
+            return false
+        }
+        menuItem.toolTip = nil
+        menuItem.attributedTitle = enabledString(menuItem)
+        return true
+    }
 
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = adaptiveModeObserver ?? adaptiveBrightnessModePublisher.sink { [weak self] change in
@@ -41,15 +130,17 @@ class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
         }
     }
 
-    func setAutoModeItemTitle(modeKey: AdaptiveModeKey? = nil) {
+    func setAutoModeItemTitle(modeKey: AdaptiveModeKey? = nil, menuItem: NSMenuItem? = nil) {
         if CachedDefaults[.overrideAdaptiveMode] {
-            if let item = lastItem {
-                item.title = defaultAutoModeTitle
+            if let item = menuItem ?? lastItem {
+                item.attributedTitle = MENU_MARKDOWN.attributedString(from: defaultAutoModeTitle)
             }
         } else {
             let modeKey = modeKey ?? DisplayController.getAdaptiveMode().key
-            if let item = lastItem {
-                item.title = defaultAutoModeTitle.replacingOccurrences(of: "Auto Mode", with: "Auto: \(modeKey.str)")
+            if let item = menuItem ?? lastItem {
+                item.attributedTitle = MENU_MARKDOWN.attributedString(
+                    from: defaultAutoModeTitle.replacingOccurrences(of: "Auto Mode", with: "Auto: \(modeKey.str)")
+                )
             }
         }
     }
@@ -75,7 +166,7 @@ class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
 
     @IBAction func setAdaptiveMode(sender button: AdaptiveModeButton?) {
         guard let button = button else { return }
-        if let mode = AdaptiveModeKey(rawValue: button.selectedTag()) {
+        if let mode = AdaptiveModeKey(rawValue: button.selectedTag()), mode != .auto {
             if !mode.available {
                 log.warning("Mode \(mode) not available!")
                 button
@@ -97,45 +188,11 @@ class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
     }
 
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
-        if menuItem.tag == AUTO_MODE_TAG {
+        guard menuItem.tag != AUTO_MODE_TAG else {
+            setAutoModeItemTitle(menuItem: menuItem)
             return true
         }
-
-        guard let mode = AdaptiveModeKey(rawValue: menuItem.tag) else {
-            return false
-        }
-
-        guard mode.available else {
-            switch mode {
-            case .location:
-                if lunarProActive {
-                    menuItem
-                        .toolTip =
-                        "Disabled because location can't be requested.\nCheck if Lunar has access to Location Services in System Preferences -> Security & Privacy"
-                } else {
-                    menuItem.toolTip = "Disabled because Lunar Pro is not activated."
-                }
-            case .sensor:
-                if lunarProActive {
-                    menuItem.toolTip = "Disabled because there is no external light sensor connected to this \(Sysctl.device)"
-                } else {
-                    menuItem.toolTip = "Disabled because Lunar Pro is not activated."
-                }
-            case .sync:
-                if lunarProActive {
-                    menuItem.toolTip = "Disabled because no source display was found"
-                } else {
-                    menuItem.toolTip = "Disabled because Lunar Pro is not activated."
-                }
-            case .clock:
-                menuItem.toolTip = "Disabled because Lunar Pro is not activated."
-            default:
-                break
-            }
-            return false
-        }
-        menuItem.toolTip = nil
-        return true
+        return AdaptiveModeButton.validate(menuItem)
     }
 
     override func draw(_ dirtyRect: NSRect) {

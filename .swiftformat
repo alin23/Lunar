@@ -48,7 +48,6 @@
 --semicolons inline
 --shortoptionals always
 --smarttabs enabled
---stripunusedargs always
 --structthreshold 0
 --tabwidth unspecified
 --trailingclosures

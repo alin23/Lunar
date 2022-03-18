@@ -214,7 +214,7 @@ class ConfigurationViewController: NSViewController {
             helpButton3?.helpText = SENSOR_POLLING_INTERVAL_TOOLTIP
         case .clock:
             helpButton3?.helpText = SCHEDULE_TRANSITION_TOOLTIP
-        case .manual:
+        case .manual, .auto:
             break
         }
 

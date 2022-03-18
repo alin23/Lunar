@@ -465,7 +465,7 @@ class BrightnessContrastChartView: LineChartView {
             chartDescription.text = ""
         case .sensor:
             chartDescription.text = ""
-        case .manual, .clock:
+        case .manual, .clock, .auto:
             chartDescription.text = ""
         }
 

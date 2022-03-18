@@ -157,7 +157,6 @@ The previous schedule values are re-applied when following events happen:
 **To disable this event behaviour, uncheck `Re-apply brightness on screen wake` in [Advanced settings](lunar://advanced)**
 """
 
-let AUTO_MODE_TAG = 99
 var leftHintsShown = false
 var rightHintsShown = false
 
