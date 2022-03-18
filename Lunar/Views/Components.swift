@@ -84,7 +84,9 @@ public struct FlatButton: ButtonStyle {
         height: CGFloat? = nil,
         circle: Bool = false,
         radius: CGFloat = 8,
-        pressedBinding: Binding<Bool>? = nil
+        pressedBinding: Binding<Bool>? = nil,
+        horizontalPadding: CGFloat = 8,
+        verticalPadding: CGFloat = 4
     ) {
         _color = colorBinding ?? .constant(color ?? Colors.lightGold)
         _textColor = textColorBinding ?? .constant(textColor ?? Colors.blackGray)
@@ -94,6 +96,8 @@ public struct FlatButton: ButtonStyle {
         _circle = .constant(circle)
         _radius = .constant(radius)
         _pressed = pressedBinding ?? .constant(false)
+        _horizontalPadding = horizontalPadding.state
+        _verticalPadding = verticalPadding.state
     }
 
     // MARK: Public
@@ -102,8 +106,8 @@ public struct FlatButton: ButtonStyle {
         configuration
             .label
             .foregroundColor(textColor)
-            .padding(.vertical, 4.0)
-            .padding(.horizontal, 8.0)
+            .padding(.vertical, verticalPadding)
+            .padding(.horizontal, horizontalPadding)
             .frame(minWidth: width, idealWidth: width, minHeight: height, idealHeight: height, alignment: .center)
             .background(
                 circle
@@ -160,6 +164,8 @@ public struct FlatButton: ButtonStyle {
     @Binding var circle: Bool
     @Binding var radius: CGFloat
     @Binding var pressed: Bool
+    @State var horizontalPadding: CGFloat = 8
+    @State var verticalPadding: CGFloat = 4
 }
 
 // MARK: - PickerButton
@@ -171,7 +177,7 @@ public struct PickerButton<T: Equatable>: ButtonStyle {
         configuration
             .label
             .foregroundColor(
-                enumValue == onValue ? (onTextColor ?? (colorScheme == .dark ? colors.accent : Colors.blackMauve)) :
+                enumValue == onValue ? (onTextColor ?? (colorScheme == .dark ? colors.accent : Color.white)) :
                     offTextColor
             )
             .padding(.vertical, verticalPadding)
@@ -180,7 +186,11 @@ public struct PickerButton<T: Equatable>: ButtonStyle {
                 RoundedRectangle(
                     cornerRadius: 8,
                     style: .continuous
-                ).fill(enumValue == onValue ? color : (offColor ?? color.opacity(colorScheme == .dark ? 0.5 : 0.8)))
+                )
+                .fill(
+                    enumValue == onValue ? (onColor ?? Color.primary.opacity(colorScheme == .dark ? 0.15 : 0.9)) :
+                        (offColor ?? color.opacity(colorScheme == .dark ? 0.5 : 0.8))
+                )
 
             ).scaleEffect(scale).colorMultiply(hoverColor)
             .contentShape(Rectangle())
@@ -203,6 +213,7 @@ public struct PickerButton<T: Equatable>: ButtonStyle {
     @Environment(\.colorScheme) var colorScheme
 
     @State var color = Color.primary.opacity(0.15)
+    @State var onColor: Color? = nil
     @State var offColor: Color? = nil
     @State var onTextColor: Color? = nil
     @State var offTextColor = Color.secondary

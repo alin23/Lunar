@@ -46,6 +46,8 @@ class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
     var adaptiveModeObserver: Cancellable?
     var pausedAdaptiveModeObserver = false
 
+    var observers: Set<AnyCancellable> = []
+
     static func spacer(_ menuItem: NSMenuItem) -> String {
         menuItem.tag == AdaptiveModeKey.location.rawValue ? "\t" : "\t\t"
     }
@@ -197,5 +199,13 @@ class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
 
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
+    }
+}
+
+extension NSParagraphStyle {
+    static var centered: NSParagraphStyle {
+        let p = NSMutableParagraphStyle()
+        p.alignment = .center
+        return p
     }
 }

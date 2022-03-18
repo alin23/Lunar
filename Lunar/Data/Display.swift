@@ -575,7 +575,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             mirroredBeforeBlackOut = ((try container.decodeIfPresent(Bool.self, forKey: .mirroredBeforeBlackOut)) ?? false)
         }
 
-        blackOutMirroringAllowed = ((try container.decodeIfPresent(Bool.self, forKey: .blackOutMirroringAllowed)) ?? true)
+        blackOutMirroringAllowed =
+            ((try container.decodeIfPresent(Bool.self, forKey: .blackOutMirroringAllowed)) ?? supportsGammaByDefault) &&
+            supportsGammaByDefault
         blackOutEnabled = ((try container.decodeIfPresent(Bool.self, forKey: .blackOutEnabled)) ?? false) && !isIndependentDummy &&
             (isNative ? (brightness.uint16Value <= 1) : true)
         if let value = (try container.decodeIfPresent(UInt16.self, forKey: .brightnessBeforeBlackout)?.ns) {
@@ -633,9 +635,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         _id = id
         self.active = active
         activeAndResponsive = active || id != GENERIC_DISPLAY_ID
-        self.adaptive = adaptive && !Self.ambientLightCompensationEnabled(id)
-
         let isSmartBuiltin = DDC.isSmartBuiltinDisplay(id)
+        self.adaptive = adaptive && !Self.ambientLightCompensationEnabled(id) && !isSmartBuiltin
+
         isSource = isSmartBuiltin
 
         self.minBrightness = isSmartBuiltin ? 0 : minBrightness.ns
@@ -675,6 +677,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             withoutApply {
                 rotation = CGDisplayRotation(id).intround
             }
+            blackOutMirroringAllowed = supportsGammaByDefault
         }
 
         if isLEDCinema() || isThunderbolt() {
@@ -1133,6 +1136,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Atomic @objc dynamic var mirroredBeforeBlackOut = false
     @Atomic @objc dynamic var blackOutEnabled = false
+    @Atomic @objc dynamic var blackOutEnabledWithoutMirroring = false
     @Atomic @objc dynamic var blackOutMirroringAllowed = true
     lazy var brightnessBeforeBlackout = brightness
     lazy var contrastBeforeBlackout = contrast
@@ -1451,7 +1455,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             mainAsync {
                 self.subzero = br < 1.0 || (br == 1.0 && self.brightness.uint16Value == self.minBrightness.uint16Value)
                 self.withoutApply {
-                    self.xdrBrightness = mapNumber(self.softwareBrightness, fromLow: 1.01, fromHigh: 1.5, toLow: 0.0, toHigh: 1.0)
+                    self.xdrBrightness = mapNumber(
+                        self.softwareBrightness,
+                        fromLow: self.softwareBrightness == 1 ? 1.00 : 1.01,
+                        fromHigh: 1.5,
+                        toLow: 0.0,
+                        toHigh: 1.0
+                    )
                 }
             }
 
@@ -1756,6 +1766,93 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
               let primaryID = NSScreen.onlineDisplayIDs.first(where: { CGDisplayMirrorsDisplay(id) == $0 })
         else { return nil }
         return NSScreen.screens.first(where: { screen in screen.hasDisplayID(primaryID) })
+    }
+
+    func getPowerOffEnabled(hasDDC: Bool? = nil) -> Bool {
+        guard active else { return false }
+        if blackOutEnabled { return true }
+
+        return (
+            displayController.activeDisplays.count > 1 ||
+                CachedDefaults[.allowBlackOutOnSingleScreen] ||
+                (hasDDC ?? self.hasDDC)
+        ) && !isDummy
+    }
+
+    func getPowerOffTooltip(hasDDC: Bool? = nil) -> String {
+        guard !(hasDDC ?? self.hasDDC) else {
+            return """
+            BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0.
+
+            Can also be toggled with the keyboard using Ctrl-Cmd-6.
+
+            Hold the following keys while clicking the button (or while pressing the hotkey) to change BlackOut behaviour:
+            - Shift: make the screen black without mirroring
+            - Option: turn off monitor completely using DDC
+            - Option and Shift: BlackOut other monitors and keep this one visible
+
+            Caveats for DDC power off:
+              • works only if the monitor can be controlled through DDC
+              • can't be used to power on the monitor
+              • when a monitor is turned off or in standby, it does not accept commands from a connected device
+              • remember to keep holding the Option key for 2 seconds after you pressed the button to account for possible DDC delays
+
+            Emergency Kill Switch: press the ⌘ Command key more than 8 times in a row to force disable BlackOut.
+            """
+        }
+        guard displayController.activeDisplays.count > 1 || CachedDefaults[.allowBlackOutOnSingleScreen] else {
+            return """
+            At least 2 screens need to be visible for this to work.
+
+            The option can also be enabled for a single screen in Advanced settings.
+            """
+        }
+
+        return """
+        BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0.
+
+        Can also be toggled with the keyboard using Ctrl-Cmd-6.
+
+        Hold the following keys while clicking the button (or while pressing the hotkey) to change BlackOut behaviour:
+        - Shift: make the screen black without mirroring
+        - Option and Shift: BlackOut other monitors and keep this one visible
+
+        Emergency Kill Switch: press the ⌘ Command key more than 8 times in a row to force disable BlackOut.
+        """
+    }
+
+    func powerOff() {
+        guard displayController.activeDisplays.count > 1 || CachedDefaults[.allowBlackOutOnSingleScreen] else { return }
+
+        if hasDDC, AppDelegate.optionKeyPressed, !AppDelegate.shiftKeyPressed {
+            _ = control?.setPower(.off)
+            return
+        }
+
+        guard lunarProOnTrial || lunarProActive else {
+            if let url = URL(string: "https://lunar.fyi/#blackout") {
+                NSWorkspace.shared.open(url)
+            }
+            return
+        }
+
+        if AppDelegate.optionKeyPressed, AppDelegate.shiftKeyPressed {
+            let blackOutEnabled = otherDisplays.contains(where: \.blackOutEnabled)
+            otherDisplays.forEach {
+                displayController.blackOut(
+                    display: $0.id,
+                    state: blackOutEnabled ? .off : .on,
+                    mirroringAllowed: false
+                )
+            }
+            return
+        }
+
+        displayController.blackOut(
+            display: id,
+            state: blackOutEnabled ? .off : .on,
+            mirroringAllowed: !AppDelegate.shiftKeyPressed && blackOutMirroringAllowed
+        )
     }
 
     func setAudioIdentifier(from dict: NSDictionary) {
@@ -4498,7 +4595,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         mainAsyncAfter(ms: 1000) { [weak self] in
             guard let self = self else { return }
             self.blackOutEnabled = false
-            self.blackOutMirroringAllowed = true
+            self.blackOutMirroringAllowed = self.supportsGammaByDefault
             self.mirroredBeforeBlackOut = false
 
             self.preciseBrightnessContrast = 0.7
@@ -4523,7 +4620,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         faceLightContrast = 90.ns
 
         blackOutEnabled = false
-        blackOutMirroringAllowed = true
+        blackOutMirroringAllowed = supportsGammaByDefault
         mirroredBeforeBlackOut = false
 
         userContrast[displayController.adaptiveModeKey]?.removeAll()
