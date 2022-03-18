@@ -40,18 +40,21 @@ open class OSDWindow: NSWindow {
             setFrameOrigin(CGPoint(x: (sframe.width / 2 - wsize.width / 2) + sframe.origin.x, y: sframe.origin.y))
         }
 
-        contentView?.alphaValue = 1
+        contentView?.superview?.alphaValue = 1
         wc.showWindow(nil)
         makeKeyAndOrderFront(nil)
         orderFrontRegardless()
 
+        endFader?.cancel()
         closer?.cancel()
         guard closeMilliseconds > 0 else { return }
         fader = mainAsyncAfter(ms: fadeMilliseconds) { [weak self] in
             guard let s = self, s.isVisible else { return }
-            s.contentView?.transition(1)
-            s.contentView?.alphaValue = 0.01
-
+            s.contentView?.superview?.transition(1)
+            s.contentView?.superview?.alphaValue = 0.01
+            s.endFader = mainAsyncAfter(ms: 1000) { [weak self] in
+                self?.contentView?.superview?.alphaValue = 0
+            }
             s.closer = mainAsyncAfter(ms: closeMilliseconds) { [weak self] in
                 self?.close()
             }
@@ -63,23 +66,9 @@ open class OSDWindow: NSWindow {
     weak var display: Display?
     lazy var wc = NSWindowController(window: self)
 
-    var closer: DispatchWorkItem? {
-        didSet {
-            guard let oldCloser = oldValue else {
-                return
-            }
-            oldCloser.cancel()
-        }
-    }
-
-    var fader: DispatchWorkItem? {
-        didSet {
-            guard let oldCloser = oldValue else {
-                return
-            }
-            oldCloser.cancel()
-        }
-    }
+    var closer: DispatchWorkItem? { didSet { oldValue?.cancel() } }
+    var fader: DispatchWorkItem? { didSet { oldValue?.cancel() } }
+    var endFader: DispatchWorkItem? { didSet { oldValue?.cancel() } }
 }
 
 extension AnyView {
@@ -184,7 +173,7 @@ public struct BigSurSlider: View {
                     ZStack {
                         Circle()
                             .foregroundColor(knobColor)
-                            .shadow(color: Colors.blackMauve.opacity(percentage > 0.4 ? 0.4 : percentage.d), radius: 5, x: -1, y: 0)
+                            .shadow(color: Colors.blackMauve.opacity(percentage > 0.3 ? 0.3 : percentage.d), radius: 5, x: -1, y: 0)
                             .frame(width: sliderHeight, height: sliderHeight, alignment: .trailing)
                         if showValue {
                             Text((percentage * 100).str(decimals: 0))
@@ -309,6 +298,7 @@ public struct Colors {
 
     public static let red = Color(hue: 0.98, saturation: 0.82, brightness: 1.00)
     public static let lightGold = Color(hue: 0.09, saturation: 0.28, brightness: 0.94)
+    public static let grayMauve = Color(hue: 252 / 360, saturation: 0.29, brightness: 0.43)
     public static let mauve = Color(hue: 252 / 360, saturation: 0.29, brightness: 0.23)
     public static let pinkMauve = Color(hue: 0.95, saturation: 0.76, brightness: 0.42)
     public static let blackMauve = Color(
@@ -322,6 +312,9 @@ public struct Colors {
     public static let peach = Color(hue: 0.08, saturation: 0.42, brightness: 1.00)
     public static let blue = Color(hue: 214 / 360, saturation: 1.0, brightness: 0.54)
     public static let green = Color(hue: 141 / 360, saturation: 0.59, brightness: 0.58)
+
+    public static let xdr = Color(hue: 0.61, saturation: 0.26, brightness: 0.78)
+    public static let subzero = Color(hue: 0.98, saturation: 0.56, brightness: 1.00)
 
     public var accent: Color
     public var colorScheme: SwiftUI.ColorScheme
@@ -359,41 +352,48 @@ struct BrightnessOSDView: View {
     @Environment(\.colors) var colors
     @ObservedObject var display: Display
 
-    var brightnessBinding: Binding<Float> {
-        guard display.softwareBrightness > 1 || (display.softwareBrightness == 1 && display.lastSoftwareBrightness > 1) else {
-            return $display.softwareBrightness
-        }
-
-        return Binding(
-            get: {
-                mapNumber(
-                    display.softwareBrightness,
-                    fromLow: display.softwareBrightness == 1 ? 1.00 : 1.01,
-                    fromHigh: 1.5,
-                    toLow: 0.0,
-                    toHigh: 1.0
-                )
-            },
-            set: { display.softwareBrightness = mapNumber($0, fromLow: 0, fromHigh: 1, toLow: 1.01, toHigh: 1.5) }
-        )
-    }
-
     var body: some View {
         VStack {
             let b = display.softwareBrightness
             let lb = display.lastSoftwareBrightness
             Text((b > 1 || (b == 1 && lb > 1)) ? "XDR Brightness" : "Sub-zero brightness")
-                .fontWeight(.heavy)
+                .font(.system(size: 16, weight: .semibold, design: .monospaced))
 
-            BigSurSlider(percentage: brightnessBinding, image: "sun.max.fill")
+            if display.enhanced {
+                BigSurSlider(
+                    percentage: $display.xdrBrightness,
+                    image: "speedometer",
+                    color: Colors.xdr,
+                    backgroundColor: Colors.xdr.opacity(colorScheme == .dark ? 0.1 : 0.2),
+                    showValue: .constant(true)
+                )
+            } else {
+                BigSurSlider(
+                    percentage: $display.softwareBrightness,
+                    image: "moon.circle.fill",
+                    color: Colors.subzero,
+                    backgroundColor: Colors.subzero.opacity(colorScheme == .dark ? 0.1 : 0.2),
+                    showValue: .constant(true)
+                )
+            }
         }
-        .padding()
+        .padding(.horizontal, 40)
+        .padding(.bottom, 40)
+        .padding(.top, 20)
         .background(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(colorScheme == .dark ? Colors.blackMauve : .white)
-                .shadow(color: Colors.blackMauve.opacity(0.3), radius: 10, x: 0, y: 6)
+            ZStack {
+                VisualEffectBlur(material: .hudWindow, blendingMode: .behindWindow, state: .active)
+                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 20)
+                    .shadow(color: Colors.blackMauve.opacity(0.2), radius: 8, x: 0, y: 4)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill((colorScheme == .dark ? Colors.blackMauve : Color.white).opacity(0.4))
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 20)
+            }
         )
-        .padding(40)
+        .padding(10)
         .opacity(display.lastSoftwareBrightness != display.softwareBrightness ? 1 : 0)
         .colors(colorScheme == .dark ? .dark : .light)
     }
@@ -406,10 +406,10 @@ let OSD_WIDTH: CGFloat = 300
 struct BrightnessOSDView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            BrightnessOSDView(display: Display(id: 10))
+            BrightnessOSDView(display: displayController.firstDisplay)
                 .frame(maxWidth: OSD_WIDTH)
                 .preferredColorScheme(.light)
-            BrightnessOSDView(display: Display(id: 10))
+            BrightnessOSDView(display: displayController.firstDisplay)
                 .frame(maxWidth: OSD_WIDTH)
                 .preferredColorScheme(.dark)
         }

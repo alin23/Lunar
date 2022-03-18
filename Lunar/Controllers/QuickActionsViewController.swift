@@ -26,6 +26,41 @@ struct PresetButtonView: View {
     }
 }
 
+// MARK: - PowerOffButtonView
+
+struct PowerOffButtonView: View {
+    @ObservedObject var display: Display
+    @State var hoveringPowerButton = false
+    @Default(.neverShowBlackoutPopover) var neverShowBlackoutPopover
+
+    var body: some View {
+        SwiftUI.Button(action: {
+            guard !AppDelegate.controlKeyPressed,
+                  lunarProActive || lunarProOnTrial || (AppDelegate.optionKeyPressed && !AppDelegate.shiftKeyPressed)
+            else {
+                hoveringPowerButton = true
+                return
+            }
+            display.powerOff()
+        }) {
+            Image(systemName: "power").font(.system(size: 10, weight: .heavy))
+        }
+        .buttonStyle(FlatButton(color: Colors.red, circle: true, horizontalPadding: 3, verticalPadding: 3))
+        .onHover { hovering in
+            if !hoveringPowerButton, hovering {
+                hoveringPowerButton = hovering && !neverShowBlackoutPopover
+            }
+        }
+        .popover(isPresented: $hoveringPowerButton) {
+            BlackoutPopoverView(hasDDC: display.hasDDC).onDisappear {
+                if !neverShowBlackoutPopover {
+                    neverShowBlackoutPopover = true
+                }
+            }
+        }
+    }
+}
+
 // MARK: - DisplayRowView
 
 struct DisplayRowView: View {
@@ -34,6 +69,7 @@ struct DisplayRowView: View {
     @Environment(\.colors) var colors
     @Default(.showSliderValues) var showSliderValues
     @Default(.showInputInQuickActions) var showInputInQuickActions
+    @Default(.showPowerInQuickActions) var showPowerInQuickActions
 
     var softwareSliders: some View {
         Group {
@@ -41,17 +77,17 @@ struct DisplayRowView: View {
                 BigSurSlider(
                     percentage: $display.xdrBrightness,
                     image: "speedometer",
-                    color: Colors.blue.blended(withFraction: 0.5, of: .white),
-                    backgroundColor: Colors.blue.opacity(colorScheme == .dark ? 0.1 : 0.2),
+                    color: Colors.xdr,
+                    backgroundColor: Colors.xdr.opacity(colorScheme == .dark ? 0.1 : 0.2),
                     showValue: $showSliderValues
                 )
             }
-            if display.subzero || SWIFTUI_PREVIEW {
+            if display.subzero || SWIFTUI_PREVIEW, !display.blackOutEnabled, display.supportsGamma {
                 BigSurSlider(
                     percentage: $display.softwareBrightness,
                     image: "moon.circle.fill",
-                    color: Colors.red.blended(withFraction: 0.3, of: .white),
-                    backgroundColor: Colors.red.opacity(colorScheme == .dark ? 0.1 : 0.2),
+                    color: Colors.subzero,
+                    backgroundColor: Colors.subzero.opacity(colorScheme == .dark ? 0.1 : 0.2),
                     showValue: $showSliderValues
                 )
             }
@@ -66,7 +102,7 @@ struct DisplayRowView: View {
             .buttonStyle(PickerButton(
                 enumValue: $display.enhanced, onValue: false
             ))
-            .font(.system(size: 12, weight: .semibold, design: .monospaced))
+            .font(.system(size: 12, weight: display.enhanced ? .semibold : .bold, design: .monospaced))
             .help("Standard Dynamic Range disables XDR and allows the system to limit the brightness to 500nits.")
 
             SwiftUI.Button("XDR") {
@@ -75,7 +111,7 @@ struct DisplayRowView: View {
             .buttonStyle(PickerButton(
                 enumValue: $display.enhanced, onValue: true
             ))
-            .font(.system(size: 12, weight: .semibold, design: .monospaced))
+            .font(.system(size: 12, weight: display.enhanced ? .bold : .semibold, design: .monospaced))
             .help("""
             Enable XDR high-dynamic range for getting past the 500nits brightness limit.
 
@@ -103,8 +139,7 @@ struct DisplayRowView: View {
                 style: .continuous
             ).fill(Color.primary.opacity(0.15))
         )
-        .opacity(0.7)
-        .colorMultiply(colors.accent)
+        .colorMultiply(colors.accent.blended(withFraction: 0.7, of: .white))
     }
 
     var rotationSelector: some View {
@@ -118,20 +153,31 @@ struct DisplayRowView: View {
 
     var body: some View {
         VStack(spacing: 4) {
-            Text(display.name)
-                .font(.system(size: 22, weight: .black))
-                .padding(.bottom, display.supportsEnhance ? 0 : 6)
-
-            if display.supportsEnhance {
-                sdrXdrSelector
+            if showPowerInQuickActions, display.getPowerOffEnabled() {
+                ZStack(alignment: .topTrailing) {
+                    Text(display.name)
+                        .font(.system(size: 22, weight: .black))
+                        .padding(6)
+                        .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(colors.fg.primary.opacity(0.5)))
+                        .padding(.bottom, display.supportsEnhance ? 0 : 6)
+                        .padding(.top, 12)
+                    PowerOffButtonView(display: display)
+                        .offset(x: 10, y: 4)
+                }
+            } else {
+                Text(display.name)
+                    .font(.system(size: 22, weight: .black))
+                    .padding(.bottom, display.supportsEnhance ? 0 : 6)
             }
+
+            if display.supportsEnhance { sdrXdrSelector }
 
             if display.noDDCOrMergedBrightnessContrast {
                 BigSurSlider(
                     percentage: $display.preciseBrightnessContrast.f,
                     image: "sun.max.fill",
                     color: colors.accent,
-                    backgroundColor: colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.3),
+                    backgroundColor: colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4),
                     showValue: $showSliderValues
                 )
                 softwareSliders
@@ -140,7 +186,7 @@ struct DisplayRowView: View {
                     percentage: $display.preciseBrightness.f,
                     image: "sun.max.fill",
                     color: colors.accent,
-                    backgroundColor: colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.3),
+                    backgroundColor: colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4),
                     showValue: $showSliderValues
                 )
                 softwareSliders
@@ -148,7 +194,7 @@ struct DisplayRowView: View {
                     percentage: $display.preciseContrast.f,
                     image: "circle.righthalf.fill",
                     color: colors.accent,
-                    backgroundColor: colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.3),
+                    backgroundColor: colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4),
                     showValue: $showSliderValues
                 )
             }
@@ -158,15 +204,15 @@ struct DisplayRowView: View {
                     percentage: $display.preciseVolume.f,
                     image: "speaker.2.fill",
                     color: colors.accent,
-                    backgroundColor: colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.3),
+                    backgroundColor: colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4),
                     showValue: $showSliderValues
                 )
             }
 
-            if (display.hasDDC && showInputInQuickActions) || display.showOrientation || display.appPreset != nil {
+            if (display.hasDDC && showInputInQuickActions) || display.showOrientation || display.appPreset != nil || SWIFTUI_PREVIEW {
                 VStack {
-                    if display.hasDDC, showInputInQuickActions { inputSelector }
-                    if display.showOrientation { rotationSelector }
+                    if (display.hasDDC && showInputInQuickActions) || SWIFTUI_PREVIEW { inputSelector }
+                    if display.showOrientation || SWIFTUI_PREVIEW { rotationSelector }
                     if let app = display.appPreset {
                         SwiftUI.Button("App Preset: \(app.name)") {
                             app.runningApps?.first?.activate()
@@ -178,7 +224,7 @@ struct DisplayRowView: View {
                 .padding(8)
                 .background(
                     RoundedRectangle(
-                        cornerRadius: 8,
+                        cornerRadius: 10,
                         style: .continuous
                     ).fill(Color.primary.opacity(0.05))
                 )
@@ -192,7 +238,7 @@ struct DisplayRowView: View {
             display.rotation = degrees
         }
         .buttonStyle(PickerButton(enumValue: $display.rotation, onValue: degrees))
-        .font(.system(size: 12, weight: .semibold, design: .monospaced))
+        .font(.system(size: 12, weight: display.rotation == degrees ? .bold : .semibold, design: .monospaced))
         .help("No rotation")
     }
 }
@@ -207,6 +253,7 @@ struct QuickActionsLayoutView: View {
     @Default(.showOnlyExternalBrightnessMenuBar) var showOnlyExternalBrightnessMenuBar
     @Default(.showOrientationInQuickActions) var showOrientationInQuickActions
     @Default(.showInputInQuickActions) var showInputInQuickActions
+    @Default(.showPowerInQuickActions) var showPowerInQuickActions
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -214,12 +261,93 @@ struct QuickActionsLayoutView: View {
             SettingsToggle(text: "Show volume slider", setting: $showVolumeSlider)
             SettingsToggle(text: "Show rotation selector", setting: $showOrientationInQuickActions)
             SettingsToggle(text: "Show input source selector", setting: $showInputInQuickActions)
+            SettingsToggle(text: "Show power button", setting: $showPowerInQuickActions)
             SettingsToggle(text: "Merge brightness and contrast", setting: $mergeBrightnessContrast)
             SettingsToggle(text: "Show brightness near menubar icon", setting: $showBrightnessMenuBar)
             SettingsToggle(text: "Show only external monitor brightness", setting: $showOnlyExternalBrightnessMenuBar)
                 .padding(.leading)
                 .disabled(!showBrightnessMenuBar)
         }.frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+// MARK: - BlackoutPopoverRowView
+
+struct BlackoutPopoverRowView: View {
+    @State var modifiers: [String] = []
+    @State var action: String
+
+    var body: some View {
+        HStack {
+            Text((modifiers + ["Click"]).joined(separator: " + ")).font(.system(size: 13, weight: .medium, design: .monospaced))
+                .foregroundColor(.white.opacity(0.9))
+                .padding(10)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(Color.white.opacity(0.1))
+                )
+                .frame(width: 200, alignment: .leading)
+            Text(action).font(.system(size: 13, weight: .medium))
+                .foregroundColor(.white.opacity(0.9))
+                .padding(10)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(Color.white.opacity(0.1))
+                )
+        }
+    }
+}
+
+// MARK: - BlackoutPopoverHeaderView
+
+struct BlackoutPopoverHeaderView: View {
+    @Default(.neverShowBlackoutPopover) var neverShowBlackoutPopover
+
+    var body: some View {
+        HStack {
+            Text("BlackOut")
+                .font(.system(size: 24, weight: .black))
+                .foregroundColor(.white)
+            Spacer()
+            if lunarProActive || lunarProOnTrial {
+                Text("Click anywhere to hide")
+                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    .foregroundColor(.white.opacity(0.8))
+            } else {
+                SwiftUI.Button("Needs Lunar Pro") {
+                    showCheckout()
+                    appDelegate?.windowController?.window?.makeKeyAndOrderFront(nil)
+                }.buttonStyle(FlatButton(color: Colors.red, textColor: .white))
+            }
+        }
+    }
+}
+
+// MARK: - BlackoutPopoverView
+
+struct BlackoutPopoverView: View {
+    @State var hasDDC: Bool
+
+    var body: some View {
+        ZStack {
+            Color.black.brightness(0.02).scaleEffect(1.5)
+            VStack(alignment: .leading, spacing: 10) {
+                BlackoutPopoverHeaderView().padding(.bottom)
+                BlackoutPopoverRowView(action: "Soft power off (with mirroring)")
+                BlackoutPopoverRowView(modifiers: ["Shift"], action: "Soft power off (without mirroring)")
+                BlackoutPopoverRowView(modifiers: ["Option", "Shift"], action: "Soft power off other displays (without mirroring)")
+
+                if hasDDC {
+                    BlackoutPopoverRowView(modifiers: ["Option"], action: "Hardware power off (DDC)")
+                        .colorMultiply(Colors.red)
+                }
+                Divider().background(Color.white.opacity(0.2))
+                BlackoutPopoverRowView(modifiers: ["Control"], action: "Show this help menu")
+                    .colorMultiply(Colors.peach)
+            }
+            .padding()
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        }
     }
 }
 
@@ -263,49 +391,50 @@ struct QuickActionsMenuView: View {
                 style: .continuous
             ).fill(Color.primary.opacity(0.15))
         )
-        .opacity(0.7)
-        .colorMultiply(colors.accent)
+        .colorMultiply(colors.accent.blended(withFraction: 0.7, of: .white))
     }
 
     var body: some View {
         VStack {
-            if layoutShown {
-                QuickActionsLayoutView()
-                    .padding(.bottom)
-                Divider().padding(.bottom)
-            }
+            VStack(spacing: 0) {
+                if layoutShown || SWIFTUI_PREVIEW {
+                    QuickActionsLayoutView()
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 20)
+                }
 
-            HStack {
-                modeSelector
-                Spacer()
-                SwiftUI.Button(
-                    action: { withAnimation(.fastSpring) { layoutShown.toggle() } },
-                    label: {
-                        HStack(spacing: 2) {
-                            Image(systemName: "line.horizontal.3.decrease.circle.fill").font(.system(size: 12, weight: .semibold))
-                            Text("Options").font(.system(size: 13, weight: .semibold))
+                HStack {
+                    modeSelector
+                    Spacer()
+                    SwiftUI.Button(
+                        action: { withAnimation(.fastSpring) { layoutShown.toggle() } },
+                        label: {
+                            HStack(spacing: 2) {
+                                Image(systemName: "line.horizontal.3.decrease.circle.fill").font(.system(size: 12, weight: .semibold))
+                                Text("Options").font(.system(size: 13, weight: .semibold))
+                            }
                         }
-                    }
-                ).buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                    ).buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
 
-                SwiftUI.Button(
-                    action: {
-                        guard let view = menuPopover?.contentViewController?.view else { return }
-                        appDelegate!.menu.popUp(
-                            positioning: nil,
-                            at: NSPoint(x: view.frame.width - (POPOVER_PADDING / 2), y: 0),
-                            in: view
-                        )
-                    },
-                    label: {
-                        HStack(spacing: 2) {
-                            Image(systemName: "ellipsis.circle.fill").font(.system(size: 12, weight: .semibold))
-                            Text("Menu").font(.system(size: 13, weight: .semibold))
+                    SwiftUI.Button(
+                        action: {
+                            guard let view = menuPopover?.contentViewController?.view else { return }
+                            appDelegate!.menu.popUp(
+                                positioning: nil,
+                                at: NSPoint(x: view.frame.width - (POPOVER_PADDING / 2), y: 0),
+                                in: view
+                            )
+                        },
+                        label: {
+                            HStack(spacing: 2) {
+                                Image(systemName: "ellipsis.circle.fill").font(.system(size: 12, weight: .semibold))
+                                Text("Menu").font(.system(size: 13, weight: .semibold))
+                            }
                         }
-                    }
-                ).buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-            }
-
+                    ).buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                }
+                .padding(10)
+            }.background(Color.primary.opacity(colorScheme == .dark ? 0.03 : 0.05))
             if let d = cursorDisplay, !SWIFTUI_PREVIEW {
                 DisplayRowView(display: d)
                     .padding(.vertical)
@@ -333,6 +462,7 @@ struct QuickActionsMenuView: View {
                 ).fill(Color.primary.opacity(0.05))
             )
             .padding(.top)
+            .padding(.horizontal, 24)
 
             HStack {
                 SwiftUI.Button("Preferences") {
@@ -354,11 +484,12 @@ struct QuickActionsMenuView: View {
                 .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
                 .font(.system(size: 12, weight: .medium, design: .monospaced))
             }
+            .padding(.horizontal, 24)
         }
-        .frame(width: 320, alignment: .top)
-        .padding(.horizontal, 40)
+        .frame(width: 360, alignment: .top)
+        .padding(.horizontal, 24)
         .padding(.bottom, 40)
-        .padding(.top, 20)
+        .padding(.top, 0)
         .background(
             ZStack {
                 VisualEffectBlur(material: .hudWindow, blendingMode: .behindWindow, state: .active)
@@ -367,7 +498,7 @@ struct QuickActionsMenuView: View {
                     .padding(.bottom, 20)
                     .shadow(color: Colors.blackMauve.opacity(0.2), radius: 8, x: 0, y: 4)
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill((colorScheme == .dark ? Colors.blackMauve : Color.white).opacity(0.7))
+                    .fill(colorScheme == .dark ? Colors.blackMauve.opacity(0.4) : Color.white.opacity(0.6))
                     .padding(.horizontal, 24)
                     .padding(.bottom, 20)
             }
