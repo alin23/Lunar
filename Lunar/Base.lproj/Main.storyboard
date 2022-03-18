@@ -1070,7 +1070,7 @@ and setting its brightness/contrast to 0</string>
                                 </userDefinedRuntimeAttributes>
                             </button>
                             <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xGE-aF-MVx" customClass="AdaptiveModeButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="795" y="652" width="123" height="22"/>
+                                <rect key="frame" x="795" y="652" width="132" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="Location Mode" bezelStyle="inline" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="1" imageScaling="proportionallyDown" inset="2" selectedItem="4Pr-nT-3EU" id="Kyh-RR-mh5" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>

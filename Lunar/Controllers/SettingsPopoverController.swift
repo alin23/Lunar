@@ -82,7 +82,7 @@ class SettingsPopoverController: NSViewController {
             return "Allow Lunar to automatically change brightness based on sun elevation"
         case .clock:
             return "Allow Lunar to automatically change brightness based on the configured schedule"
-        case .manual:
+        case .manual, .auto:
             return "Allow Lunar to automatically adjust the brightness of this display when a non-manual mode is active"
         }
     }
@@ -104,7 +104,7 @@ class SettingsPopoverController: NSViewController {
             adaptiveBrightnessNotice = "When \"None\" is selected, this monitor will not\nchange brightness based on sun position"
         case .clock:
             adaptiveBrightnessNotice = "When \"None\" is selected, this monitor will not\nchange brightness based on the schedule"
-        case .manual:
+        case .manual, .auto:
             adaptiveBrightnessNotice = "When \"None\" is selected, this monitor will not\nadapt automatically in non-Manual modes"
         }
     }

@@ -15,15 +15,17 @@ import Foundation
 import Surge
 
 let STRIDE = vDSP_Stride(1)
+let AUTO_MODE_TAG = 99
 
 // MARK: - AdaptiveModeKey
 
-enum AdaptiveModeKey: Int, Codable, Defaults.Serializable, CaseIterable, ExpressibleByArgument {
+enum AdaptiveModeKey: Int, Codable, Defaults.Serializable, CaseIterable, ExpressibleByArgument, Nameable {
     case location = 1
     case sync = -1
     case manual = 0
     case sensor = 2
     case clock = 3
+    case auto = 99
 
     // MARK: Lifecycle
 
@@ -50,6 +52,20 @@ enum AdaptiveModeKey: Int, Codable, Defaults.Serializable, CaseIterable, Express
 
     // MARK: Internal
 
+    var name: String {
+        get { "\(str) Mode" }
+        set {}
+    }
+
+    var tag: Int? { rawValue }
+    var enabled: Bool {
+        lunarProActive || lunarProOnTrial || self == .manual || self == .auto
+    }
+
+    var image: String? {
+        str.lowercased() + "mode"
+    }
+
     var str: String {
         switch self {
         case .sensor:
@@ -62,6 +78,8 @@ enum AdaptiveModeKey: Int, Codable, Defaults.Serializable, CaseIterable, Express
             return "Sync"
         case .clock:
             return "Clock"
+        case .auto:
+            return "Auto"
         }
     }
 
@@ -77,6 +95,8 @@ enum AdaptiveModeKey: Int, Codable, Defaults.Serializable, CaseIterable, Express
             return SyncMode.shared.available
         case .clock:
             return ClockMode.shared.available
+        case .auto:
+            return DisplayController.autoMode().available
         }
     }
 
@@ -92,6 +112,8 @@ enum AdaptiveModeKey: Int, Codable, Defaults.Serializable, CaseIterable, Express
             return SyncMode.shared
         case .clock:
             return ClockMode.shared
+        case .auto:
+            return DisplayController.autoMode()
         }
     }
 
@@ -107,6 +129,8 @@ enum AdaptiveModeKey: Int, Codable, Defaults.Serializable, CaseIterable, Express
             return SYNC_HELP_TEXT
         case .clock:
             return CLOCK_HELP_TEXT
+        case .auto:
+            return ""
         }
     }
 
@@ -121,6 +145,8 @@ enum AdaptiveModeKey: Int, Codable, Defaults.Serializable, CaseIterable, Express
         case .sync:
             return nil
         case .clock:
+            return nil
+        case .auto:
             return nil
         }
     }
@@ -137,6 +163,8 @@ enum AdaptiveModeKey: Int, Codable, Defaults.Serializable, CaseIterable, Express
             return .sync
         case "clock", AdaptiveModeKey.clock.rawValue.s:
             return .clock
+        case "auto", AdaptiveModeKey.auto.rawValue.s:
+            return .auto
         default:
             return .manual
         }
@@ -179,6 +207,12 @@ protocol AdaptiveMode: AnyObject {
 var datapointLock = NSRecursiveLock()
 
 extension AdaptiveMode {
+    static var sensor: AdaptiveMode { SensorMode.shared }
+    static var sync: AdaptiveMode { SyncMode.shared }
+    static var location: AdaptiveMode { LocationMode.shared }
+    static var clock: AdaptiveMode { ClockMode.shared }
+    static var manual: AdaptiveMode { ManualMode.shared }
+
     var str: String {
         key.str
     }

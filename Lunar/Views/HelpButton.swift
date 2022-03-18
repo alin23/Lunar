@@ -9,7 +9,7 @@
 import Cocoa
 import SwiftyMarkdown
 
-func getMD(dark: Bool = false) -> SwiftyMarkdown {
+func getMD(dark: Bool = false, stylize: ((SwiftyMarkdown) -> Void)? = nil) -> SwiftyMarkdown {
     let md = SwiftyMarkdown(string: "")
 
     md.h1.fontSize = 24
@@ -44,12 +44,31 @@ func getMD(dark: Bool = false) -> SwiftyMarkdown {
     md.code.fontName = "Menlo-Bold"
     md.code.color = red
 
+    stylize?(md)
     return md
 }
 
 let MD: SwiftyMarkdown = getMD()
 let DARK_MD: SwiftyMarkdown = getMD(dark: true)
 var MARKDOWN: SwiftyMarkdown { darkMode ? DARK_MD : MD }
+
+let MENU_MD: SwiftyMarkdown = getMD { md in
+    md.body.fontSize = 13
+    md.bold.fontSize = 13
+    md.italic.fontSize = 13
+    md.code.fontSize = 12
+    md.code.color = .tertiaryLabelColor
+}
+
+let MENU_DARK_MD: SwiftyMarkdown = getMD(dark: true) { md in
+    md.body.fontSize = 13
+    md.bold.fontSize = 13
+    md.italic.fontSize = 13
+    md.code.fontSize = 12
+    md.code.color = .tertiaryLabelColor
+}
+
+var MENU_MARKDOWN: SwiftyMarkdown { darkMode ? MENU_DARK_MD : MENU_MD }
 
 // MARK: - OnboardingHelpButton
 
