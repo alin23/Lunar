@@ -1383,59 +1383,12 @@ class DisplayViewController: NSViewController {
 
     func getPowerOffEnabled(display: Display? = nil, hasDDC: Bool? = nil) -> Bool {
         guard let display = display ?? self.display, display.active else { return false }
-        guard !display.isInMirrorSet else { return true }
-
-        return (
-            displayController.activeDisplays.count > 1 ||
-                CachedDefaults[.allowBlackOutOnSingleScreen] ||
-                (hasDDC ?? display.hasDDC)
-        ) &&
-            !display.isSidecar &&
-            !display.isAirplay &&
-            !display.isDummy
+        return display.getPowerOffEnabled(hasDDC: hasDDC)
     }
 
     func getPowerOffTooltip(display: Display? = nil, hasDDC: Bool? = nil) -> String? {
         guard let display = display ?? self.display else { return nil }
-        guard !(hasDDC ?? display.hasDDC) else {
-            return """
-            BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0.
-
-            Can also be toggled with the keyboard using Ctrl-Cmd-6.
-
-            Hold the following keys while clicking the button (or while pressing the hotkey) to change BlackOut behaviour:
-            - Shift: make the screen black without mirroring
-            - Option: turn off monitor completely using DDC
-            - Option and Shift: BlackOut other monitors and keep this one visible
-
-            Caveats for DDC power off:
-              • works only if the monitor can be controlled through DDC
-              • can't be used to power on the monitor
-              • when a monitor is turned off or in standby, it does not accept commands from a connected device
-              • remember to keep holding the Option key for 2 seconds after you pressed the button to account for possible DDC delays
-
-            Emergency Kill Switch: press the ⌘ Command key more than 8 times in a row to force disable BlackOut.
-            """
-        }
-        guard displayController.activeDisplays.count > 1 || CachedDefaults[.allowBlackOutOnSingleScreen] else {
-            return """
-            At least 2 screens need to be visible for this to work.
-
-            The option can also be enabled for a single screen in Advanced settings.
-            """
-        }
-
-        return """
-        BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0.
-
-        Can also be toggled with the keyboard using Ctrl-Cmd-6.
-
-        Hold the following keys while clicking the button (or while pressing the hotkey) to change BlackOut behaviour:
-        - Shift: make the screen black without mirroring
-        - Option and Shift: BlackOut other monitors and keep this one visible
-
-        Emergency Kill Switch: press the ⌘ Command key more than 8 times in a row to force disable BlackOut.
-        """
+        return display.getPowerOffTooltip(hasDDC: hasDDC)
     }
 
     @IBAction func delete(_: Any) {
@@ -1465,26 +1418,8 @@ class DisplayViewController: NSViewController {
     }
 
     @IBAction func powerOff(_: Any) {
-        guard let display = display,
-              displayController.activeDisplays.count > 1 || CachedDefaults[.allowBlackOutOnSingleScreen] else { return }
-
-        if display.hasDDC, AppDelegate.optionKeyPressed {
-            _ = display.control?.setPower(.off)
-            return
-        }
-
-        guard lunarProOnTrial || lunarProActive else {
-            if let url = URL(string: "https://lunar.fyi/#blackout") {
-                NSWorkspace.shared.open(url)
-            }
-            return
-        }
-
-        displayController.blackOut(
-            display: display.id,
-            state: display.blackOutEnabled ? .off : .on,
-            mirroringAllowed: !AppDelegate.shiftKeyPressed && display.blackOutMirroringAllowed
-        )
+        guard let display = display else { return }
+        display.powerOff()
     }
 
     func showGammaNotice() {

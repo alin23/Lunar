@@ -141,6 +141,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     @Atomic static var optionKeyPressed = false
     @Atomic static var shiftKeyPressed = false
+    @Atomic static var controlKeyPressed = false
 
     var locationManager: CLLocationManager?
     var _windowControllerLock = NSRecursiveLock()
@@ -1365,10 +1366,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         showBrightnessMenuBarPublisher.sink { [self] change in
             mainAsync {
                 if change.newValue {
-                    statusItem.button?.imagePosition = .imageLeading
-                    updateInfoMenuItem()
+                    self.statusItem.button?.imagePosition = .imageLeading
+                    self.updateInfoMenuItem()
                 } else {
-                    statusItem.button?.imagePosition = .imageOnly
+                    self.statusItem.button?.imagePosition = .imageOnly
                 }
             }
         }.store(in: &observers)
@@ -1510,8 +1511,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         AppDelegate.optionKeyPressed = event.modifierFlags.contains(.option)
         AppDelegate.shiftKeyPressed = event.modifierFlags.contains(.shift)
+        AppDelegate.controlKeyPressed = event.modifierFlags.contains(.control)
         log.debug("Option key pressed: \(AppDelegate.optionKeyPressed)")
         log.debug("Shift key pressed: \(AppDelegate.shiftKeyPressed)")
+        log.debug("Control key pressed: \(AppDelegate.controlKeyPressed)")
     }
 
     func addGlobalModifierMonitor() {
@@ -1561,11 +1564,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             let argList = Array(CommandLine.arguments[idx + 1 ..< CommandLine.arguments.count])
 
             let exc = tryBlock {
-                guard !argList.contains("--new-instance"), otherLunar() != nil,
+                guard !argList.contains("--new-instance"), self.otherLunar() != nil,
                       let socket = try? Socket.create(), let opts = Lunar.globalOptions(args: argList)
                 else {
                     if !argList.contains("--remote") {
-                        initCacheTransitionLogging()
+                        self.initCacheTransitionLogging()
                         Lunar.main(argList)
                     } else {
                         print("Can't use `--remote` and `--new-instance` at the same time.")
