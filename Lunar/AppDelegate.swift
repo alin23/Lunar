@@ -123,6 +123,8 @@ enum MemoryUsageError: Error {
     case highMemoryUsage(Int)
 }
 
+let SWIFTUI_PREVIEW = ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+
 // MARK: - AppDelegate
 
 @NSApplicationMain
@@ -1696,6 +1698,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func applicationDidFinishLaunching(_: Notification) {
+        guard !SWIFTUI_PREVIEW else {
+            displayController.displays = displayController.getDisplaysLock.around {
+                DisplayController.getDisplays(
+                    includeVirtual: CachedDefaults[.showVirtualDisplays],
+                    includeAirplay: CachedDefaults[.showAirplayDisplays],
+                    includeProjector: CachedDefaults[.showProjectorDisplays],
+                    includeDummy: CachedDefaults[.showDummyDisplays]
+                )
+            }
+            return
+        }
+
         if Defaults[.apiKey].isEmpty {
             Defaults[.apiKey] = SERIAL_NUMBER_HASH
         }

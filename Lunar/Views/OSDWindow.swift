@@ -118,6 +118,16 @@ func st<T>(_ v: T) -> State<T> {
     State(initialValue: v)
 }
 
+extension Color {
+    var isDark: Bool {
+        NSColor(self).hsb.2 < 65
+    }
+
+    var textColor: Color {
+        isDark ? .white : .black
+    }
+}
+
 // MARK: - BigSurSlider
 
 public struct BigSurSlider: View {
@@ -130,6 +140,8 @@ public struct BigSurSlider: View {
         image: String? = nil,
         color: Color? = nil,
         backgroundColor: Color = .black.opacity(0.1),
+        knobColor: Color? = nil,
+        knobTextColor: Color? = nil,
         showValue: Binding<Bool>? = nil
     ) {
         _percentage = percentage
@@ -137,8 +149,10 @@ public struct BigSurSlider: View {
         _sliderHeight = sliderHeight.state
         _image = image.state
         _color = color.state
-        _backgroundColor = backgroundColor.state
         _showValue = showValue ?? .constant(false)
+        _backgroundColor = backgroundColor.state
+        _knobColor = (color ?? colors.accent).state
+        _knobTextColor = (knobTextColor ?? ((color ?? colors.accent).textColor)).state
     }
 
     // MARK: Public
@@ -169,13 +183,13 @@ public struct BigSurSlider: View {
                     }
                     ZStack {
                         Circle()
-                            .foregroundColor(colorScheme == .dark ? (color ?? colors.accent) : Colors.darkGray)
-                            .shadow(color: Colors.blackMauve.opacity(percentage > 0.5 ? 0.5 : percentage.d), radius: 5, x: -1, y: 0)
+                            .foregroundColor(knobColor)
+                            .shadow(color: Colors.blackMauve.opacity(percentage > 0.4 ? 0.4 : percentage.d), radius: 5, x: -1, y: 0)
                             .frame(width: sliderHeight, height: sliderHeight, alignment: .trailing)
                         if showValue {
                             Text((percentage * 100).str(decimals: 0))
-                                .foregroundColor(colors.fg.primary)
-                                .font(.system(size: 9, weight: .heavy))
+                                .foregroundColor(knobTextColor)
+                                .font(.system(size: 8, weight: .medium, design: .monospaced))
                                 .allowsHitTesting(false)
                         }
                     }.offset(
@@ -218,6 +232,8 @@ public struct BigSurSlider: View {
     @State var image: String? = nil
     @State var color: Color? = nil
     @State var backgroundColor: Color = .black.opacity(0.1)
+    @State var knobColor: Color? = nil
+    @State var knobTextColor: Color? = nil
     @Binding var showValue: Bool
 
     @State var subs = Set<AnyCancellable>()
@@ -294,7 +310,13 @@ public struct Colors {
     public static let red = Color(hue: 0.98, saturation: 0.82, brightness: 1.00)
     public static let lightGold = Color(hue: 0.09, saturation: 0.28, brightness: 0.94)
     public static let mauve = Color(hue: 252 / 360, saturation: 0.29, brightness: 0.23)
-    public static let blackMauve = Color(hue: 252 / 360, saturation: 0.08, brightness: 0.12)
+    public static let pinkMauve = Color(hue: 0.95, saturation: 0.76, brightness: 0.42)
+    public static let blackMauve = Color(
+        hue: 252 / 360,
+        saturation: 0.08,
+        brightness:
+        0.12
+    )
     public static let yellow = Color(hue: 39 / 360, saturation: 1.0, brightness: 0.64)
     public static let lunarYellow = Color(hue: 0.11, saturation: 0.47, brightness: 1.00)
     public static let peach = Color(hue: 0.08, saturation: 0.42, brightness: 1.00)
