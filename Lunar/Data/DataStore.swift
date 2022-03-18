@@ -739,6 +739,8 @@ extension Defaults.Keys {
     static let showOnlyExternalBrightnessMenuBar = Key<Bool>("showOnlyExternalBrightnessMenuBar", default: false)
     static let showOrientationInQuickActions = Key<Bool>("showOrientationInQuickActions", default: false)
     static let showInputInQuickActions = Key<Bool>("showInputInQuickActions", default: true)
+    static let showPowerInQuickActions = Key<Bool>("showPowerInQuickActions", default: true)
+    static let neverShowBlackoutPopover = Key<Bool>("neverShowBlackoutPopover", default: false)
     static let clamshellModeDetection = Key<Bool>("clamshellModeDetection", default: true)
     static let brightnessStep = Key<Int>("brightnessStep", default: 6)
     static let contrastStep = Key<Int>("contrastStep", default: 6)

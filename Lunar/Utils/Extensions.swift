@@ -989,6 +989,10 @@ extension NSScreen {
         externalScreens.first { $0.hasMouse }
     }
 
+    var center: NSPoint {
+        NSPoint(x: (visibleFrame.width / 2) + visibleFrame.origin.x, y: (visibleFrame.midY / 2) + visibleFrame.origin.y)
+    }
+
     var hasMouse: Bool {
         let mouseLocation = NSEvent.mouseLocation
         if NSMouseInRect(mouseLocation, frame, false) {

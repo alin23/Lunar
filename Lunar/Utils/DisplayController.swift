@@ -678,7 +678,10 @@ class DisplayController: ObservableObject {
                     d.updateCornerWindow()
                 }
 
-                activeDisplayList = _activeDisplays.values.sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }.reversed()
+                mainAsync {
+                    self.activeDisplayList = self._activeDisplays.values.sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }
+                        .reversed()
+                }
             }
         }
     }
@@ -1226,8 +1229,11 @@ class DisplayController: ObservableObject {
                     let mirror = d.primaryMirrorScreen?.displayID ?? 0
                     let mirrorExists = activeNewDisplayIDs.contains(mirror)
 
-                    log.debug("\(d): blackOutEnabled=\(d.blackOutEnabled) mirror=\(mirror) mirrorExists=\(mirrorExists)")
-                    guard d.blackOutEnabled, mirror == 0 || !mirrorExists else { continue }
+                    log
+                        .debug(
+                            "\(d): blackOutEnabled=\(d.blackOutEnabled) mirror=\(mirror) mirrorExists=\(mirrorExists) blackOutEnabledWithoutMirroring=\(d.blackOutEnabledWithoutMirroring)"
+                        )
+                    guard d.blackOutEnabled, !d.blackOutEnabledWithoutMirroring, mirror == 0 || !mirrorExists else { continue }
 
                     log
                         .info(
