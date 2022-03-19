@@ -57,7 +57,8 @@ class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
     }
 
     static func enabledString(_ menuItem: NSMenuItem) -> NSAttributedString {
-        disabledString(menuItem, reason: "")
+        let title = MODE_DISABLED_REASON_PATTERN.replaceAll(in: menuItem.title, with: " Mode")
+        return title.withFont(.monospacedSystemFont(ofSize: 12, weight: .semibold)).withTextColor(.labelColor)
     }
 
     static func disabledString(_ menuItem: NSMenuItem, reason: String) -> NSAttributedString {
@@ -135,14 +136,17 @@ class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
     func setAutoModeItemTitle(modeKey: AdaptiveModeKey? = nil, menuItem: NSMenuItem? = nil) {
         if CachedDefaults[.overrideAdaptiveMode] {
             if let item = menuItem ?? lastItem {
-                item.attributedTitle = MENU_MARKDOWN.attributedString(from: defaultAutoModeTitle)
+                item.attributedTitle = defaultAutoModeTitle
+                    .withFont(.monospacedSystemFont(ofSize: 12, weight: .semibold))
+                    .withTextColor(.labelColor)
             }
         } else {
             let modeKey = modeKey ?? DisplayController.getAdaptiveMode().key
             if let item = menuItem ?? lastItem {
-                item.attributedTitle = MENU_MARKDOWN.attributedString(
-                    from: defaultAutoModeTitle.replacingOccurrences(of: "Auto Mode", with: "Auto: \(modeKey.str)")
-                )
+                item.attributedTitle = defaultAutoModeTitle
+                    .replacingOccurrences(of: "Auto Mode", with: "Auto: \(modeKey.str)")
+                    .withFont(.monospacedSystemFont(ofSize: 12, weight: .semibold))
+                    .withTextColor(.labelColor)
             }
         }
     }
@@ -163,6 +167,9 @@ class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
         listenForAdaptiveModeChange()
         radius = (frame.height / 2).ns
 
+        for item in itemArray {
+            item.attributedTitle = AdaptiveModeButton.enabledString(item)
+        }
         update()
     }
 

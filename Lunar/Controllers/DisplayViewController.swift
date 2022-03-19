@@ -293,6 +293,7 @@ class DisplayViewController: NSViewController {
     @IBOutlet var brightnessSlider: Slider?
     @IBOutlet var brightnessContrastSlider: Slider?
     @IBOutlet var resolutionsDropdown: ModePopupButton?
+    @IBOutlet var inputDropdown: NSPopUpButton?
 
     @IBOutlet var brightnessContrastChart: BrightnessContrastChartView?
 
@@ -659,6 +660,11 @@ class DisplayViewController: NSViewController {
 
         if let resolutionsDropdown = resolutionsDropdown {
             resolutionsDropdown.setItemStyles()
+        }
+        if let inputDropdown = inputDropdown {
+            for item in inputDropdown.itemArray {
+                item.attributedTitle = item.title.withFont(.monospacedSystemFont(ofSize: 12, weight: .semibold)).withTextColor(.labelColor)
+            }
         }
 
         display.withoutDDC { display.panelMode = display.panel?.currentMode }
