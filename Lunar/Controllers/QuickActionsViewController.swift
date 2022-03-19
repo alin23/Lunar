@@ -97,7 +97,7 @@ struct DisplayRowView: View {
     var sdrXdrSelector: some View {
         HStack {
             SwiftUI.Button("SDR") {
-                display.enhanced = false
+                withAnimation(.fastSpring) { display.enhanced = false }
             }
             .buttonStyle(PickerButton(
                 enumValue: $display.enhanced, onValue: false
@@ -106,7 +106,7 @@ struct DisplayRowView: View {
             .help("Standard Dynamic Range disables XDR and allows the system to limit the brightness to 500nits.")
 
             SwiftUI.Button("XDR") {
-                display.enhanced = true
+                withAnimation(.fastSpring) { display.enhanced = true }
             }
             .buttonStyle(PickerButton(
                 enumValue: $display.enhanced, onValue: true
