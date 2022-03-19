@@ -1,3 +1,55 @@
+# 5.5.0
+## Features
+
+* **XDR Brightness**: go past the `500` nits limit of the new *2021 MacBook Pro* and *Pro Display XDR*
+    * Warning: this is experimental. The system may become unresponsive for a few seconds when toggling this option
+    * Animation glitches are expected when this is enabled
+
+<video autoplay loop muted width="828" height="526" src="https://files.lunar.fyi/xdr-quickaction.mp4" style="width: 828px; height: 526px"/>
+
+* **Sub-zero dimming**: dim brightness below 0%
+
+<video autoplay loop muted width="828" height="526" src="https://files.lunar.fyi/subzero-quickaction.mp4" style="width: 828px; height: 526px"/>
+
+* **QuickActions** redesign:
+
+<video autoplay loop muted width="784" height="843" src="https://files.lunar.fyi/new-quickactions.mp4" style="width: 784px; height: 843px"/>
+
+* **Input Hotkeys** redesign:
+
+![Input hotkeys redesign](https://files.lunar.fyi/input-hotkeys-redesign.png)
+
+* Add **BlackOut without mirroring** checkbox in the [Controls menu](https://app.lunar.fyi/display/controls) of each display
+* Add **BlackOut other displays** action on holding `Option`+`Shift`
+* Add **Allow brightness to reach zero** checkbox in the [Controls menu](https://app.lunar.fyi/display/controls) for *built-in* displays
+    * By default this is disabled to avoid turning off the display by mistake
+* Implement **BlackOut for AirPlay/Sidecar/DisplayLink** (it's just a pitch black overlay really, but that's the most I can do)
+
+![BlackOut in QuickActions](https://files.lunar.fyi/blackout-quickactions.png)
+
+## Improvements
+
+* Add **Emergency Kill Switch** for **BlackOut**
+    * *Press the ⌘ Command key more than 8 times in a row to force disable BlackOut*
+* *F.lux* detection improvements
+    * Ensure Overlay gets activated
+    * Add note about [Shifty](https://shifty.natethompson.io) as an alternative
+    * Update AppleScript for Monterey
++ Allow Preferences window to be moved by its background
++ Add selector for switching between *System* and *Lunar* adaptive brightness
+* Disable overlay temporarily when taking a screenshot
+
+## Fixes
+
+* **Fix Gamma flashing** bright from time to time
+* **Remove Software Dimming delay** if it's the only control enabled
+* Fix displays having low brightness after wake/reconnection
+* Fix overflow crash in Clock Mode
+* Fix BlackOut being stuck when using it without mirroring
+* Fix contrast getting stuck to 0 when Lunar is restarted while BlackOut is on
+* Check for vendor ID on BetterDummy screens
+
+**Note**: Starting from `v5.5.0` Lunar will require `macOS 11.0+`
 # 5.4.3
 ## Fixes
 
