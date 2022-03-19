@@ -1395,7 +1395,7 @@ class DisplayController: ObservableObject {
                 for display in activeDisplays.values {
                     display.control = display.getBestControl()
                     if shouldPromptAboutFallback(display) {
-                        asyncNow { promptAboutFallback(display) }
+                        asyncNow { self.promptAboutFallback(display) }
                     }
                 }
             }

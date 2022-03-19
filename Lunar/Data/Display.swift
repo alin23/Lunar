@@ -450,22 +450,15 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         hotkeyInput2 = (try container.decodeIfPresent(UInt16.self, forKey: .hotkeyInput2))?.ns ?? InputSource.unknown.rawValue.ns
         hotkeyInput3 = (try container.decodeIfPresent(UInt16.self, forKey: .hotkeyInput3))?.ns ?? InputSource.unknown.rawValue.ns
 
-        brightnessOnInputChange1 = (
-            try (try container.decodeIfPresent(UInt16.self, forKey: .brightnessOnInputChange1))?
-                .ns ?? (try container.decodeIfPresent(UInt16.self, forKey: .brightnessOnInputChange))?.ns ?? 100.ns
-        )
-        brightnessOnInputChange2 = (try container.decodeIfPresent(UInt16.self, forKey: .brightnessOnInputChange2))?.ns ?? 100.ns
-        brightnessOnInputChange3 = (try container.decodeIfPresent(UInt16.self, forKey: .brightnessOnInputChange3))?.ns ?? 100.ns
+        brightnessOnInputChange1 = (try container.decodeIfPresent(Double.self, forKey: .brightnessOnInputChange1)) ?? 100.0
+        brightnessOnInputChange2 = (try container.decodeIfPresent(Double.self, forKey: .brightnessOnInputChange2)) ?? 100.0
+        brightnessOnInputChange3 = (try container.decodeIfPresent(Double.self, forKey: .brightnessOnInputChange3)) ?? 100.0
+        contrastOnInputChange1 = (try container.decodeIfPresent(Double.self, forKey: .contrastOnInputChange1)) ?? 75.0
+        contrastOnInputChange2 = (try container.decodeIfPresent(Double.self, forKey: .contrastOnInputChange2)) ?? 75.0
+        contrastOnInputChange3 = (try container.decodeIfPresent(Double.self, forKey: .contrastOnInputChange3)) ?? 75.0
 
-        contrastOnInputChange1 = try (
-            (try container.decodeIfPresent(UInt16.self, forKey: .contrastOnInputChange1))?
-                .ns ?? (try container.decodeIfPresent(UInt16.self, forKey: .contrastOnInputChange))?.ns ?? 75.ns
-        )
-        contrastOnInputChange2 = (try container.decodeIfPresent(UInt16.self, forKey: .contrastOnInputChange2))?.ns ?? 75.ns
-        contrastOnInputChange3 = (try container.decodeIfPresent(UInt16.self, forKey: .contrastOnInputChange3))?.ns ?? 75.ns
-
-        applyBrightnessOnInputChange1 = (try container.decodeIfPresent(Bool.self, forKey: .applyBrightnessOnInputChange1)) ?? true
-        applyBrightnessOnInputChange2 = (try container.decodeIfPresent(Bool.self, forKey: .applyBrightnessOnInputChange2)) ?? false
+        applyBrightnessOnInputChange1 = (try container.decodeIfPresent(Bool.self, forKey: .applyBrightnessOnInputChange1)) ?? false
+        applyBrightnessOnInputChange2 = (try container.decodeIfPresent(Bool.self, forKey: .applyBrightnessOnInputChange2)) ?? true
         applyBrightnessOnInputChange3 = (try container.decodeIfPresent(Bool.self, forKey: .applyBrightnessOnInputChange3)) ?? false
 
         if let syncUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .sync) {
@@ -541,6 +534,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             showOrientation = canRotate && CachedDefaults[.showOrientationInQuickActions]
             withoutApply {
                 rotation = CGDisplayRotation(id).intround
+                enhanced = Self.getWindowController(id, type: "hdr") != nil
             }
         }
 
@@ -676,6 +670,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             showOrientation = canRotate && CachedDefaults[.showOrientationInQuickActions]
             withoutApply {
                 rotation = CGDisplayRotation(id).intround
+                enhanced = Self.getWindowController(id, type: "hdr") != nil
             }
             blackOutMirroringAllowed = supportsGammaByDefault
         }
@@ -831,6 +826,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case rotation
         case adaptiveController
         case enhanced
+        case subzero
+        case softwareBrightness
+        case xdrBrightness
 
         // MARK: Internal
 
@@ -857,6 +855,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .blackOutMirroringAllowed,
             .allowBrightnessZero,
             .mirroredBeforeBlackOut,
+            .enhanced,
+            .subzero,
         ]
 
         static var hidden: Set<CodingKeys> = [
@@ -954,6 +954,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .rotation,
             .adaptiveController,
             .enhanced,
+            .subzero,
+            .softwareBrightness,
+            .xdrBrightness,
         ]
 
         var isHidden: Bool {
@@ -1026,7 +1029,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     lazy var isSmartBuiltin: Bool = isBuiltin && isSmartDisplay
     lazy var canChangeBrightnessDS: Bool = DisplayServicesCanChangeBrightness(id)
 
-    lazy var _hotkeyPopover: NSPopover? = POPOVERS[serial] ?? nil
+    lazy var _hotkeyPopover: NSPopover? = INPUT_HOTKEY_POPOVERS[serial] ?? nil
     lazy var hotkeyPopoverController: HotkeyPopoverController? = initHotkeyPopoverController()
 
     // MARK: Stored Properties
@@ -1236,7 +1239,29 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var noDDCOrMergedBrightnessContrast = false
 
-    @Published @objc dynamic var subzero = false
+    @Published @objc dynamic var subzero = false {
+        didSet {
+            guard apply else { return }
+            if subzero, !oldValue {
+                adaptivePaused = true
+                brightnessBeforeBlackout = brightness
+                contrastBeforeBlackout = contrast
+                brightness = minBrightness
+                contrast = minContrast
+                softwareBrightness = 0.4
+            }
+            if !subzero, oldValue {
+                if minBrightness == brightness {
+                    brightness = brightnessBeforeBlackout
+                }
+                if minContrast == contrast {
+                    contrast = contrastBeforeBlackout
+                }
+                softwareBrightness = 1
+                adaptivePaused = false
+            }
+        }
+    }
 
     @Published @objc dynamic var hasDDC = false {
         didSet {
@@ -1453,11 +1478,15 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             let br = softwareBrightness
             mainAsync {
-                self.subzero = br < 1.0 || (br == 1.0 && self.brightness.uint16Value == self.minBrightness.uint16Value)
                 self.withoutApply {
+                    self.subzero = br < 1.0 || (br == 1.0 && self.brightness.uint16Value == self.minBrightness.uint16Value)
+                    guard br > 1 else {
+                        self.xdrBrightness = 0.0
+                        return
+                    }
                     self.xdrBrightness = mapNumber(
-                        self.softwareBrightness,
-                        fromLow: self.softwareBrightness == 1 ? 1.00 : 1.01,
+                        br,
+                        fromLow: 1.01,
                         fromHigh: 1.5,
                         toLow: 0.0,
                         toHigh: 1.0
@@ -1874,7 +1903,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                        withIdentifier: NSStoryboard.SceneIdentifier("HotkeyPopoverController")
                    ) as? HotkeyPopoverController
                 {
-                    POPOVERS[serial] = _hotkeyPopover
+                    INPUT_HOTKEY_POPOVERS[serial] = _hotkeyPopover
                     popover.contentViewController = controller
                     popover.contentViewController!.loadView()
                 }
@@ -1917,6 +1946,18 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Atomic var applyDisplayServices = true
 
     @Atomic var apply = true
+
+    lazy var saving: PassthroughSubject<Bool, Never> = {
+        let p = PassthroughSubject<Bool, Never>()
+        p
+            .debounce(for: .milliseconds(800), scheduler: RunLoop.main)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                DataStore.storeDisplay(display: self)
+            }.store(in: &observers)
+
+        return p
+    }()
 
     var alternativeControlForAppleNative: Control? = nil {
         didSet {
@@ -2046,8 +2087,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         return control is DDCControl || control is NetworkControl
     }
 
-    @objc dynamic lazy var enhanced: Bool = Self.getWindowController(id, type: "hdr") != nil {
+    @Published @objc dynamic var enhanced = false {
         didSet {
+            guard apply else { return }
             handleEnhance(enhanced)
         }
     }
@@ -2080,7 +2122,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 //        #if DEBUG
 //            log.verbose("START DEINIT: \(description)")
 //            log.verbose("popover: \(_hotkeyPopover)")
-//            log.verbose("POPOVERS: \(POPOVERS.map { "\($0.key): \($0.value)" })")
+//            log.verbose("INPUT_HOTKEY_POPOVERS: \(INPUT_HOTKEY_POPOVERS.map { "\($0.key): \($0.value)" })")
 //            do { log.verbose("END DEINIT: \(description)") }
 //        #endif
 //    }
@@ -2671,9 +2713,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 softwareBrightness = 1
                 startXDRTimer()
             } else if brightness == minBrightness.uint16Value, !subzero {
-                subzero = true
+                withoutApply { subzero = true }
             } else if brightness > minBrightness.uint16Value, subzero {
-                subzero = false
+                withoutApply { subzero = false }
             }
 
             var oldBrightness: UInt16 = oldValue.uint16Value
@@ -2940,12 +2982,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var hotkeyInput2: NSNumber = InputSource.unknown.rawValue.ns { didSet { save() } }
     @Published @objc dynamic var hotkeyInput3: NSNumber = InputSource.unknown.rawValue.ns { didSet { save() } }
 
-    @Published @objc dynamic var brightnessOnInputChange1: NSNumber = 100 { didSet { save() } }
-    @Published @objc dynamic var brightnessOnInputChange2: NSNumber = 100 { didSet { save() } }
-    @Published @objc dynamic var brightnessOnInputChange3: NSNumber = 100 { didSet { save() } }
-    @Published @objc dynamic var contrastOnInputChange1: NSNumber = 75 { didSet { save() } }
-    @Published @objc dynamic var contrastOnInputChange2: NSNumber = 75 { didSet { save() } }
-    @Published @objc dynamic var contrastOnInputChange3: NSNumber = 75 { didSet { save() } }
+    @Published @objc dynamic var brightnessOnInputChange1 = 100.0 { didSet { save() } }
+    @Published @objc dynamic var brightnessOnInputChange2 = 100.0 { didSet { save() } }
+    @Published @objc dynamic var brightnessOnInputChange3 = 100.0 { didSet { save() } }
+    @Published @objc dynamic var contrastOnInputChange1 = 75.0 { didSet { save() } }
+    @Published @objc dynamic var contrastOnInputChange2 = 75.0 { didSet { save() } }
+    @Published @objc dynamic var contrastOnInputChange3 = 75.0 { didSet { save() } }
 
     @Published @objc dynamic var applyBrightnessOnInputChange1 = true { didSet { save() } }
     @Published @objc dynamic var applyBrightnessOnInputChange2 = false { didSet { save() } }
@@ -3872,9 +3914,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             DataStore.storeDisplay(display: self, now: now)
             return
         }
-        debounce(ms: 800, uniqueTaskKey: "displaySave", value: self) { display in
-            DataStore.storeDisplay(display: display)
-        }
+
+        saving.send(true)
     }
 
     func resetName() {
@@ -3961,13 +4002,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try container.encode(hotkeyInput2.uint16Value, forKey: .hotkeyInput2)
             try container.encode(hotkeyInput3.uint16Value, forKey: .hotkeyInput3)
 
-            try container.encode(brightnessOnInputChange1.uint16Value, forKey: .brightnessOnInputChange1)
-            try container.encode(brightnessOnInputChange2.uint16Value, forKey: .brightnessOnInputChange2)
-            try container.encode(brightnessOnInputChange3.uint16Value, forKey: .brightnessOnInputChange3)
+            try container.encode(brightnessOnInputChange1, forKey: .brightnessOnInputChange1)
+            try container.encode(brightnessOnInputChange2, forKey: .brightnessOnInputChange2)
+            try container.encode(brightnessOnInputChange3, forKey: .brightnessOnInputChange3)
 
-            try container.encode(contrastOnInputChange1.uint16Value, forKey: .contrastOnInputChange1)
-            try container.encode(contrastOnInputChange2.uint16Value, forKey: .contrastOnInputChange2)
-            try container.encode(contrastOnInputChange3.uint16Value, forKey: .contrastOnInputChange3)
+            try container.encode(contrastOnInputChange1, forKey: .contrastOnInputChange1)
+            try container.encode(contrastOnInputChange2, forKey: .contrastOnInputChange2)
+            try container.encode(contrastOnInputChange3, forKey: .contrastOnInputChange3)
 
             try container.encode(applyBrightnessOnInputChange1, forKey: .applyBrightnessOnInputChange1)
             try container.encode(applyBrightnessOnInputChange2, forKey: .applyBrightnessOnInputChange2)
@@ -4014,6 +4055,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try container.encode(showVolumeOSD, forKey: .showVolumeOSD)
             try container.encode(applyGamma, forKey: .applyGamma)
             try container.encode(schedules, forKey: .schedules)
+
+            try container.encode(enhanced, forKey: .enhanced)
+            try container.encode(subzero, forKey: .subzero)
+            try container.encode(softwareBrightness, forKey: .softwareBrightness)
+            try container.encode(xdrBrightness, forKey: .xdrBrightness)
         }
     }
 

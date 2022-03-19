@@ -202,7 +202,7 @@ class ALSInstallViewController: NSViewController {
                     self.operationDescription = "Error installing the firmware!\nCheck the logs for more details.".attributedString
                     self.progressBar?.stopAnimation(nil)
                 }
-                self.onClick = { NSWorkspace.shared.openFile(INSTALL_LOG_PATH) }
+                self.onClick = { NSWorkspace.shared.open(URL(fileURLWithPath: INSTALL_LOG_PATH)) }
             }
         }
 

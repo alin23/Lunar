@@ -19,10 +19,10 @@ class PopoverButton<T: NSViewController>: Button {
     }
 
     var popover: NSPopover? {
-        if !POPOVERS.keys.contains(popoverKey) || POPOVERS[popoverKey]! == nil {
+        if POPOVERS[popoverKey] == nil || POPOVERS[popoverKey]! == nil {
             appDelegate!.initPopovers()
         }
-        guard let popover = POPOVERS[popoverKey]! else { return nil }
+        guard let p = POPOVERS[popoverKey] ?? INPUT_HOTKEY_POPOVERS[popoverKey], let popover = p else { return nil }
         return popover
     }
 

@@ -62,7 +62,7 @@ class HotkeyButton: PopoverButton<HotkeyPopoverController> {
             )
             for item in dropdown.itemArray {
                 switch item.title.lowercased() {
-                case "thunderbolt".r:
+                case "thunderbolt".r, "usb-c".r:
                     item.image = NSImage(named: "usbc")
                 case "hdmi".r:
                     item.image = NSImage(named: "hdmi")
