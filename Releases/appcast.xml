@@ -3,15 +3,33 @@
     <channel>
         <title>Lunar</title>
         <item>
+            <title>5.5.0</title>
+            <pubDate>Sat, 19 Mar 2022 20:43:23 +0200</pubDate>
+            <sparkle:version>5.5.0</sparkle:version>
+            <sparkle:shortVersionString>5.5.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.5.0.dmg" length="17736303" type="application/octet-stream" sparkle:edSignature="+AXcuR+efzdQkBXaeekSTLdbj6uP7FEwcrL0xxFPZra4coResyjvO2ZgD7TjWDrkxhDVVJ+Xx7KA1PlCte6aDg==" sparkle:dsaSignature="MEUCIGgx9ePY2s3og5roTHW4CCWkqJ1b/dCH7oMj3bWz2ir0AiEAiPYNDi4TWi/tqBUT+Ga2//JllOKBRACG5JYoozJXeJc="/>
+            <sparkle:deltas>
+                <enclosure url="https://lunar.fyi/delta/5.5.0/5.4.3" sparkle:deltaFrom="5.4.3" length="6147902" type="application/octet-stream" sparkle:edSignature="iXjWZGgKwevKo5FfGdE0qLD1ipi0lLTEGHosmJSjRYHNlHMofDrgPkIvVRgEBcy8z48D5pUzukUvYVZ1HAlmAQ==" sparkle:dsaSignature="MEUCIH37xpmODNE+ze4qp/HE8wnesaM/X8Gp9S7Z55LiGarbAiEAj4rVlnSzFqV5OiRYw83fzpznwVAOabAjZEc9iin6EXY="/>
+                <enclosure url="https://lunar.fyi/delta/5.5.0/5.4.2" sparkle:deltaFrom="5.4.2" length="6155902" type="application/octet-stream" sparkle:edSignature="TtZ/cnrNbRneg1zZ4xw+SGzFR+2eg5UmexwPx1RzyiYflh+RGHO7lrh8lVJIqSUV2UwmKqwimk0x4jPpefF5Ag==" sparkle:dsaSignature="MEQCIEJwU6fSChDt/wpvm7l3x997h9ER1OiriVGqlfkRdyt3AiAeeD0pEojs/YWjDJbCHViCWUqSc4UUiCoxdeh9q8MEdw=="/>
+                <enclosure url="https://lunar.fyi/delta/5.5.0/5.4.1" sparkle:deltaFrom="5.4.1" length="6206530" type="application/octet-stream" sparkle:edSignature="gn373vLz2HMsMQFDtbKHoH30V0OiVrqLc8T/tDzSSMwVAvU38aoaMriUIBi5DkQj5FQy6GIricVSJTKQgyaHAw==" sparkle:dsaSignature="MEQCIEVRaD4rugCR2RyXKvFD9HC+2thObHb2TJD4BMOHrXpcAiBJYayGoqtFXl6m1fnSonExKSwSmEwzV8H/NGgTclSvRA=="/>
+            </sparkle:deltas>
+            <signature>U..t5TUXSxJhy57ttrhvFGP3pZA=</signature>
+            <signature>U//t5TUXSxJhy57ttrhvFGP3pZA=</signature>
+            <signature>mZZpzgCdKNtfphIFRiK4UShv7CU=</signature>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <description><![CDATA[<div><style>    * {        font-family: -apple-system, BlinkMacSystemFont, sans-serif;        font-size: .9rem;    }    img {        width: 80%;        margin: 1rem auto;        object-fit: cover;    }    video {        width: 80%;        margin: 1rem auto;        border-radius: 12px;        box-shadow: 0px 3px 1rem rgba(0, 0, 0, 0.1);    }    code, pre {        font-family: Menlo, monospace;        color: #fda43a;    }    strong {        color: #fda43a;    }    em {        color: #FBAB7E;    }    code {        font-weight: bold;    }    a {        color: #1DA1F2;    }    a:hover {        color: #0077b5;    }    h1, h2 {        font-weight: 800;    }    h1, h1 code {        font-size: 2rem;    }    h2, h2 code {        font-size: 1.5rem;    }    h3, h3 code {        font-size: 1.25rem;    }    h4, h4 code {        font-size: 1.125rem;    }    h5, h5 code {        font-size: 1.1rem;    }    h1#features, h2#features {        color: #EDB44B;    }    h1#improvements, h2#improvements {        color: #515193;    }    h1#fixes, h2#fixes {        color: #E14283;    }</style><div><h2 id="features">Features</h2><ul><li><strong>XDR Brightness</strong>: go past the <code>500</code> nits limit of the new <em>2021 MacBook Pro</em> and <em>Pro Display XDR</em><ul><li>Warning: this is experimental. The system may become unresponsive for a few seconds when toggling this option</li><li>Animation glitches are expected when this is enabled</li></ul></li></ul><p><video autoplay loop muted width="828" height="526" src="https://files.lunar.fyi/xdr-quickaction.mp4" style="width: 828px; height: 526px"></video></p><ul><li><strong>Sub-zero dimming</strong>: dim brightness below 0%</li></ul><p><video autoplay loop muted width="828" height="526" src="https://files.lunar.fyi/subzero-quickaction.mp4" style="width: 828px; height: 526px"></video></p><ul><li><strong>QuickActions</strong> redesign:</li></ul><p><video autoplay loop muted width="784" height="843" src="https://files.lunar.fyi/new-quickactions.mp4" style="width: 784px; height: 843px"></video></p><ul><li><strong>Input Hotkeys</strong> redesign:</li></ul><p><img src="https://files.lunar.fyi/input-hotkeys-redesign.png" alt="Input hotkeys redesign"></p><ul><li>Add <strong>BlackOut without mirroring</strong> checkbox in the <a href="https://app.lunar.fyi/display/controls">Controls menu</a> of each display</li><li>Add <strong>BlackOut other displays</strong> action on holding <code>Option</code>+<code>Shift</code></li><li>Add <strong>Allow brightness to reach zero</strong> checkbox in the <a href="https://app.lunar.fyi/display/controls">Controls menu</a> for <em>built-in</em> displays<ul><li>By default this is disabled to avoid turning off the display by mistake</li></ul></li><li>Implement <strong>BlackOut for AirPlay/Sidecar/DisplayLink</strong> (it's just a pitch black overlay really, but that's the most I can do)</li></ul><p><img src="https://files.lunar.fyi/blackout-quickactions.png" alt="BlackOut in QuickActions"></p><h2 id="improvements">Improvements</h2><ul><li>Add <strong>Emergency Kill Switch</strong> for <strong>BlackOut</strong><ul><li><em>Press the &#8984; Command key more than 8 times in a row to force disable BlackOut</em></li></ul></li><li><em>F.lux</em> detection improvements<ul><li>Ensure Overlay gets activated</li><li>Add note about <a href="https://shifty.natethompson.io">Shifty</a> as an alternative</li><li>Update AppleScript for Monterey</li></ul></li><li>Allow Preferences window to be moved by its background</li><li>Add selector for switching between <em>System</em> and <em>Lunar</em> adaptive brightness</li><li>Disable overlay temporarily when taking a screenshot</li></ul><h2 id="fixes">Fixes</h2><ul><li><strong>Fix Gamma flashing</strong> bright from time to time</li><li><strong>Remove Software Dimming delay</strong> if it's the only control enabled</li><li>Fix displays having low brightness after wake/reconnection</li><li>Fix overflow crash in Clock Mode</li><li>Fix BlackOut being stuck when using it without mirroring</li><li>Fix contrast getting stuck to 0 when Lunar is restarted while BlackOut is on</li><li>Check for vendor ID on BetterDummy screens</li></ul><p><strong>Note</strong>: Starting from <code>v5.5.0</code> Lunar will require <code>macOS 11.0+</code></p></div></div>]]></description>
+        </item>
+        <item>
             <title>5.4.3</title>
             <pubDate>Mon, 07 Mar 2022 10:27:11 +0200</pubDate>
             <sparkle:version>5.4.3</sparkle:version>
             <sparkle:shortVersionString>5.4.3</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.3.dmg" length="16565683" type="application/octet-stream" sparkle:edSignature="9l//Gv2m7Nq7Ho5dGzZZkYUa+zAoKA7LHtRAebwqQCb7YpUyXtVI8K38TpPqcAmtwf5Z86bdTJed1WKM2gYXBg==" sparkle:dsaSignature="MEUCIEmSK9LQteHSb5tDs25R70fUxnF5S5e3SuMTNeQ6kfiVAiEAiE3n6chtuLlKwOG4Ht6+GunOffmQM53TKtxiM7TX2zc="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.3.dmg" length="16565683" type="application/octet-stream" sparkle:edSignature="9l//Gv2m7Nq7Ho5dGzZZkYUa+zAoKA7LHtRAebwqQCb7YpUyXtVI8K38TpPqcAmtwf5Z86bdTJed1WKM2gYXBg==" sparkle:dsaSignature="MEUCIC/c+TMwXxFUzoluTGaVaGdh3EBNk8QBTrK8brEgpXVYAiEAgS2pd8KpSsvCO4Vk/63aVpF1SYkKYSVPMzWpqmD/8r0="/>
             <sparkle:deltas>
-                <enclosure url="https://lunar.fyi/delta/5.4.3/5.4.2" sparkle:deltaFrom="5.4.2" length="1381958" type="application/octet-stream" sparkle:edSignature="8Pjy6H7EPCSvURC7dfJehvfLbkQoJt/K/TU7qtWKj3aZZ6cF2icwTVdwvtJl0xMIKu8Ozqb5oylGmBH5VasFAQ==" sparkle:dsaSignature="MEQCIAE/CL33hF1W0DSQvFv+lowCunSFuG+YgUIlZrVXPqn1AiAztAC4vw6zCHFw4p2pMfArM9lhvSpWYMR1dz4dn8yyBg=="/>
-                <enclosure url="https://lunar.fyi/delta/5.4.3/5.4.1" sparkle:deltaFrom="5.4.1" length="2562662" type="application/octet-stream" sparkle:edSignature="AWyEEwsratMYcGWdsTPOqgg/MCEdjXJI44wUW2McwhiHrjjoYrIxA7Ag74k1qSPgpdi06faJlJUgB3BiLW9FBA==" sparkle:dsaSignature="MEQCIEK2qU0yeVtpVTCFOsaeIh0toe2C4DWVYzwriPDoguIJAiAtGnhd2RDOKlzPn0MxizOX+E6tMiurqJ7ti6WJzvtMjQ=="/>
+                <enclosure url="https://lunar.fyi/delta/5.4.3/5.4.2" sparkle:deltaFrom="5.4.2" length="1381958" type="application/octet-stream" sparkle:edSignature="8Pjy6H7EPCSvURC7dfJehvfLbkQoJt/K/TU7qtWKj3aZZ6cF2icwTVdwvtJl0xMIKu8Ozqb5oylGmBH5VasFAQ==" sparkle:dsaSignature="MEUCICSmdJ7OI4ljSjoIIR/tIEuag90XUfzfNKyVv24rxVXvAiEAgYFo5lV4z0PAFuceS8mRLDU+leCkIVxPo7qg7ZewbdA="/>
+                <enclosure url="https://lunar.fyi/delta/5.4.3/5.4.1" sparkle:deltaFrom="5.4.1" length="2562662" type="application/octet-stream" sparkle:edSignature="AWyEEwsratMYcGWdsTPOqgg/MCEdjXJI44wUW2McwhiHrjjoYrIxA7Ag74k1qSPgpdi06faJlJUgB3BiLW9FBA==" sparkle:dsaSignature="MEYCIQCBwvzafEVGQMqpZqubvLcRBbtd+B03dZOLJ+LkjxdyQgIhAIvun1jkCQkw8NQgRqtA0E6X6lbzFaI/Dl7W9vzXlGN8"/>
             </sparkle:deltas>
             <signature>kGcprhOAeldFfu4vEu1hKFxzZDs=</signature>
             <signature>DSu6L1xy8moFP49c5MEhIhAAH48=</signature>
@@ -46,7 +64,7 @@
             <sparkle:version>5.4.2</sparkle:version>
             <sparkle:shortVersionString>5.4.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.2.dmg" length="16575155" type="application/octet-stream" sparkle:edSignature="7lJJ7eZSAtX+rTc5bHknR5vQtWDgOh5fmWvBrYDojrG/kusKWHnhBdeOdZJQ/QpR4Gd2wlWpFjvXBHDSGpaHCg==" sparkle:dsaSignature="MEQCIBiPQ2YRJ6abAU4USAk6+asSf7yGtRt+k3l57FJSWichAiA8dFsJ+9rJe26PojTPB+Q3aMeUZGUHS+2ds2+vP5T12w=="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.2.dmg" length="16575155" type="application/octet-stream" sparkle:edSignature="7lJJ7eZSAtX+rTc5bHknR5vQtWDgOh5fmWvBrYDojrG/kusKWHnhBdeOdZJQ/QpR4Gd2wlWpFjvXBHDSGpaHCg==" sparkle:dsaSignature="MEQCIDG04uBMT6tHFga3XAQ1NrUtasWB+7w9MSABs+yZoWQNAiB5QIYm2ugrY0tC/Q75BGuX8s1mgtasEZwf2VPooEEeOQ=="/>
             <sparkle:deltas>
                 <enclosure url="https://lunar.fyi/delta/5.4.2/5.4.1" sparkle:deltaFrom="5.4.1" length="2533922" type="application/octet-stream" sparkle:edSignature="ZxiLYZb8YExmOr6kXkfe7/X1aZgH1J39lbT2qkIFPqt7Pshy/KxThBsqZ9TxfOxTYKfiRZ0D0sTPIdoobtWgBw==" sparkle:dsaSignature="MEQCIEjQu3aiU2A87KUewYC3kze0QwRhazKOJg8LEofyVADhAiBCUFL5M9kf9kty341Pa8PgO0p/MnCfkbmh4l+az1WmtA=="/>
             </sparkle:deltas>
@@ -62,7 +80,7 @@
             <sparkle:version>5.4.1</sparkle:version>
             <sparkle:shortVersionString>5.4.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.1.dmg" length="16475388" type="application/octet-stream" sparkle:edSignature="tbcYwNBj34ka2n0RBqquBdka9iHTqb9d7au1LVRvm7mYk/Owsfw1B+8iLP4R4yfDc5KZ7zc3wdU5BYN8rMriBw==" sparkle:dsaSignature="MEQCIBQn8hfYTzYzr3ahVVRWjCHfJpmeimqnJekyj6JDlE3WAiBlQ6qEhUKnr7Ti4MOE5Q06n0vtvYeoRdoTNSLtuNC/Sw=="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.1.dmg" length="16475388" type="application/octet-stream" sparkle:edSignature="tbcYwNBj34ka2n0RBqquBdka9iHTqb9d7au1LVRvm7mYk/Owsfw1B+8iLP4R4yfDc5KZ7zc3wdU5BYN8rMriBw==" sparkle:dsaSignature="MEQCICKBYEBRuBjYhfLkO/czJPmoAOTpxeNKggPI6S0L8sgvAiADbruLKo10XmnWqJuQKAjHty3vZbyd2fFfs7S7m20MCw=="/>
             <signature>pIF2KBKZjiq.6A0U9PVx8SYcSmo=</signature>
             <signature>pIF2KBKZjiq/6A0U9PVx8SYcSmo=</signature>
             <signature>tE3C3N1sDPEhZSHroaQKxeDbwKs=</signature>
@@ -1633,6 +1651,11 @@
             <signature>nm4XQtVRdtuNozTVnQ32ifdz95o=</signature>
             <signature>DMM4VfGpr+zLuMnYOrThpqvMFqk=</signature>
             <signature>0GqSkWhlbywbgmycqC4J9wWFRcs=</signature>
+            <signature>LCIi.n+AGSuP2pv+nxT.v4xaOKQ=</signature>
+            <signature>LCIi/n+AGSuP2pv+nxT/v4xaOKQ=</signature>
+            <signature>3Y5LiiVSYg157p7Hxtj9xzrow5E=</signature>
+            <signature>P7xeKEI2oQzaX5lLnOfDb95yo0w=</signature>
+            <signature>ClmsIWeTcisgVhtpFzQ8Dz4bVhU=</signature>
         </item>
     </channel>
 </rss>
