@@ -8,12 +8,12 @@
 
 import Cocoa
 
-let mauve = #colorLiteral(red: 0.1921568627, green: 0.1647058824, blue: 0.2980392157, alpha: 1)
-let darkMauve = #colorLiteral(red: 0.1529411765, green: 0.1411764706, blue: 0.1921568627, alpha: 1)
-let blackMauve = #colorLiteral(red: 0.09627126322, green: 0.08964298843, blue: 0.1218377976, alpha: 1)
-let violet = #colorLiteral(red: 0.2431372553, green: 0.2431372553, blue: 0.4392156899, alpha: 1)
+let mauve = #colorLiteral(red: 0.2391158383, green: 0.189759237, blue: 0.2980392157, alpha: 1)
+let darkMauve = #colorLiteral(red: 0.1636947905, green: 0.1439115233, blue: 0.1629818798, alpha: 1)
+let blackMauve = #colorLiteral(red: 0.09052981044, green: 0.08183357279, blue: 0.0944940476, alpha: 1)
+let violet = #colorLiteral(red: 0.2888328322, green: 0.2888328322, blue: 0.3392857143, alpha: 1)
 let lunarYellow = #colorLiteral(red: 1, green: 0.8352941176, blue: 0.5254901961, alpha: 1)
-let sunYellow = #colorLiteral(red: 0.9921568627, green: 0.7921568627, blue: 0.2274509804, alpha: 1)
+let sunYellow = #colorLiteral(red: 0.9921568627, green: 0.7114243614, blue: 0.2274509804, alpha: 1)
 let orange = #colorLiteral(red: 1, green: 0.6532859206, blue: 0.4175746441, alpha: 1)
 let peach = #colorLiteral(red: 1, green: 0.7843137255, blue: 0.5843137255, alpha: 1)
 let green = #colorLiteral(red: 0.3294117647, green: 0.8274509804, blue: 0.5058823529, alpha: 1)
@@ -69,6 +69,8 @@ let scrollableCaptionColorOnBlack = white
 
 var scrollableViewLabelColor: NSColor { darkMode ? white.withAlphaComponent(0.9) : mauve.withAlphaComponent(0.35) }
 
+var popoverBackgroundColor: NSColor { darkMode ? blackMauve.withAlphaComponent(0.8) : white.withAlphaComponent(0.85) }
+
 // MARK: - ButtonColor
 
 enum ButtonColor: Int {
@@ -87,10 +89,10 @@ var lockButtonLabelOn: NSColor { darkMode ? white : white }
 var lockButtonBgOff: NSColor { darkMode ? lunarYellow.withAlphaComponent(0.4) : gray.withAlphaComponent(0.8) }
 var lockButtonLabelOff: NSColor { darkMode ? white.withAlphaComponent(0.75) : mauve.withAlphaComponent(0.45) }
 
-var enableButtonBgOn: NSColor { darkMode ? sunYellow.withAlphaComponent(0.8) : lunarYellow }
-var enableButtonLabelOn: NSColor { darkMode ? darkMauve : darkMauve.withAlphaComponent(0.8) }
-var enableButtonBgOff: NSColor { darkMode ? lunarYellow.withAlphaComponent(0.4) : gray }
-var enableButtonLabelOff: NSColor { darkMode ? white.withAlphaComponent(0.5) : mauve.withAlphaComponent(0.45) }
+var enableButtonBgOn: NSColor { darkMode ? red.withAlphaComponent(0.8) : dullRed }
+var enableButtonLabelOn: NSColor { darkMode ? white : white }
+var enableButtonBgOff: NSColor { darkMode ? violet : violet }
+var enableButtonLabelOff: NSColor { darkMode ? gray : gray }
 
 let hotkeyColorDarkMode: [HoverState: [String: NSColor]] = [
     .hover: [
@@ -100,7 +102,7 @@ let hotkeyColorDarkMode: [HoverState: [String: NSColor]] = [
         "tintRecording": red.highlight(withLevel: 0.4) ?? red,
     ],
     .noHover: [
-        "background": white.withAlphaComponent(0.3),
+        "background": white.withAlphaComponent(0.15),
         "tint": lunarYellow.withAlphaComponent(0.9),
         "tintDisabled": white.withAlphaComponent(0.4),
         "tintRecording": red.highlight(withLevel: 0.4) ?? red,
@@ -108,13 +110,13 @@ let hotkeyColorDarkMode: [HoverState: [String: NSColor]] = [
 ]
 let hotkeyColorLightMode: [HoverState: [String: NSColor]] = [
     .hover: [
-        "background": orange.withAlphaComponent(0.4),
+        "background": white,
         "tint": blackMauve,
         "tintDisabled": darkMauve.withAlphaComponent(0.25),
         "tintRecording": red,
     ],
     .noHover: [
-        "background": orange.withAlphaComponent(0.2),
+        "background": white.withAlphaComponent(0.95),
         "tint": blackMauve,
         "tintDisabled": darkMauve.withAlphaComponent(0.25),
         "tintRecording": red,

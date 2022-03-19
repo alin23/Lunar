@@ -312,7 +312,7 @@ struct Lunar: ParsableCommand {
             abstract: "Prints code signature of the app."
         )
 
-        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
         @Flag(help: "If the output should be printed as hex.")
         var hex = false
@@ -333,7 +333,7 @@ struct Lunar: ParsableCommand {
             abstract: "Prints if lid is closed or opened."
         )
 
-        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
         func run() throws {
             Lunar.configureLogging(options: globals)
@@ -352,7 +352,7 @@ struct Lunar: ParsableCommand {
             abstract: "Prints ambient light in lux (or -1 if the sensor can't be read)."
         )
 
-        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
         func run() throws {
             Lunar.configureLogging(options: globals)
@@ -400,7 +400,7 @@ struct Lunar: ParsableCommand {
             abstract: "Use CoreDisplay methods on monitors."
         )
 
-        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
         @Argument(help: "Method to call. One of (\(AppleNativeMethod.allCases.map(\.rawValue).joined(separator: ", ")))")
         var method: AppleNativeMethod
@@ -487,7 +487,7 @@ struct Lunar: ParsableCommand {
             abstract: "Use DisplayServices methods on monitors."
         )
 
-        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
         @Argument(help: "Method to call. One of (\(DisplayServicesMethod.allCases.map(\.rawValue).joined(separator: ", ")))")
         var method: DisplayServicesMethod
@@ -623,7 +623,7 @@ struct Lunar: ParsableCommand {
         static let controlStrings = ControlID.allCases.map { String(describing: $0) }.chunks(ofCount: 2)
         static let longestString = (controlStrings.compactMap(\.first).max(by: { $0.count <= $1.count })?.count ?? 1) + 2
 
-        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
         @Argument(
             help: "Display serial or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
@@ -701,7 +701,7 @@ struct Lunar: ParsableCommand {
             abstract: "Prints information about Lunar hotkeys."
         )
 
-        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
         @Flag(name: .shortAndLong, help: "Print response as JSON.")
         var json = false
@@ -734,7 +734,7 @@ struct Lunar: ParsableCommand {
             abstract: "Prints information about the built-in display (if it exists)."
         )
 
-        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
         @Flag(name: .shortAndLong, help: "Print raw values returned by the system.")
         var raw = false
@@ -803,7 +803,7 @@ struct Lunar: ParsableCommand {
             abstract: "Generates UUID for a display ID."
         )
 
-        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
         @Flag(name: .shortAndLong, help: "Fall back to EDID if UUID is not possible to generate")
         var fallback = false
@@ -838,7 +838,7 @@ struct Lunar: ParsableCommand {
             abstract: "Applies Lunar presets."
         )
 
-        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
         @Argument(help: "Number between 0 and 100")
         var preset: Int8
@@ -878,7 +878,7 @@ struct Lunar: ParsableCommand {
             abstract: "Configures Lunar mode."
         )
 
-        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
         @Argument(help: "Adaptive mode. One of (manual, clock, location, sync, sensor, auto)")
         var mode: AdaptiveModeKey
@@ -905,7 +905,7 @@ struct Lunar: ParsableCommand {
             """
         )
 
-        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
         @Flag(name: .shortAndLong, help: "Format output as JSON")
         var json = false
@@ -1023,7 +1023,7 @@ struct Lunar: ParsableCommand {
             abstract: "Gets a property from the first active display."
         )
 
-        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
         @Flag(
             name: .shortAndLong,
@@ -1066,7 +1066,7 @@ struct Lunar: ParsableCommand {
             abstract: "Sets a property to a specific value for the first active display."
         )
 
-        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
         @Flag(
             name: .shortAndLong,
@@ -1127,7 +1127,7 @@ struct Lunar: ParsableCommand {
             abstract: "Sets gamma values. The values can only be persisted while the program is running."
         )
 
-        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
         @Option(
             name: .shortAndLong,
@@ -1287,7 +1287,7 @@ struct Lunar: ParsableCommand {
             discussion: "\("EXAMPLE".bold()): \("lunar blackout builtin enable".yellow().bold())"
         )
 
-        @OptionGroup(_hiddenFromHelp: true) var globals: GlobalOptions
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
         @Flag(name: .long, help: "BlackOut without mirroring the screen contents.")
         var noMirror = false

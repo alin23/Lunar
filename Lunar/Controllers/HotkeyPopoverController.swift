@@ -11,6 +11,18 @@ import Defaults
 import Foundation
 import Magnet
 
+// MARK: - NoFrameView
+
+class NoFrameView: NSView {
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        removePopoverBackground(view: self)
+        fixPopoverView(self, backgroundColor: popoverBackgroundColor)
+    }
+}
+
+// MARK: - HotkeyPopoverController
+
 class HotkeyPopoverController: NSViewController {
     // MARK: Lifecycle
 
@@ -27,29 +39,14 @@ class HotkeyPopoverController: NSViewController {
 
     // MARK: Internal
 
-    @IBOutlet var hotkeyLabel1: NSBox!
     @IBOutlet var hotkeyView1: HotkeyView!
     @IBOutlet var dropdown1: NSPopUpButton!
-    @IBOutlet var scrollableBrightnessField1: ScrollableTextField!
-    @IBOutlet var scrollableContrastField1: ScrollableTextField!
-    @IBOutlet var scrollableBrightnessCaption1: ScrollableTextFieldCaption!
-    @IBOutlet var scrollableContrastCaption1: ScrollableTextFieldCaption!
 
-    @IBOutlet var hotkeyLabel2: NSBox!
     @IBOutlet var hotkeyView2: HotkeyView!
     @IBOutlet var dropdown2: NSPopUpButton!
-    @IBOutlet var scrollableBrightnessField2: ScrollableTextField!
-    @IBOutlet var scrollableContrastField2: ScrollableTextField!
-    @IBOutlet var scrollableBrightnessCaption2: ScrollableTextFieldCaption!
-    @IBOutlet var scrollableContrastCaption2: ScrollableTextFieldCaption!
 
-    @IBOutlet var hotkeyLabel3: NSBox!
     @IBOutlet var hotkeyView3: HotkeyView!
     @IBOutlet var dropdown3: NSPopUpButton!
-    @IBOutlet var scrollableBrightnessField3: ScrollableTextField!
-    @IBOutlet var scrollableContrastField3: ScrollableTextField!
-    @IBOutlet var scrollableBrightnessCaption3: ScrollableTextFieldCaption!
-    @IBOutlet var scrollableContrastCaption3: ScrollableTextFieldCaption!
 
     @IBOutlet var backingView: NSView!
 
@@ -62,98 +59,62 @@ class HotkeyPopoverController: NSViewController {
     var hotkey3: PersistentHotkey?
 
     @objc func handler1() {
-        // #if DEBUG
-        //     log.verbose("TRYING CHANGE TO INPUT 1 ON DISPLAY \(display)")
-        // #endif
-        guard let display = display, display.hotkeyInput1.uint16Value != InputSource.unknown.rawValue else { return }
-
-        let inputBrightness = display.brightnessOnInputChange1
-        let inputContrast = display.contrastOnInputChange1
-
-        // #if DEBUG
-        //     log.verbose("CHANGING TO INPUT 1 ON DISPLAY \(display)")
-        //     return
-        // #endif
-
-        display.withoutSmoothTransition {
-            if display.applyBrightnessOnInputChange1 {
-                display.withoutDDC {
-                    display.brightness = inputBrightness
-                    display.contrast = inputContrast
-                }
-
-                _ = display.control?.setBrightness(display.limitedBrightness, oldValue: nil, onChange: nil)
-                _ = display.control?.setContrast(display.limitedContrast, oldValue: nil, onChange: nil)
-                mainAsyncAfter(ms: 1000) {
-                    display.input = display.hotkeyInput1
-                }
-                return
-            }
-            display.input = display.hotkeyInput1
-        }
+        guard let display = display else { return }
+        switchInput(
+            to: display.hotkeyInput1,
+            brightness: display.brightnessOnInputChange1,
+            contrast: display.contrastOnInputChange1,
+            applyBrightnessContrast: display.applyBrightnessOnInputChange1
+        )
     }
 
     @objc func handler2() {
-        // #if DEBUG
-        //     log.verbose("TRYING CHANGE TO INPUT 2 ON DISPLAY \(display)")
-        // #endif
-        guard let display = display, display.hotkeyInput2.uint16Value != InputSource.unknown.rawValue else { return }
-
-        let inputBrightness = display.brightnessOnInputChange2
-        let inputContrast = display.contrastOnInputChange2
-
-        // #if DEBUG
-        //     log.verbose("CHANGING TO INPUT 2 ON DISPLAY \(display)")
-        //     return
-        // #endif
-
-        display.withoutSmoothTransition {
-            if display.applyBrightnessOnInputChange2 {
-                display.withoutDDC {
-                    display.brightness = inputBrightness
-                    display.contrast = inputContrast
-                }
-
-                _ = display.control?.setBrightness(display.limitedBrightness, oldValue: nil, onChange: nil)
-                _ = display.control?.setContrast(display.limitedContrast, oldValue: nil, onChange: nil)
-                mainAsyncAfter(ms: 1000) {
-                    display.input = display.hotkeyInput2
-                }
-                return
-            }
-            display.input = display.hotkeyInput2
-        }
+        guard let display = display else { return }
+        switchInput(
+            to: display.hotkeyInput2,
+            brightness: display.brightnessOnInputChange2,
+            contrast: display.contrastOnInputChange2,
+            applyBrightnessContrast: display.applyBrightnessOnInputChange2
+        )
     }
 
     @objc func handler3() {
+        guard let display = display else { return }
+        switchInput(
+            to: display.hotkeyInput3,
+            brightness: display.brightnessOnInputChange3,
+            contrast: display.contrastOnInputChange3,
+            applyBrightnessContrast: display.applyBrightnessOnInputChange3
+        )
+    }
+
+    func switchInput(to input: NSNumber, brightness: Double, contrast: Double, applyBrightnessContrast: Bool) {
         // #if DEBUG
-        //     log.verbose("TRYING CHANGE TO INPUT 3 ON DISPLAY \(display)")
+        //     log.verbose("TRYING CHANGE TO INPUT \(input) ON DISPLAY \(display)")
         // #endif
-        guard let display = display, display.hotkeyInput3.uint16Value != InputSource.unknown.rawValue else { return }
-
-        let inputBrightness = display.brightnessOnInputChange3
-        let inputContrast = display.contrastOnInputChange3
+        guard let display = display, input.uint16Value != InputSource.unknown.rawValue else { return }
 
         // #if DEBUG
-        //     log.verbose("CHANGING TO INPUT 3 ON DISPLAY \(display)")
+        //     log.verbose("CHANGING TO INPUT \(input) ON DISPLAY \(display)")
         //     return
         // #endif
 
         display.withoutSmoothTransition {
-            if display.applyBrightnessOnInputChange3 {
+            if applyBrightnessContrast {
+                display.adaptivePaused = true
                 display.withoutDDC {
-                    display.brightness = inputBrightness
-                    display.contrast = inputContrast
+                    display.brightness = brightness.ns
+                    display.contrast = contrast.ns
                 }
 
                 _ = display.control?.setBrightness(display.limitedBrightness, oldValue: nil, onChange: nil)
                 _ = display.control?.setContrast(display.limitedContrast, oldValue: nil, onChange: nil)
                 mainAsyncAfter(ms: 1000) {
-                    display.input = display.hotkeyInput3
+                    display.input = input
                 }
                 return
             }
-            display.input = display.hotkeyInput3
+            display.input = input
         }
     }
 
@@ -164,50 +125,6 @@ class HotkeyPopoverController: NSViewController {
 
         mainThread {
             self.display = display
-            // dropdown1.page = .quickMenu
-            // dropdown2.page = .quickMenu
-            // dropdown3.page = .quickMenu
-
-            // dropdown1.fade()
-            // dropdown2.fade()
-            // dropdown3.fade()
-
-            scrollableBrightnessField1?.integerValue = display.brightnessOnInputChange1.intValue
-            scrollableContrastField1?.integerValue = display.contrastOnInputChange1.intValue
-            scrollableBrightnessField1?.onValueChanged = { [weak self] value in
-                guard let self = self else { return }
-                self.display?.brightnessOnInputChange1 = value.ns
-            }
-            scrollableContrastField1?.onValueChanged = { [weak self] value in
-                guard let self = self else { return }
-                self.display?.contrastOnInputChange1 = value.ns
-            }
-
-            scrollableBrightnessField2?.integerValue = display.brightnessOnInputChange2.intValue
-            scrollableContrastField2?.integerValue = display.contrastOnInputChange2.intValue
-            scrollableBrightnessField2?.onValueChanged = { [weak self] value in
-                guard let self = self else { return }
-                self.display?.brightnessOnInputChange2 = value.ns
-            }
-            scrollableContrastField2?.onValueChanged = { [weak self] value in
-                guard let self = self else { return }
-                self.display?.contrastOnInputChange2 = value.ns
-            }
-
-            scrollableBrightnessField3?.integerValue = display.brightnessOnInputChange3.intValue
-            scrollableContrastField3?.integerValue = display.contrastOnInputChange3.intValue
-            scrollableBrightnessField3?.onValueChanged = { [weak self] value in
-                guard let self = self else { return }
-                self.display?.brightnessOnInputChange3 = value.ns
-            }
-            scrollableContrastField3?.onValueChanged = { [weak self] value in
-                guard let self = self else { return }
-                self.display?.contrastOnInputChange3 = value.ns
-            }
-
-            hotkeyLabel1?.title = "Input Hotkey 1 for \(display.name)"
-            hotkeyLabel2?.title = "Input Hotkey 2 for \(display.name)"
-            hotkeyLabel3?.title = "Input Hotkey 3 for \(display.name)"
         }
 
         let identifier1 = display.hotkeyIdentifiers[0]
@@ -218,7 +135,7 @@ class HotkeyPopoverController: NSViewController {
             PersistentHotkey(
                 hotkey: Magnet.HotKey(
                     identifier: identifier1,
-                    keyCombo: KeyCombo(key: .zero, cocoaModifiers: [.control, .option])!,
+                    keyCombo: KeyCombo(key: .one, cocoaModifiers: [.control, .option])!,
                     target: self,
                     action: #selector(HotkeyPopoverController.handler1),
                     actionQueue: .main
@@ -241,7 +158,7 @@ class HotkeyPopoverController: NSViewController {
             PersistentHotkey(
                 hotkey: Magnet.HotKey(
                     identifier: identifier2,
-                    keyCombo: KeyCombo(key: .zero, cocoaModifiers: [.control, .option])!,
+                    keyCombo: KeyCombo(key: .two, cocoaModifiers: [.control, .option])!,
                     target: self,
                     action: #selector(HotkeyPopoverController.handler2),
                     actionQueue: .main
@@ -264,7 +181,7 @@ class HotkeyPopoverController: NSViewController {
             PersistentHotkey(
                 hotkey: Magnet.HotKey(
                     identifier: identifier3,
-                    keyCombo: KeyCombo(key: .zero, cocoaModifiers: [.control, .option])!,
+                    keyCombo: KeyCombo(key: .three, cocoaModifiers: [.control, .option])!,
                     target: self,
                     action: #selector(HotkeyPopoverController.handler3),
                     actionQueue: .main
@@ -282,46 +199,6 @@ class HotkeyPopoverController: NSViewController {
 
     override func viewDidLoad() {
         backingView.radius = 8.ns
-
-        scrollableBrightnessField1.caption = scrollableBrightnessCaption1
-        scrollableContrastField1.caption = scrollableContrastCaption1
-
-        scrollableBrightnessField2.caption = scrollableBrightnessCaption2
-        scrollableContrastField2.caption = scrollableContrastCaption2
-
-        scrollableBrightnessField3.caption = scrollableBrightnessCaption3
-        scrollableContrastField3.caption = scrollableContrastCaption3
-
-        scrollableBrightnessField1.onValueChanged = { [weak self] in self?.display?.brightnessOnInputChange1 = $0.ns }
-        scrollableContrastField1.onValueChanged = { [weak self] in self?.display?.contrastOnInputChange1 = $0.ns }
-
-        scrollableBrightnessField2.onValueChanged = { [weak self] in self?.display?.brightnessOnInputChange2 = $0.ns }
-        scrollableContrastField2.onValueChanged = { [weak self] in self?.display?.contrastOnInputChange2 = $0.ns }
-
-        scrollableBrightnessField3.onValueChanged = { [weak self] in self?.display?.brightnessOnInputChange3 = $0.ns }
-        scrollableContrastField3.onValueChanged = { [weak self] in self?.display?.contrastOnInputChange3 = $0.ns }
-
-        if let display = display {
-            scrollableBrightnessField1.integerValue = display.brightnessOnInputChange1.intValue
-            scrollableContrastField1.integerValue = display.contrastOnInputChange1.intValue
-
-            scrollableBrightnessField2.integerValue = display.brightnessOnInputChange2.intValue
-            scrollableContrastField2.integerValue = display.contrastOnInputChange2.intValue
-
-            scrollableBrightnessField3.integerValue = display.brightnessOnInputChange3.intValue
-            scrollableContrastField3.integerValue = display.contrastOnInputChange3.intValue
-        }
-
-        for field in [
-            scrollableBrightnessField1, scrollableContrastField1,
-            scrollableBrightnessField2, scrollableContrastField2,
-            scrollableBrightnessField3, scrollableContrastField3,
-        ] {
-            field!.textFieldColor = scrollableTextFieldColor
-            field!.textFieldColorHover = scrollableTextFieldColorHover
-            field!.textFieldColorLight = scrollableTextFieldColorLight
-            field!.caption!.textColor = scrollableTextFieldCaptionColor
-        }
 
         if let display = display {
             setup(from: display)

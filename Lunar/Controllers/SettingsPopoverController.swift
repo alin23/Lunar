@@ -138,8 +138,10 @@ class SettingsButton: PopoverButton<SettingsPopoverController> {
     }
 
     override func mouseDown(with event: NSEvent) {
-        popoverController?.display = display
-        popoverController?.displayViewController = displayViewController
+        if let popoverController = popoverController {
+            popoverController.display = display
+            popoverController.displayViewController = displayViewController
+        }
         super.mouseDown(with: event)
     }
 }

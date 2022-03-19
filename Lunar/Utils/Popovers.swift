@@ -10,9 +10,9 @@ import Cocoa
 import Foundation
 
 var menuPopover: NSPopover?
+var INPUT_HOTKEY_POPOVERS: [String: NSPopover?] = [:]
 var POPOVERS: [String: NSPopover?] = [
     "help": nil,
-    "hotkey": nil,
     "settings": nil,
     "colors": nil,
     "ddc": nil,
