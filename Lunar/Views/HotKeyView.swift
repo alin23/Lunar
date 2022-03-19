@@ -139,7 +139,7 @@ class HotkeyView: RecordView, RecordViewDelegate {
 
         if let alternates = alternateHotkeysMapping[hotkey.identifier] {
             for (flags, altIdentifier) in alternates {
-                guard !NSEvent.ModifierFlags(carbonModifiers: keyCombo.modifiers).contains(flags) else {
+                guard NSEvent.ModifierFlags(carbonModifiers: keyCombo.modifiers).intersection(flags).isEmpty else {
                     guard let altHotkey = CachedDefaults[.hotkeys].first(where: { $0.identifier == altIdentifier }),
                           let altID = altIdentifier.hk
                     else { continue }

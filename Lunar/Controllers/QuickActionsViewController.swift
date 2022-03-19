@@ -97,6 +97,7 @@ struct DisplayRowView: View {
     var sdrXdrSelector: some View {
         HStack {
             SwiftUI.Button("SDR") {
+                guard display.enhanced else { return }
                 withAnimation(.fastSpring) { display.enhanced = false }
             }
             .buttonStyle(PickerButton(
@@ -106,6 +107,7 @@ struct DisplayRowView: View {
             .help("Standard Dynamic Range disables XDR and allows the system to limit the brightness to 500nits.")
 
             SwiftUI.Button("XDR") {
+                guard !display.enhanced else { return }
                 withAnimation(.fastSpring) { display.enhanced = true }
             }
             .buttonStyle(PickerButton(
@@ -291,6 +293,8 @@ struct QuickActionsLayoutView: View {
 struct BlackoutPopoverRowView: View {
     @State var modifiers: [String] = []
     @State var action: String
+    @State var hotkeyText = ""
+    @State var actionInfo = ""
 
     var body: some View {
         HStack {
@@ -300,15 +304,35 @@ struct BlackoutPopoverRowView: View {
                 .background(
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
                         .fill(Color.white.opacity(0.1))
-                )
-                .frame(width: 200, alignment: .leading)
-            Text(action).font(.system(size: 13, weight: .medium))
-                .foregroundColor(.white.opacity(0.9))
-                .padding(10)
-                .background(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(Color.white.opacity(0.1))
-                )
+                ).frame(width: 200, alignment: .leading)
+            HStack {
+                if !hotkeyText.isEmpty {
+                    Text("or").font(.system(size: 12, weight: .semibold)).foregroundColor(.white.opacity(0.5))
+                    Text(hotkeyText).font(.system(size: 13, weight: .medium, design: .monospaced))
+                        .foregroundColor(.white.opacity(0.9))
+                        .kerning(3)
+                        .padding(10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .fill(Color.white.opacity(0.1))
+                        )
+                }
+            }.frame(width: 100, alignment: .leading)
+            HStack {
+                Text(action)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.white.opacity(0.9))
+                if !actionInfo.isEmpty {
+                    Text(actionInfo)
+                        .font(.system(size: 12, weight: .medium, design: .monospaced))
+                        .foregroundColor(.white.opacity(0.7))
+                }
+            }
+            .padding(10)
+            .background(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(Color.white.opacity(0.1))
+            )
         }
     }
 }
@@ -342,27 +366,65 @@ struct BlackoutPopoverHeaderView: View {
 
 struct BlackoutPopoverView: View {
     @State var hasDDC: Bool
+    @Default(.hotkeys) var hotkeys
 
     var body: some View {
         ZStack {
             Color.black.brightness(0.02).scaleEffect(1.5)
             VStack(alignment: .leading, spacing: 10) {
                 BlackoutPopoverHeaderView().padding(.bottom)
-                BlackoutPopoverRowView(action: "Soft power off (with mirroring)")
-                BlackoutPopoverRowView(modifiers: ["Shift"], action: "Soft power off (without mirroring)")
-                BlackoutPopoverRowView(modifiers: ["Option", "Shift"], action: "Soft power off other displays (without mirroring)")
+                BlackoutPopoverRowView(action: "Soft power off", hotkeyText: hotkeyText(id: .blackOut), actionInfo: "(with mirroring)")
+                BlackoutPopoverRowView(
+                    modifiers: ["Shift"],
+                    action: "Soft power off",
+                    hotkeyText: hotkeyText(id: .blackOutNoMirroring),
+                    actionInfo: "(without mirroring)"
+                )
+                BlackoutPopoverRowView(
+                    modifiers: ["Option", "Shift"],
+                    action: "Soft power off other displays",
+                    hotkeyText: hotkeyText(id: .blackOutOthers),
+                    actionInfo: "(without mirroring)"
+                )
 
                 if hasDDC {
-                    BlackoutPopoverRowView(modifiers: ["Option"], action: "Hardware power off (DDC)")
-                        .colorMultiply(Colors.red)
+                    BlackoutPopoverRowView(
+                        modifiers: ["Option"],
+                        action: "Hardware power off",
+                        hotkeyText: hotkeyText(id: .blackOutPowerOff),
+                        actionInfo: "(uses DDC)"
+                    )
+                    .colorMultiply(Colors.red)
                 }
                 Divider().background(Color.white.opacity(0.2))
                 BlackoutPopoverRowView(modifiers: ["Control"], action: "Show this help menu")
                     .colorMultiply(Colors.peach)
+
+                HStack(spacing: 7) {
+                    Text("Press")
+                    Text("⌘ Command")
+                        .padding(.vertical, 3)
+                        .padding(.horizontal, 5)
+                        .background(RoundedRectangle(cornerRadius: 3, style: .continuous).fill(Color.white))
+                        .foregroundColor(.black)
+                    Text("more than 8 times in a row to force turn on all displays and reset BlackOut")
+                }
+                .font(.system(size: 13, weight: .medium))
+                .foregroundColor(.white.opacity(0.6))
+                .padding(.vertical, 6)
+                .padding(.horizontal, 12)
+                .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.white.opacity(0.1)))
+                .colorMultiply(Colors.peach)
+                .padding(.top)
             }
             .padding()
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        }
+        }.preferredColorScheme(.light)
+    }
+
+    func hotkeyText(id: HotkeyIdentifier) -> String {
+        guard let h = hotkeys.first(where: { $0.identifier == id.rawValue }), h.isEnabled else { return "" }
+        return h.keyCombo.keyEquivalentModifierMaskString + h.keyCombo.keyEquivalent
     }
 }
 
@@ -507,7 +569,7 @@ struct QuickActionsMenuView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                     .padding(.horizontal, 24)
                     .padding(.bottom, 20)
-                    .shadow(color: Colors.blackMauve.opacity(0.2), radius: 8, x: 0, y: 6)
+                    .shadow(color: Colors.blackMauve.opacity(colorScheme == .dark ? 0.5 : 0.2), radius: 8, x: 0, y: 6)
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
                     .fill(colorScheme == .dark ? Colors.blackMauve.opacity(0.4) : Color.white.opacity(0.6))
                     .padding(.horizontal, 24)
