@@ -1,19 +1,19 @@
-# 5.5.0
+# 5.5.1
 ## Features
 
 * **XDR Brightness**: go past the `500` nits limit of the new *2021 MacBook Pro* and *Pro Display XDR*
     * Warning: this is experimental. The system may become unresponsive for a few seconds when toggling this option
     * Animation glitches are expected when this is enabled
 
-<video autoplay loop muted width="828" height="526" src="https://files.lunar.fyi/xdr-quickaction.mp4" style="width: 828px; height: 526px"/>
+<video autoplay loop muted width="414" height="263" src="https://files.lunar.fyi/xdr-quickaction.mp4" style="width: 414px; height: 263px"/>
 
 * **Sub-zero dimming**: dim brightness below 0%
 
-<video autoplay loop muted width="828" height="526" src="https://files.lunar.fyi/subzero-quickaction.mp4" style="width: 828px; height: 526px"/>
+<video autoplay loop muted width="414" height="263" src="https://files.lunar.fyi/subzero-quickaction.mp4" style="width: 414px; height: 263px"/>
 
 * **QuickActions** redesign:
 
-<video autoplay loop muted width="784" height="843" src="https://files.lunar.fyi/new-quickactions.mp4" style="width: 784px; height: 843px"/>
+<video autoplay loop muted width="392" height="421" src="https://files.lunar.fyi/new-quickactions.mp4" style="width: 392px; height: 421px"/>
 
 * **Input Hotkeys** redesign:
 
