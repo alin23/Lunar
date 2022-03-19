@@ -831,8 +831,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    func updateInfoMenuItem() {
-        if CachedDefaults[.showBrightnessMenuBar],
+    func updateInfoMenuItem(showBrightnessMenuBar: Bool? = nil) {
+        if showBrightnessMenuBar ?? CachedDefaults[.showBrightnessMenuBar],
            let display = CachedDefaults[.showOnlyExternalBrightnessMenuBar] ?
            displayController.mainExternalDisplay :
            displayController.cursorDisplay
@@ -841,6 +841,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             paragraphStyle.lineHeightMultiple = 0.6
             statusItem.button?.attributedTitle = " B: \(display.brightness.uint16Value)\n C: \(display.contrast.uint16Value)"
                 .withFont(.systemFont(ofSize: 10, weight: .medium)).withBaselineOffset(-5).withParagraphStyle(paragraphStyle)
+        } else {
+            statusItem.button?.attributedTitle = "".attributedString
         }
         infoMenuItem.attributedTitle = markdown.attributedString(from: "\(externalLux)\(internalLux)\(sun)".trimmed)
             .withFont(.systemFont(ofSize: 12, weight: .semibold))
@@ -1380,16 +1382,22 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .receive(on: RunLoop.main)
             .sink { _ in appDelegate!.updateInfoMenuItem() }
             .store(in: &observers)
-        showBrightnessMenuBarPublisher.sink { [self] change in
-            mainAsync {
+        showBrightnessMenuBarPublisher
+            .merge(with: showOnlyExternalBrightnessMenuBarPublisher)
+            .debounce(for: .milliseconds(100), scheduler: RunLoop.main)
+            .sink { [self] change in
                 if change.newValue {
                     self.statusItem.button?.imagePosition = .imageLeading
-                    self.updateInfoMenuItem()
                 } else {
                     self.statusItem.button?.imagePosition = .imageOnly
                 }
-            }
-        }.store(in: &observers)
+                self.updateInfoMenuItem(showBrightnessMenuBar: change.newValue)
+                self.statusItemButtonController?.closePopover()
+                mainAsync {
+                    self.statusItemButtonController?.showPopover()
+                }
+
+            }.store(in: &observers)
     }
 
     func setKeyEquivalent(_ hotkeyIdentifier: HotkeyIdentifier) {

@@ -14,13 +14,6 @@ class StatusItemButtonController: NSView, NSPopoverDelegate {
     var statusButton: NSStatusBarButton?
     var backgroundView: PopoverBackgroundView?
 
-    func popoverWillShow(_ notification: Notification) {
-//        if let menuPopover = menuPopover, let view = menuPopover.contentViewController?.view {
-//            removePopoverBackground(view: view, backgroundView: &backgroundView)
-//            fixPopoverView(view)
-//        }
-    }
-
     func popoverDidClose(_: Notification) {
         if let window = menuPopover?.contentViewController?.view.window {
             window.identifier = nil
@@ -31,17 +24,30 @@ class StatusItemButtonController: NSView, NSPopoverDelegate {
         positioningView?.removeFromSuperview()
     }
 
-    override func rightMouseDown(with event: NSEvent) {
+    override func rightMouseDown(with _: NSEvent) {
         guard let button = statusButton else { return }
         appDelegate!.menu.popUp(positioning: nil, at: NSPoint(x: 0, y: button.frame.height + 8), in: button)
     }
 
-    override func mouseDown(with event: NSEvent) {
+    func togglePopover() {
         if let menuPopover = menuPopover, menuPopover.isShown {
-            menuPopover.close()
+            closePopover()
+        } else {
+            showPopover()
+        }
+    }
+
+    func closePopover() {
+        guard let menuPopover = menuPopover, menuPopover.isShown else {
             return
         }
+        menuPopover.close()
+    }
+
+    func showPopover() {
         let menuPopover = appDelegate!.initMenuPopover()
+
+        guard !menuPopover.isShown else { return }
 
         guard let button = statusButton, menuPopover.contentViewController != nil
         else {
@@ -59,6 +65,10 @@ class StatusItemButtonController: NSView, NSPopoverDelegate {
         if let view = menuPopover.contentViewController?.view, let popoverWindow = view.window {
             popoverWindow.setFrame(popoverWindow.frame.offsetBy(dx: 0, dy: 12), display: false)
         }
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        togglePopover()
         super.mouseDown(with: event)
     }
 }
