@@ -208,6 +208,7 @@ public struct BigSurSlider: View {
                     if hovering {
                         trackScrollWheel()
                     } else {
+                        dragging = false
                         subs.forEach { $0.cancel() }
                         subs.removeAll()
                     }
@@ -252,8 +253,6 @@ public struct BigSurSlider: View {
                 )
                 .sink { event in
                     guard let event = event, event.deltaY == 0 else {
-                        dragging = false
-                        self.percentage = cap(self.percentage, minVal: 0, maxVal: 1)
                         return
                     }
 
