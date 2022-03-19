@@ -52,8 +52,8 @@ let POPOVER_SHADOW: NSShadow = {
     let s = NSShadow()
 
     s.shadowColor = NSColor.shadowColor.withAlphaComponent(0.2)
-    s.shadowOffset = .init(width: 0, height: -4)
-    s.shadowBlurRadius = 10
+    s.shadowOffset = .init(width: 0, height: -6)
+    s.shadowBlurRadius = 8
     return s
 }()
 
@@ -62,7 +62,52 @@ func fixPopoverWindow(_ window: NSWindow) {
     window.isOpaque = false
     window.styleMask = [.borderless]
     window.hasShadow = false
-//    window.identifier = MAIN_MENU_ID
+}
+
+// MARK: - PopoverClearView
+
+class PopoverClearView: NSView {
+    override func makeBackingLayer() -> CALayer {
+        NoClippingLayer()
+    }
+}
+
+let POPOVER_BLUR_VIEW_ID = NSUserInterfaceItemIdentifier("POPOVER_BLUR_VIEW_ID")
+let POPOVER_BACKING_VIEW_ID = NSUserInterfaceItemIdentifier("POPOVER_BACKING_VIEW_ID")
+func fixPopoverView(_ view: NSView?, backgroundColor: NSColor? = nil) {
+    if let view = view {
+        view.layer = nil
+        let backView = NSVisualEffectView(frame: NSRect(
+            x: POPOVER_PADDING / 2,
+            y: POPOVER_PADDING - 10,
+            width: view.frame.width - POPOVER_PADDING,
+            height: view.frame.height - POPOVER_PADDING
+        ))
+        backView.material = .hudWindow
+        backView.blendingMode = .behindWindow
+        backView.state = .active
+        backView.wantsLayer = true
+        backView.layer?.cornerCurve = .continuous
+        backView.maskImage = .mask(withCornerRadius: POPOVER_CORNER_RADIUS)
+        backView.shadow = POPOVER_SHADOW
+        backView.identifier = POPOVER_BLUR_VIEW_ID
+
+        let backViewBackground = PopoverClearView(frame: NSRect(
+            x: POPOVER_PADDING / 2,
+            y: POPOVER_PADDING - 10,
+            width: view.frame.width - POPOVER_PADDING,
+            height: view.frame.height - POPOVER_PADDING
+        ))
+        backViewBackground.identifier = POPOVER_BACKING_VIEW_ID
+        backViewBackground.wantsLayer = true
+        if let l = backViewBackground.layer {
+            l.cornerCurve = .continuous
+            l.backgroundColor = backgroundColor?.cgColor
+            l.cornerRadius = POPOVER_CORNER_RADIUS
+        }
+        view.addSubview(backViewBackground, positioned: .below, relativeTo: view.subviews.first)
+        view.addSubview(backView, positioned: .below, relativeTo: view.subviews.first)
+    }
 }
 
 extension NSImage {
@@ -100,7 +145,7 @@ func swizzlePopoverBackground() {
     method_setImplementation(updateLayerOriginal!, swizzleImpl)
 }
 
-func removePopoverBackground(view: NSView, backgroundView: inout PopoverBackgroundView?) {
+func removePopoverBackground(view: NSView) {
     if let window = view.window, let frameView = window.contentView?.superview as? NSVisualEffectView {
         frameView.identifier = MAIN_MENU_ID
         fixPopoverWindow(window)
@@ -126,11 +171,9 @@ import SwiftUI
 // MARK: - HostingView
 
 class HostingView: NSHostingView<QuickActionsMenuView> {
-    var backgroundView: PopoverBackgroundView?
-
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
-        removePopoverBackground(view: self, backgroundView: &backgroundView)
+        removePopoverBackground(view: self)
     }
 }
 
@@ -178,7 +221,7 @@ extension VisualEffectBlur {
             context.coordinator.visualEffectView
         }
 
-        func updateNSView(_ view: NSVisualEffectView, context: Context) {
+        func updateNSView(_: NSVisualEffectView, context: Context) {
             context.coordinator.update(material: material)
             context.coordinator.update(blendingMode: blendingMode)
             context.coordinator.update(state: state)
