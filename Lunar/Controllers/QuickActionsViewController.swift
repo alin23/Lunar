@@ -209,13 +209,25 @@ struct DisplayRowView: View {
                 )
             }
 
-            if (display.hasDDC && showInputInQuickActions) || display.showOrientation || display.appPreset != nil || SWIFTUI_PREVIEW {
+            if (display.hasDDC && showInputInQuickActions) || display.showOrientation || display.appPreset != nil || display
+                .adaptivePaused || SWIFTUI_PREVIEW
+            {
                 VStack {
                     if (display.hasDDC && showInputInQuickActions) || SWIFTUI_PREVIEW { inputSelector }
                     if display.showOrientation || SWIFTUI_PREVIEW { rotationSelector }
                     if let app = display.appPreset {
                         SwiftUI.Button("App Preset: \(app.name)") {
                             app.runningApps?.first?.activate()
+                        }
+                        .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .secondary.opacity(0.8)))
+                        .font(.system(size: 9, weight: .bold))
+                    }
+                    if display.adaptivePaused || SWIFTUI_PREVIEW {
+                        SwiftUI.Button(action: { display.adaptivePaused.toggle() }) {
+                            VStack {
+                                Text("Adaptive paused")
+                                Text("click to resume").font(.system(size: 9))
+                            }
                         }
                         .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .secondary.opacity(0.8)))
                         .font(.system(size: 9, weight: .bold))
@@ -257,16 +269,19 @@ struct QuickActionsLayoutView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            SettingsToggle(text: "Show slider values", setting: $showSliderValues)
-            SettingsToggle(text: "Show volume slider", setting: $showVolumeSlider)
-            SettingsToggle(text: "Show rotation selector", setting: $showOrientationInQuickActions)
-            SettingsToggle(text: "Show input source selector", setting: $showInputInQuickActions)
-            SettingsToggle(text: "Show power button", setting: $showPowerInQuickActions)
-            SettingsToggle(text: "Merge brightness and contrast", setting: $mergeBrightnessContrast)
-            SettingsToggle(text: "Show brightness near menubar icon", setting: $showBrightnessMenuBar)
-            SettingsToggle(text: "Show only external monitor brightness", setting: $showOnlyExternalBrightnessMenuBar)
-                .padding(.leading)
-                .disabled(!showBrightnessMenuBar)
+            SettingsToggle(text: "Show slider values", setting: $showSliderValues.animation(.fastSpring))
+            SettingsToggle(text: "Show volume slider", setting: $showVolumeSlider.animation(.fastSpring))
+            SettingsToggle(text: "Show rotation selector", setting: $showOrientationInQuickActions.animation(.fastSpring))
+            SettingsToggle(text: "Show input source selector", setting: $showInputInQuickActions.animation(.fastSpring))
+            SettingsToggle(text: "Show power button", setting: $showPowerInQuickActions.animation(.fastSpring))
+            SettingsToggle(text: "Merge brightness and contrast", setting: $mergeBrightnessContrast.animation(.fastSpring))
+            SettingsToggle(text: "Show brightness near menubar icon", setting: $showBrightnessMenuBar.animation(.fastSpring))
+            SettingsToggle(
+                text: "Show only external monitor brightness",
+                setting: $showOnlyExternalBrightnessMenuBar.animation(.fastSpring)
+            )
+            .padding(.leading)
+            .disabled(!showBrightnessMenuBar)
         }.frame(maxWidth: .infinity, alignment: .leading)
     }
 }
@@ -394,6 +409,37 @@ struct QuickActionsMenuView: View {
         .colorMultiply(colors.accent.blended(withFraction: 0.7, of: .white))
     }
 
+    var topRightButtons: some View {
+        Group {
+            SwiftUI.Button(
+                action: { withAnimation(.fastSpring) { layoutShown.toggle() } },
+                label: {
+                    HStack(spacing: 2) {
+                        Image(systemName: "line.horizontal.3.decrease.circle.fill").font(.system(size: 12, weight: .semibold))
+                        Text("Options").font(.system(size: 13, weight: .semibold))
+                    }
+                }
+            ).buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+
+            SwiftUI.Button(
+                action: {
+                    guard let view = menuPopover?.contentViewController?.view else { return }
+                    appDelegate!.menu.popUp(
+                        positioning: nil,
+                        at: NSPoint(x: view.frame.width - (POPOVER_PADDING / 2), y: 0),
+                        in: view
+                    )
+                },
+                label: {
+                    HStack(spacing: 2) {
+                        Image(systemName: "ellipsis.circle.fill").font(.system(size: 12, weight: .semibold))
+                        Text("Menu").font(.system(size: 13, weight: .semibold))
+                    }
+                }
+            ).buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+        }
+    }
+
     var body: some View {
         VStack {
             VStack(spacing: 0) {
@@ -406,43 +452,17 @@ struct QuickActionsMenuView: View {
                 HStack {
                     modeSelector
                     Spacer()
-                    SwiftUI.Button(
-                        action: { withAnimation(.fastSpring) { layoutShown.toggle() } },
-                        label: {
-                            HStack(spacing: 2) {
-                                Image(systemName: "line.horizontal.3.decrease.circle.fill").font(.system(size: 12, weight: .semibold))
-                                Text("Options").font(.system(size: 13, weight: .semibold))
-                            }
-                        }
-                    ).buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                    topRightButtons
+                }.padding(10)
 
-                    SwiftUI.Button(
-                        action: {
-                            guard let view = menuPopover?.contentViewController?.view else { return }
-                            appDelegate!.menu.popUp(
-                                positioning: nil,
-                                at: NSPoint(x: view.frame.width - (POPOVER_PADDING / 2), y: 0),
-                                in: view
-                            )
-                        },
-                        label: {
-                            HStack(spacing: 2) {
-                                Image(systemName: "ellipsis.circle.fill").font(.system(size: 12, weight: .semibold))
-                                Text("Menu").font(.system(size: 13, weight: .semibold))
-                            }
-                        }
-                    ).buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-                }
-                .padding(10)
             }.background(Color.primary.opacity(colorScheme == .dark ? 0.03 : 0.05))
+
             if let d = cursorDisplay, !SWIFTUI_PREVIEW {
-                DisplayRowView(display: d)
-                    .padding(.vertical)
+                DisplayRowView(display: d).padding(.vertical)
             }
 
             ForEach(displays) { d in
-                DisplayRowView(display: d)
-                    .padding(.vertical)
+                DisplayRowView(display: d).padding(.vertical)
             }
 
             HStack {
@@ -455,38 +475,29 @@ struct QuickActionsMenuView: View {
                 PresetButtonView(percent: 100)
             }
             .padding(6)
-            .background(
-                RoundedRectangle(
-                    cornerRadius: 8,
-                    style: .continuous
-                ).fill(Color.primary.opacity(0.05))
-            )
+            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.05)))
             .padding(.top)
             .padding(.horizontal, 24)
 
             HStack {
-                SwiftUI.Button("Preferences") {
-                    appDelegate!.showPreferencesWindow(sender: nil)
-                }
-                .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                SwiftUI.Button("Preferences") { appDelegate!.showPreferencesWindow(sender: nil) }
+                    .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
 
                 Spacer()
 
-                SwiftUI.Button("Restart") {
-                    appDelegate!.restartApp(appDelegate!)
-                }
-                .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-                .font(.system(size: 12, weight: .medium, design: .monospaced))
-                SwiftUI.Button("Quit") {
-                    NSApplication.shared.terminate(nil)
-                }
-                .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                SwiftUI.Button("Restart") { appDelegate!.restartApp(appDelegate!) }
+                    .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+
+                SwiftUI.Button("Quit") { NSApplication.shared.terminate(nil) }
+                    .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
             }
             .padding(.horizontal, 24)
         }
         .frame(width: 360, alignment: .top)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .padding(.horizontal, 24)
         .padding(.bottom, 40)
         .padding(.top, 0)
@@ -496,12 +507,12 @@ struct QuickActionsMenuView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                     .padding(.horizontal, 24)
                     .padding(.bottom, 20)
-                    .shadow(color: Colors.blackMauve.opacity(0.2), radius: 8, x: 0, y: 4)
+                    .shadow(color: Colors.blackMauve.opacity(0.2), radius: 8, x: 0, y: 6)
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
                     .fill(colorScheme == .dark ? Colors.blackMauve.opacity(0.4) : Color.white.opacity(0.6))
                     .padding(.horizontal, 24)
                     .padding(.bottom, 20)
-            }
+            }, alignment: .top
         ).colors(colorScheme == .dark ? .dark : .light)
         .onAppear {
             cursorDisplay = dc.cursorDisplay

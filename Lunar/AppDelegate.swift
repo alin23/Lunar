@@ -675,12 +675,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func windowDidBecomeMain(_ notification: Notification) {
         log.debug("windowDidBecomeMain")
-        guard let w = notification.object as? ModernWindow, w.isVisible, w.title == "Settings" else { return }
+        guard let w = notification.object as? ModernWindow, w.isVisible, w.title == "Settings",
+              let locationManager = locationManager else { return }
 
-        switch CLLocationManager.authorizationStatus() {
+        switch locationManager.authorizationStatus {
         case .notDetermined, .restricted, .denied:
             log.debug("Requesting location permissions")
-            locationManager?.requestAlwaysAuthorization()
+            locationManager.requestAlwaysAuthorization()
         case .authorizedAlways:
             log.debug("Location authorized")
         @unknown default:
@@ -977,6 +978,22 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                         popover.close()
                         popover.contentViewController = nil
                         POPOVERS[key] = nil
+                    }
+
+                    for (key, popover) in INPUT_HOTKEY_POPOVERS {
+                        log.debug("Adapting \(key) input hotkey popover")
+
+                        guard let backingView = popover?.contentViewController?.view.subviews
+                            .first(where: { $0.identifier == POPOVER_BACKING_VIEW_ID }),
+                            let blurView = popover?.contentViewController?.view.subviews
+                            .first(where: { $0.identifier == POPOVER_BLUR_VIEW_ID })
+                        else {
+                            log.debug("Can't find input hotkey popover for \(key)")
+                            continue
+                        }
+
+                        backingView.layer?.backgroundColor = popoverBackgroundColor.cgColor
+                        blurView.shadow = POPOVER_SHADOW
                     }
                     recreateWindow()
                 }
@@ -1939,7 +1956,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         locationManager!.stopUpdatingLocation()
         locationManager!.startUpdatingLocation()
 
-        switch CLLocationManager.authorizationStatus() {
+        switch locationManager!.authorizationStatus {
         case .authorizedAlways:
             log.debug("Location authStatus: authorizedAlways")
         case .denied:
