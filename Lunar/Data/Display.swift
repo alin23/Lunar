@@ -2895,7 +2895,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             reconfigure { panel in
                 panel.orientation = rotation.i32
                 guard modeChangeAsk, rotation != oldValue,
-                      let window = appDelegate!.windowController?.window else { return }
+                      let window = appDelegate!.windowController?.window ?? menuPopover?.contentViewController?.view.window else { return }
                 ask(
                     message: "Orientation Change",
                     info: "Do you want to keep this orientation?\n\nLunar will revert to the last orientation if no option is selected in 15 seconds.",
