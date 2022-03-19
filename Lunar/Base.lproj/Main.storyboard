@@ -3506,7 +3506,7 @@ CORNERS</string>
                                 </connections>
                             </customView>
                             <popUpButton id="BV9-vT-ncX">
-                                <rect key="frame" x="409" y="252" width="131" height="22"/>
+                                <rect key="frame" x="400" y="252" width="155" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="Video Input" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="UC7-EP-hrS" id="i0g-IR-OO6">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -4452,6 +4452,7 @@ Turns the display back on when the last monitor is disconnected</string>
                         <outlet property="displayImage" destination="j6a-90-SYD" id="Ued-mg-2oO"/>
                         <outlet property="displayName" destination="lXg-hV-GHy" id="d9A-yK-qc6"/>
                         <outlet property="gammaNotice" destination="GJn-hd-DZ0" id="9aZ-S3-aYW"/>
+                        <outlet property="inputDropdown" destination="BV9-vT-ncX" id="vTW-VW-Fdg"/>
                         <outlet property="lockBrightnessCurveButton" destination="Z5X-YG-FjQ" id="pOc-V1-hxI"/>
                         <outlet property="lockContrastCurveButton" destination="6nl-T1-C3E" id="9eK-UK-RSB"/>
                         <outlet property="resolutionsDropdown" destination="rrg-Kp-lBi" id="IVH-3Y-mNe"/>
@@ -5348,10 +5349,10 @@ Turns the display back on when the last monitor is disconnected</string>
                         <rect key="frame" x="0.0" y="0.0" width="830" height="360"/>
                         <subviews>
                             <popUpButton focusRingType="none" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="TCb-EV-tNB">
-                                <rect key="frame" x="88" y="266" width="138" height="22"/>
+                                <rect key="frame" x="80" y="266" width="155" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="22" id="Q5E-wQ-Wmf"/>
-                                    <constraint firstAttribute="width" constant="138" id="oxp-by-8dc"/>
+                                    <constraint firstAttribute="width" constant="155" id="oxp-by-8dc"/>
                                 </constraints>
                                 <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="IQZ-su-vEj" id="vJu-2B-dE7">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -5437,8 +5438,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange1" id="Ihg-0T-ZbC">
-                                    </binding>
+                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange1" id="Ihg-0T-ZbC"/>
                                     <binding destination="VkT-77-mId" name="value" keyPath="self.display.brightnessOnInputChange1" id="N8w-RW-MGa"/>
                                 </connections>
                             </slider>
@@ -5460,8 +5460,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="brightness" id="3bZ-Yc-xau"/>
                                 <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                 <connections>
-                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange1" id="3cA-2K-meK">
-                                    </binding>
+                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange1" id="3cA-2K-meK"/>
                                 </connections>
                             </imageView>
                             <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="vU5-AV-oiy" customClass="Slider" customModule="Lunar" customModuleProvider="target">
@@ -5491,8 +5490,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange1" id="OXd-mV-2qf">
-                                    </binding>
+                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange1" id="OXd-mV-2qf"/>
                                     <binding destination="VkT-77-mId" name="value" keyPath="self.display.contrastOnInputChange1" id="R7p-2n-WcF"/>
                                 </connections>
                             </slider>
@@ -5514,14 +5512,13 @@ Turns the display back on when the last monitor is disconnected</string>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="contrast" id="fRd-MN-T40"/>
                                 <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                 <connections>
-                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange1" id="dj7-rt-3CK">
-                                    </binding>
+                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange1" id="dj7-rt-3CK"/>
                                 </connections>
                             </imageView>
                             <popUpButton focusRingType="none" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="ygF-rE-Ln9">
-                                <rect key="frame" x="353" y="266" width="125" height="22"/>
+                                <rect key="frame" x="338" y="266" width="155" height="22"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="125" id="pqN-k0-nML"/>
+                                    <constraint firstAttribute="width" constant="155" id="pqN-k0-nML"/>
                                 </constraints>
                                 <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="1Zo-rI-ste" id="IJw-8j-6p1">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -5607,8 +5604,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange2" id="QYH-Ag-Fwd">
-                                    </binding>
+                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange2" id="QYH-Ag-Fwd"/>
                                     <binding destination="VkT-77-mId" name="value" keyPath="self.display.brightnessOnInputChange2" id="QeM-1W-GGY"/>
                                 </connections>
                             </slider>
@@ -5630,8 +5626,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="brightness" id="rav-Aa-7gV"/>
                                 <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                 <connections>
-                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange2" id="7GU-Im-U8l">
-                                    </binding>
+                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange2" id="7GU-Im-U8l"/>
                                 </connections>
                             </imageView>
                             <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="PeI-Lj-eQF" customClass="Slider" customModule="Lunar" customModuleProvider="target">
@@ -5661,8 +5656,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange2" id="Lan-ic-2ea">
-                                    </binding>
+                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange2" id="Lan-ic-2ea"/>
                                     <binding destination="VkT-77-mId" name="value" keyPath="self.display.contrastOnInputChange2" id="dWg-Hg-610"/>
                                 </connections>
                             </slider>
@@ -5684,14 +5678,13 @@ Turns the display back on when the last monitor is disconnected</string>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="contrast" id="Y4i-ZX-hah"/>
                                 <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                 <connections>
-                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange2" id="GOn-HF-9bF">
-                                    </binding>
+                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange2" id="GOn-HF-9bF"/>
                                 </connections>
                             </imageView>
                             <popUpButton focusRingType="none" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="FbZ-RW-w6p">
-                                <rect key="frame" x="608" y="266" width="125" height="22"/>
+                                <rect key="frame" x="593" y="266" width="155" height="22"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="125" id="hsi-l9-A0q"/>
+                                    <constraint firstAttribute="width" constant="155" id="hsi-l9-A0q"/>
                                 </constraints>
                                 <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="r6T-el-KBe" id="sg9-44-wbG">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -5777,8 +5770,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange3" id="hED-bf-S3t">
-                                    </binding>
+                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange3" id="hED-bf-S3t"/>
                                     <binding destination="VkT-77-mId" name="value" keyPath="self.display.brightnessOnInputChange3" id="8Ke-p5-dmt"/>
                                 </connections>
                             </slider>
@@ -5800,8 +5792,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="brightness" id="Zji-2j-I3Y"/>
                                 <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                 <connections>
-                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange3" id="bhm-iP-geN">
-                                    </binding>
+                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange3" id="bhm-iP-geN"/>
                                 </connections>
                             </imageView>
                             <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="xfi-Wh-iRS" customClass="Slider" customModule="Lunar" customModuleProvider="target">
@@ -5831,8 +5822,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange3" id="uYQ-hG-Rhr">
-                                    </binding>
+                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange3" id="uYQ-hG-Rhr"/>
                                     <binding destination="VkT-77-mId" name="value" keyPath="self.display.contrastOnInputChange3" id="MOL-Tw-H6u"/>
                                 </connections>
                             </slider>
@@ -5854,8 +5844,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="contrast" id="36x-6M-ZGm"/>
                                 <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                 <connections>
-                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange3" id="Ijj-Im-R7A">
-                                    </binding>
+                                    <binding destination="VkT-77-mId" name="enabled" keyPath="self.display.applyBrightnessOnInputChange3" id="Ijj-Im-R7A"/>
                                 </connections>
                             </imageView>
                             <customView alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="G9W-Iq-AuZ">

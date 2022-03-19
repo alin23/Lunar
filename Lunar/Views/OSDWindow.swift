@@ -175,6 +175,7 @@ public struct BigSurSlider: View {
                             .foregroundColor(knobColor)
                             .shadow(color: Colors.blackMauve.opacity(percentage > 0.3 ? 0.3 : percentage.d), radius: 5, x: -1, y: 0)
                             .frame(width: sliderHeight, height: sliderHeight, alignment: .trailing)
+                            .brightness(dragging ? -0.2 : 0)
                         if showValue {
                             Text((percentage * 100).str(decimals: 0))
                                 .foregroundColor(knobTextColor)
@@ -192,7 +193,13 @@ public struct BigSurSlider: View {
             .gesture(
                 DragGesture(minimumDistance: 0)
                     .onChanged { value in
+                        if !dragging { dragging = true }
+
                         self.percentage = cap(Float(value.location.x / geometry.size.width), minVal: 0, maxVal: 1)
+                    }
+                    .onEnded { value in
+                        self.percentage = cap(Float(value.location.x / geometry.size.width), minVal: 0, maxVal: 1)
+                        dragging = false
                     }
             )
             .animation(.easeOut(duration: 0.1), value: percentage)
@@ -208,6 +215,11 @@ public struct BigSurSlider: View {
             #endif
 
         }.frame(width: sliderWidth, height: sliderHeight)
+            .onChange(of: dragging) { tracking in
+                AppleNativeControl.sliderTracking = tracking
+                GammaControl.sliderTracking = tracking
+                DDCControl.sliderTracking = tracking
+            }
     }
 
     // MARK: Internal
@@ -226,6 +238,7 @@ public struct BigSurSlider: View {
     @Binding var showValue: Bool
 
     @State var subs = Set<AnyCancellable>()
+    @State var dragging = false
 
     #if os(macOS)
         func trackScrollWheel() {
@@ -238,7 +251,14 @@ public struct BigSurSlider: View {
                     latest: true
                 )
                 .sink { event in
-                    guard let event = event, event.deltaY == 0 else { return }
+                    guard let event = event, event.deltaY == 0 else {
+                        dragging = false
+                        self.percentage = cap(self.percentage, minVal: 0, maxVal: 1)
+                        return
+                    }
+
+                    if !dragging { dragging = true }
+
                     let delta = Float(event.scrollingDeltaX) * (event.isDirectionInvertedFromDevice ? -1 : 1)
                     self.percentage = cap(self.percentage - (delta / 100), minVal: 0, maxVal: 1)
                 }
