@@ -89,6 +89,7 @@ class HotkeyButton: PopoverButton<HotkeyPopoverController> {
             for item in dropdown.itemArray {
                 guard let input = inputSourceMapping[item.title] else { continue }
                 item.tag = input.rawValue.i
+                item.attributedTitle = item.title.withFont(.monospacedSystemFont(ofSize: 12, weight: .semibold)).withTextColor(.labelColor)
 
                 if input == .unknown {
                     item.isEnabled = true
