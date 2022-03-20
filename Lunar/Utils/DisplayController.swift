@@ -1721,7 +1721,7 @@ class DisplayController: ObservableObject {
                 display.softwareBrightness = cap(
                     display.softwareBrightness + (offset.f / 70),
                     minVal: 1.01,
-                    maxVal: 1.5
+                    maxVal: display.maxSoftwareBrightness
                 )
                 return
             }
