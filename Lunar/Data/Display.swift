@@ -314,9 +314,9 @@ struct GammaTable: Equatable {
         return true
     }
 
-    func adjust(brightness: UInt16, preciseBrightness: Double? = nil) -> GammaTable {
+    func adjust(brightness: UInt16, preciseBrightness: Double? = nil, maxValue: Float) -> GammaTable {
         let br: Float = preciseBrightness?.f ?? (brightness.f / 100)
-        let max: Float = br <= 1.0 ? 1.0 : 1.5
+        let max: Float = br <= 1.0 ? 1.0 : maxValue
         let gammaBrightness: Float = mapNumber(
             powf(br, 0.8),
             fromLow: 0.00, fromHigh: max, toLow: 0.08, toHigh: max
@@ -329,11 +329,11 @@ struct GammaTable: Equatable {
         )
     }
 
-    func stride(from brightness: Brightness, to newBrightness: Brightness) -> [GammaTable] {
+    func stride(from brightness: Brightness, to newBrightness: Brightness, maxValue: Float) -> [GammaTable] {
         guard brightness != newBrightness else { return [] }
 
         return Swift.stride(from: brightness, through: newBrightness, by: newBrightness < brightness ? -1 : 1).compactMap { b in
-            let table = adjust(brightness: b)
+            let table = adjust(brightness: b, maxValue: maxValue)
             return table.isZero ? nil : table
         }
     }
@@ -352,8 +352,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
 @objc class Display: NSObject, Codable, Defaults.Serializable, ObservableObject, Identifiable {
     // MARK: Lifecycle
-
-    // MARK: Initializers
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -1013,6 +1011,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     static let dummyNamePattern = "dummy|[^u]28e850|^28e850".r!
 
+    // MARK: Initializers
+
+    var maxSoftwareBrightness: Float = 1.5
     @Published @objc dynamic var appPreset: AppException? = nil
 
     @objc dynamic lazy var hasAmbientLightAdaptiveBrightness: Bool = DisplayServicesHasAmbientLightCompensation(id)
@@ -1467,7 +1468,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var xdrBrightness: Float = 0.0 {
         didSet {
             guard apply else { return }
-            softwareBrightness = mapNumber(xdrBrightness, fromLow: 0.0, fromHigh: 1.0, toLow: 1.01, toHigh: 1.5)
+            softwareBrightness = mapNumber(xdrBrightness, fromLow: 0.0, fromHigh: 1.0, toLow: 1.01, toHigh: maxSoftwareBrightness)
         }
     }
 
@@ -1487,7 +1488,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     self.xdrBrightness = mapNumber(
                         br,
                         fromLow: 1.01,
-                        fromHigh: 1.5,
+                        fromHigh: self.maxSoftwareBrightness,
                         toLow: 0.0,
                         toHigh: 1.0
                     )
@@ -4591,7 +4592,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         let brightness = brightness ?? self.brightness.uint16Value
         let gammaTable = lunarGammaTable ?? defaultGammaTable
-        let newGammaTable = gammaTable.adjust(brightness: brightness, preciseBrightness: preciseBrightness)
+        let newGammaTable = gammaTable.adjust(brightness: brightness, preciseBrightness: preciseBrightness, maxValue: maxSoftwareBrightness)
 
         guard !GammaControl.sliderTracking, let oldBrightness = oldBrightness else {
             guard !newGammaTable.isZero else { return }
@@ -4612,7 +4613,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             Thread.sleep(forTimeInterval: 0.002)
 
             self.gammaChanged = true
-            for gammaTable in gammaTable.stride(from: oldBrightness, to: brightness) {
+            for gammaTable in gammaTable.stride(from: oldBrightness, to: brightness, maxValue: self.maxSoftwareBrightness) {
                 self.apply(gamma: gammaTable)
                 if let onChange = onChange, let brightness = gammaTable.brightness {
                     onChange(brightness)
