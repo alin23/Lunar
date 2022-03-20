@@ -916,6 +916,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             w.setAccessibilitySubrole(.unknown)
         }
 
+        menuPopover.contentSize = NSSize(
+            width: MENU_WIDTH + (MENU_HORIZONTAL_PADDING * 2),
+            height: (NSScreen.main?.visibleFrame.height ?? 600) - 100
+        )
         menuPopover.animates = false
 
         return menuPopover
