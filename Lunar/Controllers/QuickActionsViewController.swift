@@ -508,83 +508,128 @@ struct QuickActionsMenuView: View {
         }
     }
 
+    var standardPresets: some View {
+        HStack {
+            Text("Presets:").font(.system(size: 14, weight: .semibold)).opacity(0.7)
+            Spacer()
+            PresetButtonView(percent: 0)
+            PresetButtonView(percent: 25)
+            PresetButtonView(percent: 50)
+            PresetButtonView(percent: 75)
+            PresetButtonView(percent: 100)
+        }
+        .padding(6)
+        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.05)))
+        .padding(.top)
+        .padding(.horizontal, 24)
+    }
+
+    var footer: some View {
+        HStack {
+            SwiftUI.Button("Preferences") { appDelegate!.showPreferencesWindow(sender: nil) }
+                .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                .font(.system(size: 12, weight: .medium, design: .monospaced))
+
+            Spacer()
+
+            SwiftUI.Button("Restart") { appDelegate!.restartApp(appDelegate!) }
+                .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                .font(.system(size: 12, weight: .medium, design: .monospaced))
+
+            SwiftUI.Button("Quit") { NSApplication.shared.terminate(nil) }
+                .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                .font(.system(size: 12, weight: .medium, design: .monospaced))
+        }
+        .padding(.horizontal, 24)
+    }
+
+    var header: some View {
+        VStack(spacing: 0) {
+            if layoutShown || SWIFTUI_PREVIEW {
+                QuickActionsLayoutView()
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 20)
+            }
+
+            HStack {
+                modeSelector
+                Spacer()
+                topRightButtons
+            }.padding(10)
+
+        }.background(Color.primary.opacity(colorScheme == .dark ? 0.03 : 0.05))
+    }
+
     var body: some View {
-        VStack {
-            VStack(spacing: 0) {
-                if layoutShown || SWIFTUI_PREVIEW {
-                    QuickActionsLayoutView()
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 20)
+        GeometryReader { geom in
+            VStack {
+                header
+
+                if let d = cursorDisplay, !SWIFTUI_PREVIEW {
+                    DisplayRowView(display: d).padding(.vertical)
                 }
 
-                HStack {
-                    modeSelector
-                    Spacer()
-                    topRightButtons
-                }.padding(10)
+                ForEach(displays) { d in
+                    DisplayRowView(display: d).padding(.vertical)
+                }
 
-            }.background(Color.primary.opacity(colorScheme == .dark ? 0.03 : 0.05))
-
-            if let d = cursorDisplay, !SWIFTUI_PREVIEW {
-                DisplayRowView(display: d).padding(.vertical)
+                standardPresets
+                footer
             }
-
-            ForEach(displays) { d in
-                DisplayRowView(display: d).padding(.vertical)
+            .frame(width: MENU_WIDTH, alignment: .top)
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .padding(.horizontal, MENU_HORIZONTAL_PADDING)
+            .padding(.bottom, 40)
+            .padding(.top, 0)
+            .background(bg, alignment: .top)
+            .colors(colorScheme == .dark ? .dark : .light)
+            .onAppear {
+                cursorDisplay = dc.cursorDisplay
+                displays = dc.nonCursorDisplays
+                appDelegate?.statusItemButtonController?
+                    .resize(NSSize(
+                        width: MENU_WIDTH + (MENU_HORIZONTAL_PADDING * 2),
+                        height: (NSScreen.main?.visibleFrame.height ?? 600) - 100
+                    ))
             }
-
-            HStack {
-                Text("Presets:").font(.system(size: 14, weight: .semibold)).opacity(0.7)
-                Spacer()
-                PresetButtonView(percent: 0)
-                PresetButtonView(percent: 25)
-                PresetButtonView(percent: 50)
-                PresetButtonView(percent: 75)
-                PresetButtonView(percent: 100)
-            }
-            .padding(6)
-            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.05)))
-            .padding(.top)
-            .padding(.horizontal, 24)
-
-            HStack {
-                SwiftUI.Button("Preferences") { appDelegate!.showPreferencesWindow(sender: nil) }
-                    .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
-
-                Spacer()
-
-                SwiftUI.Button("Restart") { appDelegate!.restartApp(appDelegate!) }
-                    .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
-
-                SwiftUI.Button("Quit") { NSApplication.shared.terminate(nil) }
-                    .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
-            }
-            .padding(.horizontal, 24)
         }
-        .frame(width: 360, alignment: .top)
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .padding(.horizontal, 24)
-        .padding(.bottom, 40)
-        .padding(.top, 0)
-        .background(
-            ZStack {
-                VisualEffectBlur(material: .hudWindow, blendingMode: .behindWindow, state: .active)
-                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 20)
-                    .shadow(color: Colors.blackMauve.opacity(colorScheme == .dark ? 0.5 : 0.2), radius: 8, x: 0, y: 6)
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(colorScheme == .dark ? Colors.blackMauve.opacity(0.4) : Color.white.opacity(0.6))
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 20)
-            }, alignment: .top
-        ).colors(colorScheme == .dark ? .dark : .light)
-        .onAppear {
-            cursorDisplay = dc.cursorDisplay
-            displays = dc.nonCursorDisplays
+    }
+
+    var bg: some View {
+        ZStack {
+            VisualEffectBlur(material: .hudWindow, blendingMode: .behindWindow, state: .active)
+                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .padding(.horizontal, MENU_HORIZONTAL_PADDING)
+                .padding(.bottom, 20)
+                .shadow(color: Colors.blackMauve.opacity(colorScheme == .dark ? 0.5 : 0.2), radius: 8, x: 0, y: 6)
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(colorScheme == .dark ? Colors.blackMauve.opacity(0.4) : Color.white.opacity(0.6))
+                .padding(.horizontal, MENU_HORIZONTAL_PADDING)
+                .padding(.bottom, 20)
+        }
+    }
+}
+
+let MENU_WIDTH: CGFloat = 360
+let MENU_HORIZONTAL_PADDING: CGFloat = 24
+
+// MARK: - ViewSizeKey
+
+struct ViewSizeKey: PreferenceKey {
+    static var defaultValue: CGSize = .zero
+
+    static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
+        value = nextValue()
+    }
+}
+
+// MARK: - ViewGeometry
+
+struct ViewGeometry: View {
+    var body: some View {
+        GeometryReader { geometry in
+            Color.clear
+                .preference(key: ViewSizeKey.self, value: geometry.size)
         }
     }
 }
