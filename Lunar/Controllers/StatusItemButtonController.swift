@@ -37,6 +37,16 @@ class StatusItemButtonController: NSView, NSPopoverDelegate {
         }
     }
 
+    func resize(_ size: NSSize) {
+        guard let menuPopover = menuPopover else { return }
+
+        menuPopover.contentSize = size
+        guard let positioningView = statusButton?.subviews.first(where: {
+            $0.identifier == NSUserInterfaceItemIdentifier(rawValue: "positioningView")
+        }) else { return }
+        menuPopover.positioningRect = positioningView.bounds
+    }
+
     func closePopover() {
         guard let menuPopover = menuPopover, menuPopover.isShown else {
             return
@@ -65,6 +75,7 @@ class StatusItemButtonController: NSView, NSPopoverDelegate {
         if let view = menuPopover.contentViewController?.view, let popoverWindow = view.window {
             popoverWindow.setFrame(popoverWindow.frame.offsetBy(dx: 0, dy: 12), display: false)
         }
+        menuPopover.contentViewController?.view.window?.makeKeyAndOrderFront(self)
     }
 
     override func mouseDown(with event: NSEvent) {
