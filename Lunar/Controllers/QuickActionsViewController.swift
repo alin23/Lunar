@@ -45,7 +45,12 @@ struct PowerOffButtonView: View {
         }) {
             Image(systemName: "power").font(.system(size: 10, weight: .heavy))
         }
-        .buttonStyle(FlatButton(color: Colors.red, circle: true, horizontalPadding: 3, verticalPadding: 3))
+        .buttonStyle(FlatButton(
+            color: display.blackOutEnabled ? Color.gray : Colors.red,
+            circle: true,
+            horizontalPadding: 3,
+            verticalPadding: 3
+        ))
         .onHover { hovering in
             if !hoveringPowerButton, hovering {
                 hoveringPowerButton = hovering && !neverShowBlackoutPopover
@@ -211,9 +216,10 @@ struct DisplayRowView: View {
                 )
             }
 
-            if (display.hasDDC && showInputInQuickActions) || display.showOrientation || display.appPreset != nil || display
-                .adaptivePaused || SWIFTUI_PREVIEW
-            {
+            if (display.hasDDC && showInputInQuickActions) || display.showOrientation || display.appPreset != nil || (
+                display
+                    .adaptivePaused && !display.blackOutEnabled
+            ) || SWIFTUI_PREVIEW {
                 VStack {
                     if (display.hasDDC && showInputInQuickActions) || SWIFTUI_PREVIEW { inputSelector }
                     if display.showOrientation || SWIFTUI_PREVIEW { rotationSelector }
@@ -224,7 +230,7 @@ struct DisplayRowView: View {
                         .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .secondary.opacity(0.8)))
                         .font(.system(size: 9, weight: .bold))
                     }
-                    if display.adaptivePaused || SWIFTUI_PREVIEW {
+                    if (display.adaptivePaused && !display.blackOutEnabled) || SWIFTUI_PREVIEW {
                         SwiftUI.Button(action: { display.adaptivePaused.toggle() }) {
                             VStack {
                                 Text("Adaptive paused")

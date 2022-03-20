@@ -4367,52 +4367,6 @@ disabled</string>
                                     <outlet property="notice" destination="HAV-CM-mF5" id="ES3-eS-txh"/>
                                 </connections>
                             </button>
-                            <button focusRingType="none" verticalHuggingPriority="750" alphaValue="0.90000000000000002" tag="1" id="b0J-Cp-TGd" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="388" y="553" width="174" height="20"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <ciFilter key="compositingFilter" name="CISubtractBlendMode">
-                                    <configuration>
-                                        <null key="inputBackgroundImage"/>
-                                        <null key="inputImage"/>
-                                    </configuration>
-                                </ciFilter>
-                                <buttonCell key="cell" type="inline" title="Enable XDR Brightness" alternateTitle="Disable XDR Brightness" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="07V-Gh-v10">
-                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
-                                </buttonCell>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
-                                        <real key="value" value="0.29999999999999999"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                        <real key="value" value="12"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="bgOff">
-                                        <color key="value" red="1" green="0.62602233784436678" blue="0.26094812925170063" alpha="0.23057222682119205" colorSpace="custom" customColorSpace="sRGB"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="labelOff">
-                                        <color key="value" name="Caption Tertiary"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="bgOn">
-                                        <color key="value" name="Slider"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="labelOn">
-                                        <color key="value" name="Caption"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <binding destination="1Bn-Ca-ETm" name="value" keyPath="self.display.enhanced" id="95u-yv-jSW">
-                                        <dictionary key="options">
-                                            <bool key="NSConditionallySetsEnabled" value="NO"/>
-                                        </dictionary>
-                                    </binding>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.supportsEnhance" id="y6v-cx-LAe">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
-                                </connections>
-                            </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="HAV-CM-mF5">
                                 <rect key="frame" x="291" y="191" width="359" height="28"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -10746,9 +10700,6 @@ settings for this monitor.</string>
         </namedColor>
         <namedColor name="Power">
             <color red="0.94900000095367432" green="0.20000000298023224" blue="0.2630000114440918" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
-        <namedColor name="Slider">
-            <color red="1" green="0.83499997854232788" blue="0.52499997615814209" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>
