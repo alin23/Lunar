@@ -186,7 +186,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         }
     }
 
-    weak var caption: ScrollableTextFieldCaption? {
+    @IBOutlet var caption: ScrollableTextFieldCaption? {
         didSet {
             caption?.isHidden = isHidden
             if didScrollTextField {
@@ -268,6 +268,13 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         trackHover()
         setBgAlpha()
         needsDisplay = true
+        if let font = font {
+            self.font = .monospacedSystemFont(
+                ofSize: font.pointSize,
+                weight: font.pointSize >= 50 ? .bold : (font.pointSize > 40 ? .bold : .heavy)
+            )
+        }
+
         // toolTip = """
         // Scroll to change, click to edit.
 

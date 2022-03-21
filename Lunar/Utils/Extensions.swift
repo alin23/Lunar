@@ -852,16 +852,16 @@ extension MPDisplayMode {
 
     open var attributedString: NSAttributedString {
         let res = "\(width) x \(height)"
-        let refresh = (refreshString?.isEmpty ?? true) ? "\(refreshRate != 0 ? refreshRate : 60)Hz" : refreshString!
+//        let refresh = (refreshString?.isEmpty ?? true) ? "\(refreshRate != 0 ? refreshRate : 60)Hz" : refreshString!
         let dpi = "\(dotsPerInch)DPI"
 
         let rightAligned = NSMutableParagraphStyle()
         rightAligned.alignment = .right
-        rightAligned.tabStops = [NSTextTab(textAlignment: NSTextAlignment.left, location: 200, options: [:])]
+        rightAligned.tabStops = [NSTextTab(textAlignment: NSTextAlignment.left, location: 100, options: [:])]
 
-        return "\(res)".withFont(.systemFont(ofSize: 12, weight: .medium))
-            + " @ ".withFont(.monospacedSystemFont(ofSize: 12, weight: .regular)).withTextColor(.gray)
-            + "\(refresh)".withFont(.systemFont(ofSize: 12, weight: .medium))
+        return "  \(res)".withFont(.systemFont(ofSize: 12, weight: .medium))
+//            + " @ ".withFont(.monospacedSystemFont(ofSize: 12, weight: .regular)).withTextColor(.gray)
+//            + "\(refresh)".withFont(.systemFont(ofSize: 12, weight: .medium))
             + "\t[\(dpi)] [\(depth)bit]"
             .withFont(.monospacedSystemFont(ofSize: 12, weight: .regular))
             .withTextColor(.gray)
@@ -885,18 +885,22 @@ class ModePopupButton: NSPopUpButton {
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        font = .monospacedSystemFont(ofSize: 12, weight: .semibold)
 
         setItemStyles()
         selectedItemPublisher
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
-            .sink { item in
+            .sink { [weak self] item in
                 guard let mgr = DisplayController.panelManager, mgr.tryLockAccess() else {
-                    mainAsyncAfter(ms: 500) { [weak self] in self?.setItemStyles() }
+//                    mainAsyncAfter(ms: 500) { [weak self] in self?.setItemStyles() }
                     return
                 }
                 defer { mgr.unlockAccess() }
 
-                guard let item = item, let mode = item.representedObject as? MPDisplayMode else { return }
+                guard let item = item, let mode = item.representedObject as? MPDisplayMode else {
+                    item?.isEnabled = false
+                    return
+                }
                 item.attributedTitle = mode.attributedString
             }.store(in: &observers)
 
@@ -904,7 +908,7 @@ class ModePopupButton: NSPopUpButton {
             .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
             .sink { [weak self] _ in
                 guard let mgr = DisplayController.panelManager, mgr.tryLockAccess() else {
-                    mainAsyncAfter(ms: 500) { [weak self] in self?.setItemStyles() }
+//                    mainAsyncAfter(ms: 500) { [weak self] in self?.setItemStyles() }
                     return
                 }
                 defer { mgr.unlockAccess() }
@@ -935,9 +939,60 @@ class ModePopupButton: NSPopUpButton {
         }
 
         defer { mgr.unlockAccess() }
-        for item in itemArray {
-            guard let mode = item.representedObject as? MPDisplayMode else { continue }
+        var oldItem: NSMenuItem?
+        var offset = 0
+        let addedSeparators = itemArray.contains(where: \.isSeparatorItem)
+        for (i, item) in itemArray.enumerated() {
+            guard let mode = item.representedObject as? MPDisplayMode else {
+                guard !item.isSeparatorItem else { continue }
+                guard item.tag != 5555 else {
+                    item.isEnabled = false
+                    continue
+                }
+                if let realItem = itemArray.first(where: { ($0.representedObject as? MPDisplayMode)?.description == item.title }) {
+                    select(realItem)
+                }
+                print(item.title)
+                item.isHidden = true
+                continue
+            }
+
+            if !addedSeparators {
+                if oldItem == nil {
+                    let rateItem = NSMenuItem()
+                    rateItem.title = mode.refreshString
+                    rateItem.isEnabled = false
+                    rateItem.tag = 5555
+                    menu?.insertItem(rateItem, at: i + offset)
+                    offset += 1
+                }
+                if let oldMode = oldItem?.representedObject as? MPDisplayMode, oldMode.refreshString != mode.refreshString {
+                    let rateItem = NSMenuItem(title: mode.refreshString, action: nil, keyEquivalent: "")
+                    rateItem.isEnabled = false
+                    rateItem.tag = 5555
+                    menu?.insertItem(.separator(), at: i + offset)
+                    menu?.insertItem(rateItem, at: i + offset + 1)
+                    offset += 2
+                }
+            }
             item.attributedTitle = mode.attributedString
+            item.indentationLevel = 1
+            let symbol = NSImage.SymbolConfiguration(pointSize: 13, weight: .bold)
+            if mode.isTVMode {
+                item.image = .init(systemSymbolName: "tv", accessibilityDescription: "TV Mode")?.withSymbolConfiguration(symbol)
+            } else if !mode.isSafeMode {
+                item.image = .init(systemSymbolName: "display.trianglebadge.exclamationmark", accessibilityDescription: "Unsafe Mode")?
+                    .withSymbolConfiguration(symbol)
+            } else if mode.width > 3800 {
+                item.image = .init(systemSymbolName: "4k.tv", accessibilityDescription: "Retina Mode")?.withSymbolConfiguration(symbol)
+            } else if mode.isNativeMode {
+                item.image = .init(systemSymbolName: "laptopcomputer", accessibilityDescription: "Native Mode")?
+                    .withSymbolConfiguration(symbol)
+            } else {
+                item.image = .init(systemSymbolName: "display", accessibilityDescription: "Computer Mode")?.withSymbolConfiguration(symbol)
+            }
+
+            oldItem = item
         }
     }
 }
