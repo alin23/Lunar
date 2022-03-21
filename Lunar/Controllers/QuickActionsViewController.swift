@@ -274,6 +274,8 @@ struct QuickActionsLayoutView: View {
     @Default(.showOrientationInQuickActions) var showOrientationInQuickActions
     @Default(.showInputInQuickActions) var showInputInQuickActions
     @Default(.showPowerInQuickActions) var showPowerInQuickActions
+    @Default(.showStandardPresets) var showStandardPresets
+    @Default(.showCustomPresets) var showCustomPresets
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -282,6 +284,8 @@ struct QuickActionsLayoutView: View {
             SettingsToggle(text: "Show rotation selector", setting: $showOrientationInQuickActions.animation(.fastSpring))
             SettingsToggle(text: "Show input source selector", setting: $showInputInQuickActions.animation(.fastSpring))
             SettingsToggle(text: "Show power button", setting: $showPowerInQuickActions.animation(.fastSpring))
+            SettingsToggle(text: "Show standard presets", setting: $showStandardPresets.animation(.fastSpring))
+            SettingsToggle(text: "Show custom presets", setting: $showCustomPresets.animation(.fastSpring))
             SettingsToggle(text: "Merge brightness and contrast", setting: $mergeBrightnessContrast.animation(.fastSpring))
             SettingsToggle(text: "Show brightness near menubar icon", setting: $showBrightnessMenuBar.animation(.fastSpring))
             SettingsToggle(
@@ -434,6 +438,52 @@ struct BlackoutPopoverView: View {
     }
 }
 
+// MARK: - PaddedTextFieldStyle
+
+public struct PaddedTextFieldStyle: TextFieldStyle {
+    // MARK: Public
+
+    public func _body(configuration: TextField<Self._Label>) -> some View {
+        configuration
+            .textFieldStyle(.plain)
+            .font(font)
+            .padding(.vertical, verticalPadding)
+            .padding(.horizontal, horizontalPadding)
+            .background(
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .fill(backgroundColor ?? .white.opacity(colorScheme == .dark ? 0.2 : 0.9))
+                    .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)
+            )
+    }
+
+    // MARK: Internal
+
+    @State var font: Font = .system(size: 12, weight: .bold)
+    @State var verticalPadding: CGFloat = 4
+    @State var horizontalPadding: CGFloat = 8
+    @State var backgroundColor: Color? = nil
+
+    @Environment(\.colorScheme) var colorScheme
+}
+
+// MARK: - TextInputView
+
+struct TextInputView: View {
+    @State var label: String
+    @State var placeholder: String
+    @Binding var data: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            if !label.isEmpty {
+                Text(label).font(.system(size: 12, weight: .semibold))
+            }
+            TextField(placeholder, text: $data)
+                .textFieldStyle(PaddedTextFieldStyle())
+        }
+    }
+}
+
 // MARK: - QuickActionsMenuView
 
 struct QuickActionsMenuView: View {
@@ -441,9 +491,11 @@ struct QuickActionsMenuView: View {
     @Environment(\.colors) var colors
     @ObservedObject var dc: DisplayController = displayController
     @Default(.overrideAdaptiveMode) var overrideAdaptiveMode
+    @Default(.showStandardPresets) var showStandardPresets
+    @Default(.showCustomPresets) var showCustomPresets
+    @Default(.showOptionsMenu) var showOptionsMenu
     @State var displays: [Display] = displayController.activeDisplayList
     @State var cursorDisplay: Display? = displayController.cursorDisplay
-    @State var layoutShown = false
     @State var adaptiveModes: [AdaptiveModeKey] = [.sensor, .sync, .location, .clock, .manual, .auto]
 
     var modeSelector: some View {
@@ -480,7 +532,7 @@ struct QuickActionsMenuView: View {
     var topRightButtons: some View {
         Group {
             SwiftUI.Button(
-                action: { withAnimation(.fastSpring) { layoutShown.toggle() } },
+                action: { withAnimation(.fastSpring) { showOptionsMenu.toggle() } },
                 label: {
                     HStack(spacing: 2) {
                         Image(systemName: "line.horizontal.3.decrease.circle.fill").font(.system(size: 12, weight: .semibold))
@@ -510,7 +562,10 @@ struct QuickActionsMenuView: View {
 
     var standardPresets: some View {
         HStack {
-            Text("Presets:").font(.system(size: 14, weight: .semibold)).opacity(0.7)
+            VStack(alignment: .center, spacing: -2) {
+                Text("Standard").font(.system(size: 10, weight: .bold)).opacity(0.7)
+                Text("Presets").font(.system(size: 12, weight: .heavy)).opacity(0.7)
+            }
             Spacer()
             PresetButtonView(percent: 0)
             PresetButtonView(percent: 25)
@@ -518,10 +573,10 @@ struct QuickActionsMenuView: View {
             PresetButtonView(percent: 75)
             PresetButtonView(percent: 100)
         }
-        .padding(6)
+        .padding(.vertical, 6)
+        .padding(.horizontal, 10)
         .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.05)))
-        .padding(.top)
-        .padding(.horizontal, 24)
+        .padding(.horizontal, MENU_HORIZONTAL_PADDING)
     }
 
     var footer: some View {
@@ -540,7 +595,7 @@ struct QuickActionsMenuView: View {
                 .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
                 .font(.system(size: 12, weight: .medium, design: .monospaced))
         }
-        .padding(.horizontal, 24)
+        .padding(.horizontal, MENU_HORIZONTAL_PADDING)
     }
 
     var header: some View {
@@ -551,7 +606,7 @@ struct QuickActionsMenuView: View {
                 topRightButtons
             }.padding(10)
 
-            if layoutShown || SWIFTUI_PREVIEW {
+            if showOptionsMenu || SWIFTUI_PREVIEW {
                 QuickActionsLayoutView()
                     .padding(.horizontal, MENU_HORIZONTAL_PADDING)
                     .padding(.top, 10)
@@ -565,6 +620,7 @@ struct QuickActionsMenuView: View {
         GeometryReader { geom in
             VStack {
                 header
+
                 if let d = cursorDisplay, !SWIFTUI_PREVIEW {
                     DisplayRowView(display: d).padding(.vertical)
                 }
@@ -573,7 +629,14 @@ struct QuickActionsMenuView: View {
                     DisplayRowView(display: d).padding(.vertical)
                 }
 
-                standardPresets
+                if showStandardPresets {
+                    standardPresets
+                }
+
+                if showCustomPresets {
+                    CustomPresetsView()
+                }
+
                 footer
             }
             .frame(width: MENU_WIDTH, alignment: .top)
