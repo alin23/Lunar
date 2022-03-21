@@ -73,6 +73,7 @@
 		C76CB7A525CFD8B7007624DE /* AdvancedSettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76CB7A425CFD8B7007624DE /* AdvancedSettingsController.swift */; };
 		C76CB7A825CFD954007624DE /* ResetButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76CB7A725CFD954007624DE /* ResetButton.swift */; };
 		C7714AF927E4A3A9002E0B2E /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7714AF827E4A3A9002E0B2E /* Components.swift */; };
+		C7714B0627E8F11C002E0B2E /* Presets.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7714B0527E8F11C002E0B2E /* Presets.swift */; };
 		C77200031FF072CB0078E155 /* ScrollableBrightness.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77200021FF072CB0078E155 /* ScrollableBrightness.swift */; };
 		C772BDD725E7A296006A1684 /* NetworkControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C772BDD625E7A296006A1684 /* NetworkControl.swift */; };
 		C7764170272139A100C7C308 /* ResetPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C776416E272139A100C7C308 /* ResetPopoverController.swift */; };
@@ -266,6 +267,7 @@
 		C76CB7A425CFD8B7007624DE /* AdvancedSettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsController.swift; sourceTree = "<group>"; };
 		C76CB7A725CFD954007624DE /* ResetButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetButton.swift; sourceTree = "<group>"; };
 		C7714AF827E4A3A9002E0B2E /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Components.swift; path = /Users/alin/Projects/Lunar/Lunar/Views/Components.swift; sourceTree = "<absolute>"; };
+		C7714B0527E8F11C002E0B2E /* Presets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Presets.swift; sourceTree = "<group>"; };
 		C77200021FF072CB0078E155 /* ScrollableBrightness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableBrightness.swift; sourceTree = "<group>"; };
 		C772BDD625E7A296006A1684 /* NetworkControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkControl.swift; sourceTree = "<group>"; };
 		C776416E272139A100C7C308 /* ResetPopoverController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResetPopoverController.swift; sourceTree = "<group>"; };
@@ -484,6 +486,7 @@
 				C7A82DC2261DF513004146A8 /* Pro.swift */,
 				C740A1F3262490E1004BC1C7 /* CLI.swift */,
 				C76B775E26447EC6007CAAC5 /* Weather.swift */,
+				C7714B0527E8F11C002E0B2E /* Presets.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -1003,6 +1006,7 @@
 				C7789AE01FF9029700D326A8 /* ScrollableContrast.swift in Sources */,
 				C7E0737A259CB2C20019C9C2 /* ManualMode.swift in Sources */,
 				C73AAC4B22241B690063AD2A /* Hotkeys.swift in Sources */,
+				C7714B0627E8F11C002E0B2E /* Presets.swift in Sources */,
 				C78BD04E259B369A00FC823F /* Popovers.swift in Sources */,
 				C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */,
 				C79975D725DEEDE000C797FF /* Control.swift in Sources */,
