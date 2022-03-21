@@ -43,7 +43,6 @@ let kAppleInterfaceThemeChangedNotification = "AppleInterfaceThemeChangedNotific
 let kAppleInterfaceStyle = "AppleInterfaceStyle"
 let kAppleInterfaceStyleSwitchesAutomatically = "AppleInterfaceStyleSwitchesAutomatically"
 
-let dataPublisherQueue = DispatchQueue(label: "fyi.lunar.data.queue", qos: .utility)
 let mediaKeyStarterQueue = RunloopQueue(named: "fyi.lunar.mediaKeyStarter.queue")
 let debounceQueue = RunloopQueue(named: "fyi.lunar.debounce.queue")
 let mainQueue = RunloopQueue(named: "fyi.lunar.main.queue")
@@ -1378,12 +1377,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 with: NotificationCenter.default
                     .publisher(for: .defaultSystemOutputDeviceChanged, object: nil)
             )
-            .receive(on: RunLoop.main)
+            .debounce(for: .milliseconds(700), scheduler: RunLoop.main)
             .sink { _ in appDelegate!.startOrRestartMediaKeyTap() }
             .store(in: &observers)
         NotificationCenter.default
             .publisher(for: currentDataPointChanged, object: nil)
-            .receive(on: RunLoop.main)
+            .debounce(for: .milliseconds(700), scheduler: RunLoop.main)
             .sink { _ in appDelegate!.updateInfoMenuItem() }
             .store(in: &observers)
         showBrightnessMenuBarPublisher
@@ -1678,6 +1677,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }.store(in: &observers)
     }
 
+    func handleCLIUpdate() {
+        let lunarBin = "/usr/local/bin/lunar"
+        if fm.fileExists(atPath: lunarBin), let currentScript = fm.contents(atPath: lunarBin)?.s,
+           currentScript.contains("Contents/MacOS/Lunar"), currentScript.contains(" $@ ")
+        {
+            fm.createFile(
+                atPath: lunarBin,
+                contents: LUNAR_CLI_SCRIPT.data(using: .utf8),
+                attributes: [.posixPermissions: 0o755]
+            )
+        }
+    }
+
     func handleCLIInstall() {
         guard CommandLine.arguments.contains("install-cli") || CommandLine.arguments
             .contains("installcli") || (CommandLine.arguments.contains("install") && CommandLine.arguments.contains("cli"))
@@ -1747,6 +1759,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         handleCLIInstall()
+        handleCLIUpdate()
         if handleCLI() {
             return
         }
