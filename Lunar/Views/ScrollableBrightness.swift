@@ -105,30 +105,30 @@ class ScrollableBrightness: NSView {
     }
 
     func addObserver(_ display: Display) {
-        display.$brightness.receive(on: dataPublisherQueue).sink { [weak self] newBrightness in
-            guard let display = self?.display, display.id != GENERIC_DISPLAY_ID else { return }
-            let minBrightness = display.minBrightness.uint16Value
-            let maxBrightness = display.maxBrightness.uint16Value
+        display.$brightness
+            .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] newBrightness in
+                guard let display = self?.display, display.id != GENERIC_DISPLAY_ID else { return }
+                let minBrightness = display.minBrightness.uint16Value
+                let maxBrightness = display.maxBrightness.uint16Value
 
-            let newBrightness = cap(newBrightness.uint16Value, minVal: minBrightness, maxVal: maxBrightness)
-            mainThread {
+                let newBrightness = cap(newBrightness.uint16Value, minVal: minBrightness, maxVal: maxBrightness)
                 self?.currentValue?.stringValue = String(newBrightness)
-            }
-        }.store(in: &displayObservers, for: "brightness")
-        display.$minBrightness.receive(on: dataPublisherQueue).sink { [weak self] newBrightness in
-            guard let self = self, let display = self.display, display.id != GENERIC_DISPLAY_ID else { return }
-            mainThread {
-                self.minValue?.intValue = self.displayMinValue.i32
-                self.maxValue?.lowerLimit = (self.displayMinValue + 1).d
-            }
-        }.store(in: &displayObservers, for: "minBrightness")
-        display.$maxBrightness.receive(on: dataPublisherQueue).sink { [weak self] newBrightness in
-            guard let self = self, let display = self.display, display.id != GENERIC_DISPLAY_ID else { return }
-            mainThread {
-                self.maxValue?.intValue = self.displayMaxValue.i32
-                self.minValue?.upperLimit = (self.displayMaxValue - 1).d
-            }
-        }.store(in: &displayObservers, for: "maxBrightness")
+            }.store(in: &displayObservers, for: "brightness")
+        display.$minBrightness
+            .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] value in
+                guard let self = self, let display = self.display, display.id != GENERIC_DISPLAY_ID else { return }
+                self.minValue?.integerValue = value.intValue
+                self.maxValue?.lowerLimit = value.doubleValue + 1
+            }.store(in: &displayObservers, for: "minBrightness")
+        display.$maxBrightness
+            .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] value in
+                guard let self = self, let display = self.display, display.id != GENERIC_DISPLAY_ID else { return }
+                self.maxValue?.integerValue = value.intValue
+                self.minValue?.upperLimit = value.doubleValue - 1
+            }.store(in: &displayObservers, for: "maxBrightness")
     }
 
     func update(from display: Display) {

@@ -105,30 +105,30 @@ class ScrollableContrast: NSView {
     }
 
     func addObserver(_ display: Display) {
-        display.$contrast.receive(on: dataPublisherQueue).sink { [weak self] newContrast in
-            guard let display = self?.display, display.id != GENERIC_DISPLAY_ID else { return }
-            let minContrast = display.minContrast.uint16Value
-            let maxContrast = display.maxContrast.uint16Value
+        display.$contrast
+            .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] newContrast in
+                guard let display = self?.display, display.id != GENERIC_DISPLAY_ID else { return }
+                let minContrast = display.minContrast.uint16Value
+                let maxContrast = display.maxContrast.uint16Value
 
-            let newContrast = cap(newContrast.uint16Value, minVal: minContrast, maxVal: maxContrast)
-            mainThread {
+                let newContrast = cap(newContrast.uint16Value, minVal: minContrast, maxVal: maxContrast)
                 self?.currentValue?.stringValue = String(newContrast)
-            }
-        }.store(in: &displayObservers, for: "contrast")
-        display.$minContrast.receive(on: dataPublisherQueue).sink { [weak self] newContrast in
-            guard let self = self, let display = self.display, display.id != GENERIC_DISPLAY_ID else { return }
-            mainThread {
-                self.minValue?.intValue = self.displayMinValue.i32
-                self.maxValue?.lowerLimit = (self.displayMinValue + 1).d
-            }
-        }.store(in: &displayObservers, for: "minContrast")
-        display.$maxContrast.receive(on: dataPublisherQueue).sink { [weak self] newContrast in
-            guard let self = self, let display = self.display, display.id != GENERIC_DISPLAY_ID else { return }
-            mainThread {
-                self.maxValue?.intValue = self.displayMaxValue.i32
-                self.minValue?.upperLimit = (self.displayMaxValue - 1).d
-            }
-        }.store(in: &displayObservers, for: "maxContrast")
+            }.store(in: &displayObservers, for: "contrast")
+        display.$minContrast
+            .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] value in
+                guard let self = self, let display = self.display, display.id != GENERIC_DISPLAY_ID else { return }
+                self.minValue?.integerValue = value.intValue
+                self.maxValue?.lowerLimit = value.doubleValue + 1
+            }.store(in: &displayObservers, for: "minContrast")
+        display.$maxContrast
+            .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] value in
+                guard let self = self, let display = self.display, display.id != GENERIC_DISPLAY_ID else { return }
+                self.maxValue?.integerValue = value.intValue
+                self.minValue?.upperLimit = value.doubleValue - 1
+            }.store(in: &displayObservers, for: "maxContrast")
     }
 
     func update(from display: Display) {

@@ -32,6 +32,9 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .showVolumeSlider,
     .showStandardPresets,
     .showCustomPresets,
+    .showXDRSelector,
+    .showHeaderOnHover,
+    .showFooterOnHover,
     .showOptionsMenu,
     .showSliderValues,
     .showAdvancedDisplaySettings,
@@ -595,6 +598,9 @@ func initCache() {
     cacheKey(.showVolumeSlider)
     cacheKey(.showStandardPresets)
     cacheKey(.showCustomPresets)
+    cacheKey(.showXDRSelector)
+    cacheKey(.showHeaderOnHover)
+    cacheKey(.showFooterOnHover)
     cacheKey(.showOptionsMenu)
     cacheKey(.showSliderValues)
     cacheKey(.showAdvancedDisplaySettings)
@@ -712,6 +718,9 @@ extension Defaults.Keys {
     static let showVolumeSlider = Key<Bool>("showVolumeSlider", default: true)
     static let showStandardPresets = Key<Bool>("showStandardPresets", default: true)
     static let showCustomPresets = Key<Bool>("showCustomPresets", default: true)
+    static let showXDRSelector = Key<Bool>("showXDRSelector", default: true)
+    static let showHeaderOnHover = Key<Bool>("showHeaderOnHover", default: false)
+    static let showFooterOnHover = Key<Bool>("showFooterOnHover", default: false)
     static let showOptionsMenu = Key<Bool>("showOptionsMenu", default: false)
     static let showSliderValues = Key<Bool>("showSliderValues", default: false)
     static let showAdvancedDisplaySettings = Key<Bool>("showAdvancedDisplaySettings", default: false)

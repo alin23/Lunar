@@ -54,8 +54,7 @@ struct ErrorTextView: View {
     var body: some View {
         Text(error).font(.system(size: 16, weight: .medium))
             .foregroundColor(.black)
-            .frame(maxWidth: 340, alignment: .topLeading)
-            .truncationMode(.middle)
+            .frame(width: 340, alignment: .topLeading)
     }
 }
 
@@ -107,13 +106,13 @@ struct CustomPresetsView: View {
         VStack(alignment: .leading) {
             HStack {
                 VStack(alignment: .center, spacing: -2) {
-                    Text("Custom").font(.system(size: 10, weight: .bold)).opacity(0.7)
+                    Text("Custom").font(.system(size: 12, weight: .bold)).opacity(0.7)
                     Text("Presets").font(.system(size: 12, weight: .heavy)).opacity(0.7)
                 }
                 Spacer()
 
                 TextField("Preset Name", text: $presetName, onCommit: save)
-                    .onReceive(Just(presetName)) { _ in limitText(9) }
+                    .onReceive(Just(presetName)) { _ in limitText(10) }
                     .textFieldStyle(PaddedTextFieldStyle(backgroundColor: .primary.opacity(0.1)))
                     .frame(width: 100)
 
@@ -149,10 +148,6 @@ struct CustomPresetsView: View {
                 }
             }
         }
-        .padding(.vertical, 6)
-        .padding(.horizontal, 10)
-        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.05)))
-        .padding(.horizontal, MENU_HORIZONTAL_PADDING)
     }
 
     func save() {
@@ -164,6 +159,7 @@ struct CustomPresetsView: View {
             error = "Preset '\(presetName)' already exists"
             return
         }
+
         presets.append(Preset(
             id: presetName,
             configs: displayController.activeDisplayList.map {
@@ -175,6 +171,7 @@ struct CustomPresetsView: View {
 
     func limitText(_ upper: Int) {
         if presetName.count > upper {
+            error = "Preset name should contain a maximum of \(upper) characters"
             presetName = String(presetName.prefix(upper))
         }
     }
