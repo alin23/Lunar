@@ -3280,10 +3280,10 @@ CORNERS</string>
                                         </textFieldCell>
                                     </textField>
                                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mts-p9-8Zt" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="65" y="159" width="120" height="56"/>
+                                        <rect key="frame" x="65" y="159" width="120" height="54"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="10" drawsBackground="YES" usesSingleLineMode="YES" id="74a-eH-SG4" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
-                                            <font key="font" metaFont="systemHeavy" size="48"/>
+                                            <font key="font" metaFont="systemHeavy" size="46"/>
                                             <color key="textColor" red="0.95206473209999998" green="0.75076706130000004" blue="0.14280970979999999" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="Field BG"/>
                                         </textFieldCell>
@@ -3379,10 +3379,10 @@ CORNERS</string>
                                         </textFieldCell>
                                     </textField>
                                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0p3-Ip-HPc" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="67" y="159" width="116" height="56"/>
+                                        <rect key="frame" x="67" y="159" width="116" height="54"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="10" drawsBackground="YES" usesSingleLineMode="YES" id="Hxe-Bv-eWX" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
-                                            <font key="font" metaFont="systemHeavy" size="48"/>
+                                            <font key="font" metaFont="systemHeavy" size="46"/>
                                             <color key="textColor" red="0.94999999999999996" green="0.74913888110000004" blue="0.14249999999999999" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" name="Field BG"/>
                                         </textFieldCell>
@@ -3775,10 +3775,10 @@ disabled</string>
                                 </connections>
                             </slider>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="E9U-Wb-J8C" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="720" y="404" width="120" height="56"/>
+                                <rect key="frame" x="720" y="404" width="120" height="54"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="100" drawsBackground="YES" usesSingleLineMode="YES" id="cSl-ea-ac9" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
-                                    <font key="font" metaFont="systemHeavy" size="48"/>
+                                    <font key="font" metaFont="systemHeavy" size="46"/>
                                     <color key="textColor" red="0.95206473209999998" green="0.75076706130000004" blue="0.14280970979999999" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="Field BG"/>
                                 </textFieldCell>
@@ -3788,10 +3788,10 @@ disabled</string>
                                 </connections>
                             </textField>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EaT-Lu-0lj" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="110" y="404" width="120" height="56"/>
+                                <rect key="frame" x="110" y="404" width="120" height="54"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="10" drawsBackground="YES" usesSingleLineMode="YES" id="EoJ-aN-NeI" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
-                                    <font key="font" metaFont="systemHeavy" size="48"/>
+                                    <font key="font" metaFont="systemHeavy" size="46"/>
                                     <color key="textColor" red="0.95206473209999998" green="0.75076706130000004" blue="0.14280970979999999" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="Field BG"/>
                                 </textFieldCell>
