@@ -840,13 +840,23 @@ struct Lunar: ParsableCommand {
 
         @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
-        @Argument(help: "Number between 0 and 100")
-        var preset: Int8
+        @Argument(help: "Percentage between 0 and 100 or name of custom preset")
+        var preset: String
 
         func validate() throws {
-            if !(0 ... 100).contains(preset) {
+            if let preset = preset.i ?? preset.replacingOccurrences(of: "%", with: "").i {
+                guard (0 ... 100).contains(preset) else {
+                    throw LunarCommandError
+                        .propertyNotValid("Preset percentage must be a number between 0 and 100")
+                }
+                return
+            }
+            let p = preset.lowercased().replacingOccurrences(of: " ", with: "")
+            if !CachedDefaults[.presets].contains(where: { $0.id.lowercased().replacingOccurrences(of: " ", with: "") == p }) {
                 throw LunarCommandError
-                    .propertyNotValid("Preset must be a number between 0 and 100")
+                    .propertyNotValid(
+                        "Custom preset '\(preset)' does not exist. Saved presets: \(CachedDefaults[.presets].map(\.id).joined(separator: ", "))"
+                    )
             }
         }
 
@@ -859,10 +869,17 @@ struct Lunar: ParsableCommand {
                 brightnessTransition = .instant
             }
 
-            displayController.setBrightnessPercent(value: preset, now: true)
-            cliSleep(1.0)
-            displayController.setContrastPercent(value: preset, now: true)
-            cliSleep(1.0)
+            if let preset = preset.i8 ?? preset.replacingOccurrences(of: "%", with: "").i8 {
+                displayController.setBrightnessPercent(value: preset, now: true)
+                cliSleep(1.0)
+                displayController.setContrastPercent(value: preset, now: true)
+                cliSleep(1.0)
+            }
+
+            let p = preset.lowercased().replacingOccurrences(of: " ", with: "")
+            if let preset = CachedDefaults[.presets].first(where: { $0.id.lowercased().replacingOccurrences(of: " ", with: "") == p }) {
+                preset.apply()
+            }
 
             for display in displayController.activeDisplays.values {
                 cliPrint(display.name)
@@ -1742,11 +1759,11 @@ let LUNAR_CLI_SCRIPT =
     #!/bin/sh
     if [[ "$1" == "ddcctl" ]]; then
         shift 1
-        "\(Bundle.main.path(forResource: "ddcctl", ofType: nil)!)" $@
+        "\(Bundle.main.path(forResource: "ddcctl", ofType: nil)!)" "$@"
     elif [[ "$1" == "launch" ]]; then
         "\(Bundle.main.bundlePath)/Contents/MacOS/Lunar"
     else
-        "\(Bundle.main.bundlePath)/Contents/MacOS/Lunar" @ $@
+        "\(Bundle.main.bundlePath)/Contents/MacOS/Lunar" @ "$@"
     fi
     """
 

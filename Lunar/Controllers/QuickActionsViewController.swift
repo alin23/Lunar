@@ -75,6 +75,7 @@ struct DisplayRowView: View {
     @Default(.showSliderValues) var showSliderValues
     @Default(.showInputInQuickActions) var showInputInQuickActions
     @Default(.showPowerInQuickActions) var showPowerInQuickActions
+    @Default(.showXDRSelector) var showXDRSelector
 
     var softwareSliders: some View {
         Group {
@@ -177,7 +178,7 @@ struct DisplayRowView: View {
                     .padding(.bottom, display.supportsEnhance ? 0 : 6)
             }
 
-            if display.supportsEnhance { sdrXdrSelector }
+            if display.supportsEnhance, showXDRSelector { sdrXdrSelector }
 
             if display.noDDCOrMergedBrightnessContrast {
                 BigSurSlider(
@@ -276,24 +277,37 @@ struct QuickActionsLayoutView: View {
     @Default(.showPowerInQuickActions) var showPowerInQuickActions
     @Default(.showStandardPresets) var showStandardPresets
     @Default(.showCustomPresets) var showCustomPresets
+    @Default(.showXDRSelector) var showXDRSelector
+    @Default(.showHeaderOnHover) var showHeaderOnHover
+    @Default(.showFooterOnHover) var showFooterOnHover
 
     var body: some View {
         VStack(alignment: .leading) {
-            SettingsToggle(text: "Show slider values", setting: $showSliderValues.animation(.fastSpring))
-            SettingsToggle(text: "Show volume slider", setting: $showVolumeSlider.animation(.fastSpring))
-            SettingsToggle(text: "Show rotation selector", setting: $showOrientationInQuickActions.animation(.fastSpring))
-            SettingsToggle(text: "Show input source selector", setting: $showInputInQuickActions.animation(.fastSpring))
-            SettingsToggle(text: "Show power button", setting: $showPowerInQuickActions.animation(.fastSpring))
-            SettingsToggle(text: "Show standard presets", setting: $showStandardPresets.animation(.fastSpring))
-            SettingsToggle(text: "Show custom presets", setting: $showCustomPresets.animation(.fastSpring))
-            SettingsToggle(text: "Merge brightness and contrast", setting: $mergeBrightnessContrast.animation(.fastSpring))
-            SettingsToggle(text: "Show brightness near menubar icon", setting: $showBrightnessMenuBar.animation(.fastSpring))
-            SettingsToggle(
-                text: "Show only external monitor brightness",
-                setting: $showOnlyExternalBrightnessMenuBar.animation(.fastSpring)
-            )
-            .padding(.leading)
-            .disabled(!showBrightnessMenuBar)
+            VStack(alignment: .leading) {
+                SettingsToggle(text: "Only show top buttons on hover", setting: $showHeaderOnHover.animation(.fastSpring))
+                SettingsToggle(text: "Only show bottom buttons on hover", setting: $showFooterOnHover.animation(.fastSpring))
+                Divider()
+                SettingsToggle(text: "Show slider values", setting: $showSliderValues.animation(.fastSpring))
+                SettingsToggle(text: "Show volume slider", setting: $showVolumeSlider.animation(.fastSpring))
+                SettingsToggle(text: "Show rotation selector", setting: $showOrientationInQuickActions.animation(.fastSpring))
+                SettingsToggle(text: "Show input source selector", setting: $showInputInQuickActions.animation(.fastSpring))
+                SettingsToggle(text: "Show power button", setting: $showPowerInQuickActions.animation(.fastSpring))
+            }
+            Divider()
+            VStack(alignment: .leading) {
+                SettingsToggle(text: "Show standard presets", setting: $showStandardPresets.animation(.fastSpring))
+                SettingsToggle(text: "Show custom presets", setting: $showCustomPresets.animation(.fastSpring))
+                SettingsToggle(text: "Merge brightness and contrast", setting: $mergeBrightnessContrast.animation(.fastSpring))
+                SettingsToggle(text: "Show XDR brightness toggle when available", setting: $showXDRSelector.animation(.fastSpring))
+                Divider()
+                SettingsToggle(text: "Show brightness near menubar icon", setting: $showBrightnessMenuBar.animation(.fastSpring))
+                SettingsToggle(
+                    text: "Show only external monitor brightness",
+                    setting: $showOnlyExternalBrightnessMenuBar.animation(.fastSpring)
+                )
+                .padding(.leading)
+                .disabled(!showBrightnessMenuBar)
+            }
         }.frame(maxWidth: .infinity, alignment: .leading)
     }
 }
@@ -493,10 +507,15 @@ struct QuickActionsMenuView: View {
     @Default(.overrideAdaptiveMode) var overrideAdaptiveMode
     @Default(.showStandardPresets) var showStandardPresets
     @Default(.showCustomPresets) var showCustomPresets
+    @Default(.showHeaderOnHover) var showHeaderOnHover
+    @Default(.showFooterOnHover) var showFooterOnHover
     @Default(.showOptionsMenu) var showOptionsMenu
     @State var displays: [Display] = displayController.activeDisplayList
     @State var cursorDisplay: Display? = displayController.cursorDisplay
     @State var adaptiveModes: [AdaptiveModeKey] = [.sensor, .sync, .location, .clock, .manual, .auto]
+
+    @State var headerOpacity: CGFloat = 1.0
+    @State var footerOpacity: CGFloat = 1.0
 
     var modeSelector: some View {
         let titleBinding = Binding<String>(
@@ -573,10 +592,6 @@ struct QuickActionsMenuView: View {
             PresetButtonView(percent: 75)
             PresetButtonView(percent: 100)
         }
-        .padding(.vertical, 6)
-        .padding(.horizontal, 10)
-        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.05)))
-        .padding(.horizontal, MENU_HORIZONTAL_PADDING)
     }
 
     var footer: some View {
@@ -596,15 +611,29 @@ struct QuickActionsMenuView: View {
                 .font(.system(size: 12, weight: .medium, design: .monospaced))
         }
         .padding(.horizontal, MENU_HORIZONTAL_PADDING)
+        .opacity(showFooterOnHover ? footerOpacity : 1.0)
+        .frame(height: footerOpacity == 0.0 ? 8 : nil)
+        .contentShape(Rectangle())
+        .onChange(of: showFooterOnHover) { showOnHover in
+            withAnimation(.fastTransition) { footerOpacity = showOnHover ? 0.0 : 1.0 }
+        }
+        .onHover { hovering in
+            withAnimation(.fastTransition) { footerOpacity = hovering ? 1.0 : 0.0 }
+        }
     }
 
     var header: some View {
-        VStack(spacing: 0) {
+        let op = (showHeaderOnHover && !showOptionsMenu) ? headerOpacity : 1.0
+        return VStack(spacing: 0) {
             HStack {
                 modeSelector
                 Spacer()
                 topRightButtons
-            }.padding(10)
+            }
+            .padding(.horizontal, 10)
+            .padding(.top, 10)
+            .padding(.bottom, 10 * op)
+            .opacity(op)
 
             if showOptionsMenu || SWIFTUI_PREVIEW {
                 QuickActionsLayoutView()
@@ -612,29 +641,36 @@ struct QuickActionsMenuView: View {
                     .padding(.top, 10)
                     .padding(.bottom, 20)
             }
-
-        }.background(Color.primary.opacity(colorScheme == .dark ? 0.03 : 0.05))
+        }
+        .background(Color.primary.opacity((colorScheme == .dark ? 0.03 : 0.05) * op))
+        .onHover { hovering in
+            withAnimation(.fastTransition) { headerOpacity = hovering ? 1.0 : 0.0 }
+        }
     }
 
     var body: some View {
-        GeometryReader { geom in
+        GeometryReader { _ in
             VStack {
                 header
 
                 if let d = cursorDisplay, !SWIFTUI_PREVIEW {
-                    DisplayRowView(display: d).padding(.vertical)
+                    DisplayRowView(display: d).padding(.bottom)
                 }
 
                 ForEach(displays) { d in
-                    DisplayRowView(display: d).padding(.vertical)
+                    DisplayRowView(display: d).padding(.bottom)
                 }
 
-                if showStandardPresets {
-                    standardPresets
-                }
-
-                if showCustomPresets {
-                    CustomPresetsView()
+                if showStandardPresets || showCustomPresets {
+                    VStack {
+                        if showStandardPresets { standardPresets }
+                        if showStandardPresets, showCustomPresets { Divider() }
+                        if showCustomPresets { CustomPresetsView() }
+                    }
+                    .padding(.vertical, 6)
+                    .padding(.horizontal, 10)
+                    .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.05)))
+                    .padding(.horizontal, MENU_HORIZONTAL_PADDING)
                 }
 
                 footer
@@ -649,6 +685,8 @@ struct QuickActionsMenuView: View {
             .onAppear {
                 cursorDisplay = dc.cursorDisplay
                 displays = dc.nonCursorDisplays
+                if showHeaderOnHover { headerOpacity = 0.0 }
+                if showFooterOnHover { footerOpacity = 0.0 }
                 appDelegate?.statusItemButtonController?
                     .resize(NSSize(
                         width: MENU_WIDTH + (MENU_HORIZONTAL_PADDING * 2),

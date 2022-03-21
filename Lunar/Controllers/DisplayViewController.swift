@@ -1262,93 +1262,112 @@ class DisplayViewController: NSViewController {
     }
 
     func listenForSendingBrightnessContrast() {
-        display?.$sendingBrightness.receive(on: dataPublisherQueue).sink { [weak self] newValue in
-            guard newValue else {
-                self?.scrollableBrightness?.currentValue.stopHighlighting()
-                return
-            }
+        display?.$sendingBrightness
+            .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] newValue in
+                guard newValue else {
+                    self?.scrollableBrightness?.currentValue.stopHighlighting()
+                    return
+                }
 
-            if let control = self?.display?.control as? NetworkControl {
-                if control.isResponsive() {
-                    self?.scrollableBrightness?.currentValue.highlight(message: "Sending")
-                } else {
-                    self?.scrollableBrightness?.currentValue.highlight(message: "Not responding")
+                if let control = self?.display?.control as? NetworkControl {
+                    if control.isResponsive() {
+                        self?.scrollableBrightness?.currentValue.highlight(message: "Sending")
+                    } else {
+                        self?.scrollableBrightness?.currentValue.highlight(message: "Not responding")
+                    }
                 }
-            }
-        }.store(in: &displayObservers, for: "sendingBrightness")
-        display?.$sendingContrast.receive(on: dataPublisherQueue).sink { [weak self] newValue in
-            guard newValue else {
-                self?.scrollableContrast?.currentValue.stopHighlighting()
-                return
-            }
-            if let control = self?.display?.control as? NetworkControl {
-                if control.isResponsive() {
-                    self?.scrollableContrast?.currentValue.highlight(message: "Sending")
-                } else {
-                    self?.scrollableContrast?.currentValue.highlight(message: "Not responding")
+            }.store(in: &displayObservers, for: "sendingBrightness")
+        display?.$sendingContrast
+            .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] newValue in
+                guard newValue else {
+                    self?.scrollableContrast?.currentValue.stopHighlighting()
+                    return
                 }
-            }
-        }.store(in: &displayObservers, for: "sendingContrast")
+                if let control = self?.display?.control as? NetworkControl {
+                    if control.isResponsive() {
+                        self?.scrollableContrast?.currentValue.highlight(message: "Sending")
+                    } else {
+                        self?.scrollableContrast?.currentValue.highlight(message: "Not responding")
+                    }
+                }
+            }.store(in: &displayObservers, for: "sendingContrast")
     }
 
     func listenForBrightnessContrastChange() {
-        display?.$maxBrightness.receive(on: DispatchQueue.main).sink { [weak self] value in
-            guard let self = self else { return }
-            self.scrollableBrightness?.maxValue.integerValue = value.intValue
-            self.scrollableBrightness?.minValue.upperLimit = value.doubleValue - 1
+        display?.$maxBrightness
+            .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] value in
+                guard let self = self else { return }
+                self.scrollableBrightness?.maxValue.integerValue = value.intValue
+                self.scrollableBrightness?.minValue.upperLimit = value.doubleValue - 1
 
-            self.maxBrightnessField?.integerValue = value.intValue
-            self.minBrightnessField?.upperLimit = value.doubleValue - 1
-        }.store(in: &displayObservers, for: "maxBrightness")
-        display?.$maxContrast.receive(on: DispatchQueue.main).sink { [weak self] value in
-            guard let self = self else { return }
-            self.scrollableContrast?.maxValue.integerValue = value.intValue
-            self.scrollableContrast?.minValue.upperLimit = value.doubleValue - 1
-        }.store(in: &displayObservers, for: "maxContrast")
+                self.maxBrightnessField?.integerValue = value.intValue
+                self.minBrightnessField?.upperLimit = value.doubleValue - 1
+            }.store(in: &displayObservers, for: "maxBrightness")
+        display?.$maxContrast
+            .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] value in
+                guard let self = self else { return }
+                self.scrollableContrast?.maxValue.integerValue = value.intValue
+                self.scrollableContrast?.minValue.upperLimit = value.doubleValue - 1
+            }.store(in: &displayObservers, for: "maxContrast")
 
-        display?.$minBrightness.receive(on: DispatchQueue.main).sink { [weak self] value in
-            guard let self = self else { return }
-            self.scrollableBrightness?.minValue.integerValue = value.intValue
-            self.scrollableBrightness?.maxValue.lowerLimit = value.doubleValue + 1
+        display?.$minBrightness
+            .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] value in
+                guard let self = self else { return }
+                self.scrollableBrightness?.minValue.integerValue = value.intValue
+                self.scrollableBrightness?.maxValue.lowerLimit = value.doubleValue + 1
 
-            self.minBrightnessField?.integerValue = value.intValue
-            self.maxBrightnessField?.lowerLimit = value.doubleValue + 1
-        }.store(in: &displayObservers, for: "minBrightness")
-        display?.$minContrast.receive(on: DispatchQueue.main).sink { [weak self] value in
-            guard let self = self else { return }
-            self.scrollableContrast?.minValue.integerValue = value.intValue
-            self.scrollableContrast?.maxValue.lowerLimit = value.doubleValue + 1
-        }.store(in: &displayObservers, for: "minContrast")
+                self.minBrightnessField?.integerValue = value.intValue
+                self.maxBrightnessField?.lowerLimit = value.doubleValue + 1
+            }.store(in: &displayObservers, for: "minBrightness")
+        display?.$minContrast
+            .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] value in
+                guard let self = self else { return }
+                self.scrollableContrast?.minValue.integerValue = value.intValue
+                self.scrollableContrast?.maxValue.lowerLimit = value.doubleValue + 1
+            }.store(in: &displayObservers, for: "minContrast")
 
-        display?.$brightness.receive(on: DispatchQueue.main).sink { [weak self] value in
-            guard let self = self else { return }
-            self.scrollableBrightness?.currentValue.integerValue = value.intValue
-        }.store(in: &displayObservers, for: "brightness")
-        display?.$contrast.receive(on: DispatchQueue.main).sink { [weak self] value in
-            guard let self = self else { return }
-            self.scrollableContrast?.currentValue.integerValue = value.intValue
-        }.store(in: &displayObservers, for: "contrast")
-        display?.$allowBrightnessZero.receive(on: DispatchQueue.main).sink { [weak self] value in
-            self?.minBrightnessField?.lowerLimit = value ? 0 : 1
-        }.store(in: &displayObservers, for: "allowBrightnessZero")
+        display?.$brightness
+            .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] value in
+                guard let self = self else { return }
+                self.scrollableBrightness?.currentValue.integerValue = value.intValue
+            }.store(in: &displayObservers, for: "brightness")
+        display?.$contrast
+            .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] value in
+                guard let self = self else { return }
+                self.scrollableContrast?.currentValue.integerValue = value.intValue
+            }.store(in: &displayObservers, for: "contrast")
+        display?.$allowBrightnessZero
+            .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] value in
+                self?.minBrightnessField?.lowerLimit = value ? 0 : 1
+            }.store(in: &displayObservers, for: "allowBrightnessZero")
     }
 
     func listenForDisplayBoolChange() {
         guard let display = display else { return }
-        display.$hasDDC.receive(on: dataPublisherQueue).sink { [weak self] hasDDC in
-            mainAsyncAfter(ms: 10) { [weak self] in
+        display.$hasDDC
+            .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] hasDDC in
                 guard let self = self else { return }
 
                 self.powerOffEnabled = self.getPowerOffEnabled(hasDDC: hasDDC)
                 self.powerOffTooltip = self.getPowerOffTooltip(hasDDC: hasDDC)
-            }
-        }.store(in: &displayObservers, for: "hasDDC")
+            }.store(in: &displayObservers, for: "hasDDC")
 
         if !display.adaptive, !display.ambientLightAdaptiveBrightnessEnabled {
             showAdaptiveNotice()
         }
-        display.$adaptive.receive(on: dataPublisherQueue).sink { [weak self] newAdaptive in
-            mainAsync { [weak self] in
+        display.$adaptive
+            .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] newAdaptive in
                 guard let self = self else { return }
                 guard let display = self.display else {
                     self.hideAdaptiveNotice()
@@ -1362,8 +1381,7 @@ class DisplayViewController: NSViewController {
                 } else {
                     self.hideAdaptiveNotice()
                 }
-            }
-        }.store(in: &displayObservers, for: "adaptive")
+            }.store(in: &displayObservers, for: "adaptive")
     }
 
     func listenForGraphDataChange() {
