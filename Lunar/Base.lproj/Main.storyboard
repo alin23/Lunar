@@ -552,56 +552,6 @@
                                                 </items>
                                             </menu>
                                         </menuItem>
-                                        <menuItem title="Quick Actions" id="XBV-bb-1ha">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <menu key="submenu" title="Quick Actions" id="eJz-YC-XA7">
-                                                <items>
-                                                    <menuItem title="Merge brightness and contrast" state="on" id="4U0-RR-lcD">
-                                                        <attributedString key="attributedTitle"/>
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <binding destination="3YV-ka-Eop" name="value" keyPath="values.mergeBrightnessContrast" id="bXp-Au-8DS"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="Show slider values" state="on" id="3U0-RR-lcD">
-                                                        <attributedString key="attributedTitle"/>
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <binding destination="3YV-ka-Eop" name="value" keyPath="values.showSliderValues" id="bXp-Au-7DS"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="Show orientation switcher" state="on" id="XtC-Fi-3Oq">
-                                                        <attributedString key="attributedTitle"/>
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <binding destination="3YV-ka-Eop" name="value" keyPath="values.showOrientationInQuickActions" id="zgZ-m2-Yhu"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="Show volume slider" state="on" id="sJQ-us-2WR">
-                                                        <attributedString key="attributedTitle"/>
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <binding destination="3YV-ka-Eop" name="value" keyPath="values.showVolumeSlider" id="HfK-Ix-BlI"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="Show brightness in menu bar" state="on" id="3hZ-CD-gRP">
-                                                        <attributedString key="attributedTitle"/>
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <binding destination="3YV-ka-Eop" name="value" keyPath="values.showBrightnessMenuBar" id="lJb-Bu-HQz"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="Show only external monitor brightness" state="on" indentationLevel="1" id="4vm-iP-IGd">
-                                                        <attributedString key="attributedTitle"/>
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <binding destination="3YV-ka-Eop" name="enabled" keyPath="values.showBrightnessMenuBar" id="k2P-N0-A5z"/>
-                                                            <binding destination="3YV-ka-Eop" name="value" keyPath="values.showOnlyExternalBrightnessMenuBar" id="1yt-ug-LLJ"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                </items>
-                                            </menu>
-                                        </menuItem>
                                         <menuItem title="Lunar Pro" id="aHz-QH-JWU">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Lunar Pro" id="BQW-zI-vBS">

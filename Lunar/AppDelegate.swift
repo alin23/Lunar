@@ -1883,8 +1883,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func applicationWillTerminate(_: Notification) {
         log.info("Going down")
 
-        CachedDefaults[.debug] = false
-        CachedDefaults[.streamLogs] = false
+        Defaults[.debug] = false
+        Defaults[.streamLogs] = false
+        Defaults[.showOptionsMenu] = false
 
         if let task = valuesReaderThread {
             lowprioQueue.cancel(timer: task)
