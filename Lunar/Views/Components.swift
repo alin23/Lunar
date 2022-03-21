@@ -21,7 +21,7 @@ struct SettingsToggle: View {
         Toggle(text, isOn: $setting)
             .toggleStyle(CheckboxToggleStyle(style: .circle))
             .foregroundColor(.primary)
-            .padding(.vertical, 0.5)
+            .frame(height: 14)
     }
 }
 
@@ -86,7 +86,8 @@ public struct FlatButton: ButtonStyle {
         radius: CGFloat = 8,
         pressedBinding: Binding<Bool>? = nil,
         horizontalPadding: CGFloat = 8,
-        verticalPadding: CGFloat = 4
+        verticalPadding: CGFloat = 4,
+        stretch: Bool = false
     ) {
         _color = colorBinding ?? .constant(color ?? Colors.lightGold)
         _textColor = textColorBinding ?? .constant(textColor ?? Colors.blackGray)
@@ -98,6 +99,7 @@ public struct FlatButton: ButtonStyle {
         _pressed = pressedBinding ?? .constant(false)
         _horizontalPadding = horizontalPadding.state
         _verticalPadding = verticalPadding.state
+        _stretch = State(initialValue: stretch)
     }
 
     // MARK: Public
@@ -108,19 +110,40 @@ public struct FlatButton: ButtonStyle {
             .foregroundColor(textColor)
             .padding(.vertical, verticalPadding)
             .padding(.horizontal, horizontalPadding)
-            .frame(minWidth: width, idealWidth: width, minHeight: height, idealHeight: height, alignment: .center)
+            .frame(
+                minWidth: width,
+                idealWidth: width,
+                maxWidth: stretch ? .infinity : nil,
+                minHeight: height,
+                idealHeight: height,
+                alignment: .center
+            )
             .background(
                 circle
                     ?
                     AnyView(
                         Circle().fill(color)
-                            .frame(minWidth: width, idealWidth: width, minHeight: height, idealHeight: height, alignment: .center)
+                            .frame(
+                                minWidth: width,
+                                idealWidth: width,
+                                maxWidth: stretch ? .infinity : nil,
+                                minHeight: height,
+                                idealHeight: height,
+                                alignment: .center
+                            )
                     )
                     : AnyView(
                         RoundedRectangle(
                             cornerRadius: radius,
                             style: .continuous
-                        ).fill(color).frame(minWidth: width, idealWidth: width, minHeight: height, idealHeight: height, alignment: .center)
+                        ).fill(color).frame(
+                            minWidth: width,
+                            idealWidth: width,
+                            maxWidth: stretch ? .infinity : nil,
+                            minHeight: height,
+                            idealHeight: height,
+                            alignment: .center
+                        )
                     )
 
             ).colorMultiply(configuration.isPressed ? pressedColor : colorMultiply)
@@ -166,6 +189,7 @@ public struct FlatButton: ButtonStyle {
     @Binding var pressed: Bool
     @State var horizontalPadding: CGFloat = 8
     @State var verticalPadding: CGFloat = 4
+    @State var stretch = false
 }
 
 // MARK: - PickerButton

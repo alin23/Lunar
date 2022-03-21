@@ -28,7 +28,11 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .autoBlackoutBuiltin,
     .streamLogs,
     .mergeBrightnessContrast,
+    .presets,
     .showVolumeSlider,
+    .showStandardPresets,
+    .showCustomPresets,
+    .showOptionsMenu,
     .showSliderValues,
     .showAdvancedDisplaySettings,
     .notificationsPermissionsGranted,
@@ -587,7 +591,11 @@ func initCache() {
     cacheKey(.workaroundBuiltinDisplay)
     cacheKey(.streamLogs)
     cacheKey(.mergeBrightnessContrast)
+    cacheKey(.presets)
     cacheKey(.showVolumeSlider)
+    cacheKey(.showStandardPresets)
+    cacheKey(.showCustomPresets)
+    cacheKey(.showOptionsMenu)
     cacheKey(.showSliderValues)
     cacheKey(.showAdvancedDisplaySettings)
     cacheKey(.lunarProActive)
@@ -700,7 +708,11 @@ extension Defaults.Keys {
     static let workaroundBuiltinDisplay = Key<Bool>("workaroundBuiltinDisplay", default: false)
     static let streamLogs = Key<Bool>("streamLogs", default: false)
     static let mergeBrightnessContrast = Key<Bool>("mergeBrightnessContrast", default: true)
+    static let presets = Key<[Preset]>("presets", default: [])
     static let showVolumeSlider = Key<Bool>("showVolumeSlider", default: true)
+    static let showStandardPresets = Key<Bool>("showStandardPresets", default: true)
+    static let showCustomPresets = Key<Bool>("showCustomPresets", default: true)
+    static let showOptionsMenu = Key<Bool>("showOptionsMenu", default: false)
     static let showSliderValues = Key<Bool>("showSliderValues", default: false)
     static let showAdvancedDisplaySettings = Key<Bool>("showAdvancedDisplaySettings", default: false)
     static let notificationsPermissionsGranted = Key<Bool>("notificationsPermissionsGranted", default: false)

@@ -63,6 +63,7 @@ class DisplayController: ObservableObject {
     var _activeDisplaysLock = NSRecursiveLock()
     var _activeDisplays: [CGDirectDisplayID: Display] = [:]
     var activeDisplaysByReadableID: [String: Display] = [:]
+    var activeDisplaysBySerial: [String: Display] = [:]
     var lastNonManualAdaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode()
     var lastModeWasAuto: Bool = !CachedDefaults[.overrideAdaptiveMode]
 
@@ -660,9 +661,12 @@ class DisplayController: ObservableObject {
         didSet {
             activeDisplays = displays.filter { $1.active }
             activeDisplaysByReadableID = [String: Display](
-                uniqueKeysWithValues: activeDisplays.map { _, display in
-                    (display.readableID, display)
-                }
+                activeDisplays.map { _, display in (display.readableID, display) },
+                uniquingKeysWith: first(this:other:)
+            )
+            activeDisplaysBySerial = [String: Display](
+                activeDisplays.map { _, display in (display.serial, display) },
+                uniquingKeysWith: first(this:other:)
             )
         }
     }
