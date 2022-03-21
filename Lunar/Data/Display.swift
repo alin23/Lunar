@@ -381,8 +381,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         allowBrightnessZero = ((try container.decodeIfPresent(Bool.self, forKey: .allowBrightnessZero)) ?? false)
 
-        let minBrightness = isSmartBuiltin ? (allowBrightnessZero ? 0 : 1) : (try container.decode(UInt16.self, forKey: .minBrightness)).ns
-        let maxBrightness = isSmartBuiltin ? 100 : (try container.decode(UInt16.self, forKey: .maxBrightness)).ns
+        let minBrightness = (try container.decode(UInt16.self, forKey: .minBrightness)).ns
+        let maxBrightness = (try container.decode(UInt16.self, forKey: .maxBrightness)).ns
         self.minBrightness = minBrightness
         self.maxBrightness = maxBrightness
         minContrast = isSmartBuiltin ? 0 : (try container.decode(UInt16.self, forKey: .minContrast)).ns
@@ -1191,8 +1191,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
         guard !modes.isEmpty else { return modes }
 
-        let grouped = Dictionary(grouping: modes, by: \.depth)
-        return Array(grouped.values.map { $0.sorted(by: { $0.dotsPerInch <= $1.dotsPerInch }).reversed() }.joined())
+        let grouped = Dictionary(grouping: modes, by: \.refreshRate).sorted(by: { $0.key >= $1.key })
+        return Array(grouped.map { $0.value.sorted(by: { $0.dotsPerInch <= $1.dotsPerInch }).reversed() }.joined())
     }()
 
     var modeChangeAsk = true
@@ -2524,9 +2524,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         ).rounded().u16
     }
 
-    @objc dynamic var allowBrightnessZero = false {
+    @Published @objc dynamic var allowBrightnessZero = false {
         didSet {
-            guard isBuiltin else { return }
+            guard isBuiltin, minBrightness.intValue <= 1 else { return }
             minBrightness = allowBrightnessZero ? 0 : 1
         }
     }
@@ -2588,10 +2588,18 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 return
             }
 
+            let brightness = (mapNumber(
+                cap(preciseBrightness, minVal: 0.0, maxVal: 1.0),
+                fromLow: 0.0,
+                fromHigh: 1.0,
+                toLow: minBrightness.doubleValue / 100.0,
+                toHigh: maxBrightness.doubleValue / 100.0
+            ) * 100).intround
+
             guard !(control is AppleNativeControl) else {
                 withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
                     mainThread {
-                        let brightness = (cap(preciseBrightness, minVal: allowBrightnessZero ? 0 : 0.01, maxVal: 1) * 100)
+//                        let brightness = (cap(preciseBrightness, minVal: allowBrightnessZero ? 0 : 0.01, maxVal: 1) * 100)
                         self.brightness = brightness.ns
                         self.insertBrightnessUserDataPoint(
                             displayController.adaptiveMode.brightnessDataPoint.last,
@@ -2601,14 +2609,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 }
                 return
             }
-
-            let brightness = (mapNumber(
-                cap(preciseBrightness, minVal: 0.0, maxVal: 1.0),
-                fromLow: 0.0,
-                fromHigh: 1.0,
-                toLow: minBrightness.doubleValue / 100.0,
-                toHigh: maxBrightness.doubleValue / 100.0
-            ) * 100).intround
 
             smallDiff = abs(brightness - self.brightness.intValue) < 5
             withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {

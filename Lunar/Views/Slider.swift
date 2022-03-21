@@ -97,9 +97,9 @@ class SliderCell: NSSliderCell {
             let centered = NSParagraphStyle.default.mutableCopy() as! NSMutableParagraphStyle
             centered.alignment = .center
 
-            let font = NSFont.systemFont(ofSize: 9, weight: .semibold)
+            let font = NSFont.monospacedSystemFont(ofSize: 8, weight: .semibold)
             let textHeight = font.boundingRectForFont.height
-            let textRect = NSRect(x: rect.minX, y: rect.midY - (textHeight / 2), width: rect.width, height: textHeight)
+            let textRect = NSRect(x: rect.minX, y: rect.midY - (textHeight / 2) + 1, width: rect.width, height: textHeight)
 
             let value = (minValue == 0 && maxValue == 1) ? CGFloat(floatValue * 100) : CGFloat(floatValue.intround)
 
