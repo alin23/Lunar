@@ -545,17 +545,18 @@ struct QuickActionsMenuView: View {
 
     var header: some View {
         VStack(spacing: 0) {
-            if layoutShown || SWIFTUI_PREVIEW {
-                QuickActionsLayoutView()
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 20)
-            }
-
             HStack {
                 modeSelector
                 Spacer()
                 topRightButtons
             }.padding(10)
+
+            if layoutShown || SWIFTUI_PREVIEW {
+                QuickActionsLayoutView()
+                    .padding(.horizontal, MENU_HORIZONTAL_PADDING)
+                    .padding(.top, 10)
+                    .padding(.bottom, 20)
+            }
 
         }.background(Color.primary.opacity(colorScheme == .dark ? 0.03 : 0.05))
     }
@@ -564,7 +565,6 @@ struct QuickActionsMenuView: View {
         GeometryReader { geom in
             VStack {
                 header
-
                 if let d = cursorDisplay, !SWIFTUI_PREVIEW {
                     DisplayRowView(display: d).padding(.vertical)
                 }
