@@ -890,9 +890,8 @@ class ModePopupButton: NSPopUpButton {
         setItemStyles()
         selectedItemPublisher
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
-            .sink { [weak self] item in
+            .sink { item in
                 guard let mgr = DisplayController.panelManager, mgr.tryLockAccess() else {
-//                    mainAsyncAfter(ms: 500) { [weak self] in self?.setItemStyles() }
                     return
                 }
                 defer { mgr.unlockAccess() }
@@ -908,7 +907,6 @@ class ModePopupButton: NSPopUpButton {
             .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
             .sink { [weak self] _ in
                 guard let mgr = DisplayController.panelManager, mgr.tryLockAccess() else {
-//                    mainAsyncAfter(ms: 500) { [weak self] in self?.setItemStyles() }
                     return
                 }
                 defer { mgr.unlockAccess() }
