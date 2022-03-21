@@ -300,6 +300,12 @@ class DisplayViewController: NSViewController {
     @IBOutlet var cornerRadiusField: ScrollableTextField?
     @IBOutlet var cornerRadiusFieldCaption: ScrollableTextFieldCaption?
 
+    @IBOutlet var minBrightnessField: ScrollableTextField?
+    @IBOutlet var minBrightnessFieldCaption: ScrollableTextFieldCaption?
+
+    @IBOutlet var maxBrightnessField: ScrollableTextField?
+    @IBOutlet var maxBrightnessFieldCaption: ScrollableTextFieldCaption?
+
     @IBOutlet var _controlsButton: NSButton!
     @IBOutlet var _softwareDimmingButton: NSButton!
     @IBOutlet var _proButton: NSButton!
@@ -756,6 +762,38 @@ class DisplayViewController: NSViewController {
             self.updateDataset(contrastFactor: factor)
         }
 
+        minBrightnessField?.integerValue = display.minBrightness.intValue
+        minBrightnessField?.lowerLimit = display.allowBrightnessZero ? 0 : 1
+        minBrightnessField?.upperLimit = (display.maxBrightness.intValue - 1).d
+
+        maxBrightnessField?.integerValue = display.maxBrightness.intValue
+        maxBrightnessField?.lowerLimit = (display.minBrightness.intValue + 1).d
+
+        minBrightnessField?.onValueChangedInstant = { [weak self] (value: Int) in
+            guard let self = self, let display = self.display else { return }
+
+            self.updateDataset(minBrightness: value.u16)
+            display.minBrightness = value.ns
+        }
+        minBrightnessField?.onValueChanged = { [weak self] (value: Int) in
+            guard let self = self, let display = self.display else { return }
+
+            self.updateDataset(minBrightness: value.u16)
+            display.minBrightness = value.ns
+        }
+        maxBrightnessField?.onValueChangedInstant = { [weak self] (value: Int) in
+            guard let self = self, let display = self.display else { return }
+
+            self.updateDataset(maxBrightness: value.u16)
+            display.maxBrightness = value.ns
+        }
+        maxBrightnessField?.onValueChanged = { [weak self] (value: Int) in
+            guard let self = self, let display = self.display else { return }
+
+            self.updateDataset(maxBrightness: value.u16)
+            display.maxBrightness = value.ns
+        }
+
         scrollableBrightness?.onCurrentValueChanged = { [weak self] brightness in
             guard let self = self, let display = self.display,
                   displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
@@ -818,6 +856,12 @@ class DisplayViewController: NSViewController {
         listenForBrightnessContrastChange()
         updateControlsButton()
         setupProButton()
+    }
+
+    override func viewDidAppear() {
+        if let resolutionsDropdown = resolutionsDropdown {
+            resolutionsDropdown.setItemStyles()
+        }
     }
 
     func setDisconnected() {
@@ -1252,6 +1296,9 @@ class DisplayViewController: NSViewController {
             guard let self = self else { return }
             self.scrollableBrightness?.maxValue.integerValue = value.intValue
             self.scrollableBrightness?.minValue.upperLimit = value.doubleValue - 1
+
+            self.maxBrightnessField?.integerValue = value.intValue
+            self.minBrightnessField?.upperLimit = value.doubleValue - 1
         }.store(in: &displayObservers, for: "maxBrightness")
         display?.$maxContrast.receive(on: DispatchQueue.main).sink { [weak self] value in
             guard let self = self else { return }
@@ -1263,6 +1310,9 @@ class DisplayViewController: NSViewController {
             guard let self = self else { return }
             self.scrollableBrightness?.minValue.integerValue = value.intValue
             self.scrollableBrightness?.maxValue.lowerLimit = value.doubleValue + 1
+
+            self.minBrightnessField?.integerValue = value.intValue
+            self.maxBrightnessField?.lowerLimit = value.doubleValue + 1
         }.store(in: &displayObservers, for: "minBrightness")
         display?.$minContrast.receive(on: DispatchQueue.main).sink { [weak self] value in
             guard let self = self else { return }
@@ -1278,6 +1328,9 @@ class DisplayViewController: NSViewController {
             guard let self = self else { return }
             self.scrollableContrast?.currentValue.integerValue = value.intValue
         }.store(in: &displayObservers, for: "contrast")
+        display?.$allowBrightnessZero.receive(on: DispatchQueue.main).sink { [weak self] value in
+            self?.minBrightnessField?.lowerLimit = value ? 0 : 1
+        }.store(in: &displayObservers, for: "allowBrightnessZero")
     }
 
     func listenForDisplayBoolChange() {
