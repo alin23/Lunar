@@ -42,6 +42,8 @@ class Button: NSButton {
 
     @IBInspectable dynamic var handCursor = true
 
+    var highligherTask: Repeater?
+
     @IBInspectable dynamic var shadowAlpha: CGFloat = 0 {
         didSet {
             if let shadow = shadow?.copy() as? NSShadow {
@@ -161,25 +163,22 @@ class Button: NSButton {
         }
     }
 
-    var highlighting: Bool { taskIsRunning(highlighterKey) }
+    var highlighting: Bool { highligherTask != nil }
 
     func highlight() {
         mainAsync { [weak self] in
-            guard let self = self, !self.isHidden, self.window?.isVisible ?? false
+            guard let self = self, !self.isHidden, self.window?.isVisible ?? false, self.highligherTask == nil
             else { return }
 
-            asyncEvery(
-                5.seconds,
-                uniqueTaskKey: self.highlighterKey,
-                skipIfExists: true,
-                eager: true,
-                queue: DispatchQueue.main
+            self.highligherTask = Repeater(
+                every: 5,
+                name: self.highlighterKey
             ) { [weak self] in
                 guard let self = self else { return }
 
                 guard self.window?.isVisible ?? false, let notice = self.notice
                 else {
-                    cancelTask(self.highlighterKey)
+                    self.highligherTask = nil
                     return
                 }
 
@@ -205,7 +204,7 @@ class Button: NSButton {
     func stopHighlighting() {
         mainAsync { [weak self] in
             guard let self = self else { return }
-            cancelTask(self.highlighterKey)
+            self.highligherTask = nil
 
             if let notice = self.notice {
                 notice.transition(0.8)

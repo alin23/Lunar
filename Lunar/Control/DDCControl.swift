@@ -6,6 +6,7 @@
 //  Copyright © 2021 Alin. All rights reserved.
 //
 
+import Combine
 import Defaults
 import Foundation
 
@@ -19,11 +20,12 @@ class DDCControl: Control {
     // MARK: Internal
 
     struct ValueRange: Equatable {
+        let displayID: CGDirectDisplayID
         let value: UInt16
         let oldValue: UInt16?
     }
 
-    static var sliderTracking = false
+    @Atomic static var sliderTracking = false
 
     var displayControl: DisplayControl = .ddc
 
@@ -34,6 +36,40 @@ class DDCControl: Control {
     var smoothTransitionContrastTask: DispatchWorkItem?
 
     @Atomic var ignoreFaults = false
+
+    var observers: Set<AnyCancellable> = []
+
+    lazy var brightnessPublisher: PassthroughSubject<ValueRange, Never> = {
+        let p = PassthroughSubject<ValueRange, Never>()
+        p.throttle(for: .milliseconds(50), scheduler: DDC.queue, latest: true)
+            .sink { [weak self] range in
+                guard let self = self else {
+                    if let display = displayController.activeDisplays[range.displayID], let control = display.control as? DDCControl {
+                        _ = control.setBrightnessDebounced(range.value, oldValue: range.oldValue)
+                    }
+                    return
+                }
+
+                _ = self.setBrightness(range.value, oldValue: range.oldValue, onChange: nil)
+            }.store(in: &observers)
+        return p
+    }()
+
+    lazy var contrastPublisher: PassthroughSubject<ValueRange, Never> = {
+        let p = PassthroughSubject<ValueRange, Never>()
+        p.throttle(for: .milliseconds(50), scheduler: DDC.queue, latest: true)
+            .sink { [weak self] range in
+                guard let self = self else {
+                    if let display = displayController.activeDisplays[range.displayID], let control = display.control as? DDCControl {
+                        _ = control.setContrastDebounced(range.value, oldValue: range.oldValue)
+                    }
+                    return
+                }
+
+                _ = self.setContrast(range.value, oldValue: range.oldValue, onChange: nil)
+            }.store(in: &observers)
+        return p
+    }()
 
     var isSoftware: Bool { false }
 
@@ -46,7 +82,9 @@ class DDCControl: Control {
             mainAsync {
                 display.responsiveDDC = true
                 display.startI2CDetection()
-                display.lastConnectionTime = Date()
+                if display.ddcEnabled {
+                    display.lastConnectionTime = Date()
+                }
             }
         } else {
             DDC.skipWritingPropertyById.removeAll()
@@ -57,7 +95,9 @@ class DDCControl: Control {
                 for display in displayController.activeDisplays.values {
                     display.responsiveDDC = true
                     display.startI2CDetection()
-                    display.lastConnectionTime = Date()
+                    if display.ddcEnabled {
+                        display.lastConnectionTime = Date()
+                    }
                 }
             }
         }
@@ -137,60 +177,14 @@ class DDCControl: Control {
             return false
         }
 
-        let key = display.preciseBrightnessKey
-        let id = display.id
-
-        let value = ValueRange(value: brightness, oldValue: oldValue)
-
-//        print("SETTING BRIGHTNESS TO \(brightness)")
-        debounce(
-            ms: 3,
-            uniqueTaskKey: key,
-            value: value,
-            subscriberKey: key
-        ) { [weak self] range in
-            guard let self = self else {
-//                log.warning("No `self` for DDCControl?", context: ["values": range])
-                cancelTask(key, subscriberKey: key)
-                if let display = displayController.activeDisplays[id], let control = display.control as? DDCControl {
-                    _ = control.setBrightnessDebounced(range.value, oldValue: range.oldValue)
-                }
-                return
-            }
-//            if let oldValue = range.oldValue {
-//                print("SETTING BRIGHTNESS FROM \(oldValue) TO \(range.value)")
-//            } else {
-//                print("SETTING BRIGHTNESS TO \(range.value)")
-//            }
-
-            _ = self.setBrightness(range.value, oldValue: range.oldValue, onChange: nil)
-        }
+        brightnessPublisher.send(ValueRange(displayID: display.id, value: brightness, oldValue: oldValue))
         return true
     }
 
     func setContrastDebounced(_ contrast: Contrast, oldValue: Contrast? = nil) -> Bool {
         guard let display = display else { return false }
 
-        let key = display.preciseContrastKey
-        let id = display.id
-
-        let value = ValueRange(value: contrast, oldValue: oldValue)
-
-        debounce(
-            ms: 3,
-            uniqueTaskKey: key,
-            value: value,
-            subscriberKey: key
-        ) { [weak self] range in
-            guard let self = self else {
-                cancelTask(key, subscriberKey: key)
-                if let display = displayController.activeDisplays[id], let control = display.control as? DDCControl {
-                    _ = control.setContrastDebounced(range.value, oldValue: range.oldValue)
-                }
-                return
-            }
-            _ = self.setContrast(range.value, oldValue: range.oldValue, onChange: nil)
-        }
+        contrastPublisher.send(ValueRange(displayID: display.id, value: contrast, oldValue: oldValue))
         return true
     }
 

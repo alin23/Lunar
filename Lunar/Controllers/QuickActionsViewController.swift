@@ -166,7 +166,7 @@ struct DisplayRowView: View {
                     Text(display.name)
                         .font(.system(size: 22, weight: .black))
                         .padding(6)
-                        .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(colors.fg.primary.opacity(0.5)))
+                        .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(colors.bg.primary.opacity(0.5)))
                         .padding(.bottom, display.supportsEnhance ? 0 : 6)
                         .padding(.top, 12)
                     PowerOffButtonView(display: display)
@@ -510,12 +510,15 @@ struct QuickActionsMenuView: View {
     @Default(.showHeaderOnHover) var showHeaderOnHover
     @Default(.showFooterOnHover) var showFooterOnHover
     @Default(.showOptionsMenu) var showOptionsMenu
+    @Default(.popoverClosed) var popoverClosed
     @State var displays: [Display] = displayController.activeDisplayList
     @State var cursorDisplay: Display? = displayController.cursorDisplay
     @State var adaptiveModes: [AdaptiveModeKey] = [.sensor, .sync, .location, .clock, .manual, .auto]
 
     @State var headerOpacity: CGFloat = 1.0
     @State var footerOpacity: CGFloat = 1.0
+
+    @EnvironmentObject var env: EnvState
 
     var modeSelector: some View {
         let titleBinding = Binding<String>(
@@ -618,6 +621,10 @@ struct QuickActionsMenuView: View {
             withAnimation(.fastTransition) { footerOpacity = showOnHover ? 0.0 : 1.0 }
         }
         .onHover { hovering in
+            guard showFooterOnHover else {
+                footerOpacity = 1.0
+                return
+            }
             withAnimation(.fastTransition) { footerOpacity = hovering ? 1.0 : 0.0 }
         }
     }
@@ -648,31 +655,36 @@ struct QuickActionsMenuView: View {
         }
     }
 
+    var content: some View {
+        Group {
+            header
+
+            if let d = cursorDisplay, !SWIFTUI_PREVIEW {
+                DisplayRowView(display: d).padding(.bottom)
+            }
+
+            ForEach(displays) { d in
+                DisplayRowView(display: d).padding(.bottom)
+            }
+
+            if showStandardPresets || showCustomPresets {
+                VStack {
+                    if showStandardPresets { standardPresets }
+                    if showStandardPresets, showCustomPresets { Divider() }
+                    if showCustomPresets { CustomPresetsView() }
+                }
+                .padding(.vertical, 6)
+                .padding(.horizontal, 10)
+                .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.05)))
+                .padding(.horizontal, MENU_HORIZONTAL_PADDING)
+            }
+        }
+    }
+
     var body: some View {
-        GeometryReader { _ in
+        GeometryReader { geom in
             VStack {
-                header
-
-                if let d = cursorDisplay, !SWIFTUI_PREVIEW {
-                    DisplayRowView(display: d).padding(.bottom)
-                }
-
-                ForEach(displays) { d in
-                    DisplayRowView(display: d).padding(.bottom)
-                }
-
-                if showStandardPresets || showCustomPresets {
-                    VStack {
-                        if showStandardPresets { standardPresets }
-                        if showStandardPresets, showCustomPresets { Divider() }
-                        if showCustomPresets { CustomPresetsView() }
-                    }
-                    .padding(.vertical, 6)
-                    .padding(.horizontal, 10)
-                    .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.05)))
-                    .padding(.horizontal, MENU_HORIZONTAL_PADDING)
-                }
-
+                content
                 footer
             }
             .frame(width: MENU_WIDTH, alignment: .top)
@@ -681,18 +693,11 @@ struct QuickActionsMenuView: View {
             .padding(.bottom, 40)
             .padding(.top, 0)
             .background(bg, alignment: .top)
-            .colors(colorScheme == .dark ? .dark : .light)
-            .onAppear {
-                cursorDisplay = dc.cursorDisplay
-                displays = dc.nonCursorDisplays
-                if showHeaderOnHover { headerOpacity = 0.0 }
-                if showFooterOnHover { footerOpacity = 0.0 }
-                appDelegate?.statusItemButtonController?
-                    .resize(NSSize(
-                        width: MENU_WIDTH + (MENU_HORIZONTAL_PADDING * 2),
-                        height: (NSScreen.main?.visibleFrame.height ?? 600) - 100
-                    ))
-            }
+            .onAppear { setup() }
+            .onChange(of: popoverClosed) { closed in if !closed { setup() }}
+        }
+        .onTapGesture {
+            env.recording = false
         }
     }
 
@@ -709,9 +714,33 @@ struct QuickActionsMenuView: View {
                 .padding(.bottom, 20)
         }
     }
+
+    func setup() {
+        cursorDisplay = dc.cursorDisplay
+        displays = dc.nonCursorDisplays
+        if showHeaderOnHover { headerOpacity = 0.0 }
+        if showFooterOnHover { footerOpacity = 0.0 }
+        appDelegate?.statusItemButtonController?
+            .resize(NSSize(
+                width: MENU_WIDTH + (MENU_HORIZONTAL_PADDING * 2),
+                height: (NSScreen.main?.visibleFrame.height ?? 600) - 50
+            ))
+    }
 }
 
-let MENU_WIDTH: CGFloat = 360
+// MARK: - QuickActionsView
+
+struct QuickActionsView: View {
+    @Environment(\.colorScheme) var colorScheme
+
+    var body: some View {
+        QuickActionsMenuView()
+            .environmentObject(EnvState())
+            .colors(colorScheme == .dark ? .dark : .light)
+    }
+}
+
+let MENU_WIDTH: CGFloat = 380
 let MENU_HORIZONTAL_PADDING: CGFloat = 24
 
 // MARK: - ViewSizeKey
@@ -735,10 +764,10 @@ struct ViewGeometry: View {
     }
 }
 
-// MARK: - QuickActionsMenuView_Previews
+// MARK: - QuickActionsView_Previews
 
-struct QuickActionsMenuView_Previews: PreviewProvider {
+struct QuickActionsView_Previews: PreviewProvider {
     static var previews: some View {
-        QuickActionsMenuView()
+        QuickActionsView()
     }
 }

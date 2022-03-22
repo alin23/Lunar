@@ -879,10 +879,11 @@ func asyncEvery(
     }
 }
 
-func cancelTask(_ key: String, subscriberKey: String? = nil) {
-//    guard let queue = taskQueueLock.around({ taskQueue[key] }) else { return }
+func cancelScreenWakeAdapterTask() {
+    appDelegate!.screenWakeAdapterTask = nil
+}
 
-//    queue.async {
+func cancelTask(_ key: String, subscriberKey: String? = nil) {
     guard let task = taskManager(key) else { return }
 
     taskManager("\(key)-cancelled", true)
@@ -898,7 +899,6 @@ func cancelTask(_ key: String, subscriberKey: String? = nil) {
     taskManagerQueue.async {
         Thread.current.threadDictionary.removeObject(forKey: key)
     }
-//    }
 }
 
 @discardableResult func asyncNow(
@@ -2022,7 +2022,7 @@ struct AXWindow {
         self.runningApp = runningApp
         self.appException = appException
         #if DEBUG
-            log.debug("\(appException) \(title) frame: \(frame)")
+            log.debug("\(appException?.description ?? "") \(title) frame: \(frame)")
             for screen in NSScreen.screens {
                 guard let id = screen.displayID else { continue }
                 log.debug("Screen \(id) frame: \(screen.frame)")

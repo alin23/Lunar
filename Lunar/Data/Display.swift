@@ -1284,9 +1284,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             resetSoftwareControl()
             preciseBrightness = Double(preciseBrightness)
 
-            thrice { d in
-                displayController.adaptBrightness(for: d, force: true)
-            }
+            displayController.adaptBrightness(for: self, force: true)
         }
     }
 
@@ -1475,7 +1473,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var softwareBrightness: Float = 1.0 {
         didSet {
             lastSoftwareBrightness = oldValue
-            log.info("Software brightness for \(self) (old: \(lastSoftwareBrightness): \(softwareBrightness)")
+            guard apply else { return }
+            log.info("Software brightness for \(self) (old: \(lastSoftwareBrightness): \(softwareBrightness))")
 
             let br = softwareBrightness
             mainAsync {
@@ -1536,6 +1535,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
             if !newValue, isBuiltin {
                 log.warning("Disabling system adaptive brightness")
+                if Logger.trace {
+                    Thread.callStackSymbols.forEach {
+                        log.info($0)
+                    }
+                }
             }
             DisplayServicesEnableAmbientLightCompensation(id, newValue)
         }
@@ -1604,6 +1608,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc dynamic lazy var dimmingMode: DimmingMode = useOverlay ? .overlay : .gamma {
         didSet {
             guard apply else { return }
+
             withoutApply {
                 useOverlay = dimmingMode == .overlay
             }
@@ -1612,6 +1617,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @objc dynamic lazy var adaptiveController: AdaptiveController = getAdaptiveController() {
         didSet {
+            guard apply else { return }
+
             switch adaptiveController {
             case .disabled:
                 adaptive = false
@@ -1959,6 +1966,66 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         return p
     }()
+
+    var xdrEnforceTask: Repeater? = nil
+    var xdrResetTask: Repeater? = nil
+
+    lazy var ddcResetPublisher: PassthroughSubject<Bool, Never> = {
+        let p = PassthroughSubject<Bool, Never>()
+        p.debounce(for: .milliseconds(10), scheduler: RunLoop.main)
+            .sink { [weak self] run in
+                guard run, let self = self else { return }
+
+                if self.control is DDCControl {
+                    self.control?.resetState()
+                } else {
+                    DDCControl(display: self).resetState()
+                }
+
+                self.resetControl()
+
+                appDelegate?.screenWakeAdapterTask = appDelegate?.screenWakeAdapterTask ?? Repeater(every: 2, times: 3) {
+                    displayController.adaptBrightness(force: true)
+                }
+            }.store(in: &observers)
+        return p
+    }()
+
+    lazy var networkResetPublisher: PassthroughSubject<Bool, Never> = {
+        let p = PassthroughSubject<Bool, Never>()
+        p.debounce(for: .milliseconds(10), scheduler: RunLoop.main)
+            .sink { [weak self] run in
+                guard run, let self = self else { return }
+
+                if self.control is NetworkControl {
+                    self.control?.resetState()
+                } else {
+                    NetworkControl.resetState(serial: self.serial)
+                }
+
+                self.resetControl()
+
+                appDelegate?.screenWakeAdapterTask = appDelegate?.screenWakeAdapterTask ?? Repeater(every: 2, times: 5) {
+                    displayController.adaptBrightness(force: true)
+                }
+            }.store(in: &observers)
+        return p
+    }()
+
+    lazy var sendingValuePublisher: PassthroughSubject<String, Never> = {
+        let p = PassthroughSubject<String, Never>()
+        p.debounce(for: .seconds(5), scheduler: RunLoop.main)
+            .sink { [weak self] name in
+                guard let self = self else { return }
+                let conditionName = name.replacingOccurrences(of: "sending", with: "sent") + "Condition"
+
+                self.setValue(false, forKey: name)
+                (self.value(forKey: conditionName) as? NSCondition)?.broadcast()
+            }.store(in: &observers)
+        return p
+    }()
+
+    var i2cDetectionTask: Repeater? = nil
 
     var alternativeControlForAppleNative: Control? = nil {
         didSet {
@@ -2533,7 +2600,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var preciseBrightnessContrast = 0.5 {
         didSet {
-            guard applyPreciseValue else { return }
+            guard applyPreciseValue else {
+                log.verbose("preciseBrightnessContrast=\(preciseBrightnessContrast) applyPreciseValue=false")
+                return
+            }
 
             let (brightness, contrast) = sliderValueToBrightnessContrast(preciseBrightnessContrast)
 
@@ -2566,9 +2636,27 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             guard applyPreciseValue else { return }
 
             var smallDiff = abs(preciseBrightness - oldValue) < 0.05
+            var oldValue = oldValue
+
+            let preciseBrightness = mapNumber(
+                cap(preciseBrightness, minVal: 0.0, maxVal: 1.0),
+                fromLow: 0.0,
+                fromHigh: 1.0,
+                toLow: minBrightness.doubleValue / 100.0,
+                toHigh: maxBrightness.doubleValue / 100.0
+            )
+            let brightness = (preciseBrightness * 100).intround
 
             guard !hasSoftwareControl else {
-                let brightness = (preciseBrightness * 100)
+                if !smallDiff {
+                    oldValue = mapNumber(
+                        cap(oldValue, minVal: 0.0, maxVal: 1.0),
+                        fromLow: 0.0,
+                        fromHigh: 1.0,
+                        toLow: minBrightness.doubleValue / 100.0,
+                        toHigh: maxBrightness.doubleValue / 100.0
+                    )
+                }
                 if supportsGamma {
                     setGamma(
                         brightness: brightness.u16,
@@ -2588,18 +2676,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 return
             }
 
-            let brightness = (mapNumber(
-                cap(preciseBrightness, minVal: 0.0, maxVal: 1.0),
-                fromLow: 0.0,
-                fromHigh: 1.0,
-                toLow: minBrightness.doubleValue / 100.0,
-                toHigh: maxBrightness.doubleValue / 100.0
-            ) * 100).intround
-
             guard !(control is AppleNativeControl) else {
                 withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
                     mainThread {
-//                        let brightness = (cap(preciseBrightness, minVal: allowBrightnessZero ? 0 : 0.01, maxVal: 1) * 100)
                         self.brightness = brightness.ns
                         self.insertBrightnessUserDataPoint(
                             displayController.adaptiveMode.brightnessDataPoint.last,
@@ -2701,12 +2780,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             guard !isForTesting else { return }
-            var brightness: UInt16
-            if displayController.adaptiveModeKey == AdaptiveModeKey.manual || hasSoftwareControl {
-                brightness = cap(self.brightness.uint16Value, minVal: 0, maxVal: 100)
-            } else {
-                brightness = cap(self.brightness.uint16Value, minVal: minBrightness.uint16Value, maxVal: maxBrightness.uint16Value)
-            }
+            var brightness = cap(brightness.uint16Value, minVal: minBrightness.uint16Value, maxVal: maxBrightness.uint16Value)
+            var oldBrightness = cap(oldValue.uint16Value, minVal: minBrightness.uint16Value, maxVal: maxBrightness.uint16Value)
 
             if brightness > minBrightness.uint16Value, softwareBrightness < 1 {
                 softwareBrightness = 1
@@ -2719,7 +2794,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 withoutApply { subzero = false }
             }
 
-            var oldBrightness: UInt16 = oldValue.uint16Value
             if DDC.applyLimits, maxDDCBrightness.uint16Value != 100 || minDDCBrightness.uint16Value != 0, !hasSoftwareControl {
                 oldBrightness = mapNumber(
                     oldBrightness.d,
@@ -2796,14 +2870,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             guard !isForTesting else { return }
-            var contrast: UInt16
-            if displayController.adaptiveModeKey == AdaptiveModeKey.manual || hasSoftwareControl {
-                contrast = cap(self.contrast.uint16Value, minVal: 0, maxVal: 100)
-            } else {
-                contrast = cap(self.contrast.uint16Value, minVal: minContrast.uint16Value, maxVal: maxContrast.uint16Value)
-            }
+            var contrast = cap(contrast.uint16Value, minVal: minContrast.uint16Value, maxVal: maxContrast.uint16Value)
+            var oldContrast = cap(oldValue.uint16Value, minVal: minContrast.uint16Value, maxVal: maxContrast.uint16Value)
 
-            var oldContrast: UInt16 = oldValue.uint16Value
             if DDC.applyLimits, maxDDCContrast.uint16Value != 100 || minDDCContrast.uint16Value != 0, !hasSoftwareControl {
                 oldContrast = mapNumber(
                     oldContrast.d,
@@ -3173,6 +3242,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
+    var shadeTask: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+
     func getSupportsEnhance() -> Bool {
         guard let control = control, let edr = screen?.maximumPotentialExtendedDynamicRangeColorComponentValue else { return false }
         return edr > 2.0 && !control.isSoftware
@@ -3302,17 +3373,28 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
+    func reapplySoftwareControl() {
+        guard hasSoftwareControl else {
+            resetSoftwareControl()
+            return
+        }
+        if supportsGamma {
+            reapplyGamma()
+        } else if !supportsGammaByDefault, hasSoftwareControl {
+            shade(amount: 1.0 - preciseBrightness)
+        }
+    }
+
     func shade(amount: Double, smooth: Bool = true) {
         guard !isInHardwareMirrorSet, !isIndependentDummy, let screen = screen ?? primaryMirrorScreen,
-              timeSince(lastConnectionTime) >= 5 || onlySoftwareDimmingEnabled
+              timeSince(lastConnectionTime) >= 1 || onlySoftwareDimmingEnabled
         else {
             shadeWindowController?.close()
             shadeWindowController = nil
             return
         }
 
-        let key = "shade-0-\(serial)"
-        cancelTask(key)
+        shadeTask = nil
         mainThread {
             if shadeWindowController?.window == nil {
                 createWindow(
@@ -3354,7 +3436,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             if amount <= 0.01, smooth {
-                asyncAfter(ms: (delay * 1000).intround + 100, uniqueTaskKey: key, mainThread: true) { [weak self] in
+                shadeTask = mainAsyncAfter(ms: (delay * 1000).intround + 100) { [weak self] in
                     guard let self = self else { return }
                     log.verbose("Removing shade for \(self.description)")
                     self.shadeWindowController?.close()
@@ -3371,7 +3453,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         shadeWindowController = nil
         mainAsync { [weak self] in
             guard let self = self else { return }
-            self.softwareBrightness = self.softwareBrightness
+            self.withoutApply {
+                self.softwareBrightness = self.softwareBrightness
+            }
         }
     }
 
@@ -3400,19 +3484,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-    func thrice(_ action: @escaping ((Display) -> Void), onFinish: ((Display) -> Void)? = nil) {
-        asyncNow { [weak self] in
-            self?.withoutSmoothTransition {
-                self?.withForce {
-                    for _ in 1 ... 3 { if let self = self { action(self) } }
-                    if let self = self {
-                        onFinish?(self)
-                    }
-                }
-            }
-        }
-    }
-
     override func isEqual(_ object: Any?) -> Bool {
         guard let other = object as? Display else {
             return false
@@ -3424,9 +3495,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func manageSendingValue(_ key: CodingKeys, oldValue _: Bool) {
         let name = key.rawValue
+        let conditionName = name.replacingOccurrences(of: "sending", with: "sent") + "Condition"
         guard let value = value(forKey: name) as? Bool,
-              let condition =
-              self.value(forKey: name.replacingOccurrences(of: "sending", with: "sent") + "Condition") as? NSCondition
+              let condition = self.value(forKey: conditionName) as? NSCondition
         else {
             log.error("No condition property found for \(name)")
             return
@@ -3435,23 +3506,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         if !value {
             condition.broadcast()
         } else {
-            let subscriberKey = "\(name)-\(serial)"
-            debounce(ms: 5000, uniqueTaskKey: name, subscriberKey: subscriberKey) { [weak self] in
-                guard let self = self else {
-                    cancelTask(name, subscriberKey: subscriberKey)
-                    return
-                }
-                self.setValue(false, forKey: name)
-
-                guard let condition = self.value(
-                    forKey: name.replacingOccurrences(of: "sending", with: "sent") + "Condition"
-                ) as? NSCondition
-                else {
-                    log.error("No condition property found for \(name)")
-                    return
-                }
-                condition.broadcast()
-            }
+            sendingValuePublisher.send(name)
         }
     }
 
@@ -3722,13 +3777,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func startI2CDetection() {
-        let taskKey = "i2c-detector-\(serial)"
-        asyncEvery(1.seconds, uniqueTaskKey: taskKey, runs: 15, eager: true, queue: .main) { [weak self] in
+        i2cDetectionTask = Repeater(every: 1, times: 15, name: "i2c-detector-\(serial)") { [weak self] in
             guard let self = self else { return }
             self.updateCornerWindow()
             self.detectI2C()
             if self.hasI2C {
-                cancelTask(taskKey)
+                self.i2cDetectionTask = nil
             }
         }
     }
@@ -3821,47 +3875,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func resetDDC() {
         detectI2C()
-        let key = "resetDDCTask"
-        let subscriberKey = "\(key)-\(serial)"
-        debounce(ms: 10, uniqueTaskKey: key, subscriberKey: subscriberKey) { [weak self] in
-            guard let self = self else {
-                cancelTask(key, subscriberKey: subscriberKey)
-                return
-            }
-            if self.control is DDCControl {
-                self.control?.resetState()
-            } else {
-                DDCControl(display: self).resetState()
-            }
 
-            self.resetControl()
-
-            asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 3, skipIfExists: true) { _ in
-                displayController.adaptBrightness(force: true)
-            }
-        }
+        ddcResetPublisher.send(true)
     }
 
     func resetNetworkController() {
-        let key = "resetNetworkControlTask"
-        let subscriberKey = "\(key)-\(serial)"
-        debounce(ms: 10, uniqueTaskKey: key, subscriberKey: subscriberKey) { [weak self] in
-            guard let self = self else {
-                cancelTask(key, subscriberKey: subscriberKey)
-                return
-            }
-            if self.control is NetworkControl {
-                self.control?.resetState()
-            } else {
-                NetworkControl.resetState(serial: self.serial)
-            }
-
-            self.resetControl()
-
-            asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) { _ in
-                displayController.adaptBrightness(force: true)
-            }
-        }
+        networkResetPublisher.send(true)
     }
 
     @objc func resetDefaultGamma() {
@@ -4264,7 +4283,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         if let readaptListener = onReadapt {
             readaptListener()
         }
-        if adaptive, displayController.adaptiveModeKey != .manual, let newVal = newValue, let oldVal = oldValue, newVal != oldVal {
+        if adaptive, let newVal = newValue, let oldVal = oldValue, newVal != oldVal {
             displayController.adaptBrightness(for: self, force: true)
         }
     }
@@ -4584,13 +4603,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             guard !isForTesting else { return }
         #endif
 
-        guard force || (enabledControls[.gamma] ?? false && (timeSince(lastConnectionTime) >= 5 || onlySoftwareDimmingEnabled))
+        guard force || (enabledControls[.gamma] ?? false && (timeSince(lastConnectionTime) >= 1 || onlySoftwareDimmingEnabled))
         else { return }
         gammaLock()
         settingGamma = true
         defer { settingGamma = false }
 
-        let brightness = brightness ?? self.brightness.uint16Value
+        let brightness = brightness ?? limitedBrightness
         let gammaTable = lunarGammaTable ?? defaultGammaTable
         let newGammaTable = gammaTable.adjust(brightness: brightness, preciseBrightness: preciseBrightness, maxValue: maxSoftwareBrightness)
 

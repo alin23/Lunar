@@ -999,7 +999,7 @@ and setting its brightness/contrast to 0</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="7bV-H8-X8t" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="770" y="655" width="16" height="16"/>
+                                <rect key="frame" x="767" y="655" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -1020,7 +1020,7 @@ and setting its brightness/contrast to 0</string>
                                 </userDefinedRuntimeAttributes>
                             </button>
                             <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xGE-aF-MVx" customClass="AdaptiveModeButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="795" y="652" width="132" height="22"/>
+                                <rect key="frame" x="789" y="652" width="140" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="Location Mode" bezelStyle="inline" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="1" imageScaling="proportionallyDown" inset="2" selectedItem="4Pr-nT-3EU" id="Kyh-RR-mh5" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>

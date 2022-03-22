@@ -55,7 +55,9 @@ class ToggleButton: NSButton {
 
     lazy var initialHeight = frame.height
 
-    var highlighting: Bool { taskIsRunning(highlighterKey) }
+    var highligherTask: Repeater?
+
+    var highlighting: Bool { highligherTask != nil }
     @IBInspectable dynamic var verticalPadding: CGFloat = 10 {
         didSet {
             setFrameSize(NSSize(width: frame.width, height: initialHeight + verticalPadding))
@@ -120,21 +122,18 @@ class ToggleButton: NSButton {
 
     func highlight() {
         mainAsync { [weak self] in
-            guard let self = self, !self.isHidden, self.window?.isVisible ?? false
+            guard let self = self, !self.isHidden, self.window?.isVisible ?? false, self.highligherTask == nil
             else { return }
 
-            asyncEvery(
-                5.seconds,
-                uniqueTaskKey: self.highlighterKey,
-                skipIfExists: true,
-                eager: true,
-                queue: DispatchQueue.main
+            self.highligherTask = Repeater(
+                every: 5,
+                name: self.highlighterKey
             ) { [weak self] in
                 guard let self = self else { return }
 
                 guard self.window?.isVisible ?? false, let notice = self.notice
                 else {
-                    cancelTask(self.highlighterKey)
+                    self.highligherTask = nil
                     return
                 }
 
@@ -160,7 +159,7 @@ class ToggleButton: NSButton {
     func stopHighlighting() {
         mainAsync { [weak self] in
             guard let self = self else { return }
-            cancelTask(self.highlighterKey)
+            self.highligherTask = nil
 
             if let notice = self.notice {
                 notice.transition(0.3)

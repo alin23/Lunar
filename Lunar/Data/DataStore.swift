@@ -29,6 +29,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .streamLogs,
     .mergeBrightnessContrast,
     .presets,
+    .popoverClosed,
     .showVolumeSlider,
     .showStandardPresets,
     .showCustomPresets,
@@ -715,6 +716,7 @@ extension Defaults.Keys {
     static let streamLogs = Key<Bool>("streamLogs", default: false)
     static let mergeBrightnessContrast = Key<Bool>("mergeBrightnessContrast", default: true)
     static let presets = Key<[Preset]>("presets", default: [])
+    static let popoverClosed = Key<Bool>("popoverClosed", default: true)
     static let showVolumeSlider = Key<Bool>("showVolumeSlider", default: true)
     static let showStandardPresets = Key<Bool>("showStandardPresets", default: true)
     static let showCustomPresets = Key<Bool>("showCustomPresets", default: true)

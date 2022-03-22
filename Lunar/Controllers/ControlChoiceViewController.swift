@@ -46,44 +46,30 @@ class LunarTestViewController: NSViewController {
     @objc dynamic var lunarTestText = "Checking Monitor"
     var taskKey = "lunarTestHighlighter"
 
+    var lunarTestHighlighter: Repeater?
+
     override func viewDidAppear() {
-        asyncEvery(
-            2.seconds,
-            uniqueTaskKey: taskKey,
-            onSuccess: {
-                mainAsync {
-                    displayController.displays.values.forEach { d in
-                        d.testWindowController?.close()
-                        d.testWindowController = nil
-                    }
-                }
-            },
-            onCancelled: {
-                mainAsync {
-                    displayController.displays.values.forEach { d in
-                        d.testWindowController?.close()
-                        d.testWindowController = nil
-                    }
-                }
+        let end = {
+            displayController.displays.values.forEach { d in
+                d.testWindowController?.close()
+                d.testWindowController = nil
             }
-        ) { [weak self] timer in
+        }
+        lunarTestHighlighter = Repeater(
+            every: 2,
+            name: taskKey,
+            onFinish: end,
+            onCancel: end
+        ) { [weak self] in
             guard let self = self else {
-                timer.invalidate()
-                mainAsync {
-                    displayController.displays.values.forEach { d in
-                        d.testWindowController?.close()
-                        d.testWindowController = nil
-                    }
-                }
+                end()
                 return
             }
-            mainThread {
-                self.label.transition(1.5, easing: .easeInOutCubic)
-                if self.label.textColor == .white {
-                    self.label.textColor = darkMauve
-                } else {
-                    self.label.textColor = .white
-                }
+            self.label.transition(1.5, easing: .easeInOutCubic)
+            if self.label.textColor == .white {
+                self.label.textColor = darkMauve
+            } else {
+                self.label.textColor = .white
             }
         }
     }
