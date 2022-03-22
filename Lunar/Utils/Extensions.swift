@@ -932,7 +932,6 @@ class ModePopupButton: NSPopUpButton {
 
     func setItemStyles() {
         guard let mgr = DisplayController.panelManager, mgr.tryLockAccess() else {
-            mainAsyncAfter(ms: 500) { [weak self] in self?.setItemStyles() }
             return
         }
 
@@ -950,7 +949,6 @@ class ModePopupButton: NSPopUpButton {
                 if let realItem = itemArray.first(where: { ($0.representedObject as? MPDisplayMode)?.description == item.title }) {
                     select(realItem)
                 }
-                print(item.title)
                 item.isHidden = true
                 continue
             }

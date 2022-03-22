@@ -170,7 +170,7 @@ import SwiftUI
 
 // MARK: - HostingView
 
-class HostingView: NSHostingView<QuickActionsMenuView> {
+class HostingView: NSHostingView<QuickActionsView> {
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         removePopoverBackground(view: self)

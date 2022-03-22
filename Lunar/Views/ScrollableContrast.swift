@@ -79,7 +79,7 @@ class ScrollableContrast: NSView {
             display?.minContrast.intValue ?? 0
         }
         set {
-            cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+            cancelScreenWakeAdapterTask()
             display?.minContrast = newValue.ns
         }
     }
@@ -89,7 +89,7 @@ class ScrollableContrast: NSView {
             display?.maxContrast.intValue ?? 100
         }
         set {
-            cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+            cancelScreenWakeAdapterTask()
             display?.maxContrast = newValue.ns
         }
     }
@@ -99,21 +99,21 @@ class ScrollableContrast: NSView {
             display?.contrast.intValue ?? 50
         }
         set {
-            cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+            cancelScreenWakeAdapterTask()
             display?.contrast = newValue.ns
         }
     }
 
     func addObserver(_ display: Display) {
         display.$contrast
-            .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
+            .throttle(for: .milliseconds(50), scheduler: DDC.queue, latest: true)
             .sink { [weak self] newContrast in
                 guard let display = self?.display, display.id != GENERIC_DISPLAY_ID else { return }
                 let minContrast = display.minContrast.uint16Value
                 let maxContrast = display.maxContrast.uint16Value
 
                 let newContrast = cap(newContrast.uint16Value, minVal: minContrast, maxVal: maxContrast)
-                self?.currentValue?.stringValue = String(newContrast)
+                mainAsync { self?.currentValue?.stringValue = String(newContrast) }
             }.store(in: &displayObservers, for: "contrast")
         display.$minContrast
             .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)

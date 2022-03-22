@@ -91,8 +91,8 @@ class ManualMode: AdaptiveMode {
                 log.debug("Setting contrast to \(contrast) for \(display)")
             #endif
             mainThread {
-                display.brightness = brightness.ns
-                display.contrast = contrast.ns
+                display.brightness = cap(brightness, minVal: display.minBrightness.intValue, maxVal: display.maxBrightness.intValue).ns
+                display.contrast = cap(contrast, minVal: display.minContrast.intValue, maxVal: display.maxContrast.intValue).ns
             }
         }
     }
