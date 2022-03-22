@@ -37,11 +37,9 @@ class SliderCell: NSSliderCell {
 
     override func startTracking(at startPoint: NSPoint, in controlView: NSView) -> Bool {
         pressed = true
-        mainAsyncAfter(ms: 10) {
-            AppleNativeControl.sliderTracking = true
-            GammaControl.sliderTracking = true
-            DDCControl.sliderTracking = true
-        }
+        AppleNativeControl.sliderTracking = true
+        GammaControl.sliderTracking = true
+        DDCControl.sliderTracking = true
         return super.startTracking(at: startPoint, in: controlView)
     }
 
@@ -52,14 +50,6 @@ class SliderCell: NSSliderCell {
         DDCControl.sliderTracking = false
         super.stopTracking(last: lastPoint, current: stopPoint, in: controlView, mouseIsUp: flag)
     }
-
-//     override func knobRect(flipped: Bool) -> NSRect {
-//         let knob = super.knobRect(flipped: flipped)
-//         let size = verticalPadding
-//         let rect = NSRect(x: knob.midX - (size / 2) + 0.5, y: knob.midY - (size / 2) - 1.5, width: size - 1, height: size - 1)
-//
-//         return rect
-//     }
 
     override func drawKnob(_ knobRect: NSRect) {
         let size = verticalPadding
@@ -90,8 +80,6 @@ class SliderCell: NSSliderCell {
         let color = knobColor.withSystemEffect(pressed ? .pressed : .none)
         color.setFill()
         knob.fill()
-//        color.blended(withFraction: 0.2, of: .gray)!.setStroke()
-//        knob.stroke()
 
         if shouldDrawText {
             let centered = NSParagraphStyle.default.mutableCopy() as! NSMutableParagraphStyle
@@ -194,32 +182,6 @@ class SliderCell: NSSliderCell {
             )
             color.setFill()
             active.fill()
-//
-//            guard let context = NSGraphicsContext.current?.cgContext else {
-//                color.setFill()
-//                active.fill()
-//                return
-//            }
-//
-//            context.beginTransparencyLayer(auxiliaryInfo: nil)
-//            color.setFill()
-//            active.fill()
-//            context.setBlendMode(.sourceIn)
-//
-//            let colors = [.clear, color.cgColor]
-//            let colorSpace = CGColorSpaceCreateDeviceRGB()
-//            let colorLocations: [CGFloat] = left ? [0.0, 0.5] : [0.5, 0.0]
-//            guard let gradient = CGGradient(colorsSpace: colorSpace, colors: colors as CFArray, locations: colorLocations) else {
-//                context.endTransparencyLayer()
-//                color.setFill()
-//                active.fill()
-//                return
-//            }
-//            let startPoint = CGPoint(x: fillRect.size.width, y: fillRect.size.height / 2)
-//            let endPoint = CGPoint(x: 0.0, y: fillRect.size.height / 2)
-//
-//            context.drawLinearGradient(gradient, start: startPoint, end: endPoint, options: CGGradientDrawingOptions.drawsBeforeStartLocation)
-//            context.endTransparencyLayer()
         }
     }
 }
@@ -267,6 +229,7 @@ class Slider: NSSlider {
     override func mouseExited(with _: NSEvent) {
         AppleNativeControl.sliderTracking = false
         GammaControl.sliderTracking = false
+        DDCControl.sliderTracking = false
         transition(0.8)
         alphaValue = 0.9
     }
@@ -278,8 +241,6 @@ class Slider: NSSlider {
 
     override func scrollWheel(with event: NSEvent) {
         guard isEnabled else { return }
-        AppleNativeControl.sliderTracking = (event.scrollingDeltaX + event.scrollingDeltaY != 0)
-        GammaControl.sliderTracking = AppleNativeControl.sliderTracking
 
         let range = Float(maxValue - minValue)
         var delta = Float(0)
@@ -293,6 +254,26 @@ class Slider: NSSlider {
         if event.isDirectionInvertedFromDevice {
             delta *= -1
         }
+
+        switch event.phase {
+        case .changed, .began, .mayBegin:
+            if !AppleNativeControl.sliderTracking {
+                AppleNativeControl.sliderTracking = true
+                GammaControl.sliderTracking = true
+                DDCControl.sliderTracking = true
+            }
+        case .ended, .cancelled, .stationary:
+            if AppleNativeControl.sliderTracking {
+                AppleNativeControl.sliderTracking = false
+                GammaControl.sliderTracking = false
+                DDCControl.sliderTracking = false
+            }
+        default:
+            AppleNativeControl.sliderTracking = delta != 0
+            GammaControl.sliderTracking = AppleNativeControl.sliderTracking
+            DDCControl.sliderTracking = AppleNativeControl.sliderTracking
+        }
+
         let increment = range * (delta / (150 * Float(scrollPrecision)))
         floatValue = floatValue + increment
         sendAction(action, to: target)

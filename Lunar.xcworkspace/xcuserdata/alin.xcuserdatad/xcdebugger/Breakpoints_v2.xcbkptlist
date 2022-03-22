@@ -3,4 +3,22 @@
    uuid = "A71689F0-05ED-400C-9A39-47EC0A36555F"
    type = "0"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "73436044-E392-465B-B0BE-1C2E243EAF50"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Lunar/Data/Display.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1537"
+            endingLineNumber = "1537"
+            landmarkName = "ambientLightAdaptiveBrightnessEnabled"
+            landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

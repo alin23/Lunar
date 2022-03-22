@@ -129,7 +129,7 @@ extension String {
 class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringConvertible {
     // MARK: Lifecycle
 
-    init(_ identifier: String, handler: ((HotKey) -> Void)? = nil, dict hk: [HotkeyPart: Int]) {
+    init(_ identifier: String, dict hk: [HotkeyPart: Int], handler: ((HotKey) -> Void)? = nil) {
         let keyCode = hk[.keyCode]!
         let enabled = hk[.enabled]!
         let modifiers = hk[.modifiers]!
@@ -244,6 +244,8 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
 
     @Atomic static var isRecording = false
 
+    static let PRESET_PREFIX = "preset-"
+
     var allowsHold: Bool {
         get { hotkey.detectKeyHold }
         set { hotkey.detectKeyHold = newValue }
@@ -335,6 +337,13 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
         hotkey.callback
     }
 
+    var isPresetHotkey: Bool { identifier.starts(with: Self.PRESET_PREFIX) }
+    var preset: Preset? {
+        guard isPresetHotkey else { return nil }
+        let presetID = identifier.suffix(identifier.count - Self.PRESET_PREFIX.count)
+        return CachedDefaults[.presets].first { $0.id == presetID }
+    }
+
     static func == (lhs: PersistentHotkey, rhs: PersistentHotkey) -> Bool {
         lhs.identifier == rhs.identifier
     }
@@ -386,6 +395,13 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
         var hotkeys = CachedDefaults[.hotkeys]
         hotkeys.remove(self)
         hotkeys.insert(self)
+        CachedDefaults[.hotkeys] = hotkeys
+    }
+
+    func delete() {
+        var hotkeys = CachedDefaults[.hotkeys]
+        hotkeys.remove(self)
+        unregister()
         CachedDefaults[.hotkeys] = hotkeys
     }
 
@@ -1292,45 +1308,45 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     @objc func percent0HotkeyHandler() {
-        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelScreenWakeAdapterTask()
         setLightPercent(percent: 0)
         log.debug("0% Hotkey pressed")
     }
 
     @objc func percent25HotkeyHandler() {
-        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelScreenWakeAdapterTask()
         setLightPercent(percent: 25)
         log.debug("25% Hotkey pressed")
     }
 
     @objc func percent50HotkeyHandler() {
-        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelScreenWakeAdapterTask()
         setLightPercent(percent: 50)
         log.debug("50% Hotkey pressed")
     }
 
     @objc func percent75HotkeyHandler() {
-        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelScreenWakeAdapterTask()
         setLightPercent(percent: 75)
         log.debug("75% Hotkey pressed")
     }
 
     @objc func percent100HotkeyHandler() {
-        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelScreenWakeAdapterTask()
         setLightPercent(percent: 100)
         log.debug("100% Hotkey pressed")
     }
 
     @objc func faceLightHotkeyHandler() {
         guard lunarProActive else { return }
-        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelScreenWakeAdapterTask()
         faceLight(self)
         log.debug("FaceLight Hotkey pressed")
     }
 
     @objc func blackOutHotkeyHandler() {
         guard lunarProActive else { return }
-        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelScreenWakeAdapterTask()
         blackOut(self)
         log.debug("BlackOut Hotkey pressed")
     }
@@ -1343,14 +1359,14 @@ extension AppDelegate: MediaKeyTapDelegate {
 
     @objc func blackOutNoMirroringHotkeyHandler() {
         guard lunarProActive else { return }
-        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelScreenWakeAdapterTask()
         blackOutNoMirroring(self)
         log.debug("BlackOut No Mirroring Hotkey pressed")
     }
 
     @objc func blackOutOthersHotkeyHandler() {
         guard lunarProActive else { return }
-        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelScreenWakeAdapterTask()
         blackOutOthers(self)
         log.debug("BlackOut Other Displays Hotkey pressed")
     }
@@ -1392,7 +1408,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func brightnessUpAction(offset: Int? = nil) {
-        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelScreenWakeAdapterTask()
         increaseBrightness(by: offset)
         if CachedDefaults[.hotkeysAffectBuiltin] {
             increaseBrightness(by: offset, builtinDisplay: true)
@@ -1407,7 +1423,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func brightnessDownAction(offset: Int? = nil) {
-        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelScreenWakeAdapterTask()
         decreaseBrightness(by: offset)
         if CachedDefaults[.hotkeysAffectBuiltin] {
             decreaseBrightness(by: offset, builtinDisplay: true)
@@ -1422,7 +1438,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func contrastUpAction(offset: Int? = nil) {
-        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelScreenWakeAdapterTask()
         increaseContrast(by: offset)
 
         for (_, display) in displayController.activeDisplays {
@@ -1434,7 +1450,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func contrastDownAction(offset: Int? = nil) {
-        cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+        cancelScreenWakeAdapterTask()
         decreaseContrast(by: offset)
 
         for (_, display) in displayController.activeDisplays {

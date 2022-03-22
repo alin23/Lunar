@@ -291,7 +291,7 @@ public struct Colors {
         // MARK: Internal
 
         var gray: Color { isDark ? Colors.lightGray : Colors.darkGray }
-        var primary: Color { isDark ? .black : .white }
+        var primary: Color { isDark ? .white : .black }
     }
 
     public struct BG {
@@ -305,7 +305,7 @@ public struct Colors {
         // MARK: Internal
 
         var gray: Color { isDark ? Colors.darkGray : Colors.lightGray }
-        var primary: Color { isDark ? .white : .black }
+        var primary: Color { isDark ? .black : .white }
     }
 
     public static var light = Colors(.light, accent: Colors.lunarYellow)

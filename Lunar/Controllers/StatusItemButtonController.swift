@@ -1,5 +1,6 @@
 import Atomics
 import Cocoa
+import Defaults
 
 class StatusItemButtonController: NSView, NSPopoverDelegate {
     // MARK: Lifecycle
@@ -14,6 +15,10 @@ class StatusItemButtonController: NSView, NSPopoverDelegate {
     var statusButton: NSStatusBarButton?
     var backgroundView: PopoverBackgroundView?
 
+    func popoverWillShow(_ notification: Notification) {
+        Defaults[.popoverClosed] = false
+    }
+
     func popoverDidClose(_: Notification) {
         if let window = menuPopover?.contentViewController?.view.window {
             window.identifier = nil
@@ -22,6 +27,7 @@ class StatusItemButtonController: NSView, NSPopoverDelegate {
             $0.identifier == NSUserInterfaceItemIdentifier(rawValue: "positioningView")
         }
         positioningView?.removeFromSuperview()
+        Defaults[.popoverClosed] = true
     }
 
     override func rightMouseDown(with _: NSEvent) {
@@ -40,7 +46,9 @@ class StatusItemButtonController: NSView, NSPopoverDelegate {
     func resize(_ size: NSSize) {
         guard let menuPopover = menuPopover else { return }
 
-        menuPopover.contentSize = size
+        if size != menuPopover.contentSize {
+            menuPopover.contentSize = size
+        }
         guard let positioningView = statusButton?.subviews.first(where: {
             $0.identifier == NSUserInterfaceItemIdentifier(rawValue: "positioningView")
         }) else { return }
