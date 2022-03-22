@@ -363,19 +363,19 @@ extension AdaptiveMode {
                 dataPoint > value.intround
             }) ?? (key: dataPoint.max, value: MAX_BRIGHTNESS.i))
 
-            let builtinLow = userValueBefore.key.d
-            let builtinHigh = userValueAfter.key.d
-            let externalLow = userValueBefore.value.d
-            let externalHigh = userValueAfter.value.d
+            let sourceLow = userValueBefore.key.d
+            let sourceHigh = userValueAfter.key.d
+            let targetLow = userValueBefore.value.d
+            let targetHigh = userValueAfter.value.d
 
-            if builtinLow == builtinHigh || externalLow == externalHigh {
-                newValue = externalLow
+            if sourceLow == sourceHigh || targetLow == targetHigh {
+                newValue = targetLow
             } else {
-                newValue = mapNumber(value, fromLow: builtinLow, fromHigh: builtinHigh, toLow: externalLow, toHigh: externalHigh)
+                newValue = mapNumber(value, fromLow: sourceLow, fromHigh: sourceHigh, toLow: targetLow, toHigh: targetHigh)
                 if key == .sensor {
-                    newValue = adjustCurve(newValue, factor: 0.5, minVal: externalLow, maxVal: externalHigh)
+                    newValue = adjustCurve(newValue, factor: 0.5, minVal: targetLow, maxVal: targetHigh)
                 }
-                newValue = adjustCurve(newValue, factor: curveFactor > 0 ? curveFactor : 1, minVal: externalLow, maxVal: externalHigh)
+                newValue = adjustCurve(newValue, factor: curveFactor > 0 ? curveFactor : 1, minVal: targetLow, maxVal: targetHigh)
             }
             if newValue.isNaN {
                 log.error(

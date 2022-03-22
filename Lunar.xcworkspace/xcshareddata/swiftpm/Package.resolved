@@ -96,7 +96,7 @@
       "location" : "https://github.com/alin23/KeyHolder",
       "state" : {
         "branch" : "master",
-        "revision" : "657e6c54ff670c91a27ccea8e73893c5b9664c18"
+        "revision" : "4cbb7eaa0b9ba245d33e9cf176f2b70c778f2784"
       }
     },
     {
@@ -150,7 +150,7 @@
       "location" : "https://github.com/alin23/sentry-cocoa.git",
       "state" : {
         "branch" : "master",
-        "revision" : "fc37f1284e42a8dbdd3e4c5f3981ab0feae92b8b"
+        "revision" : "f58ffa92bf3dc65956c6cf2a01b7bee1eabbdf5a"
       }
     },
     {
@@ -194,8 +194,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
-        "revision" : "554e7659eb5b4dff97158d531aabecf11d546e2d",
-        "version" : "1.1.0"
+        "revision" : "82905286cc3f0fa8adc4674bf49437cab65a8373",
+        "version" : "1.1.1"
       }
     },
     {

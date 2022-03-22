@@ -43,14 +43,18 @@ class DisplayController: ObservableObject {
             log.verbose("START DEINIT")
             defer { log.verbose("END DEINIT") }
         #endif
-        cancelTask(CONTROL_WATCHER_TASK_KEY)
-        cancelTask(MODE_WATCHER_TASK_KEY)
-        cancelTask(SCREENCAPTURE_WATCHER_TASK_KEY)
+        controlWatcherTask = nil
+        modeWatcherTask = nil
+        screencaptureWatcherTask = nil
     }
 
     // MARK: Internal
 
     static var panelManager: MPDisplayMgr? = MPDisplayMgr()
+
+    var controlWatcherTask: Repeater?
+    var modeWatcherTask: Repeater?
+    var screencaptureWatcherTask: Repeater?
 
     let getDisplaysLock = NSRecursiveLock()
     @Atomic var lidClosed: Bool = isLidClosed()
@@ -173,34 +177,30 @@ class DisplayController: ObservableObject {
     }
 
     func watchModeAvailability() {
-        asyncNow { [self] in
-            guard !taskIsRunning(MODE_WATCHER_TASK_KEY) else {
-                return
-            }
-
-            guard !pausedOverrideAdaptiveModeObserver else { return }
-
-            pausedOverrideAdaptiveModeObserver = true
-            asyncEvery(5.seconds, uniqueTaskKey: MODE_WATCHER_TASK_KEY, queue: .main) { [weak self] in
-                guard !screensSleeping.load(ordering: .relaxed), let self = self else { return }
-                self.autoAdaptMode()
-            }
-            pausedOverrideAdaptiveModeObserver = false
+        guard modeWatcherTask == nil else {
+            return
         }
+
+        guard !pausedOverrideAdaptiveModeObserver else { return }
+
+        pausedOverrideAdaptiveModeObserver = true
+        modeWatcherTask = Repeater(every: 5, name: MODE_WATCHER_TASK_KEY) { [weak self] in
+            guard !screensSleeping.load(ordering: .relaxed), let self = self else { return }
+            self.autoAdaptMode()
+        }
+        pausedOverrideAdaptiveModeObserver = false
     }
 
     func watchScreencaptureProcess() {
-        asyncNow { [self] in
-            guard !taskIsRunning(SCREENCAPTURE_WATCHER_TASK_KEY) else {
-                return
-            }
+        guard screencaptureWatcherTask == nil else {
+            return
+        }
 
-            asyncEvery(1.seconds, uniqueTaskKey: SCREENCAPTURE_WATCHER_TASK_KEY, queue: .main) { [weak self] in
-                guard !screensSleeping.load(ordering: .relaxed), let self = self,
-                      self.activeDisplayList.contains(where: { $0.hasSoftwareControl && !$0.supportsGamma })
-                else { return }
-                self.screencaptureIsRunning.send(processIsRunning("/usr/sbin/screencapture", nil))
-            }
+        screencaptureWatcherTask = Repeater(every: 1, name: SCREENCAPTURE_WATCHER_TASK_KEY) { [weak self] in
+            guard !screensSleeping.load(ordering: .relaxed), let self = self,
+                  self.activeDisplayList.contains(where: { $0.hasSoftwareControl && !$0.supportsGamma })
+            else { return }
+            self.screencaptureIsRunning.send(processIsRunning("/usr/sbin/screencapture", nil))
         }
     }
 
@@ -220,9 +220,9 @@ class DisplayController: ObservableObject {
         NSWorkspace.shared.notificationCenter.publisher(
             for: NSWorkspace.screensDidSleepNotification, object: nil
         ).sink { _ in
-            cancelTask(self.CONTROL_WATCHER_TASK_KEY)
-            cancelTask(self.MODE_WATCHER_TASK_KEY)
-            cancelTask(self.SCREENCAPTURE_WATCHER_TASK_KEY)
+            self.controlWatcherTask = nil
+            self.modeWatcherTask = nil
+            self.screencaptureWatcherTask = nil
         }.store(in: &observers)
 
         mergeBrightnessContrastPublisher.sink { change in
@@ -608,6 +608,22 @@ class DisplayController: ObservableObject {
     var screencaptureIsRunning: CurrentValueSubject<Bool, Never> = .init(processIsRunning("/usr/sbin/screencapture", nil))
 
     @Atomic var apply = true
+
+    lazy var panelRefreshPublisher: PassthroughSubject<CGDirectDisplayID, Never> = {
+        let p = PassthroughSubject<CGDirectDisplayID, Never>()
+        p.debounce(for: .seconds(2), scheduler: RunLoop.main)
+            .sink { [self] id in
+                DisplayController.panelManager = MPDisplayMgr()
+                if let display = self.activeDisplays[id] {
+                    display.refreshPanel()
+                }
+            }.store(in: &observers)
+        return p
+    }()
+
+    var blackOutEnforceTask: Repeater?
+
+    var reconfigureTask: Repeater?
 
     var displayList: [Display] {
         displays.values.sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }.reversed()
@@ -1270,47 +1286,52 @@ class DisplayController: ObservableObject {
     }
 
     func reconfigure() {
-        thrice(uniqueTaskKey: "display-controller-reconfiguration") { dc in
-            log.info("Resetting software dimming")
-            dc.activeDisplays.values.forEach { d in
-                d.updateCornerWindow()
-                if d.softwareBrightness == 1.0 {
-                    d.resetSoftwareControl()
+        reconfigureTask = nil
+
+        guard adaptiveMode.available else { return }
+        reconfigureTask = Repeater(every: 1, times: 3, name: "DisplayControllerReconfigure") { [self] in
+            adaptiveMode.withForce {
+                log.info("Resetting software dimming")
+                activeDisplays.values.forEach { d in
+                    d.updateCornerWindow()
+                    if d.softwareBrightness == 1.0 {
+                        d.resetSoftwareControl()
+                    }
                 }
-            }
 
-            log.info("Removing old overlays")
-            windowControllerQueue.sync {
-                dc.removeOldOverlays()
-            }
+                log.info("Removing old overlays")
+                removeOldOverlays()
 
-            log.info("Re-adapting brightness after reconfiguration")
-            dc.adaptBrightness(force: true)
+                log.info("Re-adapting brightness after reconfiguration")
+                adaptBrightness(force: true)
+            }
         }
     }
 
     func removeOldOverlays() {
-        let idsWithWindows: Set<CGDirectDisplayID> = Set(
+        windowControllerQueue.sync {
+            let idsWithWindows: Set<CGDirectDisplayID> = Set(
+                Thread.current.threadDictionary.allKeys
+                    .compactMap { $0 as? String }
+                    .filter { $0.starts(with: "window-") }
+                    .compactMap { $0.split(separator: "-").last?.u32 }
+            )
+            let currentIDs: Set<CGDirectDisplayID> = Set(displays.keys)
+
+            let idsToRemove = idsWithWindows.subtracting(currentIDs)
             Thread.current.threadDictionary.allKeys
                 .compactMap { $0 as? String }
-                .filter { $0.starts(with: "window-") }
-                .compactMap { $0.split(separator: "-").last?.u32 }
-        )
-        let currentIDs: Set<CGDirectDisplayID> = Set(displays.keys)
-
-        let idsToRemove = idsWithWindows.subtracting(currentIDs)
-        Thread.current.threadDictionary.allKeys
-            .compactMap { $0 as? String }
-            .filter {
-                guard $0.starts(with: "window-"), let id = $0.split(separator: "-").last?.u32 else { return false }
-                return idsToRemove.contains(id)
-            }.forEach { key in
-                guard let wc = Thread.current.threadDictionary[key] as? NSWindowController else {
-                    return
+                .filter {
+                    guard $0.starts(with: "window-"), let id = $0.split(separator: "-").last?.u32 else { return false }
+                    return idsToRemove.contains(id)
+                }.forEach { key in
+                    guard let wc = Thread.current.threadDictionary[key] as? NSWindowController else {
+                        return
+                    }
+                    wc.close()
+                    Thread.current.threadDictionary.removeObject(forKey: key)
                 }
-                wc.close()
-                Thread.current.threadDictionary.removeObject(forKey: key)
-            }
+        }
     }
 
     func shouldPromptAboutFallback(_ display: Display) -> Bool {
@@ -1389,18 +1410,16 @@ class DisplayController: ObservableObject {
     }
 
     func watchControlAvailability() {
-        asyncNow { [self] in
-            guard !taskIsRunning(CONTROL_WATCHER_TASK_KEY) else {
-                return
-            }
+        guard controlWatcherTask == nil else {
+            return
+        }
 
-            asyncEvery(15.seconds, uniqueTaskKey: CONTROL_WATCHER_TASK_KEY, queue: .main) { [self] in
-                guard !screensSleeping.load(ordering: .relaxed) else { return }
-                for display in activeDisplays.values {
-                    display.control = display.getBestControl()
-                    if shouldPromptAboutFallback(display) {
-                        asyncNow { self.promptAboutFallback(display) }
-                    }
+        controlWatcherTask = Repeater(every: 15, name: CONTROL_WATCHER_TASK_KEY) { [self] in
+            guard !screensSleeping.load(ordering: .relaxed) else { return }
+            for display in activeDisplays.values {
+                display.control = display.getBestControl()
+                if shouldPromptAboutFallback(display) {
+                    asyncNow { self.promptAboutFallback(display) }
                 }
             }
         }
@@ -1568,32 +1587,6 @@ class DisplayController: ObservableObject {
         for display in (displays ?? activeDisplayList).filter({ !$0.blackOutEnabled }) {
             adaptiveMode.withForce(force || display.force) {
                 self.adaptiveMode.adapt(display)
-            }
-        }
-    }
-
-    @discardableResult
-    func thrice(
-        uniqueTaskKey key: String,
-        _ action: @escaping ((DisplayController) -> Void),
-        onFinish: ((DisplayController) -> Void)? = nil
-    ) -> DispatchWorkItem {
-        if Logger.trace {
-            Thread.callStackSymbols.forEach {
-                log.info($0)
-            }
-        }
-
-        return asyncAfter(ms: 10, uniqueTaskKey: key) { [self] in
-            guard adaptiveMode.available else { return }
-            adaptiveMode.withForce {
-                guard !isCancelled(key) else { return }
-                for _ in 1 ... 3 {
-                    action(self)
-                    Thread.sleep(forTimeInterval: 1)
-                    guard !isCancelled(key) else { return }
-                }
-                onFinish?(self)
             }
         }
     }

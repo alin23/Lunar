@@ -226,6 +226,28 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var lastCommandModifierPressedTime: Date?
     var commandModifierPressedCount = 0
 
+    var screenWakeAdapterTask: Repeater?
+
+    lazy var resetStatesPublisher: PassthroughSubject<Bool, Never> = {
+        let p = PassthroughSubject<Bool, Never>()
+        p.debounce(for: .seconds(3), scheduler: RunLoop.main)
+            .sink { [self] shouldReset in
+                guard shouldReset else { return }
+
+                self.disableFaceLight(smooth: false)
+                NetworkControl.resetState()
+                DDCControl.resetState()
+                self.startOrRestartMediaKeyTap()
+                displayController.activeDisplays.values.forEach { d in
+                    d.updateCornerWindow()
+//                    d.reapplySoftwareControl()
+                }
+            }.store(in: &observers)
+        return p
+    }()
+
+    var zeroGammaChecker: Repeater?
+
     var currentPage: Int = Page.display.rawValue {
         didSet {
             log.verbose("Current Page: \(currentPage)")
@@ -469,7 +491,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         for hotkey in Hotkey.defaults {
             hotkey.unregister()
         }
+
+        var toRemove = Set<String>()
         for hotkey in hotkeys {
+            if hotkey.isPresetHotkey, hotkey.preset == nil {
+                hotkey.unregister()
+                toRemove.insert(hotkey.identifier)
+                continue
+            }
+
             hotkey.handleRegistration(persist: false)
             guard let alternates = alternateHotkeysMapping[hotkey.identifier] else { continue }
             for (flags, altIdentifier) in alternates {
@@ -480,7 +510,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 altHotkey.handleRegistration(persist: false)
             }
         }
-        CachedDefaults[.hotkeys] = hotkeys
+        CachedDefaults[.hotkeys] = hotkeys.filter { !toRemove.contains($0.identifier) }
 
         HotKeyCenter.shared.detectKeyHold = CachedDefaults[.detectKeyHold]
         detectKeyHoldPublisher.sink { change in
@@ -906,20 +936,27 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     @discardableResult func initMenuPopover() -> NSPopover {
-        menuPopover = NSPopover()
-        guard let menuPopover = menuPopover else { return NSPopover() }
-        menuPopover.contentViewController = NSViewController()
-        menuPopover.contentViewController?.view = HostingView(rootView: QuickActionsMenuView())
-        if let w = menuPopover.contentViewController?.view.window {
-            w.setAccessibilityRole(.popover)
-            w.setAccessibilitySubrole(.unknown)
+        if menuPopover == nil {
+            menuPopover = NSPopover()
+            guard let menuPopover = menuPopover else { return NSPopover() }
+            menuPopover.contentViewController = NSViewController()
+            menuPopover.contentViewController?.view = HostingView(rootView: QuickActionsView())
+            if let w = menuPopover.contentViewController?.view.window {
+                w.setAccessibilityRole(.popover)
+                w.setAccessibilitySubrole(.unknown)
+            }
+            menuPopover.animates = false
         }
 
-        menuPopover.contentSize = NSSize(
+        guard let menuPopover = menuPopover else { return NSPopover() }
+
+        let size = NSSize(
             width: MENU_WIDTH + (MENU_HORIZONTAL_PADDING * 2),
-            height: (NSScreen.main?.visibleFrame.height ?? 600) - 100
+            height: (NSScreen.main?.visibleFrame.height ?? 600) - 50
         )
-        menuPopover.animates = false
+        if menuPopover.contentSize != size {
+            menuPopover.contentSize = size
+        }
 
         return menuPopover
     }
@@ -1013,7 +1050,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func listenForScreenConfigurationChanged() {
-        asyncEvery(3.seconds, uniqueTaskKey: "zeroGammaChecker") { _ in
+        zeroGammaChecker = Repeater(every: 3, name: "zeroGammaChecker") {
             displayController.activeDisplays.values
                 .filter { d in
                     !d.isForTesting && !d.settingGamma && d.hasSoftwareControl && !d.blackOutEnabled && GammaTable(for: d.id).isZero
@@ -1034,12 +1071,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
             }
 
-            debounce(ms: 2000, uniqueTaskKey: "panel-refresh-\(displayID)", mainThread: true, value: displayID) { id in
-                DisplayController.panelManager = MPDisplayMgr()
-                if let display = displayController.activeDisplays[id] {
-                    display.refreshPanel()
-                }
-            }
+            displayController.panelRefreshPublisher.send(displayID)
         }, nil)
 
         DistributedNotificationCenter
@@ -1132,16 +1164,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 displayController.resetDisplayList(autoBlackOut: Defaults[.autoBlackoutBuiltin])
 
                 displayController.adaptBrightness(force: true)
-
-                debounce(ms: 3000, uniqueTaskKey: "resetStates") {
-                    self.disableFaceLight(smooth: false)
-                    NetworkControl.resetState()
-                    DDCControl.resetState()
-                    appDelegate!.startOrRestartMediaKeyTap()
-                    displayController.activeDisplays.values.forEach { d in
-                        d.updateCornerWindow()
-                    }
-                }
+                self.resetStatesPublisher.send(true)
             }.store(in: &observers)
 
         let wakePublisher = NSWorkspace.shared.notificationCenter
@@ -1164,21 +1187,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     if displayController.adaptiveMode.available {
                         displayController.adaptiveMode.watch()
                     }
-
-                    debounce(ms: 3000, uniqueTaskKey: "resetStates") {
-                        self.disableFaceLight(smooth: false)
-                        NetworkControl.resetState()
-                        DDCControl.resetState()
-                        appDelegate!.startOrRestartMediaKeyTap()
-                    }
+                    self.resetStatesPublisher.send(true)
 
                     if CachedDefaults[.reapplyValuesAfterWake] {
-                        asyncEvery(
-                            2.seconds,
-                            uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY,
-                            runs: CachedDefaults[.wakeReapplyTries],
-                            skipIfExists: true
-                        ) { _ in
+                        self.screenWakeAdapterTask = Repeater(every: 2, times: CachedDefaults[.wakeReapplyTries]) {
                             if displayController.adaptiveModeKey == .manual, CachedDefaults[.jitterAfterWake] {
                                 for (num, display) in displayController.activeDisplayList.enumerated() {
                                     let br = display.brightness.uint16Value
@@ -1856,7 +1868,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         #endif
 
         if CachedDefaults[.reapplyValuesAfterWake] {
-            asyncEvery(2.seconds, uniqueTaskKey: SCREEN_WAKE_ADAPTER_TASK_KEY, runs: 5, skipIfExists: true) { _ in
+            screenWakeAdapterTask = Repeater(every: 2, times: CachedDefaults[.wakeReapplyTries]) {
                 displayController.adaptBrightness(force: true)
                 for display in displayController.activeDisplays.values.filter({ !$0.blackOutEnabled && $0.reapplyColorGain }) {
                     _ = display.control?.setRedGain(display.redGain.uint16Value)
@@ -2326,13 +2338,15 @@ func acquirePrivileges(notificationTitle: String = "Lunar is now listening for m
     }
     CachedDefaults[.mediaKeysNotified] = false
 
-    asyncEvery(2.seconds, uniqueTaskKey: "AXPermissionsChecker") { _ in
-        if AXIsProcessTrusted() {
-            onAcquire()
-            cancelTask("AXPermissionsChecker")
-        }
+    axPermissionsChecker = Repeater(every: 2, name: "AXPermissionsChecker") {
+        guard AXIsProcessTrusted() else { return }
+        onAcquire()
+        axPermissionsChecker?.stop()
+        axPermissionsChecker = nil
     }
 }
+
+var axPermissionsChecker: Repeater?
 
 func isLidClosed() -> Bool {
     guard !Sysctl.isiMac else { return false }

@@ -79,7 +79,7 @@ class ScrollableBrightness: NSView {
             display?.minBrightness.intValue ?? 0
         }
         set {
-            cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+            cancelScreenWakeAdapterTask()
             display?.minBrightness = newValue.ns
         }
     }
@@ -89,7 +89,7 @@ class ScrollableBrightness: NSView {
             display?.maxBrightness.intValue ?? 100
         }
         set {
-            cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+            cancelScreenWakeAdapterTask()
             display?.maxBrightness = newValue.ns
         }
     }
@@ -99,21 +99,21 @@ class ScrollableBrightness: NSView {
             display?.brightness.intValue ?? 50
         }
         set {
-            cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+            cancelScreenWakeAdapterTask()
             display?.brightness = newValue.ns
         }
     }
 
     func addObserver(_ display: Display) {
         display.$brightness
-            .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
+            .throttle(for: .milliseconds(50), scheduler: DDC.queue, latest: true)
             .sink { [weak self] newBrightness in
                 guard let display = self?.display, display.id != GENERIC_DISPLAY_ID else { return }
                 let minBrightness = display.minBrightness.uint16Value
                 let maxBrightness = display.maxBrightness.uint16Value
 
                 let newBrightness = cap(newBrightness.uint16Value, minVal: minBrightness, maxVal: maxBrightness)
-                self?.currentValue?.stringValue = String(newBrightness)
+                mainAsync { self?.currentValue?.stringValue = String(newBrightness) }
             }.store(in: &displayObservers, for: "brightness")
         display.$minBrightness
             .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)

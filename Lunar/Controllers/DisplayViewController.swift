@@ -352,6 +352,8 @@ class DisplayViewController: NSViewController {
     var openedBlackoutPage = false
     var openedXDRPage = false
 
+    var gammaNoticeHighlighterTask: Repeater?
+
     @IBOutlet var _inputDropdownHotkeyButton: NSButton? {
         didSet {
             mainAsync { [weak self] in
@@ -420,12 +422,6 @@ class DisplayViewController: NSViewController {
         didSet {
             display?.lockedContrastCurve = lockedContrastCurve
             lockContrastCurveButton?.state = lockedContrastCurve.state
-        }
-    }
-
-    lazy var gammaNoticeHighlighterTaskKey = "gammaNoticeHighlighter-\(display?.serial ?? "display")" {
-        didSet {
-            cancelTask(oldValue)
         }
     }
 
@@ -802,7 +798,7 @@ class DisplayViewController: NSViewController {
                 self?.updateDataset(currentBrightness: brightness.u16)
                 return
             }
-            cancelTask(SCREEN_WAKE_ADAPTER_TASK_KEY)
+            cancelScreenWakeAdapterTask()
 
             let lastDataPoint = datapointLock.around { displayController.adaptiveMode.brightnessDataPoint.last }
             display.insertBrightnessUserDataPoint(lastDataPoint, brightness, modeKey: displayController.adaptiveModeKey)
@@ -986,8 +982,14 @@ class DisplayViewController: NSViewController {
                 button.helpText = NO_CONTROLS_HELP_TEXT
                 button.showPopover = true
             }
-            self.brightnessSlider?.color = button.bg!
-            self.brightnessContrastSlider?.color = button.bg!
+
+            if control is GammaControl, display.enabledControls[.gamma] ?? false {
+                self.brightnessSlider?.color = darkMode ? peach.blended(withFraction: 0.7, of: red) ?? peach : red
+                self.brightnessContrastSlider?.color = darkMode ? peach.blended(withFraction: 0.7, of: red) ?? peach : red
+            } else {
+                self.brightnessSlider?.color = button.bg!
+                self.brightnessContrastSlider?.color = button.bg!
+            }
         }
     }
 
@@ -1300,50 +1302,50 @@ class DisplayViewController: NSViewController {
             .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] value in
                 guard let self = self else { return }
-                self.scrollableBrightness?.maxValue.integerValue = value.intValue
-                self.scrollableBrightness?.minValue.upperLimit = value.doubleValue - 1
+                // self.scrollableBrightness?.maxValue.integerValue = value.intValue
+                // self.scrollableBrightness?.minValue.upperLimit = value.doubleValue - 1
 
                 self.maxBrightnessField?.integerValue = value.intValue
                 self.minBrightnessField?.upperLimit = value.doubleValue - 1
             }.store(in: &displayObservers, for: "maxBrightness")
-        display?.$maxContrast
-            .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
-            .sink { [weak self] value in
-                guard let self = self else { return }
-                self.scrollableContrast?.maxValue.integerValue = value.intValue
-                self.scrollableContrast?.minValue.upperLimit = value.doubleValue - 1
-            }.store(in: &displayObservers, for: "maxContrast")
+        // display?.$maxContrast
+        //     .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
+        //     .sink { [weak self] value in
+        //         guard let self = self else { return }
+        //         self.scrollableContrast?.maxValue.integerValue = value.intValue
+        //         self.scrollableContrast?.minValue.upperLimit = value.doubleValue - 1
+        //     }.store(in: &displayObservers, for: "maxContrast")
 
         display?.$minBrightness
             .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] value in
                 guard let self = self else { return }
-                self.scrollableBrightness?.minValue.integerValue = value.intValue
-                self.scrollableBrightness?.maxValue.lowerLimit = value.doubleValue + 1
+                // self.scrollableBrightness?.minValue.integerValue = value.intValue
+                // self.scrollableBrightness?.maxValue.lowerLimit = value.doubleValue + 1
 
                 self.minBrightnessField?.integerValue = value.intValue
                 self.maxBrightnessField?.lowerLimit = value.doubleValue + 1
             }.store(in: &displayObservers, for: "minBrightness")
-        display?.$minContrast
-            .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
-            .sink { [weak self] value in
-                guard let self = self else { return }
-                self.scrollableContrast?.minValue.integerValue = value.intValue
-                self.scrollableContrast?.maxValue.lowerLimit = value.doubleValue + 1
-            }.store(in: &displayObservers, for: "minContrast")
+        // display?.$minContrast
+        //     .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
+        //     .sink { [weak self] value in
+        //         guard let self = self else { return }
+        //         self.scrollableContrast?.minValue.integerValue = value.intValue
+        //         self.scrollableContrast?.maxValue.lowerLimit = value.doubleValue + 1
+        //     }.store(in: &displayObservers, for: "minContrast")
 
-        display?.$brightness
-            .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
-            .sink { [weak self] value in
-                guard let self = self else { return }
-                self.scrollableBrightness?.currentValue.integerValue = value.intValue
-            }.store(in: &displayObservers, for: "brightness")
-        display?.$contrast
-            .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
-            .sink { [weak self] value in
-                guard let self = self else { return }
-                self.scrollableContrast?.currentValue.integerValue = value.intValue
-            }.store(in: &displayObservers, for: "contrast")
+        // display?.$brightness
+        //     .throttle(for: .milliseconds(50), scheduler: DDC.queue, latest: true)
+        //     .sink { [weak self] value in
+        //         guard let self = self else { return }
+        //         mainAsync { self.scrollableBrightness?.currentValue.integerValue = value.intValue }
+        //     }.store(in: &displayObservers, for: "brightness")
+        // display?.$contrast
+        //     .throttle(for: .milliseconds(50), scheduler: DDC.queue, latest: true)
+        //     .sink { [weak self] value in
+        //         guard let self = self else { return }
+        //         mainAsync { self.scrollableContrast?.currentValue.integerValue = value.intValue }
+        //     }.store(in: &displayObservers, for: "contrast")
         display?.$allowBrightnessZero
             .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] value in
@@ -1501,21 +1503,19 @@ class DisplayViewController: NSViewController {
 
     func showGammaNotice() {
         mainAsync { [weak self] in
-            guard let self = self, self.display?.active ?? false, self.view.window?.isVisible ?? false
+            guard let self = self, self.display?.active ?? false, self.view.window?.isVisible ?? false,
+                  self.gammaNoticeHighlighterTask == nil
             else { return }
 
-            asyncEvery(
-                5.seconds,
-                uniqueTaskKey: self.gammaNoticeHighlighterTaskKey,
-                skipIfExists: true,
-                eager: true,
-                queue: DispatchQueue.main
+            self.gammaNoticeHighlighterTask = Repeater(
+                every: 5,
+                name: "gammaNoticeHighlighter-\(self.display?.serial ?? "display")"
             ) { [weak self] in
                 guard let self = self else { return }
 
                 guard self.view.window?.isVisible ?? false, let gammaNotice = self.gammaNotice
                 else {
-                    cancelTask(self.gammaNoticeHighlighterTaskKey)
+                    self.gammaNoticeHighlighterTask = nil
                     return
                 }
 
@@ -1535,7 +1535,7 @@ class DisplayViewController: NSViewController {
     func hideGammaNotice() {
         mainAsync { [weak self] in
             guard let self = self else { return }
-            cancelTask(self.gammaNoticeHighlighterTaskKey)
+            self.gammaNoticeHighlighterTask = nil
 
             guard let gammaNotice = self.gammaNotice else { return }
             gammaNotice.transition(0.3)

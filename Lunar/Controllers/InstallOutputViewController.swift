@@ -41,18 +41,6 @@ class OutputScrollView: NSScrollView {
 // MARK: - InstallOutputViewController
 
 class InstallOutputViewController: NSViewController {
-    // MARK: Lifecycle
-
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT")
-            defer { log.verbose("END DEINIT") }
-        #endif
-//        cancelInstall(self)
-    }
-
-    // MARK: Internal
-
     var commandChannel: Channel?
 
     @IBOutlet var outputScrollView: OutputScrollView!
