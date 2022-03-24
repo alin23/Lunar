@@ -174,7 +174,6 @@
 		C7E80E392637060F004718A4 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C7E80E252637060F004718A4 /* libssl.a */; };
 		C7E80E3A2637060F004718A4 /* libssh2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C7E80E262637060F004718A4 /* libssh2.a */; };
 		C7E80E3B2637060F004718A4 /* shim.h in Headers */ = {isa = PBXBuildFile; fileRef = C7E80E282637060F004718A4 /* shim.h */; };
-		C7E896D226500DFF0079A328 /* DiagnosticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E896D126500DFF0079A328 /* DiagnosticsViewController.swift */; };
 		C7E896DA2652C0F60079A328 /* CBBlueLightClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C7E896D82652C0F60079A328 /* CBBlueLightClient.h */; };
 		C7E896DB2652C0F60079A328 /* ExceptionCatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = C7E896D92652C0F60079A328 /* ExceptionCatcher.h */; };
 		C7E896DD2652C37E0079A328 /* CoreBrightness.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7E896DC2652C37E0079A328 /* CoreBrightness.framework */; };
@@ -366,7 +365,6 @@
 		C7E80E262637060F004718A4 /* libssh2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libssh2.a; sourceTree = "<group>"; };
 		C7E80E272637060F004718A4 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		C7E80E282637060F004718A4 /* shim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = shim.h; sourceTree = "<group>"; };
-		C7E896D126500DFF0079A328 /* DiagnosticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsViewController.swift; sourceTree = "<group>"; };
 		C7E896D82652C0F60079A328 /* CBBlueLightClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBBlueLightClient.h; sourceTree = "<group>"; };
 		C7E896D92652C0F60079A328 /* ExceptionCatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExceptionCatcher.h; sourceTree = "<group>"; };
 		C7E896DC2652C37E0079A328 /* CoreBrightness.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBrightness.framework; path = ../../../../../System/Library/PrivateFrameworks/CoreBrightness.framework; sourceTree = "<group>"; };
@@ -517,7 +515,6 @@
 				C7A82D9E2618E1B9004146A8 /* InstallOutputViewController.swift */,
 				C7A82DB5261B779E004146A8 /* SettingsPopoverController.swift */,
 				C7BADA11263889CD0058974C /* ProgressViewController.swift */,
-				C7E896D126500DFF0079A328 /* DiagnosticsViewController.swift */,
 				C71F8DB026542E1000C4648A /* GammaViewController.swift */,
 				C7A9AAB52707130E0058D1B2 /* OnboardPageController.swift */,
 				C78F121927073278009A3301 /* ModeChoiceViewController.swift */,
@@ -1053,7 +1050,6 @@
 				C76B775D26445C9B007CAAC5 /* MacToggle.swift in Sources */,
 				C731E85827E1D5780016B36D /* Defaults+Workaround.swift in Sources */,
 				C77200031FF072CB0078E155 /* ScrollableBrightness.swift in Sources */,
-				C7E896D226500DFF0079A328 /* DiagnosticsViewController.swift in Sources */,
 				C7E0737C259CB2FA0019C9C2 /* LocationMode.swift in Sources */,
 				C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */,
 				C74D07C8265BA68D00291FC2 /* LoginServiceKit.swift in Sources */,

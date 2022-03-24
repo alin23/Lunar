@@ -2052,6 +2052,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     var i2cDetectionTask: Repeater? = nil
 
+    var fallbackPromptTime: Date?
+
     var alternativeControlForAppleNative: Control? = nil {
         didSet {
             context = getContext()
@@ -4134,6 +4136,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     // MARK: Sentry
 
     func addSentryData() {
+        guard CachedDefaults[.enableSentry] else { return }
         SentrySDK.configureScope { [weak self] scope in
             guard let self = self, var dict = self.dictionary else { return }
             if let panel = self.panel,
