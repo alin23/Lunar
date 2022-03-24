@@ -1359,6 +1359,7 @@ class DisplayController: ObservableObject {
                 if let control = display.control?.displayControl {
                     display.enabledControls[control] = false
                 }
+                display.gammaEnabled = true
                 display.control = GammaControl(display: display)
                 display.setGamma()
             }
@@ -1378,13 +1379,11 @@ class DisplayController: ObservableObject {
         let resp = ask(
             message: "Non-responsive display \"\(display.name)\"",
             info: """
-                `\(display.name)` is not responding to commands in
-                **\(display.control!.str)** mode.
+            `\(display.name.trimmed)` is not responding to commands in **\(display.control!.str)** mode.
 
-                Do you want to fallback to `Software Dimming`?
+            Do you want to fallback to `Software Dimming`?
 
-                Note: adjust the monitor to `[BRIGHTNESS: 100%, CONTRAST: 70%]` manually
-                using its physical buttons to allow for a full range in software dimming.
+            Note: adjust the monitor to `[BRIGHTNESS: 100%, CONTRAST: 70%]` manually using its physical buttons to allow for a full range in software dimming.
             """,
             okButton: "Yes",
             cancelButton: "Not now",
