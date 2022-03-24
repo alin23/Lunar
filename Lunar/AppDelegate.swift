@@ -2042,15 +2042,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         currentAudioDisplay: Bool = true
     ) {
         let amount = amount ?? CachedDefaults[.volumeStep]
-        serialQueue
-            .async {
-                displayController.adjustVolume(
-                    by: amount,
-                    for: displays,
-                    currentDisplay: currentDisplay,
-                    currentAudioDisplay: currentAudioDisplay
-                )
-            }
+        mainAsync {
+            displayController.adjustVolume(
+                by: amount,
+                for: displays,
+                currentDisplay: currentDisplay,
+                currentAudioDisplay: currentAudioDisplay
+            )
+        }
     }
 
     func decreaseVolume(
@@ -2060,15 +2059,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         currentAudioDisplay: Bool = true
     ) {
         let amount = amount ?? CachedDefaults[.volumeStep]
-        serialQueue
-            .async {
-                displayController.adjustVolume(
-                    by: -amount,
-                    for: displays,
-                    currentDisplay: currentDisplay,
-                    currentAudioDisplay: currentAudioDisplay
-                )
-            }
+        mainAsync {
+            displayController.adjustVolume(
+                by: -amount,
+                for: displays,
+                currentDisplay: currentDisplay,
+                currentAudioDisplay: currentAudioDisplay
+            )
+        }
     }
 
     func increaseBrightness(

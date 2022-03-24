@@ -543,7 +543,7 @@ class DisplayViewController: NSViewController {
 
     @objc func adaptToUserDataPoint(notification: Notification) {
         guard displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
-              let values = notification.userInfo?["values"] as? [Int: Int]
+              let values = notification.userInfo?["values"] as? [Double: Double]
         else { return }
 
         if notification.name == brightnessDataPointInserted {
@@ -801,7 +801,7 @@ class DisplayViewController: NSViewController {
             cancelScreenWakeAdapterTask()
 
             let lastDataPoint = datapointLock.around { displayController.adaptiveMode.brightnessDataPoint.last }
-            display.insertBrightnessUserDataPoint(lastDataPoint, brightness, modeKey: displayController.adaptiveModeKey)
+            display.insertBrightnessUserDataPoint(lastDataPoint, brightness.d, modeKey: displayController.adaptiveModeKey)
 
             let userValues = display.userBrightness[displayController.adaptiveModeKey] ?? ThreadSafeDictionary()
             self.updateDataset(currentBrightness: brightness.u16, userBrightness: userValues.dictionary)
@@ -816,7 +816,7 @@ class DisplayViewController: NSViewController {
             }
 
             let lastDataPoint = displayController.adaptiveMode.contrastDataPoint.last
-            display.insertContrastUserDataPoint(lastDataPoint, contrast, modeKey: displayController.adaptiveModeKey)
+            display.insertContrastUserDataPoint(lastDataPoint, contrast.d, modeKey: displayController.adaptiveModeKey)
 
             let userValues = display.userContrast[displayController.adaptiveModeKey] ?? ThreadSafeDictionary()
             self.updateDataset(currentContrast: contrast.u16, userContrast: userValues.dictionary)
@@ -1002,8 +1002,8 @@ class DisplayViewController: NSViewController {
         currentContrast: UInt16? = nil,
         brightnessFactor: Double? = nil,
         contrastFactor: Double? = nil,
-        userBrightness: [Int: Int]? = nil,
-        userContrast: [Int: Int]? = nil,
+        userBrightness: [Double: Double]? = nil,
+        userContrast: [Double: Double]? = nil,
         force: Bool = false
     ) {
         guard let display = display, let brightnessContrastChart = brightnessContrastChart, display.id != GENERIC_DISPLAY_ID

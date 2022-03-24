@@ -459,36 +459,56 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         applyBrightnessOnInputChange2 = (try container.decodeIfPresent(Bool.self, forKey: .applyBrightnessOnInputChange2)) ?? true
         applyBrightnessOnInputChange3 = (try container.decodeIfPresent(Bool.self, forKey: .applyBrightnessOnInputChange3)) ?? false
 
-        if let syncUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .sync) {
-            userBrightness[.sync] = syncUserBrightness.threadSafe
+        if let syncUserBrightness = (try? userBrightnessContainer.decodeIfPresent([UserValue].self, forKey: .sync)) ??
+            (try? userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .sync))?.userValues
+        {
+            userBrightness[.sync] = syncUserBrightness.threadSafeDictionary
         }
-        if let sensorUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .sensor) {
-            userBrightness[.sensor] = sensorUserBrightness.threadSafe
+        if let sensorUserBrightness = (try? userBrightnessContainer.decodeIfPresent([UserValue].self, forKey: .sensor)) ??
+            (try? userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .sensor))?.userValues
+        {
+            userBrightness[.sensor] = sensorUserBrightness.threadSafeDictionary
         }
-        if let locationUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .location) {
-            userBrightness[.location] = locationUserBrightness.threadSafe
+        if let locationUserBrightness = (try? userBrightnessContainer.decodeIfPresent([UserValue].self, forKey: .location)) ??
+            (try? userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .location))?.userValues
+        {
+            userBrightness[.location] = locationUserBrightness.threadSafeDictionary
         }
-        if let manualUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .manual) {
-            userBrightness[.manual] = manualUserBrightness.threadSafe
+        if let manualUserBrightness = (try? userBrightnessContainer.decodeIfPresent([UserValue].self, forKey: .manual)) ??
+            (try? userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .manual))?.userValues
+        {
+            userBrightness[.manual] = manualUserBrightness.threadSafeDictionary
         }
-        if let clockUserBrightness = try userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .clock) {
-            userBrightness[.clock] = clockUserBrightness.threadSafe
+        if let clockUserBrightness = (try? userBrightnessContainer.decodeIfPresent([UserValue].self, forKey: .clock)) ??
+            (try? userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .clock))?.userValues
+        {
+            userBrightness[.clock] = clockUserBrightness.threadSafeDictionary
         }
 
-        if let syncUserContrast = try userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .sync) {
-            userContrast[.sync] = syncUserContrast.threadSafe
+        if let syncUserContrast = (try? userContrastContainer.decodeIfPresent([UserValue].self, forKey: .sync)) ??
+            (try? userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .sync))?.userValues
+        {
+            userContrast[.sync] = syncUserContrast.threadSafeDictionary
         }
-        if let sensorUserContrast = try userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .sensor) {
-            userContrast[.sensor] = sensorUserContrast.threadSafe
+        if let sensorUserContrast = (try? userContrastContainer.decodeIfPresent([UserValue].self, forKey: .sensor)) ??
+            (try? userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .sensor))?.userValues
+        {
+            userContrast[.sensor] = sensorUserContrast.threadSafeDictionary
         }
-        if let locationUserContrast = try userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .location) {
-            userContrast[.location] = locationUserContrast.threadSafe
+        if let locationUserContrast = (try? userContrastContainer.decodeIfPresent([UserValue].self, forKey: .location)) ??
+            (try? userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .location))?.userValues
+        {
+            userContrast[.location] = locationUserContrast.threadSafeDictionary
         }
-        if let manualUserContrast = try userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .manual) {
-            userContrast[.manual] = manualUserContrast.threadSafe
+        if let manualUserContrast = (try? userContrastContainer.decodeIfPresent([UserValue].self, forKey: .manual)) ??
+            (try? userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .manual))?.userValues
+        {
+            userContrast[.manual] = manualUserContrast.threadSafeDictionary
         }
-        if let clockUserContrast = try userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .clock) {
-            userContrast[.clock] = clockUserContrast.threadSafe
+        if let clockUserContrast = (try? userContrastContainer.decodeIfPresent([UserValue].self, forKey: .clock)) ??
+            (try? userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .clock))?.userValues
+        {
+            userContrast[.clock] = clockUserContrast.threadSafeDictionary
         }
 
         if let sensorFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .sensor) {
@@ -1073,8 +1093,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc dynamic var sentInputCondition = NSCondition()
     @objc dynamic var sentVolumeCondition = NSCondition()
 
-    var userBrightness: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Int, Int>> = ThreadSafeDictionary()
-    var userContrast: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Int, Int>> = ThreadSafeDictionary()
+    var userBrightness: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Double, Double>> = ThreadSafeDictionary()
+    var userContrast: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Double, Double>> = ThreadSafeDictionary()
 
     var redMin: CGGammaValue = 0.0
     var redMax: CGGammaValue = 1.0
@@ -1773,7 +1793,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     // MARK: User Data Points
 
-    static func insertDataPoint(values: inout ThreadSafeDictionary<Int, Int>, featureValue: Int, targetValue: Int, logValue: Bool = true) {
+    static func insertDataPoint(
+        values: inout ThreadSafeDictionary<Double, Double>,
+        featureValue: Double,
+        targetValue: Double,
+        logValue: Bool = true
+    ) {
         guard displayController.adaptiveModeKey != .manual else {
             return
         }
@@ -2613,7 +2638,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     self.brightness = brightness.ns
                     self.insertBrightnessUserDataPoint(
                         displayController.adaptiveMode.brightnessDataPoint.last,
-                        brightness.i, modeKey: displayController.adaptiveModeKey
+                        brightness.d, modeKey: displayController.adaptiveModeKey
                     )
                 }
             }
@@ -2624,7 +2649,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     self.contrast = contrast.ns
                     self.insertContrastUserDataPoint(
                         displayController.adaptiveMode.contrastDataPoint.last,
-                        contrast.i, modeKey: displayController.adaptiveModeKey
+                        contrast.d, modeKey: displayController.adaptiveModeKey
                     )
                 }
             }
@@ -2670,7 +2695,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     self.brightness = brightness.ns
                     self.insertBrightnessUserDataPoint(
                         displayController.adaptiveMode.brightnessDataPoint.last,
-                        brightness.i, modeKey: displayController.adaptiveModeKey
+                        brightness.d, modeKey: displayController.adaptiveModeKey
                     )
                 }
                 return
@@ -2682,7 +2707,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                         self.brightness = brightness.ns
                         self.insertBrightnessUserDataPoint(
                             displayController.adaptiveMode.brightnessDataPoint.last,
-                            brightness.i, modeKey: displayController.adaptiveModeKey
+                            brightness.d, modeKey: displayController.adaptiveModeKey
                         )
                     }
                 }
@@ -2695,7 +2720,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     self.brightness = brightness.ns
                     self.insertBrightnessUserDataPoint(
                         displayController.adaptiveMode.brightnessDataPoint.last,
-                        brightness.i, modeKey: displayController.adaptiveModeKey
+                        brightness.d, modeKey: displayController.adaptiveModeKey
                     )
                 }
             }
@@ -2720,7 +2745,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     self.contrast = contrast.ns
                     self.insertContrastUserDataPoint(
                         displayController.adaptiveMode.contrastDataPoint.last,
-                        contrast.i, modeKey: displayController.adaptiveModeKey
+                        contrast.d, modeKey: displayController.adaptiveModeKey
                     )
                 }
             }
@@ -2962,23 +2987,28 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         didSet {
             guard DDC.apply, canRotate, VALID_ROTATION_VALUES.contains(rotation) else { return }
 
-            reconfigure { panel in
-                panel.orientation = rotation.i32
-                guard modeChangeAsk, rotation != oldValue,
-                      let window = appDelegate!.windowController?.window ?? menuPopover?.contentViewController?.view.window else { return }
-                ask(
-                    message: "Orientation Change",
-                    info: "Do you want to keep this orientation?\n\nLunar will revert to the last orientation if no option is selected in 15 seconds.",
-                    window: window,
-                    okButton: "Keep", cancelButton: "Revert",
-                    onCompletion: { [weak self] keep in
-                        if !keep, let self = self {
-                            self.modeChangeAsk = false
-                            mainThread { self.rotation = oldValue }
-                            self.modeChangeAsk = true
+            mainAsync { [weak self] in
+                self?.reconfigure { panel in
+                    guard let self = self else { return }
+
+                    panel.orientation = self.rotation.i32
+                    guard self.modeChangeAsk, self.rotation != oldValue,
+                          let window = appDelegate!.windowController?.window ?? menuPopover?.contentViewController?.view.window
+                    else { return }
+                    ask(
+                        message: "Orientation Change",
+                        info: "Do you want to keep this orientation?\n\nLunar will revert to the last orientation if no option is selected in 15 seconds.",
+                        window: window,
+                        okButton: "Keep", cancelButton: "Revert",
+                        onCompletion: { [weak self] keep in
+                            if !keep, let self = self {
+                                self.modeChangeAsk = false
+                                mainThread { self.rotation = oldValue }
+                                self.modeChangeAsk = true
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
             withoutDDC {
                 panelMode = panel?.currentMode
@@ -3243,6 +3273,22 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     var shadeTask: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+
+    var userBrightnessCodable: [AdaptiveModeKey: [UserValue]] {
+        Dictionary(
+            userBrightness.map { key, value in
+                (key, value.userValues)
+            }, uniquingKeysWith: first(this:other:)
+        )
+    }
+
+    var userContrastCodable: [AdaptiveModeKey: [UserValue]] {
+        Dictionary(
+            userContrast.map { key, value in
+                (key, value.userValues)
+            }, uniquingKeysWith: first(this:other:)
+        )
+    }
 
     func getSupportsEnhance() -> Bool {
         guard let control = control, let edr = screen?.maximumPotentialExtendedDynamicRangeColorComponentValue else { return false }
@@ -3580,9 +3626,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         return nil
     }
 
-    func values(_ monitorValue: MonitorValue, modeKey: AdaptiveModeKey) -> (Double, Double, Double, [Int: Int]) {
+    func values(_ monitorValue: MonitorValue, modeKey: AdaptiveModeKey) -> (Double, Double, Double, [Double: Double]) {
         var minValue, maxValue, value: Double
-        var userValues: [Int: Int]
+        var userValues: [Double: Double]
 
         switch monitorValue {
         case let .preciseBrightness(brightness):
@@ -3625,7 +3671,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         ensureAudioIdentifier()
 
         if CachedDefaults[.refreshValues] {
-            serialQueue.async { [weak self] in
+            mainAsync { [weak self] in
                 guard let self = self else { return }
                 self.refreshBrightness()
                 self.refreshContrast()
@@ -4036,17 +4082,19 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             try container.encode(rotation, forKey: .rotation)
 
-            try userBrightnessContainer.encodeIfPresent(userBrightness[.sync]?.dictionary, forKey: .sync)
-            try userBrightnessContainer.encodeIfPresent(userBrightness[.sensor]?.dictionary, forKey: .sensor)
-            try userBrightnessContainer.encodeIfPresent(userBrightness[.location]?.dictionary, forKey: .location)
-            try userBrightnessContainer.encodeIfPresent(userBrightness[.manual]?.dictionary, forKey: .manual)
-            try userBrightnessContainer.encodeIfPresent(userBrightness[.clock]?.dictionary, forKey: .clock)
+            let userBrightness = userBrightnessCodable
+            try userBrightnessContainer.encodeIfPresent(userBrightness[.sync], forKey: .sync)
+            try userBrightnessContainer.encodeIfPresent(userBrightness[.sensor], forKey: .sensor)
+            try userBrightnessContainer.encodeIfPresent(userBrightness[.location], forKey: .location)
+            try userBrightnessContainer.encodeIfPresent(userBrightness[.manual], forKey: .manual)
+            try userBrightnessContainer.encodeIfPresent(userBrightness[.clock], forKey: .clock)
 
-            try userContrastContainer.encodeIfPresent(userContrast[.sync]?.dictionary, forKey: .sync)
-            try userContrastContainer.encodeIfPresent(userContrast[.sensor]?.dictionary, forKey: .sensor)
-            try userContrastContainer.encodeIfPresent(userContrast[.location]?.dictionary, forKey: .location)
-            try userContrastContainer.encodeIfPresent(userContrast[.manual]?.dictionary, forKey: .manual)
-            try userContrastContainer.encodeIfPresent(userContrast[.clock]?.dictionary, forKey: .clock)
+            let userContrast = userContrastCodable
+            try userContrastContainer.encodeIfPresent(userContrast[.sync], forKey: .sync)
+            try userContrastContainer.encodeIfPresent(userContrast[.sensor], forKey: .sensor)
+            try userContrastContainer.encodeIfPresent(userContrast[.location], forKey: .location)
+            try userContrastContainer.encodeIfPresent(userContrast[.manual], forKey: .manual)
+            try userContrastContainer.encodeIfPresent(userContrast[.clock], forKey: .clock)
 
             try enabledControlsContainer.encodeIfPresent(enabledControls[.network], forKey: .network)
             try enabledControlsContainer.encodeIfPresent(enabledControls[.appleNative], forKey: .appleNative)
@@ -4457,7 +4505,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             {
                 insertBrightnessUserDataPoint(
                     displayController.adaptiveMode.brightnessDataPoint.last,
-                    newBrightness.i, modeKey: displayController.adaptiveModeKey
+                    newBrightness.d, modeKey: displayController.adaptiveModeKey
                 )
             }
 
@@ -4485,7 +4533,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             {
                 insertContrastUserDataPoint(
                     displayController.adaptiveMode.contrastDataPoint.last,
-                    newContrast.i, modeKey: displayController.adaptiveModeKey
+                    newContrast.d, modeKey: displayController.adaptiveModeKey
                 )
             }
 
@@ -4858,7 +4906,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-    func insertBrightnessUserDataPoint(_ featureValue: Int, _ targetValue: Int, modeKey: AdaptiveModeKey) {
+    func insertBrightnessUserDataPoint(_ featureValue: Double, _ targetValue: Double, modeKey: AdaptiveModeKey) {
         guard !lockedBrightnessCurve, !adaptivePaused, displayController.adaptiveModeKey != .sync || !isSource,
               timeSince(lastConnectionTime) > 5 else { return }
 
@@ -4867,12 +4915,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             userBrightness[modeKey] = ThreadSafeDictionary()
         }
         let targetValue = mapNumber(
-            targetValue.f,
-            fromLow: minBrightness.floatValue,
-            fromHigh: maxBrightness.floatValue,
-            toLow: MIN_BRIGHTNESS.f,
-            toHigh: MAX_BRIGHTNESS.f
-        ).intround
+            targetValue,
+            fromLow: minBrightness.doubleValue,
+            fromHigh: maxBrightness.doubleValue,
+            toLow: MIN_BRIGHTNESS.d,
+            toHigh: MAX_BRIGHTNESS.d
+        )
 
         brightnessDataPointInsertionTask = DispatchWorkItem(name: "brightnessDataPointInsertionTask") { [weak self] in
             while let self = self, self.sendingBrightness {
@@ -4891,7 +4939,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         NotificationCenter.default.post(name: brightnessDataPointInserted, object: self, userInfo: ["values": userValues.dictionary])
     }
 
-    func insertContrastUserDataPoint(_ featureValue: Int, _ targetValue: Int, modeKey: AdaptiveModeKey) {
+    func insertContrastUserDataPoint(_ featureValue: Double, _ targetValue: Double, modeKey: AdaptiveModeKey) {
         guard !lockedContrastCurve, !adaptivePaused, displayController.adaptiveModeKey != .sync || !isSource,
               timeSince(lastConnectionTime) > 5 else { return }
 
@@ -4900,12 +4948,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             userContrast[modeKey] = ThreadSafeDictionary()
         }
         let targetValue = mapNumber(
-            targetValue.f,
-            fromLow: minContrast.floatValue,
-            fromHigh: maxContrast.floatValue,
-            toLow: MIN_CONTRAST.f,
-            toHigh: MAX_CONTRAST.f
-        ).intround
+            targetValue,
+            fromLow: minContrast.doubleValue,
+            fromHigh: maxContrast.doubleValue,
+            toLow: MIN_CONTRAST.d,
+            toHigh: MAX_CONTRAST.d
+        )
 
         contrastDataPointInsertionTask = DispatchWorkItem(name: "contrastDataPointInsertionTask") { [weak self] in
             while let self = self, self.sendingContrast {

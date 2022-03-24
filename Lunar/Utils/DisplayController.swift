@@ -1740,7 +1740,7 @@ class DisplayController: ObservableObject {
             if adaptiveModeKey != .manual {
                 display.insertBrightnessUserDataPoint(
                     adaptiveMode.brightnessDataPoint.last,
-                    value,
+                    value.d,
                     modeKey: adaptiveModeKey
                 )
             }
@@ -1765,7 +1765,7 @@ class DisplayController: ObservableObject {
             if adaptiveModeKey != .manual {
                 display.insertContrastUserDataPoint(
                     adaptiveMode.contrastDataPoint.last,
-                    value,
+                    value.d,
                     modeKey: adaptiveModeKey
                 )
             }
