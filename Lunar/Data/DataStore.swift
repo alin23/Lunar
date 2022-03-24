@@ -29,6 +29,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .streamLogs,
     .mergeBrightnessContrast,
     .enableBlackOutKillSwitch,
+    .enableSentry,
     .presets,
     .popoverClosed,
     .showVolumeSlider,
@@ -597,6 +598,7 @@ func initCache() {
     cacheKey(.streamLogs)
     cacheKey(.mergeBrightnessContrast)
     cacheKey(.enableBlackOutKillSwitch)
+    cacheKey(.enableSentry)
     cacheKey(.presets)
     cacheKey(.showVolumeSlider)
     cacheKey(.showStandardPresets)
@@ -718,6 +720,7 @@ extension Defaults.Keys {
     static let streamLogs = Key<Bool>("streamLogs", default: false)
     static let mergeBrightnessContrast = Key<Bool>("mergeBrightnessContrast", default: true)
     static let enableBlackOutKillSwitch = Key<Bool>("enableBlackOutKillSwitch", default: true)
+    static let enableSentry = Key<Bool>("enableSentry", default: true)
     static let presets = Key<[Preset]>("presets", default: [])
     static let popoverClosed = Key<Bool>("popoverClosed", default: true)
     static let showVolumeSlider = Key<Bool>("showVolumeSlider", default: true)
@@ -863,6 +866,7 @@ let workaroundBuiltinDisplayPublisher = Defaults.publisher(.workaroundBuiltinDis
     .filter { $0.oldValue != $0.newValue }
 let streamLogsPublisher = Defaults.publisher(.streamLogs).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let mergeBrightnessContrastPublisher = Defaults.publisher(.mergeBrightnessContrast).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let enableSentryPublisher = Defaults.publisher(.enableSentry).dropFirst().removeDuplicates().filter { $0.oldValue != $0.newValue }
 let showVolumeSliderPublisher = Defaults.publisher(.showVolumeSlider).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let showSliderValuesPublisher = Defaults.publisher(.showSliderValues).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let showAdvancedDisplaySettingsPublisher = Defaults.publisher(.showAdvancedDisplaySettings).removeDuplicates()
