@@ -1718,7 +1718,7 @@ private func encodedValue(key: Display.CodingKeys, value: Any) -> String {
          .defaultGammaBlueMin, .defaultGammaBlueMax, .defaultGammaBlueValue:
         return (value as! NSNumber).floatValue.str(decimals: 2)
     case .userBrightness, .userContrast:
-        return (try! encoder.encode(value as! [String: [String: Int]])).str()
+        return (try! encoder.encode(value as! [String: [[String: Double]]])).str()
     case .enabledControls:
         return (try! encoder.encode(value as! [String: Bool])).str()
     case .brightnessCurveFactors, .contrastCurveFactors:
