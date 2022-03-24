@@ -30,6 +30,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .mergeBrightnessContrast,
     .enableBlackOutKillSwitch,
     .enableSentry,
+    .paddleConsent,
     .presets,
     .popoverClosed,
     .showVolumeSlider,
@@ -599,6 +600,7 @@ func initCache() {
     cacheKey(.mergeBrightnessContrast)
     cacheKey(.enableBlackOutKillSwitch)
     cacheKey(.enableSentry)
+    cacheKey(.paddleConsent)
     cacheKey(.presets)
     cacheKey(.showVolumeSlider)
     cacheKey(.showStandardPresets)
@@ -721,6 +723,7 @@ extension Defaults.Keys {
     static let mergeBrightnessContrast = Key<Bool>("mergeBrightnessContrast", default: true)
     static let enableBlackOutKillSwitch = Key<Bool>("enableBlackOutKillSwitch", default: true)
     static let enableSentry = Key<Bool>("enableSentry", default: true)
+    static let paddleConsent = Key<Bool>("paddleConsent", default: false)
     static let presets = Key<[Preset]>("presets", default: [])
     static let popoverClosed = Key<Bool>("popoverClosed", default: true)
     static let showVolumeSlider = Key<Bool>("showVolumeSlider", default: true)

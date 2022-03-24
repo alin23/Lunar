@@ -17,6 +17,7 @@ import FuzzyFind
 import LetsMove
 import Magnet
 import MediaKeyTap
+import Paddle
 import Regex
 import Sauce
 import Sentry
@@ -1687,7 +1688,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         let user = User(userId: SERIAL_NUMBER_HASH)
-        user.email = lunarProProduct?.activationEmail
+
+        if CachedDefaults[.paddleConsent] {
+            user.email = lunarProProduct?.activationEmail
+        }
+
         user.username = lunarProProduct?.activationID
         SentrySDK.configureScope { scope in
             scope.setUser(user)
@@ -1880,7 +1885,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 guard CachedDefaults[.enableSentry] else { return }
 
                 let user = User(userId: SERIAL_NUMBER_HASH)
-                user.email = lunarProProduct?.activationEmail
+                if CachedDefaults[.paddleConsent] {
+                    user.email = lunarProProduct?.activationEmail
+                }
                 user.username = lunarProProduct?.activationID
                 SentrySDK.configureScope { scope in
                     scope.setUser(user)
