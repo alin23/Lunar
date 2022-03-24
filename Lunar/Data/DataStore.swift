@@ -28,6 +28,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .autoBlackoutBuiltin,
     .streamLogs,
     .mergeBrightnessContrast,
+    .enableBlackOutKillSwitch,
     .presets,
     .popoverClosed,
     .showVolumeSlider,
@@ -595,6 +596,7 @@ func initCache() {
     cacheKey(.workaroundBuiltinDisplay)
     cacheKey(.streamLogs)
     cacheKey(.mergeBrightnessContrast)
+    cacheKey(.enableBlackOutKillSwitch)
     cacheKey(.presets)
     cacheKey(.showVolumeSlider)
     cacheKey(.showStandardPresets)
@@ -715,6 +717,7 @@ extension Defaults.Keys {
     static let workaroundBuiltinDisplay = Key<Bool>("workaroundBuiltinDisplay", default: false)
     static let streamLogs = Key<Bool>("streamLogs", default: false)
     static let mergeBrightnessContrast = Key<Bool>("mergeBrightnessContrast", default: true)
+    static let enableBlackOutKillSwitch = Key<Bool>("enableBlackOutKillSwitch", default: true)
     static let presets = Key<[Preset]>("presets", default: [])
     static let popoverClosed = Key<Bool>("popoverClosed", default: true)
     static let showVolumeSlider = Key<Bool>("showVolumeSlider", default: true)

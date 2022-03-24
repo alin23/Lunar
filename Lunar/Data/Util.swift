@@ -1399,40 +1399,37 @@ func ask(
     timeout: DateComponents = 15.seconds,
     onCompletion: @escaping (Bool) -> Void
 ) {
-    let alert = dialog(
-        message: message,
-        info: info,
-        okButton: okButton,
-        cancelButton: cancelButton,
-        window: window
-    )
+    mainAsync {
+        let alert = dialog(
+            message: message,
+            info: info,
+            okButton: okButton,
+            cancelButton: cancelButton,
+            window: window
+        )
 
-    let semaphore = DispatchSemaphore(value: 0, name: "Panel alert dismissed")
+        let semaphore = DispatchSemaphore(value: 0, name: "Panel alert dismissed")
 
-    if let wc = window.windowController {
-        log.debug("Showing window '\(window.title)'")
-        wc.showWindow(nil)
-        window.orderFrontRegardless()
-    }
-
-    alert.beginSheetModal(for: window, completionHandler: { resp in
-        onCompletion(resp == .alertFirstButtonReturn)
-        semaphore.signal()
-    })
-
-    asyncNow {
-        if semaphore.wait(for: timeout) == .timedOut {
-            mainThread {
-                if alert.window.isVisible {
-                    alert.window.close()
-                }
-            }
-            onCompletion(false)
+        if let wc = window.windowController {
+            log.debug("Showing window '\(window.title)'")
+            wc.showWindow(nil)
+            window.orderFrontRegardless()
         }
-//        if alert.window.isVisible {
-//            alert.window.close()
-//            onCompletion(false)
-//        }
+
+        alert.beginSheetModal(for: window, completionHandler: { resp in
+            onCompletion(resp == .alertFirstButtonReturn)
+            semaphore.signal()
+        })
+        asyncNow {
+            if semaphore.wait(for: timeout) == .timedOut {
+                mainThread {
+                    if alert.window.isVisible {
+                        alert.window.close()
+                    }
+                }
+                onCompletion(false)
+            }
+        }
     }
 }
 
