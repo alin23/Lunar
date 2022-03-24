@@ -76,8 +76,6 @@ class DisplayController: ObservableObject {
     var pausedAdaptiveModeObserver = false
     var adaptiveModeObserver: Cancellable?
 
-    var fallbackPromptTime = [CGDirectDisplayID: Date]()
-
     var overrideAdaptiveModeObserver: Cancellable?
     var pausedOverrideAdaptiveModeObserver = false
 
@@ -1341,7 +1339,7 @@ class DisplayController: ObservableObject {
            let screen = display.screen, !screen.visibleFrame.isEmpty,
            !(display.control?.isResponsive() ?? true)
         {
-            if let promptTime = fallbackPromptTime[display.id] {
+            if let promptTime = display.fallbackPromptTime {
                 return promptTime + 20.minutes < Date()
             }
             return true
@@ -1352,7 +1350,7 @@ class DisplayController: ObservableObject {
 
     func promptAboutFallback(_ display: Display) {
         log.warning("Non-responsive display", context: display.context)
-        fallbackPromptTime[display.id] = Date()
+        display.fallbackPromptTime = Date()
         let semaphore = DispatchSemaphore(value: 0, name: "Non-responsive Control Watcher Prompt")
         let completionHandler = { (fallbackToGamma: NSApplication.ModalResponse) in
             if fallbackToGamma == .alertFirstButtonReturn {
@@ -1425,6 +1423,7 @@ class DisplayController: ObservableObject {
     }
 
     func addSentryData() {
+        guard CachedDefaults[.enableSentry] else { return }
         SentrySDK.configureScope { [weak self] scope in
             log.info("Creating Sentry extra context")
             scope.setExtra(value: datastore.settingsDictionary(), key: "settings")
@@ -1525,9 +1524,11 @@ class DisplayController: ObservableObject {
         lidClosed = isLidClosed()
         SyncMode.refresh()
         log.info("Lid closed: \(lidClosed)")
-        SentrySDK.configureScope { [weak self] scope in
-            guard let self = self else { return }
-            scope.setTag(value: String(describing: self.lidClosed), key: "clamshellMode")
+        if CachedDefaults[.enableSentry] {
+            SentrySDK.configureScope { [weak self] scope in
+                guard let self = self else { return }
+                scope.setTag(value: String(describing: self.lidClosed), key: "clamshellMode")
+            }
         }
 
         if CachedDefaults[.clamshellModeDetection], SyncMode.sourceDisplay?.isBuiltin ?? true {
