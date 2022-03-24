@@ -107,6 +107,8 @@ enum InputSource: UInt16, CaseIterable, Nameable {
         case "thunderbolt2": self = .thunderbolt2
         case "thunderbolt3": self = .thunderbolt2
         case "usbc": self = .thunderbolt2
+        case "usbc1": self = .thunderbolt1
+        case "usbc2": self = .thunderbolt2
         case "unknown": self = .unknown
         default:
             return nil

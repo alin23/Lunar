@@ -1634,3 +1634,34 @@ extension Collection {
 extension String.Index {
     func distance<S: StringProtocol>(in string: S) -> Int { string.distance(to: self) }
 }
+
+import Defaults
+
+// MARK: - UserValue
+
+struct UserValue: Codable, Defaults.Serializable {
+    let source: Double
+    let target: Double
+}
+
+extension ThreadSafeDictionary where T == Double, V == Double {
+    var userValues: [UserValue] {
+        map { k, v in UserValue(source: k, target: v) }
+    }
+}
+
+extension Dictionary where Key == Int, Value == Int {
+    var userValues: [UserValue] {
+        map { k, v in UserValue(source: k.d, target: v.d) }
+    }
+}
+
+extension Array where Element == UserValue {
+    var dictionary: [Double: Double] {
+        Dictionary(map { ($0.source, $0.target) }, uniquingKeysWith: first(this:other:))
+    }
+
+    var threadSafeDictionary: ThreadSafeDictionary<Double, Double> {
+        dictionary.threadSafe
+    }
+}

@@ -179,9 +179,9 @@ enum AdaptiveModeKey: Int, Codable, Defaults.Serializable, CaseIterable, Express
 // MARK: - DataPoint
 
 struct DataPoint {
-    var min: Int
-    var max: Int
-    var last: Int
+    var min: Double
+    var max: Double
+    var last: Double
 }
 
 // MARK: - AdaptiveMode
@@ -272,7 +272,7 @@ extension AdaptiveMode {
         maxVal: Double? = nil,
         offset: Double? = nil,
         factor: Double? = nil,
-        userValues: [Int: Int]? = nil
+        userValues: [Double: Double]? = nil
     ) -> [Double] {
         let (value, minValue, maxValue, displayUserValues) = display.values(monitorValue, modeKey: key)
         var userValues = userValues ?? displayUserValues
@@ -352,21 +352,21 @@ extension AdaptiveMode {
 
         var newValue: Double
 
-        if let userValue = userValues[value.intround] {
-            newValue = userValue.d
+        if let userValue = userValues[value] {
+            newValue = userValue
         } else {
             let sorted = userValues.sorted(by: { pair1, pair2 in pair1.key <= pair2.key })
             let userValueBefore = (sorted.last(where: { dataPoint, _ in
-                dataPoint <= value.intround
-            }) ?? (key: dataPoint.min, value: MIN_BRIGHTNESS.i))
+                dataPoint <= value
+            }) ?? (key: dataPoint.min, value: MIN_BRIGHTNESS.d))
             let userValueAfter = (sorted.first(where: { dataPoint, _ in
-                dataPoint > value.intround
-            }) ?? (key: dataPoint.max, value: MAX_BRIGHTNESS.i))
+                dataPoint > value
+            }) ?? (key: dataPoint.max, value: MAX_BRIGHTNESS.d))
 
-            let sourceLow = userValueBefore.key.d
-            let sourceHigh = userValueAfter.key.d
-            let targetLow = userValueBefore.value.d
-            let targetHigh = userValueAfter.value.d
+            let sourceLow = userValueBefore.key
+            let sourceHigh = userValueAfter.key
+            let targetLow = userValueBefore.value
+            let targetHigh = userValueAfter.value
 
             if sourceLow == sourceHigh || targetLow == targetHigh {
                 newValue = targetLow
@@ -406,13 +406,13 @@ extension AdaptiveMode {
     }
 
     func interpolate(
-        values: inout [Int: Int],
+        values: inout [Double: Double],
         dataPoint: DataPoint,
         factor: Float = 1.0,
         offset: Float = 0.0
     ) -> [Double] {
         if values[dataPoint.max] == nil, !values.keys.contains(where: { $0 > dataPoint.max }) {
-            values[dataPoint.max] = MAX_BRIGHTNESS.i
+            values[dataPoint.max] = MAX_BRIGHTNESS.d
         }
 
         let sorted = values.sorted(by: { pair1, pair2 in pair1.key <= pair2.key })
