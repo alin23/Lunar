@@ -593,16 +593,16 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem enabled="NO" id="D0F-3o-byd">
-                                            <string key="title">Turns the active monitor into a light panel
-for video calls in dark environments</string>
+                                            <string key="title">Turns the active monitor into a soft light panel
+for having video calls in dark environments</string>
                                             <attributedString key="attributedTitle">
                                                 <fragment>
-                                                    <string key="content">Turns the active monitor into a light panel
-for video calls in dark environments</string>
+                                                    <string key="content">Turns the active monitor into a soft light panel
+for having video calls in dark environments</string>
                                                     <attributes>
-                                                        <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="0.77416183774834435" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="0.77415999999999996" colorSpace="custom" customColorSpace="sRGB"/>
                                                         <font key="NSFont" metaFont="systemMedium" size="10"/>
-                                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
                                                     </attributes>
                                                 </fragment>
                                             </attributedString>
@@ -625,7 +625,7 @@ and setting its brightness/contrast to 0</string>
 and setting its brightness/contrast to 0</string>
                                                     <attributes>
                                                         <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="0.77415999999999996" colorSpace="custom" customColorSpace="sRGB"/>
-                                                        <font key="NSFont" metaFont="system" size="10"/>
+                                                        <font key="NSFont" metaFont="systemMedium" size="10"/>
                                                         <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
                                                     </attributes>
                                                 </fragment>
@@ -655,6 +655,28 @@ and setting its brightness/contrast to 0</string>
                                                 <action selector="blackOutOthers:" target="Voe-Tx-rLC" id="dod-Jk-6bC"/>
                                                 <binding destination="3YV-ka-Eop" name="enabled" keyPath="values.hasActiveDisplays" id="za3-qr-0Ea"/>
                                             </connections>
+                                        </menuItem>
+                                        <menuItem title="Enable BlackOut Kill Switch" alternate="YES" id="tor-Gy-BcJ">
+                                            <attributedString key="attributedTitle"/>
+                                            <connections>
+                                                <binding destination="3YV-ka-Eop" name="value" keyPath="values.enableBlackOutKillSwitch" id="4Ev-yr-3rC"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem enabled="NO" id="eA2-H3-Qg3">
+                                            <string key="title">Resets BlackOut forcefully when pressing
+the ⌘ Command key more than 8 times in a row</string>
+                                            <attributedString key="attributedTitle">
+                                                <fragment>
+                                                    <string key="content">Resets BlackOut forcefully when pressing
+the ⌘ Command key more than 8 times in a row</string>
+                                                    <attributes>
+                                                        <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="0.77415999999999996" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <font key="NSFont" metaFont="systemMedium" size="10"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
+                                                    </attributes>
+                                                </fragment>
+                                            </attributedString>
+                                            <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" title="Intensity" id="oR7-ui-EOU"/>
                                         <menuItem title="Info (click to show/hide)" enabled="NO" id="Jo8-0Y-lO0">
@@ -758,6 +780,7 @@ and setting its brightness/contrast to 0</string>
                     <connections>
                         <outlet property="activateLicenseMenuItem" destination="xUM-y5-dTw" id="jhW-HM-fs1"/>
                         <outlet property="blackOutExplanationMenuItem" destination="eAl-H3-Qg3" id="zg5-s2-gCh"/>
+                        <outlet property="blackOutKillSwitchExplanationMenuItem" destination="eA2-H3-Qg3" id="fHM-ax-XGi"/>
                         <outlet property="blackOutMenuItem" destination="yNB-Oq-RZ1" id="wQD-dU-hX3"/>
                         <outlet property="blackOutNoMirroringMenuItem" destination="tot-Gy-BcJ" id="mDw-i7-Nrs"/>
                         <outlet property="blackOutOthersMenuItem" destination="uDm-kH-RMI" id="acs-NE-mDl"/>

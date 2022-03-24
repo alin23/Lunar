@@ -34,7 +34,7 @@ class AppleNativeControl: Control {
 
     weak var display: Display?
     lazy var responsive: Bool = testReadAndWrite(method: .displayServices) || testReadAndWrite(method: .coreDisplay)
-    let str = "CoreDisplay Control"
+    let str = "AppleNative Control"
     var method = AppleNativeMethod.displayServices
 
     var smoothTransitionTask: DispatchWorkItem?

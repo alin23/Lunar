@@ -216,10 +216,9 @@ class NetworkControl: Control {
         let resp = ask(
             message: "Lunar Network Controller",
             info: """
-                Lunar found a network controller at `\(service.urls.first!
-                .absoluteString)` for the `\(display.name)` monitor.
+            Lunar found a network controller at `\(service.urls.first!.absoluteString)` for the `\(display.name)` monitor.
 
-                Do you want to use it?
+            Do you want to use it?
             """,
             okButton: "Yes",
             cancelButton: "Not now",
