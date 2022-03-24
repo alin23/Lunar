@@ -187,6 +187,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBOutlet var blackOutOthersMenuItem: NSMenuItem!
     @IBOutlet var faceLightExplanationMenuItem: NSMenuItem!
     @IBOutlet var blackOutExplanationMenuItem: NSMenuItem!
+    @IBOutlet var blackOutKillSwitchExplanationMenuItem: NSMenuItem!
     @IBOutlet var infoMenuItem: NSMenuItem!
 
     @Atomic var faceLightOn = false
@@ -983,6 +984,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         setExplanationStyle(faceLightExplanationMenuItem)
         setExplanationStyle(blackOutExplanationMenuItem)
+        setExplanationStyle(blackOutKillSwitchExplanationMenuItem)
         setInfoMenuToggleTitle()
         updateInfoMenuItem()
     }
@@ -1501,7 +1503,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func checkEmergencyBlackoutOff(event: NSEvent) {
-        guard event.modifierFlags.contains(.command) else { return }
+        guard CachedDefaults[.enableBlackOutKillSwitch],
+              event.modifierFlags.intersection([.command, .option, .shift, .control]) == [.command]
+        else {
+            if commandModifierPressedCount > 0 {
+                let mods = event.modifierFlags.intersection([.command, .option, .shift, .control])
+                log.debug(
+                    "Setting commandModifierPressedCount to 0",
+                    context: ["modifiers": mods.keyEquivalentStrings(), "modifiersRawValue": mods]
+                )
+                commandModifierPressedCount = 0
+            }
+            return
+        }
 
         guard lastCommandModifierPressedTime == nil || timeSince(lastCommandModifierPressedTime!) < 0.4 else {
             commandModifierPressedCount = 0
@@ -1559,10 +1573,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func addGlobalModifierMonitor() {
         NSEvent.addGlobalMonitorForEvents(matching: [.flagsChanged]) { [self] event in
+            guard !event.modifierFlags.intersection([.command, .option, .shift, .control]).isEmpty else { return }
             checkEmergencyBlackoutOff(event: event)
         }
         NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [self] event in
-            checkEmergencyBlackoutOff(event: event)
+            if !event.modifierFlags.intersection([.command, .option, .shift, .control]).isEmpty {
+                checkEmergencyBlackoutOff(event: event)
+            }
             handleModifierScrollThreshold(event: event)
 
             return event
