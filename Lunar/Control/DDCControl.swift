@@ -10,7 +10,7 @@ import Combine
 import Defaults
 import Foundation
 
-class DDCControl: Control {
+class DDCControl: Control, ObservableObject {
     // MARK: Lifecycle
 
     init(display: Display) {
@@ -70,6 +70,18 @@ class DDCControl: Control {
             }.store(in: &observers)
         return p
     }()
+
+    @Published var lastBrightness: UInt16? {
+        didSet { display?.lastRawBrightness = lastBrightness?.d }
+    }
+
+    @Published var lastContrast: UInt16? {
+        didSet { display?.lastRawContrast = lastContrast?.d }
+    }
+
+    @Published var lastVolume: UInt16? {
+        didSet { display?.lastRawVolume = lastVolume?.d }
+    }
 
     var isSoftware: Bool { false }
 
@@ -190,6 +202,7 @@ class DDCControl: Control {
 
     func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil, onChange: ((Brightness) -> Void)? = nil) -> Bool {
         guard let display = display else { return false }
+        defer { mainAsync { self.lastBrightness = brightness } }
         if brightnessTransition != .instant, !Self.sliderTracking, supportsSmoothTransition(for: .BRIGHTNESS), var oldValue = oldValue,
            oldValue != brightness
         {
@@ -238,6 +251,7 @@ class DDCControl: Control {
 
     func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil, onChange: ((Contrast) -> Void)? = nil) -> Bool {
         guard let display = display else { return false }
+        defer { mainAsync { self.lastContrast = contrast } }
 
         if brightnessTransition != .instant, !Self.sliderTracking, supportsSmoothTransition(for: .CONTRAST), var oldValue = oldValue,
            oldValue != contrast
@@ -286,7 +300,7 @@ class DDCControl: Control {
 
     func setVolume(_ volume: UInt16) -> Bool {
         guard let display = display else { return false }
-
+        defer { mainAsync { self.lastVolume = volume } }
         return DDC.setAudioSpeakerVolume(for: display.id, audioSpeakerVolume: volume)
     }
 

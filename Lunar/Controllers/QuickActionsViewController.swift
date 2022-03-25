@@ -76,6 +76,7 @@ struct DisplayRowView: View {
     @Default(.showInputInQuickActions) var showInputInQuickActions
     @Default(.showPowerInQuickActions) var showPowerInQuickActions
     @Default(.showXDRSelector) var showXDRSelector
+    @Default(.showRawValues) var showRawValues
 
     var softwareSliders: some View {
         Group {
@@ -217,10 +218,13 @@ struct DisplayRowView: View {
                 )
             }
 
-            if (display.hasDDC && showInputInQuickActions) || display.showOrientation || display.appPreset != nil || (
-                display
-                    .adaptivePaused && !display.blackOutEnabled
-            ) || SWIFTUI_PREVIEW {
+            if (display.hasDDC && showInputInQuickActions)
+                || display.showOrientation
+                || display.appPreset != nil
+                || (display.adaptivePaused && !display.blackOutEnabled)
+                || showRawValues
+                || SWIFTUI_PREVIEW
+            {
                 VStack {
                     if (display.hasDDC && showInputInQuickActions) || SWIFTUI_PREVIEW { inputSelector }
                     if display.showOrientation || SWIFTUI_PREVIEW { rotationSelector }
@@ -240,6 +244,10 @@ struct DisplayRowView: View {
                         }
                         .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .secondary.opacity(0.8)))
                         .font(.system(size: 9, weight: .bold))
+                    }
+
+                    if showRawValues {
+                        RawValuesView(display: display).frame(width: 220).padding(.vertical, 3)
                     }
                 }
                 .padding(8)
@@ -264,12 +272,62 @@ struct DisplayRowView: View {
     }
 }
 
+// MARK: - RawValueView
+
+struct RawValueView: View {
+    @Binding var value: Double?
+    @State var icon: String
+    @State var decimals: UInt8 = 0
+
+    var body: some View {
+        if let v = value?.str(decimals: decimals) {
+            HStack(spacing: 2) {
+                Image(systemName: icon)
+                Text(v)
+            }
+            .font(.system(size: 10, weight: .heavy, design: .monospaced))
+            .padding(.horizontal, 4)
+            .padding(.vertical, 2)
+            .background(RoundedRectangle(cornerRadius: 5, style: .continuous).fill(Color.primary.opacity(0.07)))
+        } else {
+            EmptyView()
+        }
+    }
+}
+
+// MARK: - RawValuesView
+
+struct RawValuesView: View {
+    @ObservedObject var display: Display
+
+    var body: some View {
+        if display.lastRawBrightness != nil || display.lastRawContrast != nil || display.lastRawVolume != nil {
+            HStack(spacing: 0) {
+                Text("Raw Values").font(.system(size: 12, weight: .semibold, design: .monospaced))
+                Spacer()
+                HStack(spacing: 4) {
+                    RawValueView(
+                        value: $display.lastRawBrightness,
+                        icon: "sun.max.fill",
+                        decimals: display.control is AppleNativeControl ? 2 : 0
+                    )
+                    RawValueView(value: $display.lastRawContrast, icon: "circle.righthalf.fill")
+                    RawValueView(value: $display.lastRawVolume, icon: "speaker.2.fill")
+                }.fixedSize()
+            }.foregroundColor(.secondary).padding(.horizontal, 3)
+        } else {
+            EmptyView()
+        }
+    }
+}
+
 // MARK: - QuickActionsLayoutView
 
 struct QuickActionsLayoutView: View {
     @Default(.showSliderValues) var showSliderValues
     @Default(.mergeBrightnessContrast) var mergeBrightnessContrast
     @Default(.showVolumeSlider) var showVolumeSlider
+    @Default(.showRawValues) var showRawValues
     @Default(.showBrightnessMenuBar) var showBrightnessMenuBar
     @Default(.showOnlyExternalBrightnessMenuBar) var showOnlyExternalBrightnessMenuBar
     @Default(.showOrientationInQuickActions) var showOrientationInQuickActions
@@ -286,7 +344,9 @@ struct QuickActionsLayoutView: View {
             VStack(alignment: .leading) {
                 SettingsToggle(text: "Only show top buttons on hover", setting: $showHeaderOnHover.animation(.fastSpring))
                 SettingsToggle(text: "Only show bottom buttons on hover", setting: $showFooterOnHover.animation(.fastSpring))
-                Divider()
+            }
+            Divider()
+            VStack(alignment: .leading) {
                 SettingsToggle(text: "Show slider values", setting: $showSliderValues.animation(.fastSpring))
                 SettingsToggle(text: "Show volume slider", setting: $showVolumeSlider.animation(.fastSpring))
                 SettingsToggle(text: "Show rotation selector", setting: $showOrientationInQuickActions.animation(.fastSpring))
@@ -300,6 +360,7 @@ struct QuickActionsLayoutView: View {
                 SettingsToggle(text: "Merge brightness and contrast", setting: $mergeBrightnessContrast.animation(.fastSpring))
                 SettingsToggle(text: "Show XDR brightness toggle when available", setting: $showXDRSelector.animation(.fastSpring))
                 Divider()
+                SettingsToggle(text: "Show last raw values sent to the display", setting: $showRawValues.animation(.fastSpring))
                 SettingsToggle(text: "Show brightness near menubar icon", setting: $showBrightnessMenuBar.animation(.fastSpring))
                 SettingsToggle(
                     text: "Show only external monitor brightness",
@@ -642,7 +703,7 @@ struct QuickActionsMenuView: View {
             .padding(.bottom, 10 * op)
             .opacity(op)
 
-            if showOptionsMenu || SWIFTUI_PREVIEW {
+            if showOptionsMenu {
                 QuickActionsLayoutView()
                     .padding(.horizontal, MENU_HORIZONTAL_PADDING)
                     .padding(.top, 10)
@@ -682,7 +743,7 @@ struct QuickActionsMenuView: View {
     }
 
     var body: some View {
-        GeometryReader { geom in
+        GeometryReader { _ in
             VStack {
                 content
                 footer

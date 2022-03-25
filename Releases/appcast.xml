@@ -8,12 +8,12 @@
             <sparkle:version>5.5.2</sparkle:version>
             <sparkle:shortVersionString>5.5.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.5.2.dmg" length="18010282" type="application/octet-stream" sparkle:edSignature="YmPnpruCgnzeUmwn81nLImOV/emiGUyroSxl5iWuS0sXx33xVbwYaeUR2bZ+5ICeOVKNip4af3W0bHq/qpU6CQ==" sparkle:dsaSignature="MEQCICC2RfCiKELnXWPWDLL892t1pdLVxILwjrR1bPAKCk6MAiAHU6P/jDt2WMpfFGXe5tPsfz+q4GuRLVsWGExcrmFECQ=="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.5.2.dmg" length="18010282" type="application/octet-stream" sparkle:edSignature="YmPnpruCgnzeUmwn81nLImOV/emiGUyroSxl5iWuS0sXx33xVbwYaeUR2bZ+5ICeOVKNip4af3W0bHq/qpU6CQ==" sparkle:dsaSignature="MEUCIQCdT+XvNs5gHMnacMpuE9trdfi9Q14Td2F0Wl0TrAsESQIgahxUVg+1DU8GJo+ZhaFoeYfL0mjb86tkEWLmSGiXx0M="/>
             <sparkle:deltas>
-                <enclosure url="https://lunar.fyi/delta/5.5.2/5.5.1" sparkle:deltaFrom="5.5.1" length="3288010" type="application/octet-stream" sparkle:edSignature="42ljMDN2Tf0icd/WH5r1dny7SqwcwoCR+7zrqUlhFfEjud7TX8acxVmuoa3OHQ8VjSPot+f0Nbk0NruzLIEuDA==" sparkle:dsaSignature="MEUCIQCYxKb+vnWmPA1fVyI/WBS5Ul7IbjhmATCAI2Dhnk9vYQIgHuZzGoqGF61z8/EjXhMjI1ymQtoxggBa1Xu5ReFmbKo="/>
-                <enclosure url="https://lunar.fyi/delta/5.5.2/5.4.3" sparkle:deltaFrom="5.4.3" length="6510010" type="application/octet-stream" sparkle:edSignature="8sKhHxkVMkdl56PqiRMCsyD8RVGqL5Jx9StHHY7aKdw+/eTEv9TT04vada24gTxKq49JHfRO+W5oL7haY1lVAA==" sparkle:dsaSignature="MEUCIB0Ya/XZWiB2aZS/xU/psC6CacRNmyYH78R0DFOPuTqYAiEAlUv+wR6BY0QfSEO/kJaNTdbsf1L6ia2H8S7GecaFoeI="/>
-                <enclosure url="https://lunar.fyi/delta/5.5.2/5.4.1" sparkle:deltaFrom="5.4.1" length="6562122" type="application/octet-stream" sparkle:edSignature="Wa7+m6MJo+rlbW69w4gg7BLNQmoUbdh1CPeputrvuI4CU5TWRf9aRYCAILG3uxIibvQ6uKqBwIAwPoyTamywAQ==" sparkle:dsaSignature="MEQCICDpTywQziGkiyU92DTHQpcgWuMWKgWhjY7SyNolq3giAiAkpg6BgFTD9ywb6qpW20ORGCF5WlZz+eAXlnKjqCCgJw=="/>
-                <enclosure url="https://lunar.fyi/delta/5.5.2/5.4.2" sparkle:deltaFrom="5.4.2" length="6500846" type="application/octet-stream" sparkle:edSignature="M46oAwE3p4uobnFllHXtCXN9fGZYE7/NV+BZ8uJjqbPMTwIgpWlzBDLNrAiTXmtPZaAtt72ivPru1eadmM7UCg==" sparkle:dsaSignature="MEQCIGRZ7vN8jITTv3MXyCAdoRgte6b9YHoO9Bp8KS88ddxYAiAeY5+/1wA76mDUT7fCKtPDuhfO3n9u7cayv2S14YDzoQ=="/>
+                <enclosure url="https://lunar.fyi/delta/5.5.2/5.5.1" sparkle:deltaFrom="5.5.1" length="3288010" type="application/octet-stream" sparkle:edSignature="42ljMDN2Tf0icd/WH5r1dny7SqwcwoCR+7zrqUlhFfEjud7TX8acxVmuoa3OHQ8VjSPot+f0Nbk0NruzLIEuDA==" sparkle:dsaSignature="MEQCIEOWuj+7TBGr/8zOD26Slx/GYI8MVCaxQU28X5c6O8JXAiBgKas4hA4T/04W27zqDM9Tj5gs9gOEqsnq4TMccIw7Tg=="/>
+                <enclosure url="https://lunar.fyi/delta/5.5.2/5.4.3" sparkle:deltaFrom="5.4.3" length="6510010" type="application/octet-stream" sparkle:edSignature="8sKhHxkVMkdl56PqiRMCsyD8RVGqL5Jx9StHHY7aKdw+/eTEv9TT04vada24gTxKq49JHfRO+W5oL7haY1lVAA==" sparkle:dsaSignature="MEUCIBxH3z4LBujbShicqmOhzR8C9CkEc9m/1TBGSjRh5nl8AiEAh9Oy8he+J4glPkDS5auT18vvGJYmc8id3QUvmm4jpSY="/>
+                <enclosure url="https://lunar.fyi/delta/5.5.2/5.4.2" sparkle:deltaFrom="5.4.2" length="6500846" type="application/octet-stream" sparkle:edSignature="M46oAwE3p4uobnFllHXtCXN9fGZYE7/NV+BZ8uJjqbPMTwIgpWlzBDLNrAiTXmtPZaAtt72ivPru1eadmM7UCg==" sparkle:dsaSignature="MEUCIQCPjzl/sV3KP+FMakL/HXAA1Vs9aI7chPzZOQ9C58jUzgIgHeGe3WZKnYuSZqql1XPWGnXS0SqWCu31RF9zqhQ2p3Y="/>
+                <enclosure url="https://lunar.fyi/delta/5.5.2/5.4.1" sparkle:deltaFrom="5.4.1" length="6562122" type="application/octet-stream" sparkle:edSignature="Wa7+m6MJo+rlbW69w4gg7BLNQmoUbdh1CPeputrvuI4CU5TWRf9aRYCAILG3uxIibvQ6uKqBwIAwPoyTamywAQ==" sparkle:dsaSignature="MEQCIGtxf/ZqfbezmN9jzGJICoI5QXmf5SWhGgXR6KMJeqhXAiAG5JTId4+AnuGFXw3VXm5CElJqVdea76cbbE2ngeuj/w=="/>
             </sparkle:deltas>
             <signature>Cf5NkVtxltSGyflw9F6AJn5Rp6s=</signature>
             <signature>YAePDHaBNGWI9UYYHXX50DQEeH4=</signature>
@@ -27,6 +27,12 @@
             <signature>SWct2A1lsRXTyZyt7c+GD8jT5Po=</signature>
             <signature>AWr+a6LCh944e14INHJyAf+OnYk=</signature>
             <signature>twMqVWSwYQZrQlifJpevbfCnYWc=</signature>
+            <signature>C6rTJ+UiiX.n57ltLdyJDR.9UP0=</signature>
+            <signature>C6rTJ+UiiX/n57ltLdyJDR/9UP0=</signature>
+            <signature>8EPe+5Nx86dIhJksfAAJ4xrsSGo=</signature>
+            <signature>vN7BPEGxgwepy+V5XSIcq4VWETU=</signature>
+            <signature>s3MEWzGULZ.cWSY1YLs.rbDyuS8=</signature>
+            <signature>s3MEWzGULZ/cWSY1YLs/rbDyuS8=</signature>
         </item>
         <item>
             <title>5.5.1</title>
@@ -34,7 +40,7 @@
             <sparkle:version>5.5.1</sparkle:version>
             <sparkle:shortVersionString>5.5.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.5.1.dmg" length="17713636" type="application/octet-stream" sparkle:edSignature="B8mKiH7eK5WOhIc5n0V7KsLQJXJnesEtAfoz7DN4JCkNsN5KYpb1e8TzLtK2WpIpYBYD63NGd0bciFCMqwVaAg==" sparkle:dsaSignature="MEUCIQCPkFoGFzyJN3+i27CNgiVgLWwT9YtRqLQlhB2w6TdkxAIgDeLlU1R/meR1zsV7fulhpKw2ZfKIWTQdT+/WIUcSsko="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.5.1.dmg" length="17713636" type="application/octet-stream" sparkle:edSignature="B8mKiH7eK5WOhIc5n0V7KsLQJXJnesEtAfoz7DN4JCkNsN5KYpb1e8TzLtK2WpIpYBYD63NGd0bciFCMqwVaAg==" sparkle:dsaSignature="MEUCIQCZRU8LaKzAW2rMnXtqTJ3jwlVr7UMvGZs8npn5ko97lgIgbsmupBK+b11yMmiqFwbhxYHM3bNMoTnPKogu2NqW5SM="/>
             <sparkle:deltas>
                 <enclosure url="https://lunar.fyi/delta/5.5.1/5.4.2" sparkle:deltaFrom="5.4.2" length="6177962" type="application/octet-stream" sparkle:edSignature="8j2u6sQ5Gjy64NC1ojUsG1I+KWvVALdpjdxnpEkS71BQp9+CXSqnKQ5FiVDkhy+RwaUDHFgY7oiJsnuahmICCA==" sparkle:dsaSignature="MEQCIEy+yr/xVcm815/nHeBcwIo0SMi9pROIKpkwXQeVlZYqAiBNp3D67TvY6PKrCykSFmSxwgbl3JvwCa8Lwvr2eu5ydw=="/>
                 <enclosure url="https://lunar.fyi/delta/5.5.1/5.4.1" sparkle:deltaFrom="5.4.1" length="6247118" type="application/octet-stream" sparkle:edSignature="4zoJJgj9DOU4bBXd9I9+yfGiUmpIa7Fg/LwoEDY3viD3exHdypSwYhvB9AhADaIvxyTuFlxrAFEnGNPFl8oVDQ==" sparkle:dsaSignature="MEQCIB1k2SoZu3acjp2BdSqiZszJsz4z1HGkitDIFxchrRMcAiBbEsJ6G/ecfRrXMJkgJCOtVVGA4qFIaj9QSjnPFDQLmw=="/>
@@ -57,10 +63,10 @@
             <sparkle:version>5.4.3</sparkle:version>
             <sparkle:shortVersionString>5.4.3</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.3.dmg" length="16565683" type="application/octet-stream" sparkle:edSignature="9l//Gv2m7Nq7Ho5dGzZZkYUa+zAoKA7LHtRAebwqQCb7YpUyXtVI8K38TpPqcAmtwf5Z86bdTJed1WKM2gYXBg==" sparkle:dsaSignature="MEYCIQCeilpKVJy2F0gg+Zim66R0ezelzJU4bHWmBlCZMKQBVAIhAJxFucw8n+8uIfR26GWSjB8vcNN5/KtsR/4HXastBOtO"/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.3.dmg" length="16565683" type="application/octet-stream" sparkle:edSignature="9l//Gv2m7Nq7Ho5dGzZZkYUa+zAoKA7LHtRAebwqQCb7YpUyXtVI8K38TpPqcAmtwf5Z86bdTJed1WKM2gYXBg==" sparkle:dsaSignature="MEYCIQCJF8+DdqQoN0J5Kj6xI3hwInyC4DR0lIyhmvbO54grOwIhAKW29yN4s6iSjeCRNLwIz3dlqdITjRS34d3vJXSZV3SA"/>
             <sparkle:deltas>
-                <enclosure url="https://lunar.fyi/delta/5.4.3/5.4.2" sparkle:deltaFrom="5.4.2" length="1381958" type="application/octet-stream" sparkle:edSignature="8Pjy6H7EPCSvURC7dfJehvfLbkQoJt/K/TU7qtWKj3aZZ6cF2icwTVdwvtJl0xMIKu8Ozqb5oylGmBH5VasFAQ==" sparkle:dsaSignature="MEQCIBvaeHxZBJEudFVMV6/UYxTtGJkFL+zqi+TIsoV41fSxAiACQTd+Pg1+1ugc2a3ZBU1gyK9tYGiz1RkwV50T4WXXAA=="/>
-                <enclosure url="https://lunar.fyi/delta/5.4.3/5.4.1" sparkle:deltaFrom="5.4.1" length="2562662" type="application/octet-stream" sparkle:edSignature="AWyEEwsratMYcGWdsTPOqgg/MCEdjXJI44wUW2McwhiHrjjoYrIxA7Ag74k1qSPgpdi06faJlJUgB3BiLW9FBA==" sparkle:dsaSignature="MEQCIH/tIBQ1OYo1VvE2ye/6/M3fa3jsRgX8hcVmbY+Fg4DtAiB3aFxzEeTo0tzqrd2Rq81PIlGDxzH1qD3tFq5pmvvJ9g=="/>
+                <enclosure url="https://lunar.fyi/delta/5.4.3/5.4.2" sparkle:deltaFrom="5.4.2" length="1381958" type="application/octet-stream" sparkle:edSignature="8Pjy6H7EPCSvURC7dfJehvfLbkQoJt/K/TU7qtWKj3aZZ6cF2icwTVdwvtJl0xMIKu8Ozqb5oylGmBH5VasFAQ==" sparkle:dsaSignature="MEQCIHYV7M1gBeP303iiYjhLGYN1bDoDFKdpxDEHXudcdqcTAiBo1MxuUwpzjpULSv1I6qKKRRtQ4jnTf6GlZlJkN5YEhw=="/>
+                <enclosure url="https://lunar.fyi/delta/5.4.3/5.4.1" sparkle:deltaFrom="5.4.1" length="2562662" type="application/octet-stream" sparkle:edSignature="AWyEEwsratMYcGWdsTPOqgg/MCEdjXJI44wUW2McwhiHrjjoYrIxA7Ag74k1qSPgpdi06faJlJUgB3BiLW9FBA==" sparkle:dsaSignature="MEYCIQCSkack3zRMSSbZCzjq/+h626WxyR1ufMMpA7sIOyFZsAIhAIHaGQSXNaacmYoBtZgLi/u7R2BX1ysRbe3BWxRqx6YB"/>
             </sparkle:deltas>
             <signature>SUhAAwHmgaHuPMXxeRVx+QCpwJI=</signature>
             <signature>DGZiXD2KlUghXJM4BB6stUPQ2Zc=</signature>
@@ -99,7 +105,7 @@
             <sparkle:version>5.4.2</sparkle:version>
             <sparkle:shortVersionString>5.4.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.2.dmg" length="16575155" type="application/octet-stream" sparkle:edSignature="7lJJ7eZSAtX+rTc5bHknR5vQtWDgOh5fmWvBrYDojrG/kusKWHnhBdeOdZJQ/QpR4Gd2wlWpFjvXBHDSGpaHCg==" sparkle:dsaSignature="MEQCIHRiBjlFbr/5iaZXovMNJYgfXrkdkBm6vkIDgokdQc9GAiAG32eEZMw39x3alkI//s9FAN9+yB0yPp74aVBSGnZyBg=="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.2.dmg" length="16575155" type="application/octet-stream" sparkle:edSignature="7lJJ7eZSAtX+rTc5bHknR5vQtWDgOh5fmWvBrYDojrG/kusKWHnhBdeOdZJQ/QpR4Gd2wlWpFjvXBHDSGpaHCg==" sparkle:dsaSignature="MEMCHzW12AyAY+ycczuOkQDq8tdmR7TMbvevRQU2AjTyyTACIFQm/wifgguG0IiOHH1vIBMzyNh/LVn0lGYkSMio++T0"/>
             <sparkle:deltas>
                 <enclosure url="https://lunar.fyi/delta/5.4.2/5.4.1" sparkle:deltaFrom="5.4.1" length="2533922" type="application/octet-stream" sparkle:edSignature="ZxiLYZb8YExmOr6kXkfe7/X1aZgH1J39lbT2qkIFPqt7Pshy/KxThBsqZ9TxfOxTYKfiRZ0D0sTPIdoobtWgBw==" sparkle:dsaSignature="MEQCIEjQu3aiU2A87KUewYC3kze0QwRhazKOJg8LEofyVADhAiBCUFL5M9kf9kty341Pa8PgO0p/MnCfkbmh4l+az1WmtA=="/>
             </sparkle:deltas>
@@ -115,7 +121,7 @@
             <sparkle:version>5.4.1</sparkle:version>
             <sparkle:shortVersionString>5.4.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>10.15</sparkle:minimumSystemVersion>
-            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.1.dmg" length="16475388" type="application/octet-stream" sparkle:edSignature="tbcYwNBj34ka2n0RBqquBdka9iHTqb9d7au1LVRvm7mYk/Owsfw1B+8iLP4R4yfDc5KZ7zc3wdU5BYN8rMriBw==" sparkle:dsaSignature="MEUCIQCWpBox2dSlFXCwUP1BXG2UsJEHj4FRHOHVP1rgpG+e0wIgEWbOUJD8hIm8TYcqz7L+D6rPm5JsXOsQ9J1fP/yAbnQ="/>
+            <enclosure url="https://static.lunar.fyi/releases/Lunar-5.4.1.dmg" length="16475388" type="application/octet-stream" sparkle:edSignature="tbcYwNBj34ka2n0RBqquBdka9iHTqb9d7au1LVRvm7mYk/Owsfw1B+8iLP4R4yfDc5KZ7zc3wdU5BYN8rMriBw==" sparkle:dsaSignature="MEQCIBbouxGvJWhJqzKvHwA/aF2xWP/B9lqK17a1ZYW3i/vXAiAcB7tF+5zxNG67eYMYZzBn9piCMu3SJujigQ6NCUmQrg=="/>
             <signature>pIF2KBKZjiq.6A0U9PVx8SYcSmo=</signature>
             <signature>pIF2KBKZjiq/6A0U9PVx8SYcSmo=</signature>
             <signature>tE3C3N1sDPEhZSHroaQKxeDbwKs=</signature>

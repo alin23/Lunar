@@ -1809,6 +1809,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         guard displayController.adaptiveModeKey != .manual else {
             return
         }
+
+        let featureValue = featureValue.rounded(to: 4)
         for (x, y) in values.dictionary {
             if (x < featureValue && y > targetValue) || (x > featureValue && y < targetValue) {
                 if logValue {
@@ -2060,6 +2062,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var i2cDetectionTask: Repeater? = nil
 
     var fallbackPromptTime: Date?
+
+    @Published var lastRawBrightness: Double?
+    @Published var lastRawContrast: Double?
+    @Published var lastRawVolume: Double?
 
     var alternativeControlForAppleNative: Control? = nil {
         didSet {
@@ -2781,6 +2787,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             oldValue?.cancel()
         }
     }
+
+    var isMacBook: Bool { isBuiltin && Sysctl.isMacBook }
 
     @Published @objc dynamic var brightness: NSNumber = 50 {
         didSet {

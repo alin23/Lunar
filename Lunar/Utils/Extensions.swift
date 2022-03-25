@@ -906,10 +906,10 @@ class ModePopupButton: NSPopUpButton {
         changedItemsPublisher
             .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
             .sink { [weak self] _ in
-                guard let mgr = DisplayController.panelManager, mgr.tryLockAccess() else {
-                    return
-                }
-                defer { mgr.unlockAccess() }
+//                guard let mgr = DisplayController.panelManager, mgr.tryLockAccess() else {
+//                    return
+//                }
+//                defer { mgr.unlockAccess() }
                 self?.setItemStyles()
             }.store(in: &observers)
     }
@@ -931,11 +931,11 @@ class ModePopupButton: NSPopUpButton {
     }
 
     func setItemStyles() {
-        guard let mgr = DisplayController.panelManager, mgr.tryLockAccess() else {
-            return
-        }
-
-        defer { mgr.unlockAccess() }
+//        guard let mgr = DisplayController.panelManager, mgr.tryLockAccess() else {
+//            return
+//        }
+//
+//        defer { mgr.unlockAccess() }
         var oldItem: NSMenuItem?
         var offset = 0
         let addedSeparators = itemArray.contains(where: \.isSeparatorItem)
@@ -973,7 +973,7 @@ class ModePopupButton: NSPopUpButton {
             }
             item.attributedTitle = mode.attributedString
             item.indentationLevel = 1
-            let symbol = NSImage.SymbolConfiguration(pointSize: 13, weight: .bold)
+            let symbol = NSImage.SymbolConfiguration(pointSize: 11, weight: .bold)
             if mode.isTVMode {
                 item.image = .init(systemSymbolName: "tv", accessibilityDescription: "TV Mode")?.withSymbolConfiguration(symbol)
             } else if !mode.isSafeMode {

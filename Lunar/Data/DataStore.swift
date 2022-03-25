@@ -34,6 +34,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .presets,
     .popoverClosed,
     .showVolumeSlider,
+    .showRawValues,
     .showStandardPresets,
     .showCustomPresets,
     .showXDRSelector,
@@ -603,6 +604,7 @@ func initCache() {
     cacheKey(.paddleConsent)
     cacheKey(.presets)
     cacheKey(.showVolumeSlider)
+    cacheKey(.showRawValues)
     cacheKey(.showStandardPresets)
     cacheKey(.showCustomPresets)
     cacheKey(.showXDRSelector)
@@ -727,6 +729,7 @@ extension Defaults.Keys {
     static let presets = Key<[Preset]>("presets", default: [])
     static let popoverClosed = Key<Bool>("popoverClosed", default: true)
     static let showVolumeSlider = Key<Bool>("showVolumeSlider", default: true)
+    static let showRawValues = Key<Bool>("showRawValues", default: false)
     static let showStandardPresets = Key<Bool>("showStandardPresets", default: true)
     static let showCustomPresets = Key<Bool>("showCustomPresets", default: true)
     static let showXDRSelector = Key<Bool>("showXDRSelector", default: true)
