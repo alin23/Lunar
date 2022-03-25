@@ -227,9 +227,11 @@ class Slider: NSSlider {
     }
 
     override func mouseExited(with _: NSEvent) {
-        AppleNativeControl.sliderTracking = false
-        GammaControl.sliderTracking = false
-        DDCControl.sliderTracking = false
+        if !sliderCell.pressed {
+            AppleNativeControl.sliderTracking = false
+            GammaControl.sliderTracking = false
+            DDCControl.sliderTracking = false
+        }
         transition(0.8)
         alphaValue = 0.9
     }
@@ -263,15 +265,17 @@ class Slider: NSSlider {
                 DDCControl.sliderTracking = true
             }
         case .ended, .cancelled, .stationary:
-            if AppleNativeControl.sliderTracking {
+            if AppleNativeControl.sliderTracking, !sliderCell.pressed {
                 AppleNativeControl.sliderTracking = false
                 GammaControl.sliderTracking = false
                 DDCControl.sliderTracking = false
             }
         default:
-            AppleNativeControl.sliderTracking = delta != 0
-            GammaControl.sliderTracking = AppleNativeControl.sliderTracking
-            DDCControl.sliderTracking = AppleNativeControl.sliderTracking
+            if delta == 0, !sliderCell.pressed {
+                AppleNativeControl.sliderTracking = delta != 0
+                GammaControl.sliderTracking = AppleNativeControl.sliderTracking
+                DDCControl.sliderTracking = AppleNativeControl.sliderTracking
+            }
         }
 
         let increment = range * (delta / (150 * Float(scrollPrecision)))

@@ -172,6 +172,14 @@ class DisplayImage: NSView {
     @IBInspectable var baseCornerRadius: CGFloat = 14
     @IBInspectable var maxCornerRadius: CGFloat = 24
 
+    var isMacBook = false {
+        didSet { setup(frame: frame) }
+    }
+
+    var isSidecar = false {
+        didSet { setup(frame: frame) }
+    }
+
     lazy var standColor = monitorStandColor { didSet { setup(frame: frame) }}
     lazy var screenColor = monitorScreenColor { didSet { setup(frame: frame) }}
 
@@ -180,7 +188,7 @@ class DisplayImage: NSView {
         setup(frame: frame)
     }}
 
-    func screenLayer() -> CAShapeLayer {
+    func screenLayer(perspective: CGFloat = 0) -> CAShapeLayer {
         let layer = CAShapeLayer()
         layer.cornerCurve = .continuous
 
@@ -188,15 +196,75 @@ class DisplayImage: NSView {
 
         layer.path = CGPath(
             roundedRect: CGRect(
-                x: 0, y: frame.height * 0.25,
-                width: frame.width,
-                height: frame.height * 0.75
+                x: perspective / 4, y: frame.height * 0.25 + perspective / 6,
+                width: frame.width - perspective / 2,
+                height: (frame.height * 0.75 - perspective / 2) - perspective / 6
             ),
             cornerWidth: radius,
             cornerHeight: radius,
             transform: nil
         )
         layer.fillColor = screenColor.cgColor
+        if isSidecar {
+            layer.fillColor = NSColor.black.highlight(withLevel: 0.15)!.cgColor
+            layer.lineWidth = 9
+            layer.strokeColor = NSColor.black.withAlphaComponent(0.95).cgColor
+        }
+        return layer
+    }
+
+    func macbookLayer(perspective: CGFloat) -> CAShapeLayer {
+        let layer = CAShapeLayer()
+        layer.cornerCurve = .continuous
+
+        let h = 0.08
+        let y = 1.1
+        let hh = 0.03
+
+        let radius = mapNumber(cornerRadius, fromLow: 0, fromHigh: maxCornerRadius, toLow: 10, toHigh: 14)
+        let rect = CGRect(
+            x: 0, y: frame.height * y,
+            width: frame.width,
+            height: frame.height * h
+        )
+        layer.path = CGPath(
+            rect: rect,
+            transform: nil
+        )
+
+        if darkMode {
+            layer.fillColor = screenColor.highlight(withLevel: 0.1)!.cgColor
+        } else {
+            layer.fillColor = screenColor.shadow(withLevel: 0.2)!.cgColor
+        }
+        layer.cornerRadius = radius
+        layer.masksToBounds = true
+        layer.bounds = rect
+        layer.anchorPoint = NSPoint(x: 0, y: -1.05 - y)
+        layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+
+        let sublayer = CAShapeLayer()
+        sublayer.cornerCurve = .continuous
+
+        let mid = frame.width / 2
+        sublayer.path = CGPath(
+            roundedRect: CGRect(
+                x: mid - 30, y: frame.height * ((h + y) - hh),
+                width: 60,
+                height: frame.height * hh
+            ),
+            cornerWidth: 3,
+            cornerHeight: 3,
+            transform: nil
+        )
+
+        if darkMode {
+            sublayer.fillColor = screenColor.shadow(withLevel: 0.2)!.cgColor
+        } else {
+            sublayer.fillColor = screenColor.highlight(withLevel: 0.2)!.cgColor
+        }
+
+        layer.addSublayer(sublayer)
         return layer
     }
 
@@ -234,8 +302,16 @@ class DisplayImage: NSView {
 
     func setup(frame _: NSRect) {
         wantsLayer = true
-        layer = screenLayer()
-        layer?.addSublayer(standLayer())
+        if isMacBook {
+            let perspective: CGFloat = 30
+            layer = screenLayer(perspective: perspective)
+            layer?.addSublayer(macbookLayer(perspective: perspective))
+        } else if isSidecar {
+            layer = screenLayer(perspective: 30)
+        } else {
+            layer = screenLayer()
+            layer?.addSublayer(standLayer())
+        }
     }
 }
 
@@ -354,6 +430,18 @@ class DisplayViewController: NSViewController {
 
     var gammaNoticeHighlighterTask: Repeater?
 
+    var buttonY: CGFloat?
+    var resolutionsY: CGFloat?
+
+    var deleteButtonY: CGFloat?
+    var powerButtonY: CGFloat?
+    var syncSourceButtonY: CGFloat?
+    var offTextY: CGFloat?
+
+    let topButtonsMacBookOffset: CGFloat = -13
+    var cornerRadiusFieldY: CGFloat?
+    var cornerRadiusFieldCaptionY: CGFloat?
+
     @IBOutlet var _inputDropdownHotkeyButton: NSButton? {
         didSet {
             mainAsync { [weak self] in
@@ -422,6 +510,66 @@ class DisplayViewController: NSViewController {
         didSet {
             display?.lockedContrastCurve = lockedContrastCurve
             lockContrastCurveButton?.state = lockedContrastCurve.state
+        }
+    }
+
+    @IBOutlet var deleteButton: Button! {
+        didSet {
+            guard let deleteButton = deleteButton, let display = display else { return }
+            let f = deleteButton.frame
+            if deleteButtonY == nil { deleteButtonY = f.origin.y }
+
+            guard let deleteButtonY = deleteButtonY else { return }
+            deleteButton
+                .setFrameOrigin(NSPoint(
+                    x: f.origin.x,
+                    y: deleteButtonY + ((display.isMacBook || display.isSidecar) ? topButtonsMacBookOffset : 0)
+                ))
+        }
+    }
+
+    @IBOutlet var powerButton: Button! {
+        didSet {
+            guard let powerButton = powerButton, let display = display else { return }
+            let f = powerButton.frame
+            if powerButtonY == nil { powerButtonY = f.origin.y }
+
+            guard let powerButtonY = powerButtonY else { return }
+            powerButton
+                .setFrameOrigin(NSPoint(
+                    x: f.origin.x,
+                    y: powerButtonY + ((display.isMacBook || display.isSidecar) ? topButtonsMacBookOffset : 0)
+                ))
+        }
+    }
+
+    @IBOutlet var syncSourceButton: LockButton! {
+        didSet {
+            guard let syncSourceButton = syncSourceButton, let display = display else { return }
+            let f = syncSourceButton.frame
+            if syncSourceButtonY == nil { syncSourceButtonY = f.origin.y }
+
+            guard let syncSourceButtonY = syncSourceButtonY else { return }
+            syncSourceButton
+                .setFrameOrigin(NSPoint(
+                    x: f.origin.x,
+                    y: syncSourceButtonY + ((display.isMacBook || display.isSidecar) ? topButtonsMacBookOffset : 0)
+                ))
+        }
+    }
+
+    @IBOutlet var offText: NSTextField! {
+        didSet {
+            guard let offText = offText, let display = display else { return }
+            let f = offText.frame
+            if offTextY == nil { offTextY = f.origin.y }
+
+            guard let offTextY = offTextY else { return }
+            offText
+                .setFrameOrigin(NSPoint(
+                    x: f.origin.x,
+                    y: offTextY + ((display.isMacBook || display.isSidecar) ? topButtonsMacBookOffset : 0)
+                ))
         }
     }
 
@@ -657,6 +805,22 @@ class DisplayViewController: NSViewController {
         setupProButton()
     }
 
+    func styleButton<T>(_ button: PopoverButton<T>, icon: String, display: Display) -> Void {
+        if buttonY == nil { buttonY = button.frame.origin.y }
+
+        //        let color = display.isMacBook ? white : NSColor(named: "Caption Tertiary")!
+        let color = NSColor(named: "Caption Tertiary")!
+        let symbol = NSImage.SymbolConfiguration(pointSize: 14, weight: .bold)
+
+        button.textColor = color
+        button.contentTintColor = color
+        button.image = NSImage(systemSymbolName: icon, accessibilityDescription: nil)?.withSymbolConfiguration(symbol)
+        if let buttonY = buttonY {
+            let f = button.frame
+            button.setFrameOrigin(NSPoint(x: f.origin.x, y: buttonY + (display.isMacBook ? -26 : 0)))
+        }
+    }
+
     func update(_ display: Display? = nil) {
         guard let display = display ?? self.display else { return }
 
@@ -671,7 +835,33 @@ class DisplayViewController: NSViewController {
 
         display.withoutDDC { display.panelMode = display.panel?.currentMode }
         displayImage?.cornerRadius = CGFloat(display.cornerRadius.floatValue)
-        // cornerRadiusField?.caption = cornerRadiusFieldCaption
+        displayImage?.isMacBook = display.isMacBook
+        displayImage?.isSidecar = display.isSidecar
+
+        if let cornerRadiusField = cornerRadiusField {
+            cornerRadiusField.isHidden = display.isSidecar
+            cornerRadiusFieldCaption?.isHidden = display.isSidecar
+
+            cornerRadiusField.textFieldColor = display.isMacBook ? NSColor(named: "Caption Tertiary")! : violet
+            cornerRadiusField.textFieldColorHover = cornerRadiusField.textFieldColor.highlight(withLevel: 0.2)!
+            cornerRadiusField.textFieldColorLight = cornerRadiusField.textFieldColor.blended(withFraction: 0.2, of: red)!
+            cornerRadiusField.editingTextFieldColor = cornerRadiusField.textFieldColor
+            cornerRadiusField.textFieldColor = cornerRadiusField.textFieldColor.withAlphaComponent(0.0)
+
+            if cornerRadiusFieldY == nil { cornerRadiusFieldY = cornerRadiusField.frame.origin.y }
+            if cornerRadiusFieldCaptionY == nil { cornerRadiusFieldCaptionY = cornerRadiusFieldCaption?.frame.origin.y }
+            if let cornerRadiusFieldY = cornerRadiusFieldY {
+                cornerRadiusField
+                    .setFrameOrigin(NSPoint(x: cornerRadiusField.frame.origin.x, y: cornerRadiusFieldY + (display.isMacBook ? -42 : 0)))
+            }
+            if let cornerRadiusFieldCaptionY = cornerRadiusFieldCaptionY, let cornerRadiusFieldCaption = cornerRadiusFieldCaption {
+                cornerRadiusFieldCaption
+                    .setFrameOrigin(NSPoint(
+                        x: cornerRadiusFieldCaption.frame.origin.x,
+                        y: cornerRadiusFieldCaptionY + (display.isMacBook ? -42 : 0)
+                    ))
+            }
+        }
         cornerRadiusField?.didScrollTextField = true
         cornerRadiusField?.integerValue = display.cornerRadius.intValue
         cornerRadiusField?.onValueChangedInstant = { [weak self] value in
@@ -691,15 +881,20 @@ class DisplayViewController: NSViewController {
             self.cornerRadiusFieldCaption?.transition(1)
             self.cornerRadiusFieldCaption?.alphaValue = 0.0
         }
-        cornerRadiusField?.editingTextFieldColor = mauve
-        if let cornerRadiusField = cornerRadiusField {
-            cornerRadiusField.textFieldColor = cornerRadiusField.textFieldColor.withAlphaComponent(0.0)
-        }
+
         cornerRadiusField?.onEditStateChange = { [weak self] editing in
             if editing {
                 self?.cornerRadiusField?.onMouseEnter?()
             } else {
                 self?.cornerRadiusField?.onMouseExit?()
+            }
+        }
+
+        if let resolutionsDropdown = resolutionsDropdown {
+            if resolutionsY == nil { resolutionsY = resolutionsDropdown.frame.origin.y }
+            if let resolutionsY = resolutionsY {
+                let f = resolutionsDropdown.frame
+                resolutionsDropdown.setFrameOrigin(NSPoint(x: f.origin.x, y: resolutionsY + (display.isMacBook ? 40 : 0)))
             }
         }
 
@@ -710,18 +905,22 @@ class DisplayViewController: NSViewController {
 
         if let button = colorsButton {
             button.display = display
+            styleButton(button, icon: "paintpalette", display: display)
         }
         if let button = ddcButton {
             button.display = display
+            styleButton(button, icon: "display", display: display)
         }
         if let button = settingsButton {
             button.display = display
             button.displayViewController = self
             button.notice = adaptiveNotice
+            styleButton(button, icon: "gear", display: display)
         }
         if let button = resetButton {
             button.display = display
             button.displayViewController = self
+            styleButton(button, icon: "clock.arrow.circlepath", display: display)
         }
 
         scrollableBrightness?.display = display
