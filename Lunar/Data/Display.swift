@@ -4945,7 +4945,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func insertBrightnessUserDataPoint(_ featureValue: Double, _ targetValue: Double, modeKey: AdaptiveModeKey) {
-        guard !lockedBrightnessCurve, !adaptivePaused, displayController.adaptiveModeKey != .sync || !isSource,
+        guard !lockedBrightnessCurve, !adaptivePaused,
+              displayController.adaptiveModeKey != .sync || !isSource,
+              displayController.adaptiveModeKey != .location || featureValue != 0,
               timeSince(lastConnectionTime) > 5 else { return }
 
         brightnessDataPointInsertionTask?.cancel()
@@ -4978,7 +4980,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func insertContrastUserDataPoint(_ featureValue: Double, _ targetValue: Double, modeKey: AdaptiveModeKey) {
-        guard !lockedContrastCurve, !adaptivePaused, displayController.adaptiveModeKey != .sync || !isSource,
+        guard !lockedContrastCurve, !adaptivePaused,
+              displayController.adaptiveModeKey != .sync || !isSource,
+              displayController.adaptiveModeKey != .location || featureValue != 0,
               timeSince(lastConnectionTime) > 5 else { return }
 
         contrastDataPointInsertionTask?.cancel()
