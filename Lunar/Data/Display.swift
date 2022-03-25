@@ -851,6 +851,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         // MARK: Internal
 
         static var bool: Set<CodingKeys> = [
+            .active,
             .adaptive,
             .lockedBrightness,
             .lockedContrast,
@@ -875,6 +876,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .mirroredBeforeBlackOut,
             .enhanced,
             .subzero,
+            .applyBrightnessOnInputChange1,
+            .applyBrightnessOnInputChange2,
+            .applyBrightnessOnInputChange3,
+            .extendedColorGain,
+            .reapplyColorGain,
         ]
 
         static var hidden: Set<CodingKeys> = [
@@ -1245,6 +1251,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     """
 
     @Atomic var applyPreciseValue = true
+    @Atomic var reapplyPreciseValue = true
 
     @objc dynamic lazy var preciseMaxBrightness: Double = maxBrightness.doubleValue / 100.0
     @objc dynamic lazy var preciseMinBrightness: Double = minBrightness.doubleValue / 100.0
@@ -2635,24 +2642,32 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             let (brightness, contrast) = sliderValueToBrightnessContrast(preciseBrightnessContrast)
 
             var smallDiff = abs(brightness.i - self.brightness.intValue) < 5
-            withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
-                mainThread {
-                    self.brightness = brightness.ns
-                    self.insertBrightnessUserDataPoint(
-                        displayController.adaptiveMode.brightnessDataPoint.last,
-                        brightness.d, modeKey: displayController.adaptiveModeKey
-                    )
+            if !lockedBrightness {
+                withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
+                    mainThread {
+                        withoutReapplyPreciseValue {
+                            self.brightness = brightness.ns
+                        }
+                        self.insertBrightnessUserDataPoint(
+                            displayController.adaptiveMode.brightnessDataPoint.last,
+                            brightness.d, modeKey: displayController.adaptiveModeKey
+                        )
+                    }
                 }
             }
 
-            smallDiff = abs(contrast.i - self.contrast.intValue) < 5
-            withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
-                mainThread {
-                    self.contrast = contrast.ns
-                    self.insertContrastUserDataPoint(
-                        displayController.adaptiveMode.contrastDataPoint.last,
-                        contrast.d, modeKey: displayController.adaptiveModeKey
-                    )
+            if !lockedContrast {
+                smallDiff = abs(contrast.i - self.contrast.intValue) < 5
+                withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
+                    mainThread {
+                        withoutReapplyPreciseValue {
+                            self.contrast = contrast.ns
+                        }
+                        self.insertContrastUserDataPoint(
+                            displayController.adaptiveMode.contrastDataPoint.last,
+                            contrast.d, modeKey: displayController.adaptiveModeKey
+                        )
+                    }
                 }
             }
         }
@@ -2778,12 +2793,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             mainThread {
-                applyPreciseValue = false
-                preciseBrightness = brightnessToSliderValue(self.brightness)
-                if !lockedBrightness || lockedContrast {
-                    preciseBrightnessContrast = brightnessToSliderValue(self.brightness)
+                withoutApplyPreciseValue {
+                    preciseBrightness = brightnessToSliderValue(self.brightness)
+                    if reapplyPreciseValue, !lockedBrightness || lockedContrast {
+                        preciseBrightnessContrast = brightnessToSliderValue(self.brightness)
+                    }
                 }
-                applyPreciseValue = true
             }
 
             guard applyDisplayServices, DDC.apply, !lockedBrightness, force || brightness != oldValue else {
@@ -2869,12 +2884,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             mainThread {
-                applyPreciseValue = false
-                preciseContrast = contrastToSliderValue(self.contrast, merged: CachedDefaults[.mergeBrightnessContrast])
-                if lockedBrightness, !lockedContrast {
-                    preciseBrightnessContrast = contrastToSliderValue(self.contrast)
+                withoutApplyPreciseValue {
+                    preciseContrast = contrastToSliderValue(self.contrast, merged: CachedDefaults[.mergeBrightnessContrast])
+                    if reapplyPreciseValue, lockedBrightness, !lockedContrast {
+                        preciseBrightnessContrast = contrastToSliderValue(self.contrast)
+                    }
                 }
-                applyPreciseValue = true
             }
 
             guard DDC.apply, !lockedContrast, force || contrast != oldValue else {
@@ -4797,6 +4812,18 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         apply = false
         block()
         apply = true
+    }
+
+    @inline(__always) func withoutApplyPreciseValue(_ block: () -> Void) {
+        applyPreciseValue = false
+        block()
+        applyPreciseValue = true
+    }
+
+    @inline(__always) func withoutReapplyPreciseValue(_ block: () -> Void) {
+        reapplyPreciseValue = false
+        block()
+        reapplyPreciseValue = true
     }
 
     @inline(__always) func withoutDDC(_ block: () -> Void) {
