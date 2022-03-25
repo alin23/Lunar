@@ -1658,7 +1658,7 @@ extension Dictionary where Key == Int, Value == Int {
 
 extension Array where Element == UserValue {
     var dictionary: [Double: Double] {
-        Dictionary(map { ($0.source, $0.target) }, uniquingKeysWith: first(this:other:))
+        Dictionary(map { ($0.source.rounded(to: 4), $0.target) }, uniquingKeysWith: first(this:other:))
     }
 
     var threadSafeDictionary: ThreadSafeDictionary<Double, Double> {
