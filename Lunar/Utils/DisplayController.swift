@@ -1724,13 +1724,18 @@ class DisplayController: ObservableObject {
             }
 
             if CachedDefaults[.mergeBrightnessContrast] {
-                let preciseValue = mapNumber(
-                    value.d,
-                    fromLow: display.minBrightness.doubleValue,
-                    fromHigh: display.maxBrightness.doubleValue,
-                    toLow: 0,
-                    toHigh: 100
-                ) / 100
+                let preciseValue: Double
+                if !display.lockedBrightness {
+                    preciseValue = mapNumber(
+                        value.d,
+                        fromLow: display.minBrightness.doubleValue,
+                        fromHigh: display.maxBrightness.doubleValue,
+                        toLow: 0,
+                        toHigh: 100
+                    ) / 100
+                } else {
+                    preciseValue = cap(display.preciseBrightnessContrast + (offset.d / 100), minVal: 0.0, maxVal: 1.0)
+                }
 
                 display.preciseBrightnessContrast = preciseValue
             } else {
