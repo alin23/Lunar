@@ -112,6 +112,7 @@ enum DisplayFilter: ExpressibleByArgument, Codable {
     case all
     case first
     case mainExternal
+    case external
     case main
     case nonMain
     case cursor
@@ -132,7 +133,9 @@ enum DisplayFilter: ExpressibleByArgument, Codable {
             self = .all
         case "first":
             self = .first
-        case "mainExternal", "main-external", "external":
+        case "external":
+            self = .external
+        case "mainExternal", "main-external":
             self = .mainExternal
         case "main":
             self = .main
@@ -188,16 +191,24 @@ extension NSDeviceDescriptionKey: Encodable {
 struct ForgivingEncodable: Encodable {
     // MARK: Lifecycle
 
-    init(_ value: Any?) {
+    init(_ value: Any?, key: String? = nil) {
         self.value = value
+        self.key = key
     }
 
     // MARK: Internal
 
+    var key: String?
     var value: Any?
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
+        if let key = key, let displayKey = Display.CodingKeys(stringValue: key), Display.CodingKeys.bool.contains(displayKey),
+           let b = value as? Bool
+        {
+            try container.encode(b)
+            return
+        }
         switch value {
         case is NSNumber, is NSNull, is Void, is Bool, is Int, is Int8, is Int16, is Int32, is Int64, is UInt, is UInt8, is UInt16,
              is UInt32, is UInt64, is Float, is Double, is String, is Date, is URL:
@@ -205,14 +216,23 @@ struct ForgivingEncodable: Encodable {
         case let data as Data:
             try container.encode(data.str(base64: true))
         case let array as [PersistentHotkey]:
-            cliPrint(array)
             try container.encode(array)
         case let array as [Any?]:
             try container.encode(array.map { ForgivingEncodable($0) })
         case let dictionary as [String: Any?]:
-            try container.encode(dictionary.mapValues { ForgivingEncodable($0) })
+            try container.encode(
+                Dictionary(uniqueKeysWithValues: dictionary.map {
+                    ($0.key, ForgivingEncodable($0.value, key: $0.key))
+
+                })
+            )
         case let dictionary as [NSDeviceDescriptionKey: Any?]:
-            try container.encode(dictionary.mapValues { ForgivingEncodable($0) })
+            try container.encode(
+                Dictionary(uniqueKeysWithValues: dictionary.map {
+                    ($0.key.rawValue, ForgivingEncodable($0.value, key: $0.key.rawValue))
+
+                })
+            )
         default:
             try container.encode("Value is not serializable")
         }
@@ -259,6 +279,8 @@ private func getDisplays(displays: [Display], filter: DisplayFilter) -> [Display
         guard let name = alignments.first?.result.asString else { return [] }
 
         return displays.filter { $0.name == name }
+    case .external:
+        return displays.filter { !$0.isBuiltin }
     }
 }
 
@@ -1024,7 +1046,9 @@ struct Lunar: ParsableCommand {
                 } else {
                     cliPrint("\(i): \(display.name)")
                     try printDisplay(display, json: json, prefix: "\t", systemInfo: systemInfo, panelData: panelData, edid: edid)
-                    cliPrint("")
+                    if i < displays.count - 1 {
+                        cliPrint("")
+                    }
                 }
             }
 
@@ -1510,7 +1534,7 @@ private func printDisplay(
 
     for (originalKey, key, value) in displayDict {
         guard let displayKey = Display.CodingKeys(rawValue: originalKey) else { continue }
-        cliPrint("\(prefix)\(spaced(key, longestKeySize))\(encodedValue(key: displayKey, value: value))")
+        cliPrint("\(prefix)\(spaced(key, longestKeySize))\(encodedValue(key: displayKey, value: value, prefix: prefix))")
     }
     let s = { (k: String) in spaced(k, longestKeySize) }
     cliPrint("\(prefix)\(s("Has I2C"))\(display.hasI2C)")
@@ -1562,7 +1586,7 @@ private func handleDisplays(
     controls: [DisplayControl] = [.appleNative, .ddc, .network, .gamma],
     read: Bool = false,
     systemInfo: Bool = false,
-    panelData _: Bool = false,
+    panelData: Bool = false,
     edid: Bool = false
 ) throws {
     // MARK: - Apply display filter to get single display
@@ -1573,11 +1597,37 @@ private func handleDisplays(
         throw LunarCommandError.displayNotFound(displayFilter.s)
     }
 
-    for display in displays {
+    if json, property == nil {
+        cliPrint("{")
+    }
+    defer {
+        if json, property == nil {
+            cliPrint("}")
+        }
+    }
+
+    for (i, display) in displays.enumerated() {
         do {
             guard let property = property else {
-                try printDisplay(display, json: json, systemInfo: systemInfo, edid: edid)
-                return
+                if json {
+                    try printDisplay(
+                        display,
+                        json: json,
+                        terminator: (i == displays.count - 1) ? "\n" : ",\n",
+                        prefix: "  \"\(display.serial)\": ",
+                        systemInfo: systemInfo,
+                        panelData: panelData,
+                        edid: edid
+                    )
+                } else {
+                    cliPrint("\(i): \(display.name)")
+                    try printDisplay(display, json: json, prefix: "\t", systemInfo: systemInfo, edid: edid)
+                    if i < displays.count - 1 {
+                        cliPrint("")
+                    }
+                }
+
+                continue
             }
 
             // MARK: - Enable command-line specified controls
@@ -1616,7 +1666,7 @@ private func handleDisplays(
                 }
 
                 cliPrint(encodedValue(key: property, value: readValue))
-                return
+                continue
             }
 
             // MARK: - Set display property
@@ -1710,7 +1760,7 @@ private func spaced(_ key: String, _ longestKeySize: Int) -> String {
     "\(key): \(String(repeating: " ", count: longestKeySize - key.count))"
 }
 
-private func encodedValue(key: Display.CodingKeys, value: Any) -> String {
+private func encodedValue(key: Display.CodingKeys, value: Any, prefix: String = "") -> String {
     let key = key == .mute ? .audioMuted : key
     switch key {
     case .defaultGammaRedMin, .defaultGammaRedMax, .defaultGammaRedValue,
@@ -1728,7 +1778,7 @@ private func encodedValue(key: Display.CodingKeys, value: Any) -> String {
     case .power:
         return (value as! Bool) ? "on" : "off"
     case .schedules:
-        return "\n\t" + (value as! [[String: Any]]).map { scheduleDict in
+        return "\n\(prefix)\t" + (value as! [[String: Any]]).map { scheduleDict in
             let schedule = BrightnessSchedule.from(dict: scheduleDict)
             switch schedule.type {
             case .disabled:
@@ -1742,7 +1792,7 @@ private func encodedValue(key: Display.CodingKeys, value: Any) -> String {
             case .noon:
                 return "Noon \(schedule.hour > 0 ? "+" : "")\(schedule.hour.d.str(decimals: 0, padding: 2)):\(schedule.minute.d.str(decimals: 0, padding: 2)) -> Brightness: \(schedule.brightness) | Contrast: \(schedule.contrast)"
             }
-        }.joined(separator: "\n\t")
+        }.joined(separator: "\n\(prefix)\t")
     default:
         if let v = value as? Bool, Display.CodingKeys.bool.contains(key) {
             return "\(v)"
