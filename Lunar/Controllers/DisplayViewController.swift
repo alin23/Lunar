@@ -14,6 +14,11 @@ import Magnet
 import Sauce
 import SwiftDate
 
+let NATIVE_CONTROLS_BUILTIN_HELP_TEXT = """
+## Apple Native Protocol
+
+The builtin screen brightness can be controlled natively through the macOS internal **DisplayServices framework**.
+"""
 let NATIVE_CONTROLS_HELP_TEXT = """
 ## Apple Native Protocol
 
@@ -204,7 +209,7 @@ class DisplayImage: NSView {
             cornerHeight: radius,
             transform: nil
         )
-        layer.fillColor = screenColor.cgColor
+        layer.fillColor = (isMacBook ? violet : screenColor).cgColor
         if isSidecar {
             layer.fillColor = NSColor.black.highlight(withLevel: 0.15)!.cgColor
             layer.lineWidth = 9
@@ -233,9 +238,9 @@ class DisplayImage: NSView {
         )
 
         if darkMode {
-            layer.fillColor = screenColor.highlight(withLevel: 0.1)!.cgColor
+            layer.fillColor = violet.highlight(withLevel: 0.1)!.cgColor
         } else {
-            layer.fillColor = screenColor.shadow(withLevel: 0.2)!.cgColor
+            layer.fillColor = violet.shadow(withLevel: 0.2)!.cgColor
         }
         layer.cornerRadius = radius
         layer.masksToBounds = true
@@ -259,9 +264,9 @@ class DisplayImage: NSView {
         )
 
         if darkMode {
-            sublayer.fillColor = screenColor.shadow(withLevel: 0.2)!.cgColor
+            sublayer.fillColor = violet.shadow(withLevel: 0.2)!.cgColor
         } else {
-            sublayer.fillColor = screenColor.highlight(withLevel: 0.2)!.cgColor
+            sublayer.fillColor = violet.highlight(withLevel: 0.2)!.cgColor
         }
 
         layer.addSublayer(sublayer)
@@ -440,6 +445,8 @@ class DisplayViewController: NSViewController {
     let topButtonsMacBookOffset: CGFloat = -13
     var cornerRadiusFieldY: CGFloat?
     var cornerRadiusFieldCaptionY: CGFloat?
+
+    @IBOutlet var brightnessSliderImage: ClickThroughImageView?
 
     @IBOutlet var notchButton: LockButton! { didSet {
         guard let notchButton = notchButton else { return }
@@ -1104,12 +1111,23 @@ class DisplayViewController: NSViewController {
             softwareDimmingButton.attributedTitle = "".attributedString
             softwareDimmingButton.isHidden = true
             softwareDimmingButton.isEnabled = false
-
+            if let brightnessSliderImage = self.brightnessSliderImage {
+                brightnessSliderImage.contentFilters = brightnessSliderImage.contentFilters.filter { $0.name != "CIColorInvert" }
+            }
             switch control {
             case is AppleNativeControl:
-                button.bg = green
-                button.attributedTitle = "Apple Native".withAttribute(.textColor(mauve))
-                button.helpText = NATIVE_CONTROLS_HELP_TEXT
+                if display.isMacBook {
+                    button.bg = NSColor.black.blended(withFraction: 0.6, of: violet)
+                    button.attributedTitle = "Apple Native".withAttribute(.textColor(white))
+                    button.helpText = NATIVE_CONTROLS_BUILTIN_HELP_TEXT
+                    if let brightnessSliderImage = self.brightnessSliderImage {
+                        brightnessSliderImage.contentFilters += [CIFilter(name: "CIColorInvert")!]
+                    }
+                } else {
+                    button.bg = green
+                    button.attributedTitle = "Apple Native".withAttribute(.textColor(mauve))
+                    button.helpText = NATIVE_CONTROLS_HELP_TEXT
+                }
                 button.showPopover = true
             case is DDCControl:
                 button.bg = darkMode ? peach : lunarYellow
