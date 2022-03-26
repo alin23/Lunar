@@ -204,7 +204,7 @@ class DisplayImage: NSView {
 
         layer.path = CGPath(
             roundedRect: CGRect(
-                x: perspective / 4, y: frame.height * 0.248 + perspective / 6,
+                x: perspective / 4, y: frame.height * 0.25 + perspective / 6,
                 width: frame.width - perspective / 2,
                 height: (frame.height * 0.75 - perspective / 2) - perspective / 6
             ),
@@ -450,6 +450,15 @@ class DisplayViewController: NSViewController {
     var cornerRadiusFieldCaptionY: CGFloat?
 
     @IBOutlet var brightnessSliderImage: ClickThroughImageView?
+
+    @IBOutlet var advancedSettingsButton: LockButton? {
+        didSet {
+            guard let b = advancedSettingsButton else { return }
+            b.monospaced = true
+//            b.attributedTitle = b.attributedTitle.withFont(.monospacedSystemFont(ofSize: 12, weight: .semibold))
+//            b.attributedAlternateTitle = b.attributedAlternateTitle.withFont(.monospacedSystemFont(ofSize: 12, weight: .semibold))
+        }
+    }
 
     @IBOutlet var notchButton: LockButton! { didSet {
         guard let notchButton = notchButton else { return }
