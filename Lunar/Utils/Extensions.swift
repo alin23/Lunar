@@ -804,6 +804,30 @@ let MODE_HIDPI_TAG_COLOR = #colorLiteral(red: 0.4922937925, green: 0.273587038, 
 let MODE_RETINA_TAG_COLOR = #colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1)
 let MODE_UNSAFE_TAG_COLOR = #colorLiteral(red: 0.7450980544, green: 0.1568627506, blue: 0.07450980693, alpha: 1)
 
+extension MPDisplay {
+    var modes: [MPDisplayMode] { (allModes() as? [MPDisplayMode]) ?? [] }
+}
+
+extension MPDisplayMode {
+    func withoutNotch(modes: [MPDisplayMode]) -> MPDisplayMode? {
+        modes.first { mode in
+            mode.refreshRate == refreshRate &&
+                mode.width == width &&
+                mode.dotsPerInch == dotsPerInch &&
+                mode.height < height
+        }
+    }
+
+    func withNotch(modes: [MPDisplayMode]) -> MPDisplayMode? {
+        modes.first { mode in
+            mode.refreshRate == refreshRate &&
+                mode.width == width &&
+                mode.dotsPerInch == dotsPerInch &&
+                mode.height > height
+        }
+    }
+}
+
 extension MPDisplayMode {
     enum Tag: String {
         case retina
