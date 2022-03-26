@@ -155,6 +155,7 @@ That is the same brightness that you can control with the physical buttons/contr
 
 var monitorStandColor: NSColor { darkMode ? peach : lunarYellow }
 var monitorScreenColor: NSColor { darkMode ? rouge : mauve }
+var macbookScreenColor: NSColor { darkMode ? rouge.blended(withFraction: 0.3, of: peach)! : violet }
 
 // MARK: - DisplayImage
 
@@ -178,7 +179,9 @@ class DisplayImage: NSView {
     @IBInspectable var maxCornerRadius: CGFloat = 24
 
     var isMacBook = false {
-        didSet { setup(frame: frame) }
+        didSet {
+            screenColor = isMacBook ? macbookScreenColor : monitorScreenColor
+        }
     }
 
     var isSidecar = false {
@@ -186,7 +189,7 @@ class DisplayImage: NSView {
     }
 
     lazy var standColor = monitorStandColor { didSet { setup(frame: frame) }}
-    lazy var screenColor = monitorScreenColor { didSet { setup(frame: frame) }}
+    lazy var screenColor = isMacBook ? macbookScreenColor : monitorScreenColor { didSet { setup(frame: frame) }}
 
     @IBInspectable var cornerRadius: CGFloat = 0 { didSet {
         transition(0.2)
@@ -209,7 +212,7 @@ class DisplayImage: NSView {
             cornerHeight: radius,
             transform: nil
         )
-        layer.fillColor = (isMacBook ? violet : screenColor).cgColor
+        layer.fillColor = screenColor.cgColor
         if isSidecar {
             layer.fillColor = NSColor.black.highlight(withLevel: 0.15)!.cgColor
             layer.lineWidth = 9
@@ -238,9 +241,9 @@ class DisplayImage: NSView {
         )
 
         if darkMode {
-            layer.fillColor = violet.highlight(withLevel: 0.1)!.cgColor
+            layer.fillColor = screenColor.highlight(withLevel: 0.1)!.cgColor
         } else {
-            layer.fillColor = violet.shadow(withLevel: 0.2)!.cgColor
+            layer.fillColor = screenColor.shadow(withLevel: 0.2)!.cgColor
         }
         layer.cornerRadius = radius
         layer.masksToBounds = true
@@ -264,9 +267,9 @@ class DisplayImage: NSView {
         )
 
         if darkMode {
-            sublayer.fillColor = violet.shadow(withLevel: 0.2)!.cgColor
+            sublayer.fillColor = screenColor.shadow(withLevel: 0.2)!.cgColor
         } else {
-            sublayer.fillColor = violet.highlight(withLevel: 0.2)!.cgColor
+            sublayer.fillColor = screenColor.highlight(withLevel: 0.2)!.cgColor
         }
 
         layer.addSublayer(sublayer)
@@ -1117,7 +1120,7 @@ class DisplayViewController: NSViewController {
             switch control {
             case is AppleNativeControl:
                 if display.isMacBook {
-                    button.bg = NSColor.black.blended(withFraction: 0.6, of: violet)
+                    button.bg = NSColor.black.blended(withFraction: 0.6, of: macbookScreenColor)
                     button.attributedTitle = "Apple Native".withAttribute(.textColor(white))
                     button.helpText = NATIVE_CONTROLS_BUILTIN_HELP_TEXT
                     if let brightnessSliderImage = self.brightnessSliderImage {
