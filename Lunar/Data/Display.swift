@@ -1697,7 +1697,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     modeNumber = panelMode?.modeNumber ?? -1
 
                     if let cornerRadiusBeforeNotchDisable = cornerRadiusBeforeNotchDisable, cornerRadiusBeforeNotchDisable == 0 {
-                        cornerRadius = 14
+                        cornerRadius = 12
                         cornerRadiusApplier = Repeater(every: 0.1, times: 20) { [weak self] in
                             self?.updateCornerWindow()
                         }
