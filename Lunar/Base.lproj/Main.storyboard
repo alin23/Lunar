@@ -4306,15 +4306,19 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="WK2-eG-vDJ" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="394" y="40" width="157" height="14"/>
+                                <rect key="frame" x="413" y="40" width="123" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="inline" title="Show advanced settings" alternateTitle="Hide advanced settings" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="DgP-1t-uMe">
+                                <buttonCell key="cell" type="inline" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="DgP-1t-uMe">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <string key="title">Advanced settings
+hidden</string>
+                                    <string key="alternateTitle">Advanced settings
+shown</string>
                                     <font key="font" metaFont="smallSystem"/>
                                 </buttonCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
-                                        <real key="value" value="0.10000000000000001"/>
+                                        <real key="value" value="0.69999999999999996"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="labelOn">
                                         <color key="value" name="Caption Tertiary"/>
@@ -4325,6 +4329,10 @@ and contrast to their highest values</string>
                                     <userDefinedRuntimeAttribute type="color" keyPath="bgOn">
                                         <color key="value" name="Button BG"/>
                                     </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="6"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="monospaced" value="YES"/>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
                                     <binding destination="rew-Tm-BHz" name="value" keyPath="values.showAdvancedDisplaySettings" id="5Ie-4a-I5L"/>
@@ -4426,16 +4434,19 @@ Turns the display back on when the last monitor is disconnected</string>
                                     </binding>
                                 </connections>
                             </textField>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="ipl-Bt-iSX" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="442" y="503" width="66" height="13"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <button focusRingType="none" verticalHuggingPriority="750" ambiguous="YES" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="ipl-Bt-iSX" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="442" y="503" width="66" height="28"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="20" id="V1d-Jt-ElF"/>
+                                    <constraint firstAttribute="width" constant="66" id="maD-J0-TOg"/>
+                                </constraints>
                                 <buttonCell key="cell" type="inline" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="nGU-OV-45N" customClass="LockButtonCell" customModule="Lunar" customModuleProvider="target">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                     <string key="title">Notch
 disabled</string>
                                     <string key="alternateTitle">Notch
 enabled</string>
-                                    <font key="font" metaFont="systemBold" size="10"/>
+                                    <font key="font" metaFont="systemBold" size="11"/>
                                 </buttonCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -4480,6 +4491,7 @@ enabled</string>
                         <outlet property="_softwareDimmingButton" destination="0dW-qZ-glS" id="iqi-eZ-JMs"/>
                         <outlet property="adaptiveNotice" destination="ZlW-Lv-Oa8" id="e5o-8i-RIo"/>
                         <outlet property="addScheduleButton" destination="8G3-fq-bS8" id="XHZ-uR-fu4"/>
+                        <outlet property="advancedSettingsButton" destination="WK2-eG-vDJ" id="JFd-Q2-R9M"/>
                         <outlet property="brightnessContrastChart" destination="ycx-jo-u8n" id="9av-L7-GAu"/>
                         <outlet property="brightnessContrastSlider" destination="owU-od-4JA" id="aOH-kD-PjK"/>
                         <outlet property="brightnessSlider" destination="ghR-M9-kyP" id="hpV-oy-1M3"/>
