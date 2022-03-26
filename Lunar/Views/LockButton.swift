@@ -44,6 +44,13 @@ class LockButton: NSButton {
     @IBInspectable dynamic var bgOn: NSColor = lockButtonBgOn
     @IBInspectable dynamic var bgOff: NSColor = lockButtonBgOff
 
+    @IBInspectable dynamic var monospaced = false {
+        didSet {
+            setAttributedTitleColor(labelOff)
+            setAttributedTitleColor(labelOn, alternate: true)
+        }
+    }
+
     @IBOutlet var notice: NSTextField? {
         didSet {
             notice?.alphaValue = 0.0
@@ -138,9 +145,12 @@ class LockButton: NSButton {
         let title = attrTitle.attributedSubstring(from: titleSubrange)
         let subtitle = attrTitle.attributedSubstring(from: subtitleSubrange)
 
-        let font = (title.fontAttributes(in: titleSubrange).first(where: { $0.keyName == .font })?.value as? NSFont) ?? NSFont
-            .systemFont(ofSize: 11, weight: .bold)
+        var font = (title.fontAttributes(in: titleSubrange).first(where: { $0.keyName == .font })?.value as? NSFont)
+            ?? NSFont.systemFont(ofSize: 11, weight: .bold)
 
+        if monospaced {
+            font = NSFont.monospacedSystemFont(ofSize: font.pointSize, weight: font.weight)
+        }
         let subtitleStyle = NSMutableParagraphStyle()
         subtitleStyle.lineSpacing = 0
         subtitleStyle.maximumLineHeight = 8
@@ -148,7 +158,7 @@ class LockButton: NSButton {
 
         attrTitle = title.withTextColor(color) + subtitle
             .withTextColor(color)
-            .withFont(font.withSize(font.pointSize - 3))
+            .withFont(font.withSize(max(font.pointSize - 3, 9)))
             .withParagraphStyle(subtitleStyle)
 
         if alternate {
