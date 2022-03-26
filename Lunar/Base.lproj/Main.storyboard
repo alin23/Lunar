@@ -1033,7 +1033,7 @@ the ⌘ Command key more than 8 times in a row</string>
                                 </connections>
                             </containerView>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E8L-4P-FG0">
-                                <rect key="frame" x="388" y="656" width="171" height="29"/>
+                                <rect key="frame" x="389" y="656" width="171" height="29"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="LUNAR" id="imn-dq-JnU">
                                     <font key="font" size="25" name="Menlo-Bold"/>
@@ -3629,7 +3629,7 @@ CORNERS</string>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OZD-Gw-TTp" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="447" y="638" width="53" height="18"/>
+                                <rect key="frame" x="448" y="638" width="53" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Pro" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="ZjS-nc-hfq">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3715,7 +3715,7 @@ The display will reappear with default settings on reconnection.</string>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s4q-W2-ta1" customClass="HotkeyButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="422" y="233" width="103" height="22"/>
+                                <rect key="frame" x="423" y="233" width="103" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -4096,7 +4096,7 @@ disabled</string>
                                 </connections>
                             </box>
                             <popUpButton focusRingType="none" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="rrg-Kp-lBi" customClass="ModePopupButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="407" y="253" width="135" height="22"/>
+                                <rect key="frame" x="408" y="253" width="135" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="inline" title="Item" bezelStyle="inline" alignment="center" scrollable="YES" lineBreakMode="clipping" state="on" borderStyle="border" focusRingType="none" tag="246" imageScaling="proportionallyDown" inset="2" selectedItem="Aqc-oL-X3H" id="ffq-Qo-2Wf">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -4882,14 +4882,14 @@ Turns the display back on when the last monitor is disconnected</string>
                                 </textFieldCell>
                             </textField>
                             <box fixedFrame="YES" title="Brightness" translatesAutoresizingMaskIntoConstraints="NO" id="3xL-na-Hnu">
-                                <rect key="frame" x="341" y="438" width="289" height="134"/>
+                                <rect key="frame" x="341" y="424" width="289" height="148"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="3TW-Bi-S33">
-                                    <rect key="frame" x="3" y="3" width="283" height="113"/>
+                                    <rect key="frame" x="3" y="3" width="283" height="127"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="y58-Wb-rKp">
-                                            <rect key="frame" x="0.0" y="25" width="47" height="19"/>
+                                            <rect key="frame" x="0.0" y="39" width="47" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Down" id="bVh-Xe-6k7">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4898,7 +4898,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4Qf-Fh-CXU">
-                                            <rect key="frame" x="0.0" y="67" width="47" height="19"/>
+                                            <rect key="frame" x="0.0" y="81" width="47" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Up" id="lku-B1-wcM">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4907,7 +4907,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </textFieldCell>
                                         </textField>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="86q-Tk-Q1U" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="53" y="18" width="220" height="34"/>
+                                            <rect key="frame" x="53" y="32" width="220" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -4916,7 +4916,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </userDefinedRuntimeAttributes>
                                         </customView>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="h7h-Iw-TBe" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="53" y="60" width="220" height="34"/>
+                                            <rect key="frame" x="53" y="74" width="220" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -4924,19 +4924,30 @@ Turns the display back on when the last monitor is disconnected</string>
                                                 </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
                                         </customView>
+                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vaQ-8m-fY6">
+                                            <rect key="frame" x="53" y="4" width="222" height="20"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <buttonCell key="cell" type="check" title="Control all monitors" bezelStyle="regularSquare" imagePosition="right" alignment="left" state="on" inset="2" id="kwD-iV-O0a">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" size="14" name="Menlo-Bold"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <binding destination="upY-F0-APc" name="value" keyPath="values.brightnessHotkeysControlAllMonitors" id="hw5-EY-JZU"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                                 <font key="titleFont" metaFont="systemHeavy" size="14"/>
                             </box>
                             <box fixedFrame="YES" title="Contrast" translatesAutoresizingMaskIntoConstraints="NO" id="wJb-mQ-xKY">
-                                <rect key="frame" x="341" y="286" width="289" height="134"/>
+                                <rect key="frame" x="341" y="258" width="289" height="147"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="OmN-BA-b7u">
-                                    <rect key="frame" x="3" y="3" width="283" height="113"/>
+                                    <rect key="frame" x="3" y="3" width="283" height="126"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tmt-S8-8Ol">
-                                            <rect key="frame" x="0.0" y="25" width="47" height="19"/>
+                                            <rect key="frame" x="0.0" y="38" width="47" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Down" id="fcO-b6-0Si">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4945,7 +4956,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PDy-1s-9LI">
-                                            <rect key="frame" x="0.0" y="67" width="47" height="19"/>
+                                            <rect key="frame" x="0.0" y="80" width="47" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Up" id="9Yx-Ho-QrG">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4954,7 +4965,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </textFieldCell>
                                         </textField>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iwC-6f-cJe" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="53" y="18" width="220" height="34"/>
+                                            <rect key="frame" x="53" y="31" width="220" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -4963,7 +4974,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </userDefinedRuntimeAttributes>
                                         </customView>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nqV-3i-zZp" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="53" y="60" width="220" height="34"/>
+                                            <rect key="frame" x="53" y="73" width="220" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -4971,19 +4982,30 @@ Turns the display back on when the last monitor is disconnected</string>
                                                 </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
                                         </customView>
+                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tID-dQ-Yl2">
+                                            <rect key="frame" x="53" y="4" width="222" height="20"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <buttonCell key="cell" type="check" title="Control all monitors" bezelStyle="regularSquare" imagePosition="right" alignment="left" state="on" inset="2" id="mpu-cw-4lo">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" size="14" name="Menlo-Bold"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <binding destination="upY-F0-APc" name="value" keyPath="values.contrastHotkeysControlAllMonitors" id="abd-a8-kso"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                                 <font key="titleFont" metaFont="systemHeavy" size="14"/>
                             </box>
                             <box fixedFrame="YES" title="Volume" translatesAutoresizingMaskIntoConstraints="NO" id="kwR-HX-YdF">
-                                <rect key="frame" x="341" y="48" width="289" height="221"/>
+                                <rect key="frame" x="341" y="48" width="289" height="189"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="7HP-u7-kKJ">
-                                    <rect key="frame" x="3" y="3" width="283" height="200"/>
+                                    <rect key="frame" x="3" y="3" width="283" height="168"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="y4u-jp-6fx">
-                                            <rect key="frame" x="0.0" y="112" width="47" height="19"/>
+                                            <rect key="frame" x="0.0" y="80" width="47" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Down" id="vfr-RN-7ui">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4992,7 +5014,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YXN-jH-AYQ">
-                                            <rect key="frame" x="0.0" y="154" width="47" height="19"/>
+                                            <rect key="frame" x="0.0" y="122" width="47" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Up" id="WqD-Ml-vhu">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -5001,7 +5023,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </textFieldCell>
                                         </textField>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fXp-UA-sml" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="53" y="105" width="220" height="34"/>
+                                            <rect key="frame" x="53" y="73" width="220" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -5010,7 +5032,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </userDefinedRuntimeAttributes>
                                         </customView>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dVT-T8-W1q" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="53" y="147" width="220" height="34"/>
+                                            <rect key="frame" x="53" y="115" width="220" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -5019,7 +5041,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </userDefinedRuntimeAttributes>
                                         </customView>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="d1c-vq-bzf">
-                                            <rect key="frame" x="0.0" y="70" width="47" height="19"/>
+                                            <rect key="frame" x="0.0" y="38" width="47" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Mute" id="aka-pF-4Op">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -5028,7 +5050,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </textFieldCell>
                                         </textField>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SUd-lg-U7d" customClass="HotkeyView" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="53" y="63" width="220" height="34"/>
+                                            <rect key="frame" x="53" y="31" width="220" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -5037,7 +5059,7 @@ Turns the display back on when the last monitor is disconnected</string>
                                             </userDefinedRuntimeAttributes>
                                         </customView>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iDs-n5-cCa">
-                                            <rect key="frame" x="53" y="23" width="222" height="20"/>
+                                            <rect key="frame" x="53" y="4" width="222" height="20"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <buttonCell key="cell" type="check" title="Control all monitors" bezelStyle="regularSquare" imagePosition="right" alignment="left" state="on" inset="2" id="YI2-0t-Q6Z">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>

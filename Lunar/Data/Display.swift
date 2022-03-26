@@ -1660,6 +1660,20 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
+    var notchEnabled: Bool {
+        guard Sysctl.isMacBook else { return false }
+
+        return false
+    }
+
+    var hasNotch: Bool {
+        if #available(macOS 12.0, *) {
+            return (screen?.safeAreaInsets.top ?? 0) > 0
+        } else {
+            return false
+        }
+    }
+
     static func ambientLightCompensationEnabled(_ id: CGDirectDisplayID) -> Bool {
         guard DisplayServicesHasAmbientLightCompensation(id) else { return false }
 
