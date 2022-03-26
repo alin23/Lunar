@@ -1221,7 +1221,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         return Array(grouped.map { $0.value.sorted(by: { $0.dotsPerInch <= $1.dotsPerInch }).reversed() }.joined())
     }()
 
-    var modeChangeAsk = true
+    @Atomic var modeChangeAsk = true
 
     lazy var isOnline = NSScreen.isOnline(id)
 
@@ -1266,6 +1266,17 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Atomic var hasSoftwareControl = false
 
     @Published @objc dynamic var noDDCOrMergedBrightnessContrast = false
+
+    @objc dynamic lazy var hasNotch: Bool = {
+        if #available(macOS 12.0, *), Sysctl.isMacBook {
+            return (self.screen?.safeAreaInsets.top ?? 0) > 0 || self.panelMode?.withNotch(modes: self.panelModes) != nil
+        } else {
+            return false
+        }
+    }()
+
+    var cornerRadiusBeforeNotchDisable: NSNumber?
+    var cornerRadiusApplier: Repeater?
 
     @Published @objc dynamic var subzero = false {
         didSet {
@@ -1660,17 +1671,39 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-    var notchEnabled: Bool {
-        guard Sysctl.isMacBook else { return false }
+    @objc dynamic lazy var notchEnabled: Bool = {
+        guard Sysctl.isMacBook, hasNotch, let mode = panelMode else { return false }
 
-        return false
-    }
+        return mode.withoutNotch(modes: panelModes) != nil
+    }() {
+        didSet {
+            guard apply, Sysctl.isMacBook, hasNotch, let mode = panelMode else { return }
 
-    var hasNotch: Bool {
-        if #available(macOS 12.0, *) {
-            return (screen?.safeAreaInsets.top ?? 0) > 0
-        } else {
-            return false
+            self.withoutModeChangeAsk {
+                if notchEnabled, !oldValue, let modeWithNotch = mode.withNotch(modes: panelModes) {
+                    panelMode = modeWithNotch
+                    modeNumber = panelMode?.modeNumber ?? -1
+
+                    if let cornerRadiusBeforeNotchDisable = cornerRadiusBeforeNotchDisable, cornerRadiusBeforeNotchDisable == 0 {
+                        cornerRadius = 0
+                        cornerRadiusApplier = Repeater(every: 0.1, times: 20) { [weak self] in
+                            self?.updateCornerWindow()
+                        }
+                    }
+                } else if !notchEnabled, oldValue, let modeWithoutNotch = mode.withoutNotch(modes: panelModes) {
+                    if cornerRadiusBeforeNotchDisable == nil { cornerRadiusBeforeNotchDisable = cornerRadius }
+
+                    panelMode = modeWithoutNotch
+                    modeNumber = panelMode?.modeNumber ?? -1
+
+                    if let cornerRadiusBeforeNotchDisable = cornerRadiusBeforeNotchDisable, cornerRadiusBeforeNotchDisable == 0 {
+                        cornerRadius = 14
+                        cornerRadiusApplier = Repeater(every: 0.1, times: 20) { [weak self] in
+                            self?.updateCornerWindow()
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -3041,9 +3074,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                         okButton: "Keep", cancelButton: "Revert",
                         onCompletion: { [weak self] keep in
                             if !keep, let self = self {
-                                self.modeChangeAsk = false
-                                mainThread { self.rotation = oldValue }
-                                self.modeChangeAsk = true
+                                self.withoutModeChangeAsk {
+                                    mainThread { self.rotation = oldValue }
+                                }
                             }
                         }
                     )
@@ -3068,16 +3101,18 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     okButton: "Keep", cancelButton: "Revert",
                     onCompletion: { [weak self] keep in
                         if !keep, let self = self {
-                            self.modeChangeAsk = false
-                            mainThread {
-                                self.panelMode = oldValue
-                                self.modeNumber = oldValue?.modeNumber ?? -1
+                            self.withoutModeChangeAsk {
+                                mainThread {
+                                    self.panelMode = oldValue
+                                    self.modeNumber = oldValue?.modeNumber ?? -1
+                                }
                             }
-                            self.modeChangeAsk = true
                         }
                     }
                 )
             }
+
+            setNotchState()
         }
     }
 
@@ -3286,7 +3321,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         return getScreen()
     }() {
         didSet {
-            mainAsync { self.supportsEnhance = self.getSupportsEnhance() }
+            self.setNotchState()
+            mainAsync {
+                self.supportsEnhance = self.getSupportsEnhance()
+            }
         }
     }
 
@@ -3327,6 +3365,22 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 (key, value.userValues)
             }, uniquingKeysWith: first(this:other:)
         )
+    }
+
+    func setNotchState() {
+        mainAsync {
+            if #available(macOS 12.0, *), Sysctl.isMacBook {
+                self.hasNotch = (self.screen?.safeAreaInsets.top ?? 0) > 0 || self.panelMode?.withNotch(modes: self.panelModes) != nil
+            } else {
+                self.hasNotch = false
+            }
+
+            guard Sysctl.isMacBook, self.hasNotch, let mode = self.panelMode else { return }
+
+            self.withoutApply {
+                self.notchEnabled = mode.withoutNotch(modes: self.panelModes) != nil
+            }
+        }
     }
 
     func getSupportsEnhance() -> Bool {
@@ -4834,6 +4888,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         apply = false
         block()
         apply = true
+    }
+
+    @inline(__always) func withoutModeChangeAsk(_ block: () -> Void) {
+        modeChangeAsk = false
+        block()
+        modeChangeAsk = true
     }
 
     @inline(__always) func withoutApplyPreciseValue(_ block: () -> Void) {
