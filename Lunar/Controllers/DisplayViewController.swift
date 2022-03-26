@@ -196,7 +196,7 @@ class DisplayImage: NSView {
 
         layer.path = CGPath(
             roundedRect: CGRect(
-                x: perspective / 4, y: frame.height * 0.25 + perspective / 6,
+                x: perspective / 4, y: frame.height * 0.248 + perspective / 6,
                 width: frame.width - perspective / 2,
                 height: (frame.height * 0.75 - perspective / 2) - perspective / 6
             ),
@@ -393,7 +393,6 @@ class DisplayViewController: NSViewController {
     @IBOutlet var _ddcButton: NSButton?
     @IBOutlet var lockContrastCurveButton: LockButton!
     @IBOutlet var lockBrightnessCurveButton: LockButton!
-
     @objc dynamic var noDisplay = false
     @objc dynamic lazy var chartHidden: Bool = display == nil || noDisplay || display!
         .ambientLightAdaptiveBrightnessEnabled || displayController
@@ -441,6 +440,12 @@ class DisplayViewController: NSViewController {
     let topButtonsMacBookOffset: CGFloat = -13
     var cornerRadiusFieldY: CGFloat?
     var cornerRadiusFieldCaptionY: CGFloat?
+
+    @IBOutlet var notchButton: LockButton! { didSet {
+        guard let notchButton = notchButton else { return }
+        notchButton.layer?.cornerCurve = .continuous
+        notchButton.layer?.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
+    }}
 
     @IBOutlet var _inputDropdownHotkeyButton: NSButton? {
         didSet {
