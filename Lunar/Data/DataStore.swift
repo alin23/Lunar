@@ -92,6 +92,8 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .ignoredVolumes,
     .manualLocation,
     .mediaKeysControlAllMonitors,
+    .brightnessHotkeysControlAllMonitors,
+    .contrastHotkeysControlAllMonitors,
     .volumeHotkeysControlAllMonitors,
     .useAlternateBrightnessKeys,
     .neverAskAboutFlux,
@@ -627,6 +629,8 @@ func initCache() {
     cacheKey(.detectKeyHold)
     cacheKey(.volumeKeysEnabled)
     cacheKey(.mediaKeysControlAllMonitors)
+    cacheKey(.brightnessHotkeysControlAllMonitors)
+    cacheKey(.contrastHotkeysControlAllMonitors)
     cacheKey(.volumeHotkeysControlAllMonitors)
     cacheKey(.useAlternateBrightnessKeys)
     cacheKey(.didScrollTextField)
@@ -755,6 +759,8 @@ extension Defaults.Keys {
     static let detectKeyHold = Key<Bool>("detectKeyHold", default: true)
     static let volumeKeysEnabled = Key<Bool>("volumeKeysEnabled", default: true)
     static let mediaKeysControlAllMonitors = Key<Bool>("mediaKeysControlAllMonitors", default: false)
+    static let brightnessHotkeysControlAllMonitors = Key<Bool>("brightnessHotkeysControlAllMonitors", default: false)
+    static let contrastHotkeysControlAllMonitors = Key<Bool>("contrastHotkeysControlAllMonitors", default: false)
     static let volumeHotkeysControlAllMonitors = Key<Bool>("volumeHotkeysControlAllMonitors", default: false)
     static let useAlternateBrightnessKeys = Key<Bool>("useAlternateBrightnessKeys", default: true)
     static let didScrollTextField = Key<Bool>("didScrollTextField", default: false)
@@ -910,7 +916,13 @@ let brightnessTransitionPublisher = Defaults.publisher(.brightnessTransition).re
 let volumeKeysEnabledPublisher = Defaults.publisher(.volumeKeysEnabled).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let useAlternateBrightnessKeysPublisher = Defaults.publisher(.useAlternateBrightnessKeys).removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
-let mediaKeysPublisher = Defaults.publisher(keys: .brightnessKeysEnabled, .volumeKeysEnabled, .volumeHotkeysControlAllMonitors)
+let mediaKeysPublisher = Defaults.publisher(
+    keys: .brightnessKeysEnabled,
+    .volumeKeysEnabled,
+    .volumeHotkeysControlAllMonitors,
+    .brightnessHotkeysControlAllMonitors,
+    .contrastHotkeysControlAllMonitors
+)
 let silentUpdatePublisher = Defaults.publisher(.silentUpdate).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let checkForUpdatePublisher = Defaults.publisher(.checkForUpdate).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let showDummyDisplaysPublisher = Defaults.publisher(.showDummyDisplays).dropFirst().removeDuplicates()

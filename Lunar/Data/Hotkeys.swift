@@ -1408,14 +1408,19 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func brightnessUpAction(offset: Int? = nil) {
+        let allMonitors = CachedDefaults[.brightnessHotkeysControlAllMonitors]
         cancelScreenWakeAdapterTask()
-        increaseBrightness(by: offset)
-        if CachedDefaults[.hotkeysAffectBuiltin] {
+        increaseBrightness(by: offset, currentDisplay: !allMonitors)
+        if CachedDefaults[.hotkeysAffectBuiltin], allMonitors {
             increaseBrightness(by: offset, builtinDisplay: true)
         }
 
-        for (_, display) in displayController.activeDisplays {
-            guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin else { continue }
+        if allMonitors {
+            for (_, display) in displayController.activeDisplays {
+                guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin else { continue }
+                Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, display: display)
+            }
+        } else if let display = displayController.cursorDisplay {
             Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, display: display)
         }
 
@@ -1423,14 +1428,19 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func brightnessDownAction(offset: Int? = nil) {
+        let allMonitors = CachedDefaults[.brightnessHotkeysControlAllMonitors]
         cancelScreenWakeAdapterTask()
-        decreaseBrightness(by: offset)
-        if CachedDefaults[.hotkeysAffectBuiltin] {
+        decreaseBrightness(by: offset, currentDisplay: !allMonitors)
+        if CachedDefaults[.hotkeysAffectBuiltin], allMonitors {
             decreaseBrightness(by: offset, builtinDisplay: true)
         }
 
-        for (_, display) in displayController.activeDisplays {
-            guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin else { continue }
+        if allMonitors {
+            for (_, display) in displayController.activeDisplays {
+                guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin else { continue }
+                Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, display: display)
+            }
+        } else if let display = displayController.cursorDisplay {
             Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, display: display)
         }
 
@@ -1438,11 +1448,16 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func contrastUpAction(offset: Int? = nil) {
+        let allMonitors = CachedDefaults[.contrastHotkeysControlAllMonitors]
         cancelScreenWakeAdapterTask()
-        increaseContrast(by: offset)
+        increaseContrast(by: offset, currentDisplay: !allMonitors)
 
-        for (_, display) in displayController.activeDisplays {
-            guard !display.isBuiltin else { continue }
+        if allMonitors {
+            for (_, display) in displayController.activeDisplays {
+                guard !display.isBuiltin else { continue }
+                Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, display: display)
+            }
+        } else if let display = displayController.cursorDisplay, !display.isBuiltin {
             Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, display: display)
         }
 
@@ -1450,11 +1465,16 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func contrastDownAction(offset: Int? = nil) {
+        let allMonitors = CachedDefaults[.contrastHotkeysControlAllMonitors]
         cancelScreenWakeAdapterTask()
-        decreaseContrast(by: offset)
+        decreaseContrast(by: offset, currentDisplay: !allMonitors)
 
-        for (_, display) in displayController.activeDisplays {
-            guard !display.isBuiltin else { continue }
+        if allMonitors {
+            for (_, display) in displayController.activeDisplays {
+                guard !display.isBuiltin else { continue }
+                Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, display: display)
+            }
+        } else if let display = displayController.cursorDisplay, !display.isBuiltin {
             Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, display: display)
         }
 
