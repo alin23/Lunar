@@ -1568,7 +1568,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc dynamic var ambientLightAdaptiveBrightnessEnabled: Bool {
         get { Self.ambientLightCompensationEnabled(id) }
         set {
-            guard ambientLightCompensationEnabledByUser else {
+            guard ambientLightCompensationEnabledByUser || force else {
                 return
             }
             if !newValue, isBuiltin {
@@ -1666,7 +1666,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 ambientLightAdaptiveBrightnessEnabled = false
             case .system:
                 adaptive = false
-                ambientLightAdaptiveBrightnessEnabled = true
+                withForce {
+                    ambientLightAdaptiveBrightnessEnabled = true
+                }
             }
         }
     }

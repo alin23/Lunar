@@ -799,6 +799,22 @@ extension Collection where Element == NSAttributedString {
     }
 }
 
+extension NSFont {
+    var weight: NSFont.Weight {
+        switch NSFontManager.shared.weight(of: self) {
+        case 0: return .ultraLight
+        case 1: return .thin
+        case 2 ... 4: return .light
+        case 5: return .regular
+        case 6: return .medium
+        case 7: return .semibold
+        case 8: return .heavy
+        case 9: return .black
+        default: return .medium
+        }
+    }
+}
+
 let MODE_NATIVE_TAG_COLOR = #colorLiteral(red: 0.712478668, green: 0.4330835298, blue: 0.3457791855, alpha: 1)
 let MODE_HIDPI_TAG_COLOR = #colorLiteral(red: 0.4922937925, green: 0.273587038, blue: 0.3272711812, alpha: 1)
 let MODE_RETINA_TAG_COLOR = #colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1)
