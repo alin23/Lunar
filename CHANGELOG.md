@@ -1,3 +1,34 @@
+# 5.5.3
+## Features
+
+* **Disable Notch**
+    * Use hidden screen resolutions of the MacBook Pro to remove the notch completely
+
+![Notch button](https://files.lunar.fyi/notch-button.png)
+
+<video autoplay loop muted width="512" height="346" src="https://files.lunar.fyi/lunar-notch-small.mp4" style="width: 512px; height: 346px"/>
+
+* Add option to disable `"Control all monitors"` for Function Hotkeys
+
+![Control all monitors checkbox](https://files.lunar.fyi/control-all-monitors-checkbox.png)
+
+## Improvements
+
+* The **BlackOut Kill Switch** doesn't trigger anymore on keys that contain more than just `Command`
+* Increase precision of the self-learning algorithm
+* Use astronomical sunrise/sunset as reference points in Location Mode
+* Allow negative sun elevation in Location Mode
+
+## Fixes
+
+* Fix crash when adjusting volume
+* Fix crash when adjusting rotation
+* Prompting about fallback to Software Dimming now makes sure the control is enabled
+* Fix CLI printing displays
+* Fix `external` display filter for CLI
+* Fix brightness locking when interacting with brightness keys
+* Fix flicker using the Brightness Slider because of Smooth Transition not being disabled while sliding
+
 # 5.5.2
 ## Features
 
