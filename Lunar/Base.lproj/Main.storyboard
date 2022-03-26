@@ -4483,6 +4483,7 @@ enabled</string>
                         <outlet property="brightnessContrastChart" destination="ycx-jo-u8n" id="9av-L7-GAu"/>
                         <outlet property="brightnessContrastSlider" destination="owU-od-4JA" id="aOH-kD-PjK"/>
                         <outlet property="brightnessSlider" destination="ghR-M9-kyP" id="hpV-oy-1M3"/>
+                        <outlet property="brightnessSliderImage" destination="4eI-Ef-5sC" id="Xyz-hU-KOf"/>
                         <outlet property="cornerRadiusField" destination="w4b-zt-fho" id="oxP-TL-Nn9"/>
                         <outlet property="cornerRadiusFieldCaption" destination="xRc-C4-BGQ" id="035-re-1gs"/>
                         <outlet property="deleteButton" destination="MRF-Be-NAq" id="YWf-f1-FtC"/>
@@ -10561,7 +10562,7 @@ settings for this monitor.</string>
             <color red="0.15046208688903481" green="0.13485730483799069" blue="0.15415072278911565" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="Notchless">
-            <color red="0.3100961446762085" green="0.22769425036569685" blue="0.25395939625850339" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.88854897022247314" green="0.87164008617401123" blue="0.87431710958480835" alpha="0.36825284361839294" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="Power">
             <color red="0.94900000095367432" green="0.20000000298023224" blue="0.2630000114440918" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
