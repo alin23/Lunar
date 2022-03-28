@@ -1083,9 +1083,12 @@ class DisplayController: ObservableObject {
     }
 
     func appBrightnessContrastOffset(for display: Display) -> (Int, Int)? {
-        guard lunarProActive, let exceptions = runningAppExceptions, !exceptions.isEmpty, let screen = display.screen else {
+        guard lunarProActive, !display.enhanced, let exceptions = runningAppExceptions, !exceptions.isEmpty,
+              let screen = display.screen
+        else {
             log.debug("!exceptions: \(runningAppExceptions ?? [])")
             log.debug("!screen: \(display.screen?.description ?? "")")
+            log.debug("!xdr: \(display.enhanced)")
             mainAsync { display.appPreset = nil }
             return nil
         }
