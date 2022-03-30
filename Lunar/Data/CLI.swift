@@ -108,7 +108,7 @@ let ID_PATTERN = #"\d+"#.r!
 
 // MARK: - DisplayFilter
 
-enum DisplayFilter: ExpressibleByArgument, Codable {
+enum DisplayFilter: ExpressibleByArgument, Codable, Equatable {
     case all
     case first
     case mainExternal
@@ -121,6 +121,7 @@ enum DisplayFilter: ExpressibleByArgument, Codable {
     case builtin
     case syncSource
     case syncTargets
+    case none
     case serial(String)
     case name(String)
     case id(CGDirectDisplayID)
@@ -281,6 +282,8 @@ private func getDisplays(displays: [Display], filter: DisplayFilter) -> [Display
         return displays.filter { $0.name == name }
     case .external:
         return displays.filter { !$0.isBuiltin }
+    case .none:
+        return []
     }
 }
 
@@ -1333,6 +1336,9 @@ struct Lunar: ParsableCommand {
         @Flag(name: .long, help: "BlackOut without mirroring the screen contents.")
         var noMirror = false
 
+        @Option(name: .long, help: "Display to mirror when turning on BlackOut.")
+        var master: DisplayFilter = .none
+
         @Argument(
             help: "Display serial or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
         )
@@ -1356,8 +1362,19 @@ struct Lunar: ParsableCommand {
                 throw LunarCommandError.displayNotFound(display.s)
             }
 
+            let master: CGDirectDisplayID? = master == .none ? nil : getDisplays(
+                displays: displayController.activeDisplayList,
+                filter: master
+            ).first?.id
+
             for display in displays {
-                displayController.blackOut(display: display.id, state: state == .enable ? .on : .off, mirroringAllowed: !noMirror)
+                lastBlackOutToggleDate = .distantPast
+                displayController.blackOut(
+                    display: display.id,
+                    state: state == .enable ? .on : .off,
+                    mirroringAllowed: !noMirror,
+                    master: master
+                )
             }
             cliExit(0)
         }
