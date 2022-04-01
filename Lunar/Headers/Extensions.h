@@ -39,6 +39,7 @@ typedef NS_OPTIONS(NSUInteger, OFRectEdge) {
 - (void)appendBezierPathWithRoundedRectangle:(NSRect)rect byRoundingCorners:(OFRectCorner)corners withRadius:(CGFloat)radius includingEdges:(OFRectEdge)edges;
 @end
 
+int pidCount(void);
 NSArray* allProcesses(void);
 BOOL processIsRunning(NSString* executableName, NSArray* processes);
 
