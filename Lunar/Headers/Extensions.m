@@ -6,6 +6,7 @@
 
 #import "Extensions.h"
 #import <sys/sysctl.h>
+#import <libproc.h>
 
 @implementation NSBezierPath (Extensions)
 
@@ -195,6 +196,10 @@
 }
 @end
 
+int pidCount() {
+    return proc_listallpids(NULL, 0);
+}
+
 NSArray* allProcesses(){
     static int maxArgumentSize = 0;
     if (maxArgumentSize == 0) {
@@ -218,7 +223,7 @@ NSArray* allProcesses(){
         free(info);
         return nil;
     }
-    count = length / sizeof(struct kinfo_proc);
+    count = (int)length / sizeof(struct kinfo_proc);
     for (int i = 0; i < count; i++) {
         pid_t pid = info[i].kp_proc.p_pid;
         if (pid == 0) {
