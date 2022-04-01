@@ -89,6 +89,7 @@ class DisplayController: ObservableObject {
 
     @Published var activeDisplayList: [Display] = []
 
+    @Atomic var lastPidCount = 0
     static func displayInfoDictPartialMatchScore(
         display: Display,
         name: String,
@@ -198,7 +199,12 @@ class DisplayController: ObservableObject {
             guard !screensSleeping.load(ordering: .relaxed), let self = self,
                   self.activeDisplayList.contains(where: { $0.hasSoftwareControl && !$0.supportsGamma })
             else { return }
-            self.screencaptureIsRunning.send(processIsRunning("/usr/sbin/screencapture", nil))
+            let pids = pidCount()
+
+            if pids != self.lastPidCount {
+                self.screencaptureIsRunning.send(processIsRunning("/usr/sbin/screencapture", nil))
+            }
+            self.lastPidCount = pids.i
         }
     }
 
