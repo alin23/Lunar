@@ -1,3 +1,8 @@
+# 5.5.4
+## Improvements
+
+* Don't apply app presets while XDR is enabled
+* Lower CPU usage when checking for screenshot action on monitors that use Overlay
 # 5.5.3
 ## Features
 
