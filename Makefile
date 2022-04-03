@@ -53,7 +53,7 @@ release: changelog
 	echo "" >> /tmp/release_file_$(VERSION).md
 	echo "" >> /tmp/release_file_$(VERSION).md
 	cat ReleaseNotes/$(VERSION).md >> /tmp/release_file_$(VERSION).md
-	hub release create v$(VERSION) -a "Releases/Lunar-$(VERSION).dmg#Lunar.dmg" -F /tmp/release_file_$(VERSION).md
+	gh release create v$(VERSION) -F /tmp/release_file_$(VERSION).md "Releases/Lunar-$(VERSION).dmg#Lunar.dmg"
 
 sentry-release:
 	./bin/release.sh
