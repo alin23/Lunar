@@ -629,6 +629,24 @@ class DisplayController: ObservableObject {
 
     var reconfigureTask: Repeater?
 
+    lazy var autoBlackoutPublisher: PassthroughSubject<Bool, Never> = {
+        let p = PassthroughSubject<Bool, Never>()
+        p
+            .debounce(for: .seconds(2), scheduler: RunLoop.main)
+            .sink { shouldBlackout in
+                defer { self.autoBlackoutPending = false }
+                guard shouldBlackout, let d = self.builtinDisplay else { return }
+                self.blackOut(display: d.id, state: .on)
+            }.store(in: &observers)
+        return p
+    }()
+
+    @Atomic var autoBlackoutPending = false {
+        didSet {
+            log.info("autoBlackoutPending=\(autoBlackoutPending)")
+        }
+    }
+
     var displayList: [Display] {
         displays.values.sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }.reversed()
     }
@@ -1027,6 +1045,20 @@ class DisplayController: ObservableObject {
         }
     }
 
+    func retryAutoBlackoutLater() {
+        if autoBlackoutPending {
+            log.info("Retrying Auto Blackout later")
+            autoBlackoutPublisher.send(true)
+        }
+    }
+
+    func cancelAutoBlackout() {
+        if autoBlackoutPending {
+            log.info("Cancelling Auto Blackout")
+            autoBlackoutPublisher.send(false)
+        }
+    }
+
     @inline(__always) func withoutApply(_ block: () -> Void) {
         apply = false
         block()
@@ -1277,7 +1309,14 @@ class DisplayController: ObservableObject {
                 }
                 guard let autoBlackOut = autoBlackOut, autoBlackOut, lunarProOnTrial || lunarProActive else { return }
                 if let d = activeOldDisplays.first, activeOldDisplays.count == 1, d.isBuiltin, activeNewDisplays.count > 1 {
-                    mainAsync { displayController.blackOut(display: d.id, state: .on) }
+                    log.info("Activating Auto Blackout")
+                    self.autoBlackoutPending = true
+                    self.autoBlackoutPublisher.send(true)
+                } else {
+                    log
+                        .info(
+                            "Not activating Auto Blackout: activeOldDisplays.count=\(activeOldDisplays.count) activeNewDisplays.count=\(activeNewDisplays.count)"
+                        )
                 }
             }
 

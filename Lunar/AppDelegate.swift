@@ -1075,6 +1075,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
 
             displayController.panelRefreshPublisher.send(displayID)
+            displayController.retryAutoBlackoutLater()
         }, nil)
 
         DistributedNotificationCenter
@@ -1124,6 +1125,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .sink { notification in
                 log.info("\(notification.name)")
                 displayController.reconfigure()
+                displayController.retryAutoBlackoutLater()
             }.store(in: &observers)
 
         NotificationCenter.default
@@ -1131,6 +1133,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .debounce(for: .seconds(1), scheduler: RunLoop.main)
             .sink { _ in
                 log.info("Screen configuration changed")
+
                 displayController.activeDisplays.values.forEach { d in
                     d.updateCornerWindow()
                 }
@@ -1182,6 +1185,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 case NSWorkspace.screensDidWakeNotification:
                     log.debug("Screens woke up")
                     screensSleeping.store(false, ordering: .sequentiallyConsistent)
+                    displayController.retryAutoBlackoutLater()
 
                     if CachedDefaults[.refreshValues] {
                         self.startValuesReaderThread()
@@ -1237,6 +1241,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 case NSWorkspace.screensDidSleepNotification:
                     log.debug("Screens gone to sleep")
                     screensSleeping.store(true, ordering: .sequentiallyConsistent)
+                    displayController.cancelAutoBlackout()
 
                     if let task = self.valuesReaderThread {
                         lowprioQueue.cancel(timer: task)
