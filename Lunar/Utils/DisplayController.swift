@@ -1634,6 +1634,11 @@ class DisplayController: ObservableObject {
         guard adaptiveMode.available else { return }
         for display in (displays ?? activeDisplayList).filter({ !$0.blackOutEnabled }) {
             adaptiveMode.withForce(force || display.force) {
+                guard !display.enhanced else {
+                    display.brightness = display.brightness
+                    display.softwareBrightness = display.softwareBrightness
+                    return
+                }
                 self.adaptiveMode.adapt(display)
             }
         }
