@@ -47,6 +47,7 @@ open class OSDWindow: NSWindow {
 
         endFader?.cancel()
         closer?.cancel()
+        fader?.cancel()
         guard closeMilliseconds > 0 else { return }
         fader = mainAsyncAfter(ms: fadeMilliseconds) { [weak self] in
             guard let s = self, s.isVisible else { return }
@@ -140,7 +141,7 @@ public struct BigSurSlider: View {
         _color = color.state
         _showValue = showValue ?? .constant(false)
         _backgroundColor = backgroundColor.state
-        _knobColor = (color ?? colors.accent).state
+        _knobColor = (knobColor ?? color ?? colors.accent).state
         _knobTextColor = (knobTextColor ?? ((color ?? colors.accent).textColor)).state
     }
 
@@ -154,9 +155,6 @@ public struct BigSurSlider: View {
             ZStack(alignment: .leading) {
                 Rectangle()
                     .foregroundColor(backgroundColor)
-                Rectangle()
-                    .foregroundColor(color ?? colors.accent)
-                    .frame(width: 10)
                 ZStack(alignment: .leading) {
                     Rectangle()
                         .foregroundColor(color ?? colors.accent)
@@ -375,23 +373,25 @@ struct BrightnessOSDView: View {
         VStack {
             let b = display.softwareBrightness
             let lb = display.lastSoftwareBrightness
-            Text((b > 1 || (b == 1 && lb > 1)) ? "XDR Brightness" : "Sub-zero brightness")
+            Text((b > 1 || (b == 1 && (lb > 1 || display.enhanced))) ? "XDR Brightness" : "Sub-zero brightness")
                 .font(.system(size: 16, weight: .semibold, design: .monospaced))
 
             if display.enhanced {
                 BigSurSlider(
                     percentage: $display.xdrBrightness,
-                    image: "speedometer",
-                    color: Colors.xdr,
+                    image: "sun.max.circle.fill",
+                    color: Colors.xdr.opacity(0.6),
                     backgroundColor: Colors.xdr.opacity(colorScheme == .dark ? 0.1 : 0.2),
+                    knobColor: Colors.xdr,
                     showValue: .constant(true)
                 )
             } else {
                 BigSurSlider(
                     percentage: $display.softwareBrightness,
                     image: "moon.circle.fill",
-                    color: Colors.subzero,
+                    color: Colors.subzero.opacity(0.6),
                     backgroundColor: Colors.subzero.opacity(colorScheme == .dark ? 0.1 : 0.2),
+                    knobColor: Colors.subzero,
                     showValue: .constant(true)
                 )
             }
@@ -413,7 +413,7 @@ struct BrightnessOSDView: View {
             }
         )
         .padding(10)
-        .opacity(display.lastSoftwareBrightness != display.softwareBrightness ? 1 : 0)
+//        .opacity(display.lastSoftwareBrightness != display.softwareBrightness ? 1 : 0)
         .colors(colorScheme == .dark ? .dark : .light)
     }
 }
