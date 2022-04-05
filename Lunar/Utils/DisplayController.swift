@@ -1764,10 +1764,13 @@ class DisplayController: ObservableObject {
                 return
             }
 
-            if display.enhanced, !display.hasSoftwareControl, !display.isForTesting,
-               (value == maxBrightness && value == oldValue) ||
-               (oldValue == maxBrightness && display.softwareBrightness > 1.01)
+            if display.supportsEnhance, !display.isForTesting,
+               (value == maxBrightness && value == oldValue) || (oldValue == maxBrightness && display.softwareBrightness > 1.01),
+               lunarProActive || lunarProOnTrial
             {
+                if !display.enhanced {
+                    display.handleEnhance(true, withoutSettingBrightness: true)
+                }
                 display.softwareBrightness = cap(
                     display.softwareBrightness + (offset.f / 70),
                     minVal: 1.01,
