@@ -2116,6 +2116,18 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published var lastRawContrast: Double?
     @Published var lastRawVolume: Double?
 
+    lazy var xdrDisablePublisher: PassthroughSubject<Bool, Never> = {
+        let p = PassthroughSubject<Bool, Never>()
+        p
+            .debounce(for: .milliseconds(5000), scheduler: RunLoop.main)
+            .sink { [weak self] shouldDisable in
+                guard let self = self, shouldDisable else { return }
+                self.handleEnhance(false, withoutSettingBrightness: true)
+            }.store(in: &observers)
+
+        return p
+    }()
+
     var alternativeControlForAppleNative: Control? = nil {
         didSet {
             context = getContext()
@@ -2886,6 +2898,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 softwareBrightness = 1
             } else if brightness < maxBrightness.uint16Value, softwareBrightness > 1 {
                 softwareBrightness = 1
+                xdrDisablePublisher.send(true)
                 startXDRTimer()
             } else if brightness == minBrightness.uint16Value, !subzero {
                 withoutApply { subzero = true }
