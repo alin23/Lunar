@@ -867,6 +867,8 @@ enum Hotkey {
         case .volume:
             guard display.showVolumeOSD else { return }
             controlID = .AUDIO_SPEAKER_VOLUME
+        case .muted:
+            guard display.showVolumeOSD else { return }
         default:
             break
         }
@@ -1484,14 +1486,15 @@ extension AppDelegate: MediaKeyTapDelegate {
     func volumeUpAction(offset: Int? = nil) {
         let allMonitors = CachedDefaults[.volumeHotkeysControlAllMonitors]
 
-        increaseVolume(by: offset, currentAudioDisplay: !allMonitors)
+        let hasAudioDisplay = displayController.currentAudioDisplay != nil
+        increaseVolume(by: offset, currentDisplay: !allMonitors && !hasAudioDisplay, currentAudioDisplay: !allMonitors && hasAudioDisplay)
 
         if allMonitors {
             toggleAudioMuted(for: displayController.externalActiveDisplays.filter(\.audioMuted))
             displayController.externalActiveDisplays.forEach { d in
                 Hotkey.showOsd(osdImage: volumeOsdImage(display: d), value: d.volume.uint32Value, display: d)
             }
-        } else if let display = displayController.currentAudioDisplay {
+        } else if let display = displayController.currentAudioDisplay ?? displayController.cursorDisplay, !display.isBuiltin {
             if display.audioMuted { toggleAudioMuted(for: [display]) }
             Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, display: display)
         }
@@ -1502,14 +1505,15 @@ extension AppDelegate: MediaKeyTapDelegate {
     func volumeDownAction(offset: Int? = nil) {
         let allMonitors = CachedDefaults[.volumeHotkeysControlAllMonitors]
 
-        decreaseVolume(by: offset, currentAudioDisplay: !allMonitors)
+        let hasAudioDisplay = displayController.currentAudioDisplay != nil
+        decreaseVolume(by: offset, currentDisplay: !allMonitors && !hasAudioDisplay, currentAudioDisplay: !allMonitors && hasAudioDisplay)
 
         if allMonitors {
             toggleAudioMuted(for: displayController.externalActiveDisplays.filter(\.audioMuted))
             displayController.externalActiveDisplays.forEach { d in
                 Hotkey.showOsd(osdImage: volumeOsdImage(display: d), value: d.volume.uint32Value, display: d)
             }
-        } else if let display = displayController.currentAudioDisplay {
+        } else if let display = displayController.currentAudioDisplay ?? displayController.cursorDisplay, !display.isBuiltin {
             if display.audioMuted { toggleAudioMuted(for: [display]) }
             Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, display: display)
         }
@@ -1520,13 +1524,14 @@ extension AppDelegate: MediaKeyTapDelegate {
     @objc func muteAudioHotkeyHandler() {
         let allMonitors = CachedDefaults[.volumeHotkeysControlAllMonitors]
 
-        toggleAudioMuted(currentAudioDisplay: !allMonitors)
+        let hasAudioDisplay = displayController.currentAudioDisplay != nil
+        toggleAudioMuted(currentDisplay: !allMonitors && !hasAudioDisplay, currentAudioDisplay: !allMonitors && hasAudioDisplay)
 
         if allMonitors {
             displayController.externalActiveDisplays.forEach { d in
                 Hotkey.showOsd(osdImage: volumeOsdImage(display: d), value: d.volume.uint32Value, display: d)
             }
-        } else if let display = displayController.currentAudioDisplay {
+        } else if let display = displayController.currentAudioDisplay ?? displayController.cursorDisplay, !display.isBuiltin {
             Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, display: display)
         }
 
