@@ -83,9 +83,10 @@ struct DisplayRowView: View {
             if display.enhanced || SWIFTUI_PREVIEW {
                 BigSurSlider(
                     percentage: $display.xdrBrightness,
-                    image: "speedometer",
-                    color: Colors.xdr,
+                    image: "sun.max.circle.fill",
+                    color: Colors.xdr.opacity(0.7),
                     backgroundColor: Colors.xdr.opacity(colorScheme == .dark ? 0.1 : 0.2),
+                    knobColor: Colors.xdr,
                     showValue: $showSliderValues
                 )
             }
@@ -93,8 +94,9 @@ struct DisplayRowView: View {
                 BigSurSlider(
                     percentage: $display.softwareBrightness,
                     image: "moon.circle.fill",
-                    color: Colors.subzero,
+                    color: Colors.subzero.opacity(0.7),
                     backgroundColor: Colors.subzero.opacity(colorScheme == .dark ? 0.1 : 0.2),
+                    knobColor: Colors.subzero,
                     showValue: $showSliderValues
                 )
             }
