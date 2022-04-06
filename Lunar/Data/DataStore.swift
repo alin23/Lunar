@@ -23,6 +23,8 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .adaptiveBrightnessMode,
     .colorScheme,
     .advancedSettingsShown,
+    .autoSubzero,
+    .autoXdr,
     .xdrWarningShown,
     .workaroundBuiltinDisplay,
     .autoBlackoutBuiltin,
@@ -596,6 +598,8 @@ func initCache() {
     cacheKey(.showProjectorDisplays)
     cacheKey(.showDisconnectedDisplays)
     cacheKey(.advancedSettingsShown)
+    cacheKey(.autoSubzero)
+    cacheKey(.autoXdr)
     cacheKey(.xdrWarningShown)
     cacheKey(.autoBlackoutBuiltin)
     cacheKey(.workaroundBuiltinDisplay)
@@ -722,6 +726,8 @@ extension Defaults.Keys {
     static let showProjectorDisplays = Key<Bool>("showProjectorDisplays", default: true)
     static let showDisconnectedDisplays = Key<Bool>("showDisconnectedDisplays", default: false)
     static let advancedSettingsShown = Key<Bool>("advancedSettingsShown", default: false)
+    static let autoSubzero = Key<Bool>("autoSubzero", default: true)
+    static let autoXdr = Key<Bool>("autoXdr", default: true)
     static let xdrWarningShown = Key<Bool>("xdrWarningShown", default: false)
     static let autoBlackoutBuiltin = Key<Bool>("autoBlackoutBuiltin", default: false)
     static let workaroundBuiltinDisplay = Key<Bool>("workaroundBuiltinDisplay", default: false)
@@ -874,6 +880,9 @@ let showOrientationInQuickActionsPublisher = Defaults.publisher(.showOrientation
     .filter { $0.oldValue != $0.newValue }
 let advancedSettingsShownPublisher = Defaults.publisher(.advancedSettingsShown).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let autoBlackoutBuiltinPublisher = Defaults.publisher(.autoBlackoutBuiltin).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let autoSubzeroPublisher = Defaults.publisher(.autoSubzero).removeDuplicates().dropFirst()
+    .filter { $0.oldValue != $0.newValue }
+let autoXdrPublisher = Defaults.publisher(.autoXdr).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let workaroundBuiltinDisplayPublisher = Defaults.publisher(.workaroundBuiltinDisplay).removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
 let streamLogsPublisher = Defaults.publisher(.streamLogs).removeDuplicates().filter { $0.oldValue != $0.newValue }
