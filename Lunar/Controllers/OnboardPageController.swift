@@ -59,7 +59,9 @@ class OnboardWindowController: ModernWindowController, NSWindowDelegate {
 
     func completeOnboarding() {
         completedOnboarding = true
-        appDelegate!.showWindow(after: 100)
+        mainAsyncAfter(ms: 100) {
+            appDelegate!.statusItemButtonController?.showPopover()
+        }
 
         mainAsyncAfter(ms: 1000) {
             let nc = UNUserNotificationCenter.current()

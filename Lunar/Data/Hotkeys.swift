@@ -869,8 +869,6 @@ enum Hotkey {
             controlID = .AUDIO_SPEAKER_VOLUME
         case .muted:
             guard display.showVolumeOSD else { return }
-        default:
-            break
         }
 
         let locked = (display.control is DDCControl && (DDC.skipWritingPropertyById[display.id]?.contains(controlID) ?? false))
