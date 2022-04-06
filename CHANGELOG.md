@@ -1,3 +1,20 @@
+# 5.5.5
+## Features
+
+* **Seamless XDR Brightness**: enable XDR by simply increasing the brightness further after reaching `100%`
+* Allow disabling automatic Sub-zero Dimming and XDR Brightness from the Options menu
+
+## Improvements
+
+* Make sure Auto Blackout works after screen wake by waiting for the system to settle the screen reconfiguration
+* Restore XDR Brightness after screen wake
+* Allow volume/mute hotkeys to work on the cursor display
+* Move QuickActions options into a popover to lower height of the menu
+
+## Fixes
+
+* Fix hiding the mute OSD
+
 # 5.5.4
 ## Improvements
 
