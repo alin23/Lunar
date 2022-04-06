@@ -2898,7 +2898,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 softwareBrightness = 1
             } else if brightness < maxBrightness.uint16Value, softwareBrightness > 1 {
                 softwareBrightness = 1
-                xdrDisablePublisher.send(true)
+                if displayController.autoXdr { xdrDisablePublisher.send(true) }
                 startXDRTimer()
             } else if brightness == minBrightness.uint16Value, !subzero {
                 withoutApply { subzero = true }

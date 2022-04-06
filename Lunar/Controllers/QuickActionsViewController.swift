@@ -340,6 +340,8 @@ struct QuickActionsLayoutView: View {
     @Default(.showXDRSelector) var showXDRSelector
     @Default(.showHeaderOnHover) var showHeaderOnHover
     @Default(.showFooterOnHover) var showFooterOnHover
+    @Default(.autoXdr) var autoXdr
+    @Default(.autoSubzero) var autoSubzero
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -360,8 +362,18 @@ struct QuickActionsLayoutView: View {
                 SettingsToggle(text: "Show standard presets", setting: $showStandardPresets.animation(.fastSpring))
                 SettingsToggle(text: "Show custom presets", setting: $showCustomPresets.animation(.fastSpring))
                 SettingsToggle(text: "Merge brightness and contrast", setting: $mergeBrightnessContrast.animation(.fastSpring))
+            }
+            Divider()
+            VStack(alignment: .leading) {
                 SettingsToggle(text: "Show XDR brightness toggle when available", setting: $showXDRSelector.animation(.fastSpring))
-                Divider()
+                SettingsToggle(text: "Toggle XDR Brightness when going over 100%", setting: $autoXdr.animation(.fastSpring))
+                SettingsToggle(
+                    text: "Toggle Sub-zero Dimming when going below 0%",
+                    setting: $autoSubzero.animation(.fastSpring)
+                )
+            }
+            Divider()
+            VStack(alignment: .leading) {
                 SettingsToggle(text: "Show last raw values sent to the display", setting: $showRawValues.animation(.fastSpring))
                 SettingsToggle(text: "Show brightness near menubar icon", setting: $showBrightnessMenuBar.animation(.fastSpring))
                 SettingsToggle(
@@ -446,6 +458,25 @@ struct BlackoutPopoverHeaderView: View {
                 }.buttonStyle(FlatButton(color: Colors.red, textColor: .white))
             }
         }
+    }
+}
+
+// MARK: - PaddedPopoverView
+
+struct PaddedPopoverView<Content>: View where Content: View {
+    @State var color: Color
+
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        ZStack {
+            color.scaleEffect(1.5)
+            VStack(alignment: .leading, spacing: 10) {
+                content
+            }
+            .padding()
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        }.preferredColorScheme(.light)
     }
 }
 
@@ -574,6 +605,10 @@ struct QuickActionsMenuView: View {
     @Default(.showFooterOnHover) var showFooterOnHover
     @Default(.showOptionsMenu) var showOptionsMenu
     @Default(.popoverClosed) var popoverClosed
+
+    @Default(.showBrightnessMenuBar) var showBrightnessMenuBar
+    @Default(.showOnlyExternalBrightnessMenuBar) var showOnlyExternalBrightnessMenuBar
+
     @State var displays: [Display] = displayController.activeDisplayList
     @State var cursorDisplay: Display? = displayController.cursorDisplay
     @State var adaptiveModes: [AdaptiveModeKey] = [.sensor, .sync, .location, .clock, .manual, .auto]
@@ -624,7 +659,23 @@ struct QuickActionsMenuView: View {
                         Text("Options").font(.system(size: 13, weight: .semibold))
                     }
                 }
-            ).buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+            )
+            .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+            .popover(isPresented: $showOptionsMenu, arrowEdge: .trailing) {
+                PaddedPopoverView(color: colorScheme == .dark ? Colors.sunYellow : Colors.lunarYellow) {
+                    QuickActionsLayoutView().padding(10)
+                }
+            }
+            .onChange(of: showBrightnessMenuBar) { _ in
+                let old = showOptionsMenu
+                showOptionsMenu = false
+                if old { mainAsyncAfter(ms: 500) { showOptionsMenu = true }}
+            }
+            .onChange(of: showOnlyExternalBrightnessMenuBar) { _ in
+                let old = showOptionsMenu
+                showOptionsMenu = false
+                if old { mainAsyncAfter(ms: 500) { showOptionsMenu = true }}
+            }
 
             SwiftUI.Button(
                 action: {
@@ -704,13 +755,6 @@ struct QuickActionsMenuView: View {
             .padding(.top, 10)
             .padding(.bottom, 10 * op)
             .opacity(op)
-
-            if showOptionsMenu {
-                QuickActionsLayoutView()
-                    .padding(.horizontal, MENU_HORIZONTAL_PADDING)
-                    .padding(.top, 10)
-                    .padding(.bottom, 20)
-            }
         }
         .background(Color.primary.opacity((colorScheme == .dark ? 0.03 : 0.05) * op))
         .onHover { hovering in
