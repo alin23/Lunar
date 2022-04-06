@@ -828,6 +828,26 @@ class DisplayController: ObservableObject {
         return nil
     }
 
+    lazy var autoXdr: Bool = {
+        autoXdrPublisher.sink { self.autoXdr = $0.newValue }.store(in: &observers)
+        return Defaults[.autoXdr]
+    }() {
+        didSet {
+            guard !autoXdr else { return }
+            activeDisplayList.filter(\.enhanced).forEach { $0.enhanced = false }
+        }
+    }
+
+    lazy var autoSubzero: Bool = {
+        autoSubzeroPublisher.sink { self.autoSubzero = $0.newValue }.store(in: &observers)
+        return Defaults[.autoSubzero]
+    }() {
+        didSet {
+            guard !autoSubzero else { return }
+            activeDisplayList.filter(\.subzero).forEach { $0.softwareBrightness = 1 }
+        }
+    }
+
     static func getAdaptiveMode() -> AdaptiveMode {
         if CachedDefaults[.overrideAdaptiveMode] {
             return CachedDefaults[.adaptiveBrightnessMode].mode
@@ -1752,7 +1772,8 @@ class DisplayController: ObservableObject {
                 maxVal: maxBrightness
             )
 
-            if !display.hasSoftwareControl, minBrightness <= 1, !display.isForTesting,
+            if autoSubzero || display.softwareBrightness < 1.0,
+               !display.hasSoftwareControl, minBrightness <= 1, !display.isForTesting,
                (value == minBrightness && value == oldValue) ||
                (oldValue == minBrightness && display.softwareBrightness < 1.0)
             {
@@ -1764,7 +1785,8 @@ class DisplayController: ObservableObject {
                 return
             }
 
-            if display.supportsEnhance, !display.isForTesting,
+            if autoXdr || display.softwareBrightness > 1.0 || display.enhanced,
+               display.supportsEnhance, !display.isForTesting,
                (value == maxBrightness && value == oldValue) || (oldValue == maxBrightness && display.softwareBrightness > 1.01),
                lunarProActive || lunarProOnTrial
             {
