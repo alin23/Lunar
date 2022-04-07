@@ -1630,6 +1630,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         set { Self.setWindowController(id, type: "osd", windowController: newValue) }
     }
 
+    var autoBlackoutOsdWindowController: NSWindowController? {
+        get { Self.getWindowController(id, type: "autoBlackoutOsd") }
+        set { Self.setWindowController(id, type: "autoBlackoutOsd", windowController: newValue) }
+    }
+
     var faceLightWindowController: NSWindowController? {
         get { Self.getWindowController(id, type: "faceLight") }
         set { Self.setWindowController(id, type: "faceLight", windowController: newValue) }
@@ -2127,6 +2132,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         return p
     }()
+
+    var panelModeBeforeMirroring: CGDisplayMode?
 
     var alternativeControlForAppleNative: Control? = nil {
         didSet {
@@ -2850,7 +2857,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     var isMacBook: Bool { isBuiltin && Sysctl.isMacBook }
-
     @Published @objc dynamic var brightness: NSNumber = 50 {
         didSet {
             save()

@@ -632,7 +632,7 @@ class DisplayController: ObservableObject {
     lazy var autoBlackoutPublisher: PassthroughSubject<Bool, Never> = {
         let p = PassthroughSubject<Bool, Never>()
         p
-            .debounce(for: .seconds(2), scheduler: RunLoop.main)
+            .debounce(for: .seconds(AUTO_BLACKOUT_DEBOUNCE_SECONDS), scheduler: RunLoop.main)
             .sink { shouldBlackout in
                 defer { self.autoBlackoutPending = false }
                 guard shouldBlackout, let d = self.builtinDisplay else { return }
@@ -640,6 +640,8 @@ class DisplayController: ObservableObject {
             }.store(in: &observers)
         return p
     }()
+
+    var panelModesBeforeMirroring: [CGDirectDisplayID: CGDisplayMode] = [:]
 
     @Atomic var autoBlackoutPending = false {
         didSet {
@@ -1066,8 +1068,9 @@ class DisplayController: ObservableObject {
     }
 
     func retryAutoBlackoutLater() {
-        if autoBlackoutPending {
+        if autoBlackoutPending, let d = builtinDisplay, !d.blackOutEnabled {
             log.info("Retrying Auto Blackout later")
+            d.showAutoBlackOutOSD()
             autoBlackoutPublisher.send(true)
         }
     }
@@ -1075,6 +1078,8 @@ class DisplayController: ObservableObject {
     func cancelAutoBlackout() {
         if autoBlackoutPending {
             log.info("Cancelling Auto Blackout")
+            builtinDisplay?.autoBlackoutOsdWindowController?.close()
+            builtinDisplay?.autoBlackoutOsdWindowController = nil
             autoBlackoutPublisher.send(false)
         }
     }
@@ -1328,9 +1333,12 @@ class DisplayController: ObservableObject {
                     mainAsync { displayController.blackOut(display: d.id, state: .off) }
                 }
                 guard let autoBlackOut = autoBlackOut, autoBlackOut, lunarProOnTrial || lunarProActive else { return }
-                if let d = activeOldDisplays.first, activeOldDisplays.count == 1, d.isBuiltin, activeNewDisplays.count > 1 {
+                if let d = activeOldDisplays.first, activeOldDisplays.count == 1, d.isBuiltin, activeNewDisplays.count > 1,
+                   !d.blackOutEnabled
+                {
                     log.info("Activating Auto Blackout")
                     self.autoBlackoutPending = true
+                    self.builtinDisplay?.showAutoBlackOutOSD()
                     self.autoBlackoutPublisher.send(true)
                 } else {
                     log
