@@ -158,7 +158,7 @@ public struct BigSurSlider: View {
                 ZStack(alignment: .leading) {
                     Rectangle()
                         .foregroundColor(color ?? colors.accent)
-                        .frame(width: w * cgPercentage + sliderHeight / 2)
+                        .frame(width: cgPercentage == 1 ? geometry.size.width : w * cgPercentage + sliderHeight / 2)
                     if let image = image {
                         Image(systemName: image)
                             .resizable()
@@ -342,6 +342,9 @@ public struct Colors {
 
     public var isDark: Bool { colorScheme == .dark }
     public var isLight: Bool { colorScheme == .light }
+    public var inverted: Color { isDark ? .black : .white }
+    public var invertedGray: Color { isDark ? Colors.darkGray : Colors.lightGray }
+    public var gray: Color { isDark ? Colors.lightGray : Colors.darkGray }
 }
 
 // MARK: - ColorsKey
@@ -414,12 +417,110 @@ struct BrightnessOSDView: View {
             }
         )
         .padding(10)
-//        .opacity(display.lastSoftwareBrightness != display.softwareBrightness ? 1 : 0)
         .colors(colorScheme == .dark ? .dark : .light)
     }
 }
 
+// MARK: - AutoBlackOutOSDView
+
+struct AutoBlackOutOSDView: View {
+    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.colors) var colors
+    @ObservedObject var display: Display
+    @State var progress: Float = 0.0
+    @State var opacity: CGFloat = 1.0
+
+    @State var timer: Timer?
+
+    var body: some View {
+        VStack {
+            Text("Turning off")
+                .font(.system(size: 16, weight: .semibold, design: .monospaced))
+            Text(display.name)
+                .font(.system(size: 14, weight: .heavy, design: .monospaced))
+
+            BigSurSlider(
+                percentage: $progress,
+                image: "power.circle.fill",
+                color: Colors.red.opacity(0.8),
+                backgroundColor: Colors.red.opacity(colorScheme == .dark ? 0.1 : 0.2),
+                knobColor: .clear,
+                showValue: .constant(false)
+            )
+            HStack(spacing: 3) {
+                Text("Press")
+                    .font(.system(size: 14, weight: .regular, design: .rounded))
+                    .foregroundColor(.secondary)
+                Text("esc")
+                    .font(.system(size: 14, weight: .regular, design: .monospaced))
+                    .foregroundColor(colors.inverted)
+                    .padding(.top, 1)
+                    .padding(.bottom, 2)
+                    .padding(.horizontal, 4)
+                    .background(RoundedRectangle(cornerRadius: 4, style: .continuous).fill(Color.primary))
+                Text("to abort")
+                    .font(.system(size: 14, weight: .regular, design: .rounded))
+                    .foregroundColor(.secondary)
+            }
+            .padding(.top, 6)
+        }
+        .padding(.horizontal, 40)
+        .padding(.bottom, 30)
+        .padding(.top, 30)
+        .background(
+            ZStack {
+                VisualEffectBlur(material: .hudWindow, blendingMode: .behindWindow, state: .active)
+                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 20)
+                    .shadow(color: Colors.blackMauve.opacity(0.2), radius: 8, x: 0, y: 4)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill((colorScheme == .dark ? Colors.blackMauve : Color.white).opacity(0.4))
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 20)
+            }
+        )
+        .padding(.horizontal, 10)
+        .padding(.vertical, 30)
+        .colors(colorScheme == .dark ? .dark : .light)
+        .onAppear {
+            let step = 0.1 / (AUTO_BLACKOUT_DEBOUNCE_SECONDS - 0.5).f
+            timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { t in
+                guard progress < 1, !display.blackOutEnabled else {
+                    t.invalidate()
+                    withAnimation(.easeOut(duration: 0.25)) { opacity = 0.0 }
+                    display.autoBlackoutOsdWindowController?.close()
+                    return
+                }
+                progress += step
+            }
+        }
+        .onDisappear {
+            timer?.invalidate()
+        }
+        .opacity(opacity)
+    }
+}
+
+let AUTO_BLACKOUT_DEBOUNCE_SECONDS = 3.0
 let OSD_WIDTH: CGFloat = 300
+
+// MARK: - AutoBlackOutOSDView_Previews
+
+struct AutoBlackOutOSDView_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            AutoBlackOutOSDView(display: displayController.firstDisplay)
+                .frame(maxWidth: OSD_WIDTH)
+                .colors(.light)
+                .preferredColorScheme(.light)
+            AutoBlackOutOSDView(display: displayController.firstDisplay)
+                .frame(maxWidth: OSD_WIDTH)
+                .colors(.dark)
+                .preferredColorScheme(.dark)
+        }
+    }
+}
 
 // MARK: - BrightnessOSDView_Previews
 
@@ -447,6 +548,21 @@ extension Display {
             guard let osd = self.osdWindowController?.window as? OSDWindow else { return }
 
             osd.show()
+        }
+    }
+
+    func showAutoBlackOutOSD() {
+        mainAsync { [weak self] in
+            guard let self = self, !self.blackOutEnabled else {
+                self?.autoBlackoutOsdWindowController?.close()
+                return
+            }
+            self.autoBlackoutOsdWindowController?.close()
+            self.autoBlackoutOsdWindowController = OSDWindow(swiftuiView: AnyView(AutoBlackOutOSDView(display: self)), display: self).wc
+
+            guard let osd = self.autoBlackoutOsdWindowController?.window as? OSDWindow else { return }
+
+            osd.show(closeAfter: 1000, fadeAfter: ((AUTO_BLACKOUT_DEBOUNCE_SECONDS + 0.5) * 1000).i)
         }
     }
 }

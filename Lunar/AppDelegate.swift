@@ -1592,6 +1592,28 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
+    func addGlobalKeyMonitor() {
+        if Defaults[.accessibilityPermissionsGranted] {
+            NSEvent.addGlobalMonitorForEvents(matching: [.keyDown]) { event in
+                switch event.keyCode.i {
+                case kVK_Escape where displayController.autoBlackoutPending:
+                    displayController.cancelAutoBlackout()
+                default:
+                    break
+                }
+            }
+        }
+        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            switch event.keyCode.i {
+            case kVK_Escape where displayController.autoBlackoutPending:
+                displayController.cancelAutoBlackout()
+            default:
+                break
+            }
+            return event
+        }
+    }
+
     func addGlobalMouseDownMonitor() {
         NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]) { _ in
             guard let menuPopover = menuPopover, menuPopover.isShown else { return }
@@ -1848,6 +1870,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         addGlobalMouseDownMonitor()
         addGlobalModifierMonitor()
+        addGlobalKeyMonitor()
         initHotkeys()
 
         listenForAdaptiveModeChange()
