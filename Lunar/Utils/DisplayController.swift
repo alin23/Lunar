@@ -90,6 +90,15 @@ class DisplayController: ObservableObject {
     @Published var activeDisplayList: [Display] = []
 
     @Atomic var lastPidCount = 0
+    static func tryLockManager(tries: Int = 10) -> Bool {
+        for i in 1 ... tries {
+            log.info("Trying to lock display manager (try: \(i))")
+            if let mgr = panelManager, mgr.tryLockAccess() { return true }
+            Thread.sleep(forTimeInterval: 0.05)
+        }
+        return false
+    }
+
     static func displayInfoDictPartialMatchScore(
         display: Display,
         name: String,
@@ -571,7 +580,6 @@ class DisplayController: ObservableObject {
             log.info("Mac Mini HDMI Ignore: Transport=\(display.transport?.description ?? "Unknown")")
             log.info("Mac Mini HDMI Ignore: CLCD2 Number=\(clcd2Num)")
             if Sysctl.isMacMini, clcd2Num == 1,
-               // || (Sysctl.modelLowercased.starts(with: "macbookpro18,") && clcd2Num >= 1),
                let transport = display.transport,
                transport.upstream == "DP",
                transport.downstream == "HDMI"
@@ -625,8 +633,6 @@ class DisplayController: ObservableObject {
         return p
     }()
 
-    var blackOutEnforceTask: Repeater?
-
     var reconfigureTask: Repeater?
 
     lazy var autoBlackoutPublisher: PassthroughSubject<Bool, Never> = {
@@ -636,12 +642,14 @@ class DisplayController: ObservableObject {
             .sink { shouldBlackout in
                 defer { self.autoBlackoutPending = false }
                 guard shouldBlackout, let d = self.builtinDisplay else { return }
+                lastBlackOutToggleDate = .distantPast
                 self.blackOut(display: d.id, state: .on)
             }.store(in: &observers)
         return p
     }()
 
-    var panelModesBeforeMirroring: [CGDirectDisplayID: CGDisplayMode] = [:]
+    var panelModesBeforeMirroring: [CGDirectDisplayID: MPDisplayMode] = [:]
+    var mirrorSetBeforeBlackout: [CGDirectDisplayID: [MPDisplay]] = [:]
 
     @Atomic var autoBlackoutPending = false {
         didSet {
@@ -726,6 +734,11 @@ class DisplayController: ObservableObject {
                     self.activeDisplayList = self._activeDisplays.values.sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }
                         .reversed()
                 }
+                #if DEBUG
+                    newValue.values.forEach {
+                        $0.blackOutMirroringAllowed = true
+                    }
+                #endif
             }
         }
     }
@@ -850,6 +863,8 @@ class DisplayController: ObservableObject {
         }
     }
 
+    var resetDisplayListTask: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+
     static func getAdaptiveMode() -> AdaptiveMode {
         if CachedDefaults[.overrideAdaptiveMode] {
             return CachedDefaults[.adaptiveBrightnessMode].mode
@@ -863,9 +878,11 @@ class DisplayController: ObservableObject {
     }
 
     static func panel(with id: CGDirectDisplayID) -> MPDisplay? {
-        guard let displays = DisplayController.panelManager?.displays as? [MPDisplay] else { return nil }
-
-        return displays.first { $0.displayID == id }
+        guard id != kCGNullDirectDisplay else { return nil }
+        return DisplayController.panelManager?.display(withID: id.i32) as? MPDisplay
+//        guard let displays = DisplayController.panelManager?.displays as? [MPDisplay] else { return nil }
+//
+//        return displays.first { $0.displayID == id }
     }
 
     static func autoMode() -> AdaptiveMode {
@@ -1283,7 +1300,7 @@ class DisplayController: ObservableObject {
     }
 
     func resetDisplayList(advancedSettings: Bool = false, configurationPage: Bool = false, autoBlackOut: Bool? = nil) {
-        asyncNow {
+        resetDisplayListTask = mainAsyncAfter(ms: 2000) {
             self.getDisplaysLock.around {
                 Self.panelManager = MPDisplayMgr()
                 DDC.reset()
@@ -1296,7 +1313,6 @@ class DisplayController: ObservableObject {
                     includeDummy: CachedDefaults[.showDummyDisplays]
                 )
                 let activeNewDisplays = self.displays.values.filter(\.active)
-                let activeNewDisplayIDs = activeNewDisplays.map(\.id)
 
                 let d = self.displays.values
                 if !d.contains(where: \.isSource),
@@ -1310,27 +1326,32 @@ class DisplayController: ObservableObject {
 
                 log.debug("Disabling BlackOut where the mirror does not exist anymore")
                 for d in activeNewDisplays {
-                    let mirror = d.primaryMirrorScreen?.displayID ?? 0
-                    let mirrorExists = activeNewDisplayIDs.contains(mirror)
-
                     log
                         .debug(
-                            "\(d): blackOutEnabled=\(d.blackOutEnabled) mirror=\(mirror) mirrorExists=\(mirrorExists) blackOutEnabledWithoutMirroring=\(d.blackOutEnabledWithoutMirroring)"
+                            "\(d): blackOutEnabled=\(d.blackOutEnabled) blackOutEnabledWithoutMirroring=\(d.blackOutEnabledWithoutMirroring)"
                         )
-                    guard d.blackOutEnabled, !d.blackOutEnabledWithoutMirroring, mirror == 0 || !mirrorExists else { continue }
+                    guard d.blackOutEnabled, !d.blackOutEnabledWithoutMirroring, let panel = Self.panel(with: d.id),
+                          !panel.isMirrored
+                    else {
+                        d.blackoutDisablerPublisher.send(false)
+                        continue
+                    }
 
                     log
                         .info(
-                            "Disabling BlackOut for \(d): blackOutEnabled=\(d.blackOutEnabled) mirror=\(mirror) mirrorExists=\(mirrorExists)"
+                            "Disabling BlackOut for \(d): blackOutEnabled=\(d.blackOutEnabled) isMirrored=\(panel.isMirrored) isMirrorMaster=\(panel.isMirrorMaster) mirrorMasterDisplayID=\(panel.mirrorMasterDisplayID)"
                         )
-                    mainAsync { displayController.blackOut(display: d.id, state: .off) }
+                    d.blackoutDisablerPublisher.send(false)
                 }
 
                 if let d = activeNewDisplays.first, activeNewDisplays.count == 1, d.isBuiltin, d.blackOutEnabled,
                    activeOldDisplays.count > 1
                 {
                     log.info("Disabling BlackOut if we're left with only 1 screen")
-                    mainAsync { displayController.blackOut(display: d.id, state: .off) }
+                    mainAsync {
+                        lastBlackOutToggleDate = .distantPast
+                        displayController.blackOut(display: d.id, state: .off)
+                    }
                 }
                 guard let autoBlackOut = autoBlackOut, autoBlackOut, lunarProOnTrial || lunarProActive else { return }
                 if let d = activeOldDisplays.first, activeOldDisplays.count == 1, d.isBuiltin, activeNewDisplays.count > 1,

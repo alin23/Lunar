@@ -131,7 +131,7 @@ extension BinaryInteger {
     }
 
     @inline(__always) var i32: Int32 {
-        Int32(self)
+        Int32(cap(Int(self), minVal: Int(Int32.min), maxVal: Int(Int32.max)))
     }
 
     @inline(__always) var i64: Int64 {
@@ -943,15 +943,15 @@ class ModePopupButton: NSPopUpButton {
                 item.attributedTitle = mode.attributedString
             }.store(in: &observers)
 
-        changedItemsPublisher
-            .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
-            .sink { [weak self] _ in
-//                guard let mgr = DisplayController.panelManager, mgr.tryLockAccess() else {
-//                    return
-//                }
-//                defer { mgr.unlockAccess() }
-                self?.setItemStyles()
-            }.store(in: &observers)
+//        changedItemsPublisher
+//            .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
+//            .sink { [weak self] _ in
+        ////                guard let mgr = DisplayController.panelManager, mgr.tryLockAccess() else {
+        ////                    return
+        ////                }
+        ////                defer { mgr.unlockAccess() }
+//                self?.setItemStyles()
+//            }.store(in: &observers)
     }
 
     // MARK: Internal
