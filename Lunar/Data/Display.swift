@@ -587,9 +587,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             mirroredBeforeBlackOut = ((try container.decodeIfPresent(Bool.self, forKey: .mirroredBeforeBlackOut)) ?? false)
         }
 
-        blackOutMirroringAllowed =
-            ((try container.decodeIfPresent(Bool.self, forKey: .blackOutMirroringAllowed)) ?? supportsGammaByDefault) &&
-            supportsGammaByDefault
+        if isFakeDummy {
+            blackOutMirroringAllowed = true
+        } else {
+            blackOutMirroringAllowed =
+                ((try container.decodeIfPresent(Bool.self, forKey: .blackOutMirroringAllowed)) ?? supportsGammaByDefault) &&
+                supportsGammaByDefault
+        }
         blackOutEnabled = ((try container.decodeIfPresent(Bool.self, forKey: .blackOutEnabled)) ?? false) && !isIndependentDummy &&
             (isNative ? (brightness.uint16Value <= 1) : true)
         if let value = (try container.decodeIfPresent(UInt16.self, forKey: .brightnessBeforeBlackout)?.ns) {
@@ -690,7 +694,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 rotation = CGDisplayRotation(id).intround
                 enhanced = Self.getWindowController(id, type: "hdr") != nil
             }
-            blackOutMirroringAllowed = supportsGammaByDefault
+            blackOutMirroringAllowed = supportsGammaByDefault || isFakeDummy
         }
 
         if isLEDCinema() || isThunderbolt() {
@@ -1036,6 +1040,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Atomic static var applySource = true
 
     static let dummyNamePattern = "dummy|[^u]28e850|^28e850".r!
+    static let notDummyNamePattern = "not a dummy".r!
 
     // MARK: Initializers
 
@@ -1132,6 +1137,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     var observers: Set<AnyCancellable> = []
 
+    var primaryMirrorScreenFetcher: Repeater?
+
     lazy var primaryMirrorScreen: NSScreen? = {
         NotificationCenter.default
             .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
@@ -1139,13 +1146,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 self.primaryMirrorScreen = self.getPrimaryMirrorScreen()
-                asyncEvery(
-                    2.seconds,
-                    uniqueTaskKey: "primaryMirrorScreen-\(self.serial)",
-                    runs: 5,
-                    skipIfExists: false,
-                    queue: mainQueue
-                ) { [weak self] _ in
+                self.primaryMirrorScreenFetcher = Repeater(every: 2, times: 5, name: "primaryMirrorScreen-\(self.serial)") { [weak self] in
                     guard let self = self else { return }
                     self.primaryMirrorScreen = self.getPrimaryMirrorScreen()
                 }
@@ -1277,6 +1278,19 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     var cornerRadiusBeforeNotchDisable: NSNumber?
     var cornerRadiusApplier: Repeater?
+
+    lazy var blackoutDisablerPublisher: PassthroughSubject<Bool, Never> = {
+        let p = PassthroughSubject<Bool, Never>()
+        p.debounce(for: .seconds(2), scheduler: RunLoop.main)
+            .sink { [weak self] shouldDisable in
+                guard shouldDisable, let self = self, !self.isInMirrorSet else { return }
+                lastBlackOutToggleDate = .distantPast
+                self.disableBlackOut()
+            }
+            .store(in: &observers)
+
+        return p
+    }()
 
     @Published @objc dynamic var subzero = false {
         didSet {
@@ -1600,6 +1614,26 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         return false
     }
 
+    var zeroGammaTask: Repeater? {
+        get { Self.getThreadDictValue(id, type: "zero-gamma") as? Repeater }
+        set { Self.setThreadDictValue(id, type: "zero-gamma", value: newValue) }
+    }
+
+    var zeroGammaWarmupTask: Repeater? {
+        get { Self.getThreadDictValue(id, type: "zero-gamma-warmup") as? Repeater }
+        set { Self.setThreadDictValue(id, type: "zero-gamma-warmup", value: newValue) }
+    }
+
+    var blackOutEnforceTask: Repeater? {
+        get { Self.getThreadDictValue(id, type: "blackout-enforce") as? Repeater }
+        set { Self.setThreadDictValue(id, type: "blackout-enforce", value: newValue) }
+    }
+
+    var resolutionBlackoutResetterTask: Repeater? {
+        get { Self.getThreadDictValue(id, type: "resolution-blackout-resetter") as? Repeater }
+        set { Self.setThreadDictValue(id, type: "resolution-blackout-resetter", value: newValue) }
+    }
+
     var testWindowController: NSWindowController? {
         get { Self.getWindowController(id, type: "test") }
         set { Self.setWindowController(id, type: "test", windowController: newValue) }
@@ -1893,6 +1927,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         return NSScreen.screens.first(where: { screen in screen.hasDisplayID(primaryID) })
     }
 
+    func refetchScreens() {
+        primaryMirrorScreen = getPrimaryMirrorScreen()
+        screen = getScreen()
+    }
+
     func getPowerOffEnabled(hasDDC: Bool? = nil) -> Bool {
         guard active else { return false }
         if blackOutEnabled { return true }
@@ -1964,6 +2003,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         if AppDelegate.optionKeyPressed, AppDelegate.shiftKeyPressed {
             let blackOutEnabled = otherDisplays.contains(where: \.blackOutEnabled)
             otherDisplays.forEach {
+                lastBlackOutToggleDate = .distantPast
                 displayController.blackOut(
                     display: $0.id,
                     state: blackOutEnabled ? .off : .on,
@@ -2030,7 +2070,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     var preciseContrastBeforeAppPreset = 0.5
 
-    @objc dynamic lazy var isDummy: Bool = (Self.dummyNamePattern.matches(name) || vendor == .dummy) && vendor != .samsung
+    @objc dynamic lazy var isDummy: Bool = (Self.dummyNamePattern.matches(name) || vendor == .dummy) && vendor != .samsung && !Self
+        .notDummyNamePattern.matches(name)
+    @objc dynamic lazy var isFakeDummy: Bool = (Self.notDummyNamePattern.matches(name) && vendor == .dummy)
 
     @objc dynamic lazy var otherDisplays: [Display] = displayController.activeDisplayList.filter { $0.serial != serial }
 
@@ -2133,7 +2175,29 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         return p
     }()
 
-    var panelModeBeforeMirroring: CGDisplayMode?
+//    lazy var secondaryMirrorScreenID: CGDirectDisplayID? = {
+//        NotificationCenter.default
+//            .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
+//            .debounce(for: .seconds(2), scheduler: RunLoop.main)
+//            .sink { [weak self] _ in
+//                guard let self = self else { return }
+//                self.secondaryMirrorScreenID = self.getSecondaryMirrorScreenID()
+//                asyncEvery(
+//                    2.seconds,
+//                    uniqueTaskKey: "secondaryMirrorScreen-\(self.serial)",
+//                    runs: 5,
+//                    skipIfExists: false,
+//                    queue: mainQueue
+//                ) { [weak self] _ in
+//                    guard let self = self else { return }
+//                    self.secondaryMirrorScreenID = self.getSecondaryMirrorScreenID()
+//                }
+//            }
+//            .store(in: &observers)
+//
+//        return getSecondaryMirrorScreenID()
+//    }()
+    var screenFetcher: Repeater?
 
     var alternativeControlForAppleNative: Control? = nil {
         didSet {
@@ -2224,7 +2288,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var isInHardwareMirrorSet: Bool {
         guard isInMirrorSet else { return false }
 
-        if let primary = primaryMirrorScreen {
+        if let primary = getPrimaryMirrorScreen() {
             return !primary.isDummy
         }
         return true
@@ -2968,6 +3032,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 }
             }
 
+            guard !isBuiltin else { return }
             guard DDC.apply, !lockedContrast, force || contrast != oldValue else {
                 log.verbose(
                     "Won't apply contrast to \(description)",
@@ -3296,29 +3361,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-//    lazy var secondaryMirrorScreenID: CGDirectDisplayID? = {
-//        NotificationCenter.default
-//            .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
-//            .debounce(for: .seconds(2), scheduler: RunLoop.main)
-//            .sink { [weak self] _ in
-//                guard let self = self else { return }
-//                self.secondaryMirrorScreenID = self.getSecondaryMirrorScreenID()
-//                asyncEvery(
-//                    2.seconds,
-//                    uniqueTaskKey: "secondaryMirrorScreen-\(self.serial)",
-//                    runs: 5,
-//                    skipIfExists: false,
-//                    queue: mainQueue
-//                ) { [weak self] _ in
-//                    guard let self = self else { return }
-//                    self.secondaryMirrorScreenID = self.getSecondaryMirrorScreenID()
-//                }
-//            }
-//            .store(in: &observers)
-//
-//        return getSecondaryMirrorScreenID()
-//    }()
-
     lazy var screen: NSScreen? = {
         NotificationCenter.default
             .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
@@ -3326,13 +3368,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 self.screen = self.getScreen()
-                asyncEvery(
-                    2.seconds,
-                    uniqueTaskKey: "screen-\(self.serial)",
-                    runs: 5,
-                    skipIfExists: false,
-                    queue: mainQueue
-                ) { [weak self] _ in
+                self.screenFetcher = Repeater(every: 2, times: 5, name: "screen-\(self.serial)") { [weak self] in
                     guard let self = self else { return }
                     self.screen = self.getScreen()
                 }
@@ -3386,6 +3422,28 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 (key, value.userValues)
             }, uniquingKeysWith: first(this:other:)
         )
+    }
+
+    static func reconfigure(tries: Int = 20, _ action: (MPDisplayMgr) -> Void) {
+        guard let manager = DisplayController.panelManager, DisplayController.tryLockManager(tries: tries) else {
+            return
+        }
+
+        manager.notifyWillReconfigure()
+        action(manager)
+        manager.notifyReconfigure()
+        manager.unlockAccess()
+    }
+
+    static func reconfigure(panel: MPDisplay, tries: Int = 20, _ action: (MPDisplay) -> Void) {
+        guard let manager = DisplayController.panelManager, DisplayController.tryLockManager(tries: tries) else {
+            return
+        }
+
+        manager.notifyWillReconfigure()
+        action(panel)
+        manager.notifyReconfigure()
+        manager.unlockAccess()
     }
 
     func setNotchState() {
@@ -3620,14 +3678,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func reconfigure(_ action: (MPDisplay) -> Void) {
-        guard let panel = panel, let manager = DisplayController.panelManager,
-              manager.tryLockAccess()
-        else { return }
-
-        manager.notifyWillReconfigure()
-        action(panel)
-        manager.notifyReconfigure()
-        manager.unlockAccess()
+        guard let panel = panel else { return }
+        Self.reconfigure(panel: panel, action)
     }
 
     func reapplyGamma() {
@@ -4824,7 +4876,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         mainAsyncAfter(ms: 1000) { [weak self] in
             guard let self = self else { return }
             self.blackOutEnabled = false
-            self.blackOutMirroringAllowed = self.supportsGammaByDefault
+            self.blackOutMirroringAllowed = self.supportsGammaByDefault || self.isFakeDummy
             self.mirroredBeforeBlackOut = false
 
             self.preciseBrightnessContrast = 0.7
@@ -4849,7 +4901,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         faceLightContrast = 90.ns
 
         blackOutEnabled = false
-        blackOutMirroringAllowed = supportsGammaByDefault
+        blackOutMirroringAllowed = supportsGammaByDefault || isFakeDummy
         mirroredBeforeBlackOut = false
 
         userContrast[displayController.adaptiveModeKey]?.removeAll()

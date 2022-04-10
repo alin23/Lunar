@@ -721,9 +721,6 @@ enum DDC {
         DDC.sync(barrier: true) {
             #if !DEBUG
                 if Defaults[.secondPhase] == nil || Defaults[.secondPhase] == true {
-                    #if DEBUG
-                        print("CRACKED DDC!!")
-                    #endif
                     Thread.sleep(until: .distantFuture)
                 }
             #endif
@@ -832,7 +829,18 @@ enum DDC {
 
         let realName = (name ?? Display.printableName(id)).lowercased()
         let vendorID = CGDisplayVendorNumber(id)
-        return (realName =~ Display.dummyNamePattern || vendorID == DUMMY_VENDOR_ID) && vendorID != Display.Vendor.samsung.rawValue.u32
+        return (realName =~ Display.dummyNamePattern || vendorID == DUMMY_VENDOR_ID) && vendorID != Display.Vendor.samsung.rawValue
+            .u32 && realName !~ Display.notDummyNamePattern
+    }
+
+    static func isFakeDummyDisplay(_ id: CGDirectDisplayID, name: String? = nil) -> Bool {
+        guard !isGeneric(id) else {
+            return false
+        }
+
+        let realName = (name ?? Display.printableName(id)).lowercased()
+        let vendorID = CGDisplayVendorNumber(id)
+        return (realName =~ Display.notDummyNamePattern && vendorID == DUMMY_VENDOR_ID)
     }
 
     static func isVirtualDisplay(_ id: CGDirectDisplayID, name: String? = nil, checkName: Bool = true) -> Bool {

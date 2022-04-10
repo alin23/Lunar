@@ -1539,16 +1539,21 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             guard displayController.activeDisplayList.contains(where: \.blackOutEnabled) else { return }
 
             log.warning("Command key pressed 8 times in a row, disabling BlackOut forcefully!")
-            displayController.activeDisplayList.forEach {
-                $0.resetSoftwareControl()
-                displayController.blackOut(display: $0.id, state: .off)
-                $0.blackOutEnabled = false
-                $0.mirroredBeforeBlackOut = false
-                if $0.brightness.doubleValue <= 10 {
-                    $0.brightness = 50
-                }
-                if $0.contrast.doubleValue <= 10 {
-                    $0.contrast = 50
+            displayController.activeDisplayList.map(\.id).enumerated().forEach { i, id in
+                mainAsyncAfter(ms: i * 1000) {
+                    guard let d = displayController.activeDisplays[id] else { return }
+                    log.warning("Disabling BlackOut forcefully for \(d.description)")
+                    d.resetSoftwareControl()
+                    lastBlackOutToggleDate = .distantPast
+                    displayController.blackOut(display: d.id, state: .off)
+                    d.blackOutEnabled = false
+                    d.mirroredBeforeBlackOut = false
+                    if d.brightness.doubleValue <= 10 {
+                        d.brightness = 50
+                    }
+                    if d.contrast.doubleValue <= 10 {
+                        d.contrast = 50
+                    }
                 }
             }
         }
