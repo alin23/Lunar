@@ -109,6 +109,10 @@ class SettingsPopoverController: NSViewController {
         }
     }
 
+    override func viewDidAppear() {
+        resolutionsDropdown?.setItemStyles()
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         adaptiveBrightnessModePublisher.sink { [weak self] change in

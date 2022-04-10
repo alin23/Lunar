@@ -9977,9 +9977,6 @@ in the Quick Actions menu</string>
                                 </buttonCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="boolean" keyPath="circle" value="NO"/>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="pageType">
-                                        <integer key="value" value="3"/>
-                                    </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="color">
                                         <color key="value" name="Button BG"/>
                                     </userDefinedRuntimeAttribute>

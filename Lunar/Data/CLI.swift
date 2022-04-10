@@ -1367,14 +1367,17 @@ struct Lunar: ParsableCommand {
                 filter: master
             ).first?.id
 
-            for display in displays {
-                lastBlackOutToggleDate = .distantPast
-                displayController.blackOut(
-                    display: display.id,
-                    state: state == .enable ? .on : .off,
-                    mirroringAllowed: !noMirror,
-                    master: master
-                )
+            for (i, display) in displays.enumerated() {
+                mainAsyncAfter(ms: i * 3000) {
+                    log.info("Turning \(state == .enable ? "off" : "on") \(display)")
+                    lastBlackOutToggleDate = .distantPast
+                    displayController.blackOut(
+                        display: display.id,
+                        state: state == .enable ? .on : .off,
+                        mirroringAllowed: !noMirror,
+                        master: master
+                    )
+                }
             }
             cliExit(0)
         }
