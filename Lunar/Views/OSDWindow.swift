@@ -5,10 +5,10 @@ import SwiftUI
 
 // MARK: - OSDWindow
 
-open class OSDWindow: NSWindow {
+open class OSDWindow: NSWindow, NSWindowDelegate {
     // MARK: Lifecycle
 
-    convenience init(swiftuiView: AnyView, display: Display) {
+    convenience init(swiftuiView: AnyView, display: Display, releaseWhenClosed: Bool) {
         self.init(contentRect: .zero, styleMask: .fullSizeContentView, backing: .buffered, defer: true, screen: display.screen)
         self.display = display
         contentViewController = NSHostingController(rootView: swiftuiView)
@@ -26,6 +26,8 @@ open class OSDWindow: NSWindow {
         hasShadow = false
         styleMask = [.fullSizeContentView]
         hidesOnDeactivate = false
+        isReleasedWhenClosed = releaseWhenClosed
+        delegate = self
     }
 
     // MARK: Open
@@ -60,6 +62,15 @@ open class OSDWindow: NSWindow {
                 self?.close()
             }
         }
+    }
+
+    // MARK: Public
+
+    public func windowShouldClose(_ sender: NSWindow) -> Bool {
+        guard isReleasedWhenClosed else { return true }
+        windowController?.window = nil
+        windowController = nil
+        return true
     }
 
     // MARK: Internal
@@ -453,11 +464,11 @@ struct AutoBlackOutOSDView: View {
                     .foregroundColor(.secondary)
                 Text("esc")
                     .font(.system(size: 14, weight: .regular, design: .monospaced))
-                    .foregroundColor(colors.inverted)
+                    .foregroundColor(.white)
                     .padding(.top, 1)
                     .padding(.bottom, 2)
                     .padding(.horizontal, 4)
-                    .background(RoundedRectangle(cornerRadius: 4, style: .continuous).fill(Color.primary))
+                    .background(RoundedRectangle(cornerRadius: 4, style: .continuous).fill(.black))
                 Text("to abort")
                     .font(.system(size: 14, weight: .regular, design: .rounded))
                     .foregroundColor(.secondary)
@@ -542,7 +553,11 @@ extension Display {
         mainAsync { [weak self] in
             guard let self = self else { return }
             if self.osdWindowController == nil {
-                self.osdWindowController = OSDWindow(swiftuiView: AnyView(BrightnessOSDView(display: self)), display: self).wc
+                self.osdWindowController = OSDWindow(
+                    swiftuiView: AnyView(BrightnessOSDView(display: self)),
+                    display: self,
+                    releaseWhenClosed: false
+                ).wc
             }
 
             guard let osd = self.osdWindowController?.window as? OSDWindow else { return }
@@ -558,7 +573,10 @@ extension Display {
                 return
             }
             self.autoBlackoutOsdWindowController?.close()
-            self.autoBlackoutOsdWindowController = OSDWindow(swiftuiView: AnyView(AutoBlackOutOSDView(display: self)), display: self).wc
+            self.autoBlackoutOsdWindowController = OSDWindow(
+                swiftuiView: AnyView(AutoBlackOutOSDView(display: self).colors(darkMode ? .dark : .light)),
+                display: self, releaseWhenClosed: true
+            ).wc
 
             guard let osd = self.autoBlackoutOsdWindowController?.window as? OSDWindow else { return }
 

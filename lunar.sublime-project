@@ -45,7 +45,7 @@
 			},
 			"sourcekit-lsp":
 			{
-				"enabled": true,
+				"enabled": false,
 			},
 			"lua":
 			{
