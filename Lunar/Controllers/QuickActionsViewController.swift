@@ -164,31 +164,32 @@ struct DisplayRowView: View {
 
     var body: some View {
         VStack(spacing: 4) {
+            let xdrSelectorShown = display.supportsEnhance && showXDRSelector
             if showPowerInQuickActions, display.getPowerOffEnabled() {
                 ZStack(alignment: .topTrailing) {
                     Text(display.name)
                         .font(.system(size: 22, weight: .black))
                         .padding(6)
                         .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(colors.bg.primary.opacity(0.5)))
-                        .padding(.bottom, display.supportsEnhance ? 0 : 6)
-                        .padding(.top, 12)
+                        .padding(.bottom, xdrSelectorShown ? 0 : 6)
+
                     PowerOffButtonView(display: display)
-                        .offset(x: 10, y: 4)
+                        .offset(x: 10, y: -8)
                 }
             } else {
                 Text(display.name)
                     .font(.system(size: 22, weight: .black))
-                    .padding(.bottom, display.supportsEnhance ? 0 : 6)
+                    .padding(.bottom, xdrSelectorShown ? 0 : 6)
             }
 
-            if display.supportsEnhance, showXDRSelector { sdrXdrSelector }
+            if xdrSelectorShown { sdrXdrSelector }
 
             if display.noDDCOrMergedBrightnessContrast {
                 BigSurSlider(
                     percentage: $display.preciseBrightnessContrast.f,
                     image: "sun.max.fill",
-                    color: colors.accent,
-                    backgroundColor: colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4),
+                    colorBinding: .constant(colors.accent),
+                    backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
                     showValue: $showSliderValues
                 )
                 softwareSliders
@@ -196,16 +197,16 @@ struct DisplayRowView: View {
                 BigSurSlider(
                     percentage: $display.preciseBrightness.f,
                     image: "sun.max.fill",
-                    color: colors.accent,
-                    backgroundColor: colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4),
+                    colorBinding: .constant(colors.accent),
+                    backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
                     showValue: $showSliderValues
                 )
                 softwareSliders
                 BigSurSlider(
                     percentage: $display.preciseContrast.f,
                     image: "circle.righthalf.fill",
-                    color: colors.accent,
-                    backgroundColor: colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4),
+                    colorBinding: .constant(colors.accent),
+                    backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
                     showValue: $showSliderValues
                 )
             }
@@ -214,8 +215,8 @@ struct DisplayRowView: View {
                 BigSurSlider(
                     percentage: $display.preciseVolume.f,
                     image: "speaker.2.fill",
-                    color: colors.accent,
-                    backgroundColor: colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4),
+                    colorBinding: .constant(colors.accent),
+                    backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
                     showValue: $showSliderValues
                 )
             }
@@ -383,7 +384,8 @@ struct QuickActionsLayoutView: View {
                 .padding(.leading)
                 .disabled(!showBrightnessMenuBar)
             }
-        }.frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -592,6 +594,14 @@ struct TextInputView: View {
     }
 }
 
+// MARK: - MenuDensity
+
+enum MenuDensity: String, Codable, Defaults.Serializable {
+    case clean
+    case comfortable
+    case dense
+}
+
 // MARK: - QuickActionsMenuView
 
 struct QuickActionsMenuView: View {
@@ -605,9 +615,11 @@ struct QuickActionsMenuView: View {
     @Default(.showFooterOnHover) var showFooterOnHover
     @Default(.showOptionsMenu) var showOptionsMenu
     @Default(.popoverClosed) var popoverClosed
+    @Default(.menuDensity) var menuDensity
 
     @Default(.showBrightnessMenuBar) var showBrightnessMenuBar
     @Default(.showOnlyExternalBrightnessMenuBar) var showOnlyExternalBrightnessMenuBar
+    @Default(.showAdditionalInfo) var showAdditionalInfo
 
     @State var displays: [Display] = displayController.activeDisplayList
     @State var cursorDisplay: Display? = displayController.cursorDisplay
@@ -617,6 +629,17 @@ struct QuickActionsMenuView: View {
     @State var footerOpacity: CGFloat = 1.0
 
     @EnvironmentObject var env: EnvState
+
+    @State var additionalInfoButtonOpacity: CGFloat = 0.3
+
+    @Namespace var namespace
+
+    var menuWidth: CGFloat {
+        showStandardPresets || showCustomPresets || !showHeaderOnHover || !showFooterOnHover || showAdditionalInfo || headerOpacity > 0 ||
+            footerOpacity > 0
+            ? MENU_WIDTH
+            : MENU_WIDTH - 80
+    }
 
     var modeSelector: some View {
         let titleBinding = Binding<String>(
@@ -712,34 +735,86 @@ struct QuickActionsMenuView: View {
     }
 
     var footer: some View {
-        HStack {
-            SwiftUI.Button("Preferences") { appDelegate!.showPreferencesWindow(sender: nil) }
-                .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-                .font(.system(size: 12, weight: .medium, design: .monospaced))
+        Group {
+            HStack {
+                SwiftUI.Button("Preferences") { appDelegate!.showPreferencesWindow(sender: nil) }
+                    .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .fixedSize()
 
-            Spacer()
+                if !showAdditionalInfo {
+                    SwiftUI.Button("App info") {
+                        withAnimation(.fastSpring) {
+                            showAdditionalInfo = true
+                        }
+                    }
+                    .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .fixedSize()
+                    .matchedGeometryEffect(id: "additional-info-button", in: namespace)
+                }
+                Spacer()
 
-            SwiftUI.Button("Restart") { appDelegate!.restartApp(appDelegate!) }
-                .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                SwiftUI.Button("Restart") { appDelegate!.restartApp(appDelegate!) }
+                    .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .fixedSize()
 
-            SwiftUI.Button("Quit") { NSApplication.shared.terminate(nil) }
-                .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-                .font(.system(size: 12, weight: .medium, design: .monospaced))
-        }
-        .padding(.horizontal, MENU_HORIZONTAL_PADDING)
-        .opacity(showFooterOnHover ? footerOpacity : 1.0)
-        .frame(height: footerOpacity == 0.0 ? 8 : nil)
-        .contentShape(Rectangle())
-        .onChange(of: showFooterOnHover) { showOnHover in
-            withAnimation(.fastTransition) { footerOpacity = showOnHover ? 0.0 : 1.0 }
-        }
-        .onHover { hovering in
-            guard showFooterOnHover else {
-                footerOpacity = 1.0
-                return
+                SwiftUI.Button("Quit") { NSApplication.shared.terminate(nil) }
+                    .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .fixedSize()
             }
-            withAnimation(.fastTransition) { footerOpacity = hovering ? 1.0 : 0.0 }
+            .padding(.horizontal, MENU_HORIZONTAL_PADDING)
+            .opacity(showFooterOnHover ? footerOpacity : 1.0)
+            .frame(maxWidth: .infinity, maxHeight: footerOpacity == 0.0 ? 8 : nil)
+            .contentShape(Rectangle())
+            .onChange(of: showFooterOnHover) { showOnHover in
+                withAnimation(.fastTransition) { footerOpacity = showOnHover ? 0.0 : 1.0 }
+            }
+            .onHover { hovering in
+                guard showFooterOnHover else {
+                    footerOpacity = 1.0
+                    return
+                }
+
+                guard hovering else {
+                    footerHider = mainAsyncAfter(ms: 500) {
+                        withAnimation(.fastTransition) { footerOpacity = 0.0 }
+                    }
+                    return
+                }
+                footerHider = nil
+                withAnimation(.fastTransition) { footerOpacity = 1.0 }
+            }
+
+            if let appDelegate = appDelegate, showAdditionalInfo {
+                Divider()
+                    .padding(.top, 10 * footerOpacity)
+                    .padding(.bottom, 10)
+                VStack(alignment: .leading, spacing: 6) {
+                    Toggle("Hide app info", isOn: $showAdditionalInfo.animation(.fastSpring))
+                        .toggleStyle(DetailToggleStyle(style: .circle))
+                        .foregroundColor(colors.gray)
+                        .font(.system(size: 12, weight: .semibold))
+                        .fixedSize()
+                        .matchedGeometryEffect(id: "additional-info-button", in: namespace)
+                    LicenseView()
+                    VersionView(updater: appDelegate.updater)
+                    MenuDensityView()
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 25)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .onAppear {
+            if Defaults[.launchCount] == 1 {
+                withAnimation(.spring().delay(1.0)) { showAdditionalInfo = true }
+            }
+            if Defaults[.launchCount] == 2 {
+                withAnimation(.spring().delay(1.0)) { showAdditionalInfo = false }
+            }
         }
     }
 
@@ -747,19 +822,19 @@ struct QuickActionsMenuView: View {
         let op = (showHeaderOnHover && !showOptionsMenu) ? headerOpacity : 1.0
         return VStack(spacing: 0) {
             HStack {
-                modeSelector
+                modeSelector.fixedSize()
                 Spacer()
-                topRightButtons
+                topRightButtons.fixedSize()
             }
             .padding(.horizontal, 10)
-            .padding(.top, 10)
+            .padding(.top, 10 * op)
             .padding(.bottom, 10 * op)
             .opacity(op)
         }
         .background(Color.primary.opacity((colorScheme == .dark ? 0.03 : 0.05) * op))
-        .onHover { hovering in
-            withAnimation(.fastTransition) { headerOpacity = hovering ? 1.0 : 0.0 }
-        }
+        .padding(.bottom, 10 * op)
+        .onHover(perform: handleHeaderTransition(hovering:))
+        .onChange(of: showOptionsMenu, perform: handleHeaderTransition(hovering:))
     }
 
     var content: some View {
@@ -789,19 +864,21 @@ struct QuickActionsMenuView: View {
     }
 
     var body: some View {
+        let op = (showFooterOnHover && !showAdditionalInfo) ? footerOpacity : 1.0
         GeometryReader { _ in
             VStack {
                 content
                 footer
             }
-            .frame(width: MENU_WIDTH, alignment: .top)
+            .frame(width: menuWidth, alignment: .top)
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .padding(.horizontal, MENU_HORIZONTAL_PADDING)
-            .padding(.bottom, 40)
+            .padding(.bottom, op < 1 ? 20 : 40)
             .padding(.top, 0)
             .background(bg, alignment: .top)
             .onAppear { setup() }
             .onChange(of: popoverClosed) { closed in if !closed { setup() }}
+            .frame(maxWidth: .infinity, alignment: .center)
         }
         .onTapGesture {
             env.recording = false
@@ -822,6 +899,22 @@ struct QuickActionsMenuView: View {
         }
     }
 
+    func handleHeaderTransition(hovering: Bool) {
+        guard !showOptionsMenu else {
+            headerOpacity = 1.0
+            return
+        }
+
+        guard hovering else {
+            headerHider = mainAsyncAfter(ms: 500) {
+                withAnimation(.fastTransition) { headerOpacity = 0.0 }
+            }
+            return
+        }
+        headerHider = nil
+        withAnimation(.fastTransition) { headerOpacity = 1.0 }
+    }
+
     func setup() {
         cursorDisplay = dc.cursorDisplay
         displays = dc.nonCursorDisplays
@@ -833,6 +926,18 @@ struct QuickActionsMenuView: View {
                 height: (NSScreen.main?.visibleFrame.height ?? 600) - 50
             ))
     }
+}
+
+var headerHider: DispatchWorkItem? {
+    didSet { oldValue?.cancel() }
+}
+
+var footerHider: DispatchWorkItem? {
+    didSet { oldValue?.cancel() }
+}
+
+extension Defaults.Keys {
+    static let showAdditionalInfo = Key<Bool>("showAdditionalInfo", default: false)
 }
 
 // MARK: - QuickActionsView

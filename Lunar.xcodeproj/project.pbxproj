@@ -17,6 +17,8 @@
 		C7138D8D2634AF0500406EE3 /* KeyHolder in Frameworks */ = {isa = PBXBuildFile; productRef = C7138D8C2634AF0500406EE3 /* KeyHolder */; };
 		C7138D962634B02900406EE3 /* Paddle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7138D952634B02900406EE3 /* Paddle.framework */; };
 		C7138D982634B03400406EE3 /* Paddle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7138D952634B02900406EE3 /* Paddle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C714C998280572920061588E /* ProViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C714C997280572920061588E /* ProViews.swift */; };
+		C714C99B2805BDEA0061588E /* SkyLight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C714C99A2805BDEA0061588E /* SkyLight.framework */; };
 		C71F8DB126542E1000C4648A /* GammaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71F8DB026542E1000C4648A /* GammaViewController.swift */; };
 		C71F8DBA265640C400C4648A /* DDCCTLControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71F8DB9265640C400C4648A /* DDCCTLControl.swift */; };
 		C722FB9F271AC83200ED4C94 /* Slider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C722FB9C271AC83200ED4C94 /* Slider.swift */; };
@@ -215,6 +217,8 @@
 
 /* Begin PBXFileReference section */
 		C7138D952634B02900406EE3 /* Paddle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Paddle.framework; sourceTree = "<group>"; };
+		C714C997280572920061588E /* ProViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProViews.swift; sourceTree = "<group>"; };
+		C714C99A2805BDEA0061588E /* SkyLight.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SkyLight.framework; path = ../../../../../System/Library/PrivateFrameworks/SkyLight.framework; sourceTree = "<group>"; };
 		C7151941224E34BA0024C6F6 /* DDC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DDC.h; sourceTree = "<group>"; };
 		C7151943224E34BA0024C6F6 /* Lunar-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Lunar-Bridging-Header.h"; sourceTree = "<group>"; };
 		C7151944224E34BA0024C6F6 /* DDC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDC.swift; sourceTree = "<group>"; };
@@ -415,6 +419,7 @@
 				C7B5E8592548B3F900530B47 /* Defaults in Frameworks */,
 				C75FFA0A266D24AA0034DDD6 /* Burritos in Frameworks */,
 				C7138D8D2634AF0500406EE3 /* KeyHolder in Frameworks */,
+				C714C99B2805BDEA0061588E /* SkyLight.framework in Frameworks */,
 				C73CC6A5246161E6003B2658 /* Charts in Frameworks */,
 				C73B9A0D25FB9AD7003184FC /* Glob in Frameworks */,
 			);
@@ -558,6 +563,7 @@
 				C74820F926DE6CFA00556EA8 /* PageNavigationControl.swift */,
 				C7AF321A26F62D3B00AC14AF /* Schedule.swift */,
 				C784143727DDFBC400E14941 /* OSDWindow.swift */,
+				C714C997280572920061588E /* ProViews.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -674,6 +680,7 @@
 		C7CFEA241FD3787B000AC4A6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C714C99A2805BDEA0061588E /* SkyLight.framework */,
 				C750E03927C6C1BC00AD650C /* Sparkle.framework */,
 				C7C5AD9926C5AD5400D68B7F /* MonitorPanel.framework */,
 				C7E896DC2652C37E0079A328 /* CoreBrightness.framework */,
@@ -1050,6 +1057,7 @@
 				C76B775D26445C9B007CAAC5 /* MacToggle.swift in Sources */,
 				C731E85827E1D5780016B36D /* Defaults+Workaround.swift in Sources */,
 				C77200031FF072CB0078E155 /* ScrollableBrightness.swift in Sources */,
+				C714C998280572920061588E /* ProViews.swift in Sources */,
 				C7E0737C259CB2FA0019C9C2 /* LocationMode.swift in Sources */,
 				C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */,
 				C74D07C8265BA68D00291FC2 /* LoginServiceKit.swift in Sources */,

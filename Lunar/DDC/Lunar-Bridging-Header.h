@@ -28,6 +28,7 @@
 - (BOOL)_shouldDrawTextWithDisabledAppearance;
 @end
 
+extern int SLSSetDisplayContrast(float contrast);
 double CoreDisplay_Display_GetUserBrightness(CGDirectDisplayID display);
 double CoreDisplay_Display_GetLinearBrightness(CGDirectDisplayID display);
 double CoreDisplay_Display_GetDynamicLinearBrightness(CGDirectDisplayID display);
