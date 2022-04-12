@@ -3424,6 +3424,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         )
     }
 
+    var shouldDetectI2C: Bool { ddcEnabled && !isSmartBuiltin && supportsGammaByDefault && !isDummy }
+
     static func reconfigure(tries: Int = 20, _ action: (MPDisplayMgr) -> Void) {
         guard let manager = DisplayController.panelManager, DisplayController.tryLockManager(tries: tries) else {
             return
@@ -3940,8 +3942,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func detectI2C() {
         ensureAudioIdentifier()
-        guard let ddcEnabled = enabledControls[.ddc], ddcEnabled, !isSmartBuiltin, supportsGammaByDefault, !isDummy
-        else {
+        guard shouldDetectI2C else {
             if isSmartBuiltin {
                 log.debug("Built-in smart displays don't support DDC, ignoring for display \(description)")
             }
@@ -3954,6 +3955,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             mainThread { hasI2C = false }
             return
         }
+
         if panel?.isTV ?? false {
             log.warning("This could be a TV, and TVs don't support DDC: \(description)")
         }
@@ -3983,9 +3985,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             #endif
         }()
 
-        mainAsync {
-            self.hasI2C = i2c
-        }
+        mainAsync { self.hasI2C = i2c }
     }
 
     func startI2CDetection() {

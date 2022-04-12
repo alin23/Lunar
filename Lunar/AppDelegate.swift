@@ -252,6 +252,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var enableSentryObserver: Cancellable?
 
+    var hdrFixer = AppDelegate.fixHDR()
+
     var currentPage: Int = Page.display.rawValue {
         didSet {
             log.verbose("Current Page: \(currentPage)")
@@ -1842,6 +1844,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         initCacheTransitionLogging()
+        Defaults[.launchCount] += 1
 
         startTime = Date()
         lastBlackOutToggleDate = Date()
