@@ -8,8 +8,8 @@
 
 import Cocoa
 
-let mauve = #colorLiteral(red: 0.2391158383, green: 0.189759237, blue: 0.2980392157, alpha: 1)
-let darkMauve = #colorLiteral(red: 0.1636947905, green: 0.1439115233, blue: 0.1629818798, alpha: 1)
+let mauve = #colorLiteral(red: 0.2392156863, green: 0.1882352941, blue: 0.2980392157, alpha: 1)
+let darkMauve = #colorLiteral(red: 0.1647058824, green: 0.1450980392, blue: 0.1647058824, alpha: 1)
 let blackMauve = #colorLiteral(red: 0.09052981044, green: 0.08183357279, blue: 0.0944940476, alpha: 1)
 let violet = #colorLiteral(red: 0.2888328322, green: 0.2888328322, blue: 0.3392857143, alpha: 1)
 let lunarYellow = #colorLiteral(red: 1, green: 0.8352941176, blue: 0.5254901961, alpha: 1)
