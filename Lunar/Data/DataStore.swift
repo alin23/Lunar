@@ -49,6 +49,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .accessibilityPermissionsGranted,
     .cliInstalled,
     .lunarProActive,
+    .lunarProOnTrial,
     .lunarProAccessDialogShown,
     .completedOnboarding,
     .showTwoSchedules,
@@ -81,6 +82,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .didSwipeRight,
     .didSwipeToHotkeys,
     .disableControllerVideo,
+    .launchCount,
     .firstRun,
     .firstRunAfterLunar4Upgrade,
     .firstRunAfterM1DDCUpgrade,
@@ -127,6 +129,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .jitterAfterWake,
     .wakeReapplyTries,
     .ddcSleepFactor,
+    .menuDensity,
 
     .brightnessKeysSyncControl,
     .brightnessKeysControl,
@@ -160,6 +163,8 @@ let NON_RESETTABLE_SETTINGS: [Defaults.Keys] = [
     .sunrise,
     .sunset,
     .secure,
+    .lunarProActive,
+    .lunarProOnTrial,
 ]
 
 // MARK: - DataStore
@@ -620,6 +625,7 @@ func initCache() {
     cacheKey(.showSliderValues)
     cacheKey(.showAdvancedDisplaySettings)
     cacheKey(.lunarProActive)
+    cacheKey(.lunarProOnTrial)
     cacheKey(.lunarProAccessDialogShown)
     cacheKey(.completedOnboarding)
     cacheKey(.showTwoSchedules)
@@ -660,6 +666,7 @@ func initCache() {
     cacheKey(.volumeStep)
     cacheKey(.syncPollingSeconds)
     cacheKey(.ddcSleepFactor)
+    cacheKey(.menuDensity)
     cacheKey(.sensorPollingSeconds)
     cacheKey(.adaptiveBrightnessMode)
     cacheKey(.colorScheme)
@@ -701,6 +708,7 @@ func initCache() {
 
 extension Defaults.Keys {
     static let firstRun = Key<Bool?>("firstRun", default: nil)
+    static let launchCount = Key<Int>("launchCount", default: 0)
     static let secondPhase = Key<Bool?>("secondPhase", default: nil)
     static let firstRunAfterLunar4Upgrade = Key<Bool?>("firstRunAfterLunar4Upgrade", default: nil)
     static let firstRunAfterDefaults5Upgrade = Key<Bool?>("firstRunAfterDefaults5Upgrade", default: nil)
@@ -752,6 +760,7 @@ extension Defaults.Keys {
     static let accessibilityPermissionsGranted = Key<Bool>("accessibilityPermissionsGranted", default: false)
     static let cliInstalled = Key<Bool>("cliInstalled", default: false)
     static let lunarProActive = Key<Bool>("lunarProActive", default: true)
+    static let lunarProOnTrial = Key<Bool>("lunarProOnTrial", default: true)
     static let lunarProAccessDialogShown = Key<Bool>("lunarProAccessDialogShown", default: false)
     static let completedOnboarding = Key<Bool>("completedOnboarding", default: false)
     static let showTwoSchedules = Key<Bool>("showTwoSchedules", default: false)
@@ -794,6 +803,7 @@ extension Defaults.Keys {
     static let volumeStep = Key<Int>("volumeStep", default: 6)
     static let syncPollingSeconds = Key<Int>("syncPollingSeconds", default: 0)
     static let ddcSleepFactor = Key<DDCSleepFactor>("ddcSleepFactor", default: .short)
+    static let menuDensity = Key<MenuDensity>("menuDensity", default: .comfortable)
     static let sensorPollingSeconds = Key<Int>("sensorPollingSeconds", default: 2)
     static let adaptiveBrightnessMode = Key<AdaptiveModeKey>("adaptiveBrightnessMode", default: .sync)
     static let colorScheme = Key<ColorScheme>("colorScheme", default: .system)
@@ -835,6 +845,7 @@ extension Defaults.Keys {
 
     static let silentUpdate = Key<Bool>("SUAutomaticallyUpdate", default: false)
     static let checkForUpdate = Key<Bool>("SUEnableAutomaticChecks", default: true)
+    static let updateCheckInterval = Key<Int>("SUScheduledCheckInterval", default: 86400)
     static let apiKey = Key<String>("apiKey", default: "")
     static let listenForRemoteCommands = Key<Bool>("listenForRemoteCommands", default: false)
     static let neverAskAboutXDR = Key<Bool>("neverAskAboutXDR", default: false)

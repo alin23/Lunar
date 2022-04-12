@@ -24,6 +24,7 @@ import SwiftyJSON
 enum AVServiceMatch {
     case byEDIDUUID
     case byProductAttributes
+    case byExclusion
 }
 
 // MARK: - DisplayController
@@ -417,6 +418,10 @@ class DisplayController: ObservableObject {
             return display
         }
 
+        func matchDisplayByExcludingOthers(_ service: io_service_t, displays: [Display]? = nil) -> Display? {
+            nil
+        }
+
         func matchDisplayByProductAttributes(_ service: io_service_t, displays: [Display]? = nil, props: [String: Any]? = nil) -> Display? {
             guard let displayProps = props ?? clcd2Properties(service) else { return nil }
 
@@ -463,6 +468,8 @@ class DisplayController: ObservableObject {
                 return matchDisplayByEDIDUUID(service, displays: displays)
             case .byProductAttributes:
                 return matchDisplayByProductAttributes(service, displays: displays)
+            case .byExclusion:
+                return matchDisplayByExcludingOthers(service, displays: displays)
             }
         }
 
@@ -499,15 +506,41 @@ class DisplayController: ObservableObject {
 
         var clcd2Mapping: ThreadSafeDictionary<Int, CGDirectDisplayID> = ThreadSafeDictionary()
 
+        let DCP_NAMES = ["dcp", "dcpext", "dcpext0", "dcpext1", "dcpext2", "dcpext3", "dcpext4", "dcpext5", "dcpext6", "dcpext7"]
+        let DISP_NAMES = [
+            "disp0",
+            "dispext0",
+            "dispext1",
+            "dispext2",
+            "dispext3",
+            "dispext4",
+            "dispext5",
+            "dispext6",
+            "dispext7",
+            "disp1",
+            "disp2",
+            "disp3",
+            "disp4",
+            "disp5",
+            "disp6",
+            "disp7",
+        ]
+
         func avService(displayID: CGDirectDisplayID, display: Display? = nil, match: AVServiceMatch) -> IOAVService? {
+            guard match != .byExclusion || Set(DDC.avServiceCache.dictionary.keys)
+                .isSuperset(of: activeDisplayList.filter(\.shouldDetectI2C).map(\.id)) else { return nil }
+
             guard !isTestID(displayID), NSScreen.isOnline(displayID),
                   !(display?.badHDMI ?? false),
                   !DDC.isVirtualDisplay(displayID, checkName: false)
             else {
-                log
-                    .info(
-                        "No AVService for display \(displayID): (isOnline: \(NSScreen.isOnline(displayID)), isVirtual: \(DDC.isVirtualDisplay(displayID, checkName: false)))"
+                log.info("""
+                    No AVService for display \(displayID): (
+                        isOnline: \(NSScreen.isOnline(displayID)),
+                        isVirtual: \(DDC.isVirtualDisplay(displayID, checkName: false)),
+                        badHDMI: \(display?.badHDMI ?? false)
                     )
+                """)
                 return nil
             }
 
@@ -518,13 +551,18 @@ class DisplayController: ObservableObject {
                 txIOService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleT600xIO"))
             }
 
-            guard txIOService != 0,
-                  IORegistryEntryGetChildIterator(txIOService, kIOServicePlane, &txIOIterator) == KERN_SUCCESS
+            guard txIOService != 0, IORegistryEntryGetChildIterator(txIOService, kIOServicePlane, &txIOIterator) == KERN_SUCCESS
             else {
-                log
-                    .info(
-                        "No AVService for display \(displayID): (txIOService: \(txIOService), childIteratorErr: \((txIOService != 0) ? IORegistryEntryGetChildIterator(txIOService, kIOServicePlane, &txIOIterator) : KERN_SUCCESS)))"
+                let childIteratorErr = (txIOService != 0)
+                    ? IORegistryEntryGetChildIterator(txIOService, kIOServicePlane, &txIOIterator)
+                    : KERN_SUCCESS
+                log.warning("Can't iterate AppleT810xIO or AppleT600xIO")
+                log.info("""
+                    No AVService for display \(displayID): (
+                        txIOService: \(txIOService),
+                        childIteratorErr: \(childIteratorErr)
                     )
+                """)
                 return nil
             }
 
@@ -534,35 +572,13 @@ class DisplayController: ObservableObject {
 
             var matchedDisplay: Display?
             while case let txIOChild = IOIteratorNext(txIOIterator), txIOChild != 0 {
-                if IOServiceNameMatches(
-                    txIOChild,
-                    names: [
-                        "disp0",
-                        "dispext0",
-                        "dispext1",
-                        "dispext2",
-                        "dispext3",
-                        "dispext4",
-                        "dispext5",
-                        "dispext6",
-                        "dispext7",
-                        "disp1",
-                        "disp2",
-                        "disp3",
-                        "disp4",
-                        "disp5",
-                        "disp6",
-                        "disp7",
-                    ]
-                ) {
+                if IOServiceNameMatches(txIOChild, names: DISP_NAMES) {
                     clcd2Num += 1
                     guard clcd2Mapping[clcd2Num] == nil || clcd2Mapping[clcd2Num] == displayID else { continue }
 
-                    if let d = displayForIOService(
-                        txIOChild,
-                        displays: display != nil ? [display!] : nil,
-                        match: match
-                    ), d.id == displayID {
+                    if let d = displayForIOService(txIOChild, displays: display != nil ? [display!] : nil, match: match),
+                       d.id == displayID
+                    {
                         matchedDisplay = d
                         break
                     }
@@ -574,46 +590,53 @@ class DisplayController: ObservableObject {
                 return nil
             }
 
-            log.info("Mac Mini HDMI Ignore: hw.model=\(Sysctl.modelLowercased)")
-            log.info("Mac Mini HDMI Ignore: isMacMini=\(Sysctl.isMacMini)")
-            log.info("Mac Mini HDMI Ignore: isMacBook=\(Sysctl.isMacBook)")
-            log.info("Mac Mini HDMI Ignore: Transport=\(display.transport?.description ?? "Unknown")")
-            log.info("Mac Mini HDMI Ignore: CLCD2 Number=\(clcd2Num)")
-            if Sysctl.isMacMini, clcd2Num == 1,
-               let transport = display.transport,
-               transport.upstream == "DP",
-               transport.downstream == "HDMI"
-            {
-                log.warning("This HDMI port doesn't support DDC, ignoring for display \(display)")
+            guard let dcpService = firstServiceMatching(txIOIterator, names: DCP_NAMES),
+                  let dcpAvServiceProxy = firstChildMatching(dcpService, names: ["DCPAVServiceProxy"])
+            else {
+                log.warning("No DCPAVServiceProxy for display with ID: \(displayID)")
+                return nil
+            }
+
+            if let mcdp = firstChildMatching(dcpService, names: ["AppleDCPMCDP29XX"]) {
+                log.warning("This HDMI port doesn't support DDC because of the MCDP29xx chip inside it, ignoring for display \(display)")
                 display.badHDMI = true
                 return nil
             }
 
-            var dcpAvServiceProperties: Unmanaged<CFMutableDictionary>?
-            guard let dcpService = firstServiceMatching(
-                txIOIterator,
-                names: ["dcp", "dcpext", "dcpext0", "dcpext1", "dcpext2", "dcpext3", "dcpext4", "dcpext5", "dcpext6", "dcpext7"]
-            ),
-                let dcpAvServiceProxy = firstChildMatching(dcpService, names: ["DCPAVServiceProxy"]),
-                firstChildMatching(dcpService, names: ["AppleDCPMCDP29XX"]) == nil,
-                let ioAvService = AVServiceCreateFromDCPAVServiceProxy(dcpAvServiceProxy)?.takeRetainedValue(),
-                !CFEqual(ioAvService, 0 as IOAVService),
-                // Check if DCPAVServiceProxy belongs to an external monitor
-                IORegistryEntryCreateCFProperties(dcpAvServiceProxy, &dcpAvServiceProperties, kCFAllocatorDefault, IOOptionBits()) ==
-                KERN_SUCCESS,
-                let dcpAvCFProps = dcpAvServiceProperties, let dcpAvProps = dcpAvCFProps.takeRetainedValue() as? [String: Any],
-                let avServiceLocation = dcpAvProps["Location"] as? String, avServiceLocation == "External"
+            if Sysctl.isMacMini, clcd2Num == 1, let transport = display.transport,
+               transport.upstream == "DP", transport.downstream == "HDMI"
+            {
+                log.warning("This Mac Mini's HDMI port doesn't support DDC, ignoring for display \(display)")
+                display.badHDMI = true
+                return nil
+            }
+
+            guard let ioAvService = AVServiceCreateFromDCPAVServiceProxy(dcpAvServiceProxy)?.takeRetainedValue(),
+                  !CFEqual(ioAvService, 0 as IOAVService), isExternalDCPAVService(dcpAvServiceProxy)
             else {
                 log.warning("No AVService for display with ID: \(displayID)")
                 return nil
             }
-            log
-                .info(
-                    "Found AVService for display \(display): \(CFCopyDescription(ioAvService) as String)"
-                )
+            log.info("Found AVService for display \(display): \(CFCopyDescription(ioAvService) as String)")
 
             clcd2Mapping[clcd2Num] = displayID
             return ioAvService
+        }
+
+        func isExternalDCPAVService(_ dcpAvServiceProxy: io_service_t) -> Bool {
+            var dcpAvServiceProperties: Unmanaged<CFMutableDictionary>?
+            let extractionResult = IORegistryEntryCreateCFProperties(
+                dcpAvServiceProxy,
+                &dcpAvServiceProperties,
+                kCFAllocatorDefault,
+                IOOptionBits()
+            )
+
+            guard extractionResult == KERN_SUCCESS,
+                  let dcpAvCFProps = dcpAvServiceProperties, let dcpAvProps = dcpAvCFProps.takeRetainedValue() as? [String: Any],
+                  let avServiceLocation = dcpAvProps["Location"] as? String
+            else { return false }
+            return avServiceLocation == "External"
         }
     #endif
 

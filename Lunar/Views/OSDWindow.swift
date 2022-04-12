@@ -140,20 +140,27 @@ public struct BigSurSlider: View {
         sliderHeight: CGFloat = 22,
         image: String? = nil,
         color: Color? = nil,
+        colorBinding: Binding<Color?>? = nil,
         backgroundColor: Color = .black.opacity(0.1),
+        backgroundColorBinding: Binding<Color>? = nil,
         knobColor: Color? = nil,
+        knobColorBinding: Binding<Color?>? = nil,
         knobTextColor: Color? = nil,
+        knobTextColorBinding: Binding<Color?>? = nil,
         showValue: Binding<Bool>? = nil
     ) {
+        _knobColor = .constant(knobColor)
+        _knobTextColor = .constant(knobTextColor)
+
         _percentage = percentage
         _sliderWidth = sliderWidth.state
         _sliderHeight = sliderHeight.state
         _image = image.state
-        _color = color.state
+        _color = colorBinding ?? .constant(color)
         _showValue = showValue ?? .constant(false)
-        _backgroundColor = backgroundColor.state
-        _knobColor = (knobColor ?? color ?? colors.accent).state
-        _knobTextColor = (knobTextColor ?? ((color ?? colors.accent).textColor)).state
+        _backgroundColor = backgroundColorBinding ?? .constant(backgroundColor)
+        _knobColor = knobColorBinding ?? colorBinding ?? .constant(knobColor ?? colors.accent)
+        _knobTextColor = knobTextColorBinding ?? .constant(knobTextColor ?? ((color ?? colors.accent).textColor))
     }
 
     // MARK: Public
@@ -241,10 +248,10 @@ public struct BigSurSlider: View {
     @State var sliderWidth: CGFloat = 200
     @State var sliderHeight: CGFloat = 22
     @State var image: String? = nil
-    @State var color: Color? = nil
-    @State var backgroundColor: Color = .black.opacity(0.1)
-    @State var knobColor: Color? = nil
-    @State var knobTextColor: Color? = nil
+    @Binding var color: Color?
+    @Binding var backgroundColor: Color
+    @Binding var knobColor: Color?
+    @Binding var knobTextColor: Color?
     @Binding var showValue: Bool
 
     @State var subs = Set<AnyCancellable>()
@@ -341,6 +348,7 @@ public struct Colors {
     public static let peach = Color(hue: 0.08, saturation: 0.42, brightness: 1.00)
     public static let blue = Color(hue: 214 / 360, saturation: 1.0, brightness: 0.54)
     public static let green = Color(hue: 141 / 360, saturation: 0.59, brightness: 0.58)
+    public static let lightGreen = Color(hue: 141 / 360, saturation: 0.50, brightness: 0.83)
 
     public static let xdr = Color(hue: 0.61, saturation: 0.26, brightness: 0.78)
     public static let subzero = Color(hue: 0.98, saturation: 0.56, brightness: 1.00)
