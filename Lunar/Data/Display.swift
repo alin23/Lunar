@@ -2088,7 +2088,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     lazy var saving: PassthroughSubject<Bool, Never> = {
         let p = PassthroughSubject<Bool, Never>()
         p
-            .debounce(for: .milliseconds(800), scheduler: RunLoop.main)
+            .debounce(for: .milliseconds(2800), scheduler: RunLoop.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 DataStore.storeDisplay(display: self)
@@ -2175,29 +2175,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         return p
     }()
 
-//    lazy var secondaryMirrorScreenID: CGDirectDisplayID? = {
-//        NotificationCenter.default
-//            .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
-//            .debounce(for: .seconds(2), scheduler: RunLoop.main)
-//            .sink { [weak self] _ in
-//                guard let self = self else { return }
-//                self.secondaryMirrorScreenID = self.getSecondaryMirrorScreenID()
-//                asyncEvery(
-//                    2.seconds,
-//                    uniqueTaskKey: "secondaryMirrorScreen-\(self.serial)",
-//                    runs: 5,
-//                    skipIfExists: false,
-//                    queue: mainQueue
-//                ) { [weak self] _ in
-//                    guard let self = self else { return }
-//                    self.secondaryMirrorScreenID = self.getSecondaryMirrorScreenID()
-//                }
-//            }
-//            .store(in: &observers)
-//
-//        return getSecondaryMirrorScreenID()
-//    }()
     var screenFetcher: Repeater?
+
+    var builtinBrightnessRefresher: Repeater?
+    var builtinContrastRefresher: Repeater?
 
     var alternativeControlForAppleNative: Control? = nil {
         didSet {
@@ -3864,19 +3845,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         guard isSmartBuiltin else { return }
         let listensForBrightnessChange = observeBrightnessChangeDS() && hasBrightnessChangeObserver
-        asyncEvery(
-            listensForBrightnessChange ? 5.seconds : 2.seconds,
-            uniqueTaskKey: "Builtin Brightness Refresher",
-            skipIfExists: true,
-            eager: true,
-            queue: .main
-        ) { [weak self] in
+        let refreshSeconds = listensForBrightnessChange ? 5.0 : 2.0
+        builtinBrightnessRefresher = Repeater(every: refreshSeconds, name: "Builtin Brightness Refresher") { [weak self] in
             guard let self = self, !screensSleeping.load(ordering: .relaxed), !self.hasSoftwareControl else {
                 return
             }
             self.refreshBrightness()
         }
-        asyncEvery(15.seconds, uniqueTaskKey: "Builtin Contrast Refresher", skipIfExists: true, eager: true, queue: .main) { [weak self] in
+        builtinContrastRefresher = Repeater(every: 15, name: "Builtin Contrast Refresher") { [weak self] in
             guard let self = self, !screensSleeping.load(ordering: .relaxed), !self.hasSoftwareControl else {
                 return
             }

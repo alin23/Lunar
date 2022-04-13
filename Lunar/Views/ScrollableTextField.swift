@@ -70,7 +70,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     var adaptToScrollingFinished: DispatchWorkItem?
     lazy var lastValidValue: Double = doubleValue
 
-    @AtomicLock var highlighterTask: CFRunLoopTimer?
+    var highlighterTask: Repeater?
 
     @IBInspectable var textFieldColorLight: NSColor = scrollableTextFieldColorLight
 
@@ -214,6 +214,10 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
             guard bgColor.alphaComponent > 0 else { return }
             mainThread { bg = bgColor.withAlphaComponent(isEnabled ? backgroundOpacity : 0.05) }
         }
+    }
+
+    var captionHighlighterTask: DispatchWorkItem? {
+        didSet { oldValue?.cancel() }
     }
 
     override func viewDidMoveToWindow() {
@@ -394,43 +398,31 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     func highlight(message: String) {
         let windowVisible: Bool = mainThread { window?.isVisible ?? false }
 
-        guard highlighterTask == nil || !realtimeQueue.isValid(timer: highlighterTask!),
-              let caption = caption, windowVisible
-        else {
+        guard highlighterTask == nil, let caption = caption, windowVisible else {
             return
         }
 
         mainThread { caption.stringValue = message }
-        highlighterTask = realtimeQueue.async(every: 1.seconds) { [weak self] (_: CFRunLoopTimer?) in
+        highlighterTask = Repeater(every: 1) { [weak self] in
             guard let s = self else {
-                if let timer = self?.highlighterTask {
-                    realtimeQueue.cancel(timer: timer)
-                }
+                self?.stopHighlighting()
                 return
             }
 
             var windowVisible = false
             var textColor: NSColor?
-            mainThread {
-                windowVisible = s.window?.isVisible ?? false
-                textColor = caption.textColor
-            }
-            guard windowVisible, let caption = s.caption, let currentColor = textColor
-            else {
-                if let timer = self?.highlighterTask {
-                    realtimeQueue.cancel(timer: timer)
-                }
+            windowVisible = s.window?.isVisible ?? false
+            textColor = caption.textColor
+
+            guard windowVisible, let caption = s.caption, let currentColor = textColor else {
+                self?.stopHighlighting()
                 return
             }
 
-            mainThread {
-                caption.lightenUp(color: lunarYellow)
-                caption.needsDisplay = true
-            }
+            caption.lightenUp(color: lunarYellow)
+            caption.needsDisplay = true
 
-            Thread.sleep(forTimeInterval: 0.5)
-
-            mainThread {
+            s.captionHighlighterTask = mainAsyncAfter(ms: 500) {
                 caption.darken(color: currentColor)
                 caption.needsDisplay = true
             }
@@ -438,13 +430,10 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     }
 
     func stopHighlighting() {
-        if let timer = highlighterTask {
-            realtimeQueue.cancel(timer: timer)
-        }
-
-        highlighterTask = nil
-
         mainThread { [weak self] in
+            self?.highlighterTask = nil
+            self?.captionHighlighterTask = nil
+
             guard let caption = self?.caption else { return }
             caption.resetText()
             caption.needsDisplay = true

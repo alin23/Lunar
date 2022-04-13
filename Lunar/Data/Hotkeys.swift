@@ -913,8 +913,16 @@ extension AppDelegate: MediaKeyTapDelegate {
             acquirePrivileges()
         }
 
-        asyncNow(runLoopQueue: mediaKeyStarterQueue) {
+        DispatchQueue.global().async {
+            guard !self.mediaKeyTapStarting else { return }
             asyncNow(timeout: 5.seconds, queue: concurrentQueue) {
+                self.mediaKeyTapStarting = true
+                self.mediaKeyTapStartingFinishTask = mainAsyncAfter(ms: 5000) { self.mediaKeyTapStarting = false }
+                defer {
+                    self.mediaKeyTapStarting = false
+                    self.mediaKeyTapStartingFinishTask = nil
+                }
+
                 mediaKeyTapBrightness?.stop()
                 mediaKeyTapBrightness = nil
 
