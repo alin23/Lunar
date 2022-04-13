@@ -1170,7 +1170,7 @@ class DisplayViewController: NSViewController {
                     let hasI2C = DDC.hasI2CController(displayID: display.id, ignoreCache: true)
                 #endif
 
-                if hasI2C {
+                if hasI2C || display.isForTesting {
                     button.bg = darkMode ? peach : lunarYellow
                     button.attributedTitle = "Hardware DDC".withAttribute(.textColor(darkMauve))
                     button.helpText = HARDWARE_CONTROLS_HELP_TEXT
