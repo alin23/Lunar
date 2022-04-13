@@ -25,6 +25,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .advancedSettingsShown,
     .autoSubzero,
     .autoXdr,
+    .hdrWorkaround,
     .xdrWarningShown,
     .workaroundBuiltinDisplay,
     .autoBlackoutBuiltin,
@@ -129,6 +130,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .jitterAfterWake,
     .wakeReapplyTries,
     .ddcSleepFactor,
+    .ddcSleepLonger,
     .menuDensity,
 
     .brightnessKeysSyncControl,
@@ -605,6 +607,7 @@ func initCache() {
     cacheKey(.advancedSettingsShown)
     cacheKey(.autoSubzero)
     cacheKey(.autoXdr)
+    cacheKey(.hdrWorkaround)
     cacheKey(.xdrWarningShown)
     cacheKey(.autoBlackoutBuiltin)
     cacheKey(.workaroundBuiltinDisplay)
@@ -666,6 +669,7 @@ func initCache() {
     cacheKey(.volumeStep)
     cacheKey(.syncPollingSeconds)
     cacheKey(.ddcSleepFactor)
+    cacheKey(.ddcSleepLonger)
     cacheKey(.menuDensity)
     cacheKey(.sensorPollingSeconds)
     cacheKey(.adaptiveBrightnessMode)
@@ -736,6 +740,7 @@ extension Defaults.Keys {
     static let advancedSettingsShown = Key<Bool>("advancedSettingsShown", default: false)
     static let autoSubzero = Key<Bool>("autoSubzero", default: true)
     static let autoXdr = Key<Bool>("autoXdr", default: true)
+    static let hdrWorkaround = Key<Bool>("hdrWorkaround", default: true)
     static let xdrWarningShown = Key<Bool>("xdrWarningShown", default: false)
     static let autoBlackoutBuiltin = Key<Bool>("autoBlackoutBuiltin", default: false)
     static let workaroundBuiltinDisplay = Key<Bool>("workaroundBuiltinDisplay", default: false)
@@ -803,6 +808,7 @@ extension Defaults.Keys {
     static let volumeStep = Key<Int>("volumeStep", default: 6)
     static let syncPollingSeconds = Key<Int>("syncPollingSeconds", default: 0)
     static let ddcSleepFactor = Key<DDCSleepFactor>("ddcSleepFactor", default: .short)
+    static let ddcSleepLonger = Key<Bool>("ddcSleeplonger", default: false)
     static let menuDensity = Key<MenuDensity>("menuDensity", default: .comfortable)
     static let sensorPollingSeconds = Key<Int>("sensorPollingSeconds", default: 2)
     static let adaptiveBrightnessMode = Key<AdaptiveModeKey>("adaptiveBrightnessMode", default: .sync)
@@ -894,6 +900,7 @@ let autoBlackoutBuiltinPublisher = Defaults.publisher(.autoBlackoutBuiltin).remo
 let autoSubzeroPublisher = Defaults.publisher(.autoSubzero).removeDuplicates().dropFirst()
     .filter { $0.oldValue != $0.newValue }
 let autoXdrPublisher = Defaults.publisher(.autoXdr).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
+let hdrWorkaroundPublisher = Defaults.publisher(.hdrWorkaround).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let workaroundBuiltinDisplayPublisher = Defaults.publisher(.workaroundBuiltinDisplay).removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
 let streamLogsPublisher = Defaults.publisher(.streamLogs).removeDuplicates().filter { $0.oldValue != $0.newValue }
@@ -960,4 +967,8 @@ let detectResponsivenessPublisher = Defaults.publisher(.detectResponsiveness).dr
 let nonManualModePublisher = Defaults.publisher(.nonManualMode).dropFirst().removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
 let listenForRemoteCommandsPublisher = Defaults.publisher(.listenForRemoteCommands).dropFirst().removeDuplicates()
+    .filter { $0.oldValue != $0.newValue }
+let ddcSleepLongerPublisher = Defaults.publisher(.ddcSleepLonger).dropFirst().removeDuplicates()
+    .filter { $0.oldValue != $0.newValue }
+let ddcSleepFactorPublisher = Defaults.publisher(.ddcSleepFactor).dropFirst().removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
