@@ -16,12 +16,36 @@ import SwiftUI
 struct SettingsToggle: View {
     @State var text: String
     @Binding var setting: Bool
+    @State var help: String?
+    @State var helpShown = false
 
     var body: some View {
-        Toggle(text, isOn: $setting)
-            .toggleStyle(CheckboxToggleStyle(style: .circle))
-            .foregroundColor(.primary)
-            .frame(height: 14)
+        HStack {
+            Toggle(text, isOn: $setting)
+                .toggleStyle(CheckboxToggleStyle(style: .circle))
+                .foregroundColor(.primary)
+            if let help = help {
+                SwiftUI.Button(action: { helpShown = true }) {
+                    Image(systemName: "questionmark.circle.fill")
+                        .font(.system(size: 13, weight: .black))
+                        .imageScale(.medium)
+                }
+                .buttonStyle(FlatButton(
+                    color: .clear,
+                    textColor: .gray.opacity(0.7),
+                    hoverColor: .blue,
+                    circle: true,
+                    horizontalPadding: 0,
+                    verticalPadding: 0
+                ))
+                .popover(isPresented: $helpShown, arrowEdge: .bottom) {
+                    PaddedPopoverView(color: .white) {
+                        Text(help)
+                            .foregroundColor(.primary)
+                    }
+                }
+            }
+        }.frame(height: 14)
     }
 }
 
@@ -275,7 +299,7 @@ struct CheckboxToggleStyle: ToggleStyle {
         SwiftUI.Button(action: {
             configuration.isOn.toggle() // toggle the state binding
         }, label: {
-            HStack {
+            HStack(spacing: 3) {
                 Image(systemName: configuration.isOn ? "checkmark.\(style.sfSymbolName).fill" : style.sfSymbolName)
                     .imageScale(.medium)
                 configuration.label

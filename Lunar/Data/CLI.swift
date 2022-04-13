@@ -1895,10 +1895,27 @@ class LunarServer {
 
     func onResponse(_ response: String, socket: Socket) throws {
         do {
-            var args = response.split(separator: CLI_ARG_SEPARATOR.first!).map { String($0) }.without("--remote")
-            let key = args.removeFirst()
+            let lines = response.split(separator: "\r\n")
+            let serverHTTP = lines.first?.contains("HTTP") ?? false
+            var key = lines
+                .first(where: { $0.lowercased().starts(with: "authorization:") })?
+                .split(separator: ":", maxSplits: 1, omittingEmptySubsequences: true)
+                .last?.s.trimmed
+
+            var line = lines.last?.s
+            if let l = line, l.starts(with: "cmd=") {
+                line = l.suffix(l.count - 4).replacingOccurrences(of: "+", with: " ").removingPercentEncoding
+            }
+
+            guard var args = line?
+                .split(separator: response.contains(CLI_ARG_SEPARATOR) ? CLI_ARG_SEPARATOR.first! : " ")
+                .map({ String($0) })
+                .without("--remote")
+            else { return }
+            key = key ?? args.removeFirst()
 
             guard key == CachedDefaults[.apiKey] else {
+                try socket.write(from: "HTTP/1.1 401 Unauthorized\r\nContent-Length: \("Unauthorized\n".count)\r\n\r\n")
                 try socket.write(from: "Unauthorized\n")
                 return
             }
@@ -1908,11 +1925,18 @@ class LunarServer {
                 try command.run()
             }
             if !serverOutput.isEmpty {
+                if serverHTTP {
+                    try socket.write(from: "HTTP/1.1 200 OK\r\nContent-Length: \(serverOutput.count)\r\n\r\n")
+                }
                 try socket.write(from: serverOutput)
                 serverOutput = ""
+            } else if serverHTTP {
+                try socket.write(from: "HTTP/1.1 204 No Content\r\nContent-Length: 0\r\n\r\n")
             }
         } catch {
-            try socket.write(from: Lunar.fullMessage(for: error) + "\n")
+            let err = Lunar.fullMessage(for: error) + "\n"
+            try socket.write(from: "HTTP/1.1 400 Bad Request\r\nContent-Length: \(err.count)\r\n\r\n")
+            try socket.write(from: err)
         }
     }
 
@@ -1985,6 +2009,7 @@ let CLI_ARG_SEPARATOR = "\u{01}"
 
 var isServer = false
 var serverOutput = ""
+var serverHTTP = false
 func cliSleep(_ time: TimeInterval) {
     guard !isServer else { return }
     Thread.sleep(forTimeInterval: time)

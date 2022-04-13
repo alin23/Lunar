@@ -253,7 +253,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var enableSentryObserver: Cancellable?
 
-    var hdrFixer = AppDelegate.fixHDR()
+    var hdrFixer: Repeater? = AppDelegate.fixHDR()
 
     @Atomic var mediaKeyTapStarting = false
 
@@ -1360,6 +1360,22 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func addObservers() {
+        hdrWorkaroundPublisher.sink { change in
+            self.hdrFixer = change.newValue ? Self.fixHDR() : nil
+        }.store(in: &observers)
+
+        ddcSleepLongerPublisher.sink { change in
+            Defaults.withoutPropagation {
+                CachedDefaults[.ddcSleepFactor] = change.newValue ? .long : .short
+            }
+        }.store(in: &observers)
+
+        ddcSleepFactorPublisher.sink { change in
+            Defaults.withoutPropagation {
+                CachedDefaults[.ddcSleepLonger] = change.newValue == .long
+            }
+        }.store(in: &observers)
+
         dayMomentsPublisher.sink {
             if displayController.adaptiveModeKey == .location {
                 displayController.adaptBrightness()

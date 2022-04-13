@@ -20,7 +20,7 @@ public struct LicenseView: View {
     public var body: some View {
         HStack {
             Text("Licence:")
-                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                .font(.system(size: 12, weight: .medium))
             Text(lunarProOnTrial ? "trial" : (lunarProActive ? "active" : "inactive"))
                 .font(.system(size: 12, weight: .semibold, design: .monospaced))
                 .padding(.horizontal, 6)
@@ -86,12 +86,12 @@ public struct VersionView: View {
     // MARK: Public
 
     public var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Text("Version:")
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .font(.system(size: 12, weight: .medium))
                 Text(Bundle.main.version)
-                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    .font(.system(size: 11, weight: .semibold, design: .monospaced))
 
                 Spacer()
 
@@ -101,7 +101,7 @@ public struct VersionView: View {
             }
             HStack(spacing: 3) {
                 Text("Check automatically")
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .font(.system(size: 12, weight: .medium))
                 Spacer()
 
                 SwiftUI.Button("Never") {
@@ -158,7 +158,7 @@ public struct MenuDensityView: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 3) {
                 Text("Menu density")
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .font(.system(size: 12, weight: .medium))
                 Spacer()
 
                 SwiftUI.Button("Clean") { menuDensity = .clean }
