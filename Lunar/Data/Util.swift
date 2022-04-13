@@ -1014,26 +1014,6 @@ func isCancelled(_ key: String) -> Bool {
     }
 }
 
-func debounce(
-    ms: Int,
-    uniqueTaskKey: String,
-    queue: RunloopQueue = debounceQueue,
-    mainThread: Bool = false,
-    replace: Bool = false,
-    subscriberKey: String? = nil,
-    _ action: @escaping () -> Void
-) {
-    debounce(
-        ms: ms,
-        uniqueTaskKey: uniqueTaskKey,
-        queue: queue,
-        mainThread: mainThread,
-        value: nil,
-        replace: replace,
-        subscriberKey: subscriberKey
-    ) { (_: Bool?) in action() }
-}
-
 func taskManager(_ key: String, _ value: Any?) {
     taskManagerQueue.async { Thread.current.threadDictionary[key] = value }
 }
@@ -1041,50 +1021,6 @@ func taskManager(_ key: String, _ value: Any?) {
 func taskManager(_ key: String) -> Any? {
     sync(queue: taskManagerQueue) {
         Thread.current.threadDictionary[key]
-    }
-}
-
-func debounce<T: Equatable>(
-    ms: Int,
-    uniqueTaskKey: String,
-    queue: RunloopQueue = debounceQueue,
-    mainThread: Bool = false,
-    value: T,
-    replace: Bool = false,
-    subscriberKey: String? = nil,
-    _ action: @escaping (T) -> Void
-) {
-    let queue = mainThread ? mainQueue : queue
-//    taskQueueLock.around { taskQueue[uniqueTaskKey] = queue }
-    queue.async {
-        taskManager("\(uniqueTaskKey)-cancelled", false)
-        if taskManager(uniqueTaskKey) == nil || replace {
-            #if DEBUG
-                if replace {
-                    log.verbose("Replacing subscriber for '\(uniqueTaskKey)'. Current subscriber count: \(globalObservers.count)")
-                } else {
-                    log.verbose("Creating subscriber for '\(uniqueTaskKey)'. Current subscriber count: \(globalObservers.count)")
-                }
-            #endif
-
-            let pub = (taskManager(uniqueTaskKey) as? PassthroughSubject<T, Never>) ?? PassthroughSubject<T, Never>()
-            pub
-                .debounce(for: .milliseconds(ms), scheduler: mainThread ? RunLoop.main : RunLoop.current)
-                .sink(receiveValue: action)
-                .store(in: &globalObservers, for: subscriberKey ?? uniqueTaskKey)
-            taskManager(uniqueTaskKey, pub)
-
-            #if DEBUG
-                if replace {
-                    log.verbose("Replaced subscriber for '\(uniqueTaskKey)'. New subscriber count: \(globalObservers.count)")
-                } else {
-                    log.verbose("Created subscriber for '\(uniqueTaskKey)'. New subscriber count: \(globalObservers.count)")
-                }
-            #endif
-        }
-
-        guard let pub = taskManager(uniqueTaskKey) as? PassthroughSubject<T, Never> else { return }
-        pub.send(value)
     }
 }
 

@@ -29,6 +29,7 @@ import SwiftyMarkdown
 import UserNotifications
 import WAYWindow
 
+import AVFoundation
 import Path
 import SwiftUI
 
@@ -44,13 +45,7 @@ let kAppleInterfaceThemeChangedNotification = "AppleInterfaceThemeChangedNotific
 let kAppleInterfaceStyle = "AppleInterfaceStyle"
 let kAppleInterfaceStyleSwitchesAutomatically = "AppleInterfaceStyleSwitchesAutomatically"
 
-let mediaKeyStarterQueue = RunloopQueue(named: "fyi.lunar.mediaKeyStarter.queue")
-let debounceQueue = RunloopQueue(named: "fyi.lunar.debounce.queue")
-let mainQueue = RunloopQueue(named: "fyi.lunar.main.queue")
-// let operationHighlightQueue = RunloopQueue(named: "fyi.lunar.operationHighlight.queue")
 let serviceBrowserQueue = RunloopQueue(named: "fyi.lunar.serviceBrowser.queue")
-let realtimeQueue = RunloopQueue(named: "fyi.lunar.realtime.queue")
-let lowprioQueue = RunloopQueue(named: "fyi.lunar.lowprio.queue")
 let sensorHostnameQueue = RunloopQueue(named: "fyi.lunar.sensor.hostname.queue")
 let windowControllerQueue = DispatchQueue(label: "fyi.lunar.windowControllerQueue.queue", qos: .userInitiated)
 let concurrentQueue = DispatchQueue(label: "fyi.lunar.concurrent.queue", qos: .userInitiated, attributes: .concurrent)
@@ -63,9 +58,6 @@ let smoothDisplayServicesQueue = DispatchQueue(
 let timerQueue = RunloopQueue(named: "fyi.lunar.timer.queue")
 let taskManagerQueue = RunloopQueue(named: "fyi.lunar.taskManager.queue")
 let serialQueue = DispatchQueue(label: "fyi.lunar.serial.queue", qos: .userInitiated)
-let serialSyncQueue = DispatchQueue(label: "fyi.lunar.serialSync.queue", qos: .userInitiated)
-let mainSerialQueue = DispatchQueue(label: "fyi.lunar.mainSerial.queue", qos: .userInitiated, target: .main)
-let dataSerialQueue = DispatchQueue(label: "fyi.lunar.dataSerial.queue", qos: .utility, target: DispatchQueue.global(qos: .utility))
 let appName = (Bundle.main.infoDictionary?["CFBundleName"] as? String) ?? "Lunar"
 
 let TEST_MODE = AppSettings.testMode
@@ -143,6 +135,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @Atomic static var shiftKeyPressed = false
     @Atomic static var controlKeyPressed = false
 
+    static var observers: Set<AnyCancellable> = []
+
+    static var supportsHDR: Bool = {
+        NotificationCenter.default
+            .publisher(for: AVPlayer.eligibleForHDRPlaybackDidChangeNotification)
+            .sink { _ in supportsHDR = AVPlayer.eligibleForHDRPlayback }
+            .store(in: &observers)
+        return AVPlayer.eligibleForHDRPlayback
+    }()
+
     var locationManager: CLLocationManager?
     var _windowControllerLock = NSRecursiveLock()
     var _windowController: ModernWindowController?
@@ -152,8 +154,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var onboardWindowController: ModernWindowController?
 
     var observers: Set<AnyCancellable> = []
-
-    var valuesReaderThread: CFRunLoopTimer?
+    var valuesReaderThread: Repeater?
 
     var statusButtonTrackingArea: NSTrackingArea?
     var statusItemButtonController: StatusItemButtonController?
@@ -254,6 +255,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var hdrFixer = AppDelegate.fixHDR()
 
+    @Atomic var mediaKeyTapStarting = false
+
     var currentPage: Int = Page.display.rawValue {
         didSet {
             log.verbose("Current Page: \(currentPage)")
@@ -343,6 +346,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 self.restartApp(self)
             }
         }
+    }
+
+    var mediaKeyTapStartingFinishTask: DispatchWorkItem? {
+        didSet { oldValue?.cancel() }
     }
 
     @IBAction func blackOutPowerOff(_: Any) {
@@ -890,7 +897,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func startValuesReaderThread() {
-        valuesReaderThread = asyncEvery(10.seconds, queue: lowprioQueue) { _ in
+        valuesReaderThread = Repeater(every: 10) {
             guard !screensSleeping.load(ordering: .relaxed) else { return }
 
             if CachedDefaults[.refreshValues] {
@@ -1245,9 +1252,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     screensSleeping.store(true, ordering: .sequentiallyConsistent)
                     displayController.cancelAutoBlackout()
 
-                    if let task = self.valuesReaderThread {
-                        lowprioQueue.cancel(timer: task)
-                    }
+                    self.valuesReaderThread = nil
                     displayController.adaptiveMode.stopWatching()
                 default:
                     break
@@ -1362,9 +1367,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }.store(in: &observers)
 
         refreshValuesPublisher.sink { change in
-            if let task = self.valuesReaderThread {
-                lowprioQueue.cancel(timer: task)
-            }
+            self.valuesReaderThread = nil
             if change.newValue {
                 self.startValuesReaderThread()
             }
@@ -1985,9 +1988,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         Defaults[.streamLogs] = false
         Defaults[.showOptionsMenu] = false
 
-        if let task = valuesReaderThread {
-            lowprioQueue.cancel(timer: task)
-        }
+        valuesReaderThread = nil
         displayController.activeDisplayList.filter(\.ambientLightCompensationEnabledByUser).forEach { d in
             d.ambientLightAdaptiveBrightnessEnabled = true
         }
