@@ -634,6 +634,10 @@ struct QuickActionsMenuView: View {
 
     @Namespace var namespace
 
+    @State var footerIndicatorOpacity: CGFloat = 0
+
+    @State var headerIndicatorOpacity: CGFloat = 0.0
+
     var menuWidth: CGFloat {
         showStandardPresets || showCustomPresets || !showHeaderOnHover || !showFooterOnHover || showAdditionalInfo || headerOpacity > 0 ||
             footerOpacity > 0
@@ -736,59 +740,78 @@ struct QuickActionsMenuView: View {
 
     var footer: some View {
         Group {
-            HStack {
-                SwiftUI.Button("Preferences") { appDelegate!.showPreferencesWindow(sender: nil) }
-                    .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
-                    .fixedSize()
+            let dynamicFooter = footerOpacity == 0.0 && showFooterOnHover
+            ZStack {
+                HStack {
+                    SwiftUI.Button("Preferences") { appDelegate!.showPreferencesWindow(sender: nil) }
+                        .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                        .font(.system(size: 12, weight: .medium, design: .monospaced))
+                        .fixedSize()
 
-                if !showAdditionalInfo {
-                    SwiftUI.Button("App info") {
-                        withAnimation(.fastSpring) {
-                            showAdditionalInfo = true
+                    if !showAdditionalInfo {
+                        SwiftUI.Button("App info") {
+                            withAnimation(.fastSpring) {
+                                showAdditionalInfo = true
+                            }
+                        }
+                        .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                        .font(.system(size: 12, weight: .medium, design: .monospaced))
+                        .fixedSize()
+                        .matchedGeometryEffect(id: "additional-info-button", in: namespace)
+                    }
+                    Spacer()
+
+                    SwiftUI.Button("Restart") { appDelegate!.restartApp(appDelegate!) }
+                        .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                        .font(.system(size: 12, weight: .medium, design: .monospaced))
+                        .fixedSize()
+
+                    SwiftUI.Button("Quit") { NSApplication.shared.terminate(nil) }
+                        .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                        .font(.system(size: 12, weight: .medium, design: .monospaced))
+                        .fixedSize()
+                }
+                .padding(.horizontal, MENU_HORIZONTAL_PADDING)
+                .opacity(showFooterOnHover ? footerOpacity : 1.0)
+                .contentShape(Rectangle())
+                .onChange(of: showFooterOnHover) { showOnHover in
+                    withAnimation(.fastTransition) { footerOpacity = showOnHover ? 0.0 : 1.0 }
+                }
+                .onHover { hovering in
+                    guard showFooterOnHover else {
+                        footerShowHideTask = nil
+                        footerOpacity = 1.0
+                        return
+                    }
+
+                    guard hovering else {
+                        footerShowHideTask = mainAsyncAfter(ms: 500) {
+                            withAnimation(.fastTransition) {
+                                footerOpacity = 0.0
+                                footerIndicatorOpacity = 0.0
+                            }
+                        }
+                        return
+                    }
+                    footerShowHideTask = mainAsyncAfter(ms: 50) {
+                        withAnimation(.fastTransition) { footerOpacity = 1.0 }
+                    }
+                }
+                Rectangle()
+                    .fill(Color.primary.opacity(dynamicFooter ? footerIndicatorOpacity : 0.0))
+                    .frame(maxWidth: .infinity, maxHeight: dynamicFooter ? 20.0 : 0.0)
+                    .onHover { hovering in
+                        guard footerOpacity == 0.0, showFooterOnHover else { return }
+                        if hovering {
+                            withAnimation(.spring()) {
+                                footerIndicatorOpacity = 0.1
+                            }
+                            withAnimation(.easeOut.delay(0.5)) {
+                                footerIndicatorOpacity = 0
+                            }
                         }
                     }
-                    .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
-                    .fixedSize()
-                    .matchedGeometryEffect(id: "additional-info-button", in: namespace)
-                }
-                Spacer()
-
-                SwiftUI.Button("Restart") { appDelegate!.restartApp(appDelegate!) }
-                    .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
-                    .fixedSize()
-
-                SwiftUI.Button("Quit") { NSApplication.shared.terminate(nil) }
-                    .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
-                    .fixedSize()
-            }
-            .padding(.horizontal, MENU_HORIZONTAL_PADDING)
-            .opacity(showFooterOnHover ? footerOpacity : 1.0)
-            .frame(maxWidth: .infinity, maxHeight: footerOpacity == 0.0 ? 8 : nil)
-            .contentShape(Rectangle())
-            .onChange(of: showFooterOnHover) { showOnHover in
-                withAnimation(.fastTransition) { footerOpacity = showOnHover ? 0.0 : 1.0 }
-            }
-            .onHover { hovering in
-                guard showFooterOnHover else {
-                    footerShowHideTask = nil
-                    footerOpacity = 1.0
-                    return
-                }
-
-                guard hovering else {
-                    footerShowHideTask = mainAsyncAfter(ms: 500) {
-                        withAnimation(.fastTransition) { footerOpacity = 0.0 }
-                    }
-                    return
-                }
-                footerShowHideTask = mainAsyncAfter(ms: 50) {
-                    withAnimation(.fastTransition) { footerOpacity = 1.0 }
-                }
-            }
+            }.frame(maxWidth: .infinity, maxHeight: footerOpacity == 0.0 ? 8 : nil)
 
             if let appDelegate = appDelegate, showAdditionalInfo {
                 Divider()
@@ -822,7 +845,7 @@ struct QuickActionsMenuView: View {
 
     var header: some View {
         let op = (showHeaderOnHover && !showOptionsMenu) ? headerOpacity : 1.0
-        return VStack(spacing: 0) {
+        return ZStack {
             HStack {
                 modeSelector.fixedSize()
                 Spacer()
@@ -832,6 +855,22 @@ struct QuickActionsMenuView: View {
             .padding(.top, 10 * op)
             .padding(.bottom, 10 * op)
             .opacity(op)
+
+            let dynamicHeader = headerOpacity == 0.0 && showHeaderOnHover
+            Rectangle()
+                .fill(Color.primary.opacity(dynamicHeader ? headerIndicatorOpacity : 0.0))
+                .frame(maxWidth: .infinity, maxHeight: dynamicHeader ? 20.0 : 0.0)
+                .onHover { hovering in
+                    guard headerOpacity == 0.0, showHeaderOnHover else { return }
+                    if hovering {
+                        withAnimation(.spring()) {
+                            headerIndicatorOpacity = 0.1
+                        }
+                        withAnimation(.easeOut.delay(0.5)) {
+                            headerIndicatorOpacity = 0
+                        }
+                    }
+                }.offset(x: 0, y: -6)
         }
         .background(Color.primary.opacity((colorScheme == .dark ? 0.03 : 0.05) * op))
         .padding(.bottom, 10 * op)
