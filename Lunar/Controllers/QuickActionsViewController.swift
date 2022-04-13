@@ -324,6 +324,153 @@ struct RawValuesView: View {
     }
 }
 
+// MARK: - AdvancedSettingsView
+
+struct AdvancedSettingsView: View {
+    @Default(.hideMenuBarIcon) var hideMenuBarIcon
+    @Default(.showDockIcon) var showDockIcon
+    @Default(.moreGraphData) var moreGraphData
+
+    @Default(.silentUpdate) var silentUpdate
+    @Default(.workaroundBuiltinDisplay) var workaroundBuiltinDisplay
+    @Default(.debug) var debug
+    @Default(.ddcSleepLonger) var ddcSleepLonger
+    @Default(.clamshellModeDetection) var clamshellModeDetection
+    @Default(.muteVolumeZero) var muteVolumeZero
+    @Default(.refreshValues) var refreshValues
+    @Default(.enableOrientationHotkeys) var enableOrientationHotkeys
+    @Default(.detectResponsiveness) var detectResponsiveness
+    @Default(.disableControllerVideo) var disableControllerVideo
+    @Default(.allowBlackOutOnSingleScreen) var allowBlackOutOnSingleScreen
+    @Default(.reapplyValuesAfterWake) var reapplyValuesAfterWake
+    @Default(.hdrWorkaround) var hdrWorkaround
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            VStack(alignment: .leading) {
+                SettingsToggle(text: "Hide menubar icon", setting: $hideMenuBarIcon)
+                SettingsToggle(text: "Show dock icon", setting: $showDockIcon)
+                SettingsToggle(
+                    text: "Show more graph data",
+                    setting: $moreGraphData,
+                    help: "Renders values and data lines on the bottom graph of the preferences window"
+                )
+                SettingsToggle(text: "Install updates silently in the background", setting: $silentUpdate)
+                SettingsToggle(
+                    text: "Enable verbose logging", setting: $debug,
+                    help: """
+                    Log path: ~/Library/Caches/Lunar/swiftybeaver.log
+
+                    This option will deactivate itself when the app quits
+                    to avoid filling up disk space with unnecessary logs.
+                    """
+                )
+            }
+            Divider()
+            VStack(alignment: .leading) {
+                SettingsToggle(
+                    text: "Use workaround for built-in display", setting: $workaroundBuiltinDisplay,
+                    help: """
+                    Forward brightness key events to the system instead of
+                    changing built-in brightness from Lunar.
+
+                    Disables the "Hotkey Step" setting for built-in but persists
+                    brightness changes better on some specific devices.
+                    """
+                )
+                SettingsToggle(
+                    text: "Run in HDR compatibility mode", setting: $hdrWorkaround,
+                    help: """
+                    Because of a macOS bug, any app that uses the Gamma API will break HDR.
+
+                    This workaround tries to keep HDR working by periodically resetting Gamma changes.
+
+                    This will stop working in the following cases:
+
+                    • Using "Software Dimming" with the Gamma method on any display
+                    • Having the f.lux app running
+                    • Having the Gamma Control app running
+                    • Using "XDR Brightness"
+                    • Using "Sub-zero dimming"
+                    """
+                )
+                SettingsToggle(
+                    text: "Allow BlackOut on single screen", setting: $allowBlackOutOnSingleScreen,
+                    help: "Allows turning off a screen even if it's the only visible screen left"
+                )
+                SettingsToggle(
+                    text: "Toggle Manual/Sync when the lid is closed/opened",
+                    setting: $clamshellModeDetection
+                ).disabled(!Sysctl.isMacBook)
+                SettingsToggle(
+                    text: "Re-apply brightness on screen wake", setting: $reapplyValuesAfterWake,
+                    help: """
+                    On each screen wake/reconnection, Lunar will try to
+                    re-apply previous brightness and contrast 3 times.
+
+                    Disable this if system appears slow on screen wake.
+                    """
+                )
+            }
+            Divider()
+            VStack(alignment: .leading) {
+                SettingsToggle(
+                    text: "Enable rotation hotkeys",
+                    setting: $enableOrientationHotkeys,
+                    help: """
+                    Pressing the following keys will change the
+                    orientation for the display with the cursor on it:
+
+                        Ctrl+0: 0°
+                        Ctrl+9: 90°
+                        Ctrl+8: 180°
+                        Ctrl+7: 270°
+                    """
+                )
+                SettingsToggle(
+                    text: "Apply volume 0 on the DDC mute command", setting: $muteVolumeZero,
+                    help: """
+                    Some monitors don't implement the DDC mute command.
+
+                    This option also sets the volume to 0 when muting
+                    to help working around that issue.
+                    """
+                )
+                SettingsToggle(
+                    text: "Wait longer between DDC requests", setting: $ddcSleepLonger,
+                    help: """
+                    Some monitors have a slower response time on DDC requests.
+
+                    This option might help reduce flicker in those cases.
+                    """
+                )
+                SettingsToggle(
+                    text: "Check for DDC responsiveness periodically", setting: $detectResponsiveness,
+                    help: """
+                    Detects when DDC becomes unresponsive and presents
+                    the choice to switch to Software Dimming.
+                    """
+                )
+                SettingsToggle(
+                    text: "Disable Network Controller video ", setting: $disableControllerVideo,
+                    help: """
+                    When using "Network Control" with a Raspberry Pi, it might be
+                    helpful to disable the Pi desktop if you don't need it.
+                    """
+                )
+                SettingsToggle(
+                    text: "Refresh values from monitor settings ", setting: $refreshValues,
+                    help: """
+                    Keep Lunar state in sync by reading monitor settings periodically.
+
+                    Caution: This can freeze the system if a monitor doesn't support reading.
+                    """
+                )
+            }
+        }.frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
 // MARK: - QuickActionsLayoutView
 
 struct QuickActionsLayoutView: View {
@@ -605,6 +752,11 @@ enum MenuDensity: String, Codable, Defaults.Serializable {
 // MARK: - QuickActionsMenuView
 
 struct QuickActionsMenuView: View {
+    enum OptionsTab {
+        case layout
+        case advanced
+    }
+
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.colors) var colors
     @ObservedObject var dc: DisplayController = displayController
@@ -637,6 +789,13 @@ struct QuickActionsMenuView: View {
     @State var footerIndicatorOpacity: CGFloat = 0
 
     @State var headerIndicatorOpacity: CGFloat = 0.0
+
+    @State var optionsTab: OptionsTab = .layout
+
+    @Default(.startAtLogin) var startAtLogin
+
+    @State var menuHeight: CGFloat = (NSScreen.main?.visibleFrame.height ?? 600) - 50
+    @State var displayCount = displayController.activeDisplayList.count
 
     var menuWidth: CGFloat {
         showStandardPresets || showCustomPresets || !showHeaderOnHover || !showFooterOnHover || showAdditionalInfo || headerOpacity > 0 ||
@@ -690,8 +849,31 @@ struct QuickActionsMenuView: View {
             .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
             .popover(isPresented: $showOptionsMenu, arrowEdge: .trailing) {
                 PaddedPopoverView(color: colorScheme == .dark ? Colors.sunYellow : Colors.lunarYellow) {
-                    QuickActionsLayoutView().padding(10)
-                }
+                    HStack {
+                        SwiftUI.Button("Menu layout") {
+                            withAnimation(.fastSpring) { optionsTab = .layout }
+                            showOptionsMenu = false
+                            showOptionsMenu = true
+                        }
+                        .buttonStyle(PickerButton(enumValue: $optionsTab, onValue: .layout))
+                        .font(.system(size: 12, weight: optionsTab == .layout ? .bold : .medium, design: .rounded))
+
+                        SwiftUI.Button("Advanced settings") {
+                            withAnimation(.fastSpring) { optionsTab = .advanced }
+                            showOptionsMenu = false
+                            showOptionsMenu = true
+                        }
+                        .buttonStyle(PickerButton(enumValue: $optionsTab, onValue: .advanced))
+                        .font(.system(size: 12, weight: optionsTab == .advanced ? .bold : .medium, design: .rounded))
+                    }.frame(maxWidth: .infinity)
+
+                    switch optionsTab {
+                    case .layout:
+                        QuickActionsLayoutView().padding(10)
+                    case .advanced:
+                        AdvancedSettingsView().padding(10)
+                    }
+                }.frame(width: 390, height: 465, alignment: .center)
             }
             .onChange(of: showBrightnessMenuBar) { _ in
                 let old = showOptionsMenu
@@ -818,12 +1000,19 @@ struct QuickActionsMenuView: View {
                     .padding(.top, 10 * footerOpacity)
                     .padding(.bottom, 10)
                 VStack(alignment: .leading, spacing: 6) {
-                    Toggle("Hide app info", isOn: $showAdditionalInfo.animation(.fastSpring))
-                        .toggleStyle(DetailToggleStyle(style: .circle))
-                        .foregroundColor(colors.gray)
-                        .font(.system(size: 12, weight: .semibold))
-                        .fixedSize()
-                        .matchedGeometryEffect(id: "additional-info-button", in: namespace)
+                    HStack {
+                        Toggle("Hide app info", isOn: $showAdditionalInfo.animation(.fastSpring))
+                            .toggleStyle(DetailToggleStyle(style: .circle))
+                            .foregroundColor(colors.gray)
+                            .font(.system(size: 12, weight: .semibold))
+                            .fixedSize()
+                            .matchedGeometryEffect(id: "additional-info-button", in: namespace)
+                        Spacer()
+                        Toggle("Launch at login", isOn: $startAtLogin)
+                            .toggleStyle(CheckboxToggleStyle(style: .circle))
+                            .foregroundColor(.primary)
+                            .font(.system(size: 12, weight: .medium))
+                    }
                     LicenseView()
                     VersionView(updater: appDelegate.updater)
                     MenuDensityView()
@@ -904,14 +1093,31 @@ struct QuickActionsMenuView: View {
         }
     }
 
+    var theView: some View {
+        Group {
+            if displayCount >= 4 {
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack {
+                        content
+                        footer
+                    }
+                }
+                .frame(width: menuWidth, height: menuHeight, alignment: .top)
+            } else {
+                VStack {
+                    content
+                    footer
+                }
+                .frame(width: menuWidth, alignment: .top)
+            }
+        }
+    }
+
     var body: some View {
         let op = (showFooterOnHover && !showAdditionalInfo) ? footerOpacity : 1.0
-        GeometryReader { _ in
-            VStack {
-                content
-                footer
-            }
-            .frame(width: menuWidth, alignment: .top)
+//        GeometryReader { _ in
+        theView
+
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .padding(.horizontal, MENU_HORIZONTAL_PADDING)
             .padding(.bottom, op < 1 ? 20 : 40)
@@ -920,10 +1126,10 @@ struct QuickActionsMenuView: View {
             .onAppear { setup() }
             .onChange(of: popoverClosed) { closed in if !closed { setup() }}
             .frame(maxWidth: .infinity, alignment: .center)
-        }
-        .onTapGesture {
-            env.recording = false
-        }
+//        }
+//        .onTapGesture {
+//            env.recording = false
+//        }
     }
 
     var bg: some View {
@@ -961,12 +1167,16 @@ struct QuickActionsMenuView: View {
     func setup() {
         cursorDisplay = dc.cursorDisplay
         displays = dc.nonCursorDisplays
+        displayCount = dc.activeDisplayList.count
+
         if showHeaderOnHover { headerOpacity = 0.0 }
         if showFooterOnHover { footerOpacity = 0.0 }
+        menuHeight = (NSScreen.main?.visibleFrame.height ?? 600) - 50
+
         appDelegate?.statusItemButtonController?
             .resize(NSSize(
                 width: MENU_WIDTH + (MENU_HORIZONTAL_PADDING * 2),
-                height: (NSScreen.main?.visibleFrame.height ?? 600) - 50
+                height: menuHeight
             ))
     }
 }
@@ -987,6 +1197,7 @@ extension Defaults.Keys {
 
 struct QuickActionsView: View {
     @Environment(\.colorScheme) var colorScheme
+    @Default(.popoverClosed) var popoverClosed
 
     var body: some View {
         QuickActionsMenuView()
