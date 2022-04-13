@@ -279,6 +279,10 @@ extension String {
     }
 }
 
+extension Substring.SubSequence {
+    var s: String { String(self) }
+}
+
 extension String.SubSequence {
     @inline(__always) var u32: UInt32? {
         UInt32(self)
