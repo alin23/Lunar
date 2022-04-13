@@ -774,18 +774,20 @@ struct QuickActionsMenuView: View {
             }
             .onHover { hovering in
                 guard showFooterOnHover else {
+                    footerShowHideTask = nil
                     footerOpacity = 1.0
                     return
                 }
 
                 guard hovering else {
-                    footerHider = mainAsyncAfter(ms: 500) {
+                    footerShowHideTask = mainAsyncAfter(ms: 500) {
                         withAnimation(.fastTransition) { footerOpacity = 0.0 }
                     }
                     return
                 }
-                footerHider = nil
-                withAnimation(.fastTransition) { footerOpacity = 1.0 }
+                footerShowHideTask = mainAsyncAfter(ms: 50) {
+                    withAnimation(.fastTransition) { footerOpacity = 1.0 }
+                }
             }
 
             if let appDelegate = appDelegate, showAdditionalInfo {
@@ -901,18 +903,20 @@ struct QuickActionsMenuView: View {
 
     func handleHeaderTransition(hovering: Bool) {
         guard !showOptionsMenu else {
+            headerShowHideTask = nil
             headerOpacity = 1.0
             return
         }
 
         guard hovering else {
-            headerHider = mainAsyncAfter(ms: 500) {
+            headerShowHideTask = mainAsyncAfter(ms: 500) {
                 withAnimation(.fastTransition) { headerOpacity = 0.0 }
             }
             return
         }
-        headerHider = nil
-        withAnimation(.fastTransition) { headerOpacity = 1.0 }
+        headerShowHideTask = mainAsyncAfter(ms: 50) {
+            withAnimation(.fastTransition) { headerOpacity = 1.0 }
+        }
     }
 
     func setup() {
@@ -928,11 +932,11 @@ struct QuickActionsMenuView: View {
     }
 }
 
-var headerHider: DispatchWorkItem? {
+var headerShowHideTask: DispatchWorkItem? {
     didSet { oldValue?.cancel() }
 }
 
-var footerHider: DispatchWorkItem? {
+var footerShowHideTask: DispatchWorkItem? {
     didSet { oldValue?.cancel() }
 }
 

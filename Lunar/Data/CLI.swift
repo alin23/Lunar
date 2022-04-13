@@ -1189,7 +1189,7 @@ struct Lunar: ParsableCommand {
         var display: DisplayFilter = .bestGuess
 
         @Option(name: .long, help: "How often to send the gamma values to the monitor")
-        var refreshSeconds = 1
+        var refreshSeconds: TimeInterval = 1
 
         @Flag(name: .long, help: "Read Gamma values (the default unless `--write` is passed)")
         var read = true
@@ -1305,7 +1305,7 @@ struct Lunar: ParsableCommand {
                 }
 
                 var stepsDone = 0
-                _ = asyncEvery(refreshSeconds.seconds, queue: realtimeQueue) { timer in
+                gammaRepeater = Repeater(every: refreshSeconds) {
                     display.gammaLock()
 
                     display.red = red
@@ -1315,9 +1315,7 @@ struct Lunar: ParsableCommand {
                     stepsDone += 1
                     if stepsDone == wait {
                         display.gammaUnlock()
-                        if let timer = timer {
-                            realtimeQueue.cancel(timer: timer)
-                        }
+                        gammaRepeater = nil
                         return cliExit(0)
                     }
                 }
@@ -1494,7 +1492,7 @@ private func setupNetworkControls(displays: [Display], waitms: Int = 2000) {
         display.alwaysUseNetworkControl = true
     }
 
-    asyncNow(runLoopQueue: realtimeQueue) {
+    DispatchQueue.global().async {
         NetworkControl.browser = CiaoBrowser()
         NetworkControl.listenForDDCUtilControllers()
     }
@@ -2034,3 +2032,5 @@ func serve(host: String) {
     isServer = true
     server.run(host: host)
 }
+
+var gammaRepeater: Repeater?

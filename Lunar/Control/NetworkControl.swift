@@ -599,7 +599,7 @@ class NetworkControl: Control {
               let service = NetworkControl.controllersForDisplay[display.serial] else { return false }
 
         if service.url == nil {
-            asyncNow(runLoopQueue: lowprioQueue) {
+            serialQueue.async {
                 guard let newURL = service.getFirstRespondingURL(urls: service.urls) else { return }
                 if newURL != service.url {
                     service.url = newURL
