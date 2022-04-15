@@ -1761,7 +1761,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     static func observeBrightnessChangeDS(_ id: CGDirectDisplayID) -> Bool {
-        // return false
         guard DisplayServicesCanChangeBrightness(id), !isObservingBrightnessChangeDS(id) else { return true }
 
         let result = DisplayServicesRegisterForBrightnessChangeNotifications(id, id) { _, observer, _, _, userInfo in
@@ -1774,7 +1773,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     return
                 }
                 let newBrightness = (value * 100).u16
-                guard display.brightness.uint16Value != newBrightness else {
+                guard display.brightnessU16 != newBrightness else {
                     return
                 }
 
@@ -2088,7 +2087,19 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     lazy var saving: PassthroughSubject<Bool, Never> = {
         let p = PassthroughSubject<Bool, Never>()
         p
-            .debounce(for: .milliseconds(2800), scheduler: RunLoop.main)
+            .debounce(for: .seconds(3), scheduler: RunLoop.main)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                DataStore.storeDisplay(display: self)
+            }.store(in: &observers)
+
+        return p
+    }()
+
+    lazy var savingLater: PassthroughSubject<Bool, Never> = {
+        let p = PassthroughSubject<Bool, Never>()
+        p
+            .debounce(for: .seconds(10), scheduler: RunLoop.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 DataStore.storeDisplay(display: self)
@@ -2179,6 +2190,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     var builtinBrightnessRefresher: Repeater?
     var builtinContrastRefresher: Repeater?
+
+    @Published @objc dynamic var brightnessU16: UInt16 = 50
 
     var alternativeControlForAppleNative: Control? = nil {
         didSet {
@@ -2904,7 +2917,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var isMacBook: Bool { isBuiltin && Sysctl.isMacBook }
     @Published @objc dynamic var brightness: NSNumber = 50 {
         didSet {
-            save()
+            brightnessU16 = brightness.uint16Value
+            save(later: !applyDisplayServices)
             guard timeSince(lastConnectionTime) > 1 else { return }
 
             if applyDisplayServices { userAdjusting = true }
@@ -4117,9 +4131,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-    func save(now: Bool = false) {
+    func save(now: Bool = false, later: Bool = false) {
         if now {
             DataStore.storeDisplay(display: self, now: now)
+            return
+        }
+
+        if later {
+            savingLater.send(true)
             return
         }
 
