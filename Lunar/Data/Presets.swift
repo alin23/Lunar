@@ -346,12 +346,6 @@ import Carbon
 import Magnet
 import Sauce
 
-// MARK: - EnvState
-
-final class EnvState: ObservableObject {
-    @Published var recording = false
-}
-
 // MARK: - DynamicKey
 
 struct DynamicKey: View {

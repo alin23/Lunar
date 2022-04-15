@@ -257,6 +257,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     @Atomic var mediaKeyTapStarting = false
 
+    @Atomic var menuShown = false
+
     var currentPage: Int = Page.display.rawValue {
         didSet {
             log.verbose("Current Page: \(currentPage)")
@@ -394,6 +396,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func menuWillOpen(_: NSMenu) {
+        menuShown = true
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "4"
 
         initLicensingMenuItems(version)
@@ -405,6 +408,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func menuDidClose(_: NSMenu) {
+        menuShown = false
         menuUpdater?.invalidate()
     }
 
@@ -884,6 +888,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         } else {
             statusItem.button?.attributedTitle = "".attributedString
         }
+
+        guard menuShown else { return }
         infoMenuItem.attributedTitle = markdown.attributedString(from: "\(externalLux)\(internalLux)\(sun)".trimmed)
             .withFont(.systemFont(ofSize: 12, weight: .semibold))
         infoMenuItem.isEnabled = false
@@ -1925,9 +1931,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         startReceivingSignificantLocationChanges()
 
         #if TEST_MODE
-            if !datastore.shouldOnboard {
-                showWindow()
-            }
+//            if !datastore.shouldOnboard {
+//                showWindow()
+//            }
 
             fm.createFile(
                 atPath: "/usr/local/bin/lunar",
