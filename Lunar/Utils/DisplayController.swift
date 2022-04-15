@@ -419,7 +419,9 @@ class DisplayController: ObservableObject {
         }
 
         func matchDisplayByExcludingOthers(_ service: io_service_t, displays: [Display]? = nil) -> Display? {
-            nil
+            guard let display = displays?.first, DDC.avServiceCache[display.id] == nil else { return nil }
+
+            return display
         }
 
         func matchDisplayByProductAttributes(_ service: io_service_t, displays: [Display]? = nil, props: [String: Any]? = nil) -> Display? {
