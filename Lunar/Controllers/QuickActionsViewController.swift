@@ -749,6 +749,15 @@ enum MenuDensity: String, Codable, Defaults.Serializable {
     case dense
 }
 
+// MARK: - EnvState
+
+final class EnvState: ObservableObject {
+    @Published var recording = false
+    @Published var menuWidth: CGFloat = MENU_WIDTH
+    @Published var menuHeight: CGFloat = 100
+    @Published var menuMaxHeight: CGFloat = (NSScreen.main?.visibleFrame.height ?? 600) - 50
+}
+
 // MARK: - QuickActionsMenuView
 
 struct QuickActionsMenuView: View {
@@ -759,7 +768,10 @@ struct QuickActionsMenuView: View {
 
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.colors) var colors
+    @EnvironmentObject var env: EnvState
     @ObservedObject var dc: DisplayController = displayController
+    @Namespace var namespace
+
     @Default(.overrideAdaptiveMode) var overrideAdaptiveMode
     @Default(.showStandardPresets) var showStandardPresets
     @Default(.showCustomPresets) var showCustomPresets
@@ -772,6 +784,7 @@ struct QuickActionsMenuView: View {
     @Default(.showBrightnessMenuBar) var showBrightnessMenuBar
     @Default(.showOnlyExternalBrightnessMenuBar) var showOnlyExternalBrightnessMenuBar
     @Default(.showAdditionalInfo) var showAdditionalInfo
+    @Default(.startAtLogin) var startAtLogin
 
     @State var displays: [Display] = displayController.activeDisplayList
     @State var cursorDisplay: Display? = displayController.cursorDisplay
@@ -779,30 +792,12 @@ struct QuickActionsMenuView: View {
 
     @State var headerOpacity: CGFloat = 1.0
     @State var footerOpacity: CGFloat = 1.0
-
-    @EnvironmentObject var env: EnvState
-
     @State var additionalInfoButtonOpacity: CGFloat = 0.3
-
-    @Namespace var namespace
-
-    @State var footerIndicatorOpacity: CGFloat = 0
-
     @State var headerIndicatorOpacity: CGFloat = 0.0
-
+    @State var footerIndicatorOpacity: CGFloat = 0
     @State var optionsTab: OptionsTab = .layout
 
-    @Default(.startAtLogin) var startAtLogin
-
-    @State var menuHeight: CGFloat = (NSScreen.main?.visibleFrame.height ?? 600) - 50
     @State var displayCount = displayController.activeDisplayList.count
-
-    var menuWidth: CGFloat {
-        showStandardPresets || showCustomPresets || !showHeaderOnHover || !showFooterOnHover || showAdditionalInfo || headerOpacity > 0 ||
-            footerOpacity > 0
-            ? MENU_WIDTH
-            : MENU_WIDTH - 80
-    }
 
     var modeSelector: some View {
         let titleBinding = Binding<String>(
@@ -1093,43 +1088,34 @@ struct QuickActionsMenuView: View {
         }
     }
 
-    var theView: some View {
-        Group {
-            if displayCount >= 4 {
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack {
-                        content
-                        footer
-                    }
-                }
-                .frame(width: menuWidth, height: menuHeight, alignment: .top)
-            } else {
-                VStack {
-                    content
-                    footer
-                }
-                .frame(width: menuWidth, alignment: .top)
-            }
-        }
-    }
-
     var body: some View {
         let op = (showFooterOnHover && !showAdditionalInfo) ? footerOpacity : 1.0
-//        GeometryReader { _ in
-        theView
-
+        GeometryReader { _ in
+            VStack {
+                content
+                footer
+            }
+            .frame(maxWidth: env.menuWidth, alignment: .center)
+            .scrollOnOverflow()
+            .frame(width: env.menuWidth, height: cap(env.menuHeight, minVal: 100, maxVal: env.menuMaxHeight - 50), alignment: .top)
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .padding(.horizontal, MENU_HORIZONTAL_PADDING)
             .padding(.bottom, op < 1 ? 20 : 40)
             .padding(.top, 0)
             .background(bg, alignment: .top)
             .onAppear { setup() }
-            .onChange(of: popoverClosed) { closed in if !closed { setup() }}
+            .onChange(of: popoverClosed) { closed in setup(closed) }
             .frame(maxWidth: .infinity, alignment: .center)
-//        }
-//        .onTapGesture {
-//            env.recording = false
-//        }
+            .onTapGesture { env.recording = false }
+
+            .onChange(of: showStandardPresets, perform: setMenuWidth)
+            .onChange(of: showCustomPresets, perform: setMenuWidth)
+            .onChange(of: showHeaderOnHover, perform: setMenuWidth)
+            .onChange(of: showFooterOnHover, perform: setMenuWidth)
+            .onChange(of: showAdditionalInfo, perform: setMenuWidth)
+            .onChange(of: headerOpacity, perform: setMenuWidth)
+            .onChange(of: footerOpacity, perform: setMenuWidth)
+        }
     }
 
     var bg: some View {
@@ -1143,6 +1129,17 @@ struct QuickActionsMenuView: View {
                 .fill(colorScheme == .dark ? Colors.blackMauve.opacity(0.4) : Color.white.opacity(0.6))
                 .padding(.horizontal, MENU_HORIZONTAL_PADDING)
                 .padding(.bottom, 20)
+        }
+    }
+
+    func setMenuWidth(_: Any) {
+        withAnimation(.fastSpring) {
+            env.menuWidth = (
+                showStandardPresets || showCustomPresets
+                    || !showHeaderOnHover || !showFooterOnHover
+                    || showAdditionalInfo
+                    || headerOpacity > 0 || footerOpacity > 0
+            ) ? MENU_WIDTH : MENU_WIDTH - 80
         }
     }
 
@@ -1164,21 +1161,35 @@ struct QuickActionsMenuView: View {
         }
     }
 
-    func setup() {
+    func setup(_ closed: Bool? = nil) {
+        guard !(closed ?? popoverClosed) else {
+            displayHideTask = mainAsyncAfter(ms: 2000) {
+                cursorDisplay = nil
+                displays = []
+                displayCount = 0
+            }
+            return
+        }
+
+        displayHideTask = nil
         cursorDisplay = dc.cursorDisplay
         displays = dc.nonCursorDisplays
         displayCount = dc.activeDisplayList.count
 
         if showHeaderOnHover { headerOpacity = 0.0 }
         if showFooterOnHover { footerOpacity = 0.0 }
-        menuHeight = (NSScreen.main?.visibleFrame.height ?? 600) - 50
+        env.menuMaxHeight = (NSScreen.main?.visibleFrame.height ?? 600) - 50
 
         appDelegate?.statusItemButtonController?
             .resize(NSSize(
                 width: MENU_WIDTH + (MENU_HORIZONTAL_PADDING * 2),
-                height: menuHeight
+                height: env.menuMaxHeight
             ))
     }
+}
+
+var displayHideTask: DispatchWorkItem? {
+    didSet { oldValue?.cancel() }
 }
 
 var headerShowHideTask: DispatchWorkItem? {
@@ -1199,15 +1210,18 @@ struct QuickActionsView: View {
     @Environment(\.colorScheme) var colorScheme
     @Default(.popoverClosed) var popoverClosed
 
+    var env = EnvState()
+
     var body: some View {
         QuickActionsMenuView()
-            .environmentObject(EnvState())
+            .environmentObject(env)
             .colors(colorScheme == .dark ? .dark : .light)
     }
 }
 
 let MENU_WIDTH: CGFloat = 380
 let MENU_HORIZONTAL_PADDING: CGFloat = 24
+let MENU_VERTICAL_PADDING: CGFloat = 40
 
 // MARK: - ViewSizeKey
 
