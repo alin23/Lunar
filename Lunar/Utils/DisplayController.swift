@@ -597,7 +597,7 @@ class DisplayController: ObservableObject {
                 return nil
             }
 
-            if let mcdp = firstChildMatching(dcpService, names: ["AppleDCPMCDP29XX"]) {
+            if firstChildMatching(dcpService, names: ["AppleDCPMCDP29XX"]) != nil {
                 log.warning("This HDMI port doesn't support DDC because of the MCDP29xx chip inside it, ignoring for display \(display)")
                 display.badHDMI = true
                 return nil
