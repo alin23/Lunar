@@ -1,3 +1,8 @@
+body {
+    margin: auto;
+    max-width: 760px;
+}
+
 * {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: .95rem;
