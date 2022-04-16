@@ -85,9 +85,7 @@
 	<key>NSPrincipalClass</key>
 	<string>SentryCrashExceptionApplication</string>
 	<key>SUFeedURL</key>
-	<string>$(APPCAST_URL)</string>
-	<key>SUPublicDSAKeyFile</key>
-	<string>dsa_pub.pem</string>
+	<string>https://files.lunar.fyi/appcast2.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>lqnO6tg2A9evTIFo2SC9ArZ6NS84gtBshcAWdwh12xQ=</string>
 	<key>TestMode</key>

@@ -131,6 +131,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .wakeReapplyTries,
     .ddcSleepFactor,
     .ddcSleepLonger,
+    .updateChannel,
     .menuDensity,
 
     .brightnessKeysSyncControl,
@@ -147,6 +148,14 @@ enum DDCSleepFactor: UInt8, DefaultsSerializable {
     case short = 0
     case medium = 1
     case long = 2
+}
+
+// MARK: - UpdateChannel
+
+enum UpdateChannel: UInt8, DefaultsSerializable {
+    case release = 0
+    case beta = 1
+    case alpha = 2
 }
 
 let NON_RESETTABLE_SETTINGS: [Defaults.Keys] = [
@@ -365,6 +374,8 @@ class DataStore: NSObject {
             case let valueKey as Defaults.Key<BrightnessKeyAction>:
                 dict[key.name] = try! encoder.encode(Defaults[valueKey].rawValue).str()
             case let valueKey as Defaults.Key<DDCSleepFactor>:
+                dict[key.name] = try! encoder.encode(Defaults[valueKey].rawValue).str()
+            case let valueKey as Defaults.Key<UpdateChannel>:
                 dict[key.name] = try! encoder.encode(Defaults[valueKey].rawValue).str()
             case let valueKey as Defaults.Key<ScheduleTransition>:
                 dict[key.name] = try! encoder.encode(Defaults[valueKey].rawValue).str()
@@ -670,6 +681,7 @@ func initCache() {
     cacheKey(.syncPollingSeconds)
     cacheKey(.ddcSleepFactor)
     cacheKey(.ddcSleepLonger)
+    cacheKey(.updateChannel)
     cacheKey(.menuDensity)
     cacheKey(.sensorPollingSeconds)
     cacheKey(.adaptiveBrightnessMode)
@@ -807,6 +819,7 @@ extension Defaults.Keys {
     static let contrastStep = Key<Int>("contrastStep", default: 6)
     static let volumeStep = Key<Int>("volumeStep", default: 6)
     static let syncPollingSeconds = Key<Int>("syncPollingSeconds", default: 0)
+    static let updateChannel = Key<UpdateChannel>("updateChannel", default: .release)
     static let ddcSleepFactor = Key<DDCSleepFactor>("ddcSleepFactor", default: .short)
     static let ddcSleepLonger = Key<Bool>("ddcSleeplonger", default: false)
     static let menuDensity = Key<MenuDensity>("menuDensity", default: .comfortable)
@@ -971,4 +984,6 @@ let listenForRemoteCommandsPublisher = Defaults.publisher(.listenForRemoteComman
 let ddcSleepLongerPublisher = Defaults.publisher(.ddcSleepLonger).dropFirst().removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
 let ddcSleepFactorPublisher = Defaults.publisher(.ddcSleepFactor).dropFirst().removeDuplicates()
+    .filter { $0.oldValue != $0.newValue }
+let updateChannelPublisher = Defaults.publisher(.updateChannel).dropFirst().removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
