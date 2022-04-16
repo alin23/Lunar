@@ -20,6 +20,7 @@
 		C714C998280572920061588E /* ProViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C714C997280572920061588E /* ProViews.swift */; };
 		C714C99B2805BDEA0061588E /* SkyLight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C714C99A2805BDEA0061588E /* SkyLight.framework */; };
 		C714C99E2809B4FB0061588E /* ScrollViewIfNeeded.swift in Sources */ = {isa = PBXBuildFile; fileRef = C714C99D2809B4FB0061588E /* ScrollViewIfNeeded.swift */; };
+		C714C9A12809E6470061588E /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C714C9A02809E6470061588E /* Sparkle */; };
 		C71F8DB126542E1000C4648A /* GammaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71F8DB026542E1000C4648A /* GammaViewController.swift */; };
 		C71F8DBA265640C400C4648A /* DDCCTLControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71F8DB9265640C400C4648A /* DDCCTLControl.swift */; };
 		C722FB9F271AC83200ED4C94 /* Slider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C722FB9C271AC83200ED4C94 /* Slider.swift */; };
@@ -57,8 +58,6 @@
 		C74F8DC425EB94660077DF27 /* DisplayServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C74F8DBE25EB94660077DF27 /* DisplayServices.framework */; };
 		C75083622222DC3C0020270E /* HotKeyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C75083612222DC3C0020270E /* HotKeyViewController.swift */; };
 		C75083642222DC9F0020270E /* HotKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C75083632222DC9F0020270E /* HotKeyView.swift */; };
-		C750E03B27C6C1D900AD650C /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C750E03927C6C1BC00AD650C /* Sparkle.framework */; };
-		C750E03C27C6C1D900AD650C /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C750E03927C6C1BC00AD650C /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C7520C081FD20CC200756F82 /* DisplayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7520C071FD20CC200756F82 /* DisplayController.swift */; };
 		C7521D34226C762B0062EC81 /* DDC.c in Sources */ = {isa = PBXBuildFile; fileRef = C7521D32226C762A0062EC81 /* DDC.c */; };
 		C7521D37226C77510062EC81 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7151944224E34BA0024C6F6 /* DDC.swift */; };
@@ -209,7 +208,6 @@
 				C73B41ED263BE02E006F6783 /* LetsMove.framework in Embed Frameworks */,
 				C7138D982634B03400406EE3 /* Paddle.framework in Embed Frameworks */,
 				C72CFB972586B36E005F0340 /* WAYWindow.framework in Embed Frameworks */,
-				C750E03C27C6C1D900AD650C /* Sparkle.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -254,7 +252,6 @@
 		C74F8DBE25EB94660077DF27 /* DisplayServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DisplayServices.framework; path = ../../../../../System/Library/PrivateFrameworks/DisplayServices.framework; sourceTree = "<group>"; };
 		C75083612222DC3C0020270E /* HotKeyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyViewController.swift; sourceTree = "<group>"; };
 		C75083632222DC9F0020270E /* HotKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyView.swift; sourceTree = "<group>"; };
-		C750E03927C6C1BC00AD650C /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		C7520C071FD20CC200756F82 /* DisplayController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayController.swift; sourceTree = "<group>"; };
 		C7521D32226C762A0062EC81 /* DDC.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = DDC.c; path = Lunar/DDC/DDC.c; sourceTree = SOURCE_ROOT; };
 		C7545E3125B1996300383AFB /* PopUpButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopUpButton.swift; sourceTree = "<group>"; };
@@ -394,7 +391,6 @@
 				C7F99AC727175E0C00FBF192 /* SwiftyMarkdown in Frameworks */,
 				C73B41EC263BE02E006F6783 /* LetsMove.framework in Frameworks */,
 				C77AB65C269A032E0046BA78 /* Magnet in Frameworks */,
-				C750E03B27C6C1D900AD650C /* Sparkle.framework in Frameworks */,
 				C765E4FB26FF9F3500FD6463 /* CryptorECC in Frameworks */,
 				C705A04D268BA02E001ABBA9 /* AXSwift in Frameworks */,
 				C7138D962634B02900406EE3 /* Paddle.framework in Frameworks */,
@@ -410,6 +406,7 @@
 				C7E80E392637060F004718A4 /* libssl.a in Frameworks */,
 				C7F48C4A2657A258000715A8 /* DataCompression in Frameworks */,
 				C72CFB962586B36E005F0340 /* WAYWindow.framework in Frameworks */,
+				C714C9A12809E6470061588E /* Sparkle in Frameworks */,
 				C731E85E27E1E5090016B36D /* Sentry in Frameworks */,
 				C7DA10F7259B8979006DD876 /* Regex in Frameworks */,
 				C7C5AD9E26C5AD5400D68B7F /* MonitorPanel.framework in Frameworks */,
@@ -684,7 +681,6 @@
 			isa = PBXGroup;
 			children = (
 				C714C99A2805BDEA0061588E /* SkyLight.framework */,
-				C750E03927C6C1BC00AD650C /* Sparkle.framework */,
 				C7C5AD9926C5AD5400D68B7F /* MonitorPanel.framework */,
 				C7E896DC2652C37E0079A328 /* CoreBrightness.framework */,
 				C73B41EA263BE01F006F6783 /* LetsMove.framework */,
@@ -797,7 +793,6 @@
 				C7AEC7F31FD0B4350039B562 /* Resources */,
 				C7AEC7F21FD0B4350039B562 /* Frameworks */,
 				C75083582222865F0020270E /* Embed Frameworks */,
-				C78B9223237ED34E0060DC7C /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -832,6 +827,7 @@
 				C77B176827BE430200B957D1 /* SimplyCoreAudio */,
 				C799C2F427BF67C4003A2FB9 /* Socket */,
 				C731E85D27E1E5090016B36D /* Sentry */,
+				C714C9A02809E6470061588E /* Sparkle */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -895,6 +891,7 @@
 				C77B176727BE430200B957D1 /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */,
 				C799C2F327BF67C4003A2FB9 /* XCRemoteSwiftPackageReference "BlueSocket" */,
 				C731E85C27E1E5090016B36D /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
+				C714C99F2809E6470061588E /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -957,26 +954,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\n./bin/gencode.sh\n\n#if [[ $CONFIGURATION == \"Release\" ]]; then\n#    for xpc in Frameworks/XPCServices/*.xpc\n#    do\n#        codesign -vvv --deep --strict $xpc || ./bin/codesign_embedded_executable \"$EXPANDED_CODE_SIGN_IDENTITY_NAME\" $xpc\n#    done \n#    codesign -vvv --deep --strict Frameworks/Sparkle.framework/Versions/A/Resources/Autoupdate || ./bin/codesign_embedded_executable \"$EXPANDED_CODE_SIGN_IDENTITY_NAME\" Frameworks/Sparkle.framework/Versions/A/Resources/Autoupdate\n#    codesign -vvv --deep --strict Frameworks/Sparkle.framework/Versions/A/Resources/Updater.app || ./bin/codesign_embedded_executable \"$EXPANDED_CODE_SIGN_IDENTITY_NAME\" Frameworks/Sparkle.framework/Versions/A/Resources/Updater.app\n#fi\n";
-		};
-		C78B9223237ED34E0060DC7C /* Run Script */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}",
-			);
-			name = "Run Script";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nenv > /tmp/phase.env\n#exit 0\nif [[ $ONLY_ACTIVE_ARCH == \"NO\" ]]; then\n    echo Running pack\n    \n    if [[ $CONFIGURATION == \"Release\" ]]; then\n        ./bin/buildscript.sh 2>&1 | tee -a /tmp/lunar-buildscript.log\n    else\n        export DISABLE_PACKING=1\n        export DISABLE_NOTARIZATION=1\n    fi\n    \n    ./bin/pack 2>&1 | tee /tmp/lunar-pack.log\nelse\n    echo Running sign\n    # ./bin/sign\nfi\n";
+			shellScript = "./bin/gencode.sh\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1182,7 +1160,6 @@
 		C73B41E2263AA829006F6783 /* Test */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				APPCAST_URL = "https://static.lunar.fyi/appcast-test.xml";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
 				BETA = NO;
@@ -1302,7 +1279,6 @@
 		C745CDC12636F65A00E119EB /* Beta */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				APPCAST_URL = "https://static.lunar.fyi/appcast-beta.xml";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
 				BETA = YES;
@@ -1484,7 +1460,6 @@
 		C7AEC81C1FD0B4350039B562 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				APPCAST_URL = "https://lunar.fyi/appcast.xml";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
 				BETA = NO;
@@ -1549,7 +1524,6 @@
 		C7AEC81D1FD0B4350039B562 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				APPCAST_URL = "https://lunar.fyi/appcast.xml";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
 				BETA = NO;
@@ -1693,6 +1667,14 @@
 			requirement = {
 				branch = master;
 				kind = branch;
+			};
+		};
+		C714C99F2809E6470061588E /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.0;
 			};
 		};
 		C731E85C27E1E5090016B36D /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
@@ -1892,6 +1874,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C7138D8B2634AF0500406EE3 /* XCRemoteSwiftPackageReference "KeyHolder" */;
 			productName = KeyHolder;
+		};
+		C714C9A02809E6470061588E /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C714C99F2809E6470061588E /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
 		};
 		C731E85D27E1E5090016B36D /* Sentry */ = {
 			isa = XCSwiftPackageProductDependency;
