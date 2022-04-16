@@ -50,11 +50,16 @@ public struct LicenseView: View {
 
             if lunarProOnTrial {
                 SwiftUI.Button("Buy") { showCheckout() }
-                    .buttonStyle(FlatButton(color: .primary, textColor: colors.inverted))
+                    .buttonStyle(FlatButton(
+                        color: .primary.opacity(0.9),
+                        textColor: colors.inverted,
+                        horizontalPadding: 6,
+                        verticalPadding: 3
+                    ))
                     .font(.system(size: 12, weight: .semibold))
             }
             SwiftUI.Button((lunarProActive && !lunarProOnTrial) ? "Manage" : "Activate") { showLicenseActivation() }
-                .buttonStyle(FlatButton(color: .primary, textColor: colors.inverted))
+                .buttonStyle(FlatButton(color: .primary.opacity(0.9), textColor: colors.inverted, horizontalPadding: 6, verticalPadding: 3))
                 .font(.system(size: 12, weight: .semibold))
         }
         .foregroundColor(.secondary)
@@ -86,7 +91,7 @@ public struct VersionView: View {
     // MARK: Public
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 5) {
             HStack {
                 Text("Version:")
                     .font(.system(size: 12, weight: .medium))
@@ -96,9 +101,15 @@ public struct VersionView: View {
                 Spacer()
 
                 SwiftUI.Button("Check for updates") { updater.checkForUpdates() }
-                    .buttonStyle(FlatButton(color: .primary, textColor: colors.inverted))
+                    .buttonStyle(FlatButton(
+                        color: .primary.opacity(0.9),
+                        textColor: colors.inverted,
+                        horizontalPadding: 6,
+                        verticalPadding: 3
+                    ))
                     .font(.system(size: 12, weight: .semibold))
             }
+            Divider().padding(.vertical, 2).opacity(0.5)
             HStack(spacing: 3) {
                 Text("Check automatically")
                     .font(.system(size: 12, weight: .medium))
@@ -133,6 +144,32 @@ public struct VersionView: View {
                 ))
                 .font(.system(size: 12, weight: .semibold))
             }
+            Divider().padding(.vertical, 2).opacity(0.5)
+            HStack(spacing: 3) {
+                Text("Update channel")
+                    .font(.system(size: 12, weight: .medium))
+                Spacer()
+
+                SwiftUI.Button("Release") { updateChannel = .release }
+                    .buttonStyle(PickerButton(horizontalPadding: 6, verticalPadding: 3, enumValue: $updateChannel, onValue: .release))
+                    .font(.system(size: 12, weight: .semibold))
+                SwiftUI.Button("Beta") { updateChannel = .beta }
+                    .buttonStyle(PickerButton(
+                        horizontalPadding: 6,
+                        verticalPadding: 3,
+                        enumValue: $updateChannel,
+                        onValue: .beta
+                    ))
+                    .font(.system(size: 12, weight: .semibold))
+                SwiftUI.Button("Alpha") { updateChannel = .alpha }
+                    .buttonStyle(PickerButton(
+                        horizontalPadding: 6,
+                        verticalPadding: 3,
+                        enumValue: $updateChannel,
+                        onValue: .alpha
+                    ))
+                    .font(.system(size: 12, weight: .semibold))
+            }
         }
         .foregroundColor(.secondary)
         .padding(.horizontal, 8)
@@ -144,6 +181,7 @@ public struct VersionView: View {
 
     @Default(.checkForUpdate) var checkForUpdates
     @Default(.updateCheckInterval) var updateCheckInterval
+    @Default(.updateChannel) var updateChannel
 
     @ObservedObject var updater: SPUUpdater
     @Environment(\.colors) var colors

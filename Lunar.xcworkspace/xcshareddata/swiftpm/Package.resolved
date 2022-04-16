@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Flight-School/AnyCodable",
       "state" : {
-        "revision" : "22f302d4c048aafcda09a4ab5b8c0b03855316fb",
-        "version" : "0.6.3"
+        "revision" : "11423ef0c756e8a1f6b4bb576dab9d97bc016c70",
+        "version" : "0.6.4"
       }
     },
     {
@@ -172,6 +172,15 @@
       }
     },
     {
+      "identity" : "sparkle",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/sparkle-project/Sparkle",
+      "state" : {
+        "revision" : "286edd1fa22505a9e54d170e9fd07d775ea233f2",
+        "version" : "2.1.0"
+      }
+    },
+    {
       "identity" : "surge",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Jounce/Surge",
@@ -194,8 +203,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
-        "revision" : "82905286cc3f0fa8adc4674bf49437cab65a8373",
-        "version" : "1.1.1"
+        "revision" : "f3c9084a71ef4376f2fabbdf1d3d90a49f1fabdb",
+        "version" : "1.1.2"
       }
     },
     {
@@ -248,8 +257,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SwiftyBeaver/SwiftyBeaver",
       "state" : {
-        "revision" : "2c039501d6eeb4d4cd4aec4a8d884ad28862e044",
-        "version" : "1.9.5"
+        "revision" : "12b5acf96d98f91d50de447369bd18df74600f1a",
+        "version" : "1.9.6"
       }
     },
     {

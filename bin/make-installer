@@ -17,9 +17,6 @@ set BUILD_DIR "$CODESIGNING_FOLDER_PATH"
 set TMP_DIR /tmp/Lunar
 set RELEASE_DIR "$WORK_DIR/Releases"
 set APPCAST "$RELEASE_DIR/appcast.xml"
-if test "$CONFIGURATION" != Release
-    set APPCAST "$RELEASE_DIR/appcast-"(string lower -- $CONFIGURATION)".xml"
-end
 
 set APP_TMP "$TMP_DIR/Lunar.app"
 set APP_VERSION (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_TMP/Contents/Info.plist" || exit 1)
@@ -38,7 +35,7 @@ function make-installer -a ext
         echo (set_color red)"Deleting $APP_INSTALLER"(set_color normal)
         rm "$APP_INSTALLER"
     end
-    if test -f "$APP_LATEST_INSTALLER"
+    if test -f "$APP_LATEST_INSTALLER" && not string match -rq "$CHANNEL" "beta|alpha"
         echo \n(set_color red)"Deleting $APP_LATEST_INSTALLER"(set_color normal)
         rm "$APP_LATEST_INSTALLER"
     end
@@ -61,7 +58,11 @@ function make-installer -a ext
         xcnotary notarize -d alin.p32@gmail.com -k altool "$APP_INSTALLER" || exit 1
     end
 
-    cp "$APP_INSTALLER" "$APP_LATEST_INSTALLER" || exit 1
+    if not string match -rq "$CHANNEL" "beta|alpha"
+        echo (set_color yellow)"Copying $APP_INSTALLER to $APP_LATEST_INSTALLER"(set_color normal)
+        cp "$APP_INSTALLER" "$APP_LATEST_INSTALLER" || exit 1
+    end
+
     if test "$ext" = pkg
         cd "$RELEASE_DIR"
 
