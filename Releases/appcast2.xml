@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ASCII" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Lunar</title>
+        <item>
+            <title>5.6.0b1</title>
+            <pubDate>Sat, 16 Apr 2022 20:39:12 +0300</pubDate>
+            <link>https://lunar.fyi/</link>
+            <sparkle:fullReleaseNotesLink>https://lunar.fyi/changelog</sparkle:fullReleaseNotesLink>
+            <sparkle:channel>beta</sparkle:channel>
+            <sparkle:version>5.6.0b1</sparkle:version>
+            <sparkle:shortVersionString>5.6.0b1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-5.6.0b1.html</sparkle:releaseNotesLink>
+            <enclosure url="https://files.lunar.fyi/releases/Lunar-5.6.0b1.dmg" length="18186624" type="application/octet-stream" sparkle:edSignature="qQwfwVn/XbUF4/9ddH2zNJGThfxI+g3eI8VU5rgLsM3cexdB9q9hjzT3xjIdaKOUg8wGFjenpT4KMZ4bV2oPAA=="/>
+        </item>
+    </channel>
+</rss>

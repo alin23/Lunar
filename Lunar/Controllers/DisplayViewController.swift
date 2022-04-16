@@ -787,8 +787,6 @@ class DisplayViewController: NSViewController {
     @IBAction func proButtonClick(_: Any) {
         if lunarProActive, !lunarProOnTrial {
             NSWorkspace.shared.open("https://lunar.fyi/#pro".asURL()!)
-        } else if lunarProBadSignature {
-            NSWorkspace.shared.open("https://lunar.fyi/download/latest".asURL()!)
         } else if let paddle = paddle, let lunarProProduct = lunarProProduct {
             if lunarProProduct.licenseCode != nil {
                 deactivateLicense {
@@ -810,10 +808,6 @@ class DisplayViewController: NSViewController {
                 button.bg = red
                 button.attributedTitle = "Pro".withAttribute(.textColor(white))
                 button.setFrameSize(NSSize(width: 50, height: button.frame.height))
-            } else if lunarProBadSignature {
-                button.bg = errorRed
-                button.attributedTitle = "Invalid App Signature".withAttribute(.textColor(.black.withAlphaComponent(0.8)))
-                button.setFrameSize(NSSize(width: 150, height: button.frame.height))
             } else {
                 button.bg = green
                 button.attributedTitle = "Get Pro".withAttribute(.textColor(white))
@@ -832,7 +826,6 @@ class DisplayViewController: NSViewController {
     func styleButton<T>(_ button: PopoverButton<T>, icon: String, display: Display) -> Void {
         if buttonY == nil { buttonY = button.frame.origin.y }
 
-        //        let color = display.isMacBook ? white : NSColor(named: "Caption Tertiary")!
         let color = NSColor(named: "Caption Tertiary")!
         let symbol = NSImage.SymbolConfiguration(pointSize: 14, weight: .bold)
 

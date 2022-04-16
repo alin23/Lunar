@@ -1896,6 +1896,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         try? updater.start()
+        updater.automaticallyDownloadsUpdates = CachedDefaults[.silentUpdate]
+
         handleDaemon()
 
         initDisplayController()

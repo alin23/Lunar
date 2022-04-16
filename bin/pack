@@ -13,23 +13,11 @@ set CODESIGN_CERT_INSTALLER "Developer ID Installer: Alin Panaitiu (RDDXV84A73)"
 set WORK_DIR "$PROJECT_DIR"
 set SCRIPTS_DIR "$PROJECT_DIR/scripts"
 
-if not command_exists create-dmg
-    npm i -g create-dmg
-end
-if not command_exists xcnotary
-    brew install xcnotary
-end
-if not "$WORK_DIR/bin/update_appcast.py" --help 2>/dev/null >/dev/null
-    pip install -U -r "$WORK_DIR/requirements.txt"
-end
+command_exists create-dmg || npm i -g create-dmg
+command_exists xcnotary || brew install xcnotary
 
 set BUILD_DIR "$CODESIGNING_FOLDER_PATH"
 set TMP_DIR /tmp/Lunar
-set RELEASE_DIR "$WORK_DIR/Releases"
-set APPCAST "$RELEASE_DIR/appcast.xml"
-if test "$CONFIGURATION" != Release
-    set APPCAST "$RELEASE_DIR/appcast-"(string lower -- $CONFIGURATION)".xml"
-end
 
 set APP_TMP "$TMP_DIR/Lunar.app"
 set APP_ZIP_TMP "$TMP_DIR/Lunar.zip"
@@ -74,17 +62,12 @@ if test "$DISABLE_NOTARIZATION" != 1
 end
 
 test -f "$APP_ZIP_TMP" && rm -rf "$APP_ZIP_TMP"
-ditto -c -k --keepParent "$APP_TMP" "$APP_ZIP_TMP"
+ditto -c -k --sequesterRsrc --keepParent "$APP_TMP" "$APP_ZIP_TMP"
 
 if test "$DISABLE_PACKING" != 1
     set APP_VERSION (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_TMP/Contents/Info.plist" || exit 1)
 
     ./make-installer dmg
 
-    # ./make-installer dmg &
-    # ./make-installer pkg &
-    # wait
-
-    export CONFIGURATION=$CONFIGURATION
-    ./update_appcast
+    cd "$PROJECT_DIR" && make appcast
 end
