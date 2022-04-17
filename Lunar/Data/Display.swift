@@ -1044,7 +1044,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     // MARK: Initializers
 
-    var maxSoftwareBrightness: Float = 1.5
+    lazy var maxSoftwareBrightness: Float = mapNumber(Float(edr), fromLow: 1.0, fromHigh: 31.0, toLow: 1.0, toHigh: 2.0)
     @Published @objc dynamic var appPreset: AppException? = nil
 
     @objc dynamic lazy var hasAmbientLightAdaptiveBrightness: Bool = DisplayServicesHasAmbientLightCompensation(id)
@@ -3421,6 +3421,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     var shouldDetectI2C: Bool { ddcEnabled && !isSmartBuiltin && supportsGammaByDefault && !isDummy }
 
+    var edr: CGFloat { screen?.maximumPotentialExtendedDynamicRangeColorComponentValue ?? 1.0 }
+
     static func reconfigure(tries: Int = 20, _ action: (MPDisplayMgr) -> Void) {
         guard let manager = DisplayController.panelManager, DisplayController.tryLockManager(tries: tries) else {
             return
@@ -3460,7 +3462,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func getSupportsEnhance() -> Bool {
-        guard let control = control, let edr = screen?.maximumPotentialExtendedDynamicRangeColorComponentValue else { return false }
+        guard let control = control else { return false }
         return edr > 2.0 && !control.isSoftware
     }
 
