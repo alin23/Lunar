@@ -868,6 +868,28 @@ class DisplayController: ObservableObject {
         return nil
     }
 
+    var activeDisplayCount: Int {
+        #if DEBUG
+            return activeDisplayList.filter { !$0.isForTesting }.count
+        #else
+            return activeDisplayList.count
+        #endif
+    }
+
+    lazy var xdrContrast: Bool = {
+        xdrContrastPublisher.sink { self.xdrContrast = $0.newValue }.store(in: &observers)
+        return Defaults[.xdrContrast]
+    }() {
+        didSet {
+            guard activeDisplayCount == 1, let display = firstNonTestingDisplay, display.control is AppleNativeControl else { return }
+            if !xdrContrast {
+                display.setXDRContrast(0.0)
+            } else {
+                activeDisplayList.filter(\.enhanced).forEach { $0.setXDRContrast($0.xdrContrast) }
+            }
+        }
+    }
+
     lazy var autoXdr: Bool = {
         autoXdrPublisher.sink { self.autoXdr = $0.newValue }.store(in: &observers)
         return Defaults[.autoXdr]
@@ -1848,7 +1870,6 @@ class DisplayController: ObservableObject {
                 }
 
                 display.maxEDR = display.computeMaxEDR()
-
                 display.softwareBrightness = cap(
                     display.softwareBrightness + (offset.f / 70),
                     minVal: 1.01,

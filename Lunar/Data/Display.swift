@@ -317,10 +317,8 @@ struct GammaTable: Equatable {
     func adjust(brightness: UInt16, preciseBrightness: Double? = nil, maxValue: Float) -> GammaTable {
         let br: Float = preciseBrightness?.f ?? (brightness.f / 100)
         let max: Float = br <= 1.0 ? 1.0 : maxValue
-        let gammaBrightness: Float = mapNumber(
-            powf(br, 0.8),
-            fromLow: 0.00, fromHigh: max, toLow: 0.08, toHigh: max
-        )
+        let gammaBrightness: Float = mapNumber(br, fromLow: 0.00, fromHigh: max, toLow: 0.08, toHigh: max)
+
         return GammaTable(
             red: red * gammaBrightness,
             green: green * gammaBrightness,
@@ -1292,6 +1290,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         return p
     }()
 
+    var hdrWindowOpenedAt = Date()
+    var xdrContrast: Float = 0.0
     var maxSoftwareBrightness: Float { max(maxEDR, 1.02) }
     @Published @objc dynamic var subzero = false {
         didSet {
@@ -1658,6 +1658,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var hdrWindowController: NSWindowController? {
         get { Self.getWindowController(id, type: "hdr") }
         set { Self.setWindowController(id, type: "hdr", windowController: newValue) }
+    }
+
+    var xdrSetter: DispatchWorkItem? {
+        didSet { oldValue?.cancel() }
     }
 
     var osdWindowController: NSWindowController? {
@@ -3465,7 +3469,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func getSupportsEnhance() -> Bool {
         guard let control = control else { return false }
-        return potentialEDR > 2.0 && !control.isSoftware
+        return potentialEDR > 2.0 && control is AppleNativeControl
     }
 
     func observeBrightnessChangeDS() -> Bool {
