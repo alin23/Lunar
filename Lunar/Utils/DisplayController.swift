@@ -1411,7 +1411,6 @@ class DisplayController: ObservableObject {
         guard adaptiveMode.available else { return }
         reconfigureTask = Repeater(every: 1, times: 3, name: "DisplayControllerReconfigure") { [self] in
             adaptiveMode.withForce {
-                log.info("Resetting software dimming")
                 activeDisplays.values.forEach { d in
                     d.updateCornerWindow()
                     if d.softwareBrightness == 1.0 {
@@ -1847,6 +1846,9 @@ class DisplayController: ObservableObject {
                 if !display.enhanced {
                     display.handleEnhance(true, withoutSettingBrightness: true)
                 }
+
+                display.maxEDR = display.computeMaxEDR()
+
                 display.softwareBrightness = cap(
                     display.softwareBrightness + (offset.f / 70),
                     minVal: 1.01,

@@ -297,7 +297,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             SentrySDK.configureScope { scope in
                 scope.setTag(value: "500MB", key: "memory")
                 scope.setExtra(value: mb, key: "usedMB")
-                SentrySDK.capture(error: MemoryUsageError.highMemoryUsage(mb.intround))
+                // SentrySDK.capture(error: MemoryUsageError.highMemoryUsage(mb.intround))
             }
         }
     }
@@ -1141,6 +1141,42 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 log.info("\(notification.name)")
                 displayController.reconfigure()
                 displayController.retryAutoBlackoutLater()
+            }.store(in: &observers)
+
+        NotificationCenter.default
+            .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
+            .throttle(for: .milliseconds(30), scheduler: RunLoop.main, latest: true)
+            .sink { notification in
+                log.info("\(notification.name)")
+                displayController.activeDisplays.values.filter { !$0.isForTesting }.forEach { d in
+                    let maxEDR = d.computeMaxEDR()
+
+                    guard d.maxEDR != maxEDR else {
+                        return
+                    }
+
+                    d.maxEDR = maxEDR
+                    #if DEBUG
+                        log.info("MAX EDR: \(maxEDR)")
+                    #endif
+
+                    if d.softwareBrightness > 1.0 {
+                        let oldSoftwareBrightness = mapNumber(
+                            d.softwareBrightness,
+                            fromLow: 1.0,
+                            fromHigh: d.maxSoftwareBrightness,
+                            toLow: 0.0,
+                            toHigh: 1.0
+                        )
+                        d.softwareBrightness = mapNumber(
+                            oldSoftwareBrightness,
+                            fromLow: 0.0,
+                            fromHigh: 1.0,
+                            toLow: 1.0,
+                            toHigh: d.maxSoftwareBrightness
+                        )
+                    }
+                }
             }.store(in: &observers)
 
         NotificationCenter.default

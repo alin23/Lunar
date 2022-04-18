@@ -1044,7 +1044,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     // MARK: Initializers
 
-    lazy var maxSoftwareBrightness: Float = mapNumber(Float(edr), fromLow: 1.0, fromHigh: 31.0, toLow: 1.0, toHigh: 2.0)
+    lazy var maxEDR = computeMaxEDR()
     @Published @objc dynamic var appPreset: AppException? = nil
 
     @objc dynamic lazy var hasAmbientLightAdaptiveBrightness: Bool = DisplayServicesHasAmbientLightCompensation(id)
@@ -1292,6 +1292,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         return p
     }()
 
+    var maxSoftwareBrightness: Float { max(maxEDR, 1.02) }
     @Published @objc dynamic var subzero = false {
         didSet {
             guard apply else { return }
@@ -3421,7 +3422,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     var shouldDetectI2C: Bool { ddcEnabled && !isSmartBuiltin && supportsGammaByDefault && !isDummy }
 
-    var edr: CGFloat { screen?.maximumPotentialExtendedDynamicRangeColorComponentValue ?? 1.0 }
+    var potentialEDR: CGFloat { screen?.maximumPotentialExtendedDynamicRangeColorComponentValue ?? 1.0 }
+    var edr: CGFloat { NSScreen.forDisplayID(id)?.maximumExtendedDynamicRangeColorComponentValue ?? 1.0 }
 
     static func reconfigure(tries: Int = 20, _ action: (MPDisplayMgr) -> Void) {
         guard let manager = DisplayController.panelManager, DisplayController.tryLockManager(tries: tries) else {
@@ -3463,7 +3465,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func getSupportsEnhance() -> Bool {
         guard let control = control else { return false }
-        return edr > 2.0 && !control.isSoftware
+        return potentialEDR > 2.0 && !control.isSoftware
     }
 
     func observeBrightnessChangeDS() -> Bool {
@@ -4823,7 +4825,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         let brightness = brightness ?? limitedBrightness
         let gammaTable = lunarGammaTable ?? defaultGammaTable
-        let newGammaTable = gammaTable.adjust(brightness: brightness, preciseBrightness: preciseBrightness, maxValue: maxSoftwareBrightness)
+        let newGammaTable = gammaTable.adjust(brightness: brightness, preciseBrightness: preciseBrightness, maxValue: maxEDR)
 
         guard !GammaControl.sliderTracking, let oldBrightness = oldBrightness else {
             guard !newGammaTable.isZero else { return }
@@ -4844,7 +4846,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             Thread.sleep(forTimeInterval: 0.002)
 
             self.gammaChanged = true
-            for gammaTable in gammaTable.stride(from: oldBrightness, to: brightness, maxValue: self.maxSoftwareBrightness) {
+            for gammaTable in gammaTable.stride(from: oldBrightness, to: brightness, maxValue: self.maxEDR) {
                 self.apply(gamma: gammaTable)
                 if let onChange = onChange, let brightness = gammaTable.brightness {
                     onChange(brightness)
