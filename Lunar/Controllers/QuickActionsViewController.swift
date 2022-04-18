@@ -80,7 +80,7 @@ struct DisplayRowView: View {
 
     var softwareSliders: some View {
         Group {
-            if display.enhanced || SWIFTUI_PREVIEW {
+            if display.enhanced || SWIFTUI_PREVIEW, !display.blackOutEnabled {
                 BigSurSlider(
                     percentage: $display.xdrBrightness,
                     image: "sun.max.circle.fill",
@@ -90,7 +90,7 @@ struct DisplayRowView: View {
                     showValue: $showSliderValues
                 )
             }
-            if display.subzero || SWIFTUI_PREVIEW, !display.blackOutEnabled, display.supportsGamma {
+            if display.subzero || SWIFTUI_PREVIEW, !display.blackOutEnabled {
                 BigSurSlider(
                     percentage: $display.softwareBrightness,
                     image: "moon.circle.fill",

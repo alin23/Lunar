@@ -8,7 +8,7 @@ endef
 DISABLE_NOTARIZATION := ${DISABLE_NOTARIZATION}
 DISABLE_PACKING := ${DISABLE_PACKING}
 ENV=Release
-CHANNEL=""
+CHANNEL=
 DSA=0
 
 ifeq (beta, $(CHANNEL))
@@ -65,6 +65,7 @@ release: changelog
 	cat ReleaseNotes/$(VERSION).md >> /tmp/release_file_$(VERSION).md
 	gh release create v$(VERSION) -F /tmp/release_file_$(VERSION).md "Releases/Lunar-$(VERSION).dmg#Lunar.dmg"
 
+sentry: export DWARF_DSYM_FOLDER_PATH="$(shell xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -showBuildSettings -json 2>/dev/null | jq -r .[0].buildSettings.DWARF_DSYM_FOLDER_PATH)"
 sentry:
 	./bin/sentry.sh
 
@@ -72,12 +73,12 @@ print-%  : ; @echo $* = $($*)
 
 dmg: SHELL=/usr/local/bin/fish
 dmg:
-	env CODESIGNING_FOLDER_PATH=(xcdir -s 'Lunar $(ENV)' -c $(ENV))/Lunar.app CONFIGURATION=$(ENV) ./bin/make-installer dmg
+	env CODESIGNING_FOLDER_PATH=(xcdir -s 'Lunar $(ENV)' -c $(ENV))/Lunar.app ./bin/make-installer dmg
 
 pack: SHELL=/usr/local/bin/fish
 pack: export SPARKLE_BIN_DIR="$(shell dirname $$(dirname $$(dirname $$(xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -showBuildSettings -json 2>/dev/null | jq -r .[0].buildSettings.BUILT_PRODUCTS_DIR))))/SourcePackages/artifacts/sparkle/bin"
 pack:
-	env CODESIGNING_FOLDER_PATH=(xcdir -s 'Lunar $(ENV)' -c $(ENV))/Lunar.app CONFIGURATION=$(ENV) PROJECT_DIR=$$PWD ./bin/pack
+	env CODESIGNING_FOLDER_PATH=(xcdir -s 'Lunar $(ENV)' -c $(ENV))/Lunar.app PROJECT_DIR=$$PWD ./bin/pack
 
 appcast: export SPARKLE_BIN_DIR="$(shell dirname $$(dirname $$(dirname $$(xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -showBuildSettings -json 2>/dev/null | jq -r .[0].buildSettings.BUILT_PRODUCTS_DIR))))/SourcePackages/artifacts/sparkle/bin"
 appcast: VERSION=$(shell xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace -showBuildSettings -json 2>/dev/null | jq -r .[0].buildSettings.MARKETING_VERSION)
@@ -106,10 +107,10 @@ else
 	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=$(ONLY_ACTIVE_ARCH) | tee /tmp/lunar-$(ENV)-build.log
 endif
 ifneq ($(DISABLE_PACKING),1)
-	make pack
+	make pack VERSION=$(VERSION) CHANNEL=$(CHANNEL) V=$V
 endif
 ifneq ($(DISABLE_SENTRY),1)
-	make sentry
+	make sentry VERSION=$(VERSION) CHANNEL=$(CHANNEL) V=$V
 endif
 
 Releases/Lunar-%.html: ReleaseNotes/$(VERSION)*.md
