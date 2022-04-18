@@ -344,6 +344,7 @@ struct AdvancedSettingsView: View {
     @Default(.allowBlackOutOnSingleScreen) var allowBlackOutOnSingleScreen
     @Default(.reapplyValuesAfterWake) var reapplyValuesAfterWake
     @Default(.hdrWorkaround) var hdrWorkaround
+    @Default(.xdrContrast) var xdrContrast
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -393,6 +394,10 @@ struct AdvancedSettingsView: View {
                     • Using "XDR Brightness"
                     • Using "Sub-zero dimming"
                     """
+                )
+                SettingsToggle(
+                    text: "Enhance contrast in XDR Brightness", setting: $xdrContrast,
+                    help: "Improve readability in sunlight by increasing XDR contrast.\nThis option is especially useful when using apps with dark backgrounds."
                 )
                 SettingsToggle(
                     text: "Allow BlackOut on single screen", setting: $allowBlackOutOnSingleScreen,
