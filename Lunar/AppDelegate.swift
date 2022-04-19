@@ -255,7 +255,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var hdrFixer: Repeater? = AppDelegate.fixHDR()
 
-    @Atomic var mediaKeyTapStarting = false
+    @Atomic var mediaKeyTapBrightnessStarting = false
+    @Atomic var mediaKeyTapAudioStarting = false
 
     @Atomic var menuShown = false
 
@@ -1228,12 +1229,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .publisher(for: NSWorkspace.screensDidWakeNotification, object: nil)
         let sleepPublisher = NSWorkspace.shared.notificationCenter
             .publisher(for: NSWorkspace.screensDidSleepNotification, object: nil)
+        let logoutPublisher = NSWorkspace.shared.notificationCenter
+            .publisher(for: NSWorkspace.sessionDidResignActiveNotification, object: nil)
+        let loginPublisher = NSWorkspace.shared.notificationCenter
+            .publisher(for: NSWorkspace.sessionDidBecomeActiveNotification, object: nil)
 
-        wakePublisher.merge(with: sleepPublisher)
+        wakePublisher
+            .merge(with: sleepPublisher)
+            .merge(with: logoutPublisher)
+            .merge(with: loginPublisher)
             .debounce(for: .seconds(2), scheduler: RunLoop.main)
             .sink { notif in
+                log.info(notif.name)
                 switch notif.name {
-                case NSWorkspace.screensDidWakeNotification:
+                case NSWorkspace.screensDidWakeNotification, NSWorkspace.sessionDidBecomeActiveNotification:
                     log.debug("Screens woke up")
                     screensSleeping.store(false, ordering: .sequentiallyConsistent)
                     displayController.retryAutoBlackoutLater()
@@ -1289,7 +1298,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                         }
                     }
 
-                case NSWorkspace.screensDidSleepNotification:
+                case NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification:
                     log.debug("Screens gone to sleep")
                     screensSleeping.store(true, ordering: .sequentiallyConsistent)
                     displayController.cancelAutoBlackout()

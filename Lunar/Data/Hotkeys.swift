@@ -903,49 +903,56 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func startOrRestartMediaKeyTap(brightnessKeysEnabled: Bool? = nil, volumeKeysEnabled: Bool? = nil, checkPermissions: Bool = false) {
-        displayController.currentAudioDisplay = displayController.getCurrentAudioDisplay()
+        mediaKeyTapStartingFinishTask = mainAsyncAfter(ms: 300) {
+            displayController.currentAudioDisplay = displayController.getCurrentAudioDisplay()
 
-        if checkPermissions {
-            acquirePrivileges()
-        } else if let enabled = brightnessKeysEnabled, enabled {
-            acquirePrivileges()
-        } else if let enabled = volumeKeysEnabled, enabled {
-            acquirePrivileges()
-        }
+            if checkPermissions || brightnessKeysEnabled ?? false || volumeKeysEnabled ?? false {
+                acquirePrivileges()
+            }
 
-        DispatchQueue.global().async {
-            guard !self.mediaKeyTapStarting else { return }
-            asyncNow(timeout: 5.seconds, queue: concurrentQueue) {
-                self.mediaKeyTapStarting = true
-                self.mediaKeyTapStartingFinishTask = mainAsyncAfter(ms: 5000) { self.mediaKeyTapStarting = false }
-                defer {
-                    self.mediaKeyTapStarting = false
-                    self.mediaKeyTapStartingFinishTask = nil
-                }
+            if !self.mediaKeyTapBrightnessStarting {
+                self.mediaKeyTapBrightnessStarting = true
 
                 mediaKeyTapBrightness?.stop()
                 mediaKeyTapBrightness = nil
 
+                if brightnessKeysEnabled ?? CachedDefaults[.brightnessKeysEnabled] {
+                    mediaKeyTapBrightness = MediaKeyTap(delegate: self, for: [.brightnessUp, .brightnessDown], observeBuiltIn: true)
+                    self.startAsync(mediaKeyTap: mediaKeyTapBrightness!) { self.mediaKeyTapBrightnessStarting = false }
+                } else {
+                    self.mediaKeyTapBrightnessStarting = false
+                }
+            }
+
+            if !self.mediaKeyTapAudioStarting {
+                self.mediaKeyTapAudioStarting = true
+
                 mediaKeyTapAudio?.stop()
                 mediaKeyTapAudio = nil
-
-                if brightnessKeysEnabled ?? CachedDefaults[.brightnessKeysEnabled] {
-                    mediaKeyTapBrightness = MediaKeyTap(
-                        delegate: self,
-                        for: [.brightnessUp, .brightnessDown],
-                        observeBuiltIn: true
-                    )
-                    mediaKeyTapBrightness?.start(tries: 0)
-                }
 
                 if volumeKeysEnabled ?? CachedDefaults[.volumeKeysEnabled], let audioDevice = simplyCA.defaultOutputDevice,
                    !audioDevice.canSetVirtualMainVolume(scope: .output)
                 {
                     mediaKeyTapAudio = MediaKeyTap(delegate: self, for: [.mute, .volumeUp, .volumeDown], observeBuiltIn: true)
-                    mediaKeyTapAudio?.start(tries: 0)
+                    self.startAsync(mediaKeyTap: mediaKeyTapAudio!) { self.mediaKeyTapAudioStarting = false }
+                } else {
+                    self.mediaKeyTapAudioStarting = false
                 }
             }
         }
+    }
+
+    func startAsync(mediaKeyTap: MediaKeyTap, onEnd: () -> Void) {
+        let task = DispatchWorkItem(name: "Start MediaKeyTap") {
+            mediaKeyTap.start(tries: 0)
+        }
+        DispatchQueue.global().async(execute: task.workItem)
+
+        let result = task.wait(for: 5)
+        if result == .timedOut {
+            task.cancel()
+        }
+        onEnd()
     }
 
     func openPreferences(_ mediaKey: MediaKey, event: CGEvent) -> CGEvent? {
