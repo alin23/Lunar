@@ -69,6 +69,10 @@ h5, h5 code {
     font-family: Menlo, monospace;
 }
 
+h1#hotfix, h2#hotfix {
+    color: #FF2F3C;
+}
+
 h1#features, h2#features {
     color: #EDB44B;
 }
