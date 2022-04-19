@@ -1145,7 +1145,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         NotificationCenter.default
             .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
-            .throttle(for: .milliseconds(30), scheduler: RunLoop.main, latest: true)
+            .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
             .sink { notification in
                 log.info("\(notification.name)")
                 displayController.activeDisplays.values.filter { !$0.isForTesting }.forEach { d in
@@ -1160,7 +1160,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                         log.info("MAX EDR: \(maxEDR)")
                     #endif
 
-                    if d.softwareBrightness > 1.0 {
+                    if d.softwareBrightness > 1.0, timeSince(d.hdrWindowOpenedAt) > 1 {
                         let oldSoftwareBrightness = mapNumber(
                             d.softwareBrightness,
                             fromLow: 1.0,

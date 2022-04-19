@@ -3,6 +3,31 @@
     <channel>
         <title>Lunar</title>
         <item>
+            <title>5.6.0</title>
+            <pubDate>Tue, 19 Apr 2022 14:21:19 +0300</pubDate>
+            <link>https://lunar.fyi/</link>
+            <sparkle:fullReleaseNotesLink>https://lunar.fyi/changelog</sparkle:fullReleaseNotesLink>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <sparkle:version>5.6.0</sparkle:version>
+            <sparkle:shortVersionString>5.6.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-5.6.0.html</sparkle:releaseNotesLink>
+            <enclosure url="https://files.lunar.fyi/releases/Lunar-5.6.0.dmg" length="18205780" type="application/octet-stream" sparkle:edSignature="wM7wZ60TZTTJZ6Qk1kXnFyqSWuOXSNzhBMC9Le7QXF/3XCsLTzicU9K5WjkpNAoxcUzGeyzMPzCij2t8/0yEDw=="/>
+        </item>
+        <item>
+            <title>5.6.0b3</title>
+            <pubDate>Tue, 19 Apr 2022 13:41:24 +0300</pubDate>
+            <link>https://lunar.fyi/</link>
+            <sparkle:fullReleaseNotesLink>https://lunar.fyi/changelog</sparkle:fullReleaseNotesLink>
+            <sparkle:channel>beta</sparkle:channel>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <sparkle:version>5.6.0b3</sparkle:version>
+            <sparkle:shortVersionString>5.6.0b3</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-5.6.0b3.html</sparkle:releaseNotesLink>
+            <enclosure url="https://files.lunar.fyi/releases/Lunar-5.6.0b3.dmg" length="18205859" type="application/octet-stream" sparkle:edSignature="hW/1OFi6s2yjdOIAmCmuEcp1bmhJqaksfiLsjeoGn8lt+NokmtDKDMsIGV7OvImp+0HNP+LXevpNu3r0B0jfBg=="/>
+        </item>
+        <item>
             <title>5.6.0b2</title>
             <pubDate>Mon, 18 Apr 2022 15:55:27 +0300</pubDate>
             <link>https://lunar.fyi/</link>
