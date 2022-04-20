@@ -12,6 +12,8 @@ import Defaults
 import Surge
 import SwiftUI
 
+var appInfoHiddenAfterLaunch = false
+
 // MARK: - PresetButtonView
 
 struct PresetButtonView: View {
@@ -1050,10 +1052,12 @@ struct QuickActionsMenuView: View {
         }
         .frame(maxWidth: .infinity)
         .onAppear {
-            if Defaults[.launchCount] == 1 {
+            if Defaults[.launchCount] == 1, !appInfoHiddenAfterLaunch {
+                appInfoHiddenAfterLaunch = true
                 withAnimation(.spring().delay(1.0)) { showAdditionalInfo = true }
             }
-            if Defaults[.launchCount] == 2 {
+            if Defaults[.launchCount] == 2, !appInfoHiddenAfterLaunch {
+                appInfoHiddenAfterLaunch = true
                 withAnimation(.spring().delay(1.0)) { showAdditionalInfo = false }
             }
         }
