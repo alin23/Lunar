@@ -1989,7 +1989,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             )
         // #endif
         #else
-            mainAsyncAfter(ms: 30000) {
+            mainAsyncAfter(ms: 60 * 1000 * 10) {
                 guard CachedDefaults[.enableSentry] else { return }
 
                 let user = User(userId: SERIAL_NUMBER_HASH)
