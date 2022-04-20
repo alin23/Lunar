@@ -1297,6 +1297,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                             }
                         }
                     }
+                    serve(host: CachedDefaults[.listenForRemoteCommands] ? "0.0.0.0" : "127.0.0.1")
 
                 case NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification:
                     log.debug("Screens gone to sleep")
@@ -1305,6 +1306,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
                     self.valuesReaderThread = nil
                     displayController.adaptiveMode.stopWatching()
+                    server.stop()
                 default:
                     break
                 }

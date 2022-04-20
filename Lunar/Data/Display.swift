@@ -1771,6 +1771,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         guard DisplayServicesCanChangeBrightness(id), !isObservingBrightnessChangeDS(id) else { return true }
 
         let result = DisplayServicesRegisterForBrightnessChangeNotifications(id, id) { _, observer, _, _, userInfo in
+            guard !screensSleeping.load(ordering: .relaxed) else { return }
             OperationQueue.main.addOperation {
                 guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let observer = observer else { return }
                 let id = CGDirectDisplayID(UInt(bitPattern: observer))
@@ -4640,7 +4641,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func refreshColors(onComplete: ((Bool) -> Void)? = nil) {
-        guard !isTestID(id), !isSmartBuiltin else { return }
+        guard !isTestID(id), !isSmartBuiltin,
+              !screensSleeping.load(ordering: .relaxed)
+        else { return }
         colorRefresher = asyncAfter(ms: 10) { [weak self] in
             guard let self = self else { return }
             let newRedGain = self.readRedGain()
@@ -4672,7 +4675,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func refreshBrightness() {
         guard !isTestID(id), !inSmoothTransition, !isUserAdjusting(), !sendingBrightness,
-              !SyncMode.possibleClamshellModeSoon, !hasSoftwareControl else { return }
+              !SyncMode.possibleClamshellModeSoon, !hasSoftwareControl, !screensSleeping.load(ordering: .relaxed)
+        else { return }
 
         brightnessRefresher = asyncAfter(ms: 10) { [weak self] in
             guard let self = self else { return }
@@ -4706,7 +4710,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func refreshContrast() {
-        guard !isTestID(id), !inSmoothTransition, !isUserAdjusting(), !sendingContrast else { return }
+        guard !isTestID(id), !inSmoothTransition, !isUserAdjusting(), !sendingContrast,
+              !screensSleeping.load(ordering: .relaxed)
+        else { return }
 
         contrastRefresher = asyncAfter(ms: 10) { [weak self] in
             guard let self = self else { return }
@@ -4745,7 +4751,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             hotkeys.first { $0.identifier == identifier }
         }.first { $0.isEnabled }?.isEnabled ?? false
 
-        guard !isTestID(id), !hotkeyInputEnabled, !isSmartBuiltin else { return }
+        guard !isTestID(id), !hotkeyInputEnabled, !isSmartBuiltin,
+              !screensSleeping.load(ordering: .relaxed)
+        else { return }
 
         inputRefresher = asyncAfter(ms: 10) { [weak self] in
             guard let self = self else { return }
@@ -4768,7 +4776,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func refreshVolume() {
-        guard !isTestID(id), !isSmartBuiltin else { return }
+        guard !isTestID(id), !isSmartBuiltin,
+              !screensSleeping.load(ordering: .relaxed)
+        else { return }
 
         volumeRefresher = asyncAfter(ms: 10) { [weak self] in
             guard let self = self else { return }
@@ -4795,7 +4805,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func refreshGamma() {
-        guard !isForTesting, isOnline else { return }
+        guard !isForTesting, isOnline,
+              !screensSleeping.load(ordering: .relaxed)
+        else { return }
 
         guard !defaultGammaChanged || !applyGamma else {
             lunarGammaTable = GammaTable(
