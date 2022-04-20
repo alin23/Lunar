@@ -1492,6 +1492,30 @@ class DisplayController: ObservableObject {
         return false
     }
 
+    func averageDDCWriteMilliseconds(for id: CGDirectDisplayID, ms: Int) {
+        mainAsync { [self] in
+            guard let display = activeDisplays[id] else { return }
+
+            if display.averageDDCWriteMilliseconds == 0 {
+                display.averageDDCWriteMilliseconds = ms
+            } else {
+                display.averageDDCWriteMilliseconds = (display.averageDDCWriteMilliseconds + ms) / 2
+            }
+        }
+    }
+
+    func averageDDCReadMilliseconds(for id: CGDirectDisplayID, ms: Int) {
+        mainAsync { [self] in
+            guard let display = activeDisplays[id] else { return }
+
+            if display.averageDDCReadMilliseconds == 0 {
+                display.averageDDCReadMilliseconds = ms
+            } else {
+                display.averageDDCReadMilliseconds = (display.averageDDCReadMilliseconds + ms) / 2
+            }
+        }
+    }
+
     func promptAboutFallback(_ display: Display) {
         log.warning("Non-responsive display", context: display.context)
         display.fallbackPromptTime = Date()
