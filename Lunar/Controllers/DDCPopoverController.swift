@@ -36,10 +36,12 @@ class DDCPopoverController: NSViewController {
             return
         }
 
-        let success = display.refreshColors()
-        mainAsyncAfter(ms: 1000) {
-            let text = success ? "Values refreshed successfully" : "Monitor not responding"
-            sender.attributedTitle = text.withAttribute(.textColor(sender.labelColor))
+        display.refreshColors { success in
+            mainAsyncAfter(ms: 1000) { [weak sender] in
+                guard let sender = sender else { return }
+                let text = success ? "Values refreshed successfully" : "Monitor not responding"
+                sender.attributedTitle = text.withAttribute(.textColor(sender.labelColor))
+            }
         }
     }
 

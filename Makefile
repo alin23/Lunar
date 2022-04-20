@@ -14,7 +14,7 @@ DSA=0
 
 ifeq (beta, $(CHANNEL))
 FULL_VERSION:=$(VERSION)b$V
-else ifeq (beta, $(CHANNEL))
+else ifeq (alpha, $(CHANNEL))
 FULL_VERSION:=$(VERSION)a$V
 else
 FULL_VERSION:=$(VERSION)
@@ -51,11 +51,10 @@ changelog: CHANGELOG.md
 dev: install-deps install-hooks codegen
 
 .PHONY: release upload build sentry pkg dmg pack appcast
-upload:
-	rsync -avzP Releases/*.delta darkwoods:/static/Lunar/deltas/ || true
+upload: ReleaseNotes/release.css
+	rsync -avz Releases/*.delta darkwoods:/static/Lunar/deltas/ || true
 	rsync -avzP Releases/*.dmg darkwoods:/static/Lunar/releases/
-	rsync -avzP Releases/*.html darkwoods:/static/Lunar/ReleaseNotes/
-	rsync -avzP ReleaseNotes/*.css darkwoods:/static/Lunar/ReleaseNotes/
+	rsync -avz Releases/*.html ReleaseNotes/*.css darkwoods:/static/Lunar/ReleaseNotes/
 	fish -c 'upload -d Lunar Releases/appcast2.xml'
 	cfcli -d lunar.fyi purge
 
@@ -89,6 +88,8 @@ ifneq (, $(CHANNEL))
 else
 	"$(SPARKLE_BIN_DIR)/generate_appcast" --major-version "4.0.0" --link "https://lunar.fyi/" --full-release-notes-url "https://lunar.fyi/changelog" --release-notes-url-prefix https://files.lunar.fyi/ReleaseNotes/ --download-url-prefix https://files.lunar.fyi/releases/ -o Releases/appcast2.xml Releases
 endif
+	sd 'https://files.lunar.fyi/releases/([^"]+).delta' 'https://files.lunar.fyi/deltas/$$1.delta' Releases/appcast2.xml
+
 
 setversion: OLD_VERSION=$(shell xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace -showBuildSettings -json 2>/dev/null | jq -r .[0].buildSettings.MARKETING_VERSION)
 setversion:
@@ -103,9 +104,9 @@ build: BEAUTIFY=1
 build: ONLY_ACTIVE_ARCH=NO
 build: setversion
 ifneq ($(BEAUTIFY),0)
-	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=$(ONLY_ACTIVE_ARCH) | tee /tmp/lunar-$(ENV)-build.log | xcbeautify
+	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=$(ONLY_ACTIVE_ARCH) | xcbeautify
 else
-	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=$(ONLY_ACTIVE_ARCH) | tee /tmp/lunar-$(ENV)-build.log
+	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=$(ONLY_ACTIVE_ARCH)
 endif
 ifneq ($(DISABLE_PACKING),1)
 	make pack VERSION=$(VERSION) CHANNEL=$(CHANNEL) V=$V
@@ -114,6 +115,10 @@ ifneq ($(DISABLE_SENTRY),1)
 	make sentry VERSION=$(VERSION) CHANNEL=$(CHANNEL) V=$V
 endif
 
+css: ReleaseNotes/release.css
+ReleaseNotes/release.css: ReleaseNotes/release.styl
+	stylus --compress $<
+
 Releases/Lunar-%.html: ReleaseNotes/$(VERSION)*.md
 	@echo Compiling $^ to $@
-	pandoc -f gfm -o $@ --standalone --metadata title="Lunar $(FULL_VERSION) - Release Notes" --css https://files.lunar.fyi/ReleaseNotes/style.css $^
+	pandoc -f gfm -o $@ --standalone --metadata title="Lunar $(FULL_VERSION) - Release Notes" --css https://files.lunar.fyi/ReleaseNotes/release.css $^

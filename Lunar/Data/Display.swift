@@ -3429,6 +3429,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var potentialEDR: CGFloat { screen?.maximumPotentialExtendedDynamicRangeColorComponentValue ?? 1.0 }
     var edr: CGFloat { NSScreen.forDisplayID(id)?.maximumExtendedDynamicRangeColorComponentValue ?? 1.0 }
 
+    var brightnessRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+    var contrastRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+    var volumeRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+    var inputRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+    var colorRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+
     static func reconfigure(tries: Int = 20, _ action: (MPDisplayMgr) -> Void) {
         guard let manager = DisplayController.panelManager, DisplayController.tryLockManager(tries: tries) else {
             return
@@ -3465,11 +3471,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 self.notchEnabled = mode.withoutNotch(modes: self.panelModes) != nil
             }
         }
-    }
-
-    func getSupportsEnhance() -> Bool {
-        guard let control = control else { return false }
-        return potentialEDR > 2.0 && control is AppleNativeControl
     }
 
     func observeBrightnessChangeDS() -> Bool {
@@ -4040,10 +4041,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @objc func resetColors() {
         _ = control?.resetColors()
-        if !refreshColors() {
-            redGain = DEFAULT_COLOR_GAIN.ns
-            greenGain = DEFAULT_COLOR_GAIN.ns
-            blueGain = DEFAULT_COLOR_GAIN.ns
+        refreshColors { [weak self] success in
+            guard !success, let self = self else { return }
+            self.redGain = DEFAULT_COLOR_GAIN.ns
+            self.greenGain = DEFAULT_COLOR_GAIN.ns
+            self.blueGain = DEFAULT_COLOR_GAIN.ns
         }
     }
 
@@ -4630,58 +4632,67 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         control?.getBrightness()
     }
 
-    @discardableResult
-    func refreshColors() -> Bool {
-        guard !isTestID(id) else { return false }
-        let newRedGain = readRedGain()
-        let newGreenGain = readGreenGain()
-        let newBlueGain = readBlueGain()
+    func refreshColors(onComplete: ((Bool) -> Void)? = nil) {
+        guard !isTestID(id) else { return }
+        colorRefresher = asyncAfter(ms: 10) { [weak self] in
+            guard let self = self else { return }
+            let newRedGain = self.readRedGain()
+            let newGreenGain = self.readGreenGain()
+            let newBlueGain = self.readBlueGain()
+            mainAsync {
+                guard newRedGain != nil || newGreenGain != nil || newBlueGain != nil else {
+                    log.warning("Can't read color gain for \(self.description)")
+                    onComplete?(false)
+                    return
+                }
 
-        guard newRedGain != nil || newGreenGain != nil || newBlueGain != nil else {
-            log.warning("Can't read color gain for \(description)")
-            return false
+                if let newRedGain = newRedGain, newRedGain != self.redGain.uint16Value {
+                    log.info("Refreshing red gain value: \(self.redGain.uint16Value) <> \(newRedGain)")
+                    self.withoutSmoothTransition { self.withoutDDC { self.redGain = newRedGain.ns } }
+                }
+                if let newGreenGain = newGreenGain, newGreenGain != self.greenGain.uint16Value {
+                    log.info("Refreshing green gain value: \(self.greenGain.uint16Value) <> \(newGreenGain)")
+                    self.withoutSmoothTransition { self.withoutDDC { self.greenGain = newGreenGain.ns } }
+                }
+                if let newBlueGain = newBlueGain, newBlueGain != self.blueGain.uint16Value {
+                    log.info("Refreshing blue gain value: \(self.blueGain.uint16Value) <> \(newBlueGain)")
+                    self.withoutSmoothTransition { self.withoutDDC { self.blueGain = newBlueGain.ns } }
+                }
+            }
+            onComplete?(true)
         }
-
-        if let newRedGain = newRedGain, newRedGain != redGain.uint16Value {
-            log.info("Refreshing red gain value: \(redGain.uint16Value) <> \(newRedGain)")
-            withoutSmoothTransition { withoutDDC { redGain = newRedGain.ns } }
-        }
-        if let newGreenGain = newGreenGain, newGreenGain != greenGain.uint16Value {
-            log.info("Refreshing green gain value: \(greenGain.uint16Value) <> \(newGreenGain)")
-            withoutSmoothTransition { withoutDDC { greenGain = newGreenGain.ns } }
-        }
-        if let newBlueGain = newBlueGain, newBlueGain != blueGain.uint16Value {
-            log.info("Refreshing blue gain value: \(blueGain.uint16Value) <> \(newBlueGain)")
-            withoutSmoothTransition { withoutDDC { blueGain = newBlueGain.ns } }
-        }
-
-        return true
     }
 
     func refreshBrightness() {
         guard !isTestID(id), !inSmoothTransition, !isUserAdjusting(), !sendingBrightness,
               !SyncMode.possibleClamshellModeSoon, !hasSoftwareControl else { return }
-        guard let newBrightness = readBrightness() else {
-            log.warning("Can't read brightness for \(name)")
-            return
-        }
 
-        guard !inSmoothTransition, !isUserAdjusting(), !sendingBrightness else { return }
-        if newBrightness != brightness.uint16Value {
-            log.info("Refreshing brightness: \(brightness.uint16Value) <> \(newBrightness)")
-
-            if displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
-               timeSince(lastConnectionTime) > 10
-            {
-                insertBrightnessUserDataPoint(
-                    displayController.adaptiveMode.brightnessDataPoint.last,
-                    newBrightness.d, modeKey: displayController.adaptiveModeKey
-                )
+        brightnessRefresher = asyncAfter(ms: 10) { [weak self] in
+            guard let self = self else { return }
+            guard let newBrightness = self.readBrightness() else {
+                log.warning("Can't read brightness for \(self.name)")
+                return
             }
 
-            withoutSmoothTransition {
-                withoutDDC {
-                    mainThread { brightness = newBrightness.ns }
+            mainAsync {
+                guard !self.inSmoothTransition, !self.isUserAdjusting(), !self.sendingBrightness else { return }
+                if newBrightness != self.brightness.uint16Value {
+                    log.info("Refreshing brightness: \(self.brightness.uint16Value) <> \(newBrightness)")
+
+                    if displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
+                       timeSince(self.lastConnectionTime) > 10
+                    {
+                        self.insertBrightnessUserDataPoint(
+                            displayController.adaptiveMode.brightnessDataPoint.last,
+                            newBrightness.d, modeKey: displayController.adaptiveModeKey
+                        )
+                    }
+
+                    self.withoutSmoothTransition {
+                        self.withoutDDC {
+                            mainThread { self.brightness = newBrightness.ns }
+                        }
+                    }
                 }
             }
         }
@@ -4689,27 +4700,33 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func refreshContrast() {
         guard !isTestID(id), !inSmoothTransition, !isUserAdjusting(), !sendingContrast else { return }
-        guard let newContrast = readContrast() else {
-            log.warning("Can't read contrast for \(name)")
-            return
-        }
 
-        guard !inSmoothTransition, !isUserAdjusting(), !sendingContrast else { return }
-        if newContrast != contrast.uint16Value {
-            log.info("Refreshing contrast: \(contrast.uint16Value) <> \(newContrast)")
-
-            if displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
-               timeSince(lastConnectionTime) > 10
-            {
-                insertContrastUserDataPoint(
-                    displayController.adaptiveMode.contrastDataPoint.last,
-                    newContrast.d, modeKey: displayController.adaptiveModeKey
-                )
+        contrastRefresher = asyncAfter(ms: 10) { [weak self] in
+            guard let self = self else { return }
+            guard let newContrast = self.readContrast() else {
+                log.warning("Can't read contrast for \(self.name)")
+                return
             }
 
-            withoutSmoothTransition {
-                withoutDDC {
-                    mainThread { contrast = newContrast.ns }
+            mainAsync {
+                guard !self.inSmoothTransition, !self.isUserAdjusting(), !self.sendingContrast else { return }
+                if newContrast != self.contrast.uint16Value {
+                    log.info("Refreshing contrast: \(self.contrast.uint16Value) <> \(newContrast)")
+
+                    if displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
+                       timeSince(self.lastConnectionTime) > 10
+                    {
+                        self.insertContrastUserDataPoint(
+                            displayController.adaptiveMode.contrastDataPoint.last,
+                            newContrast.d, modeKey: displayController.adaptiveModeKey
+                        )
+                    }
+
+                    self.withoutSmoothTransition {
+                        self.withoutDDC {
+                            self.contrast = newContrast.ns
+                        }
+                    }
                 }
             }
         }
@@ -4722,16 +4739,22 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }.first { $0.isEnabled }?.isEnabled ?? false
 
         guard !isTestID(id), !hotkeyInputEnabled else { return }
-        guard let newInput = readInput() else {
-            log.warning("Can't read input for \(name)")
-            return
-        }
-        if newInput != input.uint16Value {
-            log.info("Refreshing input: \(input.uint16Value) <> \(newInput)")
 
-            withoutSmoothTransition {
-                withoutDDC {
-                    mainThread { input = newInput.ns }
+        inputRefresher = asyncAfter(ms: 10) { [weak self] in
+            guard let self = self else { return }
+            guard let newInput = self.readInput() else {
+                log.warning("Can't read input for \(self.name)")
+                return
+            }
+            mainAsync {
+                if newInput != self.input.uint16Value {
+                    log.info("Refreshing input: \(self.input.uint16Value) <> \(newInput)")
+
+                    self.withoutSmoothTransition {
+                        self.withoutDDC {
+                            self.input = newInput.ns
+                        }
+                    }
                 }
             }
         }
@@ -4739,21 +4762,26 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func refreshVolume() {
         guard !isTestID(id) else { return }
-        guard let newVolume = readVolume(), let newAudioMuted = readAudioMuted() else {
-            log.warning("Can't read volume for \(name)")
-            return
-        }
 
-        if newAudioMuted != audioMuted {
-            log.info("Refreshing mute value: \(audioMuted) <> \(newAudioMuted)")
-            mainThread { audioMuted = newAudioMuted }
-        }
-        if newVolume != volume.uint16Value {
-            log.info("Refreshing volume: \(volume.uint16Value) <> \(newVolume)")
+        volumeRefresher = asyncAfter(ms: 10) { [weak self] in
+            guard let self = self else { return }
+            guard let newVolume = self.readVolume(), let newAudioMuted = self.readAudioMuted() else {
+                log.warning("Can't read volume for \(self.name)")
+                return
+            }
+            mainAsync {
+                if newAudioMuted != self.audioMuted {
+                    log.info("Refreshing mute value: \(self.audioMuted) <> \(newAudioMuted)")
+                    self.audioMuted = newAudioMuted
+                }
+                if newVolume != self.volume.uint16Value {
+                    log.info("Refreshing volume: \(self.volume.uint16Value) <> \(newVolume)")
 
-            withoutSmoothTransition {
-                withoutDDC {
-                    mainThread { volume = newVolume.ns }
+                    self.withoutSmoothTransition {
+                        self.withoutDDC {
+                            self.volume = newVolume.ns
+                        }
+                    }
                 }
             }
         }
