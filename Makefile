@@ -121,4 +121,4 @@ ReleaseNotes/release.css: ReleaseNotes/release.styl
 
 Releases/Lunar-%.html: ReleaseNotes/$(VERSION)*.md
 	@echo Compiling $^ to $@
-	pandoc -f gfm -o $@ --standalone --metadata title="Lunar $(FULL_VERSION) - Release Notes" --css https://files.lunar.fyi/ReleaseNotes/release.css $^
+	pandoc -f gfm -o $@ --standalone --metadata title="Lunar $(FULL_VERSION) - Release Notes" --css https://files.lunar.fyi/ReleaseNotes/release.css $(shell ls -Ut ReleaseNotes/$(VERSION)*.md)
