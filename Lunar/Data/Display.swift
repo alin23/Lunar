@@ -4337,21 +4337,21 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     dict["armProps"] = compressed
                 }
             }
-            if let screen = self.screen {
+            if let screen = NSScreen.forDisplayID(self.id) {
                 if let encoded = try? encoder.encode(ForgivingEncodable(screen.deviceDescription)),
                    let compressed = encoded.gzip()?.base64EncodedString()
                 {
                     dict["deviceDescription"] = compressed
                 }
                 if #available(macOS 12.0, *) {
-                    dict["minimumRefreshInterval"] = screen.minimumRefreshInterval
-                    dict["maximumRefreshInterval"] = screen.maximumRefreshInterval
-                    dict["maximumFramesPerSecond"] = screen.maximumFramesPerSecond
+                    dict["minHZ"] = screen.minimumRefreshInterval
+                    dict["maxHZ"] = screen.maximumRefreshInterval
+                    dict["maxFPS"] = screen.maximumFramesPerSecond
                 }
-                dict["maximumExtendedDynamicRangeColorComponentValue"] = screen.maximumExtendedDynamicRangeColorComponentValue
-                dict["maximumPotentialExtendedDynamicRangeColorComponentValue"] = screen
+                dict["maxEDR"] = screen.maximumExtendedDynamicRangeColorComponentValue
+                dict["potentialEDR"] = screen
                     .maximumPotentialExtendedDynamicRangeColorComponentValue
-                dict["maximumReferenceExtendedDynamicRangeColorComponentValue"] = screen
+                dict["referenceEDR"] = screen
                     .maximumReferenceExtendedDynamicRangeColorComponentValue
             }
             #if arch(arm64)
@@ -4633,7 +4633,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func refreshColors(onComplete: ((Bool) -> Void)? = nil) {
-        guard !isTestID(id) else { return }
+        guard !isTestID(id), !isSmartBuiltin else { return }
         colorRefresher = asyncAfter(ms: 10) { [weak self] in
             guard let self = self else { return }
             let newRedGain = self.readRedGain()
@@ -4738,7 +4738,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             hotkeys.first { $0.identifier == identifier }
         }.first { $0.isEnabled }?.isEnabled ?? false
 
-        guard !isTestID(id), !hotkeyInputEnabled else { return }
+        guard !isTestID(id), !hotkeyInputEnabled, !isSmartBuiltin else { return }
 
         inputRefresher = asyncAfter(ms: 10) { [weak self] in
             guard let self = self else { return }
@@ -4761,7 +4761,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func refreshVolume() {
-        guard !isTestID(id) else { return }
+        guard !isTestID(id), !isSmartBuiltin else { return }
 
         volumeRefresher = asyncAfter(ms: 10) { [weak self] in
             guard let self = self else { return }

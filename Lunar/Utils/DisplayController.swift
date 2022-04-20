@@ -1480,8 +1480,8 @@ class DisplayController: ObservableObject {
         guard !display.neverFallbackControl, display.enabledControls[.gamma] ?? false else { return false }
 
         if !SyncMode.possibleClamshellModeSoon, !screensSleeping.load(ordering: .relaxed),
-           let screen = display.screen, !screen.visibleFrame.isEmpty,
-           !(display.control?.isResponsive() ?? true)
+           let screen = display.screen, !screen.visibleFrame.isEmpty, timeSince(display.lastConnectionTime) > 10,
+           let control = display.control, !control.isResponsive()
         {
             if let promptTime = display.fallbackPromptTime {
                 return promptTime + 20.minutes < Date()

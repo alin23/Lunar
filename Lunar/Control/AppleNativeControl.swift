@@ -123,12 +123,13 @@ class AppleNativeControl: Control {
     }
 
     func isResponsive() -> Bool {
-        #if DEBUG
-            guard let display = display else { return false }
-            return responsive || TEST_IDS.contains(display.id)
-        #else
-            return responsive
-        #endif
+        true
+//        #if DEBUG
+//            guard let display = display else { return false }
+//            return responsive || TEST_IDS.contains(display.id)
+//        #else
+//            return responsive
+//        #endif
     }
 
     func resetState() {
