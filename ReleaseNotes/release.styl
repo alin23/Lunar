@@ -1,0 +1,98 @@
+codeColor = #fda43a
+boldColor = #fda43a
+emColor = #FBAB7E
+linkColor = #1DA1F2
+
+headingColors = {
+  hotfix: #FF2F3C,
+  features: #EDB44B,
+  improvements: #616187,
+  fixes: #E14283,
+}
+mono = ui-monospace, Menlo, monospace
+sansSerif = ui-sans-serif, system-ui, sans-serif
+
+body
+  margin: auto
+  padding: 0.6rem 1.5rem
+  max-width: 760px
+
+*
+  font-family: sansSerif
+  font-size: .95rem
+
+img
+  width: 80%
+  margin: 1rem auto
+  object-fit: cover
+  border-radius: 12px
+
+video
+  width: 80%
+  margin: 1rem auto
+  border-radius: 12px
+  box-shadow: 0px 3px 1rem rgba(0, 0, 0, 0.1)
+
+code, pre
+  font-family: mono
+  color: codeColor
+
+strong
+  color: boldColor
+
+em
+  color: emColor
+
+code
+  font-weight: bold
+
+a
+  color: linkColor
+  &:hover
+    color: darken(linkColor, 20%)
+
+h1
+  font-weight: 600
+  background: rgba(0,0,0,0.06)
+  border-radius: 8px
+  padding: 0.7rem
+  width: fit-content
+
+h2
+  font-weight: 200
+  border-top: solid 2px rgba(0,0,0,0.2)
+  padding: 1rem
+h3
+  font-weight: 800
+
+h1, h1 code
+  font-size: 1.7rem
+  font-family: mono
+  opacity: 0.8
+
+h2, h2 code
+  font-size: 1.4rem
+  opacity: 0.5
+  font-family: mono
+
+h3, h3 code
+  font-size: 1.15rem
+  font-family: sansSerif
+
+h4, h4 code
+  font-size: 1.1rem
+  font-family: sansSerif
+
+h5, h5 code
+  font-size: 1.05rem
+  font-family: sansSerif
+
+for heading in hotfix features improvements fixes
+  h1#{heading}, h2#{heading}, h3#{heading}
+    color: headingColors[heading]
+    opacity: 0.7
+
+  for num in (1..10)
+    h1#{heading}-{num}, h2#{heading}-{num}, h3#{heading}-{num}
+      color: headingColors[heading]
+      opacity: 0.7

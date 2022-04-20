@@ -78,6 +78,8 @@ struct DisplayRowView: View {
     @Default(.showXDRSelector) var showXDRSelector
     @Default(.showRawValues) var showRawValues
 
+    @State var showNeedsLunarPro = false
+
     var softwareSliders: some View {
         Group {
             if display.enhanced || SWIFTUI_PREVIEW, !display.blackOutEnabled {
@@ -116,6 +118,10 @@ struct DisplayRowView: View {
             .help("Standard Dynamic Range disables XDR and allows the system to limit the brightness to 500nits.")
 
             SwiftUI.Button("XDR") {
+                guard lunarProActive || lunarProOnTrial else {
+                    showNeedsLunarPro = true
+                    return
+                }
                 guard !display.enhanced else { return }
                 withAnimation(.fastSpring) { display.enhanced = true }
             }
@@ -128,6 +134,7 @@ struct DisplayRowView: View {
 
             It's not recommended to keep this enabled for prolonged periods of time.
             """)
+            .popover(isPresented: $showNeedsLunarPro) { NeedsLunarProView() }
         }
         .padding(.bottom, 4)
     }
@@ -272,6 +279,26 @@ struct DisplayRowView: View {
         .buttonStyle(PickerButton(enumValue: $display.rotation, onValue: degrees))
         .font(.system(size: 12, weight: display.rotation == degrees ? .bold : .semibold, design: .monospaced))
         .help("No rotation")
+    }
+}
+
+// MARK: - NeedsLunarProView
+
+struct NeedsLunarProView: View {
+    var body: some View {
+        PaddedPopoverView(background: AnyView(Colors.red.brightness(0.05))) {
+            HStack(spacing: 4) {
+                Text("Needs a")
+                    .foregroundColor(.black)
+                    .font(.system(size: 16, weight: .bold))
+                SwiftUI.Button("Lunar Pro") { appDelegate!.getLunarPro(appDelegate!) }
+                    .buttonStyle(FlatButton(color: .black.opacity(0.5), textColor: .white))
+                    .font(.system(size: 15, weight: .bold, design: .rounded))
+                Text("licence")
+                    .foregroundColor(.black)
+                    .font(.system(size: 16, weight: .bold))
+            }
+        }
     }
 }
 
@@ -618,13 +645,13 @@ struct BlackoutPopoverHeaderView: View {
 // MARK: - PaddedPopoverView
 
 struct PaddedPopoverView<Content>: View where Content: View {
-    @State var color: Color
+    @State var background: AnyView
 
     @ViewBuilder let content: Content
 
     var body: some View {
         ZStack {
-            color.scaleEffect(1.5)
+            background.scaleEffect(1.5)
             VStack(alignment: .leading, spacing: 10) {
                 content
             }
@@ -848,7 +875,7 @@ struct QuickActionsMenuView: View {
             )
             .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
             .popover(isPresented: $showOptionsMenu, arrowEdge: .trailing) {
-                PaddedPopoverView(color: colorScheme == .dark ? Colors.sunYellow : Colors.lunarYellow) {
+                PaddedPopoverView(background: AnyView(colorScheme == .dark ? Colors.sunYellow : Colors.lunarYellow)) {
                     HStack {
                         SwiftUI.Button("Menu layout") {
                             withAnimation(.fastSpring) { optionsTab = .layout }

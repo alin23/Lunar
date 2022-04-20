@@ -39,7 +39,7 @@ struct SettingsToggle: View {
                     verticalPadding: 0
                 ))
                 .popover(isPresented: $helpShown, arrowEdge: .bottom) {
-                    PaddedPopoverView(color: .white) {
+                    PaddedPopoverView(background: AnyView(Color.white)) {
                         Text(help)
                             .foregroundColor(.primary)
                     }
