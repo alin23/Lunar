@@ -904,7 +904,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func startValuesReaderThread() {
-        valuesReaderThread = Repeater(every: 10) {
+        valuesReaderThread = Repeater(every: 10, tolerance: 5) {
             guard !screensSleeping.load(ordering: .relaxed) else { return }
 
             if CachedDefaults[.refreshValues] {

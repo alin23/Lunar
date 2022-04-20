@@ -675,6 +675,7 @@ class DisplayController: ObservableObject {
 
     var panelModesBeforeMirroring: [CGDirectDisplayID: MPDisplayMode] = [:]
     var mirrorSetBeforeBlackout: [CGDirectDisplayID: [MPDisplay]] = [:]
+    var enabledHDRBeforeXDR: [CGDirectDisplayID: Bool] = [:]
 
     @Atomic var autoBlackoutPending = false {
         didSet {

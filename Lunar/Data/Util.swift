@@ -1024,6 +1024,17 @@ func taskManager(_ key: String) -> Any? {
     }
 }
 
+func asyncAfter(ms: Int, name: String = "asyncAfter", _ action: @escaping () -> Void) -> DispatchWorkItem {
+    let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
+
+    let workItem = DispatchWorkItem(name: name) {
+        action()
+    }
+    concurrentQueue.asyncAfter(deadline: deadline, execute: workItem.workItem)
+
+    return workItem
+}
+
 func asyncAfter(ms: Int, _ action: DispatchWorkItem) {
     let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
 
