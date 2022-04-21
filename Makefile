@@ -100,7 +100,7 @@ endif
 clean:
 	xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=NO clean
 
-build: BEAUTIFY=1
+build: BEAUTIFY=0
 build: ONLY_ACTIVE_ARCH=NO
 build: setversion
 ifneq ($(BEAUTIFY),0)

@@ -36,6 +36,7 @@ import SwiftUI
 let fm = FileManager()
 let simplyCA = SimplyCoreAudio()
 var screensSleeping = ManagedAtomic<Bool>(false)
+var loggedOut = ManagedAtomic<Bool>(false)
 var brightnessTransition = BrightnessTransition.instant
 let SCREEN_WAKE_ADAPTER_TASK_KEY = "screenWakeAdapter"
 let CONTACT_URL = "https://lunar.fyi/contact".asURL()!
@@ -1234,6 +1235,22 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         let loginPublisher = NSWorkspace.shared.notificationCenter
             .publisher(for: NSWorkspace.sessionDidBecomeActiveNotification, object: nil)
 
+        loginPublisher
+            .merge(with: logoutPublisher)
+            .debounce(for: .seconds(1), scheduler: RunLoop.main)
+            .sink { notif in
+                log.info(notif.name)
+                switch notif.name {
+                case NSWorkspace.sessionDidBecomeActiveNotification:
+                    loggedOut.store(false, ordering: .sequentiallyConsistent)
+                    log.info("SESSION: Log in")
+                case NSWorkspace.sessionDidResignActiveNotification:
+                    loggedOut.store(true, ordering: .sequentiallyConsistent)
+                    log.info("SESSION: Log out")
+                default:
+                    break
+                }
+            }.store(in: &observers)
         wakePublisher
             .merge(with: sleepPublisher)
             .merge(with: logoutPublisher)
@@ -1242,7 +1259,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .sink { notif in
                 log.info(notif.name)
                 switch notif.name {
-                case NSWorkspace.screensDidWakeNotification, NSWorkspace.sessionDidBecomeActiveNotification:
+                case NSWorkspace.screensDidWakeNotification:
+                    log.debug("SESSION: Screen wake")
+                    fallthrough
+                case NSWorkspace.screensDidSleepNotification:
+                    log.debug("SESSION: Screen sleep")
+                    fallthrough
+                case NSWorkspace.screensDidWakeNotification where !loggedOut.load(ordering: .relaxed),
+                     NSWorkspace.sessionDidBecomeActiveNotification:
                     log.debug("Screens woke up")
                     screensSleeping.store(false, ordering: .sequentiallyConsistent)
                     displayController.retryAutoBlackoutLater()
