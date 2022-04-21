@@ -20,7 +20,6 @@
 		C714C998280572920061588E /* ProViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C714C997280572920061588E /* ProViews.swift */; };
 		C714C99B2805BDEA0061588E /* SkyLight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C714C99A2805BDEA0061588E /* SkyLight.framework */; };
 		C714C99E2809B4FB0061588E /* ScrollViewIfNeeded.swift in Sources */ = {isa = PBXBuildFile; fileRef = C714C99D2809B4FB0061588E /* ScrollViewIfNeeded.swift */; };
-		C714C9A12809E6470061588E /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C714C9A02809E6470061588E /* Sparkle */; };
 		C71F8DB126542E1000C4648A /* GammaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71F8DB026542E1000C4648A /* GammaViewController.swift */; };
 		C71F8DBA265640C400C4648A /* DDCCTLControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71F8DB9265640C400C4648A /* DDCCTLControl.swift */; };
 		C722FB9F271AC83200ED4C94 /* Slider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C722FB9C271AC83200ED4C94 /* Slider.swift */; };
@@ -82,6 +81,8 @@
 		C7789AE01FF9029700D326A8 /* ScrollableContrast.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7789ADF1FF9029700D326A8 /* ScrollableContrast.swift */; };
 		C77AB65C269A032E0046BA78 /* Magnet in Frameworks */ = {isa = PBXBuildFile; productRef = C77AB65B269A032E0046BA78 /* Magnet */; };
 		C77B176927BE430200B957D1 /* SimplyCoreAudio in Frameworks */ = {isa = PBXBuildFile; productRef = C77B176827BE430200B957D1 /* SimplyCoreAudio */; };
+		C77C77522811A77B006326BE /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C77C77512811A77B006326BE /* Sparkle.framework */; };
+		C77C77532811A77B006326BE /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C77C77512811A77B006326BE /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C77CC7551FED5501009AA718 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC7541FED5501009AA718 /* SplitViewController.swift */; };
 		C77CC7591FED9ECE009AA718 /* DisplayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */; };
 		C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */; };
@@ -208,6 +209,7 @@
 				C73B41ED263BE02E006F6783 /* LetsMove.framework in Embed Frameworks */,
 				C7138D982634B03400406EE3 /* Paddle.framework in Embed Frameworks */,
 				C72CFB972586B36E005F0340 /* WAYWindow.framework in Embed Frameworks */,
+				C77C77532811A77B006326BE /* Sparkle.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -274,6 +276,7 @@
 		C772BDD625E7A296006A1684 /* NetworkControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkControl.swift; sourceTree = "<group>"; };
 		C776416E272139A100C7C308 /* ResetPopoverController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResetPopoverController.swift; sourceTree = "<group>"; };
 		C7789ADF1FF9029700D326A8 /* ScrollableContrast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableContrast.swift; sourceTree = "<group>"; };
+		C77C77512811A77B006326BE /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Sparkle/Sparkle.framework; sourceTree = "<group>"; };
 		C77CC7541FED5501009AA718 /* SplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
 		C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayViewController.swift; sourceTree = "<group>"; };
 		C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayView.swift; sourceTree = "<group>"; };
@@ -388,6 +391,7 @@
 				C7FE724F238EDFB100EBA6DA /* CoreDisplay.framework in Frameworks */,
 				C7B5E85D2548B5AC00530B47 /* AnyCodable in Frameworks */,
 				C7C09CD5256AC70500B4BC5B /* SwiftyAttributes in Frameworks */,
+				C77C77522811A77B006326BE /* Sparkle.framework in Frameworks */,
 				C7F99AC727175E0C00FBF192 /* SwiftyMarkdown in Frameworks */,
 				C73B41EC263BE02E006F6783 /* LetsMove.framework in Frameworks */,
 				C77AB65C269A032E0046BA78 /* Magnet in Frameworks */,
@@ -406,7 +410,6 @@
 				C7E80E392637060F004718A4 /* libssl.a in Frameworks */,
 				C7F48C4A2657A258000715A8 /* DataCompression in Frameworks */,
 				C72CFB962586B36E005F0340 /* WAYWindow.framework in Frameworks */,
-				C714C9A12809E6470061588E /* Sparkle in Frameworks */,
 				C731E85E27E1E5090016B36D /* Sentry in Frameworks */,
 				C7DA10F7259B8979006DD876 /* Regex in Frameworks */,
 				C7C5AD9E26C5AD5400D68B7F /* MonitorPanel.framework in Frameworks */,
@@ -680,6 +683,7 @@
 		C7CFEA241FD3787B000AC4A6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C77C77512811A77B006326BE /* Sparkle.framework */,
 				C714C99A2805BDEA0061588E /* SkyLight.framework */,
 				C7C5AD9926C5AD5400D68B7F /* MonitorPanel.framework */,
 				C7E896DC2652C37E0079A328 /* CoreBrightness.framework */,
@@ -827,7 +831,6 @@
 				C77B176827BE430200B957D1 /* SimplyCoreAudio */,
 				C799C2F427BF67C4003A2FB9 /* Socket */,
 				C731E85D27E1E5090016B36D /* Sentry */,
-				C714C9A02809E6470061588E /* Sparkle */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -891,7 +894,6 @@
 				C77B176727BE430200B957D1 /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */,
 				C799C2F327BF67C4003A2FB9 /* XCRemoteSwiftPackageReference "BlueSocket" */,
 				C731E85C27E1E5090016B36D /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
-				C714C99F2809E6470061588E /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -1172,7 +1174,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.6.2a6;
+				CURRENT_PROJECT_VERSION = 5.6.2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1181,6 +1183,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Frameworks",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Frameworks/Sparkle",
 				);
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/Frameworks/Shout/Sources/CSSH/libssh2";
@@ -1198,7 +1201,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 5.6.2a6;
+				MARKETING_VERSION = 5.6.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1291,7 +1294,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.6.2a6;
+				CURRENT_PROJECT_VERSION = 5.6.2;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1300,6 +1303,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Frameworks",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Frameworks/Sparkle",
 				);
 				GCC_OPTIMIZATION_LEVEL = 1;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/Frameworks/Shout/Sources/CSSH/libssh2";
@@ -1318,7 +1322,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 5.6.2a6;
+				MARKETING_VERSION = 5.6.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
@@ -1472,7 +1476,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.6.2a6;
+				CURRENT_PROJECT_VERSION = 5.6.2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1481,6 +1485,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Frameworks",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Frameworks/Sparkle",
 				);
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/Frameworks/Shout/Sources/CSSH/libssh2";
@@ -1498,7 +1503,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 5.6.2a6;
+				MARKETING_VERSION = 5.6.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1536,7 +1541,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.6.2a6;
+				CURRENT_PROJECT_VERSION = 5.6.2;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1545,6 +1550,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Frameworks",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Frameworks/Sparkle",
 				);
 				GCC_OPTIMIZATION_LEVEL = 1;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/Frameworks/Shout/Sources/CSSH/libssh2";
@@ -1563,7 +1569,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 5.6.2a6;
+				MARKETING_VERSION = 5.6.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1667,14 +1673,6 @@
 			requirement = {
 				branch = master;
 				kind = branch;
-			};
-		};
-		C714C99F2809E6470061588E /* XCRemoteSwiftPackageReference "Sparkle" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sparkle-project/Sparkle";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.1.0;
 			};
 		};
 		C731E85C27E1E5090016B36D /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
@@ -1874,11 +1872,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C7138D8B2634AF0500406EE3 /* XCRemoteSwiftPackageReference "KeyHolder" */;
 			productName = KeyHolder;
-		};
-		C714C9A02809E6470061588E /* Sparkle */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C714C99F2809E6470061588E /* XCRemoteSwiftPackageReference "Sparkle" */;
-			productName = Sparkle;
 		};
 		C731E85D27E1E5090016B36D /* Sentry */ = {
 			isa = XCSwiftPackageProductDependency;
