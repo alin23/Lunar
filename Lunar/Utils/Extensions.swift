@@ -894,7 +894,6 @@ extension MPDisplayMode {
 
     open var attributedString: NSAttributedString {
         let res = "\(width) x \(height)"
-//        let refresh = (refreshString?.isEmpty ?? true) ? "\(refreshRate != 0 ? refreshRate : 60)Hz" : refreshString!
         let dpi = "\(dotsPerInch)DPI"
 
         let rightAligned = NSMutableParagraphStyle()
@@ -902,8 +901,6 @@ extension MPDisplayMode {
         rightAligned.tabStops = [NSTextTab(textAlignment: NSTextAlignment.left, location: 100, options: [:])]
 
         return "  \(res)".withFont(.systemFont(ofSize: 12, weight: .medium))
-//            + " @ ".withFont(.monospacedSystemFont(ofSize: 12, weight: .regular)).withTextColor(.gray)
-//            + "\(refresh)".withFont(.systemFont(ofSize: 12, weight: .medium))
             + "\t[\(dpi)] [\(depth)bit]"
             .withFont(.monospacedSystemFont(ofSize: 12, weight: .regular))
             .withTextColor(.gray)
@@ -913,7 +910,7 @@ extension MPDisplayMode {
 
     override open var description: String {
         let res = "\(width) x \(height)"
-        let refresh = (refreshString?.isEmpty ?? true) ? "\(refreshRate != 0 ? refreshRate : 60)Hz" : refreshString!
+        let refresh = "\(refreshRate != 0 ? refreshRate : 60)Hz"
         let dpi = "\(dotsPerInch)DPI"
 
         return "\(res)@\(refresh) [\(dpi)] [\(depth)bit]\(tagsString)"
