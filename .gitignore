@@ -49,4 +49,5 @@ Lunar/ALS/lunarsensor/partitions.csv
 Lunar/Modes/ClockMode.swift
 Frameworks/*.framework
 Frameworks/WAYWindow
+Frameworks/Sparkle
 Releases/*.html

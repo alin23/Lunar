@@ -76,11 +76,11 @@ dmg:
 	env CODESIGNING_FOLDER_PATH=(xcdir -s 'Lunar $(ENV)' -c $(ENV))/Lunar.app ./bin/make-installer dmg
 
 pack: SHELL=/usr/local/bin/fish
-pack: export SPARKLE_BIN_DIR="$(shell dirname $$(dirname $$(dirname $$(xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -showBuildSettings -json 2>/dev/null | jq -r .[0].buildSettings.BUILT_PRODUCTS_DIR))))/SourcePackages/artifacts/sparkle/bin"
+pack: export SPARKLE_BIN_DIR="$$PWD/Frameworks/Sparkle/bin/"
 pack:
 	env CODESIGNING_FOLDER_PATH=(xcdir -s 'Lunar $(ENV)' -c $(ENV))/Lunar.app PROJECT_DIR=$$PWD ./bin/pack
 
-appcast: export SPARKLE_BIN_DIR="$(shell dirname $$(dirname $$(dirname $$(xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -showBuildSettings -json 2>/dev/null | jq -r .[0].buildSettings.BUILT_PRODUCTS_DIR))))/SourcePackages/artifacts/sparkle/bin"
+appcast: export SPARKLE_BIN_DIR="$$PWD/Frameworks/Sparkle/bin/"
 appcast: VERSION=$(shell xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace -showBuildSettings -json 2>/dev/null | jq -r .[0].buildSettings.MARKETING_VERSION)
 appcast: Releases/Lunar-$(FULL_VERSION).html
 ifneq (, $(CHANNEL))
@@ -121,4 +121,8 @@ ReleaseNotes/release.css: ReleaseNotes/release.styl
 
 Releases/Lunar-%.html: ReleaseNotes/$(VERSION)*.md
 	@echo Compiling $^ to $@
+ifneq (, $(CHANNEL))
 	pandoc -f gfm -o $@ --standalone --metadata title="Lunar $(FULL_VERSION) - Release Notes" --css https://files.lunar.fyi/ReleaseNotes/release.css $(shell ls -Ut ReleaseNotes/$(VERSION)*.md)
+else
+	pandoc -f gfm -o $@ --standalone --metadata title="Lunar $(FULL_VERSION) - Release Notes" --css https://files.lunar.fyi/ReleaseNotes/release.css ReleaseNotes/$(VERSION).md
+endif
