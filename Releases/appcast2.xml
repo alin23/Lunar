@@ -3,6 +3,19 @@
     <channel>
         <title>Lunar</title>
         <item>
+            <title>5.6.2a6</title>
+            <pubDate>Thu, 21 Apr 2022 10:07:40 +0300</pubDate>
+            <link>https://lunar.fyi/</link>
+            <sparkle:fullReleaseNotesLink>https://lunar.fyi/changelog</sparkle:fullReleaseNotesLink>
+            <sparkle:channel>alpha</sparkle:channel>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <sparkle:version>5.6.2a6</sparkle:version>
+            <sparkle:shortVersionString>5.6.2a6</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-5.6.2a6.html</sparkle:releaseNotesLink>
+            <enclosure url="https://files.lunar.fyi/releases/Lunar-5.6.2a6.dmg" length="18260223" type="application/octet-stream" sparkle:edSignature="tNfWUzRUZWBvhzrwlx6gZVGD1pwx6aoIr/1+XhZxeySDrzr0oFYWlnGLmCVKeLX8j58L6js6NT1opNMeQSfcAg=="/>
+        </item>
+        <item>
             <title>5.6.2a4</title>
             <pubDate>Wed, 20 Apr 2022 18:46:17 +0300</pubDate>
             <link>https://lunar.fyi/</link>

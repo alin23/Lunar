@@ -1348,7 +1348,8 @@ class DisplayController: ObservableObject {
     }
 
     func resetDisplayList(advancedSettings: Bool = false, configurationPage: Bool = false, autoBlackOut: Bool? = nil) {
-        resetDisplayListTask = mainAsyncAfter(ms: 2000) {
+        resetDisplayListTask = mainAsyncAfter(ms: 200) {
+            defer { self.resetDisplayListTask = nil }
             self.getDisplaysLock.around {
                 Self.panelManager = MPDisplayMgr()
                 DDC.reset()
