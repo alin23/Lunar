@@ -73,6 +73,8 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .showDisconnectedDisplays,
     .mediaKeysNotified,
     .detectResponsiveness,
+    .allowHDREnhanceBrightness,
+    .allowHDREnhanceContrast,
     .brightnessKeysEnabled,
     .brightnessStep,
     .clamshellModeDetection,
@@ -601,6 +603,8 @@ func initCache() {
     cacheKey(.brightnessKeysEnabled)
     cacheKey(.mediaKeysNotified)
     cacheKey(.detectResponsiveness)
+    cacheKey(.allowHDREnhanceBrightness)
+    cacheKey(.allowHDREnhanceContrast)
     cacheKey(.muteVolumeZero)
     cacheKey(.hotkeysAffectBuiltin)
 
@@ -736,6 +740,8 @@ extension Defaults.Keys {
     static let brightnessKeysEnabled = Key<Bool>("brightnessKeysEnabled", default: true)
     static let mediaKeysNotified = Key<Bool>("mediaKeysNotified", default: false)
     static let detectResponsiveness = Key<Bool>("detectResponsiveness", default: true)
+    static let allowHDREnhanceBrightness = Key<Bool>("allowHDREnhanceBrightness", default: false)
+    static let allowHDREnhanceContrast = Key<Bool>("allowHDREnhanceContrast", default: false)
     static let muteVolumeZero = Key<Bool>("muteVolumeZero", default: true)
     static let hotkeysAffectBuiltin = Key<Bool>("hotkeysAffectBuiltin", default: true)
 
