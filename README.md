@@ -1,39 +1,34 @@
 <p align="center">
-    <a href="https://lunar.fyi/"><img width="128" height="128" src="https://static.lunar.fyi/svg/lunar.svg"></a>
-  <h1 align="center"><code>Lunar</code></h1>
-  <h4 align="center">Intelligent adaptive brightness for your external display</h4>
+    <a href="https://lunar.fyi/"><img width="128" height="128" src="https://static.lunar.fyi/svg/lunar.svg" style="filter: drop-shadow(0px 2px 4px rgba(80, 50, 6, 0.2));"></a>
+  <h1 align="center"><code style="text-shadow: 0px 3px 10px rgba(8, 0, 6, 0.35); font-size: 3rem; font-family: ui-monospace, Menlo, monospace; font-weight: 800; background: transparent; color: #4d3e56; padding: 0.2rem 0.2rem; border-radius: 6px">Lunar</code></h1>
+  <h4 align="center" style="padding: 0; margin: 0; font-family: ui-monospace, monospace;">The defacto app for controlling monitors</h4>
+  <h6 align="center" style="padding: 0; margin: 0; font-family: ui-monospace, monospace; font-weight: 400;">Adjust brightness, change volume, switch inputs</h6>
 </p>
 
-### Lunar is a macOS app for controlling monitors, [with native support for both Intel and Apple Silicon](https://lunar.fyi/#m1) ###
+#### macOS app for controlling monitors, [with native support for both Intel and Apple Silicon](https://lunar.fyi/#m1)
+
+## Community
 
 [![Support Server](https://img.shields.io/discord/852182428155904010.svg?label=Discord&logo=Discord&colorB=7289da&style=for-the-badge)](https://discord.gg/dJPHpWgAhV)
 
+## DDC/CI
 
+Lunar changes the hardware brightness of the monitor using the DDC protocol.
 
-*Note: Lunar changes the actual (physical) brightness and contrast of the monitor.*
+It doesn't use a software overlay if the monitor supports DDC/CI.
 
-*It doesn't use a software overlay.*
+## Installation methods
+- Download [Lunar.dmg](https://lunar.fyi/download/latest) from [lunar.fyi](https://lunar.fyi/)
+- Or `brew install --cask lunar`
 
-## Table of Contents ##
-- [Installation methods](#installation-methods)
-- [Features](#features)
-- [Known to work list](#tested-and-known-to-work-with-the-following-types-of-connections)
-- [Troubleshooting](#troubleshooting)
-- [Caveats](#caveats)
-- [Contributing](#contributing)
-- [Building](#building)
-
-## Installation methods ##
-- Download PKG from [Official website](https://lunar.fyi)
-- Download PKG from the [Releases page](https://github.com/alin23/Lunar/releases)
-- `brew install --cask lunar`
-
-## Features ##
+## Features
 - **[Native keyboard control](https://lunar.fyi/#keys)** and hotkeys for setting brightness, volume and contrast that respect the min/max values per monitor
+- **[1000-to-1600 nits of brightness](https://lunar.fyi/#xdr)** for supported **XDR** and **HDR** displays
+- **[Dim brightness below 0%](https://lunar.fyi/#subzero)** for late-night work
 - **[Sensor-based Adaptive Brightness](https://lunar.fyi/#sensor)** (and contrast) based on [an external light sensor](https://lunar.fyi/sensor)
-- **[Sync-based Adaptive Brightness](https://lunar.fyi/#sync)** (and contrast) based on the built-in light sensor of the MacBook or iMac
+- **[Sync-based Adaptive Brightness](https://lunar.fyi/#sync)** (and contrast) based on **the built-in light sensor of the MacBook or iMac**
 - **[Location-based Adaptive Brightness](https://lunar.fyi/#location)** (and contrast) based on the sunrise/sunset times in your location
-- **[App Exception](https://lunar.fyi/#configuration-page)** list if you need more brightness for specific activities (watching movies, design work)
+- **[App Presets](https://lunar.fyi/#configuration-page)** if you need more/less brightness for specific activities (watching movies, design work)
 - **[Input switching](#input-hotkeys)** from a convenient dropdown or using up to 3 input-specific hotkeys
 - **[Screen orientation](https://lunar.fyi/#display-settings-page)** change from the menu bar or using hotkeys (Ctrl+0/9/8/7 mapped to 0°/90°/180°/270° for the display with the cursor on it)
 - **[Hidden resolutions](https://lunar.fyi/#display-settings-page)** accessible from a dropdown in the [Display Settings menu](#display-settings)
@@ -46,39 +41,43 @@
 
 It doesn't interfere at all with the native adaptive brightness that macOS implements for the built-in display.
 
-It works well along Night Shift and True Tone (and f.lux if Gamma/Software controls are not used).
+It works well along Night Shift and True Tone (and f.lux if Gamma dimming is not used).
 
 
-## Display Page ##
+## QuickActions Menu
 
-![Display page](https://static.lunar.fyi/img/display-page/1920_display-page.png)
+![QuickActions menu](https://files.lunar.fyi/menu-density-demo.png)
 
-### Display Settings ###
+## Display Page
 
-![Display settings](https://static.lunar.fyi/img/display-settings/1920_display-settings.png)
+![Display page](https://files.lunar.fyi/display-page.png)
 
-### Built-in Display Page ###
+### Display Settings
 
-![Built-in display page](https://static.lunar.fyi/img/builtin-page/1920_builtin-page.png)
+![Display settings](https://files.lunar.fyi/display-settings.png)
 
-### Display Input Hotkeys ###
+### Built-in Display Page
 
-![Display input hotkeys](https://static.lunar.fyi/img/input-hotkeys/1920_input-hotkeys.png)
+![Built-in display page](https://files.lunar.fyi/builtin-page.png)
 
-## Configuration Page ##
+### Display Input Hotkeys
 
-![Configuration page](https://static.lunar.fyi/img/configuration-page/1920_configuration-page.png)
+![Display input hotkeys](https://files.lunar.fyi/input-hotkeys.png)
 
-### Advanced Settings ###
+## Configuration Page
 
-![Advanced Settings](https://static.lunar.fyi/img/advanced-settings/1920_advanced-settings.png)
+![Configuration page](https://files.lunar.fyi/configuration-page.png)
 
-## Hotkeys Page ##
+### Advanced Settings
 
-![Hotkeys page](https://static.lunar.fyi/img/hotkeys-page/1920_hotkeys-page.png)
+![Advanced Settings](https://files.lunar.fyi/advanced-settings.png)
+
+## Hotkeys Page
+
+![Hotkeys page](https://files.lunar.fyi/hotkeys-page.png)
 
 
-## Tested and known to work with the following types of connections ##
+## Tested and known to work with the following types of connections
 - HDMI (1.0 - 2.1)
 - DisplayPort (1.0 - 2.0)
 - Thunderbolt 3 (USB Type-C)
@@ -87,12 +86,8 @@ It works well along Night Shift and True Tone (and f.lux if Gamma/Software contr
 - DVI
 - Adapters that forward DDC messages properly
 
-## Troubleshooting ##
-
-Check the [FAQ](https://lunar.fyi/faq)
-
-### Contributing ###
+### Contributing
 I'm pausing contributions for the moment as Lunar has paid features and isn't compilable because of missing parts of the source code *(Pro features code is encrypted)*.
 
-### Building ###
+### Building
 Lunar can't be built from this repo yet as the source code for the paid features is hidden. I will try to post stubs for those paid features to at least make it compilable in an only-free-features form.
