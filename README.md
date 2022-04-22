@@ -52,15 +52,15 @@ It works well along Night Shift and True Tone (and f.lux if Gamma dimming is not
 
 ![Display page](https://files.lunar.fyi/display-page.png)
 
-### Display Settings
+## Display Settings
 
 ![Display settings](https://files.lunar.fyi/display-settings.png)
 
-### Built-in Display Page
+## Built-in Display Page
 
 ![Built-in display page](https://files.lunar.fyi/builtin-page.png)
 
-### Display Input Hotkeys
+## Display Input Hotkeys
 
 ![Display input hotkeys](https://files.lunar.fyi/input-hotkeys.png)
 
@@ -68,7 +68,7 @@ It works well along Night Shift and True Tone (and f.lux if Gamma dimming is not
 
 ![Configuration page](https://files.lunar.fyi/configuration-page.png)
 
-### Advanced Settings
+## Advanced Settings
 
 ![Advanced Settings](https://files.lunar.fyi/advanced-settings.png)
 
