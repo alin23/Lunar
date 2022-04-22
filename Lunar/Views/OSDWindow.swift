@@ -220,13 +220,19 @@ public struct BigSurSlider: View {
             )
             .animation(.easeOut(duration: 0.1), value: percentage)
             #if os(macOS)
-                .onHover { hovering in
+                .onHover { hov in
+                    hovering = hov
                     if hovering {
+                        lastCursorPosition = NSEvent.mouseLocation
+                        hoveringSliderSetter = mainAsyncAfter(ms: 200) {
+                            guard lastCursorPosition != NSEvent.mouseLocation else { return }
+                            env.hoveringSlider = hovering
+                        }
                         trackScrollWheel()
                     } else {
+                        hoveringSliderSetter = nil
+                        env.hoveringSlider = false
                         dragging = false
-                        subs.forEach { $0.cancel() }
-                        subs.removeAll()
                     }
                 }
             #endif
@@ -243,6 +249,7 @@ public struct BigSurSlider: View {
 
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.colors) var colors
+    @EnvironmentObject var env: EnvState
 
     @Binding var percentage: Float
     @State var sliderWidth: CGFloat = 200
@@ -254,32 +261,50 @@ public struct BigSurSlider: View {
     @Binding var knobTextColor: Color?
     @Binding var showValue: Bool
 
-    @State var subs = Set<AnyCancellable>()
+    @State var scrollWheelListener: Cancellable?
     @State var dragging = false
+    @State var hovering = false
+    @State var lastCursorPosition = NSEvent.mouseLocation
 
     #if os(macOS)
         func trackScrollWheel() {
-            let pub = NSApp.publisher(for: \.currentEvent)
-            pub
+            guard scrollWheelListener == nil else { return }
+            scrollWheelListener = NSApp.publisher(for: \.currentEvent)
                 .filter { event in event?.type == .scrollWheel }
-                .throttle(
-                    for: .milliseconds(20),
-                    scheduler: DispatchQueue.main,
-                    latest: true
-                )
+                .throttle(for: .milliseconds(20), scheduler: DispatchQueue.main, latest: true)
                 .sink { event in
-                    guard let event = event, event.deltaY == 0 else {
+                    guard hovering, env.hoveringSlider, let event = event, event.momentumPhase.rawValue == 0 else {
                         return
                     }
-
-                    if !dragging { dragging = true }
+                    if !dragging {
+                        dragging = true
+                    }
 
                     let delta = Float(event.scrollingDeltaX) * (event.isDirectionInvertedFromDevice ? -1 : 1)
+                        + Float(event.scrollingDeltaY) * (event.isDirectionInvertedFromDevice ? 1 : -1)
                     self.percentage = cap(self.percentage - (delta / 100), minVal: 0, maxVal: 1)
                 }
-                .store(in: &subs)
         }
     #endif
+}
+
+extension NSEvent.Phase {
+    var str: String {
+        switch self {
+        case .mayBegin: return "mayBegin"
+        case .began: return "began"
+        case .changed: return "changed"
+        case .stationary: return "stationary"
+        case .cancelled: return "cancelled"
+        case .ended: return "ended"
+        default:
+            return "phase(\(rawValue))"
+        }
+    }
+}
+
+var hoveringSliderSetter: DispatchWorkItem? {
+    didSet { oldValue?.cancel() }
 }
 
 // MARK: - Colors
