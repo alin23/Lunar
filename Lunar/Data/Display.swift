@@ -377,11 +377,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         let contrast = (try container.decode(UInt16.self, forKey: .contrast)).ns
         self.contrast = contrast
 
-        allowBrightnessZero = ((try container.decodeIfPresent(Bool.self, forKey: .allowBrightnessZero)) ?? false)
-
+        let allowBrightnessZero = ((try container.decodeIfPresent(Bool.self, forKey: .allowBrightnessZero)) ?? false)
         let minBrightness = (try container.decode(UInt16.self, forKey: .minBrightness)).ns
         let maxBrightness = (try container.decode(UInt16.self, forKey: .maxBrightness)).ns
-        self.minBrightness = minBrightness
+
+        self.allowBrightnessZero = allowBrightnessZero
+        self.minBrightness = (!allowBrightnessZero && minBrightness == 0) ? 1 : minBrightness
         self.maxBrightness = maxBrightness
         minContrast = isSmartBuiltin ? 0 : (try container.decode(UInt16.self, forKey: .minContrast)).ns
         maxContrast = isSmartBuiltin ? 100 : (try container.decode(UInt16.self, forKey: .maxContrast)).ns
@@ -4156,6 +4157,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         if later {
             savingLater.send(true)
             return
+        }
+
+        if !allowBrightnessZero, minBrightness == 0 {
+            minBrightness = 1
         }
 
         saving.send(true)

@@ -81,10 +81,12 @@ struct DisplayRowView: View {
     @Default(.showRawValues) var showRawValues
 
     @State var showNeedsLunarPro = false
+    @State var showSubzero = false
+    @State var showXDR = false
 
     var softwareSliders: some View {
         Group {
-            if display.enhanced || SWIFTUI_PREVIEW, !display.blackOutEnabled {
+            if display.enhanced, !display.blackOutEnabled {
                 BigSurSlider(
                     percentage: $display.xdrBrightness,
                     image: "sun.max.circle.fill",
@@ -94,7 +96,7 @@ struct DisplayRowView: View {
                     showValue: $showSliderValues
                 )
             }
-            if display.subzero || SWIFTUI_PREVIEW, !display.blackOutEnabled {
+            if display.subzero, !display.blackOutEnabled {
                 BigSurSlider(
                     percentage: $display.softwareBrightness,
                     image: "moon.circle.fill",
@@ -105,6 +107,10 @@ struct DisplayRowView: View {
                 )
             }
         }
+        .onAppear(perform: handleSubzeroXDRSliders)
+        .onChange(of: display.subzero, perform: handleSubzeroXDRSliders)
+        .onChange(of: display.enhanced, perform: handleSubzeroXDRSliders)
+        .onChange(of: display.blackOutEnabled, perform: handleSubzeroXDRSliders)
     }
 
     var sdrXdrSelector: some View {
@@ -271,6 +277,17 @@ struct DisplayRowView: View {
                 )
                 .padding(.vertical, 3)
             }
+        }
+    }
+
+    func handleSubzeroXDRSliders(_: Bool) {
+        handleSubzeroXDRSliders()
+    }
+
+    func handleSubzeroXDRSliders() {
+        withAnimation(.fastSpring) {
+            showSubzero = display.subzero && !display.blackOutEnabled
+            showXDR = display.enhanced && !display.blackOutEnabled
         }
     }
 
@@ -790,6 +807,12 @@ final class EnvState: ObservableObject {
     @Published var menuWidth: CGFloat = MENU_WIDTH
     @Published var menuHeight: CGFloat = 100
     @Published var menuMaxHeight: CGFloat = (NSScreen.main?.visibleFrame.height ?? 600) - 50
+
+    @Published var hoveringSlider = false {
+        didSet {
+            print("hoveringSlider", hoveringSlider)
+        }
+    }
 }
 
 // MARK: - QuickActionsMenuView

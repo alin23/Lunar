@@ -157,7 +157,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var observers: Set<AnyCancellable> = []
     var valuesReaderThread: Repeater?
 
-    var statusButtonTrackingArea: NSTrackingArea?
     var statusItemButtonController: StatusItemButtonController?
 
     @IBOutlet var versionMenuItem: NSMenuItem!
@@ -879,16 +878,28 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func updateInfoMenuItem(showBrightnessMenuBar: Bool? = nil) {
         if showBrightnessMenuBar ?? CachedDefaults[.showBrightnessMenuBar],
+           let button = statusItem.button,
            let display = CachedDefaults[.showOnlyExternalBrightnessMenuBar] ?
            displayController.mainExternalDisplay :
            displayController.cursorDisplay
         {
+            button.imagePosition = .imageLeading
             let paragraphStyle = NSMutableParagraphStyle()
-            paragraphStyle.lineHeightMultiple = 0.6
-            statusItem.button?.attributedTitle = " B: \(display.brightness.uint16Value)\n C: \(display.contrast.uint16Value)"
-                .withFont(.systemFont(ofSize: 10, weight: .medium)).withBaselineOffset(-5).withParagraphStyle(paragraphStyle)
-        } else {
-            statusItem.button?.attributedTitle = "".attributedString
+            paragraphStyle.lineHeightMultiple = 0.55
+            button.attributedTitle = " B \(display.brightness.uint16Value)\n C \(display.contrast.uint16Value)"
+                .withFont(.monospacedSystemFont(ofSize: 10, weight: .medium))
+                .withBaselineOffset(-5)
+                .withParagraphStyle(paragraphStyle)
+                .withKern(-0.8)
+            mainAsync {
+                self.statusItemButtonController?.frame = button.frame
+            }
+        } else if let button = statusItem.button {
+            button.attributedTitle = "".attributedString
+            button.imagePosition = .imageOnly
+            mainAsync {
+                self.statusItemButtonController?.frame = button.frame
+            }
         }
 
         guard menuShown else { return }
@@ -1014,15 +1025,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             button.imagePosition = CachedDefaults[.showBrightnessMenuBar] ? .imageLeading : .imageOnly
 
             statusItemButtonController = StatusItemButtonController(button: button)
-            statusButtonTrackingArea = NSTrackingArea(
-                rect: button.visibleRect,
-                options: [.mouseEnteredAndExited, .activeAlways],
-                owner: statusItemButtonController,
-                userInfo: nil
-            )
-            if let trackingArea = statusButtonTrackingArea {
-                button.addTrackingArea(trackingArea)
-            }
             button.addSubview(statusItemButtonController!)
         }
         statusItem.menu = nil
