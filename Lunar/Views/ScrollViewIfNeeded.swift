@@ -219,22 +219,65 @@ struct OverflowContentViewModifier: ViewModifier {
                             env.menuHeight = height
                         }
                     }
+                    .onChange(of: env.hoveringSlider) { hovering in
+                        pauseScrolling = hovering
+                    }
                 }
             )
-            .wrappedInScrollView(when: contentOverflow)
+            .wrappedInScrollView(when: contentOverflow, pauseScrolling: pauseScrolling)
     }
 
     // MARK: Private
 
     @State private var contentOverflow = false
+    @State var pauseScrolling = false
 }
 
+var scrollWheelOriginal: Method?
+var scrollWheelOriginalIMP: IMP?
+var scrollWheelSwiz: Method?
+var scrollWheelSwizIMP: IMP?
+
+var scrollWheelSwizzled = false
+let SCROLL_VIEW_SWIZZLED_TAG = NSUserInterfaceItemIdentifier("SVZ")
+
+extension NSScrollView {
+    @objc func noScroll(with event: NSEvent) {}
+}
+
+func swizzleScrollWheel(scrollView: AnyObject) {
+    guard !scrollWheelSwizzled else {
+        return
+    }
+    scrollWheelSwizzled = true
+    let origMethod = #selector(NSScrollView.scrollWheel(with:))
+    let replacementMethod = #selector(NSScrollView.noScroll)
+
+    scrollWheelOriginal = class_getInstanceMethod(scrollView.classForCoder, origMethod)
+    scrollWheelOriginalIMP = method_getImplementation(scrollWheelOriginal!)
+
+    scrollWheelSwiz = class_getInstanceMethod(NSScrollView.self, replacementMethod)
+    scrollWheelSwizIMP = method_getImplementation(scrollWheelSwiz!)
+}
+
+import Introspect
 extension View {
     @ViewBuilder
-    func wrappedInScrollView(when condition: Bool) -> some View {
+    func wrappedInScrollView(when condition: Bool, pauseScrolling: Bool = false) -> some View {
         if condition {
             ScrollView(.vertical, showsIndicators: false) {
-                self
+                self.introspectScrollView { s in
+                    s.identifier = pauseScrolling ? SCROLL_VIEW_SWIZZLED_TAG : nil
+
+                    swizzleScrollWheel(scrollView: s)
+                    guard let scrollWheelOriginal = scrollWheelOriginal,
+                          let scrollWheelSwizIMP = scrollWheelSwizIMP,
+                          let scrollWheelOriginalIMP = scrollWheelOriginalIMP
+                    else {
+                        return
+                    }
+                    method_setImplementation(scrollWheelOriginal, pauseScrolling ? scrollWheelSwizIMP : scrollWheelOriginalIMP)
+                }
             }
         } else {
             self
@@ -245,5 +288,28 @@ extension View {
 extension View {
     func scrollOnOverflow() -> some View {
         modifier(OverflowContentViewModifier())
+    }
+}
+
+// MARK: - BetterScrollView
+
+class BetterScrollView: NSScrollView {
+    // MARK: Lifecycle
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+
+    // MARK: Internal
+
+    var scrollingEnabled = true
+
+    override func scrollWheel(with event: NSEvent) {
+        guard scrollingEnabled else { return }
+        super.scrollWheel(with: event)
     }
 }

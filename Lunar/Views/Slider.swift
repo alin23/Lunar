@@ -278,6 +278,7 @@ class Slider: NSSlider {
             }
         }
 
+        guard event.momentumPhase.rawValue == 0 else { return }
         let increment = range * (delta / (150 * Float(scrollPrecision)))
         floatValue = floatValue + increment
         sendAction(action, to: target)
