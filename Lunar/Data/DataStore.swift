@@ -27,6 +27,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .autoXdr,
     .hdrWorkaround,
     .xdrContrast,
+    .xdrContrastHigher,
     .xdrWarningShown,
     .workaroundBuiltinDisplay,
     .autoBlackoutBuiltin,
@@ -625,6 +626,7 @@ func initCache() {
     cacheKey(.autoXdr)
     cacheKey(.hdrWorkaround)
     cacheKey(.xdrContrast)
+    cacheKey(.xdrContrastHigher)
     cacheKey(.xdrWarningShown)
     cacheKey(.autoBlackoutBuiltin)
     cacheKey(.workaroundBuiltinDisplay)
@@ -762,6 +764,7 @@ extension Defaults.Keys {
     static let autoXdr = Key<Bool>("autoXdr", default: true)
     static let hdrWorkaround = Key<Bool>("hdrWorkaround", default: true)
     static let xdrContrast = Key<Bool>("xdrContrast", default: true)
+    static let xdrContrastHigher = Key<Bool>("xdrContrastHigher", default: false)
     static let xdrWarningShown = Key<Bool>("xdrWarningShown", default: false)
     static let autoBlackoutBuiltin = Key<Bool>("autoBlackoutBuiltin", default: false)
     static let workaroundBuiltinDisplay = Key<Bool>("workaroundBuiltinDisplay", default: false)
@@ -924,6 +927,7 @@ let autoSubzeroPublisher = Defaults.publisher(.autoSubzero).removeDuplicates().d
 let autoXdrPublisher = Defaults.publisher(.autoXdr).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let hdrWorkaroundPublisher = Defaults.publisher(.hdrWorkaround).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let xdrContrastPublisher = Defaults.publisher(.xdrContrast).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
+let xdrContrastHigherPublisher = Defaults.publisher(.xdrContrastHigher).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let workaroundBuiltinDisplayPublisher = Defaults.publisher(.workaroundBuiltinDisplay).removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
 let streamLogsPublisher = Defaults.publisher(.streamLogs).removeDuplicates().filter { $0.oldValue != $0.newValue }
