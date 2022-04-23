@@ -1024,6 +1024,7 @@ func taskManager(_ key: String) -> Any? {
     }
 }
 
+@discardableResult
 func asyncAfter(ms: Int, name: String = "asyncAfter", _ action: @escaping () -> Void) -> DispatchWorkItem {
     let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
 
