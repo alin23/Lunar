@@ -1159,6 +1159,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                         return
                     }
 
+                    let oldMaxSoftwareBrightness = d.maxSoftwareBrightness
                     d.maxEDR = maxEDR
                     #if DEBUG
                         log.info("MAX EDR: \(maxEDR)")
@@ -1168,7 +1169,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                         let oldSoftwareBrightness = mapNumber(
                             d.softwareBrightness,
                             fromLow: 1.0,
-                            fromHigh: d.maxSoftwareBrightness,
+                            fromHigh: oldMaxSoftwareBrightness,
                             toLow: 0.0,
                             toHigh: 1.0
                         )

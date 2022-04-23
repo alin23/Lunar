@@ -111,7 +111,8 @@ public struct FlatButton: ButtonStyle {
         pressedBinding: Binding<Bool>? = nil,
         horizontalPadding: CGFloat = 8,
         verticalPadding: CGFloat = 4,
-        stretch: Bool = false
+        stretch: Bool = false,
+        disabled: Binding<Bool>? = nil
     ) {
         _color = colorBinding ?? .constant(color ?? Colors.lightGold)
         _textColor = textColorBinding ?? .constant(textColor ?? Colors.blackGray)
@@ -124,6 +125,7 @@ public struct FlatButton: ButtonStyle {
         _horizontalPadding = horizontalPadding.state
         _verticalPadding = verticalPadding.state
         _stretch = State(initialValue: stretch)
+        _disabled = disabled ?? .constant(false)
     }
 
     // MARK: Public
@@ -170,8 +172,8 @@ public struct FlatButton: ButtonStyle {
                         )
                     )
 
-            ).colorMultiply(configuration.isPressed ? pressedColor : colorMultiply)
-            .scaleEffect(configuration.isPressed ? 1.02 : scale)
+            ).colorMultiply(configuration.isPressed && !disabled ? pressedColor : colorMultiply)
+            .scaleEffect(configuration.isPressed && !disabled ? 1.02 : scale)
             .onAppear {
                 pressedColor = hoverColor.blended(withFraction: 0.5, of: .white)
             }
@@ -189,11 +191,14 @@ public struct FlatButton: ButtonStyle {
                 }
             }
             .onHover(perform: { hover in
+                guard !disabled else { return }
                 withAnimation(.easeOut(duration: 0.2)) {
                     colorMultiply = hover ? hoverColor : .white
                     scale = hover ? 1.05 : 1
                 }
             })
+            .contrast(disabled ? 0.3 : 1.0)
+            .disabled(disabled)
     }
 
     // MARK: Internal
@@ -214,6 +219,7 @@ public struct FlatButton: ButtonStyle {
     @State var horizontalPadding: CGFloat = 8
     @State var verticalPadding: CGFloat = 4
     @State var stretch = false
+    @Binding var disabled: Bool
 }
 
 // MARK: - PickerButton

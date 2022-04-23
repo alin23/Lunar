@@ -14,6 +14,13 @@ import SwiftUI
 
 var appInfoHiddenAfterLaunch = false
 
+prefix func ! (value: Binding<Bool>) -> Binding<Bool> {
+    Binding<Bool>(
+        get: { !value.wrappedValue },
+        set: { value.wrappedValue = !$0 }
+    )
+}
+
 // MARK: - PresetButtonView
 
 struct PresetButtonView: View {
@@ -391,11 +398,13 @@ struct AdvancedSettingsView: View {
     @Default(.reapplyValuesAfterWake) var reapplyValuesAfterWake
     @Default(.hdrWorkaround) var hdrWorkaround
     @Default(.xdrContrast) var xdrContrast
-    @Default(.xdrContrastHigher) var xdrContrastHigher
+    @Default(.xdrContrastFactor) var xdrContrastFactor
+    @Default(.allowHDREnhanceBrightness) var allowHDREnhanceBrightness
+    @Default(.allowHDREnhanceContrast) var allowHDREnhanceContrast
 
     var body: some View {
         VStack(alignment: .leading) {
-            VStack(alignment: .leading) {
+            Group {
                 SettingsToggle(text: "Hide menubar icon", setting: $hideMenuBarIcon)
                 SettingsToggle(text: "Show dock icon", setting: $showDockIcon)
                 SettingsToggle(
@@ -415,17 +424,7 @@ struct AdvancedSettingsView: View {
                 )
             }
             Divider()
-            VStack(alignment: .leading) {
-                SettingsToggle(
-                    text: "Use workaround for built-in display", setting: $workaroundBuiltinDisplay,
-                    help: """
-                    Forward brightness key events to the system instead of
-                    changing built-in brightness from Lunar.
-
-                    Disables the "Hotkey Step" setting for built-in but persists
-                    brightness changes better on some specific devices.
-                    """
-                )
+            Group {
                 SettingsToggle(
                     text: "Run in HDR compatibility mode", setting: $hdrWorkaround,
                     help: """
@@ -443,15 +442,63 @@ struct AdvancedSettingsView: View {
                     """
                 )
                 SettingsToggle(
-                    text: "Enhance contrast in XDR Brightness", setting: $xdrContrast,
-                    help: "Improve readability in sunlight by increasing XDR contrast.\nThis option is especially useful when using apps with dark backgrounds."
+                    text: "Allow XDR on non-Apple HDR monitors", setting: $allowHDREnhanceBrightness.animation(.fastSpring),
+                    help: """
+                    This should work for HDR monitors that have higher brightness LEDs.
+                    Known issues: some monitors turn to grayscale/monochrome when XDR is enabled.
+
+                    In case of any issue, uncheck this and restart your computer to revert any changes.
+                    """
                 )
+
                 SettingsToggle(
-                    text: "Use even higher contrast", setting: $xdrContrastHigher,
-                    help: "For some displays, an even higher contrast can allow for more readability,\nwhile on others it can decrease color accuracy too much."
+                    text: "Enhance contrast in XDR Brightness", setting: $xdrContrast,
+                    help: """
+                    Improve readability in sunlight by increasing XDR contrast.
+                    This option is especially useful when using apps with dark backgrounds.
+
+                    Note: works only when using a single display
+                    """
                 )
-                .padding(.leading)
-                .disabled(!xdrContrast)
+                HStack {
+                    BigSurSlider(
+                        percentage: $xdrContrastFactor,
+                        image: "circle.lefthalf.filled",
+                        color: Colors.lightGray,
+                        backgroundColor: Colors.grayMauve.opacity(0.1),
+                        knobColor: Colors.lightGray,
+                        showValue: .constant(false)
+                    )
+                    .padding(.leading)
+                    .disabled(!xdrContrast)
+                    .contrast(xdrContrast ? 1.0 : 0.2)
+
+                    SwiftUI.Button("Reset") { xdrContrastFactor = 0.3 }
+                        .buttonStyle(FlatButton(
+                            color: Colors.lightGray,
+                            textColor: Colors.darkGray,
+                            radius: 10,
+                            verticalPadding: 3,
+                            disabled: !$xdrContrast
+                        ))
+                        .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                }
+                SettingsToggle(text: "Allow on non-Apple HDR monitors", setting: $allowHDREnhanceContrast.animation(.fastSpring))
+                    .padding(.leading)
+                    .disabled(!xdrContrast)
+            }
+            Divider()
+            Group {
+                SettingsToggle(
+                    text: "Use workaround for built-in display", setting: $workaroundBuiltinDisplay,
+                    help: """
+                    Forward brightness key events to the system instead of
+                    changing built-in brightness from Lunar.
+
+                    Disables the "Hotkey Step" setting for built-in but persists
+                    brightness changes better on some specific devices.
+                    """
+                )
                 SettingsToggle(
                     text: "Allow BlackOut on single screen", setting: $allowBlackOutOnSingleScreen,
                     help: "Allows turning off a screen even if it's the only visible screen left"
@@ -471,7 +518,7 @@ struct AdvancedSettingsView: View {
                 )
             }
             Divider()
-            VStack(alignment: .leading) {
+            Group {
                 SettingsToggle(
                     text: "Enable rotation hotkeys",
                     setting: $enableOrientationHotkeys,
@@ -525,6 +572,8 @@ struct AdvancedSettingsView: View {
                     """
                 )
             }
+            Spacer()
+            Color.clear
         }.frame(maxWidth: .infinity, alignment: .leading)
     }
 }
@@ -551,27 +600,29 @@ struct QuickActionsLayoutView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            VStack(alignment: .leading) {
-                SettingsToggle(text: "Only show top buttons on hover", setting: $showHeaderOnHover.animation(.fastSpring))
-                SettingsToggle(text: "Only show bottom buttons on hover", setting: $showFooterOnHover.animation(.fastSpring))
+            Group {
+                Group {
+                    SettingsToggle(text: "Only show top buttons on hover", setting: $showHeaderOnHover.animation(.fastSpring))
+                    SettingsToggle(text: "Only show bottom buttons on hover", setting: $showFooterOnHover.animation(.fastSpring))
+                }
+                Divider()
+                Group {
+                    SettingsToggle(text: "Show slider values", setting: $showSliderValues.animation(.fastSpring))
+                    SettingsToggle(text: "Show volume slider", setting: $showVolumeSlider.animation(.fastSpring))
+                    SettingsToggle(text: "Show rotation selector", setting: $showOrientationInQuickActions.animation(.fastSpring))
+                    SettingsToggle(text: "Show input source selector", setting: $showInputInQuickActions.animation(.fastSpring))
+                    SettingsToggle(text: "Show power button", setting: $showPowerInQuickActions.animation(.fastSpring))
+                }
+                Divider()
+                Group {
+                    SettingsToggle(text: "Show standard presets", setting: $showStandardPresets.animation(.fastSpring))
+                    SettingsToggle(text: "Show custom presets", setting: $showCustomPresets.animation(.fastSpring))
+                    SettingsToggle(text: "Merge brightness and contrast", setting: $mergeBrightnessContrast.animation(.fastSpring))
+                }
             }
             Divider()
-            VStack(alignment: .leading) {
-                SettingsToggle(text: "Show slider values", setting: $showSliderValues.animation(.fastSpring))
-                SettingsToggle(text: "Show volume slider", setting: $showVolumeSlider.animation(.fastSpring))
-                SettingsToggle(text: "Show rotation selector", setting: $showOrientationInQuickActions.animation(.fastSpring))
-                SettingsToggle(text: "Show input source selector", setting: $showInputInQuickActions.animation(.fastSpring))
-                SettingsToggle(text: "Show power button", setting: $showPowerInQuickActions.animation(.fastSpring))
-            }
-            Divider()
-            VStack(alignment: .leading) {
-                SettingsToggle(text: "Show standard presets", setting: $showStandardPresets.animation(.fastSpring))
-                SettingsToggle(text: "Show custom presets", setting: $showCustomPresets.animation(.fastSpring))
-                SettingsToggle(text: "Merge brightness and contrast", setting: $mergeBrightnessContrast.animation(.fastSpring))
-            }
-            Divider()
-            VStack(alignment: .leading) {
-                SettingsToggle(text: "Show XDR brightness toggle when available", setting: $showXDRSelector.animation(.fastSpring))
+            Group {
+                SettingsToggle(text: "Show XDR Brightness toggle when available", setting: $showXDRSelector.animation(.fastSpring))
                 SettingsToggle(text: "Toggle XDR Brightness when going over 100%", setting: $autoXdr.animation(.fastSpring))
                 SettingsToggle(
                     text: "Toggle Sub-zero Dimming when going below 0%",
@@ -579,7 +630,7 @@ struct QuickActionsLayoutView: View {
                 )
             }
             Divider()
-            VStack(alignment: .leading) {
+            Group {
                 SettingsToggle(text: "Show last raw values sent to the display", setting: $showRawValues.animation(.fastSpring))
                 SettingsToggle(text: "Show brightness near menubar icon", setting: $showBrightnessMenuBar.animation(.fastSpring))
                 SettingsToggle(
@@ -589,6 +640,8 @@ struct QuickActionsLayoutView: View {
                 .padding(.leading)
                 .disabled(!showBrightnessMenuBar)
             }
+            Spacer()
+            Color.clear
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -932,7 +985,7 @@ struct QuickActionsMenuView: View {
                     case .advanced:
                         AdvancedSettingsView().padding(10)
                     }
-                }.frame(width: 390, height: 465, alignment: .center)
+                }.frame(width: 390, height: 555, alignment: .center)
             }
             .onChange(of: showBrightnessMenuBar) { _ in
                 let old = showOptionsMenu

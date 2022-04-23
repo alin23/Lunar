@@ -303,6 +303,28 @@ class DisplayController: ObservableObject {
                 d.save()
             }
         }.store(in: &observers)
+
+        allowHDREnhanceBrightnessPublisher.sink { change in
+            if !change.newValue {
+                self.activeDisplayList
+                    .filter { $0.enhanced && !($0.control is AppleNativeControl) }
+                    .forEach { $0.enhanced = false }
+            }
+        }.store(in: &observers)
+        allowHDREnhanceContrastPublisher
+            .debounce(for: .seconds(1), scheduler: RunLoop.main)
+            .sink { _ in
+                self.recomputeEDR()
+                self.xdrContrast = CachedDefaults[.xdrContrast]
+            }.store(in: &observers)
+        xdrContrastFactorPublisher.sink { change in
+            self.recomputeEDR(factor: change.newValue)
+            self.xdrContrast = CachedDefaults[.xdrContrast]
+        }.store(in: &observers)
+
+        xdrContrastPublisher.sink { self.xdrContrast = $0.newValue }.store(in: &observers)
+        autoXdrPublisher.sink { self.autoXdr = $0.newValue }.store(in: &observers)
+        autoSubzeroPublisher.sink { self.autoSubzero = $0.newValue }.store(in: &observers)
     }
 
     func getMatchingDisplay(
@@ -418,8 +440,8 @@ class DisplayController: ObservableObject {
             return display
         }
 
-        func matchDisplayByExcludingOthers(_ service: io_service_t, displays: [Display]? = nil) -> Display? {
-            guard let display = displays?.first, DDC.avServiceCache[display.id] == nil else { return nil }
+        func matchDisplayByExcludingOthers(_: io_service_t, displays: [Display]? = nil) -> Display? {
+            guard let display = displays?.first else { return nil }
 
             return display
         }
@@ -877,41 +899,30 @@ class DisplayController: ObservableObject {
         #endif
     }
 
-    lazy var xdrContrast: Bool = {
-        xdrContrastPublisher.sink { self.xdrContrast = $0.newValue }.store(in: &observers)
-        xdrContrastHigherPublisher.sink { change in
-            self.activeDisplayList.filter(\.enhanced).forEach {
-                $0.xdrContrast = $0.computeXDRContrast(xdrBrightness: $0.softwareBrightness, xdrContrastHigher: change.newValue)
-            }
-            self.xdrContrast = CachedDefaults[.xdrContrast]
-        }.store(in: &observers)
-        return Defaults[.xdrContrast]
-    }() {
+    var xdrContrast: Bool = Defaults[.xdrContrast] {
         didSet {
             guard activeDisplayCount == 1, let display = firstNonTestingDisplay,
-                  display.control is AppleNativeControl || CachedDefaults[.allowHDREnhanceContrast] else { return }
-            if !xdrContrast {
+                  display.control is AppleNativeControl || CachedDefaults[.allowHDREnhanceContrast]
+            else { return }
+
+            guard xdrContrast, display.enhanced else {
                 display.setXDRContrast(0.0)
-            } else {
-                activeDisplayList.filter(\.enhanced).forEach { $0.setXDRContrast($0.xdrContrast) }
+                return
             }
+
+            display.setXDRContrast(display.xdrContrast)
+            display.setIndependentSoftwareBrightness(display.softwareBrightness, withoutSettingContrast: true)
         }
     }
 
-    lazy var autoXdr: Bool = {
-        autoXdrPublisher.sink { self.autoXdr = $0.newValue }.store(in: &observers)
-        return Defaults[.autoXdr]
-    }() {
+    var autoXdr: Bool = Defaults[.autoXdr] {
         didSet {
             guard !autoXdr else { return }
             activeDisplayList.filter(\.enhanced).forEach { $0.enhanced = false }
         }
     }
 
-    lazy var autoSubzero: Bool = {
-        autoSubzeroPublisher.sink { self.autoSubzero = $0.newValue }.store(in: &observers)
-        return Defaults[.autoSubzero]
-    }() {
+    var autoSubzero: Bool = Defaults[.autoSubzero] {
         didSet {
             guard !autoSubzero else { return }
             activeDisplayList.filter(\.subzero).forEach { $0.softwareBrightness = 1 }

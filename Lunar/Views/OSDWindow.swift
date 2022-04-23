@@ -218,7 +218,7 @@ public struct BigSurSlider: View {
                         dragging = false
                     }
             )
-            .animation(.easeOut(duration: 0.1), value: percentage)
+            .animation(.fastSpring, value: percentage)
             #if os(macOS)
                 .onHover { hov in
                     hovering = hov
