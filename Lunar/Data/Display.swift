@@ -1294,7 +1294,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }()
 
     var hdrWindowOpenedAt = Date()
-    var xdrContrast: Float = 0.0
+
     var maxSoftwareBrightness: Float { max(maxEDR, 1.02) }
     @Published @objc dynamic var subzero = false {
         didSet {

@@ -117,6 +117,8 @@ enum MemoryUsageError: Error {
 }
 
 let SWIFTUI_PREVIEW = ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+var screenIDs: Set<CGDirectDisplayID> = Set(NSScreen.onlineDisplayIDs)
+var lastXDRContrastResetTime = Date()
 
 // MARK: - AppDelegate
 
@@ -209,7 +211,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var uiElement: UIElement?
 
     var didBecomeActiveAtLeastOnce = false
-    var screenIDs: Set<CGDirectDisplayID> = Set(NSScreen.onlineDisplayIDs)
 
     var brightnessIcon = "brightness"
 
@@ -1093,6 +1094,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
             }
 
+            if screenIDs.count == 1, !screenIDs.contains(displayID), displayController.xdrContrast > 0 {
+                log.info("Disabling XDR Contrast if we have more than 1 screen")
+                lastXDRContrastResetTime = Date()
+                displayController.xdrContrast = 0
+                displayController.setXDRContrast(0)
+            }
             displayController.panelRefreshPublisher.send(displayID)
             displayController.retryAutoBlackoutLater()
         }, nil)
@@ -1195,10 +1202,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
 
                 let newScreenIDs = Set(NSScreen.onlineDisplayIDs)
-                let oldScreenIDs = self.screenIDs
+                let oldScreenIDs = screenIDs
 
                 let newLidClosed = isLidClosed()
-                guard newScreenIDs != self.screenIDs || newLidClosed != displayController.lidClosed else {
+                guard newScreenIDs != screenIDs || newLidClosed != displayController.lidClosed else {
                     return
                 }
 
@@ -1207,7 +1214,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                         "New screen IDs after screen configuration change",
                         context: ["old": oldScreenIDs.commaSeparatedString, "new": newScreenIDs.commaSeparatedString]
                     )
-                    self.screenIDs = newScreenIDs
+                    screenIDs = newScreenIDs
                 }
                 if newLidClosed != displayController.lidClosed {
                     log.info(
