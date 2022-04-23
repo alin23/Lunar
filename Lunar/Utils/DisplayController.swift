@@ -315,14 +315,14 @@ class DisplayController: ObservableObject {
             .debounce(for: .seconds(1), scheduler: RunLoop.main)
             .sink { _ in
                 self.recomputeEDR()
-                self.xdrContrast = CachedDefaults[.xdrContrast]
+                self.xdrContrastEnabled = CachedDefaults[.xdrContrast]
             }.store(in: &observers)
         xdrContrastFactorPublisher.sink { change in
             self.recomputeEDR(factor: change.newValue)
-            self.xdrContrast = CachedDefaults[.xdrContrast]
+            self.xdrContrastEnabled = CachedDefaults[.xdrContrast]
         }.store(in: &observers)
 
-        xdrContrastPublisher.sink { self.xdrContrast = $0.newValue }.store(in: &observers)
+        xdrContrastPublisher.sink { self.xdrContrastEnabled = $0.newValue }.store(in: &observers)
         autoXdrPublisher.sink { self.autoXdr = $0.newValue }.store(in: &observers)
         autoSubzeroPublisher.sink { self.autoSubzero = $0.newValue }.store(in: &observers)
     }
@@ -699,6 +699,8 @@ class DisplayController: ObservableObject {
     var mirrorSetBeforeBlackout: [CGDirectDisplayID: [MPDisplay]] = [:]
     var enabledHDRBeforeXDR: [CGDirectDisplayID: Bool] = [:]
 
+    var xdrContrast: Float = 0.0
+
     @Atomic var autoBlackoutPending = false {
         didSet {
             log.info("autoBlackoutPending=\(autoBlackoutPending)")
@@ -899,18 +901,18 @@ class DisplayController: ObservableObject {
         #endif
     }
 
-    var xdrContrast: Bool = Defaults[.xdrContrast] {
+    var xdrContrastEnabled: Bool = Defaults[.xdrContrast] {
         didSet {
             guard activeDisplayCount == 1, let display = firstNonTestingDisplay,
                   display.control is AppleNativeControl || CachedDefaults[.allowHDREnhanceContrast]
             else { return }
 
-            guard xdrContrast, display.enhanced else {
-                display.setXDRContrast(0.0)
+            guard xdrContrastEnabled, display.enhanced else {
+                setXDRContrast(0.0)
                 return
             }
 
-            display.setXDRContrast(display.xdrContrast)
+            setXDRContrast(xdrContrast)
             display.setIndependentSoftwareBrightness(display.softwareBrightness, withoutSettingContrast: true)
         }
     }
@@ -936,9 +938,6 @@ class DisplayController: ObservableObject {
             return CachedDefaults[.adaptiveBrightnessMode].mode
         } else {
             let mode = autoMode()
-//            if mode.key != CachedDefaults[.adaptiveBrightnessMode] {
-//                CachedDefaults[.adaptiveBrightnessMode] = mode.key
-//            }
             return mode
         }
     }
@@ -946,9 +945,6 @@ class DisplayController: ObservableObject {
     static func panel(with id: CGDirectDisplayID) -> MPDisplay? {
         guard id != kCGNullDirectDisplay else { return nil }
         return DisplayController.panelManager?.display(withID: id.i32) as? MPDisplay
-//        guard let displays = DisplayController.panelManager?.displays as? [MPDisplay] else { return nil }
-//
-//        return displays.first { $0.displayID == id }
     }
 
     static func autoMode() -> AdaptiveMode {
@@ -1393,10 +1389,9 @@ class DisplayController: ObservableObject {
 
                 log.debug("Disabling BlackOut where the mirror does not exist anymore")
                 for d in activeNewDisplays {
-                    log
-                        .debug(
-                            "\(d): blackOutEnabled=\(d.blackOutEnabled) blackOutEnabledWithoutMirroring=\(d.blackOutEnabledWithoutMirroring)"
-                        )
+                    log.debug(
+                        "\(d): blackOutEnabled=\(d.blackOutEnabled) blackOutEnabledWithoutMirroring=\(d.blackOutEnabledWithoutMirroring)"
+                    )
                     guard d.blackOutEnabled, !d.blackOutEnabledWithoutMirroring, let panel = Self.panel(with: d.id),
                           !panel.isMirrored
                     else {
@@ -1404,10 +1399,9 @@ class DisplayController: ObservableObject {
                         continue
                     }
 
-                    log
-                        .info(
-                            "Disabling BlackOut for \(d): blackOutEnabled=\(d.blackOutEnabled) isMirrored=\(panel.isMirrored) isMirrorMaster=\(panel.isMirrorMaster) mirrorMasterDisplayID=\(panel.mirrorMasterDisplayID)"
-                        )
+                    log.info(
+                        "Disabling BlackOut for \(d): blackOutEnabled=\(d.blackOutEnabled) isMirrored=\(panel.isMirrored) isMirrorMaster=\(panel.isMirrorMaster) mirrorMasterDisplayID=\(panel.mirrorMasterDisplayID)"
+                    )
                     d.blackoutDisablerPublisher.send(false)
                 }
 
@@ -1420,6 +1414,7 @@ class DisplayController: ObservableObject {
                         displayController.blackOut(display: d.id, state: .off)
                     }
                 }
+
                 guard let autoBlackOut = autoBlackOut, autoBlackOut, lunarProOnTrial || lunarProActive else { return }
                 if let d = activeOldDisplays.first, activeOldDisplays.count == 1, d.isBuiltin, activeNewDisplays.count > 1,
                    !d.blackOutEnabled
@@ -1429,10 +1424,9 @@ class DisplayController: ObservableObject {
                     self.builtinDisplay?.showAutoBlackOutOSD()
                     self.autoBlackoutPublisher.send(true)
                 } else {
-                    log
-                        .info(
-                            "Not activating Auto Blackout: activeOldDisplays.count=\(activeOldDisplays.count) activeNewDisplays.count=\(activeNewDisplays.count)"
-                        )
+                    log.info(
+                        "Not activating Auto Blackout: activeOldDisplays.count=\(activeOldDisplays.count) activeNewDisplays.count=\(activeNewDisplays.count)"
+                    )
                 }
             }
 
