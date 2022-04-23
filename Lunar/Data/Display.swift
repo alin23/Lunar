@@ -3912,16 +3912,16 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func possibleEDIDUUIDs() -> [String] {
         let infoDict = infoDictionary
-        guard let manufactureYear = infoDict[kDisplayYearOfManufacture] as? Int64, manufactureYear >= 1990,
-              let manufactureWeek = infoDict[kDisplayWeekOfManufacture] as? Int64,
-              let serialNumber = infoDict[kDisplaySerialNumber] as? Int64,
+        guard let serialNumber = infoDict[kDisplaySerialNumber] as? Int64,
               let productID = infoDict[kDisplayProductID] as? Int64,
               let vendorID = infoDict[kDisplayVendorID] as? Int64,
               let verticalPixels = infoDict[kDisplayVerticalImageSize] as? Int64,
               let horizontalPixels = infoDict[kDisplayHorizontalImageSize] as? Int64
         else { return [] }
 
-        let yearByte = (manufactureYear - 1990).u8.hex.uppercased()
+        let manufactureYear = (infoDict[kDisplayYearOfManufacture] as? Int64) ?? 0
+        let manufactureWeek = (infoDict[kDisplayWeekOfManufacture] as? Int64) ?? 0
+        let yearByte = (manufactureYear >= 1990 ? manufactureYear - 1990 : manufactureYear).u8.hex.uppercased()
         let weekByte = manufactureWeek.u8.hex.uppercased()
         let vendorBytes = vendorID.u16.str(reversed: true, separator: "").uppercased()
         let productBytes = productID.u16.str(reversed: false, separator: "").uppercased()
@@ -3934,6 +3934,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             "\(vendorBytes)\(productBytes)-\(serialBytes.prefix(4))-\(serialBytes.suffix(4))-\(weekByte)\(yearByte)-0104B5\(horizontalBytes)\(verticalBytes)78",
             "\(vendorBytes)\(productBytes)-0000-0000-\(weekByte)\(yearByte)-[\\dA-F]{6}\(horizontalBytes)\(verticalBytes)[\\dA-F]{2}",
             "\(vendorBytes)\(productBytes)-\(serialBytes.prefix(4))-\(serialBytes.suffix(4))-\(weekByte)\(yearByte)-[\\dA-F]{6}\(horizontalBytes)\(verticalBytes)[\\dA-F]{2}",
+            "\(vendorBytes)\(productBytes)-0000-0000-[\\dA-F]{4}-[\\dA-F]{6}\(horizontalBytes)\(verticalBytes)[\\dA-F]{2}",
+            "\(vendorBytes)\(productBytes)-\(serialBytes.prefix(4))-\(serialBytes.suffix(4))-[\\dA-F]{4}-[\\dA-F]{6}\(horizontalBytes)\(verticalBytes)[\\dA-F]{2}",
         ]
     }
 
