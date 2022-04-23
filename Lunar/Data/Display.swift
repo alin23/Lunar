@@ -3760,7 +3760,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func getBestControl(reapply: Bool = true) -> Control {
         let gammaControl = GammaControl(display: self)
-        // guard supportsGamma else {return gammaControl}
 
         let networkControl = NetworkControl(display: self)
         let appleNativeControl = AppleNativeControl(display: self)
@@ -3867,8 +3866,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         control = getBestControl()
         if let control = control, control.isSoftware {
             mainAsyncAfter(ms: 5001) { [weak self] in
-                guard let self = self, let control = self.control, control.isSoftware,
-                      self.enabledControls[.gamma] ?? false else { return }
+                guard let self = self, self.hasSoftwareControl,
+                      self.enabledControls[.gamma] ?? false, self.preciseBrightness > 0 else { return }
                 self.preciseBrightness = Double(self.preciseBrightness)
             }
         }
