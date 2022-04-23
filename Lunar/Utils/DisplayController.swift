@@ -879,10 +879,17 @@ class DisplayController: ObservableObject {
 
     lazy var xdrContrast: Bool = {
         xdrContrastPublisher.sink { self.xdrContrast = $0.newValue }.store(in: &observers)
+        xdrContrastHigherPublisher.sink { change in
+            self.activeDisplayList.filter(\.enhanced).forEach {
+                $0.xdrContrast = $0.computeXDRContrast(xdrBrightness: $0.softwareBrightness, xdrContrastHigher: change.newValue)
+            }
+            self.xdrContrast = CachedDefaults[.xdrContrast]
+        }.store(in: &observers)
         return Defaults[.xdrContrast]
     }() {
         didSet {
-            guard activeDisplayCount == 1, let display = firstNonTestingDisplay, display.control is AppleNativeControl else { return }
+            guard activeDisplayCount == 1, let display = firstNonTestingDisplay,
+                  display.control is AppleNativeControl || CachedDefaults[.allowHDREnhanceContrast] else { return }
             if !xdrContrast {
                 display.setXDRContrast(0.0)
             } else {
