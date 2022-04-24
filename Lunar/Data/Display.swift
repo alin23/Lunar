@@ -850,8 +850,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case subzero
         case softwareBrightness
         case xdrBrightness
-        case averageDDCWriteMilliseconds
-        case averageDDCReadMilliseconds
+        case averageDDCWriteMicroseconds
+        case averageDDCReadMicroseconds
 
         // MARK: Internal
 
@@ -2202,8 +2202,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var brightnessU16: UInt16 = 50
 
-    @Atomic var averageDDCWriteMilliseconds = 0
-    @Atomic var averageDDCReadMilliseconds = 0
+    @Atomic var averageDDCWriteMicroseconds = 0
+    @Atomic var averageDDCReadMicroseconds = 0
 
     var alternativeControlForAppleNative: Control? = nil {
         didSet {
@@ -4311,8 +4311,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try container.encode(subzero, forKey: .subzero)
             try container.encode(softwareBrightness, forKey: .softwareBrightness)
             try container.encode(xdrBrightness, forKey: .xdrBrightness)
-            try container.encode(averageDDCWriteMilliseconds, forKey: .averageDDCWriteMilliseconds)
-            try container.encode(averageDDCReadMilliseconds, forKey: .averageDDCReadMilliseconds)
+            try container.encode(averageDDCWriteMicroseconds, forKey: .averageDDCWriteMicroseconds)
+            try container.encode(averageDDCReadMicroseconds, forKey: .averageDDCReadMicroseconds)
         }
     }
 

@@ -261,6 +261,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     @Atomic var menuShown = false
 
+    var signalHandlers: [DispatchSourceSignal] = []
+
     var currentPage: Int = Page.display.rawValue {
         didSet {
             log.verbose("Current Page: \(currentPage)")
@@ -1740,8 +1742,26 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .first { item in item.processIdentifier != getpid() }
     }
 
+    func installCleanup(signal: Int32) {
+        let s = DispatchSource.makeSignalSource(signal: signal)
+        s.setEventHandler {
+            if isServer {
+                displayController.cleanup()
+            }
+        }
+        s.activate()
+        signalHandlers.append(s)
+    }
+
     func handleCLI() -> Bool {
+        installCleanup(signal: SIGTERM)
+        installCleanup(signal: SIGKILL)
+        installCleanup(signal: SIGINT)
+
         signal(SIGINT) { _ in
+            if isServer {
+                displayController.cleanup()
+            }
             for display in displayController.displays.values {
                 if display.gammaChanged {
                     display.resetGamma()
@@ -2087,24 +2107,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func applicationWillTerminate(_: Notification) {
-        log.info("Going down")
-
-        Defaults[.debug] = false
-        Defaults[.streamLogs] = false
-        Defaults[.showOptionsMenu] = false
-
-        valuesReaderThread = nil
-        displayController.activeDisplayList.filter(\.ambientLightCompensationEnabledByUser).forEach { d in
-            d.ambientLightAdaptiveBrightnessEnabled = true
-        }
-        displayController.activeDisplays.values.filter(\.faceLightEnabled).forEach { display in
-            display.disableFaceLight(smooth: false)
-            display.save(now: true)
-        }
-        displayController.activeDisplays.values.filter(\.blackOutEnabled).forEach { display in
-            display.disableBlackOut()
-            display.save(now: true)
-        }
+        displayController.cleanup()
     }
 
     func geolocationFallback() {
