@@ -909,11 +909,11 @@ class DisplayController: ObservableObject {
             else { return }
 
             guard xdrContrastEnabled, display.enhanced else {
-                setXDRContrast(0.0)
+                setXDRContrast(0.0, now: true)
                 return
             }
 
-            setXDRContrast(xdrContrast)
+            setXDRContrast(xdrContrast, now: true)
             display.setIndependentSoftwareBrightness(display.softwareBrightness, withoutSettingContrast: true)
         }
     }
