@@ -15,7 +15,6 @@ open class OSDWindow: NSWindow, NSWindowDelegate {
 
         level = NSWindow.Level(CGShieldingWindowLevel().i)
         collectionBehavior = [.stationary, .canJoinAllSpaces, .ignoresCycle, .fullScreenDisallowsTiling]
-//        sharingType = .none
         ignoresMouseEvents = true
         setAccessibilityRole(.popover)
         setAccessibilitySubrole(.unknown)
@@ -147,7 +146,8 @@ public struct BigSurSlider: View {
         knobColorBinding: Binding<Color?>? = nil,
         knobTextColor: Color? = nil,
         knobTextColorBinding: Binding<Color?>? = nil,
-        showValue: Binding<Bool>? = nil
+        showValue: Binding<Bool>? = nil,
+        acceptsMouseEvents: Bool = true
     ) {
         _knobColor = .constant(knobColor)
         _knobTextColor = .constant(knobTextColor)
@@ -161,6 +161,7 @@ public struct BigSurSlider: View {
         _backgroundColor = backgroundColorBinding ?? .constant(backgroundColor)
         _knobColor = knobColorBinding ?? colorBinding ?? .constant(knobColor ?? colors.accent)
         _knobTextColor = knobTextColorBinding ?? .constant(knobTextColor ?? ((color ?? colors.accent).textColor))
+        _acceptsMouseEvents = State(initialValue: acceptsMouseEvents)
     }
 
     // MARK: Public
@@ -221,6 +222,7 @@ public struct BigSurSlider: View {
             .animation(.fastSpring, value: percentage)
             #if os(macOS)
                 .onHover { hov in
+                    guard acceptsMouseEvents else { return }
                     hovering = hov
                     if hovering {
                         lastCursorPosition = NSEvent.mouseLocation
@@ -242,9 +244,6 @@ public struct BigSurSlider: View {
             AppleNativeControl.sliderTracking = tracking
             GammaControl.sliderTracking = tracking
             DDCControl.sliderTracking = tracking
-        }
-        .onDisappear {
-            scrollWheelListener = nil
         }
     }
 
@@ -268,6 +267,7 @@ public struct BigSurSlider: View {
     @State var dragging = false
     @State var hovering = false
     @State var lastCursorPosition = NSEvent.mouseLocation
+    @State var acceptsMouseEvents = true
 
     #if os(macOS)
         func trackScrollWheel() {
@@ -434,7 +434,8 @@ struct BrightnessOSDView: View {
                     color: Colors.xdr.opacity(0.6),
                     backgroundColor: Colors.xdr.opacity(colorScheme == .dark ? 0.1 : 0.2),
                     knobColor: Colors.xdr,
-                    showValue: .constant(true)
+                    showValue: .constant(true),
+                    acceptsMouseEvents: false
                 )
             } else {
                 BigSurSlider(
@@ -443,7 +444,8 @@ struct BrightnessOSDView: View {
                     color: Colors.subzero.opacity(0.6),
                     backgroundColor: Colors.subzero.opacity(colorScheme == .dark ? 0.1 : 0.2),
                     knobColor: Colors.subzero,
-                    showValue: .constant(true)
+                    showValue: .constant(true),
+                    acceptsMouseEvents: false
                 )
             }
         }
@@ -492,7 +494,8 @@ struct AutoBlackOutOSDView: View {
                 color: Colors.red.opacity(0.8),
                 backgroundColor: Colors.red.opacity(colorScheme == .dark ? 0.1 : 0.2),
                 knobColor: .clear,
-                showValue: .constant(false)
+                showValue: .constant(false),
+                acceptsMouseEvents: false
             )
             HStack(spacing: 3) {
                 Text("Press")
@@ -590,7 +593,11 @@ extension Display {
             guard let self = self else { return }
             if self.osdWindowController == nil {
                 self.osdWindowController = OSDWindow(
-                    swiftuiView: AnyView(BrightnessOSDView(display: self)),
+                    swiftuiView: AnyView(
+                        BrightnessOSDView(display: self)
+                            .colors(darkMode ? .dark : .light)
+                            .environmentObject(EnvState())
+                    ),
                     display: self,
                     releaseWhenClosed: false
                 ).wc
@@ -610,7 +617,11 @@ extension Display {
             }
             self.autoBlackoutOsdWindowController?.close()
             self.autoBlackoutOsdWindowController = OSDWindow(
-                swiftuiView: AnyView(AutoBlackOutOSDView(display: self).colors(darkMode ? .dark : .light)),
+                swiftuiView: AnyView(
+                    AutoBlackOutOSDView(display: self)
+                        .colors(darkMode ? .dark : .light)
+                        .environmentObject(EnvState())
+                ),
                 display: self, releaseWhenClosed: true
             ).wc
 
