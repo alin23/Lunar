@@ -1100,7 +1100,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 log.info("Disabling XDR Contrast if we have more than 1 screen")
                 lastXDRContrastResetTime = Date()
                 displayController.xdrContrast = 0
-                displayController.setXDRContrast(0)
+                displayController.setXDRContrast(0, now: true)
             }
             displayController.panelRefreshPublisher.send(displayID)
             displayController.retryAutoBlackoutLater()
