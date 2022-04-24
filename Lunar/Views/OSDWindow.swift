@@ -236,13 +236,16 @@ public struct BigSurSlider: View {
                     }
                 }
             #endif
-
-        }.frame(width: sliderWidth, height: sliderHeight)
-            .onChange(of: dragging) { tracking in
-                AppleNativeControl.sliderTracking = tracking
-                GammaControl.sliderTracking = tracking
-                DDCControl.sliderTracking = tracking
-            }
+        }
+        .frame(width: sliderWidth, height: sliderHeight)
+        .onChange(of: dragging) { tracking in
+            AppleNativeControl.sliderTracking = tracking
+            GammaControl.sliderTracking = tracking
+            DDCControl.sliderTracking = tracking
+        }
+        .onDisappear {
+            scrollWheelListener = nil
+        }
     }
 
     // MARK: Internal

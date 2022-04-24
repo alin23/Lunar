@@ -141,7 +141,7 @@ class ModeChoiceViewController: NSViewController {
                     d.lockedContrastCurve = false
                 }
 
-            CachedDefaults[.overrideAdaptiveMode] = true
+            CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .sync
             CachedDefaults[.adaptiveBrightnessMode] = .sync
         }
         next()
@@ -168,7 +168,7 @@ class ModeChoiceViewController: NSViewController {
                     }
                 }
 
-            CachedDefaults[.overrideAdaptiveMode] = true
+            CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .sync
             CachedDefaults[.adaptiveBrightnessMode] = .sync
         }
         next()
@@ -177,7 +177,7 @@ class ModeChoiceViewController: NSViewController {
     @objc func locationClick() {
         queueChange {
             LocationMode.specific.fetchGeolocation()
-            CachedDefaults[.overrideAdaptiveMode] = true
+            CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .location
             CachedDefaults[.adaptiveBrightnessMode] = .location
         }
         next()
@@ -185,7 +185,7 @@ class ModeChoiceViewController: NSViewController {
 
     @objc func clockClick() {
         queueChange {
-            CachedDefaults[.overrideAdaptiveMode] = true
+            CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .clock
             CachedDefaults[.adaptiveBrightnessMode] = .clock
         }
         next()
@@ -193,7 +193,7 @@ class ModeChoiceViewController: NSViewController {
 
     @objc func sensorClick() {
         queueChange {
-            CachedDefaults[.overrideAdaptiveMode] = true
+            CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .sensor
             CachedDefaults[.adaptiveBrightnessMode] = .sensor
         }
 
