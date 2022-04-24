@@ -915,6 +915,14 @@ extension MPDisplayMode {
 
         return "\(res)@\(refresh) [\(dpi)] [\(depth)bit]\(tagsString)"
     }
+
+    var refreshStringSafe: String {
+        "\(refreshRate != 0 ? refreshRate : 60)Hz"
+    }
+
+    var resolutionStringSafe: String {
+        "\(width) x \(height)"
+    }
 }
 
 // MARK: - ModePopupButton
@@ -995,14 +1003,14 @@ class ModePopupButton: NSPopUpButton {
             if !addedSeparators {
                 if oldItem == nil {
                     let rateItem = NSMenuItem()
-                    rateItem.title = mode.refreshString
+                    rateItem.title = mode.refreshStringSafe
                     rateItem.isEnabled = false
                     rateItem.tag = 5555
                     menu?.insertItem(rateItem, at: i + offset)
                     offset += 1
                 }
-                if let oldMode = oldItem?.representedObject as? MPDisplayMode, oldMode.refreshString != mode.refreshString {
-                    let rateItem = NSMenuItem(title: mode.refreshString, action: nil, keyEquivalent: "")
+                if let oldMode = oldItem?.representedObject as? MPDisplayMode, oldMode.refreshStringSafe != mode.refreshStringSafe {
+                    let rateItem = NSMenuItem(title: mode.refreshStringSafe, action: nil, keyEquivalent: "")
                     rateItem.isEnabled = false
                     rateItem.tag = 5555
                     menu?.insertItem(.separator(), at: i + offset)
