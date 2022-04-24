@@ -699,6 +699,7 @@ class DisplayController: ObservableObject {
     var mirrorSetBeforeBlackout: [CGDirectDisplayID: [MPDisplay]] = [:]
     var enabledHDRBeforeXDR: [CGDirectDisplayID: Bool] = [:]
 
+    var lastXdrContrast: Float = 0.0
     var xdrContrast: Float = 0.0
 
     @Atomic var autoBlackoutPending = false {
@@ -1505,26 +1506,51 @@ class DisplayController: ObservableObject {
         return false
     }
 
-    func averageDDCWriteMilliseconds(for id: CGDirectDisplayID, ms: Int) {
+    func cleanup() {
+        log.info("Going down")
+
+        Defaults[.debug] = false
+        Defaults[.streamLogs] = false
+        Defaults[.showOptionsMenu] = false
+
+        appDelegate?.valuesReaderThread = nil
+        activeDisplayList.filter(\.ambientLightCompensationEnabledByUser).forEach { d in
+            d.ambientLightAdaptiveBrightnessEnabled = true
+        }
+        if xdrContrastEnabled, displayController.xdrContrast > 0 {
+            setXDRContrast(0, now: true)
+        }
+
+        activeDisplayList.filter(\.faceLightEnabled).forEach { display in
+            display.disableFaceLight(smooth: false)
+            display.save(now: true)
+        }
+        activeDisplayList.filter(\.blackOutEnabled).forEach { display in
+            display.disableBlackOut()
+            display.save(now: true)
+        }
+    }
+
+    func averageDDCWriteMicroseconds(for id: CGDirectDisplayID, us: Int) {
         mainAsync { [self] in
             guard let display = activeDisplays[id] else { return }
 
-            if display.averageDDCWriteMilliseconds == 0 {
-                display.averageDDCWriteMilliseconds = ms
+            if display.averageDDCWriteMicroseconds == 0 {
+                display.averageDDCWriteMicroseconds = us
             } else {
-                display.averageDDCWriteMilliseconds = (display.averageDDCWriteMilliseconds + ms) / 2
+                display.averageDDCWriteMicroseconds = (display.averageDDCWriteMicroseconds + us) / 2
             }
         }
     }
 
-    func averageDDCReadMilliseconds(for id: CGDirectDisplayID, ms: Int) {
+    func averageDDCReadMicroseconds(for id: CGDirectDisplayID, us: Int) {
         mainAsync { [self] in
             guard let display = activeDisplays[id] else { return }
 
-            if display.averageDDCReadMilliseconds == 0 {
-                display.averageDDCReadMilliseconds = ms
+            if display.averageDDCReadMicroseconds == 0 {
+                display.averageDDCReadMicroseconds = us
             } else {
-                display.averageDDCReadMilliseconds = (display.averageDDCReadMilliseconds + ms) / 2
+                display.averageDDCReadMicroseconds = (display.averageDDCReadMicroseconds + us) / 2
             }
         }
     }
