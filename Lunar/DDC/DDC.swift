@@ -788,7 +788,7 @@ enum DDC {
         }
 
         #if DEBUG
-            return displayIDs
+//            return displayIDs
             if !displayIDs.isEmpty {
                 // displayIDs.append(TEST_DISPLAY_PERSISTENT_ID)
                 return displayIDs
@@ -956,7 +956,8 @@ enum DDC {
                 let result = DDCWrite(fb, &command)
             #endif
 
-            let writeMs = (DispatchTime.now().rawValue - writeStartedAt.rawValue) / 1_000_000
+            let writeNs = DispatchTime.now().rawValue - writeStartedAt.rawValue
+            let writeMs = writeNs / 1_000_000
             if writeMs > MAX_WRITE_DURATION_MS {
                 log.debug("Writing \(controlID) took too long: \(writeMs)ms", context: displayID)
                 writeFault(severity: 4, displayID: displayID, controlID: controlID)
@@ -968,7 +969,7 @@ enum DDC {
                 return false
             }
 
-            displayController.averageDDCWriteMilliseconds(for: displayID, ms: writeMs.i)
+            displayController.averageDDCWriteMicroseconds(for: displayID, us: (writeNs / 1000).i)
             if let display = displayController.displays[displayID], !display.responsiveDDC {
                 display.responsiveDDC = true
             }
@@ -1072,7 +1073,8 @@ enum DDC {
                 DDCRead(fb, &command)
             #endif
 
-            let readMs = (DispatchTime.now().rawValue - readStartedAt.rawValue) / 1_000_000
+            let readNs = DispatchTime.now().rawValue - readStartedAt.rawValue
+            let readMs = readNs / 1_000_000
             if readMs > MAX_READ_DURATION_MS {
                 log.debug("Reading \(controlID) took too long: \(readMs)ms", context: displayID)
                 readFault(severity: 4, displayID: displayID, controlID: controlID)
@@ -1085,7 +1087,7 @@ enum DDC {
                 return nil
             }
 
-            displayController.averageDDCReadMilliseconds(for: displayID, ms: readMs.i)
+            displayController.averageDDCReadMicroseconds(for: displayID, us: (readNs / 1000).i)
             if let display = displayController.displays[displayID], !display.responsiveDDC {
                 display.responsiveDDC = true
             }

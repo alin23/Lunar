@@ -868,11 +868,7 @@ final class EnvState: ObservableObject {
     @Published var menuHeight: CGFloat = 100
     @Published var menuMaxHeight: CGFloat = (NSScreen.main?.visibleFrame.height ?? 600) - 50
 
-    @Published var hoveringSlider = false {
-        didSet {
-            print("hoveringSlider", hoveringSlider)
-        }
-    }
+    @Published var hoveringSlider = false
 }
 
 // MARK: - QuickActionsMenuView
@@ -1137,11 +1133,19 @@ struct QuickActionsMenuView: View {
         .onAppear {
             if Defaults[.launchCount] == 1, !appInfoHiddenAfterLaunch {
                 appInfoHiddenAfterLaunch = true
-                withAnimation(.spring().delay(1.0)) { showAdditionalInfo = true }
+                additionInfoTask = mainAsyncAfter(ms: 1000) {
+                    withAnimation(.spring()) {
+                        showAdditionalInfo = true
+                    }
+                }
             }
             if Defaults[.launchCount] == 2, !appInfoHiddenAfterLaunch {
                 appInfoHiddenAfterLaunch = true
-                withAnimation(.spring().delay(1.0)) { showAdditionalInfo = false }
+                additionInfoTask = mainAsyncAfter(ms: 1000) {
+                    withAnimation(.spring()) {
+                        showAdditionalInfo = false
+                    }
+                }
             }
         }
     }
@@ -1305,6 +1309,10 @@ struct QuickActionsMenuView: View {
                 height: env.menuMaxHeight
             ))
     }
+}
+
+var additionInfoTask: DispatchWorkItem? {
+    didSet { oldValue?.cancel() }
 }
 
 var displayHideTask: DispatchWorkItem? {
