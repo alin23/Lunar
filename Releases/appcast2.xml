@@ -3,6 +3,21 @@
     <channel>
         <title>Lunar</title>
         <item>
+            <title>5.6.3</title>
+            <pubDate>Sun, 24 Apr 2022 18:45:41 +0300</pubDate>
+            <link>https://lunar.fyi/</link>
+            <sparkle:fullReleaseNotesLink>https://lunar.fyi/changelog</sparkle:fullReleaseNotesLink>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <sparkle:version>5.6.3</sparkle:version>
+            <sparkle:shortVersionString>5.6.3</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-5.6.3.html</sparkle:releaseNotesLink>
+            <enclosure url="https://files.lunar.fyi/releases/Lunar-5.6.3.dmg" length="18571876" type="application/octet-stream" sparkle:edSignature="qkj+GBVnh2CB83gKIuy2rD1pzRWdlLM/L5emQrJGJODNPPWheEVd36Af+Ts7FBjNfgV1XaUjUv4bBxHQ5PnCAQ=="/>
+            <sparkle:deltas>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.6.3-5.6.2.delta" sparkle:deltaFrom="5.6.2" length="2357062" type="application/octet-stream" sparkle:edSignature="NxOoJEFpyNw2K5doFRZcznjKY1dFUMviEZ9Tk5nu7ypVQHXnwfcPuhphhyKOP9KYUSBFCZZpqg4jsp4XhrAkBw=="/>
+            </sparkle:deltas>
+        </item>
+        <item>
             <title>5.6.2</title>
             <pubDate>Sun, 24 Apr 2022 00:57:20 +0300</pubDate>
             <link>https://lunar.fyi/</link>
@@ -11,8 +26,8 @@
             <sparkle:version>5.6.2</sparkle:version>
             <sparkle:shortVersionString>5.6.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
-            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-5.6.2.html</sparkle:releaseNotesLink>
             <enclosure url="https://files.lunar.fyi/releases/Lunar-5.6.2.dmg" length="18560461" type="application/octet-stream" sparkle:edSignature="slgtmj9oCZnuk5xJmp8IHiDPJzWm26HGwVdCOmGt6VsWr7PMvMRB4CSnmdcoem9aqc353W/r+uQVb3/8cOoCCg=="/>
+            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-5.6.2.html</sparkle:releaseNotesLink>
         </item>
         <item>
             <title>5.6.2a10</title>

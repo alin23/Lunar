@@ -83,10 +83,12 @@ pack:
 appcast: export SPARKLE_BIN_DIR="$$PWD/Frameworks/Sparkle/bin/"
 appcast: VERSION=$(shell xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace -showBuildSettings -json 2>/dev/null | jq -r .[0].buildSettings.MARKETING_VERSION)
 appcast: Releases/Lunar-$(FULL_VERSION).html
+	rm Releases/Lunar.dmg || true
 ifneq (, $(CHANNEL))
 	"$(SPARKLE_BIN_DIR)/generate_appcast" --major-version "4.0.0" --link "https://lunar.fyi/" --full-release-notes-url "https://lunar.fyi/changelog" --channel "$(CHANNEL)" --release-notes-url-prefix https://files.lunar.fyi/ReleaseNotes/ --download-url-prefix https://files.lunar.fyi/releases/ -o Releases/appcast2.xml Releases
 else
 	"$(SPARKLE_BIN_DIR)/generate_appcast" --major-version "4.0.0" --link "https://lunar.fyi/" --full-release-notes-url "https://lunar.fyi/changelog" --release-notes-url-prefix https://files.lunar.fyi/ReleaseNotes/ --download-url-prefix https://files.lunar.fyi/releases/ -o Releases/appcast2.xml Releases
+	cp Releases/Lunar-$(FULL_VERSION).dmg Releases/Lunar.dmg
 endif
 	sd 'https://files.lunar.fyi/releases/([^"]+).delta' 'https://files.lunar.fyi/deltas/$$1.delta' Releases/appcast2.xml
 
