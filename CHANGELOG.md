@@ -1,7 +1,218 @@
-# 5.6.2b1
+# 5.6.3
+## Hotfix
+
+* Fix crash caused by slider hover handler
+* Fix more crashes caused by refresh/resolution string
+* Smoother XDR contrast
+
+
+----
+
+# Changes from v5.6.2
+
+## Licensing model
+
+**Some clarifications are needed after the last change:** 
+
+* I don't have any plans on releasing a major version this year
+* If for some reason I have to do that, everyone who paid for the 1-year of free updates before the change will receive the update for free if it's within their update period
+
+## Features
+
+#### XDR Contrast Enhancer slider
+
+Improve readability in direct sunlight when using `XDR Brightness`.
+
+The contrast slider allows adjusting the pixel value formula for the brightest/darkest areas, to get even more contrast out of the miniLED display.
+
+![enhance contrast slider in Advanced settings](https://files.lunar.fyi/enhance-contrast-slider.png)
+
+#### New XDR Brightness algorithm
+
+Developed in collaboration with the creator of [BetterDummy](https://github.com/waydabber/BetterDummy), using a more native approach to provide:
+
+* Stable experience when toggling XDR
+* Compatibility with higher brightness non-Apple HDR monitors  
+* Dynamic EDR pixel values to maximise the nits allowance based on the current brightness
+
+![XDR option for HDR monitors](https://files.lunar.fyi/xdr-hdr-monitors.png)
+
 ## Improvements
 
-# Disable Lunar if the user switches to another user
+* Show that XDR needs Pro license instead of doing nothing
+* Choose alpha upgrades over beta ones when the alpha channel is used
+* Move DDC reads outside the main thread
+* Improve brightness reponsiveness check
+* Collect average DDC read/write time for features that depend on DDC timing (e.g. smooth transitions, refreshing values from monitor memory etc.)
+* Better support for scroll up/down to adjust sliders
+* Multi-user Fast Switching support
+    * Retry display list reconciliation when the system provides invalid IDs
+    * Disable Sync Mode if polling seconds is 0 and brightness observer fails to start
+    * Observe log in/out events and stop calling screen wake listener if logged out
+    * Pause HDR workaround while logged out
+    * Pause Lunar if the user switches to another user
+* Make brightness text clickable in the menu bar
+* Ensure sub-zero dimming works if `Allow zero brightness` is off
+* Use less restrictive EDID patterns for finding DDC ports
+* Improve DDC compatibility on monitors with missing metadata
+* Increase slider reponsiveness
+
+
+## Fixes
+
+* Fix overall keyboard latency
+* Pause some functions when switching users or going to standby
+    * Light sensor detection
+    * CLI server
+    * Color and Gamma reader
+    * Brightness observer
+* Fix app info not hiding on first launch
+* Fix crash on fetching the refresh rate string for the resolution dropdown
+
+# 5.6.2b1
+## beta 1
+
+### Improvements
+
+* Disable Lunar if the user switches to another user
+
+# 5.6.2a8
+## alpha 8
+
+### Improvements
+
+* Make brightness text clickable in the menu bar
+* Ensure sub-zero dimming always works if `Allow zero brightness` is off
+* Pause menu scrolling while hovering over slider
+* Improve slider scroll sensitivity
+* Add slider scroll unwanted event detection
+
+# 5.6.2a7
+## alpha 7
+
+### Improvements
+
+* Better support for scroll up/down to adjust sliders
+* Don't use `refreshString` on resolutions as that can crash for some
+
+# 5.6.2a6
+## alpha 6
+
+### Improvements
+
+* Multi-user Fast Switching support
+    * Retry display list reconciliation when the system provides invalid IDs
+    * Disable Sync Mode if polling seconds is 0 and brightness observer fails to start
+    * Observe log in/out events and stop calling screen wake listener if logged out
+    * Pause HDR workaround while logged out
+
+# 5.6.2a5
+## alpha 5
+
+### Fixes
+
+* Pause some functions when switching users or going to standby
+    * Light sensor detection
+    * CLI server
+    * Color and Gamma reader
+    * Brightness observer
+* Fix app info not hiding on first launch
+
+# 5.6.2a4
+## alpha 4
+
+### Improvements
+
+* Move DDC reads outside the main thread
+* Improve brightness reponsiveness check
+* Collect average DDC read/write time
+
+# 5.6.2a3
+## alpha 3
+
+### Improvements
+
+* Show that XDR needs Pro license instead of doing nothing
+* Choose alpha upgrades over beta ones when the alpha channel is used
+
+# 5.6.2a10
+## alpha 10
+
+### Features
+
+#### XDR Contrast Enhancer slider
+
+Improve readability in direct sunlight when using `XDR Brightness`.
+
+The contrast slider allows adjusting the pixel value formula for the brightest/darkest areas, to get even more contrast out of the miniLED display.
+
+![enhance contrast slider in Advanced settings](https://files.lunar.fyi/xdr-contrast-slider.png)
+
+### Improvements
+
+* Use less restrictive EDID patterns for finding DDC ports
+* Improve DDC compatibility on monitors with missing metadata
+* Increase slider reponsiveness
+
+# 5.6.2
+## Licensing model
+
+**Some clarifications are needed after the last change:** 
+
+* I don't have any plans on releasing a major version this year
+* If for some reason I have to do that, everyone who paid for the 1-year of free updates before the change will receive the update for free if it's within their update period
+
+## Features
+
+#### XDR Contrast Enhancer slider
+
+Improve readability in direct sunlight when using `XDR Brightness`.
+
+The contrast slider allows adjusting the pixel value formula for the brightest/darkest areas, to get even more contrast out of the miniLED display.
+
+![enhance contrast slider in Advanced settings](https://files.lunar.fyi/enhance-contrast-slider.png)
+
+#### New XDR Brightness algorithm
+
+Developed in collaboration with the creator of [BetterDummy](https://github.com/waydabber/BetterDummy), using a more native approach to provide:
+
+* Stable experience when toggling XDR
+* Compatibility with higher brightness non-Apple HDR monitors  
+* Dynamic EDR pixel values to maximise the nits allowance based on the current brightness
+
+![XDR option for HDR monitors](https://files.lunar.fyi/xdr-hdr-monitors.png)
+
+## Improvements
+
+* Show that XDR needs Pro license instead of doing nothing
+* Choose alpha upgrades over beta ones when the alpha channel is used
+* Move DDC reads outside the main thread
+* Improve brightness reponsiveness check
+* Collect average DDC read/write time for features that depend on DDC timing (e.g. smooth transitions, refreshing values from monitor memory etc.)
+* Better support for scroll up/down to adjust sliders
+* Multi-user Fast Switching support
+    * Retry display list reconciliation when the system provides invalid IDs
+    * Disable Sync Mode if polling seconds is 0 and brightness observer fails to start
+    * Observe log in/out events and stop calling screen wake listener if logged out
+    * Pause HDR workaround while logged out
+    * Pause Lunar if the user switches to another user
+* Make brightness text clickable in the menu bar
+* Ensure sub-zero dimming works if `Allow zero brightness` is off
+* Use less restrictive EDID patterns for finding DDC ports
+* Improve DDC compatibility on monitors with missing metadata
+* Increase slider reponsiveness
+
+
+## Fixes
+
+* Fix overall keyboard latency
+* Pause some functions when switching users or going to standby
+    * Light sensor detection
+    * CLI server
+    * Color and Gamma reader
+    * Brightness observer
+* Fix app info not hiding on first launch
+* Fix crash on fetching the refresh rate string for the resolution dropdown
 
 # 5.6.1
 ## Hotfix

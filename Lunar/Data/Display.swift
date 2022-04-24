@@ -852,6 +852,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case xdrBrightness
         case averageDDCWriteMicroseconds
         case averageDDCReadMicroseconds
+        case connection
 
         // MARK: Internal
 
@@ -2064,6 +2065,34 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         @Published @objc dynamic var showOrientation = false
     #endif
 
+    enum ConnectionType: String, DefaultsSerializable, Codable {
+        case displayport
+        case usbc
+        case dvi
+        case hdmi
+        case vga
+        case unknown
+
+        // MARK: Internal
+
+        static func fromTransportType(_ transportType: Int) -> ConnectionType {
+            switch transportType {
+            case 0:
+                return .displayport
+            case 1:
+                return .usbc
+            case 2:
+                return .dvi
+            case 3:
+                return .hdmi
+            case 5:
+                return .vga
+            default:
+                return .unknown
+            }
+        }
+    }
+
     // #if DEBUG
     //     @objc dynamic lazy var showVolumeSlider: Bool = CachedDefaults[.showVolumeSlider]
     // #else
@@ -2204,6 +2233,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Atomic var averageDDCWriteMicroseconds = 0
     @Atomic var averageDDCReadMicroseconds = 0
+
+    var connection: ConnectionType = .unknown
 
     var alternativeControlForAppleNative: Control? = nil {
         didSet {
@@ -3410,6 +3441,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var infoDictionary: NSDictionary = [:] {
         didSet {
             setAudioIdentifier(from: infoDictionary)
+            if let transportType = infoDictionary["kDisplayTransportType"] as? Int {
+                connection = ConnectionType.fromTransportType(transportType)
+                log.info("\(description) connected through \(connection) connection")
+            }
         }
     }
 
@@ -3920,8 +3955,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         let manufactureYear = (infoDict[kDisplayYearOfManufacture] as? Int64) ?? 0
         let manufactureWeek = (infoDict[kDisplayWeekOfManufacture] as? Int64) ?? 0
-        let yearByte = (manufactureYear >= 1990 ? manufactureYear - 1990 : manufactureYear).u8.hex.uppercased()
-        let weekByte = manufactureWeek.u8.hex.uppercased()
+        let yearByte = cap(manufactureYear >= 1990 ? manufactureYear - 1990 : manufactureYear, minVal: 0, maxVal: 255).u8.hex.uppercased()
+        let weekByte = cap(manufactureWeek, minVal: 0, maxVal: 255).u8.hex.uppercased()
         let vendorBytes = vendorID.u16.str(reversed: true, separator: "").uppercased()
         let productBytes = productID.u16.str(reversed: false, separator: "").uppercased()
         let serialBytes = serialNumber.u32.str(reversed: false, separator: "").uppercased()
@@ -4313,6 +4348,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try container.encode(xdrBrightness, forKey: .xdrBrightness)
             try container.encode(averageDDCWriteMicroseconds, forKey: .averageDDCWriteMicroseconds)
             try container.encode(averageDDCReadMicroseconds, forKey: .averageDDCReadMicroseconds)
+            try container.encode(connection, forKey: .connection)
         }
     }
 
