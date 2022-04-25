@@ -850,8 +850,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case subzero
         case softwareBrightness
         case xdrBrightness
-        case averageDDCWriteMicroseconds
-        case averageDDCReadMicroseconds
+        case averageDDCWriteNanoseconds
+        case averageDDCReadNanoseconds
         case connection
 
         // MARK: Internal
@@ -2231,10 +2231,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var brightnessU16: UInt16 = 50
 
-    @Atomic var averageDDCWriteMicroseconds = 0
-    @Atomic var averageDDCReadMicroseconds = 0
-
     var connection: ConnectionType = .unknown
+
+    var averageDDCWriteNanoseconds: UInt64 { displayController.averageDDCWriteNanoseconds[id] ?? 0 }
+    var averageDDCReadNanoseconds: UInt64 { displayController.averageDDCReadNanoseconds[id] ?? 0 }
 
     var alternativeControlForAppleNative: Control? = nil {
         didSet {
@@ -3945,7 +3945,17 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func possibleEDIDUUIDs() -> [String] {
-        let infoDict = infoDictionary
+        guard !isSidecar, !isAirplay, !isVirtual, !isDummy, !isProjector, !isForTesting else { return [] }
+
+        let infoDict = infoDictionary.dictionaryWithValues(forKeys: [
+            kDisplaySerialNumber,
+            kDisplayProductID,
+            kDisplayWeekOfManufacture,
+            kDisplayYearOfManufacture,
+            kDisplayHorizontalImageSize,
+            kDisplayVerticalImageSize,
+            kDisplayVendorID,
+        ])
         guard let serialNumber = infoDict[kDisplaySerialNumber] as? Int64,
               let productID = infoDict[kDisplayProductID] as? Int64,
               let vendorID = infoDict[kDisplayVendorID] as? Int64,
@@ -4346,8 +4356,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try container.encode(subzero, forKey: .subzero)
             try container.encode(softwareBrightness, forKey: .softwareBrightness)
             try container.encode(xdrBrightness, forKey: .xdrBrightness)
-            try container.encode(averageDDCWriteMicroseconds, forKey: .averageDDCWriteMicroseconds)
-            try container.encode(averageDDCReadMicroseconds, forKey: .averageDDCReadMicroseconds)
+            try container.encode(averageDDCWriteNanoseconds, forKey: .averageDDCWriteNanoseconds)
+            try container.encode(averageDDCReadNanoseconds, forKey: .averageDDCReadNanoseconds)
             try container.encode(connection, forKey: .connection)
         }
     }

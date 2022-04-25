@@ -969,7 +969,9 @@ enum DDC {
                 return false
             }
 
-            displayController.averageDDCWriteMicroseconds(for: displayID, us: (writeNs / 1000).i)
+            if writeNs > 0 {
+                displayController.averageDDCWriteNanoseconds(for: displayID, ns: writeNs)
+            }
             if let display = displayController.displays[displayID], !display.responsiveDDC {
                 display.responsiveDDC = true
             }
@@ -1087,7 +1089,9 @@ enum DDC {
                 return nil
             }
 
-            displayController.averageDDCReadMicroseconds(for: displayID, us: (readNs / 1000).i)
+            if readNs > 0 {
+                displayController.averageDDCReadNanoseconds(for: displayID, ns: readNs)
+            }
             if let display = displayController.displays[displayID], !display.responsiveDDC {
                 display.responsiveDDC = true
             }
