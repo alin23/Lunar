@@ -53,6 +53,9 @@ class DisplayController: ObservableObject {
 
     static var panelManager: MPDisplayMgr? = MPDisplayMgr()
 
+    var averageDDCWriteNanoseconds: ThreadSafeDictionary<CGDirectDisplayID, UInt64> = ThreadSafeDictionary()
+    var averageDDCReadNanoseconds: ThreadSafeDictionary<CGDirectDisplayID, UInt64> = ThreadSafeDictionary()
+
     var controlWatcherTask: Repeater?
     var modeWatcherTask: Repeater?
     var screencaptureWatcherTask: Repeater?
@@ -1531,27 +1534,25 @@ class DisplayController: ObservableObject {
         }
     }
 
-    func averageDDCWriteMicroseconds(for id: CGDirectDisplayID, us: Int) {
+    func averageDDCWriteNanoseconds(for id: CGDirectDisplayID, ns: UInt64) {
         mainAsync { [self] in
-            guard let display = activeDisplays[id] else { return }
-
-            if display.averageDDCWriteMicroseconds == 0 {
-                display.averageDDCWriteMicroseconds = us
-            } else {
-                display.averageDDCWriteMicroseconds = (display.averageDDCWriteMicroseconds + us) / 2
+            guard let writens = averageDDCWriteNanoseconds[id], writens > 0 else {
+                averageDDCWriteNanoseconds[id] = ns
+                return
             }
+
+            averageDDCWriteNanoseconds[id] = (writens + ns) / 2
         }
     }
 
-    func averageDDCReadMicroseconds(for id: CGDirectDisplayID, us: Int) {
+    func averageDDCReadNanoseconds(for id: CGDirectDisplayID, ns: UInt64) {
         mainAsync { [self] in
-            guard let display = activeDisplays[id] else { return }
-
-            if display.averageDDCReadMicroseconds == 0 {
-                display.averageDDCReadMicroseconds = us
-            } else {
-                display.averageDDCReadMicroseconds = (display.averageDDCReadMicroseconds + us) / 2
+            guard let readns = averageDDCReadNanoseconds[id], readns > 0 else {
+                averageDDCReadNanoseconds[id] = ns
+                return
             }
+
+            averageDDCReadNanoseconds[id] = (readns + ns) / 2
         }
     }
 
