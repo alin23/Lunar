@@ -148,6 +148,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         return AVPlayer.eligibleForHDRPlayback
     }()
 
+    @Atomic var paddleDismissed = true
+
     var locationManager: CLLocationManager?
     var _windowControllerLock = NSRecursiveLock()
     var _windowController: ModernWindowController?
