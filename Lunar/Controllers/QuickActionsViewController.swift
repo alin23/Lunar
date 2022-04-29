@@ -876,16 +876,19 @@ final class EnvState: ObservableObject {
 
     @Published var hoveringSlider = false
     @Published var draggingSlider = false
+    @Published var optionsTab: OptionsTab = .layout
+}
+
+// MARK: - OptionsTab
+
+enum OptionsTab: String, DefaultsSerializable {
+    case layout
+    case advanced
 }
 
 // MARK: - QuickActionsMenuView
 
 struct QuickActionsMenuView: View {
-    enum OptionsTab {
-        case layout
-        case advanced
-    }
-
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.colors) var colors
     @EnvironmentObject var env: EnvState
@@ -915,7 +918,6 @@ struct QuickActionsMenuView: View {
     @State var additionalInfoButtonOpacity: CGFloat = 0.3
     @State var headerIndicatorOpacity: CGFloat = 0.0
     @State var footerIndicatorOpacity: CGFloat = 0
-    @State var optionsTab: OptionsTab = .layout
 
     @State var displayCount = displayController.activeDisplayList.count
 
@@ -966,29 +968,37 @@ struct QuickActionsMenuView: View {
                 PaddedPopoverView(background: AnyView(colorScheme == .dark ? Colors.sunYellow : Colors.lunarYellow)) {
                     HStack {
                         SwiftUI.Button("Menu layout") {
-                            withAnimation(.fastSpring) { optionsTab = .layout }
+                            withAnimation(.fastSpring) { env.optionsTab = .layout }
                             showOptionsMenu = false
                             showOptionsMenu = true
                         }
-                        .buttonStyle(PickerButton(enumValue: $optionsTab, onValue: .layout))
-                        .font(.system(size: 12, weight: optionsTab == .layout ? .bold : .medium, design: .rounded))
+                        .buttonStyle(PickerButton(enumValue: $env.optionsTab, onValue: .layout))
+                        .font(.system(size: 12, weight: env.optionsTab == .layout ? .bold : .medium, design: .rounded))
 
                         SwiftUI.Button("Advanced settings") {
-                            withAnimation(.fastSpring) { optionsTab = .advanced }
+                            withAnimation(.fastSpring) { env.optionsTab = .advanced }
                             showOptionsMenu = false
                             showOptionsMenu = true
                         }
-                        .buttonStyle(PickerButton(enumValue: $optionsTab, onValue: .advanced))
-                        .font(.system(size: 12, weight: optionsTab == .advanced ? .bold : .medium, design: .rounded))
+                        .buttonStyle(PickerButton(enumValue: $env.optionsTab, onValue: .advanced))
+                        .font(.system(size: 12, weight: env.optionsTab == .advanced ? .bold : .medium, design: .rounded))
                     }.frame(maxWidth: .infinity)
 
-                    switch optionsTab {
+                    switch env.optionsTab {
                     case .layout:
                         QuickActionsLayoutView().padding(10)
                     case .advanced:
                         AdvancedSettingsView().padding(10)
                     }
-                }.frame(width: 390, height: 555, alignment: .center)
+
+                    SwiftUI.Button("Reset all settings") {
+                        DataStore.reset()
+                    }
+                    .buttonStyle(FlatButton(color: Color.red.opacity(0.7), textColor: .white))
+                    .font(.system(size: 12, weight: .medium))
+                    .frame(maxWidth: .infinity, alignment: .center)
+
+                }.frame(width: 390, height: 600, alignment: .center)
             }
             .onChange(of: showBrightnessMenuBar) { _ in
                 let old = showOptionsMenu
@@ -1318,6 +1328,10 @@ struct QuickActionsMenuView: View {
     }
 }
 
+var windowShowTask: DispatchWorkItem? {
+    didSet { oldValue?.cancel() }
+}
+
 var additionInfoTask: DispatchWorkItem? {
     didSet { oldValue?.cancel() }
 }
@@ -1344,11 +1358,9 @@ struct QuickActionsView: View {
     @Environment(\.colorScheme) var colorScheme
     @Default(.popoverClosed) var popoverClosed
 
-    var env = EnvState()
-
     var body: some View {
         QuickActionsMenuView()
-            .environmentObject(env)
+            .environmentObject(appDelegate!.env)
             .colors(colorScheme == .dark ? .dark : .light)
     }
 }

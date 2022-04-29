@@ -53,9 +53,6 @@ extension AppDelegate: NSWindowDelegate {
         }
 
         appDelegate!.currentPage = Page.display.rawValue
-        if settingsPageController.advancedSettingsShown {
-            CachedDefaults[.advancedSettingsShown] = false
-        }
         configurationViewController.view.subviews.removeAll()
         tableView.removeRows(at: .init(integersIn: 0 ..< tableView.numberOfRows), withAnimation: [])
         exceptionsViewController.view.subviews.removeAll()

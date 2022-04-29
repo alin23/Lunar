@@ -131,7 +131,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         case displayDDC
         case displayGamma
         case displayReset
-        case advancedSettingsButton
     }
 
     @Atomic static var optionKeyPressed = false
@@ -264,6 +263,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @Atomic var menuShown = false
 
     var signalHandlers: [DispatchSourceSignal] = []
+
+    var env = EnvState()
 
     var currentPage: Int = Page.display.rawValue {
         didSet {
@@ -426,21 +427,37 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         for url in urls {
             guard let scheme = url.scheme, let host = url.host, scheme == "lunar" else { continue }
 
-            mainAsync {
-                CachedDefaults[.advancedSettingsShown] = host == "advanced"
-            }
-
             switch host {
             case "checkout":
                 if windowController != nil {
                     showCheckout()
                 } else {
-                    mainAsyncAfter(ms: 2000) { showCheckout() }
+                    windowShowTask = mainAsyncAfter(ms: 2000) { showCheckout() }
                 }
             case "advanced":
-                currentPage = Page.settings.rawValue
-                uiElement = .advancedSettingsButton
-                showWindow(after: windowController == nil ? 2000 : nil)
+                statusItemButtonController?.showPopover()
+                Defaults[.showOptionsMenu] = true
+
+                env.optionsTab = .advanced
+            case "menu":
+                statusItemButtonController?.showPopover()
+                Defaults[.showOptionsMenu] = false
+            case "options", "layout":
+                statusItemButtonController?.showPopover()
+                Defaults[.showOptionsMenu] = true
+
+                env.optionsTab = .layout
+            case "appinfo", "app-info", "info":
+                Defaults[.showAdditionalInfo] = false
+                additionInfoTask = nil
+                windowShowTask = mainAsyncAfter(ms: 100) {
+                    self.statusItemButtonController?.showPopover()
+                    additionInfoTask = mainAsyncAfter(ms: 500) {
+                        withAnimation(.spring()) {
+                            Defaults[.showAdditionalInfo] = true
+                        }
+                    }
+                }
             case "settings", "configuration":
                 currentPage = Page.settings.rawValue
                 showWindow(after: windowController == nil ? 2000 : nil)
@@ -684,7 +701,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             )
             return
         }
-        mainAsyncAfter(ms: ms) { [self] in
+        windowShowTask = mainAsyncAfter(ms: ms) { [self] in
             createAndShowWindow(
                 "windowController",
                 controller: &windowController,
@@ -748,11 +765,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
               let pageController = view.subviews[0].subviews[0].nextResponder as? PageController else { return }
 
         switch uiElement {
-        case .advancedSettingsButton:
-            guard let settingsPageController = pageController
-                .viewControllers[pageController.settingsPageControllerIdentifier] as? SettingsPageController,
-                let button = settingsPageController.advancedSettingsButton else { return }
-            if highlight { button.highlight() }
         case .displayControls:
             guard let display = pageController.arrangedObjects.prefix(page + 1).last as? Display,
                   let displayViewController = pageController
@@ -1071,8 +1083,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         colorSchemePublisher
             .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
             .sink { [self] _ in
-                CachedDefaults[.advancedSettingsShown] = true
-                recreateWindow(page: Page.settings.rawValue, advancedSettings: true)
+                recreateWindow(page: Page.settings.rawValue)
             }.store(in: &observers)
     }
 
@@ -1407,26 +1418,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         )
     }
 
-    func showAdvancedSettings(highlight: Bool = false) {
-        CachedDefaults[.advancedSettingsShown] = true
-        currentPage = Page.settings.rawValue
-        uiElement = .advancedSettingsButton
-        appDelegate!.goToPage(highlight: highlight)
-    }
-
     func showConfigurationPage() {
-        CachedDefaults[.advancedSettingsShown] = false
         currentPage = Page.settings.rawValue
         uiElement = nil
         appDelegate!.goToPage()
     }
 
-    func hideAdvancedSettings() {
-        CachedDefaults[.advancedSettingsShown] = false
-        uiElement = nil
-    }
-
-    func recreateWindow(page: Int? = nil, advancedSettings: Bool? = nil) {
+    func recreateWindow(page: Int? = nil) {
         if windowController?.window != nil {
             let window = windowController!.window!
             let shouldShow = window.isVisible
@@ -1437,17 +1435,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             if let page = page {
                 currentPage = page
             }
-            if let advancedSettings = advancedSettings {
-                CachedDefaults[.advancedSettingsShown] = advancedSettings
-            }
             if shouldShow {
                 showWindow(position: lastPosition, focus: NSRunningApplication.current.isActive)
             }
         }
-    }
-
-    func addWatchers() {
-        // asyncEvery
     }
 
     func addObservers() {
@@ -2017,7 +2008,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         listenForScreenConfigurationChanged()
         displayController.listenForRunningApps()
 
-        addWatchers()
         addObservers()
         initLicensing()
 

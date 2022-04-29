@@ -779,6 +779,7 @@ class DisplayController: ObservableObject {
             _activeDisplaysLock.around {
                 _activeDisplays = newValue
                 CachedDefaults[.hasActiveDisplays] = !_activeDisplays.isEmpty
+                CachedDefaults[.hasActiveExternalDisplays] = !_activeDisplays.values.filter(\.isExternal).isEmpty
                 onActiveDisplaysChange?()
                 newValue.values.forEach { d in
                     d.updateCornerWindow()
@@ -1365,7 +1366,7 @@ class DisplayController: ObservableObject {
         adaptBrightness(force: true)
     }
 
-    func resetDisplayList(advancedSettings: Bool = false, configurationPage: Bool = false, autoBlackOut: Bool? = nil) {
+    func resetDisplayList(configurationPage: Bool = false, autoBlackOut: Bool? = nil) {
         resetDisplayListTask = mainAsyncAfter(ms: 200) {
             defer { self.resetDisplayListTask = nil }
             self.getDisplaysLock.around {
@@ -1437,8 +1438,7 @@ class DisplayController: ObservableObject {
             self.reconfigure()
             mainAsync {
                 appDelegate!.recreateWindow(
-                    page: (advancedSettings || configurationPage) ? Page.settings.rawValue : nil,
-                    advancedSettings: advancedSettings
+                    page: configurationPage ? Page.settings.rawValue : nil
                 )
                 NotificationCenter.default.post(name: displayListChanged, object: nil)
             }
