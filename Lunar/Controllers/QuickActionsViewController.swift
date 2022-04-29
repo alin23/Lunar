@@ -87,6 +87,7 @@ struct DisplayRowView: View {
     @Default(.showXDRSelector) var showXDRSelector
     @Default(.showRawValues) var showRawValues
     @Default(.xdrTipShown) var xdrTipShown
+    @Default(.autoXdr) var autoXdr
 
     @State var showNeedsLunarPro = false
     @State var showXDRTip = false
@@ -140,7 +141,7 @@ struct DisplayRowView: View {
                 }
                 guard !display.enhanced else { return }
                 withAnimation(.fastSpring) { display.enhanced = true }
-                if !xdrTipShown {
+                if !xdrTipShown, autoXdr {
                     xdrTipShown = true
                     showXDRTip = true
                 }
