@@ -494,10 +494,15 @@ struct AdvancedSettingsView: View {
                     text: "Use workaround for built-in display", setting: $workaroundBuiltinDisplay,
                     help: """
                     Forward brightness key events to the system instead of
-                    changing built-in brightness from Lunar.
+                    changing built-in display brightness from Lunar.
 
-                    Disables the "Hotkey Step" setting for built-in but persists
-                    brightness changes better on some specific devices.
+                    This setting might be needed to persist brightness
+                    changes better on some specific older devices.
+
+                    Disables the following functions for the built-in display:
+                      • Hotkey Step
+                      • Auto XDR
+                      • Sub-zero Dimming
                     """
                 )
                 SettingsToggle(
