@@ -192,7 +192,7 @@ public struct BigSurSlider: View {
                             .foregroundColor(knobColor)
                             .shadow(color: Colors.blackMauve.opacity(percentage > 0.3 ? 0.3 : percentage.d), radius: 5, x: -1, y: 0)
                             .frame(width: sliderHeight, height: sliderHeight, alignment: .trailing)
-                            .brightness(dragging ? -0.2 : 0)
+                            .brightness(env.draggingSlider && hovering ? -0.2 : 0)
                         if showValue {
                             Text((percentage * 100).str(decimals: 0))
                                 .foregroundColor(knobTextColor)
@@ -210,13 +210,23 @@ public struct BigSurSlider: View {
             .gesture(
                 DragGesture(minimumDistance: 0)
                     .onChanged { value in
-                        if !dragging { dragging = true }
+                        if !env.draggingSlider {
+                            if draggingSliderSetter == nil {
+                                draggingSliderSetter = mainAsyncAfter(ms: 200) {
+                                    env.draggingSlider = true
+                                }
+                            } else {
+                                draggingSliderSetter = nil
+                                env.draggingSlider = true
+                            }
+                        }
 
                         self.percentage = cap(Float(value.location.x / geometry.size.width), minVal: 0, maxVal: 1)
                     }
                     .onEnded { value in
+                        draggingSliderSetter = nil
                         self.percentage = cap(Float(value.location.x / geometry.size.width), minVal: 0, maxVal: 1)
-                        dragging = false
+                        env.draggingSlider = false
                     }
             )
             .animation(.fastSpring, value: percentage)
@@ -224,6 +234,7 @@ public struct BigSurSlider: View {
                 .onHover { hov in
                     guard acceptsMouseEvents else { return }
                     hovering = hov
+
                     if hovering {
                         lastCursorPosition = NSEvent.mouseLocation
                         hoveringSliderSetter = mainAsyncAfter(ms: 200) {
@@ -234,16 +245,22 @@ public struct BigSurSlider: View {
                     } else {
                         hoveringSliderSetter = nil
                         env.hoveringSlider = false
-                        dragging = false
                     }
                 }
             #endif
         }
         .frame(width: sliderWidth, height: sliderHeight)
-        .onChange(of: dragging) { tracking in
-            AppleNativeControl.sliderTracking = tracking
-            GammaControl.sliderTracking = tracking
-            DDCControl.sliderTracking = tracking
+        .onChange(of: env.draggingSlider) { tracking in
+
+            AppleNativeControl.sliderTracking = tracking || hovering
+            GammaControl.sliderTracking = tracking || hovering
+            DDCControl.sliderTracking = tracking || hovering
+        }
+        .onChange(of: hovering) { tracking in
+
+            AppleNativeControl.sliderTracking = tracking || env.draggingSlider
+            GammaControl.sliderTracking = tracking || env.draggingSlider
+            DDCControl.sliderTracking = tracking || env.draggingSlider
         }
     }
 
@@ -264,7 +281,7 @@ public struct BigSurSlider: View {
     @Binding var showValue: Bool
 
     @State var scrollWheelListener: Cancellable?
-    @State var dragging = false
+
     @State var hovering = false
     @State var lastCursorPosition = NSEvent.mouseLocation
     @State var acceptsMouseEvents = true
@@ -277,14 +294,31 @@ public struct BigSurSlider: View {
                 .throttle(for: .milliseconds(20), scheduler: DispatchQueue.main, latest: true)
                 .sink { event in
                     guard hovering, env.hoveringSlider, let event = event, event.momentumPhase.rawValue == 0 else {
+                        if let event = event, event.scrollingDeltaX + event.scrollingDeltaY == 0, event.phase.rawValue == 0,
+                           env.draggingSlider
+                        {
+                            env.draggingSlider = false
+                        }
                         return
-                    }
-                    if !dragging {
-                        dragging = true
                     }
 
                     let delta = Float(event.scrollingDeltaX) * (event.isDirectionInvertedFromDevice ? -1 : 1)
                         + Float(event.scrollingDeltaY) * (event.isDirectionInvertedFromDevice ? 1 : -1)
+
+                    switch event.phase {
+                    case .changed, .began, .mayBegin:
+                        if !env.draggingSlider {
+                            env.draggingSlider = true
+                        }
+                    case .ended, .cancelled, .stationary:
+                        if env.draggingSlider {
+                            env.draggingSlider = false
+                        }
+                    default:
+                        if delta == 0, env.draggingSlider {
+                            env.draggingSlider = false
+                        }
+                    }
                     self.percentage = cap(self.percentage - (delta / 100), minVal: 0, maxVal: 1)
                 }
         }
@@ -307,6 +341,10 @@ extension NSEvent.Phase {
 }
 
 var hoveringSliderSetter: DispatchWorkItem? {
+    didSet { oldValue?.cancel() }
+}
+
+var draggingSliderSetter: DispatchWorkItem? {
     didSet { oldValue?.cancel() }
 }
 
