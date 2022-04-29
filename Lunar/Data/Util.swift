@@ -694,12 +694,16 @@ func resolve(hostname: String) -> String? {
     return stringRepresentation(forAddress: theAddress as Data)
 }
 
-func serialAsyncAfter(ms: Int, _ action: @escaping () -> Void) {
+@discardableResult
+func serialAsyncAfter(ms: Int, name: String = "serialAsyncAfter", _ action: @escaping () -> Void) -> DispatchWorkItem {
     let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
 
-    serialQueue.asyncAfter(deadline: deadline) {
+    let workItem = DispatchWorkItem(name: name) {
         action()
     }
+    serialQueue.asyncAfter(deadline: deadline, execute: workItem.workItem)
+
+    return workItem
 }
 
 func serialAsyncAfter(ms: Int, _ action: DispatchWorkItem) {
