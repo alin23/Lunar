@@ -518,11 +518,11 @@
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Advanced Features" id="U0y-gg-pVR">
                                                 <items>
-                                                    <menuItem title="Open Lunar Diagnostics" id="rl2-Eu-7ne">
+                                                    <menuItem title="Open external monitor diagnostics" id="rl2-Eu-7ne">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="openLunarDiagnostics:" target="Voe-Tx-rLC" id="Nfe-kN-5L9"/>
-                                                            <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="JiI-T5-Pkg"/>
+                                                            <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveExternalDisplays" id="IiS-zo-b9Z"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem title="Install DDC Server on Raspberry Pi" id="BQC-o6-sh9">
@@ -543,7 +543,7 @@
                                                             <action selector="installCLI:" target="Voe-Tx-rLC" id="KRr-Ng-kxw"/>
                                                         </connections>
                                                     </menuItem>
-                                                    <menuItem title="Listen for remote CLI commands" id="2r7-5F-T8N">
+                                                    <menuItem title="Listen for remote CLI commands" indentationLevel="1" id="2r7-5F-T8N">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <binding destination="Ftc-y8-9wL" name="value" keyPath="values.listenForRemoteCommands" id="e8I-l7-Qvf"/>
@@ -1033,7 +1033,7 @@ the ⌘ Command key more than 8 times in a row</string>
                                 </connections>
                             </containerView>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E8L-4P-FG0">
-                                <rect key="frame" x="389" y="656" width="171" height="29"/>
+                                <rect key="frame" x="388" y="656" width="171" height="29"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="LUNAR" id="imn-dq-JnU">
                                     <font key="font" size="25" name="Menlo-Bold"/>
@@ -1125,7 +1125,6 @@ the ⌘ Command key more than 8 times in a row</string>
                     <connections>
                         <outlet property="_activeHelpButton" destination="7bV-H8-X8t" id="0BA-Ee-O1R"/>
                         <outlet property="activeModeButton" destination="xGE-aF-MVx" id="qKC-k3-Y0n"/>
-                        <outlet property="advancedSettingsButton" destination="YP9-Eb-WEN" id="MuE-Sa-oRw"/>
                         <outlet property="containerView" destination="mMS-bl-7KZ" id="9Fa-De-JhW"/>
                         <outlet property="logo" destination="E8L-4P-FG0" id="V5t-me-v8B"/>
                         <outlet property="pageControl" destination="YBA-Wk-tfq" id="ano-Vn-Ld4"/>
@@ -1149,608 +1148,11 @@ the ⌘ Command key more than 8 times in a row</string>
             </objects>
             <point key="canvasLocation" x="96" y="2007"/>
         </scene>
-        <!--Advanced Settings Controller-->
-        <scene sceneID="TTU-we-rHZ">
-            <objects>
-                <customObject id="1Xr-ze-Y7B" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-                <userDefaultsController id="2iU-q0-Za5"/>
-                <userDefaultsController id="DNB-4H-88e"/>
-                <viewController storyboardIdentifier="advancedSettingsViewController" id="dda-PO-nVZ" customClass="AdvancedSettingsController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" appearanceType="aqua" id="MRh-YX-LaJ">
-                        <rect key="frame" x="0.0" y="0.0" width="950" height="700"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <subviews>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fbm-VT-kqX">
-                                <rect key="frame" x="43" y="560" width="300" height="30"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Hide menubar icon" id="tHN-CR-ilq">
-                                    <font key="font" size="15" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="Qof-Xa-v4v">
-                                <rect key="frame" x="407" y="571" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="cja-oR-yaU">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
-                                <connections>
-                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.hideMenuBarIcon" id="XaE-IN-vZZ"/>
-                                </connections>
-                            </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2vT-Re-R5O">
-                                <rect key="frame" x="43" y="450" width="321" height="30"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Use workaround for built-in display" id="gaa-wL-zrP">
-                                    <font key="font" size="15" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="haR-7F-wqO">
-                                <rect key="frame" x="407" y="461" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="8PF-g5-JGn">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
-                                <connections>
-                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.workaroundBuiltinDisplay" id="NHC-gj-OAS"/>
-                                </connections>
-                            </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PKh-fF-D5v">
-                                <rect key="frame" x="43" y="390" width="300" height="30"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Show more graph data" id="vhs-Fm-qk5">
-                                    <font key="font" size="15" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="ZZ9-IW-Mmi">
-                                <rect key="frame" x="407" y="401" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="WFy-UK-HDk">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
-                                <connections>
-                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.moreGraphData" id="mdh-ZT-sUe"/>
-                                </connections>
-                            </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="64a-QL-7wH">
-                                <rect key="frame" x="43" y="372" width="360" height="26"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Renders values and data lines on the bottom graph" id="3mV-KD-y63">
-                                    <font key="font" size="11" name="Menlo-Regular"/>
-                                    <color key="textColor" red="0.28788789335664333" green="0.28788789335664333" blue="0.28788789335664333" alpha="0.7913212159863946" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IUj-7E-OhQ">
-                                <rect key="frame" x="43" y="432" width="360" height="26"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="2FD-df-bTF">
-                                    <font key="font" size="11" name="Menlo-Regular"/>
-                                    <string key="title">Forward brightness keys to the system for built-in
-Disables "Hotkey Step" but persists brightness better</string>
-                                    <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FmG-cW-61N">
-                                <rect key="frame" x="43" y="542" width="360" height="26"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="If you want ¯\_(ツ)_/¯" id="aLj-i4-faJ">
-                                    <font key="font" size="11" name="Menlo-Regular"/>
-                                    <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fsd-Hh-QgP">
-                                <rect key="frame" x="43" y="340" width="300" height="30"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Clamshell mode detection" id="sqt-c7-YEn">
-                                    <font key="font" size="15" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="P37-NS-W2U">
-                                <rect key="frame" x="407" y="351" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="vMd-qp-hWx">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
-                                <connections>
-                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.clamshellModeDetection" id="EDZ-BK-FEx"/>
-                                </connections>
-                            </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4Ix-Wb-DfR">
-                                <rect key="frame" x="43" y="322" width="360" height="26"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Toggle Sync mode when the lid is closed/opened" id="C6l-GQ-byR">
-                                    <font key="font" size="11" name="Menlo-Regular"/>
-                                    <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pkT-AK-4hq">
-                                <rect key="frame" x="43" y="290" width="330" height="30"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Refresh values from monitor settings" id="BL6-Mw-OOe">
-                                    <font key="font" size="15" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="tNN-lC-Mzw">
-                                <rect key="frame" x="407" y="301" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="Zls-zU-K3n">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
-                                <connections>
-                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.refreshValues" id="LJN-WY-bny"/>
-                                </connections>
-                            </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ts7-Be-cIj">
-                                <rect key="frame" x="43" y="272" width="360" height="26"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Keep Lunar state in sync by reading monitor settings " id="miz-5F-j8r">
-                                    <font key="font" size="11" name="Menlo-Regular"/>
-                                    <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="x4d-gH-awU">
-                                <rect key="frame" x="43" y="254" width="389" height="26"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="This can freeze the system if a monitor doesn't support reading" id="OS3-ly-FMI">
-                                    <font key="font" size="10" name="Menlo-Regular"/>
-                                    <color key="textColor" name="systemRedColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xda-XJ-76X">
-                                <rect key="frame" x="43" y="228" width="300" height="30"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Start at login" id="Kaw-nM-BSb">
-                                    <font key="font" size="15" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="JK5-mA-0oY">
-                                <rect key="frame" x="407" y="239" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="Vrl-SH-cxY">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
-                                <connections>
-                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.startAtLogin" id="HSd-ie-b1x"/>
-                                </connections>
-                            </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ifj-60-t4w">
-                                <rect key="frame" x="43" y="210" width="360" height="26"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Might not always work.. no idea why" id="RoB-pD-VKU">
-                                    <font key="font" size="11" name="Menlo-Regular"/>
-                                    <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zXD-tN-N7i" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="442" y="54" width="66" height="14"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <buttonCell key="cell" type="inline" title="Reset" alternateTitle="Extended" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="Y1g-If-niE">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="resetSettings:" target="dda-PO-nVZ" id="3Ij-bB-3at"/>
-                                </connections>
-                            </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SNO-lg-Xmp">
-                                <rect key="frame" x="43" y="178" width="300" height="30"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Disable Network Controller video" id="FFO-Oz-8C8">
-                                    <font key="font" size="15" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="7eF-EV-nI5">
-                                <rect key="frame" x="407" y="189" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="8kT-OD-5ft">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
-                                <connections>
-                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.disableControllerVideo" id="tDy-zK-DWV"/>
-                                </connections>
-                            </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SDB-oc-gZI">
-                                <rect key="frame" x="43" y="160" width="360" height="26"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Useful if you don't need to see the Pi desktop" id="aWH-8W-LbD">
-                                    <font key="font" size="11" name="Menlo-Regular"/>
-                                    <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dOK-HV-ksT">
-                                <rect key="frame" x="510" y="566" width="300" height="24"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Check for updates automatically" id="BsN-dA-jRN">
-                                    <font key="font" size="15" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="bib-Lz-vQN">
-                                <rect key="frame" x="874" y="571" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="TI1-7k-1NT">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
-                                <connections>
-                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.SUEnableAutomaticChecks" id="mRq-o2-jgL"/>
-                                </connections>
-                            </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MHC-2c-i2Q">
-                                <rect key="frame" x="510" y="530" width="300" height="24"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Install updates automatically" id="S1w-mp-59A">
-                                    <font key="font" size="15" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="0Vq-QK-MWh">
-                                <rect key="frame" x="874" y="535" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="SK6-zt-3Tn">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
-                                <connections>
-                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.SUAutomaticallyUpdate" id="fkv-jd-lJp"/>
-                                </connections>
-                            </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eFM-4J-v5n">
-                                <rect key="frame" x="43" y="128" width="312" height="30"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Re-apply brightness on screen wake" id="7uj-K0-XAY">
-                                    <font key="font" size="15" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="V3C-Ul-SK6">
-                                <rect key="frame" x="407" y="139" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="9sX-hd-6L1">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
-                                <connections>
-                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.reapplyValuesAfterWake" id="ctE-h4-yBr"/>
-                                </connections>
-                            </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="R2H-bi-Sa9">
-                                <rect key="frame" x="43" y="110" width="360" height="26"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Disable if system gets slow on screen wake" id="MSe-cp-R6h">
-                                    <font key="font" size="11" name="Menlo-Regular"/>
-                                    <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="N0B-EB-aYc">
-                                <rect key="frame" x="43" y="510" width="300" height="30"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Show dock icon" id="NWU-N4-aUp">
-                                    <font key="font" size="15" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="aaE-RR-peO">
-                                <rect key="frame" x="407" y="521" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="neL-Pp-ols">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
-                                <connections>
-                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.showDockIcon" id="frj-l4-nCh"/>
-                                </connections>
-                            </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Z5Q-PF-U4g">
-                                <rect key="frame" x="43" y="492" width="360" height="26"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="KUg-S8-oQD">
-                                    <font key="font" size="11" name="Menlo-Regular"/>
-                                    <string key="title">Use the "Show Lunar" hotkey to open Lunar
-when dock and menubar icons are hidden</string>
-                                    <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="a2D-AD-d28">
-                                <rect key="frame" x="510" y="424" width="300" height="24"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Enable verbose logging" id="cjJ-B0-iUQ">
-                                    <font key="font" size="15" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="dip-cE-zth">
-                                <rect key="frame" x="874" y="428" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="609-dX-Bnf">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
-                                <connections>
-                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.debug" id="7Th-n7-EPV"/>
-                                </connections>
-                            </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="C7M-AW-ZKZ">
-                                <rect key="frame" x="510" y="400" width="431" height="26"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" alignment="left" title="Log path: ~/Library/Caches/Lunar/swiftybeaver.log" id="Wmi-hJ-bx4">
-                                    <font key="font" size="11" name="Menlo-Regular"/>
-                                    <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kR7-Gd-eTC">
-                                <rect key="frame" x="510" y="494" width="177" height="24"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Check for updates" id="0aA-zQ-Df5">
-                                    <font key="font" size="15" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BIY-9A-Ic3">
-                                <rect key="frame" x="717" y="497" width="188" height="24"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="cY7-O9-Smy">
-                                    <font key="font" size="11" name="Menlo-Bold"/>
-                                    <segments>
-                                        <segment label="Hourly" toolTip="Check for updates every one hour" width="59"/>
-                                        <segment label="Daily" toolTip="Check for updates every 24 hours" width="59" selected="YES" tag="1"/>
-                                        <segment label="Weekly" toolTip="Check for updates every 7 days" width="58"/>
-                                    </segments>
-                                </segmentedCell>
-                                <connections>
-                                    <binding destination="2iU-q0-Za5" name="selectedIndex" keyPath="values.SUScheduledCheckInterval" id="fXW-Dv-ae7">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">UpdateCheckIntervalTransformer</string>
-                                        </dictionary>
-                                    </binding>
-                                </connections>
-                            </segmentedControl>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="g4c-gx-vTg">
-                                <rect key="frame" x="510" y="370" width="177" height="24"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="DDC Sleep Factor" id="OyE-gl-bbK">
-                                    <font key="font" size="15" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="RIf-bz-NbR">
-                                <rect key="frame" x="753" y="373" width="152" height="24"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <segmentedCell key="cell" borderStyle="border" alignment="left" segmentDistribution="fill" style="rounded" trackingMode="selectOne" id="Jha-W3-x0j">
-                                    <font key="font" size="12" name="Menlo-Bold"/>
-                                    <segments>
-                                        <segment label="Short" toolTip="Wait a very short amount of time between DDC requests. Best setting if the monitor doesn't flicker by using it." selected="YES"/>
-                                        <segment label="Medium" toolTip="Wait a moderate amount of time between DDC requests. This might make Smooth Transition janky." tag="1"/>
-                                        <segment label="Long" toolTip="Wait a longer amount of time between DDC requests. This might cause increased latency."/>
-                                    </segments>
-                                </segmentedCell>
-                                <connections>
-                                    <binding destination="2iU-q0-Za5" name="selectedIndex" keyPath="values.ddcSleepFactor" id="OJN-L0-LY3"/>
-                                </connections>
-                            </segmentedControl>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xAc-d8-sVF">
-                                <rect key="frame" x="510" y="343" width="431" height="26"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Might help reduce flicker in Hardware/Native Controls" id="Ckv-cF-R4F">
-                                    <font key="font" size="11" name="Menlo-Regular"/>
-                                    <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="p8d-0I-Cth">
-                                <rect key="frame" x="510" y="314" width="312" height="30"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Mute action applies volume 0" id="CLT-gK-BR6">
-                                    <font key="font" size="15" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="U8k-OB-lTB">
-                                <rect key="frame" x="874" y="325" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="RZu-P5-V5n">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
-                                <connections>
-                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.muteVolumeZero" id="oEI-G4-kkF"/>
-                                </connections>
-                            </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bLf-cr-AaM">
-                                <rect key="frame" x="510" y="296" width="360" height="26"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Useful if the mute button does nothing on your monitor" id="MQg-Bd-uww">
-                                    <font key="font" size="11" name="Menlo-Regular"/>
-                                    <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MwT-c9-2b2">
-                                <rect key="frame" x="510" y="458" width="177" height="24"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Color scheme" id="iz9-yo-c9h">
-                                    <font key="font" size="15" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fIT-Hu-kH1">
-                                <rect key="frame" x="753" y="461" width="152" height="24"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <segmentedCell key="cell" borderStyle="border" alignment="left" segmentDistribution="fill" style="rounded" trackingMode="selectOne" id="7ue-3B-86g">
-                                    <font key="font" size="12" name="Menlo-Bold"/>
-                                    <segments>
-                                        <segment label="System" toolTip="Follow the system theme"/>
-                                        <segment label="Light" toolTip="Always show the interface in light mode" selected="YES" tag="1"/>
-                                        <segment label="Dark" toolTip="Always show the interface in dark mode"/>
-                                    </segments>
-                                </segmentedCell>
-                                <connections>
-                                    <binding destination="2iU-q0-Za5" name="selectedIndex" keyPath="values.colorScheme" id="rzJ-JD-xa0">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">ColorSchemeTransformer</string>
-                                        </dictionary>
-                                    </binding>
-                                </connections>
-                            </segmentedControl>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Oc-JS-1wg">
-                                <rect key="frame" x="510" y="254" width="312" height="30"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Enable screen orientation hotkeys" id="6qV-NU-vWc">
-                                    <font key="font" size="15" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="thT-2h-5yD">
-                                <rect key="frame" x="874" y="267" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="NDa-Xw-2p4">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
-                                <connections>
-                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.enableOrientationHotkeys" id="wgH-7r-pj8"/>
-                                </connections>
-                            </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lQU-Ve-CjX">
-                                <rect key="frame" x="510" y="236" width="360" height="26"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Press Ctrl+0/9/8/7 for setting 0°/90°/180°/270° for the display with the cursor on it" id="1KQ-hF-FAx">
-                                    <font key="font" size="11" name="Menlo-Regular"/>
-                                    <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PP2-os-CeM">
-                                <rect key="frame" x="510" y="194" width="312" height="30"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Detect DDC responsiveness" id="HAb-yw-64g">
-                                    <font key="font" size="15" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="5oJ-Sm-zPr">
-                                <rect key="frame" x="874" y="207" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="v0a-jy-aqp">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
-                                <connections>
-                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.detectResponsiveness" id="ehQ-s4-YaQ"/>
-                                </connections>
-                            </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zmS-xQ-0ER">
-                                <rect key="frame" x="510" y="176" width="360" height="26"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="Iir-6q-N4Y">
-                                    <font key="font" size="11" name="Menlo-Regular"/>
-                                    <string key="title">Shows when DDC becomes unresponsive and presents
-the choice to switch to software controls</string>
-                                    <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cVN-OZ-DZX">
-                                <rect key="frame" x="510" y="138" width="312" height="30"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Allow BlackOut on single screen" id="BIT-aQ-he9">
-                                    <font key="font" size="15" name="Menlo-Bold"/>
-                                    <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="i33-vV-FQz">
-                                <rect key="frame" x="874" y="149" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" inset="2" id="bOf-1U-WQU">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="systemIndigoColor" catalog="System" colorSpace="catalog"/>
-                                <connections>
-                                    <binding destination="DNB-4H-88e" name="value" keyPath="values.allowBlackOutOnSingleScreen" id="Xwd-M0-uPJ"/>
-                                </connections>
-                            </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wwj-fE-1Pf">
-                                <rect key="frame" x="510" y="120" width="360" height="26"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="2jj-Rm-2JY">
-                                    <font key="font" size="11" name="Menlo-Regular"/>
-                                    <string key="title">Allows turning off a screen even if it's the only
-visible screen left</string>
-                                    <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
-                                </textFieldCell>
-                            </textField>
-                        </subviews>
-                    </view>
-                    <connections>
-                        <outlet property="resetButton" destination="zXD-tN-N7i" id="ouf-PP-2eQ"/>
-                    </connections>
-                </viewController>
-            </objects>
-            <point key="canvasLocation" x="-1933" y="2007"/>
-        </scene>
         <!--Settings Page Controller-->
         <scene sceneID="hgz-Zl-vw0">
             <objects>
+                <userDefaultsController id="vRr-wr-SBM"/>
+                <customObject id="teY-QZ-vXN" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <viewController storyboardIdentifier="settingsPageController" id="Whm-7P-QYV" customClass="SettingsPageController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="ZMk-n3-S0b">
                         <rect key="frame" x="0.0" y="0.0" width="950" height="700"/>
@@ -1760,53 +1162,15 @@ visible screen left</string>
                                 <rect key="frame" x="0.0" y="0.0" width="950" height="700"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <connections>
-                                    <binding destination="Whm-7P-QYV" name="hidden" keyPath="advancedSettingsShown" id="U6e-hh-6Tj"/>
                                     <segue destination="VFu-z9-UHh" kind="embed" id="Gqx-7X-Xsf"/>
                                 </connections>
                             </containerView>
-                            <containerView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZPL-Mq-SYD">
-                                <rect key="frame" x="0.0" y="0.0" width="950" height="700"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <connections>
-                                    <binding destination="Whm-7P-QYV" name="hidden" keyPath="advancedSettingsShown" id="YTJ-tc-eE3">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
-                                    <segue destination="dda-PO-nVZ" kind="embed" id="4ZI-sw-jFt"/>
-                                </connections>
-                            </containerView>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YP9-Eb-WEN" customClass="ToggleButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="430" y="633" width="90" height="14"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="inline" title="Advanced" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="gCp-ah-VHk">
-                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="toggleAdvancedSettings:" target="Whm-7P-QYV" id="aUN-yy-vgx"/>
-                                </connections>
-                            </button>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="28A-xK-uxm">
-                                <rect key="frame" x="367" y="599" width="217" height="16"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Click to toggle Advanced settings" id="1gW-dj-vgw">
-                                    <font key="font" metaFont="systemMedium" size="13"/>
-                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.54801324503311244" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
                         </subviews>
                     </view>
                     <connections>
-                        <outlet property="advancedSettingsButton" destination="YP9-Eb-WEN" id="wNa-Gn-SW1"/>
-                        <outlet property="advancedSettingsContainerView" destination="ZPL-Mq-SYD" id="6mf-7X-NEZ"/>
-                        <outlet property="advancedSettingsNotice" destination="28A-xK-uxm" id="MVZ-4f-76V"/>
                         <outlet property="settingsContainerView" destination="fR4-tr-Hez" id="SeA-T4-PVi"/>
                     </connections>
                 </viewController>
-                <customObject id="teY-QZ-vXN" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-                <userDefaultsController id="vRr-wr-SBM"/>
             </objects>
             <point key="canvasLocation" x="-900" y="2007"/>
         </scene>
@@ -3629,7 +2993,7 @@ CORNERS</string>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OZD-Gw-TTp" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="448" y="638" width="53" height="18"/>
+                                <rect key="frame" x="447" y="638" width="53" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Pro" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="ZjS-nc-hfq">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3715,7 +3079,7 @@ The display will reappear with default settings on reconnection.</string>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s4q-W2-ta1" customClass="HotkeyButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="423" y="233" width="103" height="22"/>
+                                <rect key="frame" x="422" y="233" width="103" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="4"/>
@@ -4306,7 +3670,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="WK2-eG-vDJ" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="413" y="40" width="123" height="14"/>
+                                <rect key="frame" x="412" y="40" width="123" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="inline" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="DgP-1t-uMe">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -4446,7 +3810,7 @@ Turns the display back on when the last monitor is disconnected</string>
 disabled</string>
                                     <string key="alternateTitle">Notch
 enabled</string>
-                                    <font key="font" metaFont="systemBold" size="11"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
                                 </buttonCell>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -10568,10 +9932,10 @@ settings for this monitor.</string>
             <color red="1" green="0.83499997854232788" blue="0.52499997615814209" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="Notch">
-            <color red="0.15046208688903481" green="0.13485730483799069" blue="0.15415072278911565" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.15000000596046448" green="0.13500000536441803" blue="0.15399999916553497" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="Notchless">
-            <color red="0.88854897022247314" green="0.87164008617401123" blue="0.87431710958480835" alpha="0.36825284361839294" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.88899999856948853" green="0.87199997901916504" blue="0.87400001287460327" alpha="0.36800000071525574" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="Power">
             <color red="0.94900000095367432" green="0.20000000298023224" blue="0.2630000114440918" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

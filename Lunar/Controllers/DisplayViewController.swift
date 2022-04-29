@@ -455,8 +455,6 @@ class DisplayViewController: NSViewController {
         didSet {
             guard let b = advancedSettingsButton else { return }
             b.monospaced = true
-//            b.attributedTitle = b.attributedTitle.withFont(.monospacedSystemFont(ofSize: 12, weight: .semibold))
-//            b.attributedAlternateTitle = b.attributedAlternateTitle.withFont(.monospacedSystemFont(ofSize: 12, weight: .semibold))
         }
     }
 

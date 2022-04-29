@@ -71,7 +71,6 @@
 		C76A12A020D8DDAD005D4BE3 /* BrightnessContrastChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */; };
 		C76B775D26445C9B007CAAC5 /* MacToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76B775C26445C9B007CAAC5 /* MacToggle.swift */; };
 		C76B775F26447EC6007CAAC5 /* Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76B775E26447EC6007CAAC5 /* Weather.swift */; };
-		C76CB7A525CFD8B7007624DE /* AdvancedSettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76CB7A425CFD8B7007624DE /* AdvancedSettingsController.swift */; };
 		C76CB7A825CFD954007624DE /* ResetButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76CB7A725CFD954007624DE /* ResetButton.swift */; };
 		C7714AF927E4A3A9002E0B2E /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7714AF827E4A3A9002E0B2E /* Components.swift */; };
 		C7714B0627E8F11C002E0B2E /* Presets.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7714B0527E8F11C002E0B2E /* Presets.swift */; };
@@ -270,7 +269,6 @@
 		C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessContrastChartView.swift; sourceTree = "<group>"; };
 		C76B775C26445C9B007CAAC5 /* MacToggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacToggle.swift; sourceTree = "<group>"; };
 		C76B775E26447EC6007CAAC5 /* Weather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weather.swift; sourceTree = "<group>"; };
-		C76CB7A425CFD8B7007624DE /* AdvancedSettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsController.swift; sourceTree = "<group>"; };
 		C76CB7A725CFD954007624DE /* ResetButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetButton.swift; sourceTree = "<group>"; };
 		C7714AF827E4A3A9002E0B2E /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Components.swift; path = /Users/alin/Projects/Lunar/Lunar/Views/Components.swift; sourceTree = "<absolute>"; };
 		C7714B0527E8F11C002E0B2E /* Presets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Presets.swift; sourceTree = "<group>"; };
@@ -520,7 +518,6 @@
 				C77CC7541FED5501009AA718 /* SplitViewController.swift */,
 				C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */,
 				C7A7C247259391C200745637 /* HotkeyPopoverController.swift */,
-				C76CB7A425CFD8B7007624DE /* AdvancedSettingsController.swift */,
 				C7DD622026120B7600B07B31 /* RaspberryPageController.swift */,
 				C7DD622B261240A800B07B31 /* SSHConnectionViewController.swift */,
 				C7A82D9E2618E1B9004146A8 /* InstallOutputViewController.swift */,
@@ -992,7 +989,6 @@
 				C7C1F7091FD639970039507C /* DataStore.swift in Sources */,
 				C794E1741FEFE31A00549462 /* ScrollableTextField.swift in Sources */,
 				C7E80E2D2637060F004718A4 /* Channel.swift in Sources */,
-				C76CB7A525CFD8B7007624DE /* AdvancedSettingsController.swift in Sources */,
 				C7E242652119A65B0020326C /* LockButton.swift in Sources */,
 				C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */,
 				C7EF9535243F4E2200839A62 /* Sysctl.swift in Sources */,
