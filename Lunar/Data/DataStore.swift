@@ -29,6 +29,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .xdrContrast,
     .xdrContrastFactor,
     .xdrWarningShown,
+    .xdrTipShown,
     .workaroundBuiltinDisplay,
     .autoBlackoutBuiltin,
     .streamLogs,
@@ -628,6 +629,7 @@ func initCache() {
     cacheKey(.xdrContrast)
     cacheKey(.xdrContrastFactor)
     cacheKey(.xdrWarningShown)
+    cacheKey(.xdrTipShown)
     cacheKey(.autoBlackoutBuiltin)
     cacheKey(.workaroundBuiltinDisplay)
     cacheKey(.streamLogs)
@@ -766,6 +768,7 @@ extension Defaults.Keys {
     static let xdrContrast = Key<Bool>("xdrContrast", default: true)
     static let xdrContrastFactor = Key<Float>("xdrContrastFactor", default: 0.3)
     static let xdrWarningShown = Key<Bool>("xdrWarningShown", default: false)
+    static let xdrTipShown = Key<Bool>("xdrTipShown", default: false)
     static let autoBlackoutBuiltin = Key<Bool>("autoBlackoutBuiltin", default: false)
     static let workaroundBuiltinDisplay = Key<Bool>("workaroundBuiltinDisplay", default: false)
     static let streamLogs = Key<Bool>("streamLogs", default: false)
