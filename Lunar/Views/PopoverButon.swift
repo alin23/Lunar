@@ -40,7 +40,7 @@ class PopoverButton<T: NSViewController>: Button {
     }
 
     func open(edge: NSRectEdge = .maxY) {
-        guard let popover = popover, (popover.contentViewController as? T) != nil, self.superview?.window != nil else {
+        guard let popover = popover, (popover.contentViewController as? T) != nil, superview?.window != nil else {
             return
         }
         popover.show(relativeTo: visibleRect, of: self, preferredEdge: edge)

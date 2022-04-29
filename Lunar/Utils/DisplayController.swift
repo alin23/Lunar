@@ -705,6 +705,8 @@ class DisplayController: ObservableObject {
     var lastXdrContrast: Float = 0.0
     var xdrContrast: Float = 0.0
 
+    var resetDisplayListTask: DispatchWorkItem?
+
     @Atomic var autoBlackoutPending = false {
         didSet {
             log.info("autoBlackoutPending=\(autoBlackoutPending)")
@@ -935,8 +937,6 @@ class DisplayController: ObservableObject {
             activeDisplayList.filter(\.subzero).forEach { $0.softwareBrightness = 1 }
         }
     }
-
-    var resetDisplayListTask: DispatchWorkItem? { didSet { oldValue?.cancel() }}
 
     static func getAdaptiveMode() -> AdaptiveMode {
         if CachedDefaults[.overrideAdaptiveMode] {
@@ -1367,8 +1367,9 @@ class DisplayController: ObservableObject {
     }
 
     func resetDisplayList(configurationPage: Bool = false, autoBlackOut: Bool? = nil) {
+        resetDisplayListTask?.cancel()
         resetDisplayListTask = mainAsyncAfter(ms: 200) {
-            defer { self.resetDisplayListTask = nil }
+            self.resetDisplayListTask = nil
             self.getDisplaysLock.around {
                 Self.panelManager = MPDisplayMgr()
                 DDC.reset()
