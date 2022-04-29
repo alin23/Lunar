@@ -1822,20 +1822,11 @@ private func encodedValue(key: Display.CodingKeys, value: Any, prefix: String = 
     }
 }
 
-let LUNAR_CLI_SCRIPT =
-    """
-    #!/bin/sh
-    if [[ "$1" == "ddcctl" ]]; then
-        shift 1
-        "\(Bundle.main.path(forResource: "ddcctl", ofType: nil)!)" "$@"
-    elif [[ "$1" == "launch" ]]; then
-        "\(Bundle.main.bundlePath)/Contents/MacOS/Lunar"
-    else
-        "\(Bundle.main.bundlePath)/Contents/MacOS/Lunar" @ "$@"
-    fi
-    """
-
 import Socket
+
+var cliServerTask: DispatchWorkItem? {
+    didSet { oldValue?.cancel() }
+}
 
 // MARK: - LunarServer
 
@@ -1860,7 +1851,12 @@ class LunarServer {
     let socketLockQueue = DispatchQueue(label: "com.kitura.serverSwift.socketLockQueue")
 
     func run(host: String = "127.0.0.1") {
-        DispatchQueue.global(qos: .userInteractive).async { [unowned self] in
+        if let cliServerTask = cliServerTask, !cliServerTask.isCancelled {
+            if continueRunning { stop() }
+            cliServerTask.wait(for: 1.seconds)
+        }
+
+        cliServerTask = DispatchWorkItem(name: "cli-server") { [unowned self] in
             do {
                 self.listenSocket = try Socket.create(family: .inet)
                 guard let socket = self.listenSocket else {
@@ -1891,6 +1887,7 @@ class LunarServer {
                 }
             }
         }
+        DispatchQueue.global(qos: .userInteractive).async(execute: cliServerTask!.workItem)
     }
 
     func onResponse(_ response: String, socket: Socket) throws {
@@ -1993,7 +1990,7 @@ class LunarServer {
     }
 
     func stop() {
-        log.info("Shutdown in progress...")
+        log.info("CLI Server shutdown in progress...")
         continueRunning = false
 
         for socket in connectedSockets.values {
@@ -2001,6 +1998,9 @@ class LunarServer {
                 self.connectedSockets[socket.socketfd] = nil
                 socket.close()
             }
+        }
+        socketLockQueue.sync {
+            connectedSockets.removeAll()
         }
     }
 }
@@ -2059,3 +2059,16 @@ func serve(host: String) {
 }
 
 var gammaRepeater: Repeater?
+
+let LUNAR_CLI_SCRIPT =
+    """
+    #!/bin/sh
+    if [[ "$1" == "ddcctl" ]]; then
+        shift 1
+        "\(Bundle.main.path(forResource: "ddcctl", ofType: nil)!)" "$@"
+    elif [[ "$1" == "launch" ]]; then
+        "\(Bundle.main.bundlePath)/Contents/MacOS/Lunar"
+    else
+        "\(Bundle.main.bundlePath)/Contents/MacOS/Lunar" @ "$@"
+    fi
+    """
