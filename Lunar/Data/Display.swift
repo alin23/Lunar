@@ -1536,7 +1536,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             let br = softwareBrightness
             mainAsync {
                 self.withoutApply {
-                    self.subzero = br < 1.0 || (br == 1.0 && self.brightness.uint16Value == self.minBrightness.uint16Value)
+                    self
+                        .subzero = br < 1.0 ||
+                        (br == 1.0 && !self.hasSoftwareControl && self.brightness.uint16Value == self.minBrightness.uint16Value)
                     guard br > 1 else {
                         self.xdrBrightness = 0.0
                         return
@@ -3009,7 +3011,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 softwareBrightness = 1
                 if displayController.autoXdr { xdrDisablePublisher.send(true) }
                 startXDRTimer()
-            } else if brightness == minBrightness.uint16Value, !subzero {
+            } else if brightness == minBrightness.uint16Value, !subzero, !hasSoftwareControl {
                 withoutApply { subzero = true }
             } else if brightness > minBrightness.uint16Value, subzero {
                 withoutApply { subzero = false }
