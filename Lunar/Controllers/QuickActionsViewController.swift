@@ -86,8 +86,10 @@ struct DisplayRowView: View {
     @Default(.showPowerInQuickActions) var showPowerInQuickActions
     @Default(.showXDRSelector) var showXDRSelector
     @Default(.showRawValues) var showRawValues
+    @Default(.xdrTipShown) var xdrTipShown
 
     @State var showNeedsLunarPro = false
+    @State var showXDRTip = false
     @State var showSubzero = false
     @State var showXDR = false
 
@@ -130,7 +132,6 @@ struct DisplayRowView: View {
                 enumValue: $display.enhanced, onValue: false
             ))
             .font(.system(size: 12, weight: display.enhanced ? .semibold : .bold, design: .monospaced))
-            .help("Standard Dynamic Range disables XDR and allows the system to limit the brightness to 500nits.")
 
             SwiftUI.Button("XDR") {
                 guard lunarProActive || lunarProOnTrial else {
@@ -139,17 +140,17 @@ struct DisplayRowView: View {
                 }
                 guard !display.enhanced else { return }
                 withAnimation(.fastSpring) { display.enhanced = true }
+                if !xdrTipShown {
+                    xdrTipShown = true
+                    showXDRTip = true
+                }
             }
             .buttonStyle(PickerButton(
                 enumValue: $display.enhanced, onValue: true
             ))
             .font(.system(size: 12, weight: display.enhanced ? .bold : .semibold, design: .monospaced))
-            .help("""
-            Enable XDR high-dynamic range for getting past the 500nits brightness limit.
-
-            It's not recommended to keep this enabled for prolonged periods of time.
-            """)
             .popover(isPresented: $showNeedsLunarPro) { NeedsLunarProView() }
+            .popover(isPresented: $showXDRTip) { XDRTipView() }
         }
         .padding(.bottom, 4)
     }
