@@ -56,6 +56,7 @@ upload: ReleaseNotes/release.css
 	rsync -avzP Releases/*.dmg darkwoods:/static/Lunar/releases/
 	rsync -avz Releases/*.html ReleaseNotes/*.css darkwoods:/static/Lunar/ReleaseNotes/
 	fish -c 'upload -d Lunar Releases/appcast2.xml'
+	fish -c 'upload -d Lunar Releases/appcast-stable.xml'
 	cfcli -d lunar.fyi purge
 
 release: changelog
@@ -87,10 +88,13 @@ appcast: Releases/Lunar-$(FULL_VERSION).html
 ifneq (, $(CHANNEL))
 	"$(SPARKLE_BIN_DIR)/generate_appcast" --major-version "4.0.0" --link "https://lunar.fyi/" --full-release-notes-url "https://lunar.fyi/changelog" --channel "$(CHANNEL)" --release-notes-url-prefix https://files.lunar.fyi/ReleaseNotes/ --download-url-prefix https://files.lunar.fyi/releases/ -o Releases/appcast2.xml Releases
 else
+	rm Releases/Lunar-*{ab}.dmg || true
 	"$(SPARKLE_BIN_DIR)/generate_appcast" --major-version "4.0.0" --link "https://lunar.fyi/" --full-release-notes-url "https://lunar.fyi/changelog" --release-notes-url-prefix https://files.lunar.fyi/ReleaseNotes/ --download-url-prefix https://files.lunar.fyi/releases/ -o Releases/appcast2.xml Releases
+	"$(SPARKLE_BIN_DIR)/generate_appcast" --major-version "4.0.0" --link "https://lunar.fyi/" --full-release-notes-url "https://lunar.fyi/changelog" --release-notes-url-prefix https://files.lunar.fyi/ReleaseNotes/ --download-url-prefix https://files.lunar.fyi/releases/ -o Releases/appcast-stable.xml Releases
 	cp Releases/Lunar-$(FULL_VERSION).dmg Releases/Lunar.dmg
 endif
 	sd 'https://files.lunar.fyi/releases/([^"]+).delta' 'https://files.lunar.fyi/deltas/$$1.delta' Releases/appcast2.xml
+	sd 'https://files.lunar.fyi/releases/([^"]+).delta' 'https://files.lunar.fyi/deltas/$$1.delta' Releases/appcast-stable.xml
 
 
 setversion: OLD_VERSION=$(shell xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV) -workspace Lunar.xcworkspace -showBuildSettings -json 2>/dev/null | jq -r .[0].buildSettings.MARKETING_VERSION)
