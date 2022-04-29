@@ -12,8 +12,6 @@ import Defaults
 import Foundation
 import Magnet
 
-var advancedSettingsHintShown = false
-
 // MARK: - PageController
 
 class PageController: NSPageController {
@@ -146,12 +144,6 @@ extension PageController: NSPageControllerDelegate {
             splitViewController.hotkeysPage()
         case 1:
             splitViewController.configurationPage()
-            if thisIsFirstRun || thisIsFirstRunAfterM1DDCUpgrade, !advancedSettingsHintShown,
-               let settingsPageController = c.viewControllers[c.settingsPageControllerIdentifier] as? SettingsPageController
-            {
-                advancedSettingsHintShown = true
-                settingsPageController.advancedSettingsButton.highlight()
-            }
         case arrangedObjects.count - 1:
             splitViewController.lastPage()
         default:

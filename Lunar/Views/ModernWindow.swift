@@ -131,13 +131,10 @@ class ModernWindow: WAYWindow {
         }
 
         switch event.keyCode {
-        case kVK_ANSI_A.u16:
-            appDelegate!.showAdvancedSettings()
         case kVK_ANSI_H.u16:
             appDelegate!.currentPage = 0
             appDelegate!.goToPage(ignoreUIElement: true)
         case kVK_ANSI_C.u16:
-            appDelegate!.hideAdvancedSettings()
             appDelegate!.currentPage = 1
             appDelegate!.goToPage(ignoreUIElement: true)
         case kVK_ANSI_B.u16:
