@@ -57,40 +57,12 @@ extension NSViewController {
 
 class SettingsPageController: NSViewController {
     @IBOutlet var settingsContainerView: NSView!
-    @IBOutlet var advancedSettingsContainerView: NSView!
-    @IBOutlet var advancedSettingsButton: ToggleButton!
-    @IBOutlet var advancedSettingsNotice: NSTextField!
-    @objc dynamic var advancedSettingsShown = CachedDefaults[.advancedSettingsShown]
-
-    var advancedSettingsShownObserver: Cancellable?
-
-    @IBAction func toggleAdvancedSettings(_ sender: ToggleButton) {
-        advancedSettingsShown = sender.state == .on
-        if advancedSettingsButton.highlighting {
-            advancedSettingsButton.stopHighlighting()
-        }
-    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.wantsLayer = true
         view.bg = settingsBgColor
         drawMoon(color: darkMauve)
-
-        advancedSettingsShownObserver = advancedSettingsShownPublisher.sink { [weak self] shown in
-            mainAsync { [weak self] in
-                guard let self = self else { return }
-                uiCrumb("Advanced Settings \(shown.newValue ? "Open" : "Close")")
-                self.advancedSettingsShown = shown.newValue
-                self.advancedSettingsButton?.state = shown.newValue ? .on : .off
-                self.advancedSettingsButton?.fade()
-            }
-        }
-
-        advancedSettingsButton?.page = .settings
-        advancedSettingsButton?.isHidden = false
-        advancedSettingsButton?.state = advancedSettingsShown ? .on : .off
-        advancedSettingsButton?.notice = advancedSettingsNotice
     }
 
     override func wantsScrollEventsForSwipeTracking(on axis: NSEvent.GestureAxis) -> Bool {

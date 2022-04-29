@@ -22,7 +22,6 @@ enum BrightnessTransition: Int, CaseIterable, Defaults.Serializable {
 let APP_SETTINGS: [Defaults.Keys] = [
     .adaptiveBrightnessMode,
     .colorScheme,
-    .advancedSettingsShown,
     .autoSubzero,
     .autoXdr,
     .hdrWorkaround,
@@ -97,6 +96,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .firstRunAfterHotkeysUpgrade,
     .fKeysAsFunctionKeys,
     .hasActiveDisplays,
+    .hasActiveExternalDisplays,
     .hideMenuBarIcon,
     .hotkeys,
     .ignoredVolumes,
@@ -181,6 +181,8 @@ let NON_RESETTABLE_SETTINGS: [Defaults.Keys] = [
     .secure,
     .lunarProActive,
     .lunarProOnTrial,
+    .lunarProAccessDialogShown,
+    .completedOnboarding,
 ]
 
 // MARK: - DataStore
@@ -622,7 +624,6 @@ func initCache() {
     cacheKey(.showAirplayDisplays)
     cacheKey(.showProjectorDisplays)
     cacheKey(.showDisconnectedDisplays)
-    cacheKey(.advancedSettingsShown)
     cacheKey(.autoSubzero)
     cacheKey(.autoXdr)
     cacheKey(.hdrWorkaround)
@@ -719,6 +720,7 @@ func initCache() {
     cacheKey(.disableControllerVideo)
     cacheKey(.neverAskAboutFlux)
     cacheKey(.hasActiveDisplays)
+    cacheKey(.hasActiveExternalDisplays)
     cacheKey(.ignoredVolumes)
     cacheKey(.listenForRemoteCommands)
     cacheKey(.neverAskAboutXDR)
@@ -761,7 +763,6 @@ extension Defaults.Keys {
     static let showAirplayDisplays = Key<Bool>("showAirplayDisplays", default: true)
     static let showProjectorDisplays = Key<Bool>("showProjectorDisplays", default: true)
     static let showDisconnectedDisplays = Key<Bool>("showDisconnectedDisplays", default: false)
-    static let advancedSettingsShown = Key<Bool>("advancedSettingsShown", default: false)
     static let autoSubzero = Key<Bool>("autoSubzero", default: true)
     static let autoXdr = Key<Bool>("autoXdr", default: true)
     static let hdrWorkaround = Key<Bool>("hdrWorkaround", default: true)
@@ -867,6 +868,7 @@ extension Defaults.Keys {
     static let disableControllerVideo = Key<Bool>("disableControllerVideo", default: true)
     static let neverAskAboutFlux = Key<Bool>("neverAskAboutFlux", default: false)
     static let hasActiveDisplays = Key<Bool>("hasActiveDisplays", default: true)
+    static let hasActiveExternalDisplays = Key<Bool>("hasActiveExternalDisplays", default: false)
     static let toolTipDelay = Key<Int>("NSInitialToolTipDelay", default: 3)
     static let wttr = Key<Wttr?>("wttr")
     static let ignoredVolumes = Key<Set<String>>("ignoredVolumes", default: [])
@@ -923,7 +925,6 @@ let showOnlyExternalBrightnessMenuBarPublisher = Defaults.publisher(.showOnlyExt
     .filter { $0.oldValue != $0.newValue }
 let showOrientationInQuickActionsPublisher = Defaults.publisher(.showOrientationInQuickActions).dropFirst().removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
-let advancedSettingsShownPublisher = Defaults.publisher(.advancedSettingsShown).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let autoBlackoutBuiltinPublisher = Defaults.publisher(.autoBlackoutBuiltin).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let autoSubzeroPublisher = Defaults.publisher(.autoSubzero).removeDuplicates().dropFirst()
     .filter { $0.oldValue != $0.newValue }

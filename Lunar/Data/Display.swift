@@ -1060,6 +1060,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc dynamic lazy var volumeWriteWorks = controlResult.write.volume
 
     @objc dynamic lazy var isBuiltin: Bool = DDC.isBuiltinDisplay(id)
+    @objc dynamic lazy var isExternal: Bool = !isBuiltin
     lazy var isSmartBuiltin: Bool = isBuiltin && isSmartDisplay
     lazy var canChangeBrightnessDS: Bool = DisplayServicesCanChangeBrightness(id)
 
