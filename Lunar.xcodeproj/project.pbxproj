@@ -106,6 +106,7 @@
 		C79975DE25DEEF9200C797FF /* AppleNativeControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79975DD25DEEF9200C797FF /* AppleNativeControl.swift */; };
 		C79975E125DEF2EC00C797FF /* GammaControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79975E025DEF2EC00C797FF /* GammaControl.swift */; };
 		C799C2F527BF67C4003A2FB9 /* Socket in Frameworks */ = {isa = PBXBuildFile; productRef = C799C2F427BF67C4003A2FB9 /* Socket */; };
+		C7A22756281C19D1005F2351 /* XDRTipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A22755281C19D1005F2351 /* XDRTipView.swift */; };
 		C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = C7A2574120EA249B003B3A84 /* dsa_pub.pem */; };
 		C7A517A12593C11C00F6CC83 /* PopoverButon.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A517A02593C11C00F6CC83 /* PopoverButon.swift */; };
 		C7A63205238C04C10005D792 /* QuickActionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A63204238C04C10005D792 /* QuickActionsViewController.swift */; };
@@ -299,6 +300,7 @@
 		C79975DD25DEEF9200C797FF /* AppleNativeControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleNativeControl.swift; sourceTree = "<group>"; };
 		C79975E025DEF2EC00C797FF /* GammaControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GammaControl.swift; sourceTree = "<group>"; };
 		C79B5A252434905900D62E52 /* Lunar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Lunar.entitlements; sourceTree = "<group>"; };
+		C7A22755281C19D1005F2351 /* XDRTipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XDRTipView.swift; sourceTree = "<group>"; };
 		C7A2574120EA249B003B3A84 /* dsa_pub.pem */ = {isa = PBXFileReference; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		C7A517A02593C11C00F6CC83 /* PopoverButon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverButon.swift; sourceTree = "<group>"; };
 		C7A63204238C04C10005D792 /* QuickActionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsViewController.swift; sourceTree = "<group>"; };
@@ -569,6 +571,7 @@
 				C784143727DDFBC400E14941 /* OSDWindow.swift */,
 				C714C997280572920061588E /* ProViews.swift */,
 				C714C99D2809B4FB0061588E /* ScrollViewIfNeeded.swift */,
+				C7A22755281C19D1005F2351 /* XDRTipView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1082,6 +1085,7 @@
 				C7AF321926F5EEDE00AC14AF /* ClockMode.swift in Sources */,
 				C728D7ED2296D81B003CAD65 /* TextButton.swift in Sources */,
 				C7C1F7071FD6354C0039507C /* Geolocation.swift in Sources */,
+				C7A22756281C19D1005F2351 /* XDRTipView.swift in Sources */,
 				C7C1F7051FD635360039507C /* Moment.swift in Sources */,
 				C7AF321B26F62D3B00AC14AF /* Schedule.swift in Sources */,
 				BF_746411459837 /* Secrets.generated.swift in Sources */,
