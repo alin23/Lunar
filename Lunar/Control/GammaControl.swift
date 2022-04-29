@@ -212,12 +212,7 @@ class GammaControl: Control {
             return true
         }
 
-        if let oldValue = oldValue, oldValue != brightness {
-            display.setGamma(brightness: brightness, oldBrightness: oldValue, onChange: onChange)
-            return true
-        }
-
-        display.setGamma(brightness: brightness)
+        display.setGamma(brightness: brightness, onChange: onChange)
         onChange?(brightness)
         return true
     }
