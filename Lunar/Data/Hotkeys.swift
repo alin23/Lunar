@@ -1120,6 +1120,8 @@ extension AppDelegate: MediaKeyTapDelegate {
         modifiers flags: NSEvent.ModifierFlags,
         event: CGEvent
     ) -> CGEvent? {
+        guard checkRemainingAdjustments() else { return event }
+
         let flags = flags.intersection([.command, .option, .control, .shift])
         switch flags {
         case [] where displayController.adaptiveModeKey == .sync:
