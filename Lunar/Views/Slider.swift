@@ -272,9 +272,9 @@ class Slider: NSSlider {
             }
         default:
             if delta == 0, !sliderCell.pressed {
-                AppleNativeControl.sliderTracking = delta != 0
-                GammaControl.sliderTracking = AppleNativeControl.sliderTracking
-                DDCControl.sliderTracking = AppleNativeControl.sliderTracking
+                AppleNativeControl.sliderTracking = false
+                GammaControl.sliderTracking = false
+                DDCControl.sliderTracking = false
             }
         }
 

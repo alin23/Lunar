@@ -869,6 +869,7 @@ final class EnvState: ObservableObject {
     @Published var menuMaxHeight: CGFloat = (NSScreen.main?.visibleFrame.height ?? 600) - 50
 
     @Published var hoveringSlider = false
+    @Published var draggingSlider = false
 }
 
 // MARK: - QuickActionsMenuView
