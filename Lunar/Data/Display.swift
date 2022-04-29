@@ -2078,7 +2078,26 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         // MARK: Internal
 
-        static func fromTransportType(_ transportType: Int) -> ConnectionType {
+        static func fromTransport(_ transport: Transport?) -> ConnectionType? {
+            guard let transport = transport else {
+                return nil
+            }
+
+            switch transport.downstream {
+            case "HDMI":
+                return .hdmi
+            case "DVI":
+                return .dvi
+            case "DP":
+                return .displayport
+            case "VGA":
+                return .vga
+            default:
+                return nil
+            }
+        }
+
+        static func fromTransportType(_ transportType: Int) -> ConnectionType? {
             switch transportType {
             case 0:
                 return .displayport
@@ -2091,7 +2110,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             case 5:
                 return .vga
             default:
-                return .unknown
+                return nil
             }
         }
     }
@@ -3446,7 +3465,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         didSet {
             setAudioIdentifier(from: infoDictionary)
             if let transportType = infoDictionary["kDisplayTransportType"] as? Int {
-                connection = ConnectionType.fromTransportType(transportType)
+                connection = ConnectionType.fromTransportType(transportType) ?? ConnectionType.fromTransport(transport) ?? .unknown
                 log.info("\(description) connected through \(connection) connection")
             }
         }
