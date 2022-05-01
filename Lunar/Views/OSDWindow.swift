@@ -458,12 +458,25 @@ struct BrightnessOSDView: View {
     @Environment(\.colors) var colors
     @ObservedObject var display: Display
 
+    var sliderText: String? {
+        let b = display.softwareBrightness
+        let lb = display.lastSoftwareBrightness
+
+        if b > 1 || (b == 1 && (lb > 1 || display.enhanced)) {
+            return "XDR Brightness"
+        }
+        if display.subzero {
+            return "Sub-zero brightness"
+        }
+        return nil
+    }
+
     var body: some View {
         VStack {
-            let b = display.softwareBrightness
-            let lb = display.lastSoftwareBrightness
-            Text((b > 1 || (b == 1 && (lb > 1 || display.enhanced))) ? "XDR Brightness" : "Sub-zero brightness")
-                .font(.system(size: 16, weight: .semibold, design: .monospaced))
+            if let sliderText = sliderText {
+                Text(sliderText)
+                    .font(.system(size: 16, weight: .semibold, design: .monospaced))
+            }
 
             if display.enhanced {
                 BigSurSlider(
