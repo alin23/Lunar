@@ -604,6 +604,7 @@ struct QuickActionsLayoutView: View {
     @Default(.showFooterOnHover) var showFooterOnHover
     @Default(.autoXdr) var autoXdr
     @Default(.autoSubzero) var autoSubzero
+    @Default(.disableNightShiftXDR) var disableNightShiftXDR
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -630,6 +631,7 @@ struct QuickActionsLayoutView: View {
             Divider()
             Group {
                 SettingsToggle(text: "Show XDR Brightness toggle when available", setting: $showXDRSelector.animation(.fastSpring))
+                SettingsToggle(text: "Disable Night Shift when toggling XDR", setting: $disableNightShiftXDR.animation(.fastSpring))
                 SettingsToggle(text: "Toggle XDR Brightness when going over 100%", setting: $autoXdr.animation(.fastSpring))
                 SettingsToggle(
                     text: "Toggle Sub-zero Dimming when going below 0%",
