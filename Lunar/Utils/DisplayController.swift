@@ -1676,7 +1676,7 @@ class DisplayController: ObservableObject {
             scope.setTag(value: String(describing: self?.lidClosed ?? isLidClosed()), key: "lidClosed")
 
             guard let self = self else { return }
-            for display in self.displays.values {
+            for display in self.activeDisplayList {
                 display.addSentryData()
                 if display.isUltraFine() {
                     scope.setTag(value: "true", key: "ultrafine")
