@@ -1033,7 +1033,7 @@ the ⌘ Command key more than 8 times in a row</string>
                                 </connections>
                             </containerView>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E8L-4P-FG0">
-                                <rect key="frame" x="388" y="656" width="171" height="29"/>
+                                <rect key="frame" x="387" y="656" width="171" height="29"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="LUNAR" id="imn-dq-JnU">
                                     <font key="font" size="25" name="Menlo-Bold"/>
@@ -3670,7 +3670,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="WK2-eG-vDJ" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="412" y="40" width="123" height="14"/>
+                                <rect key="frame" x="411" y="40" width="123" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="inline" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="DgP-1t-uMe">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -5878,8 +5878,8 @@ Lunar will continue to check in the background</string>
         <scene sceneID="GTI-N2-9dZ">
             <objects>
                 <viewController storyboardIdentifier="SettingsPopoverController" id="21a-h6-6He" customClass="SettingsPopoverController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tQ8-3z-D4n">
-                        <rect key="frame" x="0.0" y="0.0" width="300" height="697"/>
+                    <view key="view" wantsLayer="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tQ8-3z-D4n">
+                        <rect key="frame" x="0.0" y="0.0" width="300" height="725"/>
                         <subviews>
                             <box boxType="custom" cornerRadius="4" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TwA-hL-Un1" customClass="Box" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="300" height="225"/>
@@ -6071,7 +6071,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dDl-nT-014">
-                                <rect key="frame" x="22" y="658" width="179" height="25"/>
+                                <rect key="frame" x="22" y="680" width="179" height="25"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Enabled Controls" id="Ivu-gs-zlD">
                                     <font key="font" metaFont="systemHeavy" size="21"/>
                                     <color key="textColor" name="Caption"/>
@@ -6079,7 +6079,7 @@ Lunar will continue to check in the background</string>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Kap-E3-AbC">
-                                <rect key="frame" x="27" y="611" width="168" height="18"/>
+                                <rect key="frame" x="27" y="633" width="168" height="18"/>
                                 <buttonCell key="cell" type="check" title="Network (Raspberry Pi)" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" state="on" inset="2" id="zlB-32-Rul">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -6089,7 +6089,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gQ1-Jv-FTC">
-                                <rect key="frame" x="27" y="591" width="215" height="18"/>
+                                <rect key="frame" x="27" y="613" width="215" height="18"/>
                                 <buttonCell key="cell" type="check" title="Apple Native (DisplayServices)" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" state="on" inset="2" id="ppm-z5-gWv">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -6099,7 +6099,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YSi-X1-Nsf">
-                                <rect key="frame" x="27" y="571" width="126" height="18"/>
+                                <rect key="frame" x="27" y="593" width="126" height="18"/>
                                 <buttonCell key="cell" type="check" title="Hardware (DDC)" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" state="on" inset="2" id="BTR-Jw-BqR">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -6109,7 +6109,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1Tt-VZ-2bh">
-                                <rect key="frame" x="27" y="551" width="138" height="18"/>
+                                <rect key="frame" x="27" y="573" width="138" height="18"/>
                                 <buttonCell key="cell" type="check" title="Software Dimming" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" state="on" inset="2" id="crR-7g-L0v">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -6119,7 +6119,7 @@ Lunar will continue to check in the background</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="rc0-ia-euE">
-                                <rect key="frame" x="22" y="633" width="200" height="26"/>
+                                <rect key="frame" x="22" y="655" width="200" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="196" id="Om7-JU-mwi"/>
                                     <constraint firstAttribute="height" constant="26" id="RN0-8F-zdH"/>
@@ -6542,7 +6542,7 @@ should rise or fall based on the adaptive input</string>
                                 </userDefinedRuntimeAttributes>
                             </box>
                             <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QRE-1k-k2f">
-                                <rect key="frame" x="174" y="548" width="114" height="23"/>
+                                <rect key="frame" x="174" y="570" width="114" height="23"/>
                                 <segmentedCell key="cell" refusesFirstResponder="YES" borderStyle="border" alignment="left" segmentDistribution="fillEqually" style="capsule" trackingMode="selectOne" id="SXK-K4-MWl">
                                     <font key="font" metaFont="systemSemibold" size="12"/>
                                     <segments>
@@ -6554,6 +6554,16 @@ should rise or fall based on the adaptive input</string>
                                     <binding destination="21a-h6-6He" name="selectedTag" keyPath="self.display.dimmingMode" id="rPl-FI-B6E"/>
                                 </connections>
                             </segmentedControl>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JiO-c0-8Kw">
+                                <rect key="frame" x="27" y="547" width="143" height="18"/>
+                                <buttonCell key="cell" type="check" title="Try to enforce DDC" bezelStyle="regularSquare" imagePosition="left" refusesFirstResponder="YES" state="on" inset="2" id="5gu-Fw-97U">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="21a-h6-6He" name="value" keyPath="self.display.forceDDC" id="4uM-k0-y6t"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="QRE-1k-k2f" secondAttribute="trailing" constant="13" id="0OR-Of-0uH"/>
@@ -6567,6 +6577,7 @@ should rise or fall based on the adaptive input</string>
                             <constraint firstItem="TwA-hL-Un1" firstAttribute="centerX" secondItem="tQ8-3z-D4n" secondAttribute="centerX" id="CVF-iF-kdb"/>
                             <constraint firstItem="QRE-1k-k2f" firstAttribute="leading" secondItem="1Tt-VZ-2bh" secondAttribute="trailing" constant="10" id="DAD-1I-wsX"/>
                             <constraint firstItem="gQ1-Jv-FTC" firstAttribute="top" secondItem="Kap-E3-AbC" secondAttribute="bottom" constant="4" id="FJ6-z2-mo0"/>
+                            <constraint firstItem="JiO-c0-8Kw" firstAttribute="top" secondItem="1Tt-VZ-2bh" secondAttribute="bottom" constant="10" id="GYt-5Z-3Pl"/>
                             <constraint firstItem="YSi-X1-Nsf" firstAttribute="leading" secondItem="gQ1-Jv-FTC" secondAttribute="leading" id="GYx-Yl-p83"/>
                             <constraint firstAttribute="width" constant="300" id="Gn4-1w-hac"/>
                             <constraint firstItem="rc0-ia-euE" firstAttribute="top" secondItem="dDl-nT-014" secondAttribute="bottom" constant="-1" id="IE1-Gb-jzF"/>
@@ -6574,7 +6585,6 @@ should rise or fall based on the adaptive input</string>
                             <constraint firstItem="fsC-TN-3ly" firstAttribute="leading" secondItem="2Nm-jy-7uZ" secondAttribute="leading" id="Jav-W0-Xe2"/>
                             <constraint firstAttribute="bottom" secondItem="TwA-hL-Un1" secondAttribute="bottom" id="PAd-12-Zlm"/>
                             <constraint firstAttribute="trailing" secondItem="gQ1-Jv-FTC" secondAttribute="trailing" constant="58" id="SYo-Ov-aQv"/>
-                            <constraint firstItem="TwA-hL-Un8" firstAttribute="top" secondItem="1Tt-VZ-2bh" secondAttribute="bottom" constant="18" id="VZa-LA-cmt"/>
                             <constraint firstAttribute="bottom" secondItem="fsC-TN-3ly" secondAttribute="bottom" constant="15" id="XVY-Rb-2lr"/>
                             <constraint firstItem="YSi-X1-Nsf" firstAttribute="top" secondItem="gQ1-Jv-FTC" secondAttribute="bottom" constant="4" id="Y8C-pW-qsW"/>
                             <constraint firstItem="rc0-ia-euE" firstAttribute="leading" secondItem="dDl-nT-014" secondAttribute="leading" id="Yug-0t-AC3"/>
@@ -6590,7 +6600,9 @@ should rise or fall based on the adaptive input</string>
                             <constraint firstItem="QRE-1k-k2f" firstAttribute="centerY" secondItem="1Tt-VZ-2bh" secondAttribute="centerY" id="mYe-ON-CAR"/>
                             <constraint firstAttribute="bottom" secondItem="2Nm-jy-7uZ" secondAttribute="bottom" constant="27" id="o87-0A-ssg"/>
                             <constraint firstItem="o9z-UY-Ynz" firstAttribute="width" secondItem="tQ8-3z-D4n" secondAttribute="width" id="omZ-2S-B5n"/>
+                            <constraint firstItem="hfj-gY-8Aw" firstAttribute="top" secondItem="JiO-c0-8Kw" secondAttribute="bottom" constant="16" id="pgY-QN-bVu"/>
                             <constraint firstItem="TwA-hL-Un1" firstAttribute="top" secondItem="MR1-5D-jfX" secondAttribute="bottom" constant="10" id="woT-iB-5sE"/>
+                            <constraint firstItem="JiO-c0-8Kw" firstAttribute="leading" secondItem="1Tt-VZ-2bh" secondAttribute="leading" id="xJD-ja-he6"/>
                             <constraint firstItem="1Tt-VZ-2bh" firstAttribute="leading" secondItem="YSi-X1-Nsf" secondAttribute="leading" id="zfY-vE-yyw"/>
                         </constraints>
                     </view>

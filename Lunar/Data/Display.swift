@@ -389,13 +389,20 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         defaultGammaRedMin = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaRedMin)?.ns) ?? 0.ns
         defaultGammaRedMax = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaRedMax)?.ns) ?? 1.ns
-        defaultGammaRedValue = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaRedValue)?.ns) ?? 1.ns
+        let defaultGammaRedValue = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaRedValue)?.ns) ?? 1.ns
         defaultGammaGreenMin = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaGreenMin)?.ns) ?? 0.ns
         defaultGammaGreenMax = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaGreenMax)?.ns) ?? 1.ns
-        defaultGammaGreenValue = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaGreenValue)?.ns) ?? 1.ns
+        let defaultGammaGreenValue = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaGreenValue)?.ns) ?? 1.ns
         defaultGammaBlueMin = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaBlueMin)?.ns) ?? 0.ns
         defaultGammaBlueMax = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaBlueMax)?.ns) ?? 1.ns
-        defaultGammaBlueValue = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaBlueValue)?.ns) ?? 1.ns
+        let defaultGammaBlueValue = (try container.decodeIfPresent(Float.self, forKey: .defaultGammaBlueValue)?.ns) ?? 1.ns
+
+        self.defaultGammaRedValue = defaultGammaRedValue
+        red = Self.gammaValueToSliderValue(defaultGammaRedValue.doubleValue)
+        self.defaultGammaGreenValue = defaultGammaGreenValue
+        green = Self.gammaValueToSliderValue(defaultGammaGreenValue.doubleValue)
+        self.defaultGammaBlueValue = defaultGammaBlueValue
+        blue = Self.gammaValueToSliderValue(defaultGammaBlueValue.doubleValue)
 
         let _maxDDCBrightness = isSmartBuiltin ? 100 : (try container.decodeIfPresent(UInt16.self, forKey: .maxDDCBrightness)?.ns) ?? 100.ns
         let _maxDDCContrast = isSmartBuiltin ? 100 : (try container.decodeIfPresent(UInt16.self, forKey: .maxDDCContrast)?.ns) ?? 100.ns
@@ -439,6 +446,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         showVolumeOSD = try container.decodeIfPresent(Bool.self, forKey: .showVolumeOSD) ?? true
         applyGamma = try container.decodeIfPresent(Bool.self, forKey: .applyGamma) ?? false
         input = (try container.decodeIfPresent(UInt16.self, forKey: .input))?.ns ?? InputSource.unknown.rawValue.ns
+        forceDDC = (try container.decodeIfPresent(Bool.self, forKey: .forceDDC)) ?? false
 
         hotkeyInput1 = try (
             (try container.decodeIfPresent(UInt16.self, forKey: .hotkeyInput1))?
@@ -657,8 +665,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         self.minBrightness = isSmartBuiltin ? 0 : minBrightness.ns
         self.maxBrightness = isSmartBuiltin ? 100 : maxBrightness.ns
-        self.minContrast = isSmartBuiltin ? 0 : minContrast.ns
-        self.maxContrast = isSmartBuiltin ? 100 : maxContrast.ns
+        self.minContrast = isSmartBuiltin || DisplayServicesCanChangeBrightness(id) ? 0 : minContrast.ns
+        self.maxContrast = isSmartBuiltin || DisplayServicesCanChangeBrightness(id) ? 100 : maxContrast.ns
 
         edidName = Self.printableName(id)
         if let n = name, !n.isEmpty {
@@ -832,6 +840,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case sendingVolume
         case isSource
         case showVolumeOSD
+        case forceDDC
         case applyGamma
         case brightnessOnInputChange
         case brightnessOnInputChange1
@@ -874,6 +883,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .neverFallbackControl,
             .isSource,
             .showVolumeOSD,
+            .forceDDC,
             .applyGamma,
             .faceLightEnabled,
             .blackOutEnabled,
@@ -974,6 +984,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .neverFallbackControl,
             .isSource,
             .showVolumeOSD,
+            .forceDDC,
             .applyGamma,
             .brightnessOnInputChange1,
             .brightnessOnInputChange2,
@@ -1132,7 +1143,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var slowRead = false
     var slowWrite = false
     var badHDMI = false
-
     var onControlChange: ((Control) -> Void)? = nil
     @AtomicLock var context: [String: Any]? = nil
 
@@ -1296,6 +1306,15 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }()
 
     var hdrWindowOpenedAt = Date()
+
+    @objc dynamic var forceDDC = false {
+        didSet {
+            guard initialised else { return }
+            context = getContext()
+            resetDDC()
+            save()
+        }
+    }
 
     var maxSoftwareBrightness: Float { max(maxEDR, 1.02) }
     @Published @objc dynamic var subzero = false {
@@ -2598,37 +2617,19 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @objc dynamic var red = 0.5 {
         didSet {
-            if red == 0.5 {
-                defaultGammaRedValue = 1.0
-            } else if red > 0.5 {
-                defaultGammaRedValue = mapNumber(red, fromLow: 0.5, fromHigh: 1.0, toLow: 1.0, toHigh: 0.0).ns
-            } else {
-                defaultGammaRedValue = mapNumber(red, fromLow: 0.0, fromHigh: 0.5, toLow: 3.0, toHigh: 1.0).ns
-            }
+            defaultGammaRedValue = Self.sliderValueToGammaValue(red).ns
         }
     }
 
     @objc dynamic var green = 0.5 {
         didSet {
-            if green == 0.5 {
-                defaultGammaGreenValue = 1.0
-            } else if green > 0.5 {
-                defaultGammaGreenValue = mapNumber(green, fromLow: 0.5, fromHigh: 1.0, toLow: 1.0, toHigh: 0.0).ns
-            } else {
-                defaultGammaGreenValue = mapNumber(green, fromLow: 0.0, fromHigh: 0.5, toLow: 3.0, toHigh: 1.0).ns
-            }
+            defaultGammaGreenValue = Self.sliderValueToGammaValue(green).ns
         }
     }
 
     @objc dynamic var blue = 0.5 {
         didSet {
-            if blue == 0.5 {
-                defaultGammaBlueValue = 1.0
-            } else if blue > 0.5 {
-                defaultGammaBlueValue = mapNumber(blue, fromLow: 0.5, fromHigh: 1.0, toLow: 1.0, toHigh: 0.0).ns
-            } else {
-                defaultGammaBlueValue = mapNumber(blue, fromLow: 0.0, fromHigh: 0.5, toLow: 3.0, toHigh: 1.0).ns
-            }
+            defaultGammaBlueValue = Self.sliderValueToGammaValue(blue).ns
         }
     }
 
@@ -3504,6 +3505,28 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         didSet { oldValue?.cancel() }
     }
 
+    static func sliderValueToGammaValue(_ value: Double) -> Double {
+        if value == 0.5 {
+            return 1.0
+        }
+        if value > 0.5 {
+            return mapNumber(value, fromLow: 0.5, fromHigh: 1.0, toLow: 1.0, toHigh: 0.0)
+        }
+
+        return mapNumber(value, fromLow: 0.0, fromHigh: 0.5, toLow: 3.0, toHigh: 1.0)
+    }
+
+    static func gammaValueToSliderValue(_ value: Double) -> Double {
+        if value == 1.0 {
+            return 0.5
+        }
+        if value < 1.0 {
+            return mapNumber(value, fromLow: 0.0, fromHigh: 1.0, toLow: 1.0, toHigh: 0.5)
+        }
+
+        return mapNumber(value, fromLow: 1.0, fromHigh: 3.0, toLow: 0.5, toHigh: 0.0)
+    }
+
     static func reconfigure(tries: Int = 20, _ action: (MPDisplayMgr) -> Void) {
         guard let manager = DisplayController.panelManager, DisplayController.tryLockManager(tries: tries) else {
             return
@@ -3816,6 +3839,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             "isAppleDisplay": isAppleDisplay(),
             "isSource": isSource,
             "showVolumeOSD": showVolumeOSD,
+            "forceDDC": forceDDC,
             "applyGamma": applyGamma,
         ]
     }
@@ -4181,15 +4205,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         blue = 0.5
         blacks = 0
         whites = 1
-        // defaultGammaRedMin = 0.0
-        // defaultGammaRedMax = 1.0
-        // defaultGammaRedValue = 1.0
-        // defaultGammaGreenMin = 0.0
-        // defaultGammaGreenMax = 1.0
-        // defaultGammaGreenValue = 1.0
-        // defaultGammaBlueMin = 0.0
-        // defaultGammaBlueMax = 1.0
-        // defaultGammaBlueValue = 1.0
+
         lunarGammaTable = nil
     }
 
@@ -4376,6 +4392,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try container.encode(power, forKey: .power)
             try container.encode(isSource, forKey: .isSource)
             try container.encode(showVolumeOSD, forKey: .showVolumeOSD)
+            try container.encode(forceDDC, forKey: .forceDDC)
             try container.encode(applyGamma, forKey: .applyGamma)
             try container.encode(schedules, forKey: .schedules)
 

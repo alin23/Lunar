@@ -557,9 +557,11 @@ class DisplayController: ObservableObject {
             guard match != .byExclusion || Set(DDC.avServiceCache.dictionary.keys)
                 .isSuperset(of: activeDisplayList.filter(\.shouldDetectI2C).map(\.id)) else { return nil }
 
+            let forceDDC = (display?.forceDDC ?? false)
             guard !isTestID(displayID), NSScreen.isOnline(displayID),
-                  !(display?.badHDMI ?? false),
-                  !DDC.isVirtualDisplay(displayID, checkName: false)
+                  forceDDC || (
+                      !(display?.badHDMI ?? false) && !DDC.isVirtualDisplay(displayID, checkName: false)
+                  )
             else {
                 log.info("""
                     No AVService for display \(displayID): (
@@ -569,6 +571,10 @@ class DisplayController: ObservableObject {
                     )
                 """)
                 return nil
+            }
+
+            if forceDDC {
+                log.info("Forcing DDC assignment for \(displayID)")
             }
 
             var clcd2Num = 0
@@ -625,17 +631,21 @@ class DisplayController: ObservableObject {
             }
 
             if firstChildMatching(dcpService, names: ["AppleDCPMCDP29XX"]) != nil {
-                log.warning("This HDMI port doesn't support DDC because of the MCDP29xx chip inside it, ignoring for display \(display)")
+                log.warning("This HDMI port might not support DDC because of the MCDP29xx chip inside it (display: \(display))")
                 display.badHDMI = true
-                return nil
+                if !forceDDC {
+                    return nil
+                }
             }
 
             if Sysctl.isMacMini, clcd2Num == 1, let transport = display.transport,
                transport.upstream == "DP", transport.downstream == "HDMI"
             {
-                log.warning("This Mac Mini's HDMI port doesn't support DDC, ignoring for display \(display)")
+                log.warning("This Mac Mini's HDMI port might not support DDC (display: \(display))")
                 display.badHDMI = true
-                return nil
+                if !forceDDC {
+                    return nil
+                }
             }
 
             guard let ioAvService = AVServiceCreateFromDCPAVServiceProxy(dcpAvServiceProxy)?.takeRetainedValue(),
