@@ -59,6 +59,7 @@ let smoothDisplayServicesQueue = DispatchQueue(
 let timerQueue = RunloopQueue(named: "fyi.lunar.timer.queue")
 let taskManagerQueue = RunloopQueue(named: "fyi.lunar.taskManager.queue")
 let serialQueue = DispatchQueue(label: "fyi.lunar.serial.queue", qos: .userInitiated)
+let gammaQueue = DispatchQueue(label: "fyi.lunar.gamma.queue", qos: .userInteractive)
 let appName = (Bundle.main.infoDictionary?["CFBundleName"] as? String) ?? "Lunar"
 
 let TEST_MODE = AppSettings.testMode
@@ -760,7 +761,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    func activateUIElement(_ uiElement: UIElement, page: Int, highlight: Bool = true) {
+    func activateUIElement(_ uiElement: UIElement, page: Int, highlight _: Bool = true) {
         guard let w = windowController?.window, let view = w.contentView, !view.subviews.isEmpty, !view.subviews[0].subviews.isEmpty,
               let pageController = view.subviews[0].subviews[0].nextResponder as? PageController else { return }
 
@@ -1088,15 +1089,52 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func listenForScreenConfigurationChanged() {
-        zeroGammaChecker = Repeater(every: 3, name: "zeroGammaChecker") {
-            displayController.activeDisplays.values
+        zeroGammaChecker = Repeater(every: 3, name: "zeroGammaChecker", tolerance: 10) {
+            displayController.activeDisplayList
                 .filter { d in
-                    !d.isForTesting && !d.settingGamma && d.hasSoftwareControl && !d.blackOutEnabled && GammaTable(for: d.id).isZero
+                    !d.isForTesting && !d.settingGamma && !d.blackOutEnabled &&
+                        (d.hasSoftwareControl || CachedDefaults[.hdrWorkaround] || d.enhanced || d.subzero || d.applyGamma) &&
+                        GammaTable(for: d.id, allowZero: true).isZero
                 }
                 .forEach { d in
-                    log.warning("Gamma tables are zeroed out for display \(d)!\nReverting to last non-zero gamma tables")
-                    if let table = d.lastGammaTable {
+                    log.warning("Gamma tables are zeroed out for display \(d.description)!\nTrying to revert to last non-zero gamma tables")
+                    if let table = d.lastGammaTable, !table.isZero {
                         d.apply(gamma: table)
+                    } else {
+                        d.apply(gamma: GammaTable.original)
+                    }
+
+                    if GammaTable(for: d.id, allowZero: true).isZero {
+                        log
+                            .warning(
+                                "Applying last gamma tables didn't work for display \(d.description)!\nTrying to reset ColorSync settings"
+                            )
+                        restoreColorSyncSettings()
+                    }
+
+                    guard GammaTable(for: d.id, allowZero: true).isZero, !CachedDefaults[.screenBlankingIssueWarningShown] else {
+                        return
+                    }
+                    CachedDefaults[.screenBlankingIssueWarningShown] = true
+                    askAndHandle(
+                        message: "Screen Blanking Issue Detected",
+                        info: """
+                        Because of a macOS bug in the **Gamma API**, your screen might have gone blank.
+
+                        Lunar will now try to minimise future Gamma changes by disabling the **HDR compatibility workaround**.
+
+                        If the screen doesn't come back on by itself, you can try one of the following:
+
+                        * Changing the display color profile in `System Preferences`
+                        * Logging out, then logging back in
+                        * Restarting the computer
+                        """,
+                        cancelButton: nil,
+                        screen: NSScreen.screens.first(where: { !$0.isVirtual && !$0.hasDisplayID(1) }),
+                        wide: true,
+                        markdown: true
+                    ) { _ in
+                        CachedDefaults[.hdrWorkaround] = false
                     }
                 }
         }
@@ -1167,6 +1205,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 log.info("\(notification.name)")
                 displayController.reconfigure()
                 displayController.retryAutoBlackoutLater()
+            }.store(in: &observers)
+
+        NotificationCenter.default
+            .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
+            .sink { _ in
+                lastColorSyncReset = Date()
+                #if DEBUG
+                    if let d = NSScreen.main {
+                        print("Max EDR:", d.maximumExtendedDynamicRangeColorComponentValue)
+                        print("Potential EDR:", d.maximumPotentialExtendedDynamicRangeColorComponentValue)
+                        print("Reference EDR:", d.maximumReferenceExtendedDynamicRangeColorComponentValue)
+                        print("")
+                    }
+                #endif
             }.store(in: &observers)
 
         NotificationCenter.default
