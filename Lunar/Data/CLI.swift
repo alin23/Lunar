@@ -1276,14 +1276,14 @@ struct Lunar: ParsableCommand {
                     if isServer {
                         display.resetDefaultGamma()
                     } else {
-                        CGDisplayRestoreColorSyncSettings()
+                        restoreColorSyncSettings()
                     }
                     cliPrint("Resetting gamma table for \(display)\n")
                     printTable()
                     continue
                 }
                 if restoreColorSync {
-                    CGDisplayRestoreColorSyncSettings()
+                    restoreColorSyncSettings()
                     cliPrint("Restoring ColorSync settings\n")
                     printTable()
                     continue

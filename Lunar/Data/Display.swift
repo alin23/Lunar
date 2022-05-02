@@ -264,13 +264,24 @@ struct GammaTable: Equatable {
         self.brightness = brightness
     }
 
-    init(for id: CGDirectDisplayID) {
+    init(for id: CGDirectDisplayID, allowZero: Bool = false) {
         var redTable = [CGGammaValue](repeating: 0, count: 256)
         var greenTable = [CGGammaValue](repeating: 0, count: 256)
         var blueTable = [CGGammaValue](repeating: 0, count: 256)
         var sampleCount: UInt32 = 0
 
-        CGGetDisplayTransferByTable(id, 256, &redTable, &greenTable, &blueTable, &sampleCount)
+        let result = gammaQueue.sync {
+            CGGetDisplayTransferByTable(id, 256, &redTable, &greenTable, &blueTable, &sampleCount)
+        }
+
+        guard result == .success, allowZero || sum(redTable) + sum(greenTable) + sum(blueTable) != 0 else {
+            log.error("Error reading Gamma for \(id): \(result)")
+            red = Self.original.red
+            green = Self.original.green
+            blue = Self.original.blue
+            samples = Self.original.samples
+            return
+        }
 
         red = redTable
         green = greenTable
@@ -310,7 +321,14 @@ struct GammaTable: Equatable {
             GammaTable.original.apply(to: id)
             return false
         }
-        CGSetDisplayTransferByTable(id, samples, red, green, blue)
+        let result = gammaQueue.sync {
+            CGSetDisplayTransferByTable(id, samples, red, green, blue)
+        }
+
+        guard result == .success else {
+            log.error("Error setting Gamma for \(id): \(result)")
+            return false
+        }
         return true
     }
 
@@ -4920,7 +4938,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             return
         }
 
-        CGDisplayRestoreColorSyncSettings()
+        restoreColorSyncSettings()
         lunarGammaTable = nil
         defaultGammaTable = GammaTable(for: id)
     }
@@ -4966,15 +4984,20 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         guard force || (enabledControls[.gamma] ?? false && (timeSince(lastConnectionTime) >= 1 || onlySoftwareDimmingEnabled))
         else { return }
         gammaLock()
-        if gammaSetterTask != nil { gammaSetterTask = nil }
+        if gammaSetterTask != nil {
+            gammaSetterTask = nil
+        }
         settingGamma = true
-        defer { settingGamma = false }
 
         let brightness = brightness ?? limitedBrightness
         let gammaTable = lunarGammaTable ?? defaultGammaTable
         let newGammaTable = gammaTable.adjust(brightness: brightness, preciseBrightness: preciseBrightness, maxValue: maxEDR)
 
         guard !GammaControl.sliderTracking, lastGammaBrightness != brightness else {
+            defer {
+                settingGamma = false
+                lastColorSyncReset = Date()
+            }
             guard !newGammaTable.isZero else { return }
 
             gammaChanged = true
@@ -4987,17 +5010,30 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         gammaSetterTask = serialAsyncAfter(ms: 1, name: "gamma-setter") { [weak self] in
-            guard let self = self else {
-                return
-            }
-            self.gammaChanged = true
-            Thread.sleep(forTimeInterval: 0.002)
+            guard let self = self else { return }
 
+            self.settingGamma = true
             self.gammaChanged = true
+            var lastGammaTable = self.lastGammaTable
+            var lastGammaBrightness = self.lastGammaBrightness
+            defer {
+                self.settingGamma = false
+                lastColorSyncReset = Date()
+                self.lastGammaTable = lastGammaTable
+                self.lastGammaBrightness = lastGammaBrightness
+            }
+
             for gammaTable in gammaTable.stride(from: self.lastGammaBrightness, to: brightness, maxValue: self.maxEDR) {
-                self.apply(gamma: gammaTable)
+                guard let gammaSetterTask = self.gammaSetterTask, !gammaSetterTask.isCancelled else {
+                    return
+                }
+
+                if self.apply(gamma: gammaTable) {
+                    lastGammaTable = gammaTable
+                }
+
                 if let brightness = gammaTable.brightness {
-                    self.lastGammaBrightness = brightness
+                    lastGammaBrightness = brightness
                     onChange?(brightness)
                 }
                 Thread.sleep(forTimeInterval: brightnessTransition == .slow ? 0.025 : 0.002)
@@ -5008,8 +5044,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             if self.apply(gamma: newGammaTable) {
-                self.lastGammaTable = newGammaTable
-                self.lastGammaBrightness = newGammaTable.brightness ?? brightness
+                lastGammaTable = newGammaTable
+                lastGammaBrightness = newGammaTable.brightness ?? brightness
             }
             onChange?(brightness)
         }
