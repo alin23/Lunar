@@ -1092,7 +1092,7 @@ class DisplayController: ObservableObject {
             Display.applySource = true
         }
 
-        CGDisplayRestoreColorSyncSettings()
+        restoreColorSyncSettings()
         DisplayController.panelManager = MPDisplayMgr()
         guard let displayList = datastore.displays(serials: serials), !displayList.isEmpty else {
             let displays = ids.map { Display(id: $0, active: true) }
