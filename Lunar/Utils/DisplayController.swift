@@ -1928,6 +1928,7 @@ class DisplayController: ObservableObject {
                (value == minBrightness && value == oldValue) ||
                (oldValue == minBrightness && display.softwareBrightness < 1.0)
             {
+                display.forceShowSoftwareOSD = true
                 display.softwareBrightness = cap(
                     display.softwareBrightness + (offset.f / 36),
                     minVal: 0.0,
@@ -1946,6 +1947,7 @@ class DisplayController: ObservableObject {
                 }
 
                 display.maxEDR = display.computeMaxEDR()
+                display.forceShowSoftwareOSD = true
                 display.softwareBrightness = cap(
                     display.softwareBrightness + (offset.f / 70),
                     minVal: 1.01,
