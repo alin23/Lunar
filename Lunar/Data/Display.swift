@@ -1223,7 +1223,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc dynamic lazy var inputTooltip: String? = hasDDC ? nil :
         "This monitor doesn't support input switching because DDC is not available"
 
-    lazy var defaultGammaTable = GammaTable(for: id)
+    lazy var defaultGammaTable = AppDelegate.hdrWorkaround ? GammaTable(for: id) : GammaTable.original
     var lunarGammaTable: GammaTable? = nil
     var lastGammaTable: GammaTable? = nil
 
@@ -4940,9 +4940,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             return
         }
 
-        restoreColorSyncSettings()
         lunarGammaTable = nil
-        defaultGammaTable = GammaTable(for: id)
+        if AppDelegate.hdrWorkaround, restoreColorSyncSettings() {
+            defaultGammaTable = GammaTable(for: id)
+        } else {
+            defaultGammaTable = GammaTable.original
+        }
     }
 
     func resetGamma() {

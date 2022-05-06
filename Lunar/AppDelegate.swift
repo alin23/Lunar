@@ -148,6 +148,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         return AVPlayer.eligibleForHDRPlayback
     }()
 
+    static var hdrWorkaround: Bool = Defaults[.hdrWorkaround]
+
     @Atomic var paddleDismissed = true
 
     var locationManager: CLLocationManager?
@@ -1104,37 +1106,36 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                         d.apply(gamma: GammaTable.original)
                     }
 
+                    if !CachedDefaults[.screenBlankingIssueWarningShown] {
+                        CachedDefaults[.screenBlankingIssueWarningShown] = true
+                        askAndHandle(
+                            message: "Screen Blanking Issue Detected",
+                            info: """
+                            Because of a macOS bug in the **Gamma API**, your screen might have gone blank.
+
+                            Lunar will now try to minimise future Gamma changes by disabling the **HDR compatibility workaround**.
+
+                            If the screen doesn't come back on by itself, you can try one of the following:
+
+                            * Changing the display color profile in `System Preferences`
+                            * Logging out, then logging back in
+                            * Restarting the computer
+                            """,
+                            cancelButton: nil,
+                            screen: NSScreen.screens.first(where: { !$0.isVirtual && !$0.hasDisplayID(1) }),
+                            wide: true,
+                            markdown: true
+                        ) { _ in
+                            CachedDefaults[.hdrWorkaround] = false
+                        }
+                    }
+
                     if GammaTable(for: d.id, allowZero: true).isZero {
                         log
                             .warning(
                                 "Applying last gamma tables didn't work for display \(d.description)!\nTrying to reset ColorSync settings"
                             )
                         restoreColorSyncSettings()
-                    }
-
-                    guard GammaTable(for: d.id, allowZero: true).isZero, !CachedDefaults[.screenBlankingIssueWarningShown] else {
-                        return
-                    }
-                    CachedDefaults[.screenBlankingIssueWarningShown] = true
-                    askAndHandle(
-                        message: "Screen Blanking Issue Detected",
-                        info: """
-                        Because of a macOS bug in the **Gamma API**, your screen might have gone blank.
-
-                        Lunar will now try to minimise future Gamma changes by disabling the **HDR compatibility workaround**.
-
-                        If the screen doesn't come back on by itself, you can try one of the following:
-
-                        * Changing the display color profile in `System Preferences`
-                        * Logging out, then logging back in
-                        * Restarting the computer
-                        """,
-                        cancelButton: nil,
-                        screen: NSScreen.screens.first(where: { !$0.isVirtual && !$0.hasDisplayID(1) }),
-                        wide: true,
-                        markdown: true
-                    ) { _ in
-                        CachedDefaults[.hdrWorkaround] = false
                     }
                 }
         }
@@ -1495,6 +1496,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func addObservers() {
         hdrWorkaroundPublisher.sink { change in
+            Self.hdrWorkaround = change.newValue
             self.hdrFixer = change.newValue ? Self.fixHDR() : nil
         }.store(in: &observers)
 
