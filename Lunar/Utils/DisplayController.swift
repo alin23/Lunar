@@ -1508,7 +1508,9 @@ class DisplayController: ObservableObject {
     }
 
     func shouldPromptAboutFallback(_ display: Display) -> Bool {
-        guard !display.neverFallbackControl, display.enabledControls[.gamma] ?? false else { return false }
+//        guard !display.neverFallbackControl, display.enabledControls[.gamma] ?? false else { return false }
+        guard !display.neverFallbackControl, !display.isBuiltin, !AppleNativeControl.isAvailable(for: display),
+              !display.isAppleDisplay() else { return false }
 
         if !SyncMode.possibleClamshellModeSoon, !screensSleeping.load(ordering: .relaxed),
            let screen = display.screen, !screen.visibleFrame.isEmpty, timeSince(display.lastConnectionTime) > 10,
