@@ -1325,6 +1325,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     var hdrWindowOpenedAt = Date()
 
+    @Atomic var forceShowSoftwareOSD = false
+
     @objc dynamic var forceDDC = false {
         didSet {
             guard initialised else { return }
