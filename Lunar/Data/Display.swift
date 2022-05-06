@@ -157,6 +157,7 @@ let GENERIC_DISPLAY = Display(
 
 let MAX_SMOOTH_STEP_TIME_NS: UInt64 = 90 * 1_000_000 // 90ms
 
+let STUDIO_DISPLAY_NAME = "Studio Display"
 let ULTRAFINE_NAME = "LG UltraFine"
 let THUNDERBOLT_NAME = "Thunderbolt"
 let LED_CINEMA_NAME = "LED Cinema"
@@ -3876,6 +3877,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 if !blackOutEnabled { resetSoftwareControl() }
                 appleNativeControl.reapply()
             }
+            enabledControls[.gamma] = false
             return appleNativeControl
         }
         if ddcControl.isAvailable() {
@@ -3883,6 +3885,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 if !blackOutEnabled { resetSoftwareControl() }
                 ddcControl.reapply()
             }
+            enabledControls[.gamma] = false
             return ddcControl
         }
         if networkControl.isAvailable() {
@@ -3890,6 +3893,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 if !blackOutEnabled { resetSoftwareControl() }
                 networkControl.reapply()
             }
+            enabledControls[.gamma] = false
             return networkControl
         }
 
@@ -4508,6 +4512,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     // MARK: AppleNative Detection
 
+    func isStudioDisplay() -> Bool {
+        name.contains(STUDIO_DISPLAY_NAME) || edidName.contains(STUDIO_DISPLAY_NAME)
+    }
+
     func isUltraFine() -> Bool {
         name.contains(ULTRAFINE_NAME) || edidName.contains(ULTRAFINE_NAME)
     }
@@ -4529,7 +4537,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func isAppleDisplay() -> Bool {
-        isUltraFine() || isThunderbolt() || isLEDCinema() || isCinema() || isAppleVendorID()
+        isStudioDisplay() || isUltraFine() || isThunderbolt() || isLEDCinema() || isCinema() || isAppleVendorID()
     }
 
     func isAppleVendorID() -> Bool {
