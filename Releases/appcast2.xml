@@ -13,10 +13,10 @@
             <sparkle:shortVersionString>5.6.4a5</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
             <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-5.6.4a5.html</sparkle:releaseNotesLink>
-            <enclosure url="https://files.lunar.fyi/releases/Lunar-5.6.4a5.dmg" length="18584831" type="application/octet-stream" sparkle:edSignature="CgS8alEQkIGGxNE1EjBNSE0f1UTUhd2IqWvZ2ziml3kmmPni9U4HGnXNGSSKBxfl+OW29aVc44it40auz9XgAg=="/>
+            <enclosure url="https://files.lunar.fyi/releases/Lunar-5.6.4a5.dmg" length="18584167" type="application/octet-stream" sparkle:edSignature="LID8WhaSXaidDwKhqiaUsirDarG904+2UXwb85FQIo5O/ZPH5CSAsaEoGNVn+JXxi4syJjLrkIG3B8slG/2vBQ=="/>
             <sparkle:deltas>
-                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.6.4a5-5.6.4a4.delta" sparkle:deltaFrom="5.6.4a4" length="1976178" type="application/octet-stream" sparkle:edSignature="vyxXpC1GrZ8h0beoxQuC0SGLWiV38RJeXbjWEpGk0kkruNFQRy2G4kyaG2wG7VEb9sv7dsOl6soQ1KCqn1AUCg=="/>
                 <enclosure url="https://files.lunar.fyi/deltas/Lunar5.6.4a5-5.6.4a3.delta" sparkle:deltaFrom="5.6.4a3" length="2066330" type="application/octet-stream" sparkle:edSignature="YPByrC3SDxv/M6JKMyHiHpjDR4SQ6SVjb58iXcoLpQMYhKOeXITiyiRoCPpRRQ1Zy8x5BPPIoKff8Sh/S67KCg=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.6.4a5-5.6.4a4.delta" sparkle:deltaFrom="5.6.4a4" length="1976178" type="application/octet-stream" sparkle:edSignature="vyxXpC1GrZ8h0beoxQuC0SGLWiV38RJeXbjWEpGk0kkruNFQRy2G4kyaG2wG7VEb9sv7dsOl6soQ1KCqn1AUCg=="/>
                 <enclosure url="https://files.lunar.fyi/deltas/Lunar5.6.4a5-5.6.3.delta" sparkle:deltaFrom="5.6.3" length="2767738" type="application/octet-stream" sparkle:edSignature="5629NepgmTF8MxWWGXuIgLl+s8TJx1fwb2UD6L9ta8NpCQ9gTLLRu+Wm1/jtTHXnNpgt83Q9DSfgnJrXmlSqAA=="/>
                 <enclosure url="https://files.lunar.fyi/deltas/Lunar5.6.4a5-5.6.2.delta" sparkle:deltaFrom="5.6.2" length="2854962" type="application/octet-stream" sparkle:edSignature="nV6LGCRncYih7vs4+JJM68ylDdrreFcouoju8mabNZ7gf7P9FLxQ0CNcwkzhmWWqO0L68mFh84MQIYAtx8HvAQ=="/>
             </sparkle:deltas>

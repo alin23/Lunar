@@ -2355,3 +2355,30 @@ func formattedMemoryFootprint() -> String {
     let usedMBAsString = "Memory Used by App: \((memoryFootprintMB() ?? 0).str(decimals: 2)) MB"
     return usedMBAsString
 }
+
+import SystemConfiguration
+
+// MARK: - Reachability
+
+public class Reachability {
+    class func isConnectedToNetwork() -> Bool {
+        var zeroAddress = sockaddr()
+        zeroAddress.sa_len = UInt8(MemoryLayout<sockaddr>.size)
+        zeroAddress.sa_family = sa_family_t(AF_INET)
+
+        guard let defaultRouteReachability = SCNetworkReachabilityCreateWithAddress(nil, &zeroAddress) else {
+            log.error("ReachabilityError.failedToCreateWithAddress: \(SCError())")
+            return true
+        }
+
+        var flags = SCNetworkReachabilityFlags(rawValue: 0)
+        if SCNetworkReachabilityGetFlags(defaultRouteReachability, &flags) == false {
+            return false
+        }
+
+        let isReachable = flags == .reachable
+        let needsConnection = flags == .connectionRequired
+
+        return isReachable && !needsConnection
+    }
+}
