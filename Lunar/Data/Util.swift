@@ -2137,8 +2137,8 @@ extension LineReader: Sequence {
 func getModeDetails(_ mode: MPDisplayMode?, prefix: String = "\t") -> String {
     guard let mode = mode else { return "nil" }
     return """
-        \(prefix)refreshString: \(mode.refreshStringSafe ?? "Unknown")
-        \(prefix)resolutionString: \(mode.resolutionStringSafe ?? "Unknown")
+        \(prefix)refreshString: \(mode.refreshStringSafe)
+        \(prefix)resolutionString: \(mode.resolutionStringSafe)
         \(prefix)isSafeMode: \(mode.isSafeMode)
         \(prefix)tvModeEquiv: \(mode.tvModeEquiv)
         \(prefix)tvMode: \(mode.tvMode)
@@ -2173,8 +2173,8 @@ import AnyCodable
 func getModeDetailsJSON(_ mode: MPDisplayMode?) -> [String: Any]? {
     guard let mode = mode else { return nil }
     return [
-        "refreshString": mode.refreshStringSafe ?? "Unknown",
-        "resolutionString": mode.resolutionStringSafe ?? "Unknown",
+        "refreshString": mode.refreshStringSafe,
+        "resolutionString": mode.resolutionStringSafe,
         "isSafeMode": mode.isSafeMode,
         "tvModeEquiv": mode.tvModeEquiv,
         "tvMode": mode.tvMode,
