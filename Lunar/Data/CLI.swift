@@ -1825,7 +1825,10 @@ private func encodedValue(key: Display.CodingKeys, value: Any, prefix: String = 
 import Socket
 
 var cliServerTask: DispatchWorkItem? {
-    didSet { oldValue?.cancel() }
+    didSet {
+        oldValue?.cancel()
+        server.closeOldSockets()
+    }
 }
 
 // MARK: - LunarServer
@@ -1850,6 +1853,8 @@ class LunarServer {
     var connectedSockets = [Int32: Socket]()
     let socketLockQueue = DispatchQueue(label: "com.kitura.serverSwift.socketLockQueue")
 
+    var currentSocketFD: Int32 = 0
+
     func run(host: String = "127.0.0.1") {
         if let cliServerTask = cliServerTask, !cliServerTask.isCancelled {
             if continueRunning { stop() }
@@ -1860,30 +1865,32 @@ class LunarServer {
             do {
                 self.listenSocket = try Socket.create(family: .inet)
                 guard let socket = self.listenSocket else {
-                    log.error("Unable to unwrap socket...")
+                    print("Unable to unwrap socket...")
                     return
                 }
 
                 try socket.listen(on: LUNAR_CLI_PORT.i, node: host)
-                log.info("Listening on port: \(socket.listeningPort)")
+                print("Listening on port: \(socket.listeningPort)")
 
                 repeat {
                     let newSocket = try socket.acceptClientConnection()
 
-                    log.debug("Accepted connection from: \(newSocket.remoteHostname) on port \(newSocket.remotePort)")
-                    log.debug("Socket Signature: \(String(describing: newSocket.signature?.description))")
+                    #if DEBUG
+                        print("Accepted connection from: \(newSocket.remoteHostname) on port \(newSocket.remotePort)")
+                        print("Socket Signature: \(String(describing: newSocket.signature?.description))")
+                    #endif
 
                     self.addNewConnection(socket: newSocket)
 
                 } while self.continueRunning
             } catch {
                 guard let socketError = error as? Socket.Error else {
-                    log.error("Unexpected error: \(error)")
+                    print("Unexpected error: \(error)")
                     return
                 }
 
                 if self.continueRunning {
-                    log.error("Error reported:\n \(socketError.description)")
+                    print("Error reported:\n \(socketError.description)")
                 }
             }
         }
@@ -1939,6 +1946,7 @@ class LunarServer {
 
     func addNewConnection(socket: Socket) {
         socketLockQueue.sync { [unowned self, socket] in
+            self.currentSocketFD = socket.socketfd
             self.connectedSockets[socket.socketfd] = socket
         }
 
@@ -1951,19 +1959,23 @@ class LunarServer {
                     switch try socket.read(into: &readData) {
                     case 1 ... Self.bufferSize:
                         guard let response = String(data: readData, encoding: .utf8)?.trimmed else {
-                            log.error("Error decoding response...")
+                            print("Error decoding response...")
                             readData.removeAll(keepingCapacity: true)
                             break readLoop
                         }
 
-                        log.debug("Server received from connection at \(socket.remoteHostname):\(socket.remotePort): \(response) ")
+                        #if DEBUG
+                            print("Server received from connection at \(socket.remoteHostname):\(socket.remotePort): \(response) ")
+                        #endif
                         try onResponse(response, socket: socket)
                     case 0:
-                        log.debug("Read 0 bytes, closing socket")
+                        #if DEBUG
+                            print("Read 0 bytes, closing socket")
+                        #endif
                         shouldKeepRunning = false
                         break readLoop
                     default:
-                        log.warning("Read too many bytes!")
+                        print("Read too many bytes!")
                         readData.removeAll(keepingCapacity: true)
                         break readLoop
                     }
@@ -1971,7 +1983,9 @@ class LunarServer {
                     readData.removeAll(keepingCapacity: true)
                 } while shouldKeepRunning
 
-                log.debug("Socket: \(socket.remoteHostname):\(socket.remotePort) closed...")
+                #if DEBUG
+                    print("Socket: \(socket.remoteHostname):\(socket.remotePort) closed...")
+                #endif
                 socket.close()
 
                 self.socketLockQueue.sync { [unowned self, socket] in
@@ -1979,18 +1993,27 @@ class LunarServer {
                 }
             } catch {
                 guard let socketError = error as? Socket.Error else {
-                    log.error("Unexpected error by connection at \(socket.remoteHostname):\(socket.remotePort)...")
+                    print("Unexpected error by connection at \(socket.remoteHostname):\(socket.remotePort)...")
                     return
                 }
                 if self.continueRunning {
-                    log.error("Error reported by connection at \(socket.remoteHostname):\(socket.remotePort):\n \(socketError.description)")
+                    print("Error reported by connection at \(socket.remoteHostname):\(socket.remotePort):\n \(socketError.description)")
                 }
             }
         }
     }
 
+    func closeOldSockets() {
+        socketLockQueue.sync { [unowned self] in
+            for socket in connectedSockets.values.filter({ $0.socketfd != self.currentSocketFD }) {
+                self.connectedSockets.removeValue(forKey: socket.socketfd)
+                socket.close()
+            }
+        }
+    }
+
     func stop() {
-        log.info("CLI Server shutdown in progress...")
+        print("CLI Server shutdown in progress...")
         continueRunning = false
 
         for socket in connectedSockets.values {
