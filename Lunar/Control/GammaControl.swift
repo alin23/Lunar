@@ -198,11 +198,16 @@ class GammaControl: Control {
     func getBlueGain() -> UInt16? { nil }
     func resetColors() -> Bool { true }
 
-    func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil, onChange: ((Brightness) -> Void)? = nil) -> Bool {
+    func setBrightness(
+        _ brightness: Brightness,
+        oldValue: Brightness? = nil,
+        force: Bool = false,
+        onChange: ((Brightness) -> Void)? = nil
+    ) -> Bool {
         guard let display = display else { return false }
 
-        guard display.active, let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else {
-            return false
+        guard force || display.active, let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else {
+            return true
         }
 
         let brightness = cap(brightness, minVal: 0, maxVal: 100)
@@ -212,7 +217,7 @@ class GammaControl: Control {
             return true
         }
 
-        display.setGamma(brightness: brightness, onChange: onChange)
+        display.setGamma(brightness: brightness, force: force, onChange: onChange)
         onChange?(brightness)
         return true
     }

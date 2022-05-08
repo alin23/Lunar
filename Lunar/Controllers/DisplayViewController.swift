@@ -1149,8 +1149,8 @@ class DisplayViewController: NSViewController {
                 softwareDimmingButton.showPopover = false
                 softwareDimmingButton.onClick = { [weak self] in
                     guard let display = self?.display else { return }
-                    display.gammaEnabled = true
                     display.ddcEnabled = false
+                    display.gammaEnabled = true
                     display.control = display.getBestControl(reapply: true)
                 }
                 self.view.bringSubviewToFront(button)

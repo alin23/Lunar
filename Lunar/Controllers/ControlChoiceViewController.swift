@@ -171,6 +171,8 @@ class ControlChoiceViewController: NSViewController {
     var progressForLastDisplay: Double = 0
     var progressForDisplay: Double = 0
 
+    var didAppear = false
+
     var controlButton: HelpButton? { _controlButton as? HelpButton }
     var ddcBlockersButton: OnboardingHelpButton? { _ddcBlockersButton as? OnboardingHelpButton }
 
@@ -307,7 +309,7 @@ class ControlChoiceViewController: NSViewController {
         }
         var answerResult = false
         noButton.onClick = { [weak self] in
-            log.info("Anwered 'no' to '\(question)'")
+            log.info("Answered 'no' to '\(question)'")
             guard let self = self else {
                 self?.semaphore.signal()
                 return
@@ -318,7 +320,7 @@ class ControlChoiceViewController: NSViewController {
             self.hideQuestion()
         }
         yesButton.onClick = { [weak self] in
-            log.info("Anwered 'yes' to '\(question)'")
+            log.info("Answered 'yes' to '\(question)'")
             guard let self = self else {
                 self?.semaphore.signal()
                 return
@@ -385,6 +387,7 @@ class ControlChoiceViewController: NSViewController {
                 button.attributedTitle = "Using DDC-over-Network Protocol".withTextColor(blue.highlight(withLevel: 0.2) ?? blue)
                 button.helpText = NETWORK_CONTROLS_HELP_TEXT
             case .gamma:
+                display.enabledControls[.gamma] = true
                 button.bg = .clear
                 if display.supportsGamma {
                     button.attributedTitle = "Using Gamma Approximation".withTextColor(red)
@@ -484,21 +487,25 @@ class ControlChoiceViewController: NSViewController {
         guard wait(1.1) else { return .allWorked }
 
         display.withBrightnessTransition {
+            display.enabledControls[control.displayControl] = true
+
             let write1Worked = control.setBrightness(
-                currentBrightness != 0 ? 0 : 50,
+                currentBrightness != 0 ? (control.isSoftware ? 25 : 0) : 50,
                 oldValue: currentBrightness,
+                force: true,
                 onChange: { [weak self] br in self?.setBrightness(br) }
             )
             guard wait(4) else { return }
             setWriteProgress(0.15)
 
-            let write2Worked = control.setBrightness(75, oldValue: 0, onChange: { [weak self] br in self?.setBrightness(br) })
+            let write2Worked = control.setBrightness(75, oldValue: 0, force: true, onChange: { [weak self] br in self?.setBrightness(br) })
             guard wait(4) else { return }
             setWriteProgress(0.2)
 
             let write3Worked = control.setBrightness(
-                67,
+                control.isSoftware ? 100 : 67,
                 oldValue: 75,
+                force: true,
                 onChange: { [weak self] br in self?.setBrightness(br) }
             )
             brightnessWriteWorked = (write1Worked.i + write2Worked.i + write3Worked.i) >= 2
@@ -626,7 +633,7 @@ class ControlChoiceViewController: NSViewController {
         info("Setting values before test", color: peach)
         guard wait(2) else { return .allWorked }
 
-        _ = control.setBrightness(currentBrightness, oldValue: nil, onChange: nil)
+        _ = control.setBrightness(currentBrightness, oldValue: nil, force: true, onChange: nil)
         setBrightness(currentBrightness)
         setWriteProgress(0.85)
 
@@ -922,6 +929,8 @@ class ControlChoiceViewController: NSViewController {
     }
 
     override func viewDidAppear() {
+        guard !didAppear else { return }
+        didAppear = true
         uiCrumb("Control Tester")
 
         adaptiveModeDisabledByDiagnostics = false
@@ -1075,9 +1084,10 @@ class ControlChoiceViewController: NSViewController {
                     ddcBlockerText: d.possibleDDCBlockers()
                 ) { nextStep = $0 }
                 if nextStep {
-                    let ddcEnabled = result.write.volume || result.write.contrast
+//                    let ddcEnabled = result.write.volume || result.write.contrast
                     queueChange {
-                        d.enabledControls[.ddc] = ddcEnabled
+                        d.enabledControls[.ddc] = false
+                        d.enabledControls[.gamma] = true
                         d.save()
                     }
                 } else {

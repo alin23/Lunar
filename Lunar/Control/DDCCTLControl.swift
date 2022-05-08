@@ -112,7 +112,12 @@ struct DDCCTLControl: Control {
         ddcctlSet(.RESET_COLOR, value: 1)
     }
 
-    func setBrightness(_ value: Brightness, oldValue _: Brightness? = nil, onChange: ((Brightness) -> Void)? = nil) -> Bool {
+    func setBrightness(
+        _ value: Brightness,
+        oldValue _: Brightness? = nil,
+        force: Bool = false,
+        onChange: ((Brightness) -> Void)? = nil
+    ) -> Bool {
         ddcctlSet(.BRIGHTNESS, value: value)
     }
 
