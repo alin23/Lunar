@@ -93,7 +93,7 @@ protocol Control {
     var displayControl: DisplayControl { get }
     var isSoftware: Bool { get }
 
-    func setBrightness(_ brightness: Brightness, oldValue: Brightness?, onChange: ((Brightness) -> Void)?) -> Bool
+    func setBrightness(_ brightness: Brightness, oldValue: Brightness?, force: Bool, onChange: ((Brightness) -> Void)?) -> Bool
     func setContrast(_ contrast: Contrast, oldValue: Contrast?, onChange: ((Contrast) -> Void)?) -> Bool
     func setVolume(_ volume: UInt16) -> Bool
     func setInput(_ input: InputSource) -> Bool
@@ -130,7 +130,7 @@ protocol Control {
 extension Control {
     func reapply() {
         guard let display = display else { return }
-        _ = setBrightness(display.limitedBrightness, oldValue: nil, onChange: nil)
+        _ = setBrightness(display.limitedBrightness, oldValue: nil, force: false, onChange: nil)
         _ = setContrast(display.limitedContrast, oldValue: nil, onChange: nil)
     }
 
@@ -167,7 +167,7 @@ extension Control {
     @discardableResult func write(_ key: Display.CodingKeys, _ value: Any) -> Any? {
         switch key {
         case .brightness:
-            return setBrightness(value as! Brightness, oldValue: nil, onChange: nil)
+            return setBrightness(value as! Brightness, oldValue: nil, force: false, onChange: nil)
         case .contrast:
             return setContrast(value as! Contrast, oldValue: nil, onChange: nil)
         case .volume:

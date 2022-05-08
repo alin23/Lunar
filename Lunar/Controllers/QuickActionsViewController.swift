@@ -235,7 +235,7 @@ struct DisplayRowView: View {
                 )
             }
 
-            if display.hasDDC, display.showVolumeSlider {
+            if display.hasDDC, display.showVolumeSlider, display.ddcEnabled {
                 BigSurSlider(
                     percentage: $display.preciseVolume.f,
                     image: "speaker.2.fill",

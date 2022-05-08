@@ -200,7 +200,12 @@ class DDCControl: Control, ObservableObject {
         return true
     }
 
-    func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil, onChange: ((Brightness) -> Void)? = nil) -> Bool {
+    func setBrightness(
+        _ brightness: Brightness,
+        oldValue: Brightness? = nil,
+        force: Bool = false,
+        onChange: ((Brightness) -> Void)? = nil
+    ) -> Bool {
         guard let display = display else { return false }
         defer { mainAsync { self.lastBrightness = brightness } }
         if brightnessTransition != .instant, !Self.sliderTracking, supportsSmoothTransition(for: .BRIGHTNESS), var oldValue = oldValue,

@@ -325,22 +325,6 @@ class DataStore: NSObject {
     static func firstRun() {
         log.debug("First run")
         thisIsFirstRun = true
-        for app in DEFAULT_APP_EXCEPTIONS {
-            let appPath = "/Applications/\(app).app"
-            if FileManager.default.fileExists(atPath: appPath) {
-                let bundle = Bundle(path: appPath)
-                guard let id = bundle?.bundleIdentifier,
-                      let name = bundle?.infoDictionary?["CFBundleName"] as? String
-                else {
-                    continue
-                }
-                if let exc = CachedDefaults[.appExceptions]?.first(where: { $0.identifier == id }) {
-                    log.debug("Existing app for \(app): \(String(describing: exc))")
-                    continue
-                }
-                storeAppException(app: AppException(identifier: id, name: name))
-            }
-        }
     }
 
     func displays(serials: [String]? = nil) -> [Display]? {
@@ -562,12 +546,41 @@ enum CachedDefaults {
                 }
 
                 key.suite[key] = newValue
+
+                guard !crumbKeys.contains(key) else { return }
+                crumb("Set \(key.name) to \(newValue)", level: .info, category: "Settings")
             }
             return
         }
     }
 
     // MARK: Internal
+
+    static var crumbKeys: Set<Defaults.AnyKey> = [
+        .adaptiveBrightnessMode,
+        .astronomicalTwilightBegin,
+        .astronomicalTwilightEnd,
+        .civilTwilightBegin,
+        .civilTwilightEnd,
+        .clockMode,
+        .dayLength,
+        .debug,
+        .hasActiveDisplays,
+        .hasActiveExternalDisplays,
+        .location,
+        .nauticalTwilightBegin,
+        .nauticalTwilightEnd,
+        .nonManualMode,
+        .secure,
+        .solarNoon,
+        .streamLogs,
+        .sunrise,
+        .sunset,
+        .syncMode,
+        .hotkeys,
+        .displays,
+        .apiKey,
+    ]
 
     static var cache: ThreadSafeDictionary<String, AnyCodable> = ThreadSafeDictionary()
     static var locks: [String: NSRecursiveLock] = [:]
@@ -599,9 +612,12 @@ func cacheKey<Value>(_ key: Defaults.Key<Value>, load: Bool = true) {
     if key == .secondPhase {
         initSecondPhase()
     }
-    Defaults.publisher(key).sink { change in
+    Defaults.publisher(key).dropFirst().sink { change in
         // log.debug("Caching \(key.name) = \(change.newValue)")
         CachedDefaults.cache[key.name] = AnyCodable(change.newValue)
+
+        guard !CachedDefaults.crumbKeys.contains(key) else { return }
+        crumb("Set \(key.name) to \(change.newValue)", level: .info, category: "Settings")
     }.store(in: &CachedDefaults.observers)
 }
 

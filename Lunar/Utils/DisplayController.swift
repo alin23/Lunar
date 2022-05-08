@@ -1636,7 +1636,7 @@ class DisplayController: ObservableObject {
         }
 
         controlWatcherTask = Repeater(every: 15, name: CONTROL_WATCHER_TASK_KEY) { [self] in
-            guard !screensSleeping.load(ordering: .relaxed) else { return }
+            guard !screensSleeping.load(ordering: .relaxed), completedOnboarding else { return }
             for display in activeDisplays.values {
                 display.control = display.getBestControl()
                 if shouldPromptAboutFallback(display) {
