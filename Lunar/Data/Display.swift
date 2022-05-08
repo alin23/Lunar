@@ -1273,6 +1273,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     let DDC_BLOCKERS_TRAILER = """
     #### Other possible blockers
 
+    * The builtin `HDMI` port of the newer Mac devices
+        * If possible, use only the `Thunderbolt` ports
     * Some `HDMI-to-USB-C` Cables
         * If possible, try a `DisplayPort to USB-C` cable
     * Smart monitors
@@ -3085,7 +3087,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             if let control = control as? DDCControl {
                 _ = control.setBrightnessDebounced(brightness, oldValue: oldBrightness)
-            } else if let control = control, !control.setBrightness(brightness, oldValue: oldBrightness, onChange: nil) {
+            } else if let control = control, !control.setBrightness(brightness, oldValue: oldBrightness, force: false, onChange: nil) {
                 log.warning(
                     "Error writing brightness using \(control.str)",
                     context: context

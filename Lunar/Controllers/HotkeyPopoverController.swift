@@ -107,7 +107,7 @@ class HotkeyPopoverController: NSViewController {
                     display.contrast = contrast.ns
                 }
 
-                _ = display.control?.setBrightness(display.limitedBrightness, oldValue: nil, onChange: nil)
+                _ = display.control?.setBrightness(display.limitedBrightness, oldValue: nil, force: false, onChange: nil)
                 _ = display.control?.setContrast(display.limitedContrast, oldValue: nil, onChange: nil)
                 mainAsyncAfter(ms: 1000) {
                     display.input = input

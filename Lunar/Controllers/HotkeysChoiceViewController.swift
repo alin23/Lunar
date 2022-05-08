@@ -72,8 +72,12 @@ class HotkeysChoiceViewController: NSViewController {
     @IBOutlet var skipButton: Button!
 
     @objc dynamic var displays: [Display] = []
+    var didAppear = false
 
     override func viewDidAppear() {
+        guard !didAppear else { return }
+        didAppear = true
+
         uiCrumb("\(useOnboardingForDiagnostics ? "Diagnostics" : "Onboarding") Summary")
         displays = displayController.activeDisplays.values.map { $0 }
         if let wc = view.window?.windowController as? OnboardWindowController {
