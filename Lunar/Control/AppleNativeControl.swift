@@ -200,7 +200,12 @@ class AppleNativeControl: Control {
         return control.resetColors()
     }
 
-    func setBrightness(_ brightness: Brightness, oldValue: Brightness? = nil, onChange: ((Brightness) -> Void)? = nil) -> Bool {
+    func setBrightness(
+        _ brightness: Brightness,
+        oldValue: Brightness? = nil,
+        force: Bool = false,
+        onChange: ((Brightness) -> Void)? = nil
+    ) -> Bool {
         guard let display = display else { return false }
         guard !display.isForTesting else { return false }
 

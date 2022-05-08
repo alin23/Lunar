@@ -42,6 +42,8 @@ class ModeChoiceViewController: NSViewController {
     lazy var originalOverride = CachedDefaults[.overrideAdaptiveMode]
     lazy var originalMode = displayController.adaptiveModeKey
 
+    var didAppear = false
+
     func queueChange(_ change: @escaping (() -> Void)) {
         guard let wc = view.window?.windowController as? OnboardWindowController else {
             return
@@ -142,7 +144,8 @@ class ModeChoiceViewController: NSViewController {
                 }
 
             CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .sync
-            CachedDefaults[.adaptiveBrightnessMode] = .sync
+            displayController.enable(mode: .sync)
+//            CachedDefaults[.adaptiveBrightnessMode] = .sync
         }
         next()
     }
@@ -169,7 +172,8 @@ class ModeChoiceViewController: NSViewController {
                 }
 
             CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .sync
-            CachedDefaults[.adaptiveBrightnessMode] = .sync
+            displayController.enable(mode: .sync)
+//            CachedDefaults[.adaptiveBrightnessMode] = .sync
         }
         next()
     }
@@ -178,7 +182,8 @@ class ModeChoiceViewController: NSViewController {
         queueChange {
             LocationMode.specific.fetchGeolocation()
             CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .location
-            CachedDefaults[.adaptiveBrightnessMode] = .location
+            displayController.enable(mode: .location)
+//            CachedDefaults[.adaptiveBrightnessMode] = .location
         }
         next()
     }
@@ -186,7 +191,8 @@ class ModeChoiceViewController: NSViewController {
     @objc func clockClick() {
         queueChange {
             CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .clock
-            CachedDefaults[.adaptiveBrightnessMode] = .clock
+            displayController.enable(mode: .clock)
+//            CachedDefaults[.adaptiveBrightnessMode] = .clock
         }
         next()
     }
@@ -194,7 +200,8 @@ class ModeChoiceViewController: NSViewController {
     @objc func sensorClick() {
         queueChange {
             CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .sensor
-            CachedDefaults[.adaptiveBrightnessMode] = .sensor
+            displayController.enable(mode: .sensor)
+//            CachedDefaults[.adaptiveBrightnessMode] = .sensor
         }
 
         if let url = URL(string: "https://lunar.fyi/sensor") {
@@ -214,7 +221,8 @@ class ModeChoiceViewController: NSViewController {
 
     func revert() {
         CachedDefaults[.overrideAdaptiveMode] = originalOverride
-        CachedDefaults[.adaptiveBrightnessMode] = originalMode
+        displayController.enable(mode: originalMode)
+//        CachedDefaults[.adaptiveBrightnessMode] = originalMode
     }
 
     override func viewDidLoad() {
@@ -322,6 +330,9 @@ class ModeChoiceViewController: NSViewController {
     }
 
     override func viewDidAppear() {
+        guard !didAppear else { return }
+        didAppear = true
+
         uiCrumb("Mode Choice")
         if let wc = view.window?.windowController as? OnboardWindowController {
             wc.setupSkipButton(skipButton) { [weak self] in

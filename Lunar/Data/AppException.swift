@@ -14,7 +14,6 @@ import Sentry
 let APP_MAX_BRIGHTNESS_OFFSET: Int8 = 30
 let APP_MAX_CONTRAST_OFFSET: Int8 = 20
 let DEFAULT_APP_BRIGHTNESS_CONTRAST = 0.8
-let DEFAULT_APP_EXCEPTIONS = ["VLC", "Plex", "QuickTime Player", "Plex Media Player", "IINA", "Netflix", "Elmedia Player"]
 
 // MARK: - AppException
 
