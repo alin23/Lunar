@@ -489,25 +489,42 @@ class ControlChoiceViewController: NSViewController {
         display.withBrightnessTransition {
             display.enabledControls[control.displayControl] = true
 
+            var newBr: UInt16 = currentBrightness != 0 ? (control.isSoftware ? 25 : 0) : 50
             let write1Worked = control.setBrightness(
-                currentBrightness != 0 ? (control.isSoftware ? 25 : 0) : 50,
+                newBr,
                 oldValue: currentBrightness,
                 force: true,
                 onChange: { [weak self] br in self?.setBrightness(br) }
             )
+            if control.isSoftware, !display.supportsGamma {
+                setBrightness(newBr)
+            }
             guard wait(4) else { return }
             setWriteProgress(0.15)
 
-            let write2Worked = control.setBrightness(75, oldValue: 0, force: true, onChange: { [weak self] br in self?.setBrightness(br) })
+            newBr = 75
+            let write2Worked = control.setBrightness(
+                newBr,
+                oldValue: 0,
+                force: true,
+                onChange: { [weak self] br in self?.setBrightness(br) }
+            )
+            if control.isSoftware, !display.supportsGamma {
+                setBrightness(newBr)
+            }
             guard wait(4) else { return }
             setWriteProgress(0.2)
 
+            newBr = control.isSoftware ? 100 : 67
             let write3Worked = control.setBrightness(
-                control.isSoftware ? 100 : 67,
+                newBr,
                 oldValue: 75,
                 force: true,
                 onChange: { [weak self] br in self?.setBrightness(br) }
             )
+            if control.isSoftware, !display.supportsGamma {
+                setBrightness(newBr)
+            }
             brightnessWriteWorked = (write1Worked.i + write2Worked.i + write3Worked.i) >= 2
             setWriteProgress(0.25)
         }
