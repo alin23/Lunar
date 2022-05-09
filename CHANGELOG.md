@@ -1,3 +1,111 @@
+# 5.6.4a6
+## alpha 6
+
+### Improvements
+
+* Disable all Gamma reset calls when disabling the **HDR compatibility workaround**
+* Disable **Software Dimming** automatically if DDC/AppleNative works
+* Ensure CLI doesn't get stuck on a blocked socket
+* Show Screen Blanking dialog even if the zero gamma workaround worked
+* More reliable light sensor checker
+
+# 5.6.4a5
+## alpha 5
+
+### Improvements
+
+* Show XDR slider even on 100%
+* Hide XDR/Subzero text if XDR has just been disabled
+* Minimise chances of triggering the screen blanking bug by adding an artificial delay between Gamma API calls
+* Add detection for the screen blanking issue
+
+![screen blanking dialog](https://files.lunar.fyi/screen-blanking-dialog.png)
+
+# 5.6.4a4
+## alpha 4
+
+### Improvements
+
+* Better sensible defaults for contrast in Apple displays
+* Add option to keep Night Shift on when using XDR by default
+
+![disable night shift xdr](https://files.lunar.fyi/disable-night-shift-xdr.png)
+
+
+# 5.6.4a3
+## alpha 3
+
+### Improvements
+
+* Restrict HDR compatibility workaround only for setups with EDR-capable displays
+* Add a way to enforce DDC if the detection logic gives a false negative
+
+![enforce DDC checkbox](https://files.lunar.fyi/enforce-ddc-checkbox.png)
+
+### Fixes
+
+* Restore Gamma slider values properly
+# 5.6.4a2
+## alpha 2
+
+### Improvements
+
+* Smoother **XDR Brightness**, **Sub-zero Dimming** and **Software Dimming**
+* Update Paddle SDK to v4.3.0
+* Don't show licensing UI more than once to avoid locking the UI
+* Remove redundant Advanced Settings screen
+
+### Fixes
+
+* Stop handling brightness keys and forward them to the system when the adjustment limit is reached
+# 5.6.4a1
+## alpha 1
+
+### Hotfix
+
+* Fix crash caused by EDID UUID fetching on invalid displays
+
+# 5.6.4
+## Hotfix
+
+* Fix crash caused by EDID UUID fetching on invalid displays
+
+## Improvements
+
+* Smoother **XDR Brightness**, **Sub-zero Dimming** and **Software Dimming**
+* Update Paddle SDK to v4.3.0
+* Don't show licensing UI more than once to avoid locking the UI
+* Remove redundant Advanced Settings screen
+* Restrict HDR compatibility workaround only for setups with EDR-capable displays
+* Add a way to enforce DDC if the detection logic gives a false negative
+
+![enforce DDC checkbox](https://files.lunar.fyi/enforce-ddc-checkbox.png)
+
+* Better sensible defaults for contrast in Apple displays
+* Add option to keep Night Shift on when using XDR by default
+
+![disable night shift xdr](https://files.lunar.fyi/disable-night-shift-xdr.png)
+
+* Show XDR slider even on 100%
+* Hide XDR/Subzero text if XDR has just been disabled
+* Minimise chances of triggering the screen blanking bug by adding an artificial delay between Gamma API calls
+* Add detection for the screen blanking issue
+
+![screen blanking dialog](https://files.lunar.fyi/screen-blanking-dialog.png)
+
+* Disable all Gamma reset calls when disabling the **HDR compatibility workaround**
+* Disable **Software Dimming** automatically if DDC/AppleNative works
+* Ensure CLI doesn't get stuck on a blocked socket
+* Show Screen Blanking dialog even if the zero gamma workaround worked
+* More reliable light sensor checker
+
+
+## Fixes
+
+* Stop handling brightness keys and forward them to the system when the adjustment limit is reached
+* Restore Gamma slider values properly
+* Fix resetting the remaining adjustments limit
+
 # 5.6.3
 ## Hotfix
 
