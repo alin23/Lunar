@@ -213,7 +213,7 @@ class GammaControl: Control {
         let brightness = cap(brightness, minVal: 0, maxVal: 100)
 
         guard display.supportsGamma else {
-            display.shade(amount: 1.0 - (brightness.d / 100.0))
+            display.shade(amount: 1.0 - (brightness.d / 100.0), force: force, onChange: onChange)
             return true
         }
 

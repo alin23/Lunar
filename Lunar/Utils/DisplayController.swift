@@ -61,7 +61,6 @@ class DisplayController: ObservableObject {
     var screencaptureWatcherTask: Repeater?
 
     let getDisplaysLock = NSRecursiveLock()
-    @Atomic var lidClosed: Bool = isLidClosed()
     var clamshellMode = false
 
     var appObserver: NSKeyValueObservation?
@@ -94,6 +93,22 @@ class DisplayController: ObservableObject {
     @Published var activeDisplayList: [Display] = []
 
     @Atomic var lastPidCount = 0
+    @Atomic var lidClosed: Bool = isLidClosed() {
+        didSet {
+            guard lidClosed != oldValue else { return }
+
+            log.info(
+                "Lid state changed",
+                context: [
+                    "old": oldValue ? "closed" : "opened",
+                    "new": lidClosed ? "closed" : "opened",
+                ]
+            )
+
+            reset()
+        }
+    }
+
     static func tryLockManager(tries: Int = 10) -> Bool {
         for i in 1 ... tries {
             log.info("Trying to lock display manager (try: \(i))")
@@ -186,6 +201,16 @@ class DisplayController: ObservableObject {
         }
 
         return matches
+    }
+
+    func reset() {
+        menuPopover?.close()
+
+        displayController.manageClamshellMode()
+        displayController.resetDisplayList(autoBlackOut: Defaults[.autoBlackoutBuiltin])
+
+        displayController.adaptBrightness(force: true)
+        appDelegate!.resetStatesPublisher.send(true)
     }
 
     func watchModeAvailability() {
@@ -945,6 +970,17 @@ class DisplayController: ObservableObject {
         didSet {
             guard !autoSubzero else { return }
             activeDisplayList.filter(\.subzero).forEach { $0.softwareBrightness = 1 }
+        }
+    }
+
+    var screenIDs: Set<CGDirectDisplayID> = Set(NSScreen.onlineDisplayIDs) {
+        didSet {
+            guard screenIDs != oldValue else { return }
+            log.info(
+                "New screen IDs after screen configuration change",
+                context: ["old": oldValue.commaSeparatedString, "new": screenIDs.commaSeparatedString]
+            )
+            reset()
         }
     }
 
