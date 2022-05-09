@@ -119,7 +119,7 @@ enum MemoryUsageError: Error {
 }
 
 let SWIFTUI_PREVIEW = ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
-var screenIDs: Set<CGDirectDisplayID> = Set(NSScreen.onlineDisplayIDs)
+
 var lastXDRContrastResetTime = Date()
 
 // MARK: - AppDelegate
@@ -1149,7 +1149,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
             }
 
-            if screenIDs.count == 1, !screenIDs.contains(displayID), displayController.xdrContrast > 0 {
+            if displayController.screenIDs.count == 1, !displayController.screenIDs.contains(displayID), displayController.xdrContrast > 0 {
                 log.info("Disabling XDR Contrast if we have more than 1 screen")
                 lastXDRContrastResetTime = Date()
                 displayController.xdrContrast = 0
@@ -1262,47 +1262,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         NotificationCenter.default
             .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
-            .debounce(for: .seconds(1), scheduler: RunLoop.main)
+            .debounce(for: .seconds(2), scheduler: RunLoop.main)
             .sink { _ in
                 log.info("Screen configuration changed")
 
                 displayController.activeDisplays.values.forEach { d in
                     d.updateCornerWindow()
                 }
-
-                let newScreenIDs = Set(NSScreen.onlineDisplayIDs)
-                let oldScreenIDs = screenIDs
-
-                let newLidClosed = isLidClosed()
-                guard newScreenIDs != screenIDs || newLidClosed != displayController.lidClosed else {
-                    return
-                }
-
-                if newScreenIDs != oldScreenIDs {
-                    log.info(
-                        "New screen IDs after screen configuration change",
-                        context: ["old": oldScreenIDs.commaSeparatedString, "new": newScreenIDs.commaSeparatedString]
-                    )
-                    screenIDs = newScreenIDs
-                }
-                if newLidClosed != displayController.lidClosed {
-                    log.info(
-                        "Lid state changed",
-                        context: [
-                            "old": displayController.lidClosed ? "closed" : "opened",
-                            "new": newLidClosed ? "closed" : "opened",
-                        ]
-                    )
-                    displayController.lidClosed = newLidClosed
-                }
-
-                menuPopover?.close()
-
-                displayController.manageClamshellMode()
-                displayController.resetDisplayList(autoBlackOut: Defaults[.autoBlackoutBuiltin])
-
-                displayController.adaptBrightness(force: true)
-                self.resetStatesPublisher.send(true)
+                displayController.screenIDs = Set(NSScreen.onlineDisplayIDs)
+                displayController.lidClosed = isLidClosed()
             }.store(in: &observers)
 
         let wakePublisher = NSWorkspace.shared.notificationCenter

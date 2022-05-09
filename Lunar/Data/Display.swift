@@ -3724,9 +3724,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-    func shade(amount: Double, smooth: Bool = true) {
-        guard !isInHardwareMirrorSet, !isIndependentDummy, let screen = screen ?? primaryMirrorScreen,
-              timeSince(lastConnectionTime) >= 1 || onlySoftwareDimmingEnabled
+    func shade(amount: Double, smooth: Bool = true, force: Bool = false, onChange _: ((Brightness) -> Void)? = nil) {
+        guard let screen = screen ?? primaryMirrorScreen, force || (
+            !isInHardwareMirrorSet && !isIndependentDummy &&
+                timeSince(lastConnectionTime) >= 1 || onlySoftwareDimmingEnabled
+        )
         else {
             shadeWindowController?.close()
             shadeWindowController = nil
