@@ -399,6 +399,7 @@ struct AdvancedSettingsView: View {
     @Default(.allowBlackOutOnSingleScreen) var allowBlackOutOnSingleScreen
     @Default(.reapplyValuesAfterWake) var reapplyValuesAfterWake
     @Default(.hdrWorkaround) var hdrWorkaround
+    @Default(.oldBlackOutMirroring) var oldBlackOutMirroring
     @Default(.xdrContrast) var xdrContrast
     @Default(.xdrContrastFactor) var xdrContrastFactor
     @Default(.allowHDREnhanceBrightness) var allowHDREnhanceBrightness
@@ -509,6 +510,17 @@ struct AdvancedSettingsView: View {
                 SettingsToggle(
                     text: "Allow BlackOut on single screen", setting: $allowBlackOutOnSingleScreen,
                     help: "Allows turning off a screen even if it's the only visible screen left"
+                )
+                SettingsToggle(
+                    text: "Switch to the old BlackOut mirroring system", setting: $oldBlackOutMirroring,
+                    help: """
+                    Some setups will have trouble enabling mirroring with the new macOS 11+ API.
+
+                    You can try enabling this option if BlackOut is not working properly.
+
+                    Note: the old mirroring system can't handle complex mirror sets with dummies and virtual/wireless displays.
+                    The best covered cases are "BlackOut built-in display" and "BlackOut only external displays".
+                    """
                 )
                 SettingsToggle(
                     text: "Toggle Manual/Sync when the lid is closed/opened",
