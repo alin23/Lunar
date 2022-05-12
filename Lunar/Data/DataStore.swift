@@ -25,6 +25,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .autoSubzero,
     .autoXdr,
     .hdrWorkaround,
+    .oldBlackOutMirroring,
     .disableNightShiftXDR,
     .screenBlankingIssueWarningShown,
     .xdrContrast,
@@ -645,6 +646,7 @@ func initCache() {
     cacheKey(.autoSubzero)
     cacheKey(.autoXdr)
     cacheKey(.hdrWorkaround)
+    cacheKey(.oldBlackOutMirroring)
     cacheKey(.disableNightShiftXDR)
     cacheKey(.screenBlankingIssueWarningShown)
     cacheKey(.xdrContrast)
@@ -786,6 +788,7 @@ extension Defaults.Keys {
     static let autoSubzero = Key<Bool>("autoSubzero", default: true)
     static let autoXdr = Key<Bool>("autoXdr", default: true)
     static let hdrWorkaround = Key<Bool>("hdrWorkaround", default: true)
+    static let oldBlackOutMirroring = Key<Bool>("oldBlackOutMirroring", default: false)
     static let disableNightShiftXDR = Key<Bool>("disableNightShiftXDR", default: false)
     static let screenBlankingIssueWarningShown = Key<Bool>("screenBlankingIssueWarningShown", default: false)
     static let xdrContrast = Key<Bool>("xdrContrast", default: true)
@@ -952,6 +955,8 @@ let autoSubzeroPublisher = Defaults.publisher(.autoSubzero).removeDuplicates().d
     .filter { $0.oldValue != $0.newValue }
 let autoXdrPublisher = Defaults.publisher(.autoXdr).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let hdrWorkaroundPublisher = Defaults.publisher(.hdrWorkaround).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
+let oldBlackOutMirroringPublisher = Defaults.publisher(.oldBlackOutMirroring).removeDuplicates().dropFirst()
+    .filter { $0.oldValue != $0.newValue }
 let xdrContrastPublisher = Defaults.publisher(.xdrContrast).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let xdrContrastFactorPublisher = Defaults.publisher(.xdrContrastFactor).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let allowHDREnhanceContrastPublisher = Defaults.publisher(.allowHDREnhanceContrast).removeDuplicates().dropFirst()
