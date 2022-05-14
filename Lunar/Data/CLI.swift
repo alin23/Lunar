@@ -1409,6 +1409,7 @@ struct Lunar: ParsableCommand {
     @OptionGroup var globals: GlobalOptions
 
     static func configureLogging(options globals: GlobalOptions) {
+        guard !isServer else { return }
         if !globals.log, !globals.debug, !globals.verbose {
             log.disable()
         } else {
@@ -1827,7 +1828,7 @@ import Socket
 var cliServerTask: DispatchWorkItem? {
     didSet {
         oldValue?.cancel()
-        server.closeOldSockets()
+        appDelegate?.server.closeOldSockets()
     }
 }
 
@@ -1919,7 +1920,9 @@ class LunarServer {
             key = key ?? args.removeFirst()
 
             guard key == CachedDefaults[.apiKey] else {
-                try socket.write(from: "HTTP/1.1 401 Unauthorized\r\nContent-Length: \("Unauthorized\n".count)\r\n\r\n")
+                if serverHTTP {
+                    try socket.write(from: "HTTP/1.1 401 Unauthorized\r\nContent-Length: \("Unauthorized\n".count)\r\n\r\n")
+                }
                 try socket.write(from: "Unauthorized\n")
                 return
             }
@@ -1939,7 +1942,9 @@ class LunarServer {
             }
         } catch {
             let err = Lunar.fullMessage(for: error) + "\n"
-            try socket.write(from: "HTTP/1.1 400 Bad Request\r\nContent-Length: \(err.count)\r\n\r\n")
+            if serverHTTP {
+                try socket.write(from: "HTTP/1.1 400 Bad Request\r\nContent-Length: \(err.count)\r\n\r\n")
+            }
             try socket.write(from: err)
         }
     }
@@ -2026,6 +2031,19 @@ class LunarServer {
             connectedSockets.removeAll()
         }
     }
+
+    func stopAsync() {
+        print("CLI Server shutdown in progress...")
+        socketLockQueue.async {
+            self.continueRunning = false
+
+            for socket in self.connectedSockets.values {
+                self.connectedSockets[socket.socketfd] = nil
+                socket.close()
+            }
+            self.connectedSockets.removeAll()
+        }
+    }
 }
 
 let CLI_ARG_SEPARATOR = "\u{01}"
@@ -2074,11 +2092,12 @@ func cliGetDisplays(
 }
 
 let LUNAR_CLI_PORT: Int32 = 23803
-let server = LunarServer()
 
 func serve(host: String) {
     isServer = true
-    server.run(host: host)
+    guard let appDelegate = appDelegate else { return }
+    appDelegate.server = LunarServer()
+    appDelegate.server.run(host: host)
 }
 
 var gammaRepeater: Repeater?

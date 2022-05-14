@@ -365,6 +365,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         didSet { oldValue?.cancel() }
     }
 
+    var server = LunarServer() {
+        didSet {
+            oldValue.stopAsync()
+        }
+    }
+
     @IBAction func blackOutPowerOff(_: Any) {
         guard let display = displayController.mainExternalDisplay else { return }
         _ = display.control?.setPower(.off)
@@ -1377,7 +1383,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
                     self.valuesReaderThread = nil
                     displayController.adaptiveMode.stopWatching()
-                    server.stop()
+                    self.server.stopAsync()
                 default:
                     break
                 }
@@ -1995,7 +2001,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         listenForRemoteCommandsPublisher
             .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
             .sink { change in
-                server.stop()
+                self.server.stopAsync()
                 serve(host: change.newValue ? "0.0.0.0" : "127.0.0.1")
             }.store(in: &observers)
         serve(host: CachedDefaults[.listenForRemoteCommands] ? "0.0.0.0" : "127.0.0.1")
