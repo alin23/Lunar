@@ -622,6 +622,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
         blackOutEnabled = ((try container.decodeIfPresent(Bool.self, forKey: .blackOutEnabled)) ?? false) && !isIndependentDummy &&
             (isNative ? (brightness.uint16Value <= 1) : true)
+        if blackOutEnabled, minBrightness == 1 {
+            self.minBrightness = 0
+        }
+
         if let value = (try container.decodeIfPresent(UInt16.self, forKey: .brightnessBeforeBlackout)?.ns) {
             brightnessBeforeBlackout = value
         }
@@ -4276,7 +4280,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             return
         }
 
-        if isSmartBuiltin, !allowBrightnessZero, minBrightness == 0 {
+        if isSmartBuiltin, !allowBrightnessZero, !blackOutEnabled, minBrightness == 0 {
             minBrightness = 1
         }
 

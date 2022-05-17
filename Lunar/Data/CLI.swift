@@ -1862,10 +1862,10 @@ class LunarServer {
             cliServerTask.wait(for: 1.seconds)
         }
 
-        cliServerTask = DispatchWorkItem(name: "cli-server") { [unowned self] in
+        cliServerTask = DispatchWorkItem(name: "cli-server") { [weak self] in
             do {
-                self.listenSocket = try Socket.create(family: .inet)
-                guard let socket = self.listenSocket else {
+                self?.listenSocket = try Socket.create(family: .inet)
+                guard let socket = self?.listenSocket else {
                     print("Unable to unwrap socket...")
                     return
                 }
@@ -1881,16 +1881,16 @@ class LunarServer {
                         print("Socket Signature: \(String(describing: newSocket.signature?.description))")
                     #endif
 
-                    self.addNewConnection(socket: newSocket)
+                    self?.addNewConnection(socket: newSocket)
 
-                } while self.continueRunning
+                } while self?.continueRunning ?? false
             } catch {
                 guard let socketError = error as? Socket.Error else {
                     print("Unexpected error: \(error)")
                     return
                 }
 
-                if self.continueRunning {
+                if let self = self, self.continueRunning {
                     print("Error reported:\n \(socketError.description)")
                 }
             }
