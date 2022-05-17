@@ -1,3 +1,30 @@
+# 5.6.5a1
+## alpha 1
+
+### Hotfix
+
+* Update Paddle to fix a crash happening when there was no network connection
+
+### Improvements
+
+* Allow switching to the *old BlackOut mirroring system* for setups incompatible with the new API
+
+![old blackout system checkbox](https://files.lunar.fyi/old-blackout-system.png)
+
+# 5.6.5
+## Improvements
+
+* Allow switching to the *old BlackOut mirroring system* for setups incompatible with the new API
+
+![old blackout system checkbox](https://files.lunar.fyi/old-blackout-system.png)
+
+## Fixes
+
+* Update Paddle to fix a crash happening when there was no network connection
+* Allow setting min brightness to 0 for external monitors
+* Fix CLI hanging
+* Stop disabling logging when using the CLI
+* Fix min brightness set to 1 instead of 0 on BlackOut
 # 5.6.4a6
 ## alpha 6
 
