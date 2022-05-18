@@ -140,7 +140,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @Atomic static var controlKeyPressed = false
 
     static var observers: Set<AnyCancellable> = []
-
+    static var enableSentry = CachedDefaults[.enableSentry]
     static var supportsHDR: Bool = {
         NotificationCenter.default
             .publisher(for: AVPlayer.eligibleForHDRPlaybackDidChangeNotification)
@@ -303,7 +303,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var memory500MBPassed = false {
         didSet {
-            guard CachedDefaults[.enableSentry], memory500MBPassed, !oldValue, let mb = memoryFootprintMB() else { return }
+            guard AppDelegate.enableSentry, memory500MBPassed, !oldValue, let mb = memoryFootprintMB() else { return }
 
             SentrySDK.configureScope { scope in
                 scope.setTag(value: "500MB", key: "memory")
@@ -315,7 +315,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var memory1GBPassed = false {
         didSet {
-            guard CachedDefaults[.enableSentry], memory1GBPassed, !oldValue, let mb = memoryFootprintMB() else { return }
+            guard AppDelegate.enableSentry, memory1GBPassed, !oldValue, let mb = memoryFootprintMB() else { return }
             SentrySDK.configureScope { scope in
                 scope.setTag(value: "1GB", key: "memory")
                 scope.setExtra(value: mb, key: "usedMB")
@@ -327,7 +327,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var memory2GBPassed = false {
         didSet {
-            guard CachedDefaults[.enableSentry], memory2GBPassed, !oldValue, let mb = memoryFootprintMB() else { return }
+            guard AppDelegate.enableSentry, memory2GBPassed, !oldValue, let mb = memoryFootprintMB() else { return }
             SentrySDK.configureScope { scope in
                 scope.setTag(value: "2GB", key: "memory")
                 scope.setExtra(value: mb, key: "usedMB")
@@ -339,7 +339,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var memory4GBPassed = false {
         didSet {
-            guard CachedDefaults[.enableSentry], memory4GBPassed, !oldValue, let mb = memoryFootprintMB() else { return }
+            guard AppDelegate.enableSentry, memory4GBPassed, !oldValue, let mb = memoryFootprintMB() else { return }
             SentrySDK.configureScope { scope in
                 scope.setTag(value: "4GB", key: "memory")
                 scope.setExtra(value: mb, key: "usedMB")
@@ -351,7 +351,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var memory8GBPassed = false {
         didSet {
-            guard CachedDefaults[.enableSentry], memory8GBPassed, !oldValue, let mb = memoryFootprintMB() else { return }
+            guard AppDelegate.enableSentry, memory8GBPassed, !oldValue, let mb = memoryFootprintMB() else { return }
             SentrySDK.configureScope { scope in
                 scope.setTag(value: "8GB", key: "memory")
                 scope.setExtra(value: mb, key: "usedMB")
@@ -584,7 +584,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         adaptiveBrightnessModePublisher.sink { change in
             log.info("adaptiveBrightnessModePublisher: \(change)")
-            if CachedDefaults[.enableSentry] {
+            if AppDelegate.enableSentry {
                 SentrySDK.configureScope { scope in
                     scope.setTag(value: change.newValue.str, key: "adaptiveMode")
                     scope.setTag(value: change.oldValue.str, key: "lastAdaptiveMode")
@@ -1847,6 +1847,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         enableSentryObserver = enableSentryObserver ?? enableSentryPublisher
             .debounce(for: .seconds(1), scheduler: RunLoop.main)
             .sink { change in
+                AppDelegate.enableSentry = change.newValue
                 if change.newValue {
                     self.configureSentry()
                 } else {
@@ -1854,7 +1855,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
             }
 
-        guard CachedDefaults[.enableSentry] else { return }
+        guard AppDelegate.enableSentry else { return }
         UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
 
         let release = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "1"
@@ -2067,7 +2068,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         // #endif
         #else
             mainAsyncAfter(ms: 60 * 1000 * 10) {
-                guard CachedDefaults[.enableSentry] else { return }
+                guard AppDelegate.enableSentry else { return }
 
                 let user = User(userId: SERIAL_NUMBER_HASH)
                 if CachedDefaults[.paddleConsent] {
