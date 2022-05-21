@@ -1847,6 +1847,7 @@ class LunarServer {
     // MARK: Internal
 
     static let bufferSize = 4096
+    static let queue = DispatchQueue(label: "fyi.lunar.cliServer.queue", qos: .userInitiated)
 
     @Atomic var continueRunning = true
 
@@ -1857,45 +1858,48 @@ class LunarServer {
     var currentSocketFD: Int32 = 0
 
     func run(host: String = "127.0.0.1") {
-        if let cliServerTask = cliServerTask, !cliServerTask.isCancelled {
-            if continueRunning { stop() }
-            cliServerTask.wait(for: 1.seconds)
-        }
-
-        cliServerTask = DispatchWorkItem(name: "cli-server") { [weak self] in
-            do {
-                self?.listenSocket = try Socket.create(family: .inet)
-                guard let socket = self?.listenSocket else {
-                    print("Unable to unwrap socket...")
-                    return
-                }
-
-                try socket.listen(on: LUNAR_CLI_PORT.i, node: host)
-                print("Listening on port: \(socket.listeningPort)")
-
-                repeat {
-                    let newSocket = try socket.acceptClientConnection()
-
-                    #if DEBUG
-                        print("Accepted connection from: \(newSocket.remoteHostname) on port \(newSocket.remotePort)")
-                        print("Socket Signature: \(String(describing: newSocket.signature?.description))")
-                    #endif
-
-                    self?.addNewConnection(socket: newSocket)
-
-                } while self?.continueRunning ?? false
-            } catch {
-                guard let socketError = error as? Socket.Error else {
-                    print("Unexpected error: \(error)")
-                    return
-                }
-
-                if let self = self, self.continueRunning {
-                    print("Error reported:\n \(socketError.description)")
+        Self.queue.async {
+            if let cliServerTask = cliServerTask, !cliServerTask.isCancelled {
+                Self.queue.async {
+                    cliServerTask.wait(for: 60.seconds)
                 }
             }
+
+            cliServerTask = DispatchWorkItem(name: "cli-server") { [weak self] in
+                do {
+                    self?.listenSocket = try Socket.create(family: .inet)
+                    guard let socket = self?.listenSocket else {
+                        log.info("Unable to unwrap socket...")
+                        return
+                    }
+
+                    try socket.listen(on: LUNAR_CLI_PORT.i, node: host)
+                    log.info("Listening on port: \(socket.listeningPort)")
+
+                    repeat {
+                        let newSocket = try socket.acceptClientConnection()
+
+                        #if DEBUG
+                            log.info("Accepted connection from: \(newSocket.remoteHostname) on port \(newSocket.remotePort)")
+                            log.info("Socket Signature: \(String(describing: newSocket.signature?.description))")
+                        #endif
+
+                        self?.addNewConnection(socket: newSocket)
+
+                    } while self?.continueRunning ?? false
+                } catch {
+                    guard let socketError = error as? Socket.Error else {
+                        log.error("Unexpected error: \(error)")
+                        return
+                    }
+
+                    if let self = self, self.continueRunning {
+                        log.error("Error reported:\n \(socketError.description)")
+                    }
+                }
+            }
+            Self.queue.async(execute: cliServerTask!.workItem)
         }
-        DispatchQueue.global(qos: .userInteractive).async(execute: cliServerTask!.workItem)
     }
 
     func onResponse(_ response: String, socket: Socket) throws {
@@ -1964,23 +1968,23 @@ class LunarServer {
                     switch try socket.read(into: &readData) {
                     case 1 ... Self.bufferSize:
                         guard let response = String(data: readData, encoding: .utf8)?.trimmed else {
-                            print("Error decoding response...")
+                            log.error("Error decoding response...")
                             readData.removeAll(keepingCapacity: true)
                             break readLoop
                         }
 
                         #if DEBUG
-                            print("Server received from connection at \(socket.remoteHostname):\(socket.remotePort): \(response) ")
+                            log.info("Server received from connection at \(socket.remoteHostname):\(socket.remotePort): \(response) ")
                         #endif
                         try onResponse(response, socket: socket)
                     case 0:
                         #if DEBUG
-                            print("Read 0 bytes, closing socket")
+                            log.info("Read 0 bytes, closing socket")
                         #endif
                         shouldKeepRunning = false
                         break readLoop
                     default:
-                        print("Read too many bytes!")
+                        log.warning("Read too many bytes!")
                         readData.removeAll(keepingCapacity: true)
                         break readLoop
                     }
@@ -1989,7 +1993,7 @@ class LunarServer {
                 } while shouldKeepRunning
 
                 #if DEBUG
-                    print("Socket: \(socket.remoteHostname):\(socket.remotePort) closed...")
+                    log.info("Socket: \(socket.remoteHostname):\(socket.remotePort) closed...")
                 #endif
                 socket.close()
 
@@ -1998,11 +2002,11 @@ class LunarServer {
                 }
             } catch {
                 guard let socketError = error as? Socket.Error else {
-                    print("Unexpected error by connection at \(socket.remoteHostname):\(socket.remotePort)...")
+                    log.error("Unexpected error by connection at \(socket.remoteHostname):\(socket.remotePort)...")
                     return
                 }
                 if self.continueRunning {
-                    print("Error reported by connection at \(socket.remoteHostname):\(socket.remotePort):\n \(socketError.description)")
+                    log.error("Error reported by connection at \(socket.remoteHostname):\(socket.remotePort):\n \(socketError.description)")
                 }
             }
         }
@@ -2018,7 +2022,7 @@ class LunarServer {
     }
 
     func stop() {
-        print("CLI Server shutdown in progress...")
+        log.info("CLI Server shutdown in progress...")
         continueRunning = false
 
         for socket in connectedSockets.values {
@@ -2033,7 +2037,7 @@ class LunarServer {
     }
 
     func stopAsync() {
-        print("CLI Server shutdown in progress...")
+        log.info("CLI Server shutdown in progress...")
         socketLockQueue.async {
             self.continueRunning = false
 
