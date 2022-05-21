@@ -2558,16 +2558,8 @@ CORNERS</string>
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
                                         </dictionary>
                                     </binding>
-                                    <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.hasAmbientLightAdaptiveBrightness" id="czX-x1-01Y"/>
+                                    <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.canBeSource" id="czX-x1-01Y"/>
                                     <binding destination="1Bn-Ca-ETm" name="value" keyPath="self.display.isSource" id="Ubq-Yp-jHg"/>
-                                    <binding destination="1Bn-Ca-ETm" name="enabled2" keyPath="self.display.supportsGammaByDefault" previousBinding="czX-x1-01Y" id="BpW-Hb-kEN">
-                                        <dictionary key="options">
-                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                            <integer key="NSNullPlaceholder" value="-1"/>
-                                        </dictionary>
-                                    </binding>
                                     <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.syncMode" previousBinding="BpW-Hb-kEN" id="5Zz-Qx-8X0">
                                         <dictionary key="options">
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
@@ -8315,16 +8307,8 @@ Set the brightness to 100% manually using the monitor physical buttons to allow 
                                                                         <userDefinedRuntimeAttribute type="boolean" keyPath="grayDisabledText" value="NO"/>
                                                                     </userDefinedRuntimeAttributes>
                                                                     <connections>
-                                                                        <binding destination="sL5-vP-v2A" name="enabled" keyPath="objectValue.hasAmbientLightAdaptiveBrightness" id="X4A-4x-1Pv"/>
+                                                                        <binding destination="sL5-vP-v2A" name="enabled" keyPath="objectValue.canBeSource" id="X4A-4x-1Pv"/>
                                                                         <binding destination="sL5-vP-v2A" name="value" keyPath="objectValue.isSource" id="oGI-II-hax"/>
-                                                                        <binding destination="sL5-vP-v2A" name="enabled2" keyPath="objectValue.supportsGammaByDefault" previousBinding="X4A-4x-1Pv" id="tVo-15-BXr">
-                                                                            <dictionary key="options">
-                                                                                <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                                                <integer key="NSNullPlaceholder" value="-1"/>
-                                                                            </dictionary>
-                                                                        </binding>
                                                                     </connections>
                                                                 </button>
                                                                 <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="No1-4u-BUb" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
