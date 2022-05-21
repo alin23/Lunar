@@ -1489,6 +1489,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             datastore.storeDisplays(displayController.displays.values.map { $0 })
+            if displayController.adaptiveModeKey == .sync {
+                displayController.adaptiveMode.stopWatching()
+                displayController.adaptiveMode.watch()
+            }
             SyncMode.refresh()
         }
     }
