@@ -617,6 +617,7 @@ struct QuickActionsLayoutView: View {
     @Default(.autoXdr) var autoXdr
     @Default(.autoSubzero) var autoSubzero
     @Default(.disableNightShiftXDR) var disableNightShiftXDR
+    @Default(.allowAnySyncSource) var allowAnySyncSource
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -638,6 +639,10 @@ struct QuickActionsLayoutView: View {
                     SettingsToggle(text: "Show standard presets", setting: $showStandardPresets.animation(.fastSpring))
                     SettingsToggle(text: "Show custom presets", setting: $showCustomPresets.animation(.fastSpring))
                     SettingsToggle(text: "Merge brightness and contrast", setting: $mergeBrightnessContrast.animation(.fastSpring))
+                    SettingsToggle(
+                        text: "Allow non-Apple monitors as Sync Mode source",
+                        setting: $allowAnySyncSource.animation(.fastSpring)
+                    )
                 }
             }
             Divider()
