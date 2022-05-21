@@ -51,3 +51,4 @@ Frameworks/*.framework
 Frameworks/WAYWindow
 Frameworks/Sparkle
 Releases/*.html
+*.mdraft
