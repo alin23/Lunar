@@ -1084,6 +1084,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var appPreset: AppException? = nil
 
     @objc dynamic lazy var hasAmbientLightAdaptiveBrightness: Bool = DisplayServicesHasAmbientLightCompensation(id)
+    @objc dynamic lazy var canBeSource: Bool = {
+        allowAnySyncSourcePublisher.sink { [weak self] change in
+            guard let self = self else { return }
+            self.canBeSource = (self.hasAmbientLightAdaptiveBrightness && self.supportsGammaByDefault) || change.newValue
+        }.store(in: &observers)
+        return (hasAmbientLightAdaptiveBrightness && supportsGammaByDefault) || CachedDefaults[.allowAnySyncSource]
+    }()
+
     dynamic lazy var controlResult = isBuiltin ? ControlResult.onlyBrightnessWorked : ControlResult.allWorked
     @objc dynamic lazy var brightnessReadWorks = controlResult.read.brightness
     @objc dynamic lazy var contrastReadWorks = controlResult.read.contrast
@@ -2303,6 +2311,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Atomic var lastGammaBrightness: Brightness = 100
 
+    @Atomic var isNative = false
+
     var averageDDCWriteNanoseconds: UInt64 { displayController.averageDDCWriteNanoseconds[id] ?? 0 }
     var averageDDCReadNanoseconds: UInt64 { displayController.averageDDCReadNanoseconds[id] ?? 0 }
 
@@ -2328,9 +2338,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             mainAsync { self.supportsEnhance = self.getSupportsEnhance() }
             guard let control = control else {
                 hasSoftwareControl = false
+                isNative = false
                 return
             }
             hasSoftwareControl = control.isSoftware
+            isNative = control is AppleNativeControl
 
             log.debug(
                 "Display got \(control.str)",

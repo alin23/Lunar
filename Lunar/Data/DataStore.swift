@@ -24,6 +24,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .colorScheme,
     .autoSubzero,
     .autoXdr,
+    .allowAnySyncSource,
     .hdrWorkaround,
     .oldBlackOutMirroring,
     .disableNightShiftXDR,
@@ -645,6 +646,7 @@ func initCache() {
     cacheKey(.showDisconnectedDisplays)
     cacheKey(.autoSubzero)
     cacheKey(.autoXdr)
+    cacheKey(.allowAnySyncSource)
     cacheKey(.hdrWorkaround)
     cacheKey(.oldBlackOutMirroring)
     cacheKey(.disableNightShiftXDR)
@@ -787,6 +789,7 @@ extension Defaults.Keys {
     static let showDisconnectedDisplays = Key<Bool>("showDisconnectedDisplays", default: false)
     static let autoSubzero = Key<Bool>("autoSubzero", default: true)
     static let autoXdr = Key<Bool>("autoXdr", default: true)
+    static let allowAnySyncSource = Key<Bool>("allowAnySyncSource", default: false)
     static let hdrWorkaround = Key<Bool>("hdrWorkaround", default: true)
     static let oldBlackOutMirroring = Key<Bool>("oldBlackOutMirroring", default: false)
     static let disableNightShiftXDR = Key<Bool>("disableNightShiftXDR", default: false)
@@ -954,6 +957,8 @@ let autoBlackoutBuiltinPublisher = Defaults.publisher(.autoBlackoutBuiltin).remo
 let autoSubzeroPublisher = Defaults.publisher(.autoSubzero).removeDuplicates().dropFirst()
     .filter { $0.oldValue != $0.newValue }
 let autoXdrPublisher = Defaults.publisher(.autoXdr).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
+let allowAnySyncSourcePublisher = Defaults.publisher(.allowAnySyncSource).removeDuplicates().dropFirst()
+    .filter { $0.oldValue != $0.newValue }
 let hdrWorkaroundPublisher = Defaults.publisher(.hdrWorkaround).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let oldBlackOutMirroringPublisher = Defaults.publisher(.oldBlackOutMirroring).removeDuplicates().dropFirst()
     .filter { $0.oldValue != $0.newValue }
