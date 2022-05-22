@@ -600,6 +600,8 @@ struct AdvancedSettingsView: View {
 // MARK: - QuickActionsLayoutView
 
 struct QuickActionsLayoutView: View {
+    @ObservedObject var dc: DisplayController = displayController
+
     @Default(.showSliderValues) var showSliderValues
     @Default(.mergeBrightnessContrast) var mergeBrightnessContrast
     @Default(.showVolumeSlider) var showVolumeSlider
@@ -618,6 +620,8 @@ struct QuickActionsLayoutView: View {
     @Default(.autoSubzero) var autoSubzero
     @Default(.disableNightShiftXDR) var disableNightShiftXDR
     @Default(.allowAnySyncSource) var allowAnySyncSource
+    @Default(.autoXdrSensor) var autoXdrSensor
+    @Default(.autoXdrSensorLuxThreshold) var autoXdrSensorLuxThreshold
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -646,15 +650,7 @@ struct QuickActionsLayoutView: View {
                 }
             }
             Divider()
-            Group {
-                SettingsToggle(text: "Show XDR Brightness toggle when available", setting: $showXDRSelector.animation(.fastSpring))
-                SettingsToggle(text: "Disable Night Shift when toggling XDR", setting: $disableNightShiftXDR.animation(.fastSpring))
-                SettingsToggle(text: "Toggle XDR Brightness when going over 100%", setting: $autoXdr.animation(.fastSpring))
-                SettingsToggle(
-                    text: "Toggle Sub-zero Dimming when going below 0%",
-                    setting: $autoSubzero.animation(.fastSpring)
-                )
-            }
+            xdrSettings
             Divider()
             Group {
                 SettingsToggle(text: "Show last raw values sent to the display", setting: $showRawValues.animation(.fastSpring))
@@ -670,6 +666,65 @@ struct QuickActionsLayoutView: View {
             Color.clear
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    var xdrSettings: some View {
+        Group {
+            SettingsToggle(text: "Show XDR Brightness toggle when available", setting: $showXDRSelector.animation(.fastSpring))
+            SettingsToggle(text: "Disable Night Shift when toggling XDR", setting: $disableNightShiftXDR.animation(.fastSpring))
+            SettingsToggle(text: "Toggle XDR Brightness when going over 100%", setting: $autoXdr.animation(.fastSpring))
+            SettingsToggle(
+                text: "Toggle Sub-zero Dimming when going below 0%",
+                setting: $autoSubzero.animation(.fastSpring)
+            )
+            Divider().padding(.horizontal)
+            VStack(alignment: .leading, spacing: 2) {
+                SettingsToggle(text: "Toggle XDR Brightness based on ambient light", setting: $autoXdrSensor)
+                Text("XDR Brightness will be automatically enabled")
+                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                    .foregroundColor(.black.opacity(0.4))
+                    .padding(.leading, 20)
+                Text("when ambient light is above \(autoXdrSensorLuxThreshold.str(decimals: 0)) lux")
+                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                    .foregroundColor(.black.opacity(0.4))
+                    .padding(.leading, 20)
+                    .padding(.top, -5)
+            }
+            HStack {
+                let luxBinding = Binding<Float>(
+                    get: { autoXdrSensorLuxThreshold / 50000 },
+                    set: { autoXdrSensorLuxThreshold = $0 * 50000 }
+                )
+                BigSurSlider(
+                    percentage: luxBinding,
+                    image: "circle.lefthalf.filled",
+                    color: Colors.lightGray,
+                    backgroundColor: Colors.grayMauve.opacity(0.1),
+                    knobColor: Colors.lightGray,
+                    showValue: .constant(false)
+                )
+                .padding(.leading)
+                .disabled(!autoXdrSensor)
+                .contrast(autoXdrSensor ? 1.0 : 0.2)
+
+                SwiftUI.Button("Reset") { autoXdrSensorLuxThreshold = 10000 }
+                    .buttonStyle(FlatButton(
+                        color: Colors.lightGray,
+                        textColor: Colors.darkGray,
+                        radius: 10,
+                        verticalPadding: 3,
+                        disabled: !$autoXdrSensor
+                    ))
+                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+            }
+            if autoXdrSensor {
+                Text("Current ambient light: \(dc.internalSensorLux.str(decimals: 0)) lux")
+                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                    .foregroundColor(.black.opacity(0.4))
+                    .padding(.leading, 20)
+                    .padding(.top, -5)
+            }
+        }
     }
 }
 
@@ -1018,7 +1073,7 @@ struct QuickActionsMenuView: View {
                     .font(.system(size: 12, weight: .medium))
                     .frame(maxWidth: .infinity, alignment: .center)
 
-                }.frame(width: 390, height: 600, alignment: .center)
+                }.frame(width: 390, height: 650, alignment: .center)
             }
             .onChange(of: showBrightnessMenuBar) { _ in
                 let old = showOptionsMenu
