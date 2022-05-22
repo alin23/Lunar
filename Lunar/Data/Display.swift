@@ -1078,6 +1078,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     static let dummyNamePattern = "dummy|[^u]28e850|^28e850".r!
     static let notDummyNamePattern = "not a dummy".r!
 
+    static let numberNamePattern = #"\s*\(\d\)\s*"#.r!
+
     // MARK: Initializers
 
     lazy var maxEDR = computeMaxEDR()
@@ -1477,8 +1479,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             if isSource {
+                let normalizedName = Self.numberNamePattern.replaceAll(in: edidName, with: "").trimmed
                 displayController.displays.values.filter { $0.id != id }.forEach { d in
                     d.isSource = false
+                    if Self.numberNamePattern.replaceAll(in: d.edidName, with: "").trimmed == normalizedName {
+                        d.brightnessCurveFactors[.sync] = 1
+                        d.contrastCurveFactors[.sync] = 1
+                    }
                 }
             } else if let builtinDisplay = displayController.builtinDisplay, builtinDisplay.serial != serial {
                 builtinDisplay.isSource = true
@@ -2317,6 +2324,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Atomic var isNative = false
 
+    lazy var isMacBook: Bool = isBuiltin && Sysctl.isMacBook
+
     var averageDDCWriteNanoseconds: UInt64 { displayController.averageDDCWriteNanoseconds[id] ?? 0 }
     var averageDDCReadNanoseconds: UInt64 { displayController.averageDDCReadNanoseconds[id] ?? 0 }
 
@@ -3024,7 +3033,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-    var isMacBook: Bool { isBuiltin && Sysctl.isMacBook }
+    var isMacBookXDR: Bool { isMacBook && supportsEnhance }
+
     @Published @objc dynamic var brightness: NSNumber = 50 {
         didSet {
             brightnessU16 = brightness.uint16Value
