@@ -37,6 +37,7 @@ class DisplayController: ObservableObject {
         watchModeAvailability()
         watchScreencaptureProcess()
         initObservers()
+        setupXdrTask()
     }
 
     deinit {
@@ -742,6 +743,16 @@ class DisplayController: ObservableObject {
 
     var resetDisplayListTask: DispatchWorkItem?
 
+    var xdrSensorTask: Repeater?
+    lazy var autoXdrSensorLuxThreshold: Float = {
+        autoXdrSensorLuxThresholdPublisher.sink { change in
+            self.autoXdrSensorLuxThreshold = change.newValue
+        }.store(in: &self.observers)
+        return CachedDefaults[.autoXdrSensorLuxThreshold]
+    }()
+
+    @Published var internalSensorLux: Float = 0
+
     @Atomic var autoBlackoutPending = false {
         didSet {
             log.info("autoBlackoutPending=\(autoBlackoutPending)")
@@ -807,6 +818,9 @@ class DisplayController: ObservableObject {
                 activeDisplays.map { _, display in (display.serial, display) },
                 uniquingKeysWith: first(this:other:)
             )
+            if CachedDefaults[.autoXdrSensor] {
+                xdrSensorTask = getSensorTask()
+            }
         }
     }
 
@@ -1200,6 +1214,40 @@ class DisplayController: ObservableObject {
         }
     }
 
+    func getSensorTask() -> Repeater? {
+        guard let display = builtinDisplay, display.isMacBookXDR else {
+            return nil
+        }
+
+        return Repeater(every: 5, name: "xdrSensorTask") { [self] in
+            guard !screensSleeping.load(ordering: .relaxed), activeDisplayCount == 1,
+                  let display = builtinDisplay, display.isMacBookXDR,
+                  let lux = SensorMode.getInternalSensorLux()?.f else { return }
+
+            internalSensorLux = lux
+            if lux > autoXdrSensorLuxThreshold {
+                display.enhanced = true
+            } else if lux <= max(autoXdrSensorLuxThreshold - 1000, 0) {
+                display.enhanced = false
+            }
+        }
+    }
+
+    func setupXdrTask() {
+        autoXdrSensorPublisher.sink { [self] change in
+            guard let display = builtinDisplay, display.isMacBookXDR, let lux = SensorMode.getInternalSensorLux()?.f else {
+                xdrSensorTask = nil
+                return
+            }
+            internalSensorLux = lux
+            xdrSensorTask = change.newValue ? getSensorTask() : nil
+        }.store(in: &observers)
+
+        if CachedDefaults[.autoXdrSensor] {
+            xdrSensorTask = getSensorTask()
+        }
+    }
+
     func retryAutoBlackoutLater() {
         if autoBlackoutPending, let d = builtinDisplay, !d.blackOutEnabled {
             log.info("Retrying Auto Blackout later")
@@ -1485,6 +1533,9 @@ class DisplayController: ObservableObject {
                 }
             }
 
+            if CachedDefaults[.autoXdrSensor] {
+                self.xdrSensorTask = self.getSensorTask()
+            }
             self.reconfigure()
             mainAsync {
                 appDelegate!.recreateWindow(
