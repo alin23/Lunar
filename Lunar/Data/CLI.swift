@@ -1651,12 +1651,16 @@ private func handleDisplays(
 
             // MARK: - Enable command-line specified controls
 
+            let oldEnabledControls = display.enabledControls
             display.enabledControls = [
                 .network: controls.contains(.network),
                 .appleNative: controls.contains(.appleNative),
                 .ddc: controls.contains(.ddc),
                 .gamma: controls.contains(.gamma),
             ]
+            defer {
+                display.enabledControls = oldEnabledControls
+            }
             display.control = display.getBestControl()
             if Display.CodingKeys.settableWithControl.contains(property), !display.enabledControls[.gamma]!,
                display.hasSoftwareControl
@@ -1673,8 +1677,9 @@ private func handleDisplays(
 
                 if !read {
                     log.debug("Fetching value for \(property.rawValue)")
-                    cliPrint(encodedValue(key: property, value: propertyValue))
-                    return
+                    cliPrint("\(i): \(display.name)")
+                    cliPrint("\t\(property.stringValue): \(encodedValue(key: property, value: propertyValue))")
+                    continue
                 }
 
                 // MARK: - Read display property
@@ -1684,7 +1689,8 @@ private func handleDisplays(
                     throw LunarCommandError.cantReadProperty(property.rawValue)
                 }
 
-                cliPrint(encodedValue(key: property, value: readValue))
+                cliPrint("\(i): \(display.name)")
+                cliPrint("\t\(property.stringValue): \(encodedValue(key: property, value: readValue))")
                 continue
             }
 
@@ -1764,9 +1770,11 @@ private func handleDisplays(
             if display.control is NetworkControl {
                 cliSleep(1)
             }
-            cliPrint(encodedValue(key: property, value: display.dictionary![property.rawValue]!))
+            cliPrint("\(i): \(display.name)")
+            cliPrint("\t\(property.stringValue): \(encodedValue(key: property, value: display.dictionary![property.rawValue]!))")
         } catch {
-            cliPrint("\(display): \(error)")
+            cliPrint("\(i): \(display.name)")
+            cliPrint("\t\(error)")
         }
     }
 }
