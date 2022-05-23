@@ -1225,9 +1225,9 @@ class DisplayController: ObservableObject {
                   let lux = SensorMode.getInternalSensorLux()?.f else { return }
 
             internalSensorLux = lux
-            if lux > autoXdrSensorLuxThreshold {
+            if lux > autoXdrSensorLuxThreshold, !display.enhanced {
                 display.enhanced = true
-            } else if lux <= max(autoXdrSensorLuxThreshold - 1000, 0) {
+            } else if lux <= max(autoXdrSensorLuxThreshold - 1000, 0), display.enhanced {
                 display.enhanced = false
             }
         }
