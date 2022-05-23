@@ -976,6 +976,9 @@ struct Lunar: ParsableCommand {
         @Flag(help: "Include panel data in the output")
         var panelData = false
 
+        @Flag(help: "Include all resolutions for panel data in the output")
+        var panelDataAllResolutions = false
+
         @Flag(
             name: .shortAndLong,
             help: "If <property> is passed, try to actively read the property instead of fetching it from cache. Caution: might cause a kernel panic if DDC is too slow to respond!"
@@ -1023,6 +1026,7 @@ struct Lunar: ParsableCommand {
                         read: read,
                         systemInfo: systemInfo,
                         panelData: panelData,
+                        panelDataAllResolutions: panelDataAllResolutions,
                         edid: edid
                     )
                 } catch {
@@ -1044,11 +1048,20 @@ struct Lunar: ParsableCommand {
                         prefix: "  \"\(display.serial)\": ",
                         systemInfo: systemInfo,
                         panelData: panelData,
+                        panelDataAllResolutions: panelDataAllResolutions,
                         edid: edid
                     )
                 } else {
                     cliPrint("\(i): \(display.name)")
-                    try printDisplay(display, json: json, prefix: "\t", systemInfo: systemInfo, panelData: panelData, edid: edid)
+                    try printDisplay(
+                        display,
+                        json: json,
+                        prefix: "\t",
+                        systemInfo: systemInfo,
+                        panelData: panelData,
+                        panelDataAllResolutions: panelDataAllResolutions,
+                        edid: edid
+                    )
                     if i < displays.count - 1 {
                         cliPrint("")
                     }
@@ -1511,6 +1524,7 @@ private func printDisplay(
     prefix: String = "",
     systemInfo: Bool = false,
     panelData: Bool = false,
+    panelDataAllResolutions: Bool = false,
     edid: Bool = false
 ) throws {
     var edidStr = ""
@@ -1531,7 +1545,7 @@ private func printDisplay(
             dict["systemInfo"] = display.infoDictionary
         }
         if panelData, let panel = display.panel {
-            dict["panelData"] = getMonitorPanelDataJSON(panel)
+            dict["panelData"] = getMonitorPanelDataJSON(panel, includeModes: panelDataAllResolutions)
         }
         if edid {
             dict["edid"] = edidStr
@@ -1569,7 +1583,7 @@ private func printDisplay(
     }
 
     if panelData, let panel = display.panel {
-        let dict = getMonitorPanelDataJSON(panel)
+        let dict = getMonitorPanelDataJSON(panel, includeModes: panelDataAllResolutions)
         if dict.count != 0 {
             cliPrint("\(prefix)\(s("Panel Data"))")
             printDictionary(dict, level: 6, longestKeySize: longestKeySize)
@@ -1606,6 +1620,7 @@ private func handleDisplays(
     read: Bool = false,
     systemInfo: Bool = false,
     panelData: Bool = false,
+    panelDataAllResolutions: Bool = false,
     edid: Bool = false
 ) throws {
     // MARK: - Apply display filter to get single display
@@ -1636,6 +1651,7 @@ private func handleDisplays(
                         prefix: "  \"\(display.serial)\": ",
                         systemInfo: systemInfo,
                         panelData: panelData,
+                        panelDataAllResolutions: panelDataAllResolutions,
                         edid: edid
                     )
                 } else {
