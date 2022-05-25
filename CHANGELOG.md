@@ -1,3 +1,72 @@
+# 5.6.6a4
+## alpha 4
+
+### Hotfix
+
+* **Auto XDR** based on **ambient light** was setting brightness to 100% wrongly
+# 5.6.6a3
+## alpha 3
+
+### Features
+
+* **Auto XDR** based on **ambient light**
+    * XDR will automatically enable when the ambient light is really bright
+    * It will also disable when the ambient light is low enough for visibility in normal brightness
+    * The feature will only work on the **MacBook Pro 2021** when it is used alone *(without external monitors)*
+
+![auto xdr ambient light setting](https://files.lunar.fyi/auto-xdr-ambient-light.png)
+
+### Improvements
+
+* Automatically set Curve Slope to middle point on target monitors identical to the source
+* Print single property on multiple displays when using the `displays` CLI command 
+* Add **Hide Menubar Icon** setting on the [Configuration page](lunar://configuration)
+
+# 5.6.6a2
+## alpha 2
+
+### Features
+
+* Add option to use non-Apple monitors as sources for Sync Mode
+
+![non apple monitor as sync source setting](https://files.lunar.fyi/sync-source-non-apple.png)
+
+### Fixes
+
+* Fix CLI hanging
+
+# 5.6.6a1
+## alpha 1
+
+### Hotfix
+
+* Run some UI logging async to avoid blocking the main thread
+
+# 5.6.6
+## Features
+
+* **Auto XDR** based on **ambient light**
+    * XDR will automatically enable when the ambient light is really bright
+    * It will also disable when the ambient light is low enough for visibility in normal brightness
+    * The feature will only work on the **MacBook Pro 2021** when it is used alone *(without external monitors)*
+
+![auto xdr ambient light setting](https://files.lunar.fyi/auto-xdr-ambient-light.png)
+
+* Add option to use non-Apple monitors as sources for Sync Mode
+
+![non apple monitor as sync source setting](https://files.lunar.fyi/sync-source-non-apple.png)
+
+### Improvements
+
+* Automatically set Curve Slope to middle point on target monitors identical to the source
+* Print single property on multiple displays when using the `displays` CLI command 
+* Add **Hide Menubar Icon** setting on the [Configuration page](lunar://configuration)
+
+## Fixes
+
+* Fix CLI hanging
+* Run some UI logging async to avoid blocking the main thread
+
 # 5.6.5a1
 ## alpha 1
 
