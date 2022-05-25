@@ -3,6 +3,24 @@
     <channel>
         <title>Lunar</title>
         <item>
+            <title>5.6.6</title>
+            <pubDate>Wed, 25 May 2022 09:01:02 +0300</pubDate>
+            <link>https://lunar.fyi/</link>
+            <sparkle:fullReleaseNotesLink>https://lunar.fyi/changelog</sparkle:fullReleaseNotesLink>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <sparkle:version>5.6.6</sparkle:version>
+            <sparkle:shortVersionString>5.6.6</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-5.6.6.html</sparkle:releaseNotesLink>
+            <enclosure url="https://files.lunar.fyi/releases/Lunar-5.6.6.dmg" length="18635264" type="application/octet-stream" sparkle:edSignature="p8ZNx3adD5XjAYeE6GQJTwRVQjcZVbc4O+2IZlZPBHaShrZUJzfhUYlFRwmXBSsqsGjaSKY/EtSbnrr/TF/5Bw=="/>
+            <sparkle:deltas>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.6.6-5.6.5.delta" sparkle:deltaFrom="5.6.5" length="2226714" type="application/octet-stream" sparkle:edSignature="K8VL21u0D3iur9UkKtndJmEcaT4PJrXdB9fDZN3N/rgH1dRrCZHrZmhsUsl0YnL2vBTz84K7ASMrKVY4lGSzBA=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.6.6-5.6.4.delta" sparkle:deltaFrom="5.6.4" length="2453586" type="application/octet-stream" sparkle:edSignature="AZKYLoJeTiNeY5XKzIjZ30nt6K80FJvAfeQncu9OKFPKC8N71Z9fT9gzGcyN66oSx7QDb7FDDlKd6UzlWL2bCA=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.6.6-5.6.3.delta" sparkle:deltaFrom="5.6.3" length="3242814" type="application/octet-stream" sparkle:edSignature="uZ3E/29W6M8Adv7NwJMZgrk63MbuaeHx+mFonqidyEmYIUNm0zWCCGwfTRS4HApLJMggO2LsrzO4ZZDTzcMlAA=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.6.6-5.6.2.delta" sparkle:deltaFrom="5.6.2" length="3322998" type="application/octet-stream" sparkle:edSignature="0m+juVuyKFIujza7+29+KbOtGu11PK7h+QoUkPe7+4WZxoRm78mIjR8DsQDJJ6gKZzfBKIpvXgx59HkXkHsgBQ=="/>
+            </sparkle:deltas>
+        </item>
+        <item>
             <title>5.6.5</title>
             <pubDate>Tue, 17 May 2022 09:44:53 +0300</pubDate>
             <link>https://lunar.fyi/</link>
