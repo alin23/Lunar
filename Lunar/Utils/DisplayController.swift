@@ -1913,7 +1913,7 @@ class DisplayController: ObservableObject {
 
         displays.forEach { display in
             guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin,
-                  !display.lockedBrightness || !display.usesDDCBrightnessControl
+                  !display.lockedBrightness || display.hasSoftwareControl
             else { return }
 
             let set = {
@@ -2050,7 +2050,7 @@ class DisplayController: ObservableObject {
 
             if CachedDefaults[.mergeBrightnessContrast] {
                 let preciseValue: Double
-                if !display.lockedBrightness || !display.usesDDCBrightnessControl {
+                if !display.lockedBrightness || display.hasSoftwareControl {
                     preciseValue = mapNumber(
                         value.d,
                         fromLow: display.minBrightness.doubleValue,
