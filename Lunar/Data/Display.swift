@@ -2326,6 +2326,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     lazy var isMacBook: Bool = isBuiltin && Sysctl.isMacBook
 
+    lazy var usesDDCBrightnessControl: Bool = control is DDCControl || control is NetworkControl
+
     var averageDDCWriteNanoseconds: UInt64 { displayController.averageDDCWriteNanoseconds[id] ?? 0 }
     var averageDDCReadNanoseconds: UInt64 { displayController.averageDDCReadNanoseconds[id] ?? 0 }
 
@@ -2350,10 +2352,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             context = getContext()
             mainAsync { self.supportsEnhance = self.getSupportsEnhance() }
             guard let control = control else {
+                usesDDCBrightnessControl = false
                 hasSoftwareControl = false
                 isNative = false
                 return
             }
+            usesDDCBrightnessControl = control is DDCControl || control is NetworkControl
             hasSoftwareControl = control.isSoftware
             isNative = control is AppleNativeControl
 
@@ -2894,7 +2898,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             let (brightness, contrast) = sliderValueToBrightnessContrast(preciseBrightnessContrast)
 
             var smallDiff = abs(brightness.i - self.brightness.intValue) < 5
-            if !lockedBrightness {
+            if !lockedBrightness || !usesDDCBrightnessControl {
                 withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
                     mainThread {
                         withoutReapplyPreciseValue {
@@ -3055,7 +3059,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 }
             }
 
-            guard applyDisplayServices, DDC.apply, !lockedBrightness, force || brightness != oldValue else {
+            guard applyDisplayServices, DDC.apply, !lockedBrightness || !usesDDCBrightnessControl, force || brightness != oldValue else {
                 log.verbose(
                     "Won't apply brightness to \(description)",
                     context: [
@@ -3668,7 +3672,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         var brightness = brightness.uint16Value
         var contrast = contrast.uint16Value
 
-        if !lockedBrightness {
+        if !lockedBrightness || !usesDDCBrightnessControl {
             brightness = (mapNumber(
                 cap(value, minVal: 0.0, maxVal: 1.0),
                 fromLow: 0.0,
