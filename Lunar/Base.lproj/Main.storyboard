@@ -3948,13 +3948,21 @@ enabled</string>
                                                         <menuItem title="All displays" state="on" id="62m-O0-ejM">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
-                                                        <menuItem title="All external displays" tag="1" id="doT-eo-mJV">
-                                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                                        </menuItem>
                                                         <menuItem title="Display with cursor" tag="2" id="GdW-mS-8Xk">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
+                                                        <menuItem isSeparatorItem="YES" id="Mv1-Ul-451"/>
+                                                        <menuItem title="All external displays" tag="1" id="doT-eo-mJV">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
                                                         <menuItem title="Only the built-in display" tag="3" id="abB-Rf-rHp">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem isSeparatorItem="YES" id="Mv1-Ul-441"/>
+                                                        <menuItem title="All non-main displays" tag="6" id="kAH-41-hCs">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="Only the main display" tag="5" id="kAH-20-hCs">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
                                                     </items>
@@ -4004,16 +4012,24 @@ enabled</string>
                                                         <menuItem title="All displays" state="on" id="GrK-so-l5A">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
-                                                        <menuItem title="All external displays" tag="1" id="Nft-F4-bFg">
+                                                        <menuItem title="Display with cursor" tag="2" id="M2H-wT-ad6">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
-                                                        <menuItem title="Display with cursor" tag="2" id="M2H-wT-ad6">
+                                                        <menuItem isSeparatorItem="YES" id="Mv1-Ul-452"/>
+                                                        <menuItem title="All external displays" tag="1" id="Nft-F4-bFg">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
                                                         <menuItem title="Only the built-in display" tag="3" id="Hzq-Jb-7Kb">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
                                                         <menuItem title="Only the source display" tag="4" id="JSH-4r-aGr">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem isSeparatorItem="YES" id="Mv1-Ul-442"/>
+                                                        <menuItem title="All non-main displays" tag="6" id="kAH-42-hCs">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="Only the main display" tag="5" id="kAH-21-hCs">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
                                                     </items>
@@ -4057,13 +4073,21 @@ enabled</string>
                                                         <menuItem title="All displays" state="on" id="CRe-nn-c6r">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
-                                                        <menuItem title="All external displays" tag="1" id="S8T-6n-POX">
-                                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                                        </menuItem>
                                                         <menuItem title="Display with cursor" tag="2" id="hFL-Ed-gfs">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
+                                                        <menuItem isSeparatorItem="YES" id="Mv1-Ul-453"/>
+                                                        <menuItem title="All external displays" tag="1" id="S8T-6n-POX">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
                                                         <menuItem title="Only the built-in display" tag="3" id="X3A-II-Tkj">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem isSeparatorItem="YES" id="Mv1-Ul-443"/>
+                                                        <menuItem title="All non-main displays" tag="6" id="kAH-43-hCs">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="Only the main display" tag="5" id="kAH-22-hCs">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
                                                     </items>
@@ -4113,16 +4137,24 @@ enabled</string>
                                                         <menuItem title="All displays" state="on" id="K6k-uA-bhA">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
-                                                        <menuItem title="All external displays" tag="1" id="pkj-3J-Hza">
+                                                        <menuItem title="Display with cursor" tag="2" id="UUY-s2-edq">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
-                                                        <menuItem title="Display with cursor" tag="2" id="UUY-s2-edq">
+                                                        <menuItem isSeparatorItem="YES" id="Mv1-Ul-454"/>
+                                                        <menuItem title="All external displays" tag="1" id="pkj-3J-Hza">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
                                                         <menuItem title="Only the built-in display" tag="3" id="0ad-aC-bfd">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
                                                         <menuItem title="Only the source display" tag="4" id="jqX-dt-eG0">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem isSeparatorItem="YES" id="Mv1-Ul-444"/>
+                                                        <menuItem title="All non-main displays" tag="6" id="kAH-44-hCs">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="Only the main display" tag="5" id="kAH-23-hCs">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
                                                     </items>
@@ -4166,13 +4198,21 @@ enabled</string>
                                                         <menuItem title="All displays" state="on" id="fRv-Fr-fuC">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
-                                                        <menuItem title="All external displays" tag="1" id="b7e-bE-BFf">
-                                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                                        </menuItem>
                                                         <menuItem title="Display with cursor" tag="2" id="K8o-iv-0nt">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
+                                                        <menuItem isSeparatorItem="YES" id="Mv1-Ul-455"/>
+                                                        <menuItem title="All external displays" tag="1" id="b7e-bE-BFf">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
                                                         <menuItem title="Only the built-in display" tag="3" id="a5v-XD-ZHO">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem isSeparatorItem="YES" id="Mv1-Ul-445"/>
+                                                        <menuItem title="All non-main displays" tag="6" id="kAH-45-hCs">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="Only the main display" tag="5" id="kAH-24-hCs">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
                                                     </items>
@@ -4222,16 +4262,24 @@ enabled</string>
                                                         <menuItem title="All displays" state="on" id="fyN-kS-fMs">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
-                                                        <menuItem title="All external displays" tag="1" id="Rbk-Zr-Hj4">
+                                                        <menuItem title="Display with cursor" tag="2" id="imM-b5-gsB">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
-                                                        <menuItem title="Display with cursor" tag="2" id="imM-b5-gsB">
+                                                        <menuItem isSeparatorItem="YES" id="Mv1-Ul-456"/>
+                                                        <menuItem title="All external displays" tag="1" id="Rbk-Zr-Hj4">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
                                                         <menuItem title="Only the built-in display" tag="3" id="kAH-l8-hCs">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
                                                         <menuItem title="Only the source display" tag="4" id="gW9-1I-GaD">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem isSeparatorItem="YES" id="Mv1-Ul-446"/>
+                                                        <menuItem title="All non-main displays" tag="6" id="kAH-46-hCs">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                        <menuItem title="Only the main display" tag="5" id="kAH-l9-hCs">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
                                                         </menuItem>
                                                     </items>
