@@ -2278,7 +2278,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         for displays: [Display]? = nil,
         currentDisplay: Bool = false,
         builtinDisplay: Bool = false,
-        sourceDisplay: Bool = false
+        sourceDisplay: Bool = false,
+        mainDisplay: Bool = false,
+        nonMainDisplays: Bool = false
     ) {
         let amount = amount ?? CachedDefaults[.brightnessStep]
         displayController.adjustBrightness(
@@ -2286,7 +2288,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             for: displays,
             currentDisplay: currentDisplay,
             builtinDisplay: builtinDisplay,
-            sourceDisplay: sourceDisplay
+            sourceDisplay: sourceDisplay,
+            mainDisplay: mainDisplay,
+            nonMainDisplays: nonMainDisplays
         )
     }
 
@@ -2294,10 +2298,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         by amount: Int? = nil,
         for displays: [Display]? = nil,
         currentDisplay: Bool = false,
-        sourceDisplay: Bool = false
+        sourceDisplay: Bool = false,
+        mainDisplay: Bool = false,
+        nonMainDisplays: Bool = false
     ) {
         let amount = amount ?? CachedDefaults[.contrastStep]
-        displayController.adjustContrast(by: amount, for: displays, currentDisplay: currentDisplay, sourceDisplay: sourceDisplay)
+        displayController.adjustContrast(
+            by: amount,
+            for: displays,
+            currentDisplay: currentDisplay,
+            sourceDisplay: sourceDisplay,
+            mainDisplay: mainDisplay,
+            nonMainDisplays: nonMainDisplays
+        )
     }
 
     func decreaseBrightness(
@@ -2305,7 +2318,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         for displays: [Display]? = nil,
         currentDisplay: Bool = false,
         builtinDisplay: Bool = false,
-        sourceDisplay: Bool = false
+        sourceDisplay: Bool = false,
+        mainDisplay: Bool = false,
+        nonMainDisplays: Bool = false
     ) {
         let amount = amount ?? CachedDefaults[.brightnessStep]
         displayController.adjustBrightness(
@@ -2313,7 +2328,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             for: displays,
             currentDisplay: currentDisplay,
             builtinDisplay: builtinDisplay,
-            sourceDisplay: sourceDisplay
+            sourceDisplay: sourceDisplay,
+            mainDisplay: mainDisplay,
+            nonMainDisplays: nonMainDisplays
         )
     }
 
@@ -2321,10 +2338,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         by amount: Int? = nil,
         for displays: [Display]? = nil,
         currentDisplay: Bool = false,
-        sourceDisplay: Bool = false
+        sourceDisplay: Bool = false,
+        mainDisplay: Bool = false,
+        nonMainDisplays: Bool = false
     ) {
         let amount = amount ?? CachedDefaults[.contrastStep]
-        displayController.adjustContrast(by: -amount, for: displays, currentDisplay: currentDisplay, sourceDisplay: sourceDisplay)
+        displayController.adjustContrast(
+            by: -amount,
+            for: displays,
+            currentDisplay: currentDisplay,
+            sourceDisplay: sourceDisplay,
+            mainDisplay: mainDisplay,
+            nonMainDisplays: nonMainDisplays
+        )
     }
 
     @IBAction func setLight0Percent(sender _: Any?) {
