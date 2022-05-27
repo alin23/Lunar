@@ -433,6 +433,8 @@ enum BrightnessKeyAction: Int, CaseIterable, Defaults.Serializable {
     case cursor
     case builtin
     case source
+    case main
+    case nonMain
 }
 
 // MARK: - Hotkey
@@ -974,31 +976,60 @@ extension AppDelegate: MediaKeyTapDelegate {
         currentDisplay: Bool = false,
         builtinDisplay: Bool = false,
         sourceDisplay: Bool = false,
+        mainDisplay: Bool = false,
+        nonMainDisplays: Bool = false,
         allDisplays: Bool = false
     ) {
-        if contrast && builtinDisplay && !(allDisplays || currentDisplay || sourceDisplay) {
+        let builtinDisplay = builtinDisplay || (mainDisplay && (displayController.mainDisplay?.isBuiltin ?? false))
+        if contrast && builtinDisplay && !(allDisplays || nonMainDisplays || currentDisplay || sourceDisplay) {
             return
         }
 
         switch mediaKey {
         case .brightnessUp where contrast:
-            increaseContrast(by: value, currentDisplay: currentDisplay, sourceDisplay: sourceDisplay)
+            increaseContrast(
+                by: value,
+                currentDisplay: currentDisplay,
+                sourceDisplay: sourceDisplay,
+                mainDisplay: mainDisplay,
+                nonMainDisplays: nonMainDisplays
+            )
         case .brightnessUp where allDisplays:
             if builtinDisplay {
                 increaseBrightness(by: value, builtinDisplay: builtinDisplay)
             }
             increaseBrightness(by: value)
         case .brightnessUp:
-            increaseBrightness(by: value, currentDisplay: currentDisplay, builtinDisplay: builtinDisplay, sourceDisplay: sourceDisplay)
+            increaseBrightness(
+                by: value,
+                currentDisplay: currentDisplay,
+                builtinDisplay: builtinDisplay,
+                sourceDisplay: sourceDisplay,
+                mainDisplay: mainDisplay,
+                nonMainDisplays: nonMainDisplays
+            )
         case .brightnessDown where contrast:
-            decreaseContrast(by: value, currentDisplay: currentDisplay, sourceDisplay: sourceDisplay)
+            decreaseContrast(
+                by: value,
+                currentDisplay: currentDisplay,
+                sourceDisplay: sourceDisplay,
+                mainDisplay: mainDisplay,
+                nonMainDisplays: nonMainDisplays
+            )
         case .brightnessDown where allDisplays:
             if builtinDisplay {
                 decreaseBrightness(by: value, builtinDisplay: builtinDisplay)
             }
             decreaseBrightness(by: value)
         case .brightnessDown:
-            decreaseBrightness(by: value, currentDisplay: currentDisplay, builtinDisplay: builtinDisplay, sourceDisplay: sourceDisplay)
+            decreaseBrightness(
+                by: value,
+                currentDisplay: currentDisplay,
+                builtinDisplay: builtinDisplay,
+                sourceDisplay: sourceDisplay,
+                mainDisplay: mainDisplay,
+                nonMainDisplays: nonMainDisplays
+            )
         default:
             break
         }
@@ -1017,7 +1048,7 @@ extension AppDelegate: MediaKeyTapDelegate {
             }
         }
 
-        guard sourceDisplay || builtinDisplay || currentDisplay || allDisplays else {
+        guard sourceDisplay || builtinDisplay || currentDisplay || allDisplays || mainDisplay || nonMainDisplays else {
             log.info("showOSD()")
             if CachedDefaults[.workaroundBuiltinDisplay] {
                 displayController.externalActiveDisplays.forEach(showOSD)
@@ -1028,17 +1059,25 @@ extension AppDelegate: MediaKeyTapDelegate {
             return
         }
 
+        if mainDisplay, let display = displayController.mainDisplay {
+            log.info("showOSD(mainDisplay)")
+            showOSD(display)
+        }
         if sourceDisplay, let display = displayController.sourceDisplay {
             log.info("showOSD(sourceDisplay)")
             showOSD(display)
         }
-        if builtinDisplay, let display = displayController.builtinDisplay {
+        if builtinDisplay, let display = displayController.builtinDisplay, !mainDisplay {
             log.info("showOSD(builtinDisplay)")
             showOSD(display)
         }
         if currentDisplay, let display = displayController.cursorDisplay {
             log.info("showOSD(cursorDisplay)")
             showOSD(display)
+        }
+        if nonMainDisplays {
+            log.info("showOSD(nonMainDisplays)")
+            displayController.nonMainDisplays.forEach(showOSD)
         }
         if allDisplays {
             log.info("showOSD(allDisplays)")
@@ -1080,6 +1119,10 @@ extension AppDelegate: MediaKeyTapDelegate {
             adjust(mediaKey, by: offset, contrast: contrast, builtinDisplay: true, allDisplays: true)
         case .external:
             adjust(mediaKey, by: offset, contrast: contrast, allDisplays: true)
+        case .main:
+            adjust(mediaKey, by: offset, contrast: contrast, mainDisplay: true)
+        case .nonMain:
+            adjust(mediaKey, by: offset, contrast: contrast, nonMainDisplays: true)
         case .cursor:
             if CachedDefaults[.workaroundBuiltinDisplay], !contrast, let cursor = displayController.cursorDisplay, cursor.isBuiltin {
                 event.flags = event.flags.subtracting([.maskShift, .maskAlternate, .maskCommand, .maskControl])

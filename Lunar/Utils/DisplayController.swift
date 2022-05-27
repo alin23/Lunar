@@ -1989,7 +1989,9 @@ class DisplayController: ObservableObject {
         for displays: [Display]? = nil,
         currentDisplay: Bool = false,
         builtinDisplay: Bool = false,
-        sourceDisplay: Bool = false
+        sourceDisplay: Bool = false,
+        mainDisplay: Bool = false,
+        nonMainDisplays: Bool = false
     ) {
         guard checkRemainingAdjustments() else { return }
 
@@ -1997,11 +1999,13 @@ class DisplayController: ObservableObject {
             for: displays,
             currentDisplay: currentDisplay,
             builtinDisplay: builtinDisplay,
-            sourceDisplay: sourceDisplay
+            sourceDisplay: sourceDisplay,
+            mainDisplay: mainDisplay,
+            nonMainDisplays: nonMainDisplays
         ) { (display: Display) in
             guard !display.noControls, !display.blackOutEnabled else { return }
             if display.isBuiltin {
-                guard builtinDisplay || currentDisplay || sourceDisplay else { return }
+                guard builtinDisplay || currentDisplay || sourceDisplay || mainDisplay else { return }
             }
 
             var value = getFilledChicletValue(display.brightness.intValue, offset: offset)
@@ -2077,10 +2081,23 @@ class DisplayController: ObservableObject {
         }
     }
 
-    func adjustContrast(by offset: Int, for displays: [Display]? = nil, currentDisplay: Bool = false, sourceDisplay: Bool = false) {
+    func adjustContrast(
+        by offset: Int,
+        for displays: [Display]? = nil,
+        currentDisplay: Bool = false,
+        sourceDisplay: Bool = false,
+        mainDisplay: Bool = false,
+        nonMainDisplays: Bool = false
+    ) {
         guard checkRemainingAdjustments() else { return }
 
-        adjustValue(for: displays, currentDisplay: currentDisplay, sourceDisplay: sourceDisplay) { (display: Display) in
+        adjustValue(
+            for: displays,
+            currentDisplay: currentDisplay,
+            sourceDisplay: sourceDisplay,
+            mainDisplay: mainDisplay,
+            nonMainDisplays: nonMainDisplays
+        ) { (display: Display) in
             guard !display.isBuiltin, !display.blackOutEnabled else { return }
 
             var value = getFilledChicletValue(display.contrast.intValue, offset: offset)
@@ -2108,6 +2125,8 @@ class DisplayController: ObservableObject {
         currentAudioDisplay: Bool = false,
         builtinDisplay: Bool = false,
         sourceDisplay: Bool = false,
+        mainDisplay: Bool = false,
+        nonMainDisplays: Bool = false,
         _ setValue: (Display) -> Void
     ) {
         if currentAudioDisplay {
@@ -2128,6 +2147,14 @@ class DisplayController: ObservableObject {
             }
         } else if sourceDisplay {
             if let display = self.sourceDisplay {
+                setValue(display)
+            }
+        } else if mainDisplay {
+            if let display = self.mainDisplay {
+                setValue(display)
+            }
+        } else if nonMainDisplays {
+            self.nonMainDisplays.forEach { display in
                 setValue(display)
             }
         } else if let displays = displays {
