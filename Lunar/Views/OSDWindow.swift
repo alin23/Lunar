@@ -130,6 +130,96 @@ extension Color {
 
 // MARK: - BigSurSlider
 
+// public extension BigSurSlider where Label == AnyView {
+//    // MARK: Lifecycle
+//
+//    init(
+//        percentage: Binding<Float>,
+//        sliderWidth: CGFloat = 200,
+//        sliderHeight: CGFloat = 22,
+//        image: String? = nil,
+//        color: Color? = nil,
+//        colorBinding: Binding<Color?>? = nil,
+//        backgroundColor: Color = .black.opacity(0.1),
+//        backgroundColorBinding: Binding<Color>? = nil,
+//        knobColor: Color? = nil,
+//        knobColorBinding: Binding<Color?>? = nil,
+//        knobTextColor: Color? = nil,
+//        knobTextColorBinding: Binding<Color?>? = nil,
+//        showValue: Binding<Bool>? = nil,
+//        acceptsMouseEvents: Binding<Bool>? = nil,
+//        disabled: Binding<Bool>,
+//        enableText: String = "Enable"
+//    ) {
+//        self.init(
+//            percentage: percentage,
+//            sliderWidth: sliderWidth,
+//            sliderHeight: sliderHeight,
+//            image: image,
+//            color: color,
+//            colorBinding: colorBinding,
+//            backgroundColor: backgroundColor,
+//            backgroundColorBinding: backgroundColorBinding,
+//            knobColor: knobColor,
+//            knobColorBinding: knobColorBinding,
+//            knobTextColor: knobTextColor,
+//            knobTextColorBinding: knobTextColorBinding,
+//            showValue: showValue,
+//            acceptsMouseEvents: acceptsMouseEvents,
+//            disabled: disabled
+//        )
+//        label = AnyView(
+//            SwiftUI.Button(enableText) {
+//                self.disabled = false
+//            }
+//            .buttonStyle(FlatButton(color: Colors.red.opacity(0.7), textColor: .white, horizontalPadding: 6, verticalPadding: 2))
+//            .font(.system(size: 10, weight: .medium, design: .rounded))
+//        )
+//    }
+// }
+//
+// public extension BigSurSlider where Label == EmptyView {
+//    // MARK: Lifecycle
+//
+//    init(
+//        percentage: Binding<Float>,
+//        sliderWidth: CGFloat = 200,
+//        sliderHeight: CGFloat = 22,
+//        image: String? = nil,
+//        color: Color? = nil,
+//        colorBinding: Binding<Color?>? = nil,
+//        backgroundColor: Color = .black.opacity(0.1),
+//        backgroundColorBinding: Binding<Color>? = nil,
+//        knobColor: Color? = nil,
+//        knobColorBinding: Binding<Color?>? = nil,
+//        knobTextColor: Color? = nil,
+//        knobTextColorBinding: Binding<Color?>? = nil,
+//        showValue: Binding<Bool>? = nil,
+//        acceptsMouseEvents: Binding<Bool>? = nil,
+//        disabled: Binding<Bool>? = nil
+//    ) {
+//        self.init(
+//            percentage: percentage,
+//            sliderWidth: sliderWidth,
+//            sliderHeight: sliderHeight,
+//            image: image,
+//            color: color,
+//            colorBinding: colorBinding,
+//            backgroundColor: backgroundColor,
+//            backgroundColorBinding: backgroundColorBinding,
+//            knobColor: knobColor,
+//            knobColorBinding: knobColorBinding,
+//            knobTextColor: knobTextColor,
+//            knobTextColorBinding: knobTextColorBinding,
+//            showValue: showValue,
+//            acceptsMouseEvents: acceptsMouseEvents,
+//            disabled: disabled
+//        ) {
+//            EmptyView()
+//        }
+//    }
+// }
+
 public struct BigSurSlider: View {
     // MARK: Lifecycle
 
@@ -147,7 +237,9 @@ public struct BigSurSlider: View {
         knobTextColor: Color? = nil,
         knobTextColorBinding: Binding<Color?>? = nil,
         showValue: Binding<Bool>? = nil,
-        acceptsMouseEvents: Bool = true
+        acceptsMouseEvents: Binding<Bool>? = nil,
+        disabled: Binding<Bool>? = nil,
+        enableText: String? = nil
     ) {
         _knobColor = .constant(knobColor)
         _knobTextColor = .constant(knobTextColor)
@@ -159,9 +251,12 @@ public struct BigSurSlider: View {
         _color = colorBinding ?? .constant(color)
         _showValue = showValue ?? .constant(false)
         _backgroundColor = backgroundColorBinding ?? .constant(backgroundColor)
+        _acceptsMouseEvents = acceptsMouseEvents ?? .constant(true)
+        _disabled = disabled ?? .constant(false)
+        _enableText = State(initialValue: enableText)
+
         _knobColor = knobColorBinding ?? colorBinding ?? .constant(knobColor ?? colors.accent)
         _knobTextColor = knobTextColorBinding ?? .constant(knobTextColor ?? ((color ?? colors.accent).textColor))
-        _acceptsMouseEvents = State(initialValue: acceptsMouseEvents)
     }
 
     // MARK: Public
@@ -204,12 +299,31 @@ public struct BigSurSlider: View {
                         y: 0
                     )
                 }
+                .disabled(disabled)
+                .contrast(disabled ? 0.4 : 1.0)
+                .saturation(disabled ? 0.4 : 1.0)
+
+                if disabled, hovering, let enableText = enableText {
+                    SwiftUI.Button(enableText) {
+                        disabled = false
+                    }
+                    .buttonStyle(FlatButton(
+                        color: Colors.red.opacity(0.7),
+                        textColor: .white,
+                        horizontalPadding: 6,
+                        verticalPadding: 2
+                    ))
+                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .transition(.scale.animation(.spring()))
+                    .frame(maxWidth: .infinity, alignment: .center)
+                }
             }
             .frame(width: sliderWidth, height: sliderHeight)
             .cornerRadius(20)
             .gesture(
                 DragGesture(minimumDistance: 0)
                     .onChanged { value in
+                        guard acceptsMouseEvents, !disabled else { return }
                         if !env.draggingSlider {
                             if draggingSliderSetter == nil {
                                 draggingSliderSetter = mainAsyncAfter(ms: 200) {
@@ -224,6 +338,7 @@ public struct BigSurSlider: View {
                         self.percentage = cap(Float(value.location.x / geometry.size.width), minVal: 0, maxVal: 1)
                     }
                     .onEnded { value in
+                        guard acceptsMouseEvents, !disabled else { return }
                         draggingSliderSetter = nil
                         self.percentage = cap(Float(value.location.x / geometry.size.width), minVal: 0, maxVal: 1)
                         env.draggingSlider = false
@@ -232,8 +347,8 @@ public struct BigSurSlider: View {
             .animation(.fastSpring, value: percentage)
             #if os(macOS)
                 .onHover { hov in
-                    guard acceptsMouseEvents else { return }
                     hovering = hov
+                    guard acceptsMouseEvents, !disabled else { return }
 
                     if hovering {
                         lastCursorPosition = NSEvent.mouseLocation
@@ -251,13 +366,11 @@ public struct BigSurSlider: View {
         }
         .frame(width: sliderWidth, height: sliderHeight)
         .onChange(of: env.draggingSlider) { tracking in
-
             AppleNativeControl.sliderTracking = tracking || hovering
             GammaControl.sliderTracking = tracking || hovering
             DDCControl.sliderTracking = tracking || hovering
         }
         .onChange(of: hovering) { tracking in
-
             AppleNativeControl.sliderTracking = tracking || env.draggingSlider
             GammaControl.sliderTracking = tracking || env.draggingSlider
             DDCControl.sliderTracking = tracking || env.draggingSlider
@@ -283,8 +396,10 @@ public struct BigSurSlider: View {
     @State var scrollWheelListener: Cancellable?
 
     @State var hovering = false
+    @State var enableText: String? = nil
     @State var lastCursorPosition = NSEvent.mouseLocation
-    @State var acceptsMouseEvents = true
+    @Binding var acceptsMouseEvents: Bool
+    @Binding var disabled: Bool
 
     #if os(macOS)
         func trackScrollWheel() {
@@ -486,7 +601,7 @@ struct BrightnessOSDView: View {
                     backgroundColor: Colors.xdr.opacity(colorScheme == .dark ? 0.1 : 0.2),
                     knobColor: Colors.xdr,
                     showValue: .constant(true),
-                    acceptsMouseEvents: false
+                    acceptsMouseEvents: .constant(false)
                 )
             } else {
                 BigSurSlider(
@@ -496,7 +611,7 @@ struct BrightnessOSDView: View {
                     backgroundColor: Colors.subzero.opacity(colorScheme == .dark ? 0.1 : 0.2),
                     knobColor: Colors.subzero,
                     showValue: .constant(true),
-                    acceptsMouseEvents: false
+                    acceptsMouseEvents: .constant(false)
                 )
             }
         }
@@ -546,7 +661,7 @@ struct AutoBlackOutOSDView: View {
                 backgroundColor: Colors.red.opacity(colorScheme == .dark ? 0.1 : 0.2),
                 knobColor: .clear,
                 showValue: .constant(false),
-                acceptsMouseEvents: false
+                acceptsMouseEvents: .constant(false)
             )
             HStack(spacing: 3) {
                 Text("Press")
