@@ -209,12 +209,21 @@ struct DisplayRowView: View {
             if xdrSelectorShown { sdrXdrSelector }
 
             if display.noDDCOrMergedBrightnessContrast {
+                let mergedLockBinding = Binding<Bool>(
+                    get: { display.lockedBrightness && display.lockedContrast },
+                    set: { locked in
+                        display.lockedBrightness = locked
+                        display.lockedContrast = locked
+                    }
+                )
                 BigSurSlider(
                     percentage: $display.preciseBrightnessContrast.f,
                     image: "sun.max.fill",
                     colorBinding: .constant(colors.accent),
                     backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
-                    showValue: $showSliderValues
+                    showValue: $showSliderValues,
+                    disabled: mergedLockBinding,
+                    enableText: "Unlock"
                 )
                 softwareSliders
             } else {
@@ -223,7 +232,9 @@ struct DisplayRowView: View {
                     image: "sun.max.fill",
                     colorBinding: .constant(colors.accent),
                     backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
-                    showValue: $showSliderValues
+                    showValue: $showSliderValues,
+                    disabled: $display.lockedBrightness,
+                    enableText: "Unlock"
                 )
                 softwareSliders
                 BigSurSlider(
@@ -231,7 +242,9 @@ struct DisplayRowView: View {
                     image: "circle.righthalf.fill",
                     colorBinding: .constant(colors.accent),
                     backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
-                    showValue: $showSliderValues
+                    showValue: $showSliderValues,
+                    disabled: $display.lockedContrast,
+                    enableText: "Unlock"
                 )
             }
 
@@ -470,11 +483,10 @@ struct AdvancedSettingsView: View {
                         color: Colors.lightGray,
                         backgroundColor: Colors.grayMauve.opacity(0.1),
                         knobColor: Colors.lightGray,
-                        showValue: .constant(false)
+                        showValue: .constant(false),
+                        disabled: !$xdrContrast
                     )
                     .padding(.leading)
-                    .disabled(!xdrContrast)
-                    .contrast(xdrContrast ? 1.0 : 0.2)
 
                     SwiftUI.Button("Reset") { xdrContrastFactor = 0.3 }
                         .buttonStyle(FlatButton(
@@ -701,11 +713,10 @@ struct QuickActionsLayoutView: View {
                     color: Colors.lightGray,
                     backgroundColor: Colors.grayMauve.opacity(0.1),
                     knobColor: Colors.lightGray,
-                    showValue: .constant(false)
+                    showValue: .constant(false),
+                    disabled: !$autoXdrSensor
                 )
                 .padding(.leading)
-                .disabled(!autoXdrSensor)
-                .contrast(autoXdrSensor ? 1.0 : 0.2)
 
                 SwiftUI.Button("Reset") { autoXdrSensorLuxThreshold = 10000 }
                     .buttonStyle(FlatButton(
