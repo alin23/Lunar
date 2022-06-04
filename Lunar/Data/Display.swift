@@ -266,6 +266,14 @@ struct GammaTable: Equatable {
     }
 
     init(for id: CGDirectDisplayID, allowZero: Bool = false) {
+        guard !displayController.gammaDisabledCompletely else {
+            red = Self.original.red
+            green = Self.original.green
+            blue = Self.original.blue
+            samples = Self.original.samples
+            return
+        }
+
         var redTable = [CGGammaValue](repeating: 0, count: 256)
         var greenTable = [CGGammaValue](repeating: 0, count: 256)
         var blueTable = [CGGammaValue](repeating: 0, count: 256)
@@ -316,6 +324,8 @@ struct GammaTable: Equatable {
 
     @discardableResult
     func apply(to id: CGDirectDisplayID, force: Bool = false) -> Bool {
+        guard !displayController.gammaDisabledCompletely else { return true }
+
         log.debug("Applying gamma table to ID \(id)")
         guard force || !isZero else {
             log.debug("Zero gamma table: samples=\(samples)")

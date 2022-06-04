@@ -94,6 +94,8 @@ class DisplayController: ObservableObject {
     @Published var activeDisplayList: [Display] = []
 
     @Atomic var lastPidCount = 0
+    @Atomic var gammaDisabledCompletely = CachedDefaults[.gammaDisabledCompletely]
+
     @Atomic var lidClosed: Bool = isLidClosed() {
         didSet {
             guard lidClosed != oldValue else { return }
@@ -268,16 +270,60 @@ class DisplayController: ObservableObject {
             self.screencaptureWatcherTask = nil
         }.store(in: &observers)
 
-        mergeBrightnessContrastPublisher.sink { change in
-            mainAsync { [self] in
+        gammaDisabledCompletelyPublisher
+            .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
+            .sink { [self] change in
+                if change.newValue {
+                    restoreColorSyncSettings()
+                }
+
+                gammaDisabledCompletely = change.newValue
+                guard change.newValue else {
+                    if let oldVal = CachedDefaults[.oldHdrWorkaround] { CachedDefaults[.hdrWorkaround] = oldVal }
+                    if let oldVal = CachedDefaults[.oldAutoXdr] { CachedDefaults[.autoXdr] = oldVal }
+                    if let oldVal = CachedDefaults[.oldAutoXdrSensor] { CachedDefaults[.autoXdrSensor] = oldVal }
+                    if let oldVal = CachedDefaults[.oldAutoSubzero] { CachedDefaults[.autoSubzero] = oldVal }
+                    if let oldVal = CachedDefaults[.oldXdrContrast] { CachedDefaults[.xdrContrast] = oldVal }
+                    if let oldVal = CachedDefaults[.oldShowXDRSelector] { CachedDefaults[.showXDRSelector] = oldVal }
+                    if let oldVal = CachedDefaults[.oldAllowHDREnhanceBrightness] { CachedDefaults[.allowHDREnhanceBrightness] = oldVal }
+                    if let oldVal = CachedDefaults[.oldAllowHDREnhanceContrast] { CachedDefaults[.allowHDREnhanceContrast] = oldVal }
+                    return
+                }
+
+                displays.values.forEach {
+                    $0.gammaEnabled = false
+                }
+
+                CachedDefaults[.oldHdrWorkaround] = CachedDefaults[.hdrWorkaround]
+                CachedDefaults[.oldAutoXdr] = CachedDefaults[.autoXdr]
+                CachedDefaults[.oldAutoXdrSensor] = CachedDefaults[.autoXdrSensor]
+                CachedDefaults[.oldAutoSubzero] = CachedDefaults[.autoSubzero]
+                CachedDefaults[.oldXdrContrast] = CachedDefaults[.xdrContrast]
+                CachedDefaults[.oldShowXDRSelector] = CachedDefaults[.showXDRSelector]
+                CachedDefaults[.oldAllowHDREnhanceBrightness] = CachedDefaults[.allowHDREnhanceBrightness]
+                CachedDefaults[.oldAllowHDREnhanceContrast] = CachedDefaults[.allowHDREnhanceContrast]
+
+                CachedDefaults[.hdrWorkaround] = false
+                CachedDefaults[.autoXdr] = false
+                CachedDefaults[.autoXdrSensor] = false
+                CachedDefaults[.autoSubzero] = false
+                CachedDefaults[.xdrContrast] = false
+                CachedDefaults[.showXDRSelector] = false
+                CachedDefaults[.allowHDREnhanceBrightness] = false
+                CachedDefaults[.allowHDREnhanceContrast] = false
+            }.store(in: &observers)
+
+        mergeBrightnessContrastPublisher
+            .debounce(for: .milliseconds(50), scheduler: RunLoop.main)
+            .sink { [self] change in
                 displays.values.forEach {
                     $0.noDDCOrMergedBrightnessContrast = !$0.hasDDC || change.newValue
                 }
-            }
-        }.store(in: &observers)
+            }.store(in: &observers)
 
-        showOrientationInQuickActionsPublisher.sink { [self] change in
-            mainAsync { [self] in
+        showOrientationInQuickActionsPublisher
+            .debounce(for: .milliseconds(50), scheduler: RunLoop.main)
+            .sink { [self] change in
                 displays.values.forEach {
                     #if DEBUG
                         $0.showOrientation = change.newValue
@@ -285,16 +331,15 @@ class DisplayController: ObservableObject {
                         $0.showOrientation = $0.canRotate && change.newValue
                     #endif
                 }
-            }
-        }.store(in: &observers)
+            }.store(in: &observers)
 
-        showVolumeSliderPublisher.sink { [self] change in
-            mainAsync { [self] in
+        showVolumeSliderPublisher
+            .debounce(for: .milliseconds(50), scheduler: RunLoop.main)
+            .sink { [self] change in
                 displays.values.forEach {
                     $0.showVolumeSlider = $0.canChangeVolume && change.newValue
                 }
-            }
-        }.store(in: &observers)
+            }.store(in: &observers)
 
         showTwoSchedulesPublisher.sink { [self] change in
             guard !change.newValue else { return }
