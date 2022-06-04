@@ -20,6 +20,15 @@ enum BrightnessTransition: Int, CaseIterable, Defaults.Serializable {
 }
 
 let APP_SETTINGS: [Defaults.Keys] = [
+    .oldHdrWorkaround,
+    .oldAutoXdr,
+    .oldAutoXdrSensor,
+    .oldAutoSubzero,
+    .oldXdrContrast,
+    .oldShowXDRSelector,
+    .oldAllowHDREnhanceBrightness,
+    .oldAllowHDREnhanceContrast,
+
     .adaptiveBrightnessMode,
     .colorScheme,
     .autoSubzero,
@@ -27,6 +36,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .autoXdrSensor,
     .autoXdrSensorLuxThreshold,
     .allowAnySyncSource,
+    .gammaDisabledCompletely,
     .hdrWorkaround,
     .oldBlackOutMirroring,
     .disableNightShiftXDR,
@@ -646,11 +656,23 @@ func initCache() {
     cacheKey(.showAirplayDisplays)
     cacheKey(.showProjectorDisplays)
     cacheKey(.showDisconnectedDisplays)
+
     cacheKey(.autoSubzero)
     cacheKey(.autoXdr)
     cacheKey(.autoXdrSensor)
     cacheKey(.autoXdrSensorLuxThreshold)
     cacheKey(.allowAnySyncSource)
+
+    cacheKey(.gammaDisabledCompletely)
+    cacheKey(.oldHdrWorkaround)
+    cacheKey(.oldAutoXdr)
+    cacheKey(.oldAutoXdrSensor)
+    cacheKey(.oldAutoSubzero)
+    cacheKey(.oldXdrContrast)
+    cacheKey(.oldShowXDRSelector)
+    cacheKey(.oldAllowHDREnhanceBrightness)
+    cacheKey(.oldAllowHDREnhanceContrast)
+
     cacheKey(.hdrWorkaround)
     cacheKey(.oldBlackOutMirroring)
     cacheKey(.disableNightShiftXDR)
@@ -796,6 +818,17 @@ extension Defaults.Keys {
     static let autoXdrSensor = Key<Bool>("autoXdrSensor", default: false)
     static let autoXdrSensorLuxThreshold = Key<Float>("autoXdrSensorLuxThreshold", default: 10000)
     static let allowAnySyncSource = Key<Bool>("allowAnySyncSource", default: false)
+
+    static let gammaDisabledCompletely = Key<Bool>("gammaDisabledCompletely", default: false)
+    static let oldHdrWorkaround = Key<Bool?>("oldHdrWorkaround", default: nil)
+    static let oldAutoXdr = Key<Bool?>("oldAutoXdr", default: nil)
+    static let oldAutoXdrSensor = Key<Bool?>("oldAutoXdrSensor", default: nil)
+    static let oldAutoSubzero = Key<Bool?>("oldAutoSubzero", default: nil)
+    static let oldXdrContrast = Key<Bool?>("oldXdrContrast", default: nil)
+    static let oldShowXDRSelector = Key<Bool?>("oldShowXDRSelector", default: nil)
+    static let oldAllowHDREnhanceBrightness = Key<Bool?>("oldAllowHDREnhanceBrightness", default: nil)
+    static let oldAllowHDREnhanceContrast = Key<Bool?>("oldAllowHDREnhanceContrast", default: nil)
+
     static let hdrWorkaround = Key<Bool>("hdrWorkaround", default: true)
     static let oldBlackOutMirroring = Key<Bool>("oldBlackOutMirroring", default: false)
     static let disableNightShiftXDR = Key<Bool>("disableNightShiftXDR", default: false)
@@ -967,6 +1000,8 @@ let autoXdrSensorPublisher = Defaults.publisher(.autoXdrSensor).removeDuplicates
 let autoXdrSensorLuxThresholdPublisher = Defaults.publisher(.autoXdrSensorLuxThreshold).removeDuplicates().dropFirst()
     .filter { $0.oldValue != $0.newValue }
 let allowAnySyncSourcePublisher = Defaults.publisher(.allowAnySyncSource).removeDuplicates().dropFirst()
+    .filter { $0.oldValue != $0.newValue }
+let gammaDisabledCompletelyPublisher = Defaults.publisher(.gammaDisabledCompletely).removeDuplicates().dropFirst()
     .filter { $0.oldValue != $0.newValue }
 let hdrWorkaroundPublisher = Defaults.publisher(.hdrWorkaround).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let oldBlackOutMirroringPublisher = Defaults.publisher(.oldBlackOutMirroring).removeDuplicates().dropFirst()

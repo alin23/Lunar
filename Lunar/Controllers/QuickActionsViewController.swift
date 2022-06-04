@@ -417,6 +417,7 @@ struct AdvancedSettingsView: View {
     @Default(.xdrContrastFactor) var xdrContrastFactor
     @Default(.allowHDREnhanceBrightness) var allowHDREnhanceBrightness
     @Default(.allowHDREnhanceContrast) var allowHDREnhanceContrast
+    @Default(.gammaDisabledCompletely) var gammaDisabledCompletely
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -595,11 +596,27 @@ struct AdvancedSettingsView: View {
                     """
                 )
                 SettingsToggle(
-                    text: "Refresh values from monitor settings ", setting: $refreshValues,
+                    text: "Refresh values from monitor settings", setting: $refreshValues,
                     help: """
                     Keep Lunar state in sync by reading monitor settings periodically.
 
                     Caution: This can freeze the system if a monitor doesn't support reading.
+                    """
+                )
+                SettingsToggle(
+                    text: "Disable usage of Gamma API completely", setting: $gammaDisabledCompletely,
+                    help: """
+                    Experimental: for people running into macOS bugs like the color profile
+                    being constantly reset, display turning to monochrome or HDR being disabled,
+                    this could be a safe measure to ensure Lunar never touches the Gamma API of macOS.
+
+                    This will disable or cripple the following features:
+
+                    • XDR Brightness
+                    • Facelight
+                    • Blackout
+                    • Software Dimming
+                    • Sub-zero Dimming
                     """
                 )
             }
