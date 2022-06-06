@@ -595,30 +595,43 @@ struct AdvancedSettingsView: View {
                     helpful to disable the Pi desktop if you don't need it.
                     """
                 )
-                SettingsToggle(
-                    text: "Refresh values from monitor settings", setting: $refreshValues,
-                    help: """
-                    Keep Lunar state in sync by reading monitor settings periodically.
+                Divider()
+                Group {
+                    Text("EXPERIMENTAL!")
+                        .foregroundColor(Colors.red)
+                        .bold()
+                    Text("Don't use unless really needed or asked by the developer")
+                        .foregroundColor(Colors.red)
+                        .font(.caption)
+                    SettingsToggle(
+                        text: "Refresh values from monitor settings", setting: $refreshValues,
+                        help: """
+                        Keep Lunar state in sync by reading monitor settings periodically.
 
-                    Caution: This can freeze the system if a monitor doesn't support reading.
-                    """
-                )
-                SettingsToggle(
-                    text: "Disable usage of Gamma API completely", setting: $gammaDisabledCompletely,
-                    help: """
-                    Experimental: for people running into macOS bugs like the color profile
-                    being constantly reset, display turning to monochrome or HDR being disabled,
-                    this could be a safe measure to ensure Lunar never touches the Gamma API of macOS.
+                        This is only useful if monitor values are changed externally,
+                        from another computer or through special buttons/knobs.
 
-                    This will disable or cripple the following features:
+                        Caution: Most monitors don't support read commands and enabling this setting
+                        can cause many issues with losing signal, system freezes, hanging apps etc.
+                        """
+                    )
+                    SettingsToggle(
+                        text: "Disable usage of Gamma API completely", setting: $gammaDisabledCompletely,
+                        help: """
+                        Experimental: for people running into macOS bugs like the color profile
+                        being constantly reset, display turning to monochrome or HDR being disabled,
+                        this could be a safe measure to ensure Lunar never touches the Gamma API of macOS.
 
-                    • XDR Brightness
-                    • Facelight
-                    • Blackout
-                    • Software Dimming
-                    • Sub-zero Dimming
-                    """
-                )
+                        This will disable or cripple the following features:
+
+                        • XDR Brightness
+                        • Facelight
+                        • Blackout
+                        • Software Dimming
+                        • Sub-zero Dimming
+                        """
+                    )
+                }
             }
             Spacer()
             Color.clear
@@ -1101,7 +1114,7 @@ struct QuickActionsMenuView: View {
                     .font(.system(size: 12, weight: .medium))
                     .frame(maxWidth: .infinity, alignment: .center)
 
-                }.frame(width: 390, height: 650, alignment: .center)
+                }.frame(width: 390, height: 680, alignment: .center)
             }
             .onChange(of: showBrightnessMenuBar) { _ in
                 let old = showOptionsMenu
