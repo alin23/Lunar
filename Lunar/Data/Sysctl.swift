@@ -18,10 +18,11 @@
 //  IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 //
 import Foundation
+import IOKit.ps
 
 let NATIVE_EXECUTION = Int32(0)
 let EMULATED_EXECUTION = Int32(1)
-let UNKONWN_EXECUTION = -Int32(1)
+let UNKNOWN_EXECUTION = -Int32(1)
 
 // MARK: - Sysctl
 
@@ -113,6 +114,23 @@ public enum Sysctl {
     /// e.g. "Darwin Kernel Version 15.3.0: Thu Dec 10 18:40:58 PST 2015; root:xnu-3248.30.4~1/RELEASE_X86_64" or
     /// "Darwin Kernel Version 15.0.0: Wed Dec  9 22:19:38 PST 2015; root:xnu-3248.31.3~2/RELEASE_ARM64_S8000"
     public static var version: String { try! Sysctl.string(for: [CTL_KERN, KERN_VERSION]) }
+
+    public static func batteryLevel() -> Double? {
+        guard isMacBook, let snapshot = IOPSCopyPowerSourcesInfo()?.takeRetainedValue(),
+              let sources: NSArray = IOPSCopyPowerSourcesList(snapshot)?.takeRetainedValue()
+        else { return nil }
+
+        for ps in sources {
+            guard let info: NSDictionary = IOPSGetPowerSourceDescription(snapshot, ps as CFTypeRef)?.takeUnretainedValue(),
+                  let capacity = info[kIOPSCurrentCapacityKey] as? Int,
+                  let max = info[kIOPSMaxCapacityKey] as? Int
+            else { continue }
+
+            return (max > 0) ? (Double(capacity) / Double(max)) : Double(capacity)
+        }
+
+        return nil
+    }
 
     /// Access the raw data for an array of sysctl identifiers.
     public static func data(for keys: [Int32]) throws -> [Int8] {

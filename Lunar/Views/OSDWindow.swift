@@ -239,7 +239,8 @@ public struct BigSurSlider: View {
         showValue: Binding<Bool>? = nil,
         acceptsMouseEvents: Binding<Bool>? = nil,
         disabled: Binding<Bool>? = nil,
-        enableText: String? = nil
+        enableText: String? = nil,
+        mark: Binding<Float>? = nil
     ) {
         _knobColor = .constant(knobColor)
         _knobTextColor = .constant(knobTextColor)
@@ -254,6 +255,7 @@ public struct BigSurSlider: View {
         _acceptsMouseEvents = acceptsMouseEvents ?? .constant(true)
         _disabled = disabled ?? .constant(false)
         _enableText = State(initialValue: enableText)
+        _mark = mark ?? .constant(0)
 
         _knobColor = knobColorBinding ?? colorBinding ?? .constant(knobColor ?? colors.accent)
         _knobTextColor = knobTextColorBinding ?? .constant(knobTextColor ?? ((color ?? colors.accent).textColor))
@@ -298,6 +300,15 @@ public struct BigSurSlider: View {
                         x: cgPercentage * w,
                         y: 0
                     )
+                    if mark > 0 {
+                        RoundedRectangle(cornerRadius: 1, style: .continuous)
+                            .fill(Color.red)
+                            .frame(width: 3, height: sliderHeight, alignment: .center)
+                            .offset(
+                                x: cap(mark, minVal: 0, maxVal: 1).cg * w,
+                                y: 0
+                            ).animation(.fastSpring, value: mark)
+                    }
                 }
                 .disabled(disabled)
                 .contrast(disabled ? 0.4 : 1.0)
@@ -400,6 +411,7 @@ public struct BigSurSlider: View {
     @State var lastCursorPosition = NSEvent.mouseLocation
     @Binding var acceptsMouseEvents: Bool
     @Binding var disabled: Bool
+    @Binding var mark: Float
 
     #if os(macOS)
         func trackScrollWheel() {
@@ -636,12 +648,17 @@ struct BrightnessOSDView: View {
     }
 }
 
-// MARK: - AutoBlackOutOSDView
+// MARK: - AutoOSDView
 
-struct AutoBlackOutOSDView: View {
+struct AutoOSDView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.colors) var colors
     @ObservedObject var display: Display
+    @Binding var done: Bool
+    @State var title: String
+    @State var subtitle: String
+    @State var color: Color
+    @State var icon: String
     @State var progress: Float = 0.0
     @State var opacity: CGFloat = 1.0
 
@@ -649,16 +666,20 @@ struct AutoBlackOutOSDView: View {
 
     var body: some View {
         VStack {
-            Text("Turning off")
+            Text(title)
                 .font(.system(size: 16, weight: .semibold, design: .monospaced))
-            Text(display.name)
-                .font(.system(size: 14, weight: .heavy, design: .monospaced))
+            Text(subtitle)
+                .font(.system(size: 14, weight: .bold, design: .monospaced))
+                .lineLimit(1)
+                .scaledToFit()
+                .minimumScaleFactor(.leastNonzeroMagnitude)
+                .padding(.horizontal, 10)
 
             BigSurSlider(
                 percentage: $progress,
-                image: "power.circle.fill",
-                color: Colors.red.opacity(0.8),
-                backgroundColor: Colors.red.opacity(colorScheme == .dark ? 0.1 : 0.2),
+                image: icon,
+                color: color.opacity(0.8),
+                backgroundColor: color.opacity(colorScheme == .dark ? 0.1 : 0.2),
                 knobColor: .clear,
                 showValue: .constant(false),
                 acceptsMouseEvents: .constant(false)
@@ -700,12 +721,12 @@ struct AutoBlackOutOSDView: View {
         .padding(.vertical, 30)
         .colors(colorScheme == .dark ? .dark : .light)
         .onAppear {
-            let step = 0.1 / (AUTO_BLACKOUT_DEBOUNCE_SECONDS - 0.5).f
+            let step = 0.1 / (AUTO_OSD_DEBOUNCE_SECONDS - 0.5).f
             timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { t in
-                guard progress < 1, !display.blackOutEnabled else {
+                guard progress < 1, !done else {
                     t.invalidate()
                     withAnimation(.easeOut(duration: 0.25)) { opacity = 0.0 }
-                    display.autoBlackoutOsdWindowController?.close()
+                    display.autoOsdWindowController?.close()
                     return
                 }
                 progress += step
@@ -718,40 +739,91 @@ struct AutoBlackOutOSDView: View {
     }
 }
 
-let AUTO_BLACKOUT_DEBOUNCE_SECONDS = 3.0
+let AUTO_OSD_DEBOUNCE_SECONDS = 4.0
 let OSD_WIDTH: CGFloat = 300
 
 // MARK: - AutoBlackOutOSDView_Previews
 
 struct AutoBlackOutOSDView_Previews: PreviewProvider {
     static var previews: some View {
+        let display = displayController.firstDisplay
         Group {
-            AutoBlackOutOSDView(display: displayController.firstDisplay)
-                .frame(maxWidth: OSD_WIDTH)
-                .colors(.light)
-                .preferredColorScheme(.light)
-            AutoBlackOutOSDView(display: displayController.firstDisplay)
-                .frame(maxWidth: OSD_WIDTH)
-                .colors(.dark)
-                .preferredColorScheme(.dark)
+            AutoOSDView(
+                display: display,
+                done: .constant(false),
+                title: "Turning off",
+                subtitle: display.name,
+                color: Colors.red,
+                icon: "power.circle.fill"
+            )
+            .environmentObject(EnvState())
+            .frame(maxWidth: OSD_WIDTH)
+            .colors(.light)
+            .preferredColorScheme(.light)
+            AutoOSDView(
+                display: display,
+                done: .constant(false),
+                title: "Turning off",
+                subtitle: display.name,
+                color: Colors.red,
+                icon: "power.circle.fill"
+            )
+            .environmentObject(EnvState())
+            .frame(maxWidth: OSD_WIDTH)
+            .colors(.dark)
+            .preferredColorScheme(.dark)
+        }
+    }
+}
+
+// MARK: - AutoXdrOSDView_Previews
+
+struct AutoXdrOSDView_Previews: PreviewProvider {
+    static var previews: some View {
+        let display = displayController.firstDisplay
+        Group {
+            AutoOSDView(
+                display: display,
+                done: .constant(false),
+                title: "Activating XDR",
+                subtitle: "Ambient light at 10000 lux",
+                color: Colors.xdr,
+                icon: "sun.max.circle.fill"
+            )
+            .environmentObject(EnvState())
+            .frame(maxWidth: OSD_WIDTH)
+            .colors(.light)
+            .preferredColorScheme(.light)
+            AutoOSDView(
+                display: display,
+                done: .constant(false),
+                title: "Disabling XDR",
+                subtitle: "Ambient light at 8000 lux",
+                color: Colors.xdr,
+                icon: "sun.max.circle.fill"
+            )
+            .environmentObject(EnvState())
+            .frame(maxWidth: OSD_WIDTH)
+            .colors(.dark)
+            .preferredColorScheme(.dark)
         }
     }
 }
 
 // MARK: - BrightnessOSDView_Previews
 
-struct BrightnessOSDView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            BrightnessOSDView(display: displayController.firstDisplay)
-                .frame(maxWidth: OSD_WIDTH)
-                .preferredColorScheme(.light)
-            BrightnessOSDView(display: displayController.firstDisplay)
-                .frame(maxWidth: OSD_WIDTH)
-                .preferredColorScheme(.dark)
-        }
-    }
-}
+// struct BrightnessOSDView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        Group {
+//            BrightnessOSDView(display: displayController.firstDisplay)
+//                .frame(maxWidth: OSD_WIDTH)
+//                .preferredColorScheme(.light)
+//            BrightnessOSDView(display: displayController.firstDisplay)
+//                .frame(maxWidth: OSD_WIDTH)
+//                .preferredColorScheme(.dark)
+//        }
+//    }
+// }
 
 extension Display {
     func showSoftwareOSD() {
@@ -778,22 +850,56 @@ extension Display {
     func showAutoBlackOutOSD() {
         mainAsync { [weak self] in
             guard let self = self, !self.blackOutEnabled else {
-                self?.autoBlackoutOsdWindowController?.close()
+                self?.autoOsdWindowController?.close()
                 return
             }
-            self.autoBlackoutOsdWindowController?.close()
-            self.autoBlackoutOsdWindowController = OSDWindow(
+            self.autoOsdWindowController?.close()
+            self.autoOsdWindowController = OSDWindow(
                 swiftuiView: AnyView(
-                    AutoBlackOutOSDView(display: self)
-                        .colors(darkMode ? .dark : .light)
-                        .environmentObject(EnvState())
+                    AutoOSDView(
+                        display: self,
+                        done: .oneway { [weak self] in self?.blackOutEnabled ?? true },
+                        title: "Turning off",
+                        subtitle: self.name,
+                        color: Colors.red,
+                        icon: "power.circle.fill"
+                    )
+                    .colors(darkMode ? .dark : .light)
+                    .environmentObject(EnvState())
                 ),
                 display: self, releaseWhenClosed: true
             ).wc
 
-            guard let osd = self.autoBlackoutOsdWindowController?.window as? OSDWindow else { return }
+            guard let osd = self.autoOsdWindowController?.window as? OSDWindow else { return }
 
-            osd.show(closeAfter: 1000, fadeAfter: ((AUTO_BLACKOUT_DEBOUNCE_SECONDS + 0.5) * 1000).i)
+            osd.show(closeAfter: 1000, fadeAfter: ((AUTO_OSD_DEBOUNCE_SECONDS + 0.5) * 1000).i)
+        }
+    }
+
+    func showAutoXdrOSD(xdrEnabled: Bool, reason: String) {
+        mainAsync { [weak self] in
+            guard let self = self else { return }
+
+            self.autoOsdWindowController?.close()
+            self.autoOsdWindowController = OSDWindow(
+                swiftuiView: AnyView(
+                    AutoOSDView(
+                        display: self,
+                        done: .oneway { [weak self] in (self?.enhanced ?? xdrEnabled) == xdrEnabled },
+                        title: xdrEnabled ? "Activating XDR" : "Disabling XDR",
+                        subtitle: reason,
+                        color: Colors.xdr,
+                        icon: "sun.max.circle.fill"
+                    )
+                    .colors(darkMode ? .dark : .light)
+                    .environmentObject(EnvState())
+                ),
+                display: self, releaseWhenClosed: true
+            ).wc
+
+            guard let osd = self.autoOsdWindowController?.window as? OSDWindow else { return }
+
+            osd.show(closeAfter: 1000, fadeAfter: ((AUTO_OSD_DEBOUNCE_SECONDS + 0.5) * 1000).i)
         }
     }
 }

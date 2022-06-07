@@ -1712,3 +1712,10 @@ extension Array where Element == UserValue {
         dictionary.threadSafe
     }
 }
+
+import SwiftUI
+extension Binding {
+    static func oneway(getter: @escaping () -> Value) -> Binding {
+        Binding(get: getter, set: { _ in })
+    }
+}
