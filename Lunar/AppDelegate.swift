@@ -35,12 +35,11 @@ import SwiftUI
 
 let fm = FileManager()
 let simplyCA = SimplyCoreAudio()
-var screensSleeping = ManagedAtomic<Bool>(false)
-var loggedOut = ManagedAtomic<Bool>(false)
 var brightnessTransition = BrightnessTransition.instant
 let SCREEN_WAKE_ADAPTER_TASK_KEY = "screenWakeAdapter"
 let CONTACT_URL = "https://lunar.fyi/contact".asURL()!
 var startTime = Date()
+var wakeTime = startTime
 
 let kAppleInterfaceThemeChangedNotification = "AppleInterfaceThemeChangedNotification"
 let kAppleInterfaceStyle = "AppleInterfaceStyle"
@@ -944,7 +943,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func startValuesReaderThread() {
         valuesReaderThread = Repeater(every: 10, tolerance: 5) {
-            guard !screensSleeping.load(ordering: .relaxed) else { return }
+            guard !displayController.screensSleeping else { return }
 
             if CachedDefaults[.refreshValues] {
                 displayController.fetchValues()
@@ -1295,10 +1294,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 log.info(notif.name)
                 switch notif.name {
                 case NSWorkspace.sessionDidBecomeActiveNotification:
-                    loggedOut.store(false, ordering: .sequentiallyConsistent)
+                    displayController.loggedOut = false
                     log.info("SESSION: Log in")
                 case NSWorkspace.sessionDidResignActiveNotification:
-                    loggedOut.store(true, ordering: .sequentiallyConsistent)
+                    displayController.loggedOut = true
                     log.info("SESSION: Log out")
                 default:
                     break
@@ -1318,10 +1317,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 case NSWorkspace.screensDidSleepNotification:
                     log.debug("SESSION: Screen sleep")
                     fallthrough
-                case NSWorkspace.screensDidWakeNotification where !loggedOut.load(ordering: .relaxed),
+                case NSWorkspace.screensDidWakeNotification where !displayController.loggedOut,
                      NSWorkspace.sessionDidBecomeActiveNotification:
                     log.debug("Screens woke up")
-                    screensSleeping.store(false, ordering: .sequentiallyConsistent)
+                    wakeTime = Date()
+                    displayController.screensSleeping = false
                     displayController.retryAutoBlackoutLater()
 
                     if CachedDefaults[.refreshValues] {
@@ -1378,7 +1378,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
                 case NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification:
                     log.debug("Screens gone to sleep")
-                    screensSleeping.store(true, ordering: .sequentiallyConsistent)
+                    displayController.screensSleeping = true
                     displayController.cancelAutoBlackout()
 
                     self.valuesReaderThread = nil
@@ -1729,24 +1729,27 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
+    func handleAutoOSDEvent(_ event: NSEvent) {
+        switch event.keyCode.i {
+        case kVK_Escape where displayController.autoBlackoutPending:
+            displayController.cancelAutoBlackout()
+        case kVK_Escape where displayController.autoXdrPendingEnabled:
+            displayController.cancelAutoXdr()
+        case kVK_Escape where displayController.autoXdrPendingDisabled:
+            displayController.cancelAutoXdr()
+        default:
+            break
+        }
+    }
+
     func addGlobalKeyMonitor() {
         if Defaults[.accessibilityPermissionsGranted] {
             NSEvent.addGlobalMonitorForEvents(matching: [.keyDown]) { event in
-                switch event.keyCode.i {
-                case kVK_Escape where displayController.autoBlackoutPending:
-                    displayController.cancelAutoBlackout()
-                default:
-                    break
-                }
+                self.handleAutoOSDEvent(event)
             }
         }
         NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-            switch event.keyCode.i {
-            case kVK_Escape where displayController.autoBlackoutPending:
-                displayController.cancelAutoBlackout()
-            default:
-                break
-            }
+            self.handleAutoOSDEvent(event)
             return event
         }
     }

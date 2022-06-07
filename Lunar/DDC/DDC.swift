@@ -714,6 +714,47 @@ enum DDC {
         return p
     }()
 
+    static var waitAfterWakeSeconds: Int = {
+        waitAfterWakeSecondsPublisher.debounce(for: .seconds(1), scheduler: RunLoop.main)
+            .sink { waitAfterWakeSeconds = $0.newValue }
+            .store(in: &observers)
+
+        return CachedDefaults[.waitAfterWakeSeconds]
+    }()
+
+    static var delayDDCAfterWake: Bool = {
+        delayDDCAfterWakePublisher.debounce(for: .seconds(2), scheduler: RunLoop.main)
+            .sink { change in
+                delayDDCAfterWake = change.newValue
+
+                guard change.newValue else {
+                    if let oldVal = CachedDefaults[.oldReapplyValuesAfterWake] { CachedDefaults[.reapplyValuesAfterWake] = oldVal }
+                    if let oldVal = CachedDefaults[.oldBrightnessTransition] { CachedDefaults[.brightnessTransition] = oldVal }
+                    if let oldVal = CachedDefaults[.oldDetectResponsiveness] { CachedDefaults[.detectResponsiveness] = oldVal }
+                    return
+                }
+
+                CachedDefaults[.oldReapplyValuesAfterWake] = CachedDefaults[.reapplyValuesAfterWake]
+                CachedDefaults[.oldBrightnessTransition] = CachedDefaults[.brightnessTransition]
+                CachedDefaults[.oldDetectResponsiveness] = CachedDefaults[.detectResponsiveness]
+
+                CachedDefaults[.detectResponsiveness] = false
+                CachedDefaults[.reapplyValuesAfterWake] = false
+                CachedDefaults[.brightnessTransition] = .instant
+
+                displayController.displays.values.forEach { d in
+                    d.reapplyColorGain = false
+                }
+            }
+            .store(in: &observers)
+
+        return CachedDefaults[.delayDDCAfterWake]
+    }()
+
+    static var shouldWait: Bool {
+        delayDDCAfterWake && waitAfterWakeSeconds > 0 && wakeTime != startTime && timeSince(wakeTime) > waitAfterWakeSeconds.d
+    }
+
     static func IORegistryTreeChanged() {
         #if DEBUG
             print("IORegistryTreeChanged")
@@ -926,9 +967,9 @@ enum DDC {
 
     static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt16) -> Bool {
         #if DEBUG
-            guard apply, !isTestID(displayID) else { return true }
+            guard apply, !isTestID(displayID), !shouldWait else { return true }
         #else
-            guard apply else { return true }
+            guard apply, !shouldWait else { return true }
         #endif
 
         #if arch(arm64)
@@ -1046,7 +1087,7 @@ enum DDC {
     }
 
     static func read(displayID: CGDirectDisplayID, controlID: ControlID) -> DDCReadResult? {
-        guard !isTestID(displayID) else { return nil }
+        guard !isTestID(displayID), !shouldWait else { return nil }
 
         #if arch(arm64)
             guard let avService = AVService(displayID: displayID) else { return nil }
