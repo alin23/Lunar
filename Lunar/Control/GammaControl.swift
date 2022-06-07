@@ -106,7 +106,7 @@ class GammaControl: Control {
 
     func fluxChecker(flux: NSRunningApplication) {
         guard let display = display, display.supportsGamma else { return }
-        guard !CachedDefaults[.neverAskAboutFlux], !screensSleeping.load(ordering: .relaxed),
+        guard !CachedDefaults[.neverAskAboutFlux], !displayController.screensSleeping,
               fluxPromptTime == nil || timeSince(fluxPromptTime!) > 10.minutes.timeInterval
         else { return }
 

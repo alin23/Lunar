@@ -1751,7 +1751,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         set { Self.setWindowController(id, type: "osd", windowController: newValue) }
     }
 
-    var autoBlackoutOsdWindowController: NSWindowController? {
+    var autoOsdWindowController: NSWindowController? {
         get { Self.getWindowController(id, type: "autoBlackoutOsd") }
         set { Self.setWindowController(id, type: "autoBlackoutOsd", windowController: newValue) }
     }
@@ -1851,7 +1851,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         guard DisplayServicesCanChangeBrightness(id), !isObservingBrightnessChangeDS(id) else { return true }
 
         let result = DisplayServicesRegisterForBrightnessChangeNotifications(id, id) { _, observer, _, _, userInfo in
-            guard !screensSleeping.load(ordering: .relaxed) else { return }
+            guard !displayController.screensSleeping else { return }
             OperationQueue.main.addOperation {
                 guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let observer = observer else { return }
                 let id = CGDirectDisplayID(UInt(bitPattern: observer))
@@ -4034,13 +4034,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         let listensForBrightnessChange = observeBrightnessChangeDS() && hasBrightnessChangeObserver
         let refreshSeconds = listensForBrightnessChange ? 5.0 : 2.0
         builtinBrightnessRefresher = Repeater(every: refreshSeconds, name: "Builtin Brightness Refresher") { [weak self] in
-            guard let self = self, !screensSleeping.load(ordering: .relaxed), !self.hasSoftwareControl else {
+            guard let self = self, !displayController.screensSleeping, !self.hasSoftwareControl else {
                 return
             }
             self.refreshBrightness()
         }
         builtinContrastRefresher = Repeater(every: 15, name: "Builtin Contrast Refresher") { [weak self] in
-            guard let self = self, !screensSleeping.load(ordering: .relaxed), !self.hasSoftwareControl else {
+            guard let self = self, !displayController.screensSleeping, !self.hasSoftwareControl else {
                 return
             }
 
@@ -4814,7 +4814,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func refreshColors(onComplete: ((Bool) -> Void)? = nil) {
         guard !isTestID(id), !isSmartBuiltin,
-              !screensSleeping.load(ordering: .relaxed)
+              !displayController.screensSleeping
         else { return }
         colorRefresher = asyncAfter(ms: 10) { [weak self] in
             guard let self = self else { return }
@@ -4847,7 +4847,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func refreshBrightness() {
         guard !isTestID(id), !inSmoothTransition, !isUserAdjusting(), !sendingBrightness,
-              !SyncMode.possibleClamshellModeSoon, !hasSoftwareControl, !screensSleeping.load(ordering: .relaxed)
+              !SyncMode.possibleClamshellModeSoon, !hasSoftwareControl, !displayController.screensSleeping
         else { return }
 
         brightnessRefresher = asyncAfter(ms: 10) { [weak self] in
@@ -4883,7 +4883,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func refreshContrast() {
         guard !isTestID(id), !inSmoothTransition, !isUserAdjusting(), !sendingContrast,
-              !screensSleeping.load(ordering: .relaxed)
+              !displayController.screensSleeping
         else { return }
 
         contrastRefresher = asyncAfter(ms: 10) { [weak self] in
@@ -4924,7 +4924,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }.first { $0.isEnabled }?.isEnabled ?? false
 
         guard !isTestID(id), !hotkeyInputEnabled, !isSmartBuiltin,
-              !screensSleeping.load(ordering: .relaxed)
+              !displayController.screensSleeping
         else { return }
 
         inputRefresher = asyncAfter(ms: 10) { [weak self] in
@@ -4949,7 +4949,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func refreshVolume() {
         guard !isTestID(id), !isSmartBuiltin,
-              !screensSleeping.load(ordering: .relaxed)
+              !displayController.screensSleeping
         else { return }
 
         volumeRefresher = asyncAfter(ms: 10) { [weak self] in
@@ -4978,7 +4978,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func refreshGamma() {
         guard !isForTesting, isOnline,
-              !screensSleeping.load(ordering: .relaxed)
+              !displayController.screensSleeping
         else { return }
 
         guard !defaultGammaChanged || !applyGamma else {

@@ -392,55 +392,25 @@ struct RawValuesView: View {
     }
 }
 
-// MARK: - AdvancedSettingsView
+// MARK: - HDRSettingsView
 
-struct AdvancedSettingsView: View {
-    @Default(.hideMenuBarIcon) var hideMenuBarIcon
-    @Default(.showDockIcon) var showDockIcon
-    @Default(.moreGraphData) var moreGraphData
+struct HDRSettingsView: View {
+    @ObservedObject var dc: DisplayController = displayController
 
-    @Default(.silentUpdate) var silentUpdate
-    @Default(.workaroundBuiltinDisplay) var workaroundBuiltinDisplay
-    @Default(.debug) var debug
-    @Default(.ddcSleepLonger) var ddcSleepLonger
-    @Default(.clamshellModeDetection) var clamshellModeDetection
-    @Default(.muteVolumeZero) var muteVolumeZero
-    @Default(.refreshValues) var refreshValues
-    @Default(.enableOrientationHotkeys) var enableOrientationHotkeys
-    @Default(.detectResponsiveness) var detectResponsiveness
-    @Default(.disableControllerVideo) var disableControllerVideo
-    @Default(.allowBlackOutOnSingleScreen) var allowBlackOutOnSingleScreen
-    @Default(.reapplyValuesAfterWake) var reapplyValuesAfterWake
     @Default(.hdrWorkaround) var hdrWorkaround
-    @Default(.oldBlackOutMirroring) var oldBlackOutMirroring
     @Default(.xdrContrast) var xdrContrast
     @Default(.xdrContrastFactor) var xdrContrastFactor
     @Default(.allowHDREnhanceBrightness) var allowHDREnhanceBrightness
     @Default(.allowHDREnhanceContrast) var allowHDREnhanceContrast
-    @Default(.gammaDisabledCompletely) var gammaDisabledCompletely
+
+    @Default(.autoXdr) var autoXdr
+    @Default(.autoSubzero) var autoSubzero
+    @Default(.disableNightShiftXDR) var disableNightShiftXDR
+    @Default(.autoXdrSensor) var autoXdrSensor
+    @Default(.autoXdrSensorLuxThreshold) var autoXdrSensorLuxThreshold
 
     var body: some View {
         VStack(alignment: .leading) {
-            Group {
-                SettingsToggle(text: "Hide menubar icon", setting: $hideMenuBarIcon)
-                SettingsToggle(text: "Show dock icon", setting: $showDockIcon)
-                SettingsToggle(
-                    text: "Show more graph data",
-                    setting: $moreGraphData,
-                    help: "Renders values and data lines on the bottom graph of the preferences window"
-                )
-                SettingsToggle(text: "Install updates silently in the background", setting: $silentUpdate)
-                SettingsToggle(
-                    text: "Enable verbose logging", setting: $debug,
-                    help: """
-                    Log path: ~/Library/Caches/Lunar/swiftybeaver.log
-
-                    This option will deactivate itself when the app quits
-                    to avoid filling up disk space with unnecessary logs.
-                    """
-                )
-            }
-            Divider()
             Group {
                 SettingsToggle(
                     text: "Run in HDR compatibility mode", setting: $hdrWorkaround,
@@ -502,6 +472,120 @@ struct AdvancedSettingsView: View {
                 SettingsToggle(text: "Allow on non-Apple HDR monitors", setting: $allowHDREnhanceContrast.animation(.fastSpring))
                     .padding(.leading)
                     .disabled(!xdrContrast)
+            }
+            Divider()
+            xdrSettings
+            Spacer()
+            Color.clear
+        }
+    }
+
+    var xdrSettings: some View {
+        Group {
+            SettingsToggle(text: "Disable Night Shift when toggling XDR", setting: $disableNightShiftXDR.animation(.fastSpring))
+            SettingsToggle(text: "Toggle XDR Brightness when going over 100%", setting: $autoXdr.animation(.fastSpring))
+            SettingsToggle(
+                text: "Toggle Sub-zero Dimming when going below 0%",
+                setting: $autoSubzero.animation(.fastSpring)
+            )
+            Divider().padding(.horizontal)
+            if Sysctl.isMacBook, displayController.builtinDisplay?.supportsEnhance ?? false {
+                VStack(alignment: .leading, spacing: 2) {
+                    SettingsToggle(text: "Toggle XDR Brightness based on ambient light", setting: $autoXdrSensor)
+                    Text("XDR Brightness will be automatically enabled")
+                        .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                        .foregroundColor(.black.opacity(0.4))
+                        .padding(.leading, 20)
+                    Text("when ambient light is above \(autoXdrSensorLuxThreshold.str(decimals: 0)) lux")
+                        .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                        .foregroundColor(.black.opacity(0.4))
+                        .padding(.leading, 20)
+                        .padding(.top, -5)
+                }
+                HStack {
+                    let luxBinding = Binding<Float>(
+                        get: { powf(max(autoXdrSensorLuxThreshold - XDR_LUX_LEAST_NONZERO, 0) / XDR_MAX_LUX, 0.25) },
+                        set: { autoXdrSensorLuxThreshold = powf($0, 4) * XDR_MAX_LUX + XDR_LUX_LEAST_NONZERO }
+                    )
+                    BigSurSlider(
+                        percentage: luxBinding,
+                        image: "sun.dust.fill",
+                        color: Colors.lightGray,
+                        backgroundColor: Colors.grayMauve.opacity(0.1),
+                        knobColor: Colors.lightGray,
+                        showValue: .constant(false),
+                        disabled: !$autoXdrSensor,
+                        mark: .oneway { powf(max(dc.internalSensorLux - XDR_LUX_LEAST_NONZERO, 0) / XDR_MAX_LUX, 0.25) }
+                    )
+                    .padding(.leading)
+
+                    SwiftUI.Button("Reset") { autoXdrSensorLuxThreshold = XDR_DEFAULT_LUX }
+                        .buttonStyle(FlatButton(
+                            color: Colors.lightGray,
+                            textColor: Colors.darkGray,
+                            radius: 10,
+                            verticalPadding: 3,
+                            disabled: !$autoXdrSensor
+                        ))
+                        .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                }
+                if autoXdrSensor {
+                    Text(dc.autoXdrSensorPausedReason ?? "Current ambient light: \(dc.internalSensorLux.str(decimals: 0)) lux")
+                        .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                        .foregroundColor(.black.opacity(0.4))
+                        .padding(.leading, 20)
+                        .padding(.top, -5)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - AdvancedSettingsView
+
+struct AdvancedSettingsView: View {
+    @Default(.hideMenuBarIcon) var hideMenuBarIcon
+    @Default(.showDockIcon) var showDockIcon
+    @Default(.moreGraphData) var moreGraphData
+
+    @Default(.silentUpdate) var silentUpdate
+    @Default(.workaroundBuiltinDisplay) var workaroundBuiltinDisplay
+    @Default(.debug) var debug
+    @Default(.ddcSleepLonger) var ddcSleepLonger
+    @Default(.clamshellModeDetection) var clamshellModeDetection
+    @Default(.muteVolumeZero) var muteVolumeZero
+    @Default(.enableOrientationHotkeys) var enableOrientationHotkeys
+    @Default(.detectResponsiveness) var detectResponsiveness
+    @Default(.disableControllerVideo) var disableControllerVideo
+    @Default(.allowBlackOutOnSingleScreen) var allowBlackOutOnSingleScreen
+    @Default(.reapplyValuesAfterWake) var reapplyValuesAfterWake
+    @Default(.oldBlackOutMirroring) var oldBlackOutMirroring
+
+    @Default(.refreshValues) var refreshValues
+    @Default(.gammaDisabledCompletely) var gammaDisabledCompletely
+    @Default(.waitAfterWakeSeconds) var waitAfterWakeSeconds
+    @Default(.delayDDCAfterWake) var delayDDCAfterWake
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            Group {
+                SettingsToggle(text: "Hide menubar icon", setting: $hideMenuBarIcon)
+                SettingsToggle(text: "Show dock icon", setting: $showDockIcon)
+                SettingsToggle(
+                    text: "Show more graph data",
+                    setting: $moreGraphData,
+                    help: "Renders values and data lines on the bottom graph of the preferences window"
+                )
+                SettingsToggle(text: "Install updates silently in the background", setting: $silentUpdate)
+                SettingsToggle(
+                    text: "Enable verbose logging", setting: $debug,
+                    help: """
+                    Log path: ~/Library/Caches/Lunar/swiftybeaver.log
+
+                    This option will deactivate itself when the app quits
+                    to avoid filling up disk space with unnecessary logs.
+                    """
+                )
             }
             Divider()
             Group {
@@ -631,6 +715,58 @@ struct AdvancedSettingsView: View {
                         • Sub-zero Dimming
                         """
                     )
+
+                    SettingsToggle(
+                        text: "Delay DDC commands after wake", setting: $delayDDCAfterWake,
+                        help: """
+                        Experimental: for people running into monitor bugs like the video signal being
+                        lost or screen not waking up after system sleep, this could be a safe measure
+                        to ensure Lunar doesn't send any DDC command until the monitor connection
+                        is fully established.
+
+                        This will disable or cripple the following features:
+
+                        • Smooth transitions
+                        • DDC responsiveness checker
+                        • Re-applying color gain on wake
+                        • Re-applying brightness/contrast on wake
+                        """
+                    )
+                    HStack {
+                        let secondsBinding = Binding<Float>(
+                            get: { waitAfterWakeSeconds.f / 100 },
+                            set: { waitAfterWakeSeconds = ($0 * 100).i }
+                        )
+                        BigSurSlider(
+                            percentage: secondsBinding,
+                            image: "clock.circle",
+                            color: Colors.lightGray,
+                            backgroundColor: Colors.grayMauve.opacity(0.1),
+                            knobColor: Colors.lightGray,
+                            showValue: .constant(true),
+                            disabled: !$delayDDCAfterWake
+                        )
+                        .padding(.leading)
+
+                        SwiftUI.Button("Reset") { waitAfterWakeSeconds = 30 }
+                            .buttonStyle(FlatButton(
+                                color: Colors.lightGray,
+                                textColor: Colors.darkGray,
+                                radius: 10,
+                                verticalPadding: 3,
+                                disabled: !$delayDDCAfterWake
+                            ))
+                            .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    }
+                    if delayDDCAfterWake {
+                        Text("Lunar will wait \(waitAfterWakeSeconds) seconds before sending\nthe first DDC command after screen wake")
+                            .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                            .foregroundColor(.black.opacity(0.4))
+                            .frame(height: 28, alignment: .topLeading)
+                            .lineLimit(2)
+                            .padding(.leading, 20)
+                            .padding(.top, -5)
+                    }
                 }
             }
             Spacer()
@@ -658,12 +794,7 @@ struct QuickActionsLayoutView: View {
     @Default(.showXDRSelector) var showXDRSelector
     @Default(.showHeaderOnHover) var showHeaderOnHover
     @Default(.showFooterOnHover) var showFooterOnHover
-    @Default(.autoXdr) var autoXdr
-    @Default(.autoSubzero) var autoSubzero
-    @Default(.disableNightShiftXDR) var disableNightShiftXDR
     @Default(.allowAnySyncSource) var allowAnySyncSource
-    @Default(.autoXdrSensor) var autoXdrSensor
-    @Default(.autoXdrSensorLuxThreshold) var autoXdrSensorLuxThreshold
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -684,15 +815,17 @@ struct QuickActionsLayoutView: View {
                 Group {
                     SettingsToggle(text: "Show standard presets", setting: $showStandardPresets.animation(.fastSpring))
                     SettingsToggle(text: "Show custom presets", setting: $showCustomPresets.animation(.fastSpring))
-                    SettingsToggle(text: "Merge brightness and contrast", setting: $mergeBrightnessContrast.animation(.fastSpring))
-                    SettingsToggle(
-                        text: "Allow non-Apple monitors as Sync Mode source",
-                        setting: $allowAnySyncSource.animation(.fastSpring)
-                    )
+                    SettingsToggle(text: "Show XDR Brightness toggle when available", setting: $showXDRSelector.animation(.fastSpring))
                 }
             }
             Divider()
-            xdrSettings
+            Group {
+                SettingsToggle(text: "Merge brightness and contrast", setting: $mergeBrightnessContrast.animation(.fastSpring))
+                SettingsToggle(
+                    text: "Allow non-Apple monitors as Sync Mode source",
+                    setting: $allowAnySyncSource.animation(.fastSpring)
+                )
+            }
             Divider()
             Group {
                 SettingsToggle(text: "Show last raw values sent to the display", setting: $showRawValues.animation(.fastSpring))
@@ -708,64 +841,6 @@ struct QuickActionsLayoutView: View {
             Color.clear
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    var xdrSettings: some View {
-        Group {
-            SettingsToggle(text: "Show XDR Brightness toggle when available", setting: $showXDRSelector.animation(.fastSpring))
-            SettingsToggle(text: "Disable Night Shift when toggling XDR", setting: $disableNightShiftXDR.animation(.fastSpring))
-            SettingsToggle(text: "Toggle XDR Brightness when going over 100%", setting: $autoXdr.animation(.fastSpring))
-            SettingsToggle(
-                text: "Toggle Sub-zero Dimming when going below 0%",
-                setting: $autoSubzero.animation(.fastSpring)
-            )
-            Divider().padding(.horizontal)
-            VStack(alignment: .leading, spacing: 2) {
-                SettingsToggle(text: "Toggle XDR Brightness based on ambient light", setting: $autoXdrSensor)
-                Text("XDR Brightness will be automatically enabled")
-                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                    .foregroundColor(.black.opacity(0.4))
-                    .padding(.leading, 20)
-                Text("when ambient light is above \(autoXdrSensorLuxThreshold.str(decimals: 0)) lux")
-                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                    .foregroundColor(.black.opacity(0.4))
-                    .padding(.leading, 20)
-                    .padding(.top, -5)
-            }
-            HStack {
-                let luxBinding = Binding<Float>(
-                    get: { autoXdrSensorLuxThreshold / 50000 },
-                    set: { autoXdrSensorLuxThreshold = $0 * 50000 }
-                )
-                BigSurSlider(
-                    percentage: luxBinding,
-                    image: "circle.lefthalf.filled",
-                    color: Colors.lightGray,
-                    backgroundColor: Colors.grayMauve.opacity(0.1),
-                    knobColor: Colors.lightGray,
-                    showValue: .constant(false),
-                    disabled: !$autoXdrSensor
-                )
-                .padding(.leading)
-
-                SwiftUI.Button("Reset") { autoXdrSensorLuxThreshold = 10000 }
-                    .buttonStyle(FlatButton(
-                        color: Colors.lightGray,
-                        textColor: Colors.darkGray,
-                        radius: 10,
-                        verticalPadding: 3,
-                        disabled: !$autoXdrSensor
-                    ))
-                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
-            }
-            if autoXdrSensor {
-                Text("Current ambient light: \(dc.internalSensorLux.str(decimals: 0)) lux")
-                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                    .foregroundColor(.black.opacity(0.4))
-                    .padding(.leading, 20)
-                    .padding(.top, -5)
-            }
-        }
     }
 }
 
@@ -1000,6 +1075,7 @@ final class EnvState: ObservableObject {
 enum OptionsTab: String, DefaultsSerializable {
     case layout
     case advanced
+    case hdr
 }
 
 // MARK: - QuickActionsMenuView
@@ -1098,6 +1174,14 @@ struct QuickActionsMenuView: View {
                         }
                         .buttonStyle(PickerButton(enumValue: $env.optionsTab, onValue: .advanced))
                         .font(.system(size: 12, weight: env.optionsTab == .advanced ? .bold : .medium, design: .rounded))
+
+                        SwiftUI.Button("HDR") {
+                            withAnimation(.fastSpring) { env.optionsTab = .hdr }
+                            showOptionsMenu = false
+                            showOptionsMenu = true
+                        }
+                        .buttonStyle(PickerButton(enumValue: $env.optionsTab, onValue: .hdr))
+                        .font(.system(size: 12, weight: env.optionsTab == .hdr ? .bold : .medium, design: .rounded))
                     }.frame(maxWidth: .infinity)
 
                     switch env.optionsTab {
@@ -1105,6 +1189,8 @@ struct QuickActionsMenuView: View {
                         QuickActionsLayoutView().padding(10)
                     case .advanced:
                         AdvancedSettingsView().padding(10)
+                    case .hdr:
+                        HDRSettingsView().padding(10)
                     }
 
                     SwiftUI.Button("Reset all settings") {
@@ -1114,7 +1200,7 @@ struct QuickActionsMenuView: View {
                     .font(.system(size: 12, weight: .medium))
                     .frame(maxWidth: .infinity, alignment: .center)
 
-                }.frame(width: 390, height: 680, alignment: .center)
+                }.frame(width: 390, height: 640, alignment: .center)
             }
             .onChange(of: showBrightnessMenuBar) { _ in
                 let old = showOptionsMenu

@@ -225,7 +225,7 @@ class DisplayController: ObservableObject {
 
         pausedOverrideAdaptiveModeObserver = true
         modeWatcherTask = Repeater(every: 5, name: MODE_WATCHER_TASK_KEY) { [weak self] in
-            guard !screensSleeping.load(ordering: .relaxed), let self = self else { return }
+            guard !displayController.screensSleeping, let self = self else { return }
             self.autoAdaptMode()
         }
         pausedOverrideAdaptiveModeObserver = false
@@ -237,7 +237,7 @@ class DisplayController: ObservableObject {
         }
 
         screencaptureWatcherTask = Repeater(every: 1, name: SCREENCAPTURE_WATCHER_TASK_KEY) { [weak self] in
-            guard !screensSleeping.load(ordering: .relaxed), let self = self,
+            guard !displayController.screensSleeping, let self = self,
                   self.activeDisplayList.contains(where: { $0.hasSoftwareControl && !$0.supportsGamma })
             else { return }
             let pids = pidCount()
@@ -748,6 +748,14 @@ class DisplayController: ObservableObject {
         }
     #endif
 
+    enum XDRState {
+        case none
+        case enabledManually
+        case disabledManually
+        case enabledAutomatically
+        case disabledAutomatically
+    }
+
     var screencaptureIsRunning: CurrentValueSubject<Bool, Never> = .init(processIsRunning("/usr/sbin/screencapture", nil))
 
     @Atomic var apply = true
@@ -769,12 +777,29 @@ class DisplayController: ObservableObject {
     lazy var autoBlackoutPublisher: PassthroughSubject<Bool, Never> = {
         let p = PassthroughSubject<Bool, Never>()
         p
-            .debounce(for: .seconds(AUTO_BLACKOUT_DEBOUNCE_SECONDS), scheduler: RunLoop.main)
+            .debounce(for: .seconds(AUTO_OSD_DEBOUNCE_SECONDS), scheduler: RunLoop.main)
             .sink { shouldBlackout in
                 defer { self.autoBlackoutPending = false }
                 guard shouldBlackout, let d = self.builtinDisplay else { return }
                 lastBlackOutToggleDate = .distantPast
                 self.blackOut(display: d.id, state: .on)
+            }.store(in: &observers)
+        return p
+    }()
+
+    lazy var autoXdrAmbientLightPublisher: PassthroughSubject<Bool?, Never> = {
+        let p = PassthroughSubject<Bool?, Never>()
+        p
+            .debounce(for: .seconds(AUTO_OSD_DEBOUNCE_SECONDS), scheduler: RunLoop.main)
+            .sink { xdrEnabled in
+                defer {
+                    self.autoXdrPendingEnabled = false
+                    self.autoXdrPendingDisabled = false
+                }
+                guard let xdrEnabled = xdrEnabled, let d = self.builtinDisplay else { return }
+
+                d.enhanced = xdrEnabled
+                self.xdrState = xdrEnabled ? .enabledAutomatically : .disabledAutomatically
             }.store(in: &observers)
         return p
     }()
@@ -796,11 +821,38 @@ class DisplayController: ObservableObject {
         return CachedDefaults[.autoXdrSensorLuxThreshold]
     }()
 
+    @Published var autoXdrSensorPausedReason: String? = nil
     @Published var internalSensorLux: Float = 0
+
+    var xdrState: XDRState = .none
+
+    @Atomic var autoXdrTipShown = CachedDefaults[.autoXdrTipShown]
+    @Atomic var screensSleeping = false
+    @Atomic var loggedOut = false
+
+    var autoXdrSensor: Bool = Defaults[.autoXdrSensor]
 
     @Atomic var autoBlackoutPending = false {
         didSet {
             log.info("autoBlackoutPending=\(autoBlackoutPending)")
+        }
+    }
+
+    @Atomic var autoXdrPendingEnabled = false {
+        didSet {
+            log.info("autoXdrPendingEnabled=\(autoXdrPendingEnabled)")
+            if autoXdrPendingEnabled {
+                autoXdrPendingDisabled = false
+            }
+        }
+    }
+
+    @Atomic var autoXdrPendingDisabled = false {
+        didSet {
+            log.info("autoXdrPendingDisabled=\(autoXdrPendingDisabled)")
+            if autoXdrPendingDisabled {
+                autoXdrPendingEnabled = false
+            }
         }
     }
 
@@ -1043,6 +1095,12 @@ class DisplayController: ObservableObject {
         }
     }
 
+    var autoXdrTipShowTask: DispatchWorkItem? {
+        didSet {
+            oldValue?.cancel()
+        }
+    }
+
     static func getAdaptiveMode() -> AdaptiveMode {
         if CachedDefaults[.overrideAdaptiveMode] {
             return CachedDefaults[.adaptiveBrightnessMode].mode
@@ -1259,27 +1317,9 @@ class DisplayController: ObservableObject {
         }
     }
 
-    func getSensorTask() -> Repeater? {
-        guard let display = builtinDisplay, display.isMacBookXDR else {
-            return nil
-        }
-
-        return Repeater(every: 5, name: "xdrSensorTask") { [self] in
-            guard !screensSleeping.load(ordering: .relaxed), activeDisplayCount == 1,
-                  let display = builtinDisplay, display.isMacBookXDR,
-                  let lux = SensorMode.getInternalSensorLux()?.f else { return }
-
-            internalSensorLux = lux
-            if lux > autoXdrSensorLuxThreshold, !display.enhanced {
-                display.enhanced = true
-            } else if lux <= max(autoXdrSensorLuxThreshold - 1000, 0), display.enhanced {
-                display.enhanced = false
-            }
-        }
-    }
-
     func setupXdrTask() {
         autoXdrSensorPublisher.sink { [self] change in
+            autoXdrSensor = change.newValue
             guard let display = builtinDisplay, display.isMacBookXDR, let lux = SensorMode.getInternalSensorLux()?.f else {
                 xdrSensorTask = nil
                 return
@@ -1301,13 +1341,24 @@ class DisplayController: ObservableObject {
         }
     }
 
+    func cancelAutoXdr() {
+        guard autoXdrPendingEnabled || autoXdrPendingDisabled else { return }
+        log.info("Cancelling Auto XDR")
+
+        lastXDRAbortDate = Date()
+        xdrState = autoXdrPendingEnabled ? .disabledManually : .enabledManually
+
+        builtinDisplay?.autoOsdWindowController?.close()
+        builtinDisplay?.autoOsdWindowController = nil
+        autoXdrAmbientLightPublisher.send(nil)
+    }
+
     func cancelAutoBlackout() {
-        if autoBlackoutPending {
-            log.info("Cancelling Auto Blackout")
-            builtinDisplay?.autoBlackoutOsdWindowController?.close()
-            builtinDisplay?.autoBlackoutOsdWindowController = nil
-            autoBlackoutPublisher.send(false)
-        }
+        guard autoBlackoutPending else { return }
+        log.info("Cancelling Auto Blackout")
+        builtinDisplay?.autoOsdWindowController?.close()
+        builtinDisplay?.autoOsdWindowController = nil
+        autoBlackoutPublisher.send(false)
     }
 
     @inline(__always) func withoutApply(_ block: () -> Void) {
@@ -1644,7 +1695,7 @@ class DisplayController: ObservableObject {
         guard !display.neverFallbackControl, !display.isBuiltin, !AppleNativeControl.isAvailable(for: display),
               !display.isAppleDisplay() else { return false }
 
-        if !SyncMode.possibleClamshellModeSoon, !screensSleeping.load(ordering: .relaxed),
+        if !SyncMode.possibleClamshellModeSoon, !displayController.screensSleeping,
            let screen = display.screen, !screen.visibleFrame.isEmpty, timeSince(display.lastConnectionTime) > 10,
            let control = display.control, !control.isResponsive()
         {
@@ -1768,7 +1819,7 @@ class DisplayController: ObservableObject {
         }
 
         controlWatcherTask = Repeater(every: 15, name: CONTROL_WATCHER_TASK_KEY) { [self] in
-            guard !screensSleeping.load(ordering: .relaxed), completedOnboarding else { return }
+            guard !displayController.screensSleeping, completedOnboarding else { return }
             for display in activeDisplays.values {
                 display.control = display.getBestControl()
                 if shouldPromptAboutFallback(display) {

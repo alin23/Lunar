@@ -29,6 +29,10 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .oldAllowHDREnhanceBrightness,
     .oldAllowHDREnhanceContrast,
 
+    .oldReapplyValuesAfterWake,
+    .oldBrightnessTransition,
+    .oldDetectResponsiveness,
+
     .adaptiveBrightnessMode,
     .colorScheme,
     .autoSubzero,
@@ -45,6 +49,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .xdrContrastFactor,
     .xdrWarningShown,
     .xdrTipShown,
+    .autoXdrTipShown,
     .workaroundBuiltinDisplay,
     .autoBlackoutBuiltin,
     .streamLogs,
@@ -149,6 +154,8 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .volumeStep,
     .reapplyValuesAfterWake,
     .jitterAfterWake,
+    .waitAfterWakeSeconds,
+    .delayDDCAfterWake,
     .wakeReapplyTries,
     .ddcSleepFactor,
     .ddcSleepLonger,
@@ -673,6 +680,10 @@ func initCache() {
     cacheKey(.oldAllowHDREnhanceBrightness)
     cacheKey(.oldAllowHDREnhanceContrast)
 
+    cacheKey(.oldReapplyValuesAfterWake)
+    cacheKey(.oldBrightnessTransition)
+    cacheKey(.oldDetectResponsiveness)
+
     cacheKey(.hdrWorkaround)
     cacheKey(.oldBlackOutMirroring)
     cacheKey(.disableNightShiftXDR)
@@ -681,6 +692,7 @@ func initCache() {
     cacheKey(.xdrContrastFactor)
     cacheKey(.xdrWarningShown)
     cacheKey(.xdrTipShown)
+    cacheKey(.autoXdrTipShown)
     cacheKey(.autoBlackoutBuiltin)
     cacheKey(.workaroundBuiltinDisplay)
     cacheKey(.streamLogs)
@@ -753,6 +765,8 @@ func initCache() {
     cacheKey(.overrideAdaptiveMode)
     cacheKey(.reapplyValuesAfterWake)
     cacheKey(.jitterAfterWake)
+    cacheKey(.waitAfterWakeSeconds)
+    cacheKey(.delayDDCAfterWake)
     cacheKey(.wakeReapplyTries)
     cacheKey(.sunrise)
     cacheKey(.sunset)
@@ -816,7 +830,7 @@ extension Defaults.Keys {
     static let autoSubzero = Key<Bool>("autoSubzero", default: true)
     static let autoXdr = Key<Bool>("autoXdr", default: true)
     static let autoXdrSensor = Key<Bool>("autoXdrSensor", default: false)
-    static let autoXdrSensorLuxThreshold = Key<Float>("autoXdrSensorLuxThreshold", default: 10000)
+    static let autoXdrSensorLuxThreshold = Key<Float>("autoXdrSensorLuxThreshold", default: XDR_DEFAULT_LUX)
     static let allowAnySyncSource = Key<Bool>("allowAnySyncSource", default: false)
 
     static let gammaDisabledCompletely = Key<Bool>("gammaDisabledCompletely", default: false)
@@ -829,6 +843,10 @@ extension Defaults.Keys {
     static let oldAllowHDREnhanceBrightness = Key<Bool?>("oldAllowHDREnhanceBrightness", default: nil)
     static let oldAllowHDREnhanceContrast = Key<Bool?>("oldAllowHDREnhanceContrast", default: nil)
 
+    static let oldReapplyValuesAfterWake = Key<Bool?>("oldReapplyValuesAfterWake", default: nil)
+    static let oldDetectResponsiveness = Key<Bool?>("oldDetectResponsiveness", default: nil)
+    static let oldBrightnessTransition = Key<BrightnessTransition?>("oldBrightnessTransition", default: nil)
+
     static let hdrWorkaround = Key<Bool>("hdrWorkaround", default: true)
     static let oldBlackOutMirroring = Key<Bool>("oldBlackOutMirroring", default: false)
     static let disableNightShiftXDR = Key<Bool>("disableNightShiftXDR", default: false)
@@ -837,6 +855,7 @@ extension Defaults.Keys {
     static let xdrContrastFactor = Key<Float>("xdrContrastFactor", default: 0.3)
     static let xdrWarningShown = Key<Bool>("xdrWarningShown", default: false)
     static let xdrTipShown = Key<Bool>("xdrTipShown", default: false)
+    static let autoXdrTipShown = Key<Bool>("autoXdrTipShown", default: false)
     static let autoBlackoutBuiltin = Key<Bool>("autoBlackoutBuiltin", default: false)
     static let workaroundBuiltinDisplay = Key<Bool>("workaroundBuiltinDisplay", default: false)
     static let streamLogs = Key<Bool>("streamLogs", default: false)
@@ -915,6 +934,8 @@ extension Defaults.Keys {
     static let overrideAdaptiveMode = Key<Bool>("overrideAdaptiveMode", default: false)
     static let reapplyValuesAfterWake = Key<Bool>("reapplyValuesAfterWake", default: true)
     static let jitterAfterWake = Key<Bool>("jitterAfterWake", default: false)
+    static let waitAfterWakeSeconds = Key<Int>("waitAfterWakeSeconds", default: 60)
+    static let delayDDCAfterWake = Key<Bool>("delayDDCAfterWake", default: false)
     static let wakeReapplyTries = Key<Int>("wakeReapplyTries", default: 5)
     static let hotkeys = Key<Set<PersistentHotkey>>("hotkeys", default: Hotkey.defaults)
     static let displays = Key<[Display]?>("displays", default: nil)
@@ -1017,6 +1038,10 @@ let workaroundBuiltinDisplayPublisher = Defaults.publisher(.workaroundBuiltinDis
 let streamLogsPublisher = Defaults.publisher(.streamLogs).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let mergeBrightnessContrastPublisher = Defaults.publisher(.mergeBrightnessContrast).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let enableSentryPublisher = Defaults.publisher(.enableSentry).dropFirst().removeDuplicates().filter { $0.oldValue != $0.newValue }
+let waitAfterWakeSecondsPublisher = Defaults.publisher(.waitAfterWakeSeconds).dropFirst().removeDuplicates()
+    .filter { $0.oldValue != $0.newValue }
+let delayDDCAfterWakePublisher = Defaults.publisher(.delayDDCAfterWake).dropFirst().removeDuplicates()
+    .filter { $0.oldValue != $0.newValue }
 let showVolumeSliderPublisher = Defaults.publisher(.showVolumeSlider).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let showSliderValuesPublisher = Defaults.publisher(.showSliderValues).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let showAdvancedDisplaySettingsPublisher = Defaults.publisher(.showAdvancedDisplaySettings).removeDuplicates()

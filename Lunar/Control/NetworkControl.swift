@@ -175,7 +175,7 @@ class NetworkControl: Control {
     static func shouldPromptForNetworkControl(_ display: Display) -> Bool {
         guard !display.neverUseNetworkControl else { return false }
 
-        if !screensSleeping.load(ordering: .relaxed), let screen = display.screen ?? display.primaryMirrorScreen,
+        if !displayController.screensSleeping, let screen = display.screen ?? display.primaryMirrorScreen,
            !screen.visibleFrame.isEmpty
         {
             return true
@@ -299,7 +299,7 @@ class NetworkControl: Control {
             let displayService = controllersForDisplay.first(where: { _, displayService in
                 service == displayService.service
             })
-            if !screensSleeping.load(ordering: .relaxed),
+            if !displayController.screensSleeping,
                let serial = displayService?.key, let controller = displayService?.value,
                let display = displayController.displays.values.first(where: { $0.serial == serial })
             {
@@ -327,7 +327,7 @@ class NetworkControl: Control {
     }
 
     static func setDisplayPower(_ power: Bool) {
-        guard !screensSleeping.load(ordering: .relaxed) else { return }
+        guard !displayController.screensSleeping else { return }
         sendToAllControllers { url in
             _ = waitForResponse(from: url / "display-power" / power.i)
         }
@@ -383,7 +383,7 @@ class NetworkControl: Control {
                 .removeDuplicates()
                 .throttle(for: .milliseconds(500), scheduler: RunLoop.current, latest: true)
                 .sink { [weak self] request in
-                    guard let self = self, !screensSleeping.load(ordering: .relaxed) else { return }
+                    guard let self = self, !displayController.screensSleeping else { return }
 
                     defer {
                         self.manageSendingState(for: request.controlID, sending: false)
@@ -463,7 +463,7 @@ class NetworkControl: Control {
     func get(_ controlID: ControlID, max: Bool = false) -> UInt16? {
         guard let display = display else { return nil }
 
-        guard !screensSleeping.load(ordering: .relaxed) else { return nil }
+        guard !displayController.screensSleeping else { return nil }
 
         _ = getterTasksSemaphore.wait(for: 5.seconds)
         defer { getterTasksSemaphore.signal() }

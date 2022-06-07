@@ -3,6 +3,26 @@
     <channel>
         <title>Lunar</title>
         <item>
+            <title>5.6.7a3</title>
+            <pubDate>Tue, 07 Jun 2022 17:28:31 +0300</pubDate>
+            <link>https://lunar.fyi/</link>
+            <sparkle:fullReleaseNotesLink>https://lunar.fyi/changelog</sparkle:fullReleaseNotesLink>
+            <sparkle:channel>alpha</sparkle:channel>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <sparkle:version>5.6.7a3</sparkle:version>
+            <sparkle:shortVersionString>5.6.7a3</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-5.6.7a3.html</sparkle:releaseNotesLink>
+            <enclosure url="https://files.lunar.fyi/releases/Lunar-5.6.7a3.dmg" length="18753061" type="application/octet-stream" sparkle:edSignature="H1GwtjbXkSNO8XxitKi+imKZLtJvYe2NodukJY1VPwjvrmQKJcI/Bi8dGDFrqZLbiknT7NesHhsLD40TgQ5oBA=="/>
+            <sparkle:deltas>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.6.7a3-5.6.7a2.delta" sparkle:deltaFrom="5.6.7a2" length="2689306" type="application/octet-stream" sparkle:edSignature="+lpt+vFfDQUR/WMM1WlhTOttkheF84tJ0VzPLjW1irOtPMstD4bQLkAm+rYggfBt8Cv9iDd3HqQI2wu5FTWSBA=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.6.7a3-5.6.7a1.delta" sparkle:deltaFrom="5.6.7a1" length="2743318" type="application/octet-stream" sparkle:edSignature="yb/N6zM81ZuxMfWILR0L/oJKNRFVUADl1DJ5gT91iuIWbEhgvVIuRAc/N3suTN3e+Mf8RHUGmz2b4AYMM2ZmCA=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.6.7a3-5.6.6.delta" sparkle:deltaFrom="5.6.6" length="2836214" type="application/octet-stream" sparkle:edSignature="K3cVtaNU3dLCOnNTzcePJaGi0TZJiLZQZ4KvC0d3aynqSEDcYKz0fj6O+H8wSwxcc5zMawyy2kZAagODTy9FBw=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.6.7a3-5.6.5.delta" sparkle:deltaFrom="5.6.5" length="3011838" type="application/octet-stream" sparkle:edSignature="zN+5TFm0XYRsaNc+wq8/4iXPw3BlwunXbukAYi5JD9ScCJg9I32PyCVAA7E0GG7sRUXUofj5BMbe2T4qgmXSDA=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.6.7a3-5.6.4.delta" sparkle:deltaFrom="5.6.4" length="3085902" type="application/octet-stream" sparkle:edSignature="2D6mdVCoBdavIArmcxCiUqNOyxCpv/g8c1vNb4+/PLBqzbAEf5sIJkhDOrw4a3WNM5e79dwwy23Qa2tvs97zBA=="/>
+            </sparkle:deltas>
+        </item>
+        <item>
             <title>5.6.7a2</title>
             <pubDate>Sat, 04 Jun 2022 12:00:48 +0300</pubDate>
             <link>https://lunar.fyi/</link>
