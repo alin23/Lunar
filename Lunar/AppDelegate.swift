@@ -448,6 +448,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 Defaults[.showOptionsMenu] = true
 
                 env.optionsTab = .advanced
+            case "xdr", "hdr":
+                statusItemButtonController?.showPopover()
+                Defaults[.showOptionsMenu] = true
+
+                env.optionsTab = .hdr
             case "menu":
                 statusItemButtonController?.showPopover()
                 Defaults[.showOptionsMenu] = false

@@ -1061,6 +1061,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case prism = -2
         case lenovo = 12462
         case xiaomi = 10007
+        case xiaomi2 = 25001
         case philips = 16652
         case sceptre = 19988
         case huawei = 8950
@@ -1072,6 +1073,21 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case hp = 8718
         case portable = 19700
         case dummy = 0xF0F0
+        case innocn = 12547
+        case tcl = 20588
+        case aoc = 1507
+        case gigabyte = 7252
+        case eve = 5829
+        case aosiman = 1645
+        case iiyama = 9933
+        case ktc = 19815
+        case iodata = 9700
+        case innoview = 25716
+        case cforce = 12434
+        case horizon = 8387
+        case msi = 13929
+        case viewsonic = 23139
+        case ic = 9316
         case unknown = -1
     }
 
@@ -4754,7 +4770,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             specificBlockers = DEFAULT_DDC_BLOCKERS
         case .proart:
             specificBlockers = DEFAULT_DDC_BLOCKERS
-        case .unknown, .dummy, .portable:
+        default:
             specificBlockers = DEFAULT_DDC_BLOCKERS
         }
 

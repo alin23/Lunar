@@ -892,7 +892,7 @@ extension MPDisplayMode {
         return tags.isEmpty ? "".attributedString : "   ".attributedString + tags.joined(separator: ", ")
     }
 
-    open var attributedString: NSAttributedString {
+    public var attributedString: NSAttributedString {
         let res = "\(width) x \(height)"
         let dpi = "\(dotsPerInch)DPI"
 
