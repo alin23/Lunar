@@ -92,6 +92,21 @@ public extension Color {
     }
 }
 
+extension View {
+    /// Applies the given transform if the given condition evaluates to `true`.
+    /// - Parameters:
+    ///   - condition: The condition to evaluate.
+    ///   - transform: The transform to apply to the source `View`.
+    /// - Returns: Either the original `View` or the modified `View` if the condition is `true`.
+    @ViewBuilder func `if`<Content: View>(_ condition: @autoclosure () -> Bool, transform: (Self) -> Content) -> some View {
+        if condition() {
+            transform(self)
+        } else {
+            self
+        }
+    }
+}
+
 // MARK: - FlatButton
 
 public struct FlatButton: ButtonStyle {
@@ -171,9 +186,9 @@ public struct FlatButton: ButtonStyle {
                             alignment: .center
                         )
                     )
-
-            ).colorMultiply(configuration.isPressed && !disabled ? pressedColor : colorMultiply)
+            )
             .scaleEffect(configuration.isPressed && !disabled ? 1.02 : scale)
+            .colorMultiply(configuration.isPressed && !disabled ? pressedColor : colorMultiply)
             .onAppear {
                 pressedColor = hoverColor.blended(withFraction: 0.5, of: .white)
             }
@@ -194,7 +209,7 @@ public struct FlatButton: ButtonStyle {
                 guard !disabled else { return }
                 withAnimation(.easeOut(duration: 0.2)) {
                     colorMultiply = hover ? hoverColor : .white
-                    scale = hover ? 1.05 : 1
+                    scale = hover ? 1.07 : 1
                 }
             })
             .contrast(disabled ? 0.3 : 1.0)

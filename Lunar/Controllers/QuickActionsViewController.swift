@@ -1564,6 +1564,7 @@ struct QuickActionsView: View {
         QuickActionsMenuView()
             .environmentObject(appDelegate!.env)
             .colors(colorScheme == .dark ? .dark : .light)
+            .focusable(false)
     }
 }
 
