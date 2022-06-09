@@ -38,6 +38,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .autoSubzero,
     .autoXdr,
     .autoXdrSensor,
+    .autoXdrSensorShowOSD,
     .autoXdrSensorLuxThreshold,
     .allowAnySyncSource,
     .gammaDisabledCompletely,
@@ -667,6 +668,7 @@ func initCache() {
     cacheKey(.autoSubzero)
     cacheKey(.autoXdr)
     cacheKey(.autoXdrSensor)
+    cacheKey(.autoXdrSensorShowOSD)
     cacheKey(.autoXdrSensorLuxThreshold)
     cacheKey(.allowAnySyncSource)
 
@@ -830,6 +832,7 @@ extension Defaults.Keys {
     static let autoSubzero = Key<Bool>("autoSubzero", default: true)
     static let autoXdr = Key<Bool>("autoXdr", default: true)
     static let autoXdrSensor = Key<Bool>("autoXdrSensor", default: false)
+    static let autoXdrSensorShowOSD = Key<Bool>("autoXdrSensorShowOSD", default: true)
     static let autoXdrSensorLuxThreshold = Key<Float>("autoXdrSensorLuxThreshold", default: XDR_DEFAULT_LUX)
     static let allowAnySyncSource = Key<Bool>("allowAnySyncSource", default: false)
 
@@ -1018,6 +1021,8 @@ let autoSubzeroPublisher = Defaults.publisher(.autoSubzero).removeDuplicates().d
     .filter { $0.oldValue != $0.newValue }
 let autoXdrPublisher = Defaults.publisher(.autoXdr).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let autoXdrSensorPublisher = Defaults.publisher(.autoXdrSensor).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
+let autoXdrSensorShowOSDPublisher = Defaults.publisher(.autoXdrSensorShowOSD).removeDuplicates().dropFirst()
+    .filter { $0.oldValue != $0.newValue }
 let autoXdrSensorLuxThresholdPublisher = Defaults.publisher(.autoXdrSensorLuxThreshold).removeDuplicates().dropFirst()
     .filter { $0.oldValue != $0.newValue }
 let allowAnySyncSourcePublisher = Defaults.publisher(.allowAnySyncSource).removeDuplicates().dropFirst()
