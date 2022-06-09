@@ -302,12 +302,12 @@ public struct BigSurSlider: View {
                     )
                     if mark > 0 {
                         RoundedRectangle(cornerRadius: 1, style: .continuous)
-                            .fill(Color.red)
-                            .frame(width: 3, height: sliderHeight, alignment: .center)
+                            .fill(Color.red.opacity(0.7))
+                            .frame(width: 3, height: sliderHeight - 5, alignment: .center)
                             .offset(
                                 x: cap(mark, minVal: 0, maxVal: 1).cg * w,
                                 y: 0
-                            ).animation(.fastSpring, value: mark)
+                            ).animation(.jumpySpring, value: mark)
                     }
                 }
                 .disabled(disabled)
