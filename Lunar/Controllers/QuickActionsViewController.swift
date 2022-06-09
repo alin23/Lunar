@@ -407,6 +407,7 @@ struct HDRSettingsView: View {
     @Default(.autoSubzero) var autoSubzero
     @Default(.disableNightShiftXDR) var disableNightShiftXDR
     @Default(.autoXdrSensor) var autoXdrSensor
+    @Default(.autoXdrSensorShowOSD) var autoXdrSensorShowOSD
     @Default(.autoXdrSensorLuxThreshold) var autoXdrSensorLuxThreshold
 
     var body: some View {
@@ -492,15 +493,15 @@ struct HDRSettingsView: View {
             if Sysctl.isMacBook, displayController.builtinDisplay?.supportsEnhance ?? false {
                 VStack(alignment: .leading, spacing: 2) {
                     SettingsToggle(text: "Toggle XDR Brightness based on ambient light", setting: $autoXdrSensor)
-                    Text("XDR Brightness will be automatically enabled")
-                        .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                        .foregroundColor(.black.opacity(0.4))
-                        .padding(.leading, 20)
-                    Text("when ambient light is above \(autoXdrSensorLuxThreshold.str(decimals: 0)) lux")
-                        .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                        .foregroundColor(.black.opacity(0.4))
-                        .padding(.leading, 20)
-                        .padding(.top, -5)
+                    Text(
+                        """
+                        XDR Brightness will be automatically enabled
+                        when ambient light is above \(autoXdrSensorLuxThreshold.str(decimals: 0)) lux
+                        """
+                    )
+                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                    .foregroundColor(.black.opacity(0.4))
+                    .padding(.leading, 20)
                 }
                 HStack {
                     let luxBinding = Binding<Float>(
@@ -530,13 +531,29 @@ struct HDRSettingsView: View {
                         .font(.system(size: 12, weight: .semibold, design: .monospaced))
                 }
                 if autoXdrSensor {
-                    Text(dc.autoXdrSensorPausedReason ?? "Current ambient light: \(dc.internalSensorLux.str(decimals: 0)) lux")
-                        .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                        .foregroundColor(.black.opacity(0.4))
-                        .padding(.leading, 20)
-                        .padding(.top, -5)
+                    (
+                        Text(dc.autoXdrSensorPausedReason ?? "Current ambient light: ")
+                            .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                            + Text(dc.autoXdrSensorPausedReason == nil ? "\(dc.internalSensorLux.str(decimals: 0)) lux" : "")
+                            .font(.system(size: 10, weight: .heavy, design: .monospaced))
+                    )
+                    .foregroundColor(.black.opacity(0.4))
+                    .padding(.leading, 20)
                 }
             }
+            VStack(alignment: .leading, spacing: 2) {
+                SettingsToggle(text: "Show OSD when toggling XDR automatically", setting: $autoXdrSensorShowOSD.animation(.fastSpring))
+                (
+                    Text("Shows a progress bar while XDR is activating and\n")
+                        .font(.system(size: 10, weight: .semibold, design: .monospaced).leading(.tight))
+                        + Text("allows aborting the activation by pressing ")
+                        .font(.system(size: 10, weight: .semibold, design: .monospaced).leading(.tight))
+                        + Text("Esc")
+                        .font(.system(size: 10, weight: .heavy, design: .monospaced).leading(.tight))
+                )
+                .foregroundColor(.black.opacity(0.4))
+                .padding(.leading, 20)
+            }.padding(.leading)
         }
     }
 }
