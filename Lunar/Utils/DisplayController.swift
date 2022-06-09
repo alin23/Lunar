@@ -831,6 +831,7 @@ class DisplayController: ObservableObject {
     @Atomic var loggedOut = false
 
     var autoXdrSensor: Bool = Defaults[.autoXdrSensor]
+    var autoXdrSensorShowOSD: Bool = Defaults[.autoXdrSensorShowOSD]
 
     @Atomic var autoBlackoutPending = false {
         didSet {
@@ -1318,15 +1319,23 @@ class DisplayController: ObservableObject {
     }
 
     func setupXdrTask() {
-        autoXdrSensorPublisher.sink { [self] change in
-            autoXdrSensor = change.newValue
-            guard let display = builtinDisplay, display.isMacBookXDR, let lux = SensorMode.getInternalSensorLux()?.f else {
-                xdrSensorTask = nil
-                return
-            }
-            internalSensorLux = lux
-            xdrSensorTask = change.newValue ? getSensorTask() : nil
-        }.store(in: &observers)
+        autoXdrSensorShowOSDPublisher
+            .debounce(for: .seconds(1), scheduler: RunLoop.main)
+            .sink { [self] change in
+                autoXdrSensorShowOSD = change.newValue
+            }.store(in: &observers)
+
+        autoXdrSensorPublisher
+            .debounce(for: .seconds(1), scheduler: RunLoop.main)
+            .sink { [self] change in
+                autoXdrSensor = change.newValue
+                guard let display = builtinDisplay, display.isMacBookXDR, let lux = SensorMode.getInternalSensorLux()?.f else {
+                    xdrSensorTask = nil
+                    return
+                }
+                internalSensorLux = lux
+                xdrSensorTask = change.newValue ? getSensorTask() : nil
+            }.store(in: &observers)
 
         if CachedDefaults[.autoXdrSensor] {
             xdrSensorTask = getSensorTask()
