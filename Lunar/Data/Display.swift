@@ -3735,7 +3735,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 screen: screen,
                 show: true,
                 backgroundColor: .clear,
-                level: .screenSaver,
+                level: .hud,
                 fillScreen: true,
                 stationary: true
             )

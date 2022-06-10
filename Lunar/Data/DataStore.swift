@@ -116,6 +116,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .firstRunAfterDefaults5Upgrade,
     .firstRunAfterBuiltinUpgrade,
     .firstRunAfterHotkeysUpgrade,
+    .firstRunAfterExperimentalDDCUpgrade,
     .fKeysAsFunctionKeys,
     .hasActiveDisplays,
     .hasActiveExternalDisplays,
@@ -228,6 +229,7 @@ class DataStore: NSObject {
             Defaults[.firstRunAfterDefaults5Upgrade] = true
             Defaults[.firstRunAfterBuiltinUpgrade] = true
             Defaults[.firstRunAfterHotkeysUpgrade] = true
+            Defaults[.firstRunAfterExperimentalDDCUpgrade] = true
             shouldOnboard = true
         }
 
@@ -255,6 +257,11 @@ class DataStore: NSObject {
         if Defaults[.firstRunAfterM1DDCUpgrade] == nil {
             DataStore.firstRunAfterM1DDCUpgrade()
             Defaults[.firstRunAfterM1DDCUpgrade] = true
+        }
+
+        if Defaults[.firstRunAfterExperimentalDDCUpgrade] == nil {
+            DataStore.firstRunAfterExperimentalDDCUpgrade()
+            Defaults[.firstRunAfterExperimentalDDCUpgrade] = true
         }
 
         Defaults[.toolTipDelay] = 1
@@ -337,6 +344,11 @@ class DataStore: NSObject {
 
     static func firstRunAfterM1DDCUpgrade() {
         thisIsFirstRunAfterM1DDCUpgrade = true
+    }
+
+    static func firstRunAfterExperimentalDDCUpgrade() {
+        thisIsFirstRunAfterExperimentalDDCUpgrade = true
+        CachedDefaults[.refreshValues] = false
     }
 
     static func reset() {
@@ -809,6 +821,7 @@ extension Defaults.Keys {
     static let firstRunAfterBuiltinUpgrade = Key<Bool?>("firstRunAfterBuiltinUpgrade", default: nil)
     static let firstRunAfterHotkeysUpgrade = Key<Bool?>("firstRunAfterHotkeysUpgrade", default: nil)
     static let firstRunAfterM1DDCUpgrade = Key<Bool?>("firstRunAfterM1DDCUpgrade", default: nil)
+    static let firstRunAfterExperimentalDDCUpgrade = Key<Bool?>("firstRunAfterExperimentalDDCUpgrade", default: nil)
     static let brightnessKeysEnabled = Key<Bool>("brightnessKeysEnabled", default: true)
     static let mediaKeysNotified = Key<Bool>("mediaKeysNotified", default: false)
     static let detectResponsiveness = Key<Bool>("detectResponsiveness", default: true)
