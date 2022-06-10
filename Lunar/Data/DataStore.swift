@@ -937,7 +937,7 @@ extension Defaults.Keys {
     static let overrideAdaptiveMode = Key<Bool>("overrideAdaptiveMode", default: false)
     static let reapplyValuesAfterWake = Key<Bool>("reapplyValuesAfterWake", default: true)
     static let jitterAfterWake = Key<Bool>("jitterAfterWake", default: false)
-    static let waitAfterWakeSeconds = Key<Int>("waitAfterWakeSeconds", default: 60)
+    static let waitAfterWakeSeconds = Key<Int>("waitAfterWakeSeconds", default: 30)
     static let delayDDCAfterWake = Key<Bool>("delayDDCAfterWake", default: false)
     static let wakeReapplyTries = Key<Int>("wakeReapplyTries", default: 5)
     static let hotkeys = Key<Set<PersistentHotkey>>("hotkeys", default: Hotkey.defaults)
