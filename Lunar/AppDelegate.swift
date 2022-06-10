@@ -74,6 +74,7 @@ var thisIsFirstRunAfterDefaults5Upgrade = false
 var thisIsFirstRunAfterM1DDCUpgrade = false
 var thisIsFirstRunAfterBuiltinUpgrade = false
 var thisIsFirstRunAfterHotkeysUpgrade = false
+var thisIsFirstRunAfterExperimentalDDCUpgrade = false
 
 func createTransition(
     duration: TimeInterval,
