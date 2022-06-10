@@ -722,34 +722,7 @@ enum DDC {
         return CachedDefaults[.waitAfterWakeSeconds]
     }()
 
-    static var delayDDCAfterWake: Bool = {
-        delayDDCAfterWakePublisher.debounce(for: .seconds(2), scheduler: RunLoop.main)
-            .sink { change in
-                delayDDCAfterWake = change.newValue
-
-                guard change.newValue else {
-                    if let oldVal = CachedDefaults[.oldReapplyValuesAfterWake] { CachedDefaults[.reapplyValuesAfterWake] = oldVal }
-                    if let oldVal = CachedDefaults[.oldBrightnessTransition] { CachedDefaults[.brightnessTransition] = oldVal }
-                    if let oldVal = CachedDefaults[.oldDetectResponsiveness] { CachedDefaults[.detectResponsiveness] = oldVal }
-                    return
-                }
-
-                CachedDefaults[.oldReapplyValuesAfterWake] = CachedDefaults[.reapplyValuesAfterWake]
-                CachedDefaults[.oldBrightnessTransition] = CachedDefaults[.brightnessTransition]
-                CachedDefaults[.oldDetectResponsiveness] = CachedDefaults[.detectResponsiveness]
-
-                CachedDefaults[.detectResponsiveness] = false
-                CachedDefaults[.reapplyValuesAfterWake] = false
-                CachedDefaults[.brightnessTransition] = .instant
-
-                displayController.displays.values.forEach { d in
-                    d.reapplyColorGain = false
-                }
-            }
-            .store(in: &observers)
-
-        return CachedDefaults[.delayDDCAfterWake]
-    }()
+    static var delayDDCAfterWake: Bool = CachedDefaults[.delayDDCAfterWake]
 
     static var shouldWait: Bool {
         delayDDCAfterWake && waitAfterWakeSeconds > 0 && wakeTime != startTime && timeSince(wakeTime) > waitAfterWakeSeconds.d
@@ -795,6 +768,7 @@ enum DDC {
                 .compactMap { IOServiceDetector(serviceClass: $0, callback: { _, _, _ in ioRegistryTreeChanged.send(true) }) }
         #endif
         serviceDetectors.forEach { _ = $0.startDetection() }
+        addObservers()
     }
 
     static func reset() {
@@ -1253,6 +1227,34 @@ enum DDC {
         default:
             return nil
         }
+    }
+
+    static func addObservers() {
+        delayDDCAfterWake = CachedDefaults[.delayDDCAfterWake]
+        delayDDCAfterWakePublisher.debounce(for: .seconds(2), scheduler: RunLoop.main)
+            .sink { change in
+                delayDDCAfterWake = change.newValue
+
+                guard change.newValue else {
+                    if let oldVal = CachedDefaults[.oldReapplyValuesAfterWake] { CachedDefaults[.reapplyValuesAfterWake] = oldVal }
+                    if let oldVal = CachedDefaults[.oldBrightnessTransition] { CachedDefaults[.brightnessTransition] = oldVal }
+                    if let oldVal = CachedDefaults[.oldDetectResponsiveness] { CachedDefaults[.detectResponsiveness] = oldVal }
+                    return
+                }
+
+                CachedDefaults[.oldReapplyValuesAfterWake] = CachedDefaults[.reapplyValuesAfterWake]
+                CachedDefaults[.oldBrightnessTransition] = CachedDefaults[.brightnessTransition]
+                CachedDefaults[.oldDetectResponsiveness] = CachedDefaults[.detectResponsiveness]
+
+                CachedDefaults[.detectResponsiveness] = false
+                CachedDefaults[.reapplyValuesAfterWake] = false
+                CachedDefaults[.brightnessTransition] = .instant
+
+                displayController.displays.values.forEach { d in
+                    d.reapplyColorGain = false
+                }
+            }
+            .store(in: &observers)
     }
 
     static func extractName(from edid: EDID, hex: Bool = false) -> String? {
