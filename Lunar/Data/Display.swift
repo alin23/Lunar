@@ -763,8 +763,16 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     deinit {
         gammaWindowController?.close()
         gammaWindowController = nil
-        cornerWindowController?.close()
-        cornerWindowController = nil
+
+        cornerWindowControllerTopLeft?.close()
+        cornerWindowControllerTopRight?.close()
+        cornerWindowControllerBottomLeft?.close()
+        cornerWindowControllerBottomRight?.close()
+        cornerWindowControllerTopLeft = nil
+        cornerWindowControllerTopRight = nil
+        cornerWindowControllerBottomLeft = nil
+        cornerWindowControllerBottomRight = nil
+
         shadeWindowController?.close()
         shadeWindowController = nil
         faceLightWindowController?.close()
@@ -1738,9 +1746,24 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         set { Self.setWindowController(id, type: "test", windowController: newValue) }
     }
 
-    var cornerWindowController: NSWindowController? {
-        get { Self.getWindowController(id, type: "corner") }
-        set { Self.setWindowController(id, type: "corner", windowController: newValue) }
+    var cornerWindowControllerTopLeft: NSWindowController? {
+        get { Self.getWindowController(id, type: "corner-topLeft") }
+        set { Self.setWindowController(id, type: "corner-topLeft", windowController: newValue) }
+    }
+
+    var cornerWindowControllerTopRight: NSWindowController? {
+        get { Self.getWindowController(id, type: "corner-topRight") }
+        set { Self.setWindowController(id, type: "corner-topRight", windowController: newValue) }
+    }
+
+    var cornerWindowControllerBottomLeft: NSWindowController? {
+        get { Self.getWindowController(id, type: "corner-bottomLeft") }
+        set { Self.setWindowController(id, type: "corner-bottomLeft", windowController: newValue) }
+    }
+
+    var cornerWindowControllerBottomRight: NSWindowController? {
+        get { Self.getWindowController(id, type: "corner-bottomRight") }
+        set { Self.setWindowController(id, type: "corner-bottomRight", windowController: newValue) }
     }
 
     var gammaWindowController: NSWindowController? {
@@ -3725,23 +3748,39 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             guard cornerRadius.intValue > 0, active, !isInHardwareMirrorSet,
                   !isIndependentDummy, let screen = screen ?? primaryMirrorScreen
             else {
-                cornerWindowController?.close()
-                cornerWindowController = nil
+                cornerWindowControllerTopLeft?.close()
+                cornerWindowControllerTopRight?.close()
+                cornerWindowControllerBottomLeft?.close()
+                cornerWindowControllerBottomRight?.close()
+                cornerWindowControllerTopLeft = nil
+                cornerWindowControllerTopRight = nil
+                cornerWindowControllerBottomLeft = nil
+                cornerWindowControllerBottomRight = nil
                 return
             }
-            createWindow(
-                "cornerWindowController",
-                controller: &cornerWindowController,
-                screen: screen,
-                show: true,
-                backgroundColor: .clear,
-                level: .hud,
-                fillScreen: true,
-                stationary: true
-            )
-            if let wc = cornerWindowController as? CornerWindowController {
-                wc.display = self
+
+            let create: (inout NSWindowController?, ScreenCorner) -> Void = { wc, corner in
+                createWindow(
+                    "cornerWindowController",
+                    controller: &wc,
+                    screen: screen,
+                    show: true,
+                    backgroundColor: .clear,
+                    level: .hud,
+                    stationary: true,
+                    corner: corner,
+                    size: NSSize(width: 50, height: 50)
+                )
+                if let wc = wc as? CornerWindowController {
+                    wc.corner = corner
+                    wc.display = self
+                }
             }
+
+            create(&cornerWindowControllerTopLeft, .topLeft)
+            create(&cornerWindowControllerTopRight, .topRight)
+            create(&cornerWindowControllerBottomLeft, .bottomLeft)
+            create(&cornerWindowControllerBottomRight, .bottomRight)
         }
     }
 

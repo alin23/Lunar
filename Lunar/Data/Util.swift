@@ -1215,6 +1215,15 @@ func zip4<S1: Sequence, S2: Sequence, S3: Sequence, S4: Sequence>(
     Zip4Sequence(s1, s2, s3, s4)
 }
 
+// MARK: - ScreenCorner
+
+enum ScreenCorner {
+    case topLeft
+    case topRight
+    case bottomLeft
+    case bottomRight
+}
+
 func createWindow(
     _ identifier: String,
     controller: inout NSWindowController?,
@@ -1223,7 +1232,9 @@ func createWindow(
     backgroundColor: NSColor? = .clear,
     level: NSWindow.Level = .normal,
     fillScreen: Bool = false,
-    stationary: Bool = false
+    stationary: Bool = false,
+    corner: ScreenCorner? = nil,
+    size: NSSize? = nil
 ) {
     mainThread {
         guard let mainStoryboard = NSStoryboard.main else { return }
@@ -1235,13 +1246,45 @@ func createWindow(
 
         if let wc = controller {
             if let screen = screen, let w = wc.window {
-                w.setFrameOrigin(CGPoint(x: screen.frame.minX, y: screen.frame.minY))
-                if fillScreen {
-                    w.setFrame(screen.frame, display: false)
+                if let size {
+                    w.contentMaxSize = size
+                    w.contentMinSize = size
+                }
+                if let corner {
+                    switch corner {
+                    case .bottomLeft:
+                        w.setFrame(
+                            NSRect(origin: NSPoint(x: screen.frame.minX, y: screen.frame.minY), size: size ?? w.frame.size),
+                            display: false
+                        )
+                    case .bottomRight:
+                        w.setFrame(
+                            NSRect(origin: NSPoint(x: screen.frame.maxX, y: screen.frame.minY), size: size ?? w.frame.size),
+                            display: false
+                        )
+                    case .topLeft:
+                        w.setFrame(
+                            NSRect(origin: NSPoint(x: screen.frame.minX, y: screen.frame.maxY), size: size ?? w.frame.size),
+                            display: false
+                        )
+                    case .topRight:
+                        w.setFrame(
+                            NSRect(origin: NSPoint(x: screen.frame.maxX, y: screen.frame.maxY), size: size ?? w.frame.size),
+                            display: false
+                        )
+                    }
+                } else {
+                    w.setFrameOrigin(CGPoint(x: screen.frame.minX, y: screen.frame.minY))
+                    if fillScreen {
+                        w.setFrame(screen.frame, display: false)
+                    }
                 }
             }
 
             if let window = wc.window {
+                if let size, corner == nil {
+                    window.setContentSize(size)
+                }
                 window.level = level
                 window.isOpaque = false
                 window.backgroundColor = backgroundColor
