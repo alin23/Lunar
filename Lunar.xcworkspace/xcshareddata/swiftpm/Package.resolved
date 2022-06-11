@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Flight-School/AnyCodable",
       "state" : {
-        "revision" : "11423ef0c756e8a1f6b4bb576dab9d97bc016c70",
-        "version" : "0.6.4"
+        "revision" : "f9fda69a7b704d46fb5123005f2f7e43dbb8a0fa",
+        "version" : "0.6.5"
       }
     },
     {
@@ -50,8 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/danielgindi/Charts",
       "state" : {
-        "revision" : "b61fc9b97829ab9b954d01f96e601d52045ef5dc",
-        "version" : "4.0.2"
+        "revision" : "b38b8d45a8cbda9f0f2a3566778ed114f06056b7",
+        "version" : "4.0.3"
       }
     },
     {
@@ -68,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sindresorhus/Defaults",
       "state" : {
-        "revision" : "119f654d44f7b90f00dc11f7dd1c94a36f12576b",
-        "version" : "6.2.1"
+        "revision" : "981ccb0a01c54abbe3c12ccb8226108527bbf115",
+        "version" : "6.3.0"
       }
     },
     {

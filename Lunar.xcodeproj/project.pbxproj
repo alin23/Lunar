@@ -35,7 +35,6 @@
 		C730421F2407E92C0016E591 /* Headers in Resources */ = {isa = PBXBuildFile; fileRef = C730421E2407E92C0016E591 /* Headers */; };
 		C731260C22B38899001ED199 /* HelpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C731260B22B38899001ED199 /* HelpButton.swift */; };
 		C731260F22B3A9CD001ED199 /* HelpPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C731260E22B3A9CD001ED199 /* HelpPopoverController.swift */; };
-		C731E85827E1D5780016B36D /* Defaults+Workaround.swift in Sources */ = {isa = PBXBuildFile; fileRef = C731E85727E1D5780016B36D /* Defaults+Workaround.swift */; };
 		C731E85E27E1E5090016B36D /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = C731E85D27E1E5090016B36D /* Sentry */; };
 		C73716A526DE1F22008EEE53 /* CBTrueToneClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C737169E26DE1F22008EEE53 /* CBTrueToneClient.h */; };
 		C73716A626DE1F22008EEE53 /* BrightnessSystemClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C73716A326DE1F22008EEE53 /* BrightnessSystemClient.h */; };
@@ -239,7 +238,6 @@
 		C730421E2407E92C0016E591 /* Headers */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Headers; path = OSD.framework/Headers; sourceTree = "<group>"; };
 		C731260B22B38899001ED199 /* HelpButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpButton.swift; sourceTree = "<group>"; };
 		C731260E22B3A9CD001ED199 /* HelpPopoverController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpPopoverController.swift; sourceTree = "<group>"; };
-		C731E85727E1D5780016B36D /* Defaults+Workaround.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Defaults+Workaround.swift"; sourceTree = "<group>"; };
 		C735DD791FD5C04D00FBD16F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		C737169E26DE1F22008EEE53 /* CBTrueToneClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBTrueToneClient.h; sourceTree = "<group>"; };
 		C73716A326DE1F22008EEE53 /* BrightnessSystemClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrightnessSystemClient.h; sourceTree = "<group>"; };
@@ -589,7 +587,6 @@
 		C790D4BC259B9DC100868689 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				C731E85727E1D5780016B36D /* Defaults+Workaround.swift */,
 				C7F8623F2608A34300704300 /* RunloopQueue.swift */,
 				C7520C071FD20CC200756F82 /* DisplayController.swift */,
 				C78BD04D259B369A00FC823F /* Popovers.swift */,
@@ -1046,7 +1043,6 @@
 				C7E07373259BAC660019C9C2 /* AdaptiveMode.swift in Sources */,
 				C7DD622F2614CBAA00B07B31 /* PaddedButton.swift in Sources */,
 				C76B775D26445C9B007CAAC5 /* MacToggle.swift in Sources */,
-				C731E85827E1D5780016B36D /* Defaults+Workaround.swift in Sources */,
 				C77200031FF072CB0078E155 /* ScrollableBrightness.swift in Sources */,
 				C714C998280572920061588E /* ProViews.swift in Sources */,
 				C7E0737C259CB2FA0019C9C2 /* LocationMode.swift in Sources */,
@@ -1183,7 +1179,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.6.8a1;
+				CURRENT_PROJECT_VERSION = 5.6.8;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -1211,7 +1207,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 5.6.8a1;
+				MARKETING_VERSION = 5.6.8;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1305,7 +1301,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.6.8a1;
+				CURRENT_PROJECT_VERSION = 5.6.8;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1333,7 +1329,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 5.6.8a1;
+				MARKETING_VERSION = 5.6.8;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
@@ -1489,7 +1485,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.6.8a1;
+				CURRENT_PROJECT_VERSION = 5.6.8;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -1517,7 +1513,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 5.6.8a1;
+				MARKETING_VERSION = 5.6.8;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1555,7 +1551,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.6.8a1;
+				CURRENT_PROJECT_VERSION = 5.6.8;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1583,7 +1579,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 5.6.8a1;
+				MARKETING_VERSION = 5.6.8;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;

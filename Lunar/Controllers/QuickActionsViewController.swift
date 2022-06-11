@@ -411,73 +411,76 @@ struct HDRSettingsView: View {
     @Default(.autoXdrSensorLuxThreshold) var autoXdrSensorLuxThreshold
 
     var body: some View {
-        VStack(alignment: .leading) {
-            Group {
-                SettingsToggle(
-                    text: "Run in HDR compatibility mode", setting: $hdrWorkaround,
-                    help: """
-                    Because of a macOS bug, any app that uses the Gamma API will break HDR.
+        ZStack {
+            Color.clear.frame(maxWidth: .infinity, alignment: .leading)
+            VStack(alignment: .leading) {
+                Group {
+                    SettingsToggle(
+                        text: "Run in HDR compatibility mode", setting: $hdrWorkaround,
+                        help: """
+                        Because of a macOS bug, any app that uses the Gamma API will break HDR.
 
-                    This workaround tries to keep HDR working by periodically resetting Gamma changes.
+                        This workaround tries to keep HDR working by periodically resetting Gamma changes.
 
-                    This will stop working in the following cases:
+                        This will stop working in the following cases:
 
-                    • Using "Software Dimming" with the Gamma method on any display
-                    • Having the f.lux app running
-                    • Having the Gamma Control app running
-                    • Using "XDR Brightness"
-                    • Using "Sub-zero dimming"
-                    """
-                )
-                SettingsToggle(
-                    text: "Allow XDR on non-Apple HDR monitors", setting: $allowHDREnhanceBrightness.animation(.fastSpring),
-                    help: """
-                    This should work for HDR monitors that have higher brightness LEDs.
-                    Known issues: some monitors turn to grayscale/monochrome when XDR is enabled.
-
-                    In case of any issue, uncheck this and restart your computer to revert any changes.
-                    """
-                )
-
-                SettingsToggle(
-                    text: "Enhance contrast in XDR Brightness", setting: $xdrContrast,
-                    help: """
-                    Improve readability in sunlight by increasing XDR contrast.
-                    This option is especially useful when using apps with dark backgrounds.
-
-                    Note: works only when using a single display
-                    """
-                )
-                HStack {
-                    BigSurSlider(
-                        percentage: $xdrContrastFactor,
-                        image: "circle.lefthalf.filled",
-                        color: Colors.lightGray,
-                        backgroundColor: Colors.grayMauve.opacity(0.1),
-                        knobColor: Colors.lightGray,
-                        showValue: .constant(false),
-                        disabled: !$xdrContrast
+                        • Using "Software Dimming" with the Gamma method on any display
+                        • Having the f.lux app running
+                        • Having the Gamma Control app running
+                        • Using "XDR Brightness"
+                        • Using "Sub-zero dimming"
+                        """
                     )
-                    .padding(.leading)
+                    SettingsToggle(
+                        text: "Allow XDR on non-Apple HDR monitors", setting: $allowHDREnhanceBrightness.animation(.fastSpring),
+                        help: """
+                        This should work for HDR monitors that have higher brightness LEDs.
+                        Known issues: some monitors turn to grayscale/monochrome when XDR is enabled.
 
-                    SwiftUI.Button("Reset") { xdrContrastFactor = 0.3 }
-                        .buttonStyle(FlatButton(
+                        In case of any issue, uncheck this and restart your computer to revert any changes.
+                        """
+                    )
+
+                    SettingsToggle(
+                        text: "Enhance contrast in XDR Brightness", setting: $xdrContrast,
+                        help: """
+                        Improve readability in sunlight by increasing XDR contrast.
+                        This option is especially useful when using apps with dark backgrounds.
+
+                        Note: works only when using a single display
+                        """
+                    )
+                    HStack {
+                        BigSurSlider(
+                            percentage: $xdrContrastFactor,
+                            image: "circle.lefthalf.filled",
                             color: Colors.lightGray,
-                            textColor: Colors.darkGray,
-                            radius: 10,
-                            verticalPadding: 3,
+                            backgroundColor: Colors.grayMauve.opacity(0.1),
+                            knobColor: Colors.lightGray,
+                            showValue: .constant(false),
                             disabled: !$xdrContrast
-                        ))
-                        .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                        )
+                        .padding(.leading)
+
+                        SwiftUI.Button("Reset") { xdrContrastFactor = 0.3 }
+                            .buttonStyle(FlatButton(
+                                color: Colors.lightGray,
+                                textColor: Colors.darkGray,
+                                radius: 10,
+                                verticalPadding: 3,
+                                disabled: !$xdrContrast
+                            ))
+                            .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    }
+                    SettingsToggle(text: "Allow on non-Apple HDR monitors", setting: $allowHDREnhanceContrast.animation(.fastSpring))
+                        .padding(.leading)
+                        .disabled(!xdrContrast)
                 }
-                SettingsToggle(text: "Allow on non-Apple HDR monitors", setting: $allowHDREnhanceContrast.animation(.fastSpring))
-                    .padding(.leading)
-                    .disabled(!xdrContrast)
-            }
-            Divider()
-            xdrSettings
-            Spacer()
-            Color.clear
+                Divider()
+                xdrSettings
+                Spacer()
+                Color.clear
+            }.frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
@@ -584,211 +587,214 @@ struct AdvancedSettingsView: View {
     @Default(.delayDDCAfterWake) var delayDDCAfterWake
 
     var body: some View {
-        VStack(alignment: .leading) {
-            Group {
-                SettingsToggle(text: "Hide menubar icon", setting: $hideMenuBarIcon)
-                SettingsToggle(text: "Show dock icon", setting: $showDockIcon)
-                SettingsToggle(
-                    text: "Show more graph data",
-                    setting: $moreGraphData,
-                    help: "Renders values and data lines on the bottom graph of the preferences window"
-                )
-                SettingsToggle(text: "Install updates silently in the background", setting: $silentUpdate)
-                SettingsToggle(
-                    text: "Enable verbose logging", setting: $debug,
-                    help: """
-                    Log path: ~/Library/Caches/Lunar/swiftybeaver.log
+        ZStack {
+            Color.clear.frame(maxWidth: .infinity, alignment: .leading)
+            VStack(alignment: .leading) {
+                Group {
+                    SettingsToggle(text: "Hide menubar icon", setting: $hideMenuBarIcon)
+                    SettingsToggle(text: "Show dock icon", setting: $showDockIcon)
+                    SettingsToggle(
+                        text: "Show more graph data",
+                        setting: $moreGraphData,
+                        help: "Renders values and data lines on the bottom graph of the preferences window"
+                    )
+                    SettingsToggle(text: "Install updates silently in the background", setting: $silentUpdate)
+                    SettingsToggle(
+                        text: "Enable verbose logging", setting: $debug,
+                        help: """
+                        Log path: ~/Library/Caches/Lunar/swiftybeaver.log
 
-                    This option will deactivate itself when the app quits
-                    to avoid filling up disk space with unnecessary logs.
-                    """
-                )
-            }
-            Divider()
-            Group {
-                SettingsToggle(
-                    text: "Use workaround for built-in display", setting: $workaroundBuiltinDisplay,
-                    help: """
-                    Forward brightness key events to the system instead of
-                    changing built-in display brightness from Lunar.
-
-                    This setting might be needed to persist brightness
-                    changes better on some specific older devices.
-
-                    Disables the following functions for the built-in display:
-                      • Hotkey Step
-                      • Auto XDR
-                      • Sub-zero Dimming
-                    """
-                )
-                SettingsToggle(
-                    text: "Allow BlackOut on single screen", setting: $allowBlackOutOnSingleScreen,
-                    help: "Allows turning off a screen even if it's the only visible screen left"
-                )
-                SettingsToggle(
-                    text: "Switch to the old BlackOut mirroring system", setting: $oldBlackOutMirroring,
-                    help: """
-                    Some setups will have trouble enabling mirroring with the new macOS 11+ API.
-
-                    You can try enabling this option if BlackOut is not working properly.
-
-                    Note: the old mirroring system can't handle complex mirror sets with dummies and virtual/wireless displays.
-                    The best covered cases are "BlackOut built-in display" and "BlackOut only external displays".
-                    """
-                )
-                SettingsToggle(
-                    text: "Toggle Manual/Sync when the lid is closed/opened",
-                    setting: $clamshellModeDetection
-                ).disabled(!Sysctl.isMacBook)
-                SettingsToggle(
-                    text: "Re-apply brightness on screen wake", setting: $reapplyValuesAfterWake,
-                    help: """
-                    On each screen wake/reconnection, Lunar will try to
-                    re-apply previous brightness and contrast 3 times.
-
-                    Disable this if system appears slow on screen wake.
-                    """
-                )
-            }
-            Divider()
-            Group {
-                SettingsToggle(
-                    text: "Enable rotation hotkeys",
-                    setting: $enableOrientationHotkeys,
-                    help: """
-                    Pressing the following keys will change the
-                    orientation for the display with the cursor on it:
-
-                        Ctrl+0: 0°
-                        Ctrl+9: 90°
-                        Ctrl+8: 180°
-                        Ctrl+7: 270°
-                    """
-                )
-                SettingsToggle(
-                    text: "Apply volume 0 on the DDC mute command", setting: $muteVolumeZero,
-                    help: """
-                    Some monitors don't implement the DDC mute command.
-
-                    This option also sets the volume to 0 when muting
-                    to help working around that issue.
-                    """
-                )
-                SettingsToggle(
-                    text: "Wait longer between DDC requests", setting: $ddcSleepLonger,
-                    help: """
-                    Some monitors have a slower response time on DDC requests.
-
-                    This option might help reduce flicker in those cases.
-                    """
-                )
-                SettingsToggle(
-                    text: "Check for DDC responsiveness periodically", setting: $detectResponsiveness,
-                    help: """
-                    Detects when DDC becomes unresponsive and presents
-                    the choice to switch to Software Dimming.
-                    """
-                )
-                SettingsToggle(
-                    text: "Disable Network Controller video ", setting: $disableControllerVideo,
-                    help: """
-                    When using "Network Control" with a Raspberry Pi, it might be
-                    helpful to disable the Pi desktop if you don't need it.
-                    """
-                )
+                        This option will deactivate itself when the app quits
+                        to avoid filling up disk space with unnecessary logs.
+                        """
+                    )
+                }
                 Divider()
                 Group {
-                    Text("EXPERIMENTAL!")
-                        .foregroundColor(Colors.red)
-                        .bold()
-                    Text("Don't use unless really needed or asked by the developer")
-                        .foregroundColor(Colors.red)
-                        .font(.caption)
                     SettingsToggle(
-                        text: "Refresh values from monitor settings", setting: $refreshValues,
+                        text: "Use workaround for built-in display", setting: $workaroundBuiltinDisplay,
                         help: """
-                        Keep Lunar state in sync by reading monitor settings periodically.
+                        Forward brightness key events to the system instead of
+                        changing built-in display brightness from Lunar.
 
-                        This is only useful if monitor values are changed externally,
-                        from another computer or through special buttons/knobs.
+                        This setting might be needed to persist brightness
+                        changes better on some specific older devices.
 
-                        Caution: Most monitors don't support read commands and enabling this setting
-                        can cause many issues with losing signal, system freezes, hanging apps etc.
+                        Disables the following functions for the built-in display:
+                          • Hotkey Step
+                          • Auto XDR
+                          • Sub-zero Dimming
                         """
                     )
                     SettingsToggle(
-                        text: "Disable usage of Gamma API completely", setting: $gammaDisabledCompletely,
-                        help: """
-                        Experimental: for people running into macOS bugs like the color profile
-                        being constantly reset, display turning to monochrome or HDR being disabled,
-                        this could be a safe measure to ensure Lunar never touches the Gamma API of macOS.
-
-                        This will disable or cripple the following features:
-
-                        • XDR Brightness
-                        • Facelight
-                        • Blackout
-                        • Software Dimming
-                        • Sub-zero Dimming
-                        """
+                        text: "Allow BlackOut on single screen", setting: $allowBlackOutOnSingleScreen,
+                        help: "Allows turning off a screen even if it's the only visible screen left"
                     )
-
                     SettingsToggle(
-                        text: "Delay DDC commands after wake", setting: $delayDDCAfterWake,
+                        text: "Switch to the old BlackOut mirroring system", setting: $oldBlackOutMirroring,
                         help: """
-                        Experimental: for people running into monitor bugs like the video signal being
-                        lost or screen not waking up after system sleep, this could be a safe measure
-                        to ensure Lunar doesn't send any DDC command until the monitor connection
-                        is fully established.
+                        Some setups will have trouble enabling mirroring with the new macOS 11+ API.
 
-                        This will disable or cripple the following features:
+                        You can try enabling this option if BlackOut is not working properly.
 
-                        • Smooth transitions
-                        • DDC responsiveness checker
-                        • Re-applying color gain on wake
-                        • Re-applying brightness/contrast on wake
+                        Note: the old mirroring system can't handle complex mirror sets with dummies and virtual/wireless displays.
+                        The best covered cases are "BlackOut built-in display" and "BlackOut only external displays".
                         """
                     )
-                    HStack {
-                        let secondsBinding = Binding<Float>(
-                            get: { waitAfterWakeSeconds.f / 100 },
-                            set: { waitAfterWakeSeconds = ($0 * 100).i }
+                    SettingsToggle(
+                        text: "Toggle Manual/Sync when the lid is closed/opened",
+                        setting: $clamshellModeDetection
+                    ).disabled(!Sysctl.isMacBook)
+                    SettingsToggle(
+                        text: "Re-apply brightness on screen wake", setting: $reapplyValuesAfterWake,
+                        help: """
+                        On each screen wake/reconnection, Lunar will try to
+                        re-apply previous brightness and contrast 3 times.
+
+                        Disable this if system appears slow on screen wake.
+                        """
+                    )
+                }
+                Divider()
+                Group {
+                    SettingsToggle(
+                        text: "Enable rotation hotkeys",
+                        setting: $enableOrientationHotkeys,
+                        help: """
+                        Pressing the following keys will change the
+                        orientation for the display with the cursor on it:
+
+                            Ctrl+0: 0°
+                            Ctrl+9: 90°
+                            Ctrl+8: 180°
+                            Ctrl+7: 270°
+                        """
+                    )
+                    SettingsToggle(
+                        text: "Apply volume 0 on the DDC mute command", setting: $muteVolumeZero,
+                        help: """
+                        Some monitors don't implement the DDC mute command.
+
+                        This option also sets the volume to 0 when muting
+                        to help working around that issue.
+                        """
+                    )
+                    SettingsToggle(
+                        text: "Wait longer between DDC requests", setting: $ddcSleepLonger,
+                        help: """
+                        Some monitors have a slower response time on DDC requests.
+
+                        This option might help reduce flicker in those cases.
+                        """
+                    )
+                    SettingsToggle(
+                        text: "Check for DDC responsiveness periodically", setting: $detectResponsiveness,
+                        help: """
+                        Detects when DDC becomes unresponsive and presents
+                        the choice to switch to Software Dimming.
+                        """
+                    )
+                    SettingsToggle(
+                        text: "Disable Network Controller video ", setting: $disableControllerVideo,
+                        help: """
+                        When using "Network Control" with a Raspberry Pi, it might be
+                        helpful to disable the Pi desktop if you don't need it.
+                        """
+                    )
+                    Divider()
+                    Group {
+                        Text("EXPERIMENTAL!")
+                            .foregroundColor(Colors.red)
+                            .bold()
+                        Text("Don't use unless really needed or asked by the developer")
+                            .foregroundColor(Colors.red)
+                            .font(.caption)
+                        SettingsToggle(
+                            text: "Refresh values from monitor settings", setting: $refreshValues,
+                            help: """
+                            Keep Lunar state in sync by reading monitor settings periodically.
+
+                            This is only useful if monitor values are changed externally,
+                            from another computer or through special buttons/knobs.
+
+                            Caution: Most monitors don't support read commands and enabling this setting
+                            can cause many issues with losing signal, system freezes, hanging apps etc.
+                            """
                         )
-                        BigSurSlider(
-                            percentage: secondsBinding,
-                            image: "clock.circle",
-                            color: Colors.lightGray,
-                            backgroundColor: Colors.grayMauve.opacity(0.1),
-                            knobColor: Colors.lightGray,
-                            showValue: .constant(true),
-                            disabled: !$delayDDCAfterWake
-                        )
-                        .padding(.leading)
+                        SettingsToggle(
+                            text: "Disable usage of Gamma API completely", setting: $gammaDisabledCompletely,
+                            help: """
+                            Experimental: for people running into macOS bugs like the color profile
+                            being constantly reset, display turning to monochrome or HDR being disabled,
+                            this could be a safe measure to ensure Lunar never touches the Gamma API of macOS.
 
-                        SwiftUI.Button("Reset") { waitAfterWakeSeconds = 30 }
-                            .buttonStyle(FlatButton(
+                            This will disable or cripple the following features:
+
+                            • XDR Brightness
+                            • Facelight
+                            • Blackout
+                            • Software Dimming
+                            • Sub-zero Dimming
+                            """
+                        )
+
+                        SettingsToggle(
+                            text: "Delay DDC commands after wake", setting: $delayDDCAfterWake,
+                            help: """
+                            Experimental: for people running into monitor bugs like the video signal being
+                            lost or screen not waking up after system sleep, this could be a safe measure
+                            to ensure Lunar doesn't send any DDC command until the monitor connection
+                            is fully established.
+
+                            This will disable or cripple the following features:
+
+                            • Smooth transitions
+                            • DDC responsiveness checker
+                            • Re-applying color gain on wake
+                            • Re-applying brightness/contrast on wake
+                            """
+                        )
+                        HStack {
+                            let secondsBinding = Binding<Float>(
+                                get: { waitAfterWakeSeconds.f / 100 },
+                                set: { waitAfterWakeSeconds = ($0 * 100).i }
+                            )
+                            BigSurSlider(
+                                percentage: secondsBinding,
+                                image: "clock.circle",
                                 color: Colors.lightGray,
-                                textColor: Colors.darkGray,
-                                radius: 10,
-                                verticalPadding: 3,
+                                backgroundColor: Colors.grayMauve.opacity(0.1),
+                                knobColor: Colors.lightGray,
+                                showValue: .constant(true),
                                 disabled: !$delayDDCAfterWake
-                            ))
-                            .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                    }
-                    if delayDDCAfterWake {
-                        Text("Lunar will wait \(waitAfterWakeSeconds) seconds before sending\nthe first DDC command after screen wake")
-                            .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                            .foregroundColor(.black.opacity(0.4))
-                            .frame(height: 28, alignment: .topLeading)
-                            .lineLimit(2)
-                            .padding(.leading, 20)
-                            .padding(.top, -5)
+                            )
+                            .padding(.leading)
+
+                            SwiftUI.Button("Reset") { waitAfterWakeSeconds = 30 }
+                                .buttonStyle(FlatButton(
+                                    color: Colors.lightGray,
+                                    textColor: Colors.darkGray,
+                                    radius: 10,
+                                    verticalPadding: 3,
+                                    disabled: !$delayDDCAfterWake
+                                ))
+                                .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                        }
+                        if delayDDCAfterWake {
+                            Text("Lunar will wait \(waitAfterWakeSeconds) seconds before sending\nthe first DDC command after screen wake")
+                                .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                                .foregroundColor(.black.opacity(0.4))
+                                .frame(height: 28, alignment: .topLeading)
+                                .lineLimit(2)
+                                .padding(.leading, 20)
+                                .padding(.top, -5)
+                        }
                     }
                 }
-            }
-            Spacer()
-            Color.clear
-        }.frame(maxWidth: .infinity, alignment: .leading)
+                Spacer()
+                Color.clear
+            }.frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 }
 
@@ -814,50 +820,53 @@ struct QuickActionsLayoutView: View {
     @Default(.allowAnySyncSource) var allowAnySyncSource
 
     var body: some View {
-        VStack(alignment: .leading) {
-            Group {
+        ZStack {
+            Color.clear.frame(maxWidth: .infinity, alignment: .leading)
+            VStack(alignment: .leading) {
                 Group {
-                    SettingsToggle(text: "Only show top buttons on hover", setting: $showHeaderOnHover.animation(.fastSpring))
-                    SettingsToggle(text: "Only show bottom buttons on hover", setting: $showFooterOnHover.animation(.fastSpring))
+                    Group {
+                        SettingsToggle(text: "Only show top buttons on hover", setting: $showHeaderOnHover.animation(.fastSpring))
+                        SettingsToggle(text: "Only show bottom buttons on hover", setting: $showFooterOnHover.animation(.fastSpring))
+                    }
+                    Divider()
+                    Group {
+                        SettingsToggle(text: "Show slider values", setting: $showSliderValues.animation(.fastSpring))
+                        SettingsToggle(text: "Show volume slider", setting: $showVolumeSlider.animation(.fastSpring))
+                        SettingsToggle(text: "Show rotation selector", setting: $showOrientationInQuickActions.animation(.fastSpring))
+                        SettingsToggle(text: "Show input source selector", setting: $showInputInQuickActions.animation(.fastSpring))
+                        SettingsToggle(text: "Show power button", setting: $showPowerInQuickActions.animation(.fastSpring))
+                    }
+                    Divider()
+                    Group {
+                        SettingsToggle(text: "Show standard presets", setting: $showStandardPresets.animation(.fastSpring))
+                        SettingsToggle(text: "Show custom presets", setting: $showCustomPresets.animation(.fastSpring))
+                        SettingsToggle(text: "Show XDR Brightness toggle when available", setting: $showXDRSelector.animation(.fastSpring))
+                    }
                 }
                 Divider()
                 Group {
-                    SettingsToggle(text: "Show slider values", setting: $showSliderValues.animation(.fastSpring))
-                    SettingsToggle(text: "Show volume slider", setting: $showVolumeSlider.animation(.fastSpring))
-                    SettingsToggle(text: "Show rotation selector", setting: $showOrientationInQuickActions.animation(.fastSpring))
-                    SettingsToggle(text: "Show input source selector", setting: $showInputInQuickActions.animation(.fastSpring))
-                    SettingsToggle(text: "Show power button", setting: $showPowerInQuickActions.animation(.fastSpring))
+                    SettingsToggle(text: "Merge brightness and contrast", setting: $mergeBrightnessContrast.animation(.fastSpring))
+                    SettingsToggle(
+                        text: "Allow non-Apple monitors as Sync Mode source",
+                        setting: $allowAnySyncSource.animation(.fastSpring)
+                    )
                 }
                 Divider()
                 Group {
-                    SettingsToggle(text: "Show standard presets", setting: $showStandardPresets.animation(.fastSpring))
-                    SettingsToggle(text: "Show custom presets", setting: $showCustomPresets.animation(.fastSpring))
-                    SettingsToggle(text: "Show XDR Brightness toggle when available", setting: $showXDRSelector.animation(.fastSpring))
+                    SettingsToggle(text: "Show last raw values sent to the display", setting: $showRawValues.animation(.fastSpring))
+                    SettingsToggle(text: "Show brightness near menubar icon", setting: $showBrightnessMenuBar.animation(.fastSpring))
+                    SettingsToggle(
+                        text: "Show only external monitor brightness",
+                        setting: $showOnlyExternalBrightnessMenuBar.animation(.fastSpring)
+                    )
+                    .padding(.leading)
+                    .disabled(!showBrightnessMenuBar)
                 }
+                Spacer()
+                Color.clear
             }
-            Divider()
-            Group {
-                SettingsToggle(text: "Merge brightness and contrast", setting: $mergeBrightnessContrast.animation(.fastSpring))
-                SettingsToggle(
-                    text: "Allow non-Apple monitors as Sync Mode source",
-                    setting: $allowAnySyncSource.animation(.fastSpring)
-                )
-            }
-            Divider()
-            Group {
-                SettingsToggle(text: "Show last raw values sent to the display", setting: $showRawValues.animation(.fastSpring))
-                SettingsToggle(text: "Show brightness near menubar icon", setting: $showBrightnessMenuBar.animation(.fastSpring))
-                SettingsToggle(
-                    text: "Show only external monitor brightness",
-                    setting: $showOnlyExternalBrightnessMenuBar.animation(.fastSpring)
-                )
-                .padding(.leading)
-                .disabled(!showBrightnessMenuBar)
-            }
-            Spacer()
-            Color.clear
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
