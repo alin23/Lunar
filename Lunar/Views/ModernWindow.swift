@@ -14,9 +14,15 @@ var navigationHotkeysEnabled = true
 var scrollableAdjustHotkeysEnabled = true
 
 extension NSView {
-    func mask(withRect maskRect: CGRect, cornerRadius: CGFloat, inverse: Bool = false) {
+    func mask(withRect maskRect: CGRect, cornerRadius: CGFloat, inverse: Bool = false, rasterScale: CGFloat? = nil) {
         let maskLayer = CAShapeLayer()
         maskLayer.cornerCurve = .continuous
+        maskLayer.allowsEdgeAntialiasing = true
+        maskLayer.edgeAntialiasingMask = [.layerBottomEdge, .layerTopEdge, .layerLeftEdge, .layerRightEdge]
+        if let rasterScale {
+            maskLayer.shouldRasterize = true
+            maskLayer.rasterizationScale = rasterScale
+        }
         let path = CGMutablePath()
         if inverse {
             path.addPath(CGPath(rect: bounds, transform: nil))
@@ -31,12 +37,20 @@ extension NSView {
         wantsLayer = true
         layer?.mask = maskLayer
         layer?.cornerCurve = .continuous
+        layer?.allowsEdgeAntialiasing = true
+        layer?.edgeAntialiasingMask = [.layerBottomEdge, .layerTopEdge, .layerLeftEdge, .layerRightEdge]
+        if let rasterScale, let layer {
+            layer.shouldRasterize = true
+            layer.rasterizationScale = rasterScale
+        }
     }
 }
 
 // MARK: - CornerWindowController
 
 class CornerWindowController: NSWindowController {
+    var corner: ScreenCorner?
+
     weak var display: Display? {
         didSet {
             mainAsync { [self] in
@@ -45,12 +59,50 @@ class CornerWindowController: NSWindowController {
                 else { return }
 
                 view.bg = .black
-                w.setFrame(screen.frame, display: true)
-                view.mask(
-                    withRect: NSRect(x: 0, y: 0, width: w.frame.width, height: w.frame.height),
-                    cornerRadius: CGFloat(display.cornerRadius.floatValue),
-                    inverse: true
-                )
+                switch corner {
+                case .bottomLeft:
+                    w.setFrame(
+                        NSRect(origin: NSPoint(x: screen.frame.minX, y: screen.frame.minY), size: NSSize(width: 50, height: 50)),
+                        display: false
+                    )
+                    view.mask(
+                        withRect: NSRect(x: 0, y: 0, width: 70, height: 70),
+                        cornerRadius: CGFloat(display.cornerRadius.floatValue),
+                        inverse: true, rasterScale: screen.backingScaleFactor
+                    )
+                case .bottomRight:
+                    w.setFrame(
+                        NSRect(origin: NSPoint(x: screen.frame.maxX - 50, y: screen.frame.minY), size: NSSize(width: 50, height: 50)),
+                        display: false
+                    )
+                    view.mask(
+                        withRect: NSRect(x: -20, y: 0, width: 70, height: 70),
+                        cornerRadius: CGFloat(display.cornerRadius.floatValue),
+                        inverse: true, rasterScale: screen.backingScaleFactor
+                    )
+                case .topLeft:
+                    w.setFrame(
+                        NSRect(origin: NSPoint(x: screen.frame.minX, y: screen.frame.maxY - 50), size: NSSize(width: 50, height: 50)),
+                        display: false
+                    )
+                    view.mask(
+                        withRect: NSRect(x: 0, y: -20, width: 70, height: 70),
+                        cornerRadius: CGFloat(display.cornerRadius.floatValue),
+                        inverse: true, rasterScale: screen.backingScaleFactor
+                    )
+                case .topRight:
+                    w.setFrame(
+                        NSRect(origin: NSPoint(x: screen.frame.maxX - 50, y: screen.frame.maxY - 50), size: NSSize(width: 50, height: 50)),
+                        display: false
+                    )
+                    view.mask(
+                        withRect: NSRect(x: -20, y: -20, width: 70, height: 70),
+                        cornerRadius: CGFloat(display.cornerRadius.floatValue),
+                        inverse: true, rasterScale: screen.backingScaleFactor
+                    )
+                default:
+                    break
+                }
             }
         }
     }
