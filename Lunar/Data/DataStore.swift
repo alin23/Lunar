@@ -45,6 +45,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .hdrWorkaround,
     .oldBlackOutMirroring,
     .disableNightShiftXDR,
+    .enableDarkModeXDR,
     .screenBlankingIssueWarningShown,
     .xdrContrast,
     .xdrContrastFactor,
@@ -701,6 +702,7 @@ func initCache() {
     cacheKey(.hdrWorkaround)
     cacheKey(.oldBlackOutMirroring)
     cacheKey(.disableNightShiftXDR)
+    cacheKey(.enableDarkModeXDR)
     cacheKey(.screenBlankingIssueWarningShown)
     cacheKey(.xdrContrast)
     cacheKey(.xdrContrastFactor)
@@ -866,6 +868,7 @@ extension Defaults.Keys {
     static let hdrWorkaround = Key<Bool>("hdrWorkaround", default: true)
     static let oldBlackOutMirroring = Key<Bool>("oldBlackOutMirroring", default: false)
     static let disableNightShiftXDR = Key<Bool>("disableNightShiftXDR", default: false)
+    static let enableDarkModeXDR = Key<Bool>("enableDarkModeXDR", default: false)
     static let screenBlankingIssueWarningShown = Key<Bool>("screenBlankingIssueWarningShown", default: false)
     static let xdrContrast = Key<Bool>("xdrContrast", default: true)
     static let xdrContrastFactor = Key<Float>("xdrContrastFactor", default: 0.3)
