@@ -355,24 +355,23 @@ public struct BigSurSlider: View {
                         env.draggingSlider = false
                     }
             )
-            .animation(.fastSpring, value: percentage)
             #if os(macOS)
-                .onHover { hov in
-                    hovering = hov
-                    guard acceptsMouseEvents, !disabled else { return }
+            .onHover { hov in
+                hovering = hov
+                guard acceptsMouseEvents, !disabled else { return }
 
-                    if hovering {
-                        lastCursorPosition = NSEvent.mouseLocation
-                        hoveringSliderSetter = mainAsyncAfter(ms: 200) {
-                            guard lastCursorPosition != NSEvent.mouseLocation else { return }
-                            env.hoveringSlider = hovering
-                        }
-                        trackScrollWheel()
-                    } else {
-                        hoveringSliderSetter = nil
-                        env.hoveringSlider = false
+                if hovering {
+                    lastCursorPosition = NSEvent.mouseLocation
+                    hoveringSliderSetter = mainAsyncAfter(ms: 200) {
+                        guard lastCursorPosition != NSEvent.mouseLocation else { return }
+                        env.hoveringSlider = hovering
                     }
+                    trackScrollWheel()
+                } else {
+                    hoveringSliderSetter = nil
+                    env.hoveringSlider = false
                 }
+            }
             #endif
         }
         .frame(width: sliderWidth, height: sliderHeight)
