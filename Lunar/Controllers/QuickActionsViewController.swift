@@ -582,7 +582,6 @@ struct AdvancedSettingsView: View {
     @Default(.debug) var debug
     @Default(.ddcSleepLonger) var ddcSleepLonger
     @Default(.clamshellModeDetection) var clamshellModeDetection
-    @Default(.muteVolumeZero) var muteVolumeZero
     @Default(.enableOrientationHotkeys) var enableOrientationHotkeys
     @Default(.detectResponsiveness) var detectResponsiveness
     @Default(.disableControllerVideo) var disableControllerVideo
@@ -677,15 +676,6 @@ struct AdvancedSettingsView: View {
                             Ctrl+9: 90°
                             Ctrl+8: 180°
                             Ctrl+7: 270°
-                        """
-                    )
-                    SettingsToggle(
-                        text: "Apply volume 0 on the DDC mute command", setting: $muteVolumeZero,
-                        help: """
-                        Some monitors don't implement the DDC mute command.
-
-                        This option also sets the volume to 0 when muting
-                        to help working around that issue.
                         """
                     )
                     SettingsToggle(

@@ -547,7 +547,9 @@ class NetworkControl: Control {
     }
 
     func setMute(_ muted: Bool) -> Bool {
-        set(muted ? 1 : 2, for: .AUDIO_MUTE)
+        guard let display else { return false }
+
+        return set(muted ? display.muteByteValueOn : display.muteByteValueOff, for: .AUDIO_MUTE)
     }
 
     func setInput(_ input: InputSource) -> Bool {
