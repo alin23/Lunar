@@ -941,9 +941,9 @@ enum DDC {
 
     static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt16) -> Bool {
         #if DEBUG
-            guard apply, !isTestID(displayID), !shouldWait else { return true }
+            guard apply, !isTestID(displayID), !shouldWait, !displayController.screensSleeping else { return true }
         #else
-            guard apply, !shouldWait else { return true }
+            guard apply, !shouldWait, !displayController.screensSleeping else { return true }
         #endif
 
         #if arch(arm64)
@@ -1061,7 +1061,7 @@ enum DDC {
     }
 
     static func read(displayID: CGDirectDisplayID, controlID: ControlID) -> DDCReadResult? {
-        guard !isTestID(displayID), !shouldWait else { return nil }
+        guard !isTestID(displayID), !shouldWait, !displayController.screensSleeping else { return nil }
 
         #if arch(arm64)
             guard let avService = AVService(displayID: displayID) else { return nil }
