@@ -473,6 +473,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         canChangeVolume = (try container.decodeIfPresent(Bool.self, forKey: .canChangeVolume)) ?? true
         isSource = try container.decodeIfPresent(Bool.self, forKey: .isSource) ?? DDC.isSmartBuiltinDisplay(id)
         showVolumeOSD = try container.decodeIfPresent(Bool.self, forKey: .showVolumeOSD) ?? true
+        muteByteValueOn = try container.decodeIfPresent(UInt16.self, forKey: .muteByteValueOn) ?? 1
+        muteByteValueOff = try container.decodeIfPresent(UInt16.self, forKey: .muteByteValueOff) ?? 2
+        volumeValueOnMute = try container.decodeIfPresent(UInt16.self, forKey: .volumeValueOnMute) ?? 0
+        applyVolumeValueOnMute = try container
+            .decodeIfPresent(Bool.self, forKey: .applyVolumeValueOnMute) ?? CachedDefaults[.muteVolumeZero]
+
         applyGamma = try container.decodeIfPresent(Bool.self, forKey: .applyGamma) ?? false
         input = (try container.decodeIfPresent(UInt16.self, forKey: .input))?.ns ?? InputSource.unknown.rawValue.ns
         forceDDC = (try container.decodeIfPresent(Bool.self, forKey: .forceDDC)) ?? false
@@ -881,6 +887,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case sendingVolume
         case isSource
         case showVolumeOSD
+        case muteByteValueOn
+        case muteByteValueOff
+        case volumeValueOnMute
+        case applyVolumeValueOnMute
         case forceDDC
         case applyGamma
         case brightnessOnInputChange
@@ -938,6 +948,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .applyBrightnessOnInputChange3,
             .extendedColorGain,
             .reapplyColorGain,
+            .applyVolumeValueOnMute,
         ]
 
         static var hidden: Set<CodingKeys> = [
@@ -1025,6 +1036,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .neverFallbackControl,
             .isSource,
             .showVolumeOSD,
+            .muteByteValueOn,
+            .muteByteValueOff,
+            .volumeValueOnMute,
+            .applyVolumeValueOnMute,
             .forceDDC,
             .applyGamma,
             .brightnessOnInputChange1,
@@ -1351,7 +1366,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var noDDCOrMergedBrightnessContrast = false
 
     @objc dynamic lazy var hasNotch: Bool = {
-        if #available(macOS 12.0, *), Sysctl.isMacBook {
+        if #available(macOS 12.0, *), isMacBook {
             return (self.screen?.safeAreaInsets.top ?? 0) > 0 || self.panelMode?.withNotch(modes: self.panelModes) != nil
         } else {
             return false
@@ -1377,6 +1392,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var hdrWindowOpenedAt = Date()
 
     @Atomic var forceShowSoftwareOSD = false
+
+    @Published @objc dynamic var muteByteValueOn: UInt16 = 1
+    @Published @objc dynamic var muteByteValueOff: UInt16 = 2
+    @Published @objc dynamic var volumeValueOnMute: UInt16 = 0
+    @Published @objc dynamic var applyVolumeValueOnMute = false
 
     @objc dynamic var forceDDC = false {
         didSet {
@@ -3433,8 +3453,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 )
             }
 
-            guard CachedDefaults[.muteVolumeZero] else { return }
-            volume = audioMuted ? 0 : lastVolume
+            guard applyVolumeValueOnMute else { return }
+            volume = audioMuted ? volumeValueOnMute.ns : lastVolume
         }
     }
 
@@ -4280,6 +4300,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
+    @objc func resetMuteWorkarounds() {
+        muteByteValueOn = 1
+        muteByteValueOff = 2
+        applyVolumeValueOnMute = false
+        volumeValueOnMute = 0
+    }
+
     @objc func resetLimits() {
         minDDCBrightness = 0.ns
         minDDCContrast = 0.ns
@@ -4519,6 +4546,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try container.encode(power, forKey: .power)
             try container.encode(isSource, forKey: .isSource)
             try container.encode(showVolumeOSD, forKey: .showVolumeOSD)
+            try container.encode(muteByteValueOn, forKey: .muteByteValueOn)
+            try container.encode(muteByteValueOff, forKey: .muteByteValueOff)
+            try container.encode(volumeValueOnMute, forKey: .volumeValueOnMute)
+            try container.encode(applyVolumeValueOnMute, forKey: .applyVolumeValueOnMute)
             try container.encode(forceDDC, forKey: .forceDDC)
             try container.encode(applyGamma, forKey: .applyGamma)
             try container.encode(schedules, forKey: .schedules)

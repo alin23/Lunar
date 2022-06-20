@@ -312,7 +312,12 @@ class DDCControl: Control, ObservableObject {
     func setMute(_ muted: Bool) -> Bool {
         guard let display = display else { return false }
 
-        return DDC.setAudioMuted(for: display.id, audioMuted: muted)
+        // return DDC.setAudioMuted(for: display.id, audioMuted: muted)
+        return DDC.write(
+            displayID: display.id,
+            controlID: ControlID.AUDIO_MUTE,
+            newValue: muted ? display.muteByteValueOn : display.muteByteValueOff
+        )
     }
 
     func setInput(_ input: InputSource) -> Bool {

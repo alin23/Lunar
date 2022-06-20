@@ -76,6 +76,8 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
 
     @IBInspectable dynamic var backgroundOpacity: CGFloat = 0.05
 
+    @objc var shouldAllowEmptyValue = false
+
     @IBInspectable dynamic var lowerLimit = 0.0 {
         didSet { doubleValue = cap(doubleValue, minVal: lowerLimit, maxVal: upperLimit) }
     }
@@ -312,6 +314,18 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     }
 
     override func textShouldEndEditing(_ textObject: NSText) -> Bool {
+        guard !textObject.string.trimmed.isEmpty else {
+            if shouldAllowEmptyValue {
+                doubleValue = -1
+                onValueChanged?(-1)
+                onValueChangedDouble?(-1)
+                onValueChangedInstant?(-1)
+                onValueChangedInstantDouble?(-1)
+                editing = false
+                return true
+            }
+            return false
+        }
         guard let val = textObject.string.d, val >= lowerLimit, val <= upperLimit else {
             return false
         }
