@@ -1309,6 +1309,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     break
                 }
             }.store(in: &observers)
+
+        sleepPublisher
+            .debounce(for: .milliseconds(1), scheduler: RunLoop.main)
+            .sink { notif in
+                log.info(notif.name)
+                switch notif.name {
+                case NSWorkspace.screensDidSleepNotification:
+                    displayController.screensSleeping = true
+                    log.info("SESSION: Screen sleep warmup")
+                default:
+                    break
+                }
+            }.store(in: &observers)
+
         wakePublisher
             .merge(with: sleepPublisher)
             .merge(with: logoutPublisher)
@@ -1317,15 +1331,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .sink { notif in
                 log.info(notif.name)
                 switch notif.name {
-                case NSWorkspace.screensDidWakeNotification:
-                    log.debug("SESSION: Screen wake")
-                    fallthrough
-                case NSWorkspace.screensDidSleepNotification:
-                    log.debug("SESSION: Screen sleep")
-                    fallthrough
                 case NSWorkspace.screensDidWakeNotification where !displayController.loggedOut,
                      NSWorkspace.sessionDidBecomeActiveNotification:
-                    log.debug("Screens woke up")
+                    log.debug("SESSION: Screen wake")
                     wakeTime = Date()
                     displayController.screensSleeping = false
                     displayController.retryAutoBlackoutLater()
@@ -1383,7 +1391,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     serve(host: CachedDefaults[.listenForRemoteCommands] ? "0.0.0.0" : "127.0.0.1")
 
                 case NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification:
-                    log.debug("Screens gone to sleep")
+                    log.debug("SESSION: Screen sleep")
                     displayController.screensSleeping = true
                     displayController.cancelAutoBlackout()
 
