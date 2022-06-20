@@ -9,7 +9,7 @@ export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 LOG_PATH=${LOG_PATH:-/tmp/lunar-sensor-install.log}
 BOARD="${BOARD:-esp32dev}"
 
-if [[ "$BOARD" == "metroesp32-s2" ]]; then
+if [[ "$BOARD" == "metroesp32-s2" || "$BOARD" == "featheresp32-s2" ]]; then
     PLATFORM_VERSION="${PLATFORM_VERSION:-https://static.lunar.fyi/platform-espressif32-b331f75383faaa7bc8ee971b0cdb83177feb8284.zip}"
     PLATFORM="${PLATFORM:-ESP32}"
     SDA="${SDA:-33}"

@@ -28,10 +28,102 @@ let NIGHT_SHIFT_TAB_SCRIPT =
 
 var fluxPromptTime: Date?
 
+extension BrightnessSystemClient {
+    static var shared = BrightnessSystemClient()
+
+    func sunriseSunsetData() -> [String: Any]? {
+        if let sunriseSunsetProperty = copyProperty(forKey: "BlueLightSunSchedule" as CFString),
+           let sunriseSunsetDict = sunriseSunsetProperty as? [String: Any]
+        {
+            return sunriseSunsetDict
+        }
+        return nil
+    }
+
+    private func sunriseSunsetProperty(forKey key: String) -> Any? {
+        if let data = sunriseSunsetData(),
+           let property = data[key]
+        {
+            return property
+        }
+        return nil
+    }
+
+    var sunrise: Date? {
+        sunriseSunsetProperty(forKey: "sunrise") as? Date
+    }
+
+    var sunset: Date? {
+        sunriseSunsetProperty(forKey: "sunset") as? Date
+    }
+
+    var nextSunrise: Date? {
+        sunriseSunsetProperty(forKey: "nextSunrise") as? Date
+    }
+
+    var nextSunset: Date? {
+        sunriseSunsetProperty(forKey: "nextSunset") as? Date
+    }
+
+    var previousSunrise: Date? {
+        sunriseSunsetProperty(forKey: "previousSunrise") as? Date
+    }
+
+    var previousSunset: Date? {
+        sunriseSunsetProperty(forKey: "previousSunset") as? Date
+    }
+
+    var isDaylight: Bool? {
+        sunriseSunsetProperty(forKey: "isDaylight") as? Bool
+    }
+}
+
+// MARK: - Time + Equatable, Comparable
+
+extension Time: Equatable, Comparable {
+    public static func < (lhs: Time, rhs: Time) -> Bool {
+        lhs.hour < rhs.hour || (lhs.hour == rhs.hour && lhs.minute < rhs.minute)
+    }
+
+    public static func == (lhs: Time, rhs: Time) -> Bool {
+        lhs.hour == rhs.hour && lhs.minute == rhs.minute
+    }
+
+    init(_ date: Date) {
+        self = Time(hour: date.hour.i32, minute: date.minute.i32)
+    }
+}
+
+// MARK: - NightShiftScheduleType
+
+enum NightShiftScheduleType: Equatable {
+    case off
+    case solar
+    case custom(start: Time, end: Time)
+
+    // MARK: Internal
+
+    static func == (lhs: NightShiftScheduleType, rhs: NightShiftScheduleType) -> Bool {
+        switch (lhs, rhs) {
+        case (.off, .off), (.solar, .solar):
+            return true
+        case (let .custom(leftStart, leftEnd), let custom(rightStart, rightEnd)):
+            return leftStart == rightStart && leftEnd == rightEnd
+        default:
+            return false
+        }
+    }
+}
+
 // MARK: - NightShift
 
 enum NightShift {
     static let client = CBBlueLightClient()
+
+    static var darkMode: Bool {
+        get { SLSGetAppearanceThemeLegacy() }
+        set { SLSSetAppearanceThemeLegacy(newValue) }
+    }
 
     static var strength: Float {
         get {
@@ -63,13 +155,84 @@ enum NightShift {
         return status
     }
 
+    static var schedule: NightShiftScheduleType {
+        get {
+            switch mode {
+            case 0:
+                return .off
+            case 1:
+                return .solar
+            case 2:
+                return .custom(start: status.schedule.fromTime, end: status.schedule.toTime)
+            default:
+                log.error("Unknown NightShift mode")
+                return .off
+            }
+        }
+        set {
+            switch newValue {
+            case .off:
+                mode = 0
+            case .solar:
+                mode = 1
+            case let .custom(start: start, end: end):
+                mode = 2
+                var schedule = CBSchedule(fromTime: start, toTime: end)
+                client.setSchedule(&schedule)
+            }
+        }
+    }
+
+    static var scheduledState: Bool {
+        switch schedule {
+        case .off:
+            return false
+        case let .custom(start: startTime, end: endTime):
+            let now = Time(Date())
+            if endTime > startTime {
+                // startTime and endTime are on the same day
+                let scheduledState = now >= startTime && now < endTime
+                return scheduledState
+            } else {
+                // endTime is on the day following startTime
+                let scheduledState = now >= startTime || now < endTime
+                return scheduledState
+            }
+        case .solar:
+            guard let sunrise = BrightnessSystemClient.shared?.sunrise, let sunset = BrightnessSystemClient.shared?.sunrise
+            else {
+                return false
+            }
+            let now = Date()
+
+            // For some reason, BrightnessSystemClient.isDaylight doesn't track perfectly with sunrise and sunset
+            // Should return true when not daylight
+            let scheduledState: Bool
+            let order = NSCalendar.current.compare(sunrise, to: sunset, toGranularity: .day)
+            switch order {
+            case .orderedSame, .orderedAscending:
+                scheduledState = now >= sunset || now <= sunrise
+            case .orderedDescending:
+                scheduledState = now >= sunset && now <= sunrise
+            }
+            return scheduledState
+        }
+    }
+
     static func enable(mode: Int32? = nil, strength: Float? = nil) {
         isEnabled = true
+
         if let mode = mode {
             self.mode = mode
         }
         if let strength = strength {
             self.strength = strength
+        }
+
+        if scheduledState {
+            let savedSchedule = schedule
+            schedule = .off
+            schedule = savedSchedule
         }
     }
 

@@ -406,6 +406,7 @@ struct HDRSettingsView: View {
     @Default(.autoXdr) var autoXdr
     @Default(.autoSubzero) var autoSubzero
     @Default(.disableNightShiftXDR) var disableNightShiftXDR
+    @Default(.enableDarkModeXDR) var enableDarkModeXDR
     @Default(.autoXdrSensor) var autoXdrSensor
     @Default(.autoXdrSensorShowOSD) var autoXdrSensorShowOSD
     @Default(.autoXdrSensorLuxThreshold) var autoXdrSensorLuxThreshold
@@ -487,6 +488,14 @@ struct HDRSettingsView: View {
     var xdrSettings: some View {
         Group {
             SettingsToggle(text: "Disable Night Shift when toggling XDR", setting: $disableNightShiftXDR.animation(.fastSpring))
+            SettingsToggle(
+                text: "Enable Dark Mode when toggling XDR", setting: $enableDarkModeXDR.animation(.fastSpring),
+                help: """
+                Use dark backgrounds with bright text for minimizing power usage and LED temperature while XDR is active.
+
+                This works best in combination with the "Enhance contrast in XDR Brightness" setting.
+                """
+            )
             SettingsToggle(text: "Toggle XDR Brightness when going over 100%", setting: $autoXdr.animation(.fastSpring))
             SettingsToggle(
                 text: "Toggle Sub-zero Dimming when going below 0%",
