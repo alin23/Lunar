@@ -8,6 +8,10 @@ import Defaults
 class DDCPopoverController: NSViewController {
     var displayObservers = [String: AnyCancellable]()
 
+    @IBOutlet var muteByteValueOnField: ScrollableTextField!
+    @IBOutlet var muteByteValueOffField: ScrollableTextField!
+    @IBOutlet var volumeValueOnMuteField: ScrollableTextField!
+
     @IBOutlet var maxDDCBrightnessField: ScrollableTextField!
     @IBOutlet var maxDDCContrastField: ScrollableTextField!
     @IBOutlet var maxDDCVolumeField: ScrollableTextField!
@@ -82,6 +86,27 @@ class DDCPopoverController: NSViewController {
             self.maxDDCContrastField.lowerLimit = self.minDDCContrastField.intValue.d
             self.minDDCVolumeField.upperLimit = self.maxDDCVolumeField.intValue.d
             self.maxDDCVolumeField.lowerLimit = self.minDDCVolumeField.intValue.d
+
+            self.muteByteValueOnField.integerValue = display.muteByteValueOn.i
+            self.muteByteValueOffField.integerValue = display.muteByteValueOff.i
+            self.volumeValueOnMuteField.integerValue = display.volumeValueOnMute.i
+
+            self.muteByteValueOnField.lowerLimit = 0
+            self.muteByteValueOnField.upperLimit = UInt16.max.d
+            self.muteByteValueOffField.lowerLimit = 0
+            self.muteByteValueOffField.upperLimit = UInt16.max.d
+            self.volumeValueOnMuteField.lowerLimit = 0
+            self.volumeValueOnMuteField.upperLimit = UInt16.max.d
+        }
+
+        muteByteValueOnField.onValueChanged = { [weak self] value in
+            self?.display?.muteByteValueOn = value.u16
+        }
+        muteByteValueOffField.onValueChanged = { [weak self] value in
+            self?.display?.muteByteValueOff = value.u16
+        }
+        volumeValueOnMuteField.onValueChanged = { [weak self] value in
+            self?.display?.volumeValueOnMute = value.u16
         }
 
         minDDCBrightnessField.onValueChanged = { [weak self] value in
@@ -140,6 +165,19 @@ class DDCPopoverController: NSViewController {
             self.maxDDCVolumeField.integerValue = value.intValue
             self.minDDCVolumeField.upperLimit = value.doubleValue
         }.store(in: &displayObservers, for: "maxDDCVolume")
+
+        display.$muteByteValueOn.sink { [weak self] value in
+            guard let self = self else { return }
+            self.muteByteValueOnField.integerValue = value.i
+        }.store(in: &displayObservers, for: "muteByteValueOn")
+        display.$muteByteValueOff.sink { [weak self] value in
+            guard let self = self else { return }
+            self.muteByteValueOffField.integerValue = value.i
+        }.store(in: &displayObservers, for: "muteByteValueOff")
+        display.$volumeValueOnMute.sink { [weak self] value in
+            guard let self = self else { return }
+            self.volumeValueOnMuteField.integerValue = value.i
+        }.store(in: &displayObservers, for: "volumeValueOnMute")
     }
 }
 
