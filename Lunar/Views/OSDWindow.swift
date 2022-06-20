@@ -228,6 +228,7 @@ public struct BigSurSlider: View {
         sliderWidth: CGFloat = 200,
         sliderHeight: CGFloat = 22,
         image: String? = nil,
+        imageBinding: Binding<String?>? = nil,
         color: Color? = nil,
         colorBinding: Binding<Color?>? = nil,
         backgroundColor: Color = .black.opacity(0.1),
@@ -248,7 +249,7 @@ public struct BigSurSlider: View {
         _percentage = percentage
         _sliderWidth = sliderWidth.state
         _sliderHeight = sliderHeight.state
-        _image = image.state
+        _image = imageBinding ?? .constant(image)
         _color = colorBinding ?? .constant(color)
         _showValue = showValue ?? .constant(false)
         _backgroundColor = backgroundColorBinding ?? .constant(backgroundColor)
@@ -325,7 +326,7 @@ public struct BigSurSlider: View {
                         verticalPadding: 2
                     ))
                     .font(.system(size: 10, weight: .medium, design: .rounded))
-                    .transition(.scale.animation(.spring()))
+                    .transition(.scale.animation(.fastSpring))
                     .frame(maxWidth: .infinity, alignment: .center)
                 }
             }
@@ -396,7 +397,7 @@ public struct BigSurSlider: View {
     @Binding var percentage: Float
     @State var sliderWidth: CGFloat = 200
     @State var sliderHeight: CGFloat = 22
-    @State var image: String? = nil
+    @Binding var image: String?
     @Binding var color: Color?
     @Binding var backgroundColor: Color
     @Binding var knobColor: Color?

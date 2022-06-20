@@ -78,6 +78,12 @@ struct PowerOffButtonView: View {
 // MARK: - DisplayRowView
 
 struct DisplayRowView: View {
+    static var hoveringVolumeSliderTask: DispatchWorkItem? {
+        didSet {
+            oldValue?.cancel()
+        }
+    }
+
     @ObservedObject var display: Display
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.colors) var colors
@@ -93,6 +99,8 @@ struct DisplayRowView: View {
     @State var showXDRTip = false
     @State var showSubzero = false
     @State var showXDR = false
+
+    @State var hoveringVolumeSlider = false
 
     var softwareSliders: some View {
         Group {
@@ -249,20 +257,43 @@ struct DisplayRowView: View {
             }
 
             if display.hasDDC, display.showVolumeSlider, display.ddcEnabled {
-                BigSurSlider(
-                    percentage: $display.preciseVolume.f,
-                    image: "speaker.2.fill",
-                    colorBinding: .constant(colors.accent),
-                    backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
-                    showValue: $showSliderValues
-                )
+                ZStack {
+                    BigSurSlider(
+                        percentage: $display.preciseVolume.f,
+                        imageBinding: .oneway { display.audioMuted ? "speaker.slash.fill" : "speaker.2.fill" },
+                        colorBinding: .constant(colors.accent),
+                        backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                        showValue: $showSliderValues,
+                        disabled: $display.audioMuted,
+                        enableText: "Unmute"
+                    )
+                    if hoveringVolumeSlider, !display.audioMuted {
+                        SwiftUI.Button("Mute") {
+                            display.audioMuted = true
+                        }
+                        .buttonStyle(FlatButton(
+                            color: Colors.red.opacity(0.7),
+                            textColor: .white,
+                            horizontalPadding: 6,
+                            verticalPadding: 2
+                        ))
+                        .font(.system(size: 10, weight: .medium, design: .rounded))
+                        .transition(.scale.animation(.fastSpring))
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .offset(x: -120, y: 0)
+                    }
+                }.onHover { hovering in
+                    Self.hoveringVolumeSliderTask = mainAsyncAfter(ms: 150) {
+                        hoveringVolumeSlider = hovering
+                    }
+                }
             }
 
             if (display.hasDDC && showInputInQuickActions)
                 || display.showOrientation
                 || display.appPreset != nil
                 || (display.adaptivePaused && !display.blackOutEnabled)
-                || showRawValues
+                || showRawValues && (display.lastRawBrightness != nil || display.lastRawContrast != nil || display.lastRawVolume != nil)
                 || SWIFTUI_PREVIEW
             {
                 VStack {
