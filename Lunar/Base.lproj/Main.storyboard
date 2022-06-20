@@ -7248,6 +7248,9 @@ Keep this disabled when using f.lux</string>
                                             <menuItem title="Metro ESP32 S2" state="on" tag="30" identifier="metroesp32-s2" id="Qtb-lf-Oop">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
+                                            <menuItem title="Feather ESP32 S2" state="on" tag="31" identifier="featheresp32-s2" id="Qtb-lf-Ool">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
                                             <menuItem title="WEMOS LOLIN32" tag="29" identifier="lolin32" id="e7f-R5-jxy">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>

@@ -69,3 +69,6 @@ int DisplayServicesRegisterForAmbientLightCompensationNotifications(CGDirectDisp
 int DisplayServicesUnregisterForBrightnessChangeNotifications(CGDirectDisplayID display, CGDirectDisplayID displayObserver);
 int DisplayServicesUnregisterForAmbientLightCompensationNotifications(CGDirectDisplayID display, CGDirectDisplayID displayObserver);
 bool DisplayServicesCanResetAmbientLight(CGDirectDisplayID display, UInt check);
+
+void SLSSetAppearanceThemeLegacy(BOOL);
+BOOL SLSGetAppearanceThemeLegacy();

@@ -72,6 +72,8 @@ class ALSInstallViewController: NSViewController {
         switch board {
         case "Metro ESP32 S2":
             return "metroesp32-s2"
+        case "Feather ESP32 S2":
+            return "featheresp32-s2"
         case "WEMOS LOLIN32":
             return "lolin32"
         case "WEMOS LOLIN32 Lite":
