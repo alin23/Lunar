@@ -14,7 +14,7 @@ set WORK_DIR "$PROJECT_DIR"
 set SCRIPTS_DIR "$PROJECT_DIR/scripts"
 
 command_exists create-dmg || npm i -g create-dmg
-command_exists xcnotary || brew install xcnotary
+# command_exists xcnotary || brew install xcnotary
 
 set BUILD_DIR "$CODESIGNING_FOLDER_PATH"
 set TMP_DIR /tmp/Lunar
@@ -41,6 +41,8 @@ for file in $filesToSign
     codesign -fs "$CODESIGN_CERT" -o runtime --entitlements "$WORK_DIR/Lunar/LunarRelease.entitlements" --timestamp "$file" || exit 1
 end
 
+test -f "$APP_ZIP_TMP" && rm -rf "$APP_ZIP_TMP"
+ditto -c -k --sequesterRsrc --keepParent "$APP_TMP" "$APP_ZIP_TMP"
 
 if test "$DISABLE_NOTARIZATION" != 1
     if not codesign -vvv --deep --strict "$APP_TMP"
@@ -56,13 +58,17 @@ if test "$DISABLE_NOTARIZATION" != 1
         end
 
         if test "$DISABLE_PACKING" = 1
-            xcnotary notarize -d alin.p32@gmail.com -k altool "$APP_TMP"
+            # xcnotary notarize -d alin.p32@gmail.com -k altool "$APP_TMP"
+            xcrun notarytool submit "$APP_ZIP_TMP" --keychain-profile Alin --wait || exit 1
+            xcrun stapler staple "$APP_TMP"
+            spctl --assess -vv "$APP_TMP" || exit 1
+
+            test -f "$APP_ZIP_TMP" && rm -rf "$APP_ZIP_TMP"
+            ditto -c -k --sequesterRsrc --keepParent "$APP_TMP" "$APP_ZIP_TMP"
         end
     end
 end
 
-test -f "$APP_ZIP_TMP" && rm -rf "$APP_ZIP_TMP"
-ditto -c -k --sequesterRsrc --keepParent "$APP_TMP" "$APP_ZIP_TMP"
 
 if test "$DISABLE_PACKING" != 1
     set APP_VERSION (/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_TMP/Contents/Info.plist" || exit 1)

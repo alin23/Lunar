@@ -55,7 +55,10 @@ function make-installer -a ext
     cp "$APP_TMP_INSTALLER" "$APP_INSTALLER" || exit 1
 
     if test "$DISABLE_NOTARIZATION" != 1
-        xcnotary notarize -d alin.p32@gmail.com -k altool "$APP_INSTALLER" || exit 1
+        # xcnotary notarize -d alin.p32@gmail.com -k altool "$APP_INSTALLER" || exit 1
+        xcrun notarytool submit "$APP_INSTALLER" --keychain-profile Alin --wait || exit 1
+        xcrun stapler staple "$APP_INSTALLER"
+        spctl --assess -vv --type install "$APP_INSTALLER" || exit 1
     end
 
     if not string match -rq "$CHANNEL" "beta|alpha"
