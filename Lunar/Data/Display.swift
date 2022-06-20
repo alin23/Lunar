@@ -3454,7 +3454,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             guard applyVolumeValueOnMute else { return }
-            volume = audioMuted ? volumeValueOnMute.ns : lastVolume
+            if volume != volumeValueOnMute.ns {
+                lastVolume = volume
+            }
+            if audioMuted {
+                let _ = control?.setVolume(volumeValueOnMute)
+            } else {
+                volume = lastVolume
+            }
         }
     }
 
