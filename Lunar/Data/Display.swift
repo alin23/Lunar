@@ -37,12 +37,12 @@ let DEFAULT_MAX_CONTRAST: UInt16 = 75
 let DEFAULT_COLOR_GAIN: UInt16 = 90
 
 let DEFAULT_SENSOR_BRIGHTNESS_CURVE_FACTOR = 0.5
-let DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR = 0.5
+let DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR = 1.0
 let DEFAULT_LOCATION_BRIGHTNESS_CURVE_FACTOR = 1.0
 let DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR = 1.0
 
 let DEFAULT_SENSOR_CONTRAST_CURVE_FACTOR = 0.2
-let DEFAULT_SYNC_CONTRAST_CURVE_FACTOR = 2.0
+let DEFAULT_SYNC_CONTRAST_CURVE_FACTOR = 0.26
 let DEFAULT_LOCATION_CONTRAST_CURVE_FACTOR = 0.8
 let DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR = 1.0
 
@@ -476,6 +476,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         muteByteValueOn = try container.decodeIfPresent(UInt16.self, forKey: .muteByteValueOn) ?? 1
         muteByteValueOff = try container.decodeIfPresent(UInt16.self, forKey: .muteByteValueOff) ?? 2
         volumeValueOnMute = try container.decodeIfPresent(UInt16.self, forKey: .volumeValueOnMute) ?? 0
+        applyMuteValueOnMute = try container
+            .decodeIfPresent(Bool.self, forKey: .applyMuteValueOnMute) ?? true
         applyVolumeValueOnMute = try container
             .decodeIfPresent(Bool.self, forKey: .applyVolumeValueOnMute) ?? CachedDefaults[.muteVolumeZero]
 
@@ -891,6 +893,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case muteByteValueOff
         case volumeValueOnMute
         case applyVolumeValueOnMute
+        case applyMuteValueOnMute
         case forceDDC
         case applyGamma
         case brightnessOnInputChange
@@ -949,6 +952,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .extendedColorGain,
             .reapplyColorGain,
             .applyVolumeValueOnMute,
+            .applyMuteValueOnMute,
         ]
 
         static var hidden: Set<CodingKeys> = [
@@ -1040,6 +1044,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .muteByteValueOff,
             .volumeValueOnMute,
             .applyVolumeValueOnMute,
+            .applyMuteValueOnMute,
             .forceDDC,
             .applyGamma,
             .brightnessOnInputChange1,
@@ -1397,6 +1402,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var muteByteValueOff: UInt16 = 2
     @Published @objc dynamic var volumeValueOnMute: UInt16 = 0
     @Published @objc dynamic var applyVolumeValueOnMute = false
+    @Published @objc dynamic var applyMuteValueOnMute = true
 
     @objc dynamic var forceDDC = false {
         didSet {
@@ -3445,21 +3451,34 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         didSet {
             save()
 
-            guard !isForTesting else { return }
-            if let control = control, !control.setMute(audioMuted) {
-                log.warning(
-                    "Error writing muted audio using \(control.str)",
-                    context: context
-                )
+            guard !isForTesting, let control = control else { return }
+
+            if applyMuteValueOnMute {
+                log.info("Sending mute value \(audioMuted ? muteByteValueOn : muteByteValueOff) to \(audioMuted ? "mute" : "unmute") audio")
+
+                if !control.setMute(audioMuted) {
+                    log.warning(
+                        "Error writing muted audio using \(control.str)",
+                        context: context
+                    )
+                }
             }
 
             guard applyVolumeValueOnMute else { return }
+
             if volume != volumeValueOnMute.ns {
                 lastVolume = volume
             }
             if audioMuted {
-                let _ = control?.setVolume(volumeValueOnMute)
+                log.info("Sending volume \(volumeValueOnMute) to mute audio")
+                if !control.setVolume(volumeValueOnMute) {
+                    log.warning(
+                        "Error writing volume value \(volumeValueOnMute) for muted audio using \(control.str)",
+                        context: context
+                    )
+                }
             } else {
+                log.info("Setting last volume \(lastVolume) to unmute audio")
                 volume = lastVolume
             }
         }
@@ -4311,6 +4330,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         muteByteValueOn = 1
         muteByteValueOff = 2
         applyVolumeValueOnMute = false
+        applyMuteValueOnMute = true
         volumeValueOnMute = 0
     }
 
@@ -4557,6 +4577,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try container.encode(muteByteValueOff, forKey: .muteByteValueOff)
             try container.encode(volumeValueOnMute, forKey: .volumeValueOnMute)
             try container.encode(applyVolumeValueOnMute, forKey: .applyVolumeValueOnMute)
+            try container.encode(applyMuteValueOnMute, forKey: .applyMuteValueOnMute)
             try container.encode(forceDDC, forKey: .forceDDC)
             try container.encode(applyGamma, forKey: .applyGamma)
             try container.encode(schedules, forKey: .schedules)
