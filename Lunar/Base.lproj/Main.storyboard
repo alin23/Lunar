@@ -9486,7 +9486,7 @@ in the Quick Actions menu</string>
                                 </connections>
                             </textField>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0aX-nv-f8w" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="148" y="416" width="60" height="28"/>
+                                <rect key="frame" x="157" y="416" width="60" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="60" id="cJr-m8-JmY"/>
                                     <constraint firstAttribute="height" constant="28" id="eJK-aa-qPu"/>
@@ -9564,7 +9564,7 @@ non-standard mute implementation</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Vvp-rh-oA1">
-                                <rect key="frame" x="161" y="403" width="34" height="13"/>
+                                <rect key="frame" x="170" y="403" width="34" height="13"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="MUTE" id="ILa-Kx-Bb1">
                                     <font key="font" metaFont="systemSemibold" size="10"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -9579,18 +9579,6 @@ non-standard mute implementation</string>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="dLb-ZE-u17">
-                                <rect key="frame" x="13" y="411" width="129" height="11"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="125" id="9Jh-Qs-E0J"/>
-                                    <constraint firstAttribute="height" constant="11" id="sGP-xO-ro0"/>
-                                </constraints>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Sent on DDC mute" id="pY8-4i-bpj">
-                                    <font key="font" metaFont="systemSemibold" size="9"/>
-                                    <color key="textColor" name="Caption Tertiary"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
                             <button verticalHuggingPriority="750" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="tCa-64-4Oa">
                                 <rect key="frame" x="15" y="362" width="142" height="11"/>
                                 <buttonCell key="cell" type="check" title="Send when activating mute" bezelStyle="regularSquare" imagePosition="left" controlSize="mini" state="on" inset="2" id="V40-4i-CS3">
@@ -9599,6 +9587,16 @@ non-standard mute implementation</string>
                                 </buttonCell>
                                 <connections>
                                     <binding destination="JzB-v1-VXs" name="value" keyPath="self.display.applyVolumeValueOnMute" id="CVI-ku-IrW"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="dpY-iW-JEG">
+                                <rect key="frame" x="15" y="409" width="135" height="11"/>
+                                <buttonCell key="cell" type="check" title="Send when toggling mute" bezelStyle="regularSquare" imagePosition="left" controlSize="mini" state="on" inset="2" id="Sui-o9-gBc">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="systemSemibold" size="9"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="JzB-v1-VXs" name="value" keyPath="self.display.applyMuteValueOnMute" id="aLR-uM-zWV"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -9617,12 +9615,12 @@ non-standard mute implementation</string>
                             <constraint firstItem="SYN-qO-cgY" firstAttribute="centerY" secondItem="Qbi-XG-kgW" secondAttribute="centerY" id="6bz-Rw-v5W"/>
                             <constraint firstItem="fFF-ZM-Emx" firstAttribute="top" secondItem="zMc-kW-K8Z" secondAttribute="bottom" constant="15" id="7Yy-Fs-S46"/>
                             <constraint firstItem="zMc-kW-K8Z" firstAttribute="centerX" secondItem="vk0-hY-IKP" secondAttribute="centerX" id="7uJ-5Z-fV5"/>
-                            <constraint firstItem="dLb-ZE-u17" firstAttribute="top" secondItem="kqQ-dZ-C0J" secondAttribute="bottom" id="7wK-8w-gg3"/>
                             <constraint firstItem="yKc-wq-QpC" firstAttribute="leading" secondItem="YC7-3Y-dfA" secondAttribute="leading" id="8MZ-yE-Jjy"/>
                             <constraint firstItem="DZc-3H-qPr" firstAttribute="centerY" secondItem="Qbi-XG-kgW" secondAttribute="centerY" id="8xt-LI-cFh"/>
                             <constraint firstItem="Y6b-dB-TTa" firstAttribute="top" secondItem="6t2-LA-zTO" secondAttribute="bottom" constant="21" id="91H-Dq-9r4"/>
                             <constraint firstItem="YC7-3Y-dfA" firstAttribute="leading" secondItem="GDr-wf-jzJ" secondAttribute="leading" id="92t-P5-OqC"/>
                             <constraint firstItem="zlO-DT-D1a" firstAttribute="centerY" secondItem="zMc-kW-K8Z" secondAttribute="centerY" id="9w3-BS-1Qf"/>
+                            <constraint firstItem="dpY-iW-JEG" firstAttribute="leading" secondItem="kqQ-dZ-C0J" secondAttribute="leading" id="AYc-Et-aSh"/>
                             <constraint firstItem="v71-fh-wyY" firstAttribute="centerY" secondItem="Y8V-a2-Kyk" secondAttribute="centerY" id="CBo-DG-vku"/>
                             <constraint firstItem="sye-Nf-IV1" firstAttribute="leading" secondItem="E6J-H0-wkE" secondAttribute="leading" id="CuV-MP-LaU"/>
                             <constraint firstAttribute="bottom" secondItem="yKc-wq-QpC" secondAttribute="bottom" constant="18" id="Dei-k0-OfR"/>
@@ -9637,6 +9635,7 @@ non-standard mute implementation</string>
                             <constraint firstItem="uHL-jq-7ru" firstAttribute="centerY" secondItem="fTD-mn-mNa" secondAttribute="centerY" id="IRY-yr-3Ay"/>
                             <constraint firstItem="O1a-dG-iZD" firstAttribute="top" secondItem="ndm-be-yth" secondAttribute="bottom" id="IgG-Df-DBw"/>
                             <constraint firstItem="zlO-DT-D1a" firstAttribute="leading" secondItem="O4f-dy-3wr" secondAttribute="leading" constant="15" id="JFP-3E-e2e"/>
+                            <constraint firstItem="dpY-iW-JEG" firstAttribute="top" secondItem="kqQ-dZ-C0J" secondAttribute="bottom" constant="2" id="JL0-9P-ZaY"/>
                             <constraint firstItem="YC7-3Y-dfA" firstAttribute="top" secondItem="LUX-64-DtM" secondAttribute="bottom" constant="13" id="JVo-lN-owC"/>
                             <constraint firstItem="uHL-jq-7ru" firstAttribute="leading" secondItem="fTD-mn-mNa" secondAttribute="trailing" constant="5" id="KQG-16-5zc"/>
                             <constraint firstItem="10M-jG-PSH" firstAttribute="leading" secondItem="5xI-sa-EcU" secondAttribute="trailing" constant="3" id="Kch-6w-ehi"/>
@@ -9685,7 +9684,6 @@ non-standard mute implementation</string>
                             <constraint firstItem="k4C-cA-Pqe" firstAttribute="centerY" secondItem="5xI-sa-EcU" secondAttribute="centerY" id="lU6-eS-h9Z"/>
                             <constraint firstItem="Y6b-dB-TTa" firstAttribute="leading" secondItem="E6J-H0-wkE" secondAttribute="leading" id="laD-Hv-oER"/>
                             <constraint firstItem="esR-sk-lwD" firstAttribute="top" secondItem="tNH-AR-h2N" secondAttribute="bottom" constant="2" id="lya-0x-LUK"/>
-                            <constraint firstItem="dLb-ZE-u17" firstAttribute="leading" secondItem="kqQ-dZ-C0J" secondAttribute="leading" id="mFj-TB-qtN"/>
                             <constraint firstItem="iNk-3R-8Rl" firstAttribute="centerY" secondItem="v71-fh-wyY" secondAttribute="centerY" id="mJz-OW-Kgv"/>
                             <constraint firstItem="BW5-MP-UeP" firstAttribute="centerY" secondItem="E6J-H0-wkE" secondAttribute="centerY" id="mPi-ga-Yar"/>
                             <constraint firstAttribute="trailing" secondItem="ck2-cV-HqR" secondAttribute="trailing" constant="13" id="nSZ-Mn-EW0"/>
@@ -9695,7 +9693,7 @@ non-standard mute implementation</string>
                             <constraint firstItem="7VZ-cK-CTG" firstAttribute="leading" secondItem="ndm-be-yth" secondAttribute="leading" id="pcc-xU-ISQ"/>
                             <constraint firstItem="BW5-MP-UeP" firstAttribute="trailing" secondItem="t3p-DW-pd4" secondAttribute="trailing" id="qIB-jI-XWp"/>
                             <constraint firstItem="6t2-LA-zTO" firstAttribute="top" secondItem="kqQ-dZ-C0J" secondAttribute="bottom" constant="30" id="qvI-yT-TLH"/>
-                            <constraint firstItem="ndm-be-yth" firstAttribute="leading" secondItem="0aX-nv-f8w" secondAttribute="trailing" constant="19" id="rOp-7t-iFc"/>
+                            <constraint firstItem="ndm-be-yth" firstAttribute="leading" secondItem="0aX-nv-f8w" secondAttribute="trailing" constant="10" id="rOp-7t-iFc"/>
                             <constraint firstItem="DZc-3H-qPr" firstAttribute="leading" secondItem="SYN-qO-cgY" secondAttribute="trailing" constant="5" id="rRB-vO-lcC"/>
                             <constraint firstItem="LUX-64-DtM" firstAttribute="top" secondItem="GDr-wf-jzJ" secondAttribute="bottom" constant="-2" id="sQ3-sD-niI"/>
                             <constraint firstItem="bJS-rP-OSB" firstAttribute="leading" secondItem="l2v-Yw-wzp" secondAttribute="leading" id="sg4-Ge-10V"/>
