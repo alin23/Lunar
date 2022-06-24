@@ -1336,6 +1336,51 @@ struct Lunar: ParsableCommand {
         }
     }
 
+    struct Facelight: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Turns monitors into bright light panels.",
+            discussion: "\("EXAMPLE".bold()): \("lunar facelight external enable".yellow().bold())"
+        )
+
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
+
+        @Argument(
+            help: "Display serial or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
+        )
+        var display = DisplayFilter.bestGuess
+
+        @Argument(help: "Whether Facelight should be enabled or disabled")
+        var state: FeatureState = .enable
+
+        func run() throws {
+            Lunar.configureLogging(options: globals)
+
+            cliGetDisplays(
+                includeVirtual: CachedDefaults[.showVirtualDisplays],
+                includeAirplay: CachedDefaults[.showAirplayDisplays],
+                includeProjector: CachedDefaults[.showProjectorDisplays],
+                includeDummy: CachedDefaults[.showDummyDisplays]
+            )
+
+            let displays = getDisplays(displays: displayController.activeDisplayList, filter: display)
+            guard !displays.isEmpty else {
+                throw LunarCommandError.displayNotFound(display.s)
+            }
+
+            for (i, display) in displays.enumerated() {
+                mainAsyncAfter(ms: i * 1000) {
+                    log.info("\(state == .enable ? "Enabling" : "Disabling") Facelight for \(display)")
+                    if state == .enable {
+                        display.enableFaceLight()
+                    } else {
+                        display.disableFaceLight()
+                    }
+                }
+            }
+            cliExit(0)
+        }
+    }
+
     struct Blackout: ParsableCommand {
         static let configuration = CommandConfiguration(
             abstract: "Turns monitors off without cutting power or closing the lid.",
@@ -1356,7 +1401,7 @@ struct Lunar: ParsableCommand {
         var display = DisplayFilter.bestGuess
 
         @Argument(help: "Whether Blackout should be enabled (monitor turned off) or disabled (turn monitor back on)")
-        var state: BlackoutState = .enable
+        var state: FeatureState = .enable
 
         func run() throws {
             Lunar.configureLogging(options: globals)
@@ -1403,6 +1448,7 @@ struct Lunar: ParsableCommand {
             Preset.self,
             Mode.self,
             Blackout.self,
+            Facelight.self,
             Builtin.self,
             Ddc.self,
             Ddcctl.self,
@@ -1486,6 +1532,8 @@ struct Lunar: ParsableCommand {
         case let cmd as Gamma:
             return cmd.globals
         case let cmd as Blackout:
+            return cmd.globals
+        case let cmd as Facelight:
             return cmd.globals
         case let cmd as CoreDisplay:
             return cmd.globals
