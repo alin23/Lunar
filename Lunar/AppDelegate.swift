@@ -1818,17 +1818,29 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         configureSentry()
         asyncNow { [self] in
             log.initLogger(cli: true)
-            let argList = Array(CommandLine.arguments[idx + 1 ..< CommandLine.arguments.count])
+            #if DEBUG
+                let argList: [String]
+                if CommandLine.arguments.contains("-NSDocumentRevisionsDebugMode"), CommandLine.arguments.last == "YES" {
+                    argList = Array(CommandLine.arguments[idx + 1 ..< CommandLine.arguments.count - 2])
+                } else {
+                    argList = Array(CommandLine.arguments[idx + 1 ..< CommandLine.arguments.count])
+                }
+            #else
+                let argList = Array(CommandLine.arguments[idx + 1 ..< CommandLine.arguments.count])
+            #endif
 
             let exc = tryBlock {
                 guard !argList.contains("--new-instance"), self.otherLunar() != nil,
-                      let socket = try? Socket.create(), let opts = Lunar.globalOptions(args: argList)
+                      let socket = try! Socket.create(), let opts = Lunar.globalOptions(args: argList)
                 else {
                     if !argList.contains("--remote") {
                         self.initCacheTransitionLogging()
                         Lunar.main(argList)
-                    } else {
+                    } else if argList.contains("--new-instance") {
                         print("Can't use `--remote` and `--new-instance` at the same time.")
+                        cliExit(1)
+                    } else {
+                        print("Can't connect to a running Lunar instance.")
                         cliExit(1)
                     }
                     return
