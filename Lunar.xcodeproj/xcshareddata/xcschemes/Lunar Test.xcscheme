@@ -58,6 +58,10 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "--remote"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "displays"
             isEnabled = "NO">
          </CommandLineArgument>
