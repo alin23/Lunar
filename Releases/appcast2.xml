@@ -3,6 +3,23 @@
     <channel>
         <title>Lunar</title>
         <item>
+            <title>5.7.0</title>
+            <pubDate>Thu, 30 Jun 2022 13:33:35 +0300</pubDate>
+            <link>https://lunar.fyi/</link>
+            <sparkle:fullReleaseNotesLink>https://lunar.fyi/changelog</sparkle:fullReleaseNotesLink>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <sparkle:version>5.7.0</sparkle:version>
+            <sparkle:shortVersionString>5.7.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-5.7.0.html</sparkle:releaseNotesLink>
+            <enclosure url="https://files.lunar.fyi/releases/Lunar-5.7.0.dmg" length="18827033" type="application/octet-stream" sparkle:edSignature="WPN0baXK9kUJFPmcfzpBk62XSdl3kJvPnuGnUeh0voxxkLX56Dglon2HHQYGENiTa9JZuCWa7CaTZwO7Cf9gDA=="/>
+            <sparkle:deltas>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.7.0-5.6.8.delta" sparkle:deltaFrom="5.6.8" length="2712810" type="application/octet-stream" sparkle:edSignature="bBgzW0mD35tF6Wy3IZjKsnVNRPUh/cnvcPHcyzI35kqUOOli9XNsrRplI0es41F0Ah0F3Aulh6tQMmTKYTzABQ=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.7.0-5.6.7.delta" sparkle:deltaFrom="5.6.7" length="2984594" type="application/octet-stream" sparkle:edSignature="8oIggFZlASeFFKjESWSPX2nIeL6yaqCJByfg4767rJDEBbsFpsW3o8oy5KsHy51PgtvgrR/uNgx+qTdYxjdwAQ=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.7.0-5.6.6.delta" sparkle:deltaFrom="5.6.6" length="6258542" type="application/octet-stream" sparkle:edSignature="AKLh9K9dQ58I0onX7WElAxQCIOT29Lw5E/pHTE/2LmfsJDNPlmUjiHXd+MzRv0+fVnRJhoWUdx82b/dODF9zBA=="/>
+            </sparkle:deltas>
+        </item>
+        <item>
             <title>5.7.0a4</title>
             <pubDate>Fri, 24 Jun 2022 19:59:01 +0300</pubDate>
             <link>https://lunar.fyi/</link>
