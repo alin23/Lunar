@@ -533,7 +533,7 @@ class DisplayController: ObservableObject {
                   let name = props["ProductName"] as? String, let serial = props["SerialNumber"] as? Int,
                   let productID = props["ProductID"] as? Int, let manufactureYear = props["YearOfManufacture"] as? Int
             else {
-                log.info("No display matched for service \(service): (displayProps: \(displayProps))")
+                log.info("No display matched for service \(service)")
                 log.verbose("displayProps: \(displayProps)")
                 return nil
             }
