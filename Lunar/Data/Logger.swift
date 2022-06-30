@@ -94,6 +94,8 @@ class Logger: SwiftyBeaver {
         defer { initialized = true }
         console.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M \t$X"
         file.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M \t$X"
+        file.logFileMaxSize = (15 * 1024 * 1024)
+        file.logFileAmount = 3
         Logger.addDestination(console)
 
         let debugMode = { (enabled: Bool) in
