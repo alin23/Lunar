@@ -1,3 +1,71 @@
+# 5.7.0a4
+## alpha 4
+
+### Features
+
+* Add `lunar facelight` CLI command
+
+# 5.7.0a3
+## alpha 3
+
+### Improvements
+
+* Add a way to stop sending the mute command and rely only on the volume value when muting audio
+
+# 5.7.0a2
+## alpha 2
+
+### Features
+
+* Add a mute/unmute button when hovering the volume slider
+
+### Improvements
+
+* Don't take volume DDC range into account when sending the mute workaround value
+
+# 5.7.0a1
+## alpha 1
+
+### Features
+
+* Add option to toggle Dark Mode when using XDR Brightness for lowering power usage and LED heat
+* The Night Shift disabling feature in XDR can now re-enable Night Shift if within the user schedule
+* Add ALS support for Feather ESP32-S2 boards
+* Add configurable mute workarounds for monitors where mute doesn't work because of non-standard DDC implementations
+
+![DDC mute workarounds](https://files.lunar.fyi/ddc-mute-workaround.png)
+
+### Improvements
+
+* React to screen sleep events faster to work around some buggy monitors that don't enter standby
+
+### Fixes
+
+* Don't show the Notch Disabled button on non-MacBook screens
+# 5.7.0
+### Features
+
+* Add `lunar facelight` CLI command
+* Add a mute/unmute button when hovering the volume slider
+* Add option to toggle Dark Mode when using XDR Brightness for lowering power usage and LED heat
+* The Night Shift disabling feature in XDR can now re-enable Night Shift if within the user schedule
+* Add ALS support for Feather ESP32-S2 boards
+* Add configurable mute workarounds for monitors where mute doesn't work because of non-standard DDC implementations
+
+![DDC mute workarounds](https://files.lunar.fyi/ddc-mute-workaround.png)
+
+## Improvements
+
+* Minimise `INFO` logging
+* Add log file rotation
+* Add a way to stop sending the mute command and rely only on the volume value when muting audio
+* Don't take volume DDC range into account when sending the mute workaround value
+* React to screen sleep events faster to work around some buggy monitors that don't enter standby
+
+### Fixes
+
+* Don't show the Notch Disabled button on non-MacBook screens
+
 # 5.6.8a1
 ## alpha 1
 
