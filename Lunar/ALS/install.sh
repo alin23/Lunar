@@ -1,9 +1,11 @@
 #!/bin/zsh
 
 DIR="${0:a:h}"
+BOARD_DIR="/tmp/lunarsensor/$BOARD"
 
-mkdir -p "/tmp/lunarsensor/$BOARD"
-cd "/tmp/lunarsensor/$BOARD"
+mkdir -p "$BOARD_DIR"
+cp -RL "$DIR"/{lunar.yaml,install.sh,tsl2591.h} "$BOARD_DIR/"
+cd "$BOARD_DIR"
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 LOG_PATH=${LOG_PATH:-/tmp/lunar-sensor-install.log}
@@ -58,7 +60,7 @@ echo /usr/bin/python3 -m esphome \
     -s platform_version "$PLATFORM_VERSION" \
     -s sda "$SDA" \
     -s scl "$SCL" \
-    run "$DIR/lunar.yaml" --no-logs --device "$ESP_DEVICE" 2>&1 | tee -a "$LOG_PATH"
+    run "$BOARD_DIR/lunar.yaml" --no-logs --device "$ESP_DEVICE" 2>&1 | tee -a "$LOG_PATH"
 
 /usr/bin/python3 -m esphome \
     -s ssid "$WIFI_SSID" \
@@ -68,4 +70,4 @@ echo /usr/bin/python3 -m esphome \
     -s platform_version "$PLATFORM_VERSION" \
     -s sda "$SDA" \
     -s scl "$SCL" \
-    run "$DIR/lunar.yaml" --no-logs --device "$ESP_DEVICE" 2>&1 | tee -a "$LOG_PATH"
+    run "$BOARD_DIR/lunar.yaml" --no-logs --device "$ESP_DEVICE" 2>&1 | tee -a "$LOG_PATH"

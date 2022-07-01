@@ -1,3 +1,8 @@
+# 5.7.1
+## Hotfix
+
+* Copy ESPHome configuration outside the app folder to avoid altering the bundle
+    * This fixes cases where the app was deactivated and deleted after installing the firmware on the ambient light sensor
 # 5.7.0a4
 ## alpha 4
 
@@ -43,7 +48,7 @@
 
 * Don't show the Notch Disabled button on non-MacBook screens
 # 5.7.0
-### Features
+## Features
 
 * Add `lunar facelight` CLI command
 * Add a mute/unmute button when hovering the volume slider
@@ -62,7 +67,7 @@
 * Don't take volume DDC range into account when sending the mute workaround value
 * React to screen sleep events faster to work around some buggy monitors that don't enter standby
 
-### Fixes
+## Fixes
 
 * Don't show the Notch Disabled button on non-MacBook screens
 
