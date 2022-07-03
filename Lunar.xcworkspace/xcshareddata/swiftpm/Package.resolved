@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mw99/DataCompression/",
       "state" : {
-        "revision" : "6abb8f3cd0e4b2a33b4927a7a92b6764528f2440",
-        "version" : "3.6.0"
+        "revision" : "4ac2c9c108d80b690a74252a4ec48f47e9995e00",
+        "version" : "3.7.0"
       }
     },
     {
@@ -150,7 +150,7 @@
       "location" : "https://github.com/alin23/sentry-cocoa.git",
       "state" : {
         "branch" : "master",
-        "revision" : "d2aa8703d5d6d31a4b70f50bdfe8b82d507d0294"
+        "revision" : "5c0e59fde8685da18503e74fcbbbc0e8a79f04b8"
       }
     },
     {
