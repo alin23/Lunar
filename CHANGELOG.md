@@ -1,3 +1,8 @@
+# 5.7.2
+## Hotfix
+
+* Fix XDR Brightness detection for older MacBooks
+
 # 5.7.1
 ## Hotfix
 
