@@ -164,12 +164,12 @@ extension Control {
         }
     }
 
-    @discardableResult func write(_ key: Display.CodingKeys, _ value: Any) -> Any? {
+    @discardableResult func write(_ key: Display.CodingKeys, _ value: Any, _ oldValue: Any? = nil) -> Any? {
         switch key {
         case .brightness:
-            return setBrightness(value as! Brightness, oldValue: nil, force: false, onChange: nil)
+            return setBrightness(value as! Brightness, oldValue: oldValue as! Brightness?, force: false, onChange: nil)
         case .contrast:
-            return setContrast(value as! Contrast, oldValue: nil, onChange: nil)
+            return setContrast(value as! Contrast, oldValue: oldValue as! Contrast?, onChange: nil)
         case .volume:
             return setVolume(value as! UInt16)
         case .input:
