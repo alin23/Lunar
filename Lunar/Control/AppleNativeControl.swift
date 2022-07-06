@@ -284,6 +284,18 @@ class AppleNativeControl: Control {
             return true
         }
 
+        #if DEBUG
+            if brightnessTransition == .smooth {
+                log.debug(
+                    "Skipping smooth transition on brightness=\(brightness) using \(self) for \(display)",
+                    context: [
+                        "sliderTracking": Self.sliderTracking,
+                        "supportsSmoothTransition": supportsSmoothTransition(for: .BRIGHTNESS),
+                        "oldValue": oldValue as Any,
+                    ]
+                )
+            }
+        #endif
         onChange?(brightness)
         return writeBrightness(brightness)
     }

@@ -1814,11 +1814,13 @@ private func handleDisplays(
 
                 switch property {
                 case .brightness:
+                    let old = display.brightness
                     display.brightness = value
-                    display.control?.write(property, display.limitedBrightness)
+                    display.control?.write(property, display.limitedBrightness, old)
                 case .contrast:
+                    let old = display.contrast
                     display.contrast = value
-                    display.control?.write(property, display.limitedContrast)
+                    display.control?.write(property, display.limitedContrast, old)
                 case .volume:
                     display.volume = value
                     display.control?.write(property, display.limitedVolume)
