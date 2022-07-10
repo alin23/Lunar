@@ -1977,15 +1977,18 @@ class LunarServer {
     }
 
     func onResponse(_ response: String, socket: Socket) throws {
+        let lines = response.split(separator: "\r\n")
+        let serverHTTP = lines.first?.contains("HTTP") ?? false
         do {
-            let lines = response.split(separator: "\r\n")
-            let serverHTTP = lines.first?.contains("HTTP") ?? false
             var key = lines
                 .first(where: { $0.lowercased().starts(with: "authorization:") })?
                 .split(separator: ":", maxSplits: 1, omittingEmptySubsequences: true)
                 .last?.s.trimmed
 
             var line = lines.last?.s
+            if let l = line, serverHTTP, !l.starts(with: "cmd=") {
+                line = try socket.readString()
+            }
             if let l = line, l.starts(with: "cmd=") {
                 line = l.suffix(l.count - 4).replacingOccurrences(of: "+", with: " ").removingPercentEncoding
             }
@@ -2010,8 +2013,9 @@ class LunarServer {
                 try command.run()
             }
             if !serverOutput.isEmpty {
+                let jsonHeader = args.contains("--json") ? "Content-Type: application/json\r\n" : ""
                 if serverHTTP {
-                    try socket.write(from: "HTTP/1.1 200 OK\r\nContent-Length: \(serverOutput.count)\r\n\r\n")
+                    try socket.write(from: "HTTP/1.1 200 OK\r\n\(jsonHeader)Content-Length: \(serverOutput.count)\r\n\r\n")
                 }
                 try socket.write(from: serverOutput)
                 serverOutput = ""
