@@ -142,11 +142,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     static var observers: Set<AnyCancellable> = []
     static var enableSentry = CachedDefaults[.enableSentry]
     static var supportsHDR: Bool = {
-        NotificationCenter.default
-            .publisher(for: AVPlayer.eligibleForHDRPlaybackDidChangeNotification)
-            .sink { _ in supportsHDR = AVPlayer.eligibleForHDRPlayback }
-            .store(in: &observers)
-        return AVPlayer.eligibleForHDRPlayback
+        asyncAfter(ms: 1) {
+            NotificationCenter.default
+                .publisher(for: AVPlayer.eligibleForHDRPlaybackDidChangeNotification)
+                .sink { _ in supportsHDR = AVPlayer.eligibleForHDRPlayback }
+                .store(in: &observers)
+            let hdr = AVPlayer.eligibleForHDRPlayback
+            mainAsync { supportsHDR = hdr }
+        }
+
+        return false
     }()
 
     static var hdrWorkaround: Bool = Defaults[.hdrWorkaround]
@@ -1831,7 +1836,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
             let exc = tryBlock {
                 guard !argList.contains("--new-instance"), self.otherLunar() != nil,
-                      let socket = try! Socket.create(), let opts = Lunar.globalOptions(args: argList)
+                      let socket = try? Socket.create(), let opts = Lunar.globalOptions(args: argList)
                 else {
                     if !argList.contains("--remote") {
                         self.initCacheTransitionLogging()
