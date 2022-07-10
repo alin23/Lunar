@@ -44,7 +44,6 @@
 		C73B41ED263BE02E006F6783 /* LetsMove.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C73B41EA263BE01F006F6783 /* LetsMove.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C73B41F6263E1301006F6783 /* ddcctl in Resources */ = {isa = PBXBuildFile; fileRef = C73B41F5263E1301006F6783 /* ddcctl */; };
 		C73B9A0D25FB9AD7003184FC /* Glob in Frameworks */ = {isa = PBXBuildFile; productRef = C73B9A0C25FB9AD7003184FC /* Glob */; };
-		C73CC6A5246161E6003B2658 /* Charts in Frameworks */ = {isa = PBXBuildFile; productRef = C73CC6A4246161E6003B2658 /* Charts */; };
 		C73CC6AE24616462003B2658 /* Sauce in Frameworks */ = {isa = PBXBuildFile; productRef = C73CC6AD24616462003B2658 /* Sauce */; };
 		C740A1F4262490E1004BC1C7 /* CLI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C740A1F3262490E1004BC1C7 /* CLI.swift */; };
 		C740A1F826249176004BC1C7 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = C740A1F726249176004BC1C7 /* ArgumentParser */; };
@@ -128,6 +127,7 @@
 		C7B9E48324018AA500A48347 /* OSD.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7B9E47F2401767E00A48347 /* OSD.framework */; };
 		C7BAD9C3263869920058974C /* Pro Meteor.png in Resources */ = {isa = PBXBuildFile; fileRef = C7BAD9BC263869920058974C /* Pro Meteor.png */; };
 		C7BADA12263889CD0058974C /* ProgressViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BADA11263889CD0058974C /* ProgressViewController.swift */; };
+		C7BD5F85287B44130077CCB7 /* Charts in Frameworks */ = {isa = PBXBuildFile; productRef = C7BD5F84287B44130077CCB7 /* Charts */; };
 		C7C09CD1256AC09800B4BC5B /* AdaptiveModeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C09CD0256AC09800B4BC5B /* AdaptiveModeButton.swift */; };
 		C7C09CD5256AC70500B4BC5B /* SwiftyAttributes in Frameworks */ = {isa = PBXBuildFile; productRef = C7C09CD4256AC70500B4BC5B /* SwiftyAttributes */; };
 		C7C16321208503B000C7EA8F /* ConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C16320208503B000C7EA8F /* ConfigurationViewController.swift */; };
@@ -407,6 +407,7 @@
 				C740A1F826249176004BC1C7 /* ArgumentParser in Frameworks */,
 				C7045DC12441015C002289E5 /* SwiftDate in Frameworks */,
 				C7E80E392637060F004718A4 /* libssl.a in Frameworks */,
+				C7BD5F85287B44130077CCB7 /* Charts in Frameworks */,
 				C7F48C4A2657A258000715A8 /* DataCompression in Frameworks */,
 				C72CFB962586B36E005F0340 /* WAYWindow.framework in Frameworks */,
 				C731E85E27E1E5090016B36D /* Sentry in Frameworks */,
@@ -422,7 +423,6 @@
 				C7138D8D2634AF0500406EE3 /* KeyHolder in Frameworks */,
 				C714C99B2805BDEA0061588E /* SkyLight.framework in Frameworks */,
 				C77C77582812AA80006326BE /* Introspect in Frameworks */,
-				C73CC6A5246161E6003B2658 /* Charts in Frameworks */,
 				C73B9A0D25FB9AD7003184FC /* Glob in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -807,7 +807,6 @@
 				C7045DB12440DC5E002289E5 /* SwiftyBeaver */,
 				C7045DB72440DEEE002289E5 /* SwiftyJSON */,
 				C7045DC02441015C002289E5 /* SwiftDate */,
-				C73CC6A4246161E6003B2658 /* Charts */,
 				C73CC6AD24616462003B2658 /* Sauce */,
 				C701A23E2546C8BF004747B5 /* MediaKeyTap */,
 				C7B5E8582548B3F900530B47 /* Defaults */,
@@ -831,6 +830,7 @@
 				C799C2F427BF67C4003A2FB9 /* Socket */,
 				C731E85D27E1E5090016B36D /* Sentry */,
 				C77C77572812AA80006326BE /* Introspect */,
+				C7BD5F84287B44130077CCB7 /* Charts */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -871,7 +871,6 @@
 				C7045DB02440DC5E002289E5 /* XCRemoteSwiftPackageReference "SwiftyBeaver" */,
 				C7045DB62440DEEE002289E5 /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
 				C7045DBF2441015C002289E5 /* XCRemoteSwiftPackageReference "SwiftDate" */,
-				C73CC6A3246161E6003B2658 /* XCRemoteSwiftPackageReference "Charts" */,
 				C73CC6AC24616462003B2658 /* XCRemoteSwiftPackageReference "Sauce" */,
 				C701A23D2546C8BF004747B5 /* XCRemoteSwiftPackageReference "MediaKeyTap" */,
 				C7B5E8572548B3F900530B47 /* XCRemoteSwiftPackageReference "Defaults" */,
@@ -895,6 +894,7 @@
 				C799C2F327BF67C4003A2FB9 /* XCRemoteSwiftPackageReference "BlueSocket" */,
 				C731E85C27E1E5090016B36D /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 				C77C77562812AA80006326BE /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
+				C7BD5F83287B44130077CCB7 /* XCRemoteSwiftPackageReference "Charts" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -1701,14 +1701,6 @@
 				minimumVersion = 1.0.5;
 			};
 		};
-		C73CC6A3246161E6003B2658 /* XCRemoteSwiftPackageReference "Charts" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/danielgindi/Charts";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.0.1;
-			};
-		};
 		C73CC6AC24616462003B2658 /* XCRemoteSwiftPackageReference "Sauce" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Clipy/Sauce";
@@ -1803,6 +1795,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 0.3.0;
+			};
+		};
+		C7BD5F83287B44130077CCB7 /* XCRemoteSwiftPackageReference "Charts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/alin23/Charts/";
+			requirement = {
+				branch = master;
+				kind = branch;
 			};
 		};
 		C7C09CD3256AC70400B4BC5B /* XCRemoteSwiftPackageReference "SwiftyAttributes" */ = {
@@ -1901,11 +1901,6 @@
 			package = C73B9A0B25FB9AD7003184FC /* XCRemoteSwiftPackageReference "Glob" */;
 			productName = Glob;
 		};
-		C73CC6A4246161E6003B2658 /* Charts */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C73CC6A3246161E6003B2658 /* XCRemoteSwiftPackageReference "Charts" */;
-			productName = Charts;
-		};
 		C73CC6AD24616462003B2658 /* Sauce */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C73CC6AC24616462003B2658 /* XCRemoteSwiftPackageReference "Sauce" */;
@@ -1965,6 +1960,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C7B5E85B2548B5AC00530B47 /* XCRemoteSwiftPackageReference "AnyCodable" */;
 			productName = AnyCodable;
+		};
+		C7BD5F84287B44130077CCB7 /* Charts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7BD5F83287B44130077CCB7 /* XCRemoteSwiftPackageReference "Charts" */;
+			productName = Charts;
 		};
 		C7C09CD4256AC70500B4BC5B /* SwiftyAttributes */ = {
 			isa = XCSwiftPackageProductDependency;
