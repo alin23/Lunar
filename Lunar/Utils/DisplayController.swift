@@ -654,13 +654,16 @@ class DisplayController: ObservableObject {
             if txIOService == 0 {
                 txIOService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleT600xIO"))
             }
+            if txIOService == 0 {
+                txIOService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleT811xIO"))
+            }
 
             guard txIOService != 0, IORegistryEntryGetChildIterator(txIOService, kIOServicePlane, &txIOIterator) == KERN_SUCCESS
             else {
                 let childIteratorErr = (txIOService != 0)
                     ? IORegistryEntryGetChildIterator(txIOService, kIOServicePlane, &txIOIterator)
                     : KERN_SUCCESS
-                log.warning("Can't iterate AppleT810xIO or AppleT600xIO")
+                log.warning("Can't iterate AppleT810xIO/AppleT600xIO/AppleT811xIO")
                 log.info("""
                     No AVService for display \(displayID): (
                         txIOService: \(txIOService),

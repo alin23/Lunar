@@ -457,19 +457,19 @@ class DataStore: NSObject {
     }
 }
 
-// MARK: - Defaults.AnyKey + Hashable
-
-extension Defaults.AnyKey: Hashable {
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(name)
-    }
-
-    public static func == (lhs: Defaults.Keys, rhs: Defaults.Keys) -> Bool {
-        lhs.name == rhs.name
-    }
-}
-
 // MARK: - AnyCodable + Defaults.Serializable
+
+//// MARK: - Defaults.AnyKey + Hashable
+//
+// extension Defaults.AnyKey: Hashable {
+//    public func hash(into hasher: inout Hasher) {
+//        hasher.combine(name)
+//    }
+//
+//    public static func == (lhs: Defaults.Keys, rhs: Defaults.Keys) -> Bool {
+//        lhs.name == rhs.name
+//    }
+// }
 
 extension AnyCodable: Defaults.Serializable {}
 
