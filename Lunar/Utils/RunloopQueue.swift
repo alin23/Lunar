@@ -150,13 +150,13 @@ public class RunloopQueue: NSObject {
 
         thread.start {
             [weak self] runloop in
-                // This is on the background thread.
+            // This is on the background thread.
 
-                conditionLock.lock()
-                defer { conditionLock.unlock(withCondition: 1) }
+            conditionLock.lock()
+            defer { conditionLock.unlock(withCondition: 1) }
 
-                guard let self = self else { return }
-                self.runloop = runloop
+            guard let self = self else { return }
+            self.runloop = runloop
         }
 
         conditionLock.lock(whenCondition: 1)

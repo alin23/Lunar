@@ -24,20 +24,17 @@ class NoFrameView: NSView {
 // MARK: - HotkeyPopoverController
 
 class HotkeyPopoverController: NSViewController {
-    // MARK: Lifecycle
-
-    deinit {
-        #if DEBUG
-            log.verbose("START DEINIT: \(display?.description ?? "no display")")
-            do { log.verbose("END DEINIT: \(display?.description ?? "no display")") }
-        #endif
-
-        hotkey1?.unregister()
-        hotkey2?.unregister()
-        hotkey3?.unregister()
-    }
-
-    // MARK: Internal
+//
+//    deinit {
+//        #if DEBUG
+//            log.verbose("START DEINIT: \(display?.description ?? "no display")")
+//            do { log.verbose("END DEINIT: \(display?.description ?? "no display")") }
+//        #endif
+//
+//        hotkey1?.unregister()
+//        hotkey2?.unregister()
+//        hotkey3?.unregister()
+//    }
 
     @IBOutlet var hotkeyView1: HotkeyView!
     @IBOutlet var dropdown1: NSPopUpButton!
