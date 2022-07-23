@@ -101,6 +101,19 @@ func fadeTransition(duration: TimeInterval) -> CATransition {
     return transition
 }
 
+func playVolumeChangedSound() {
+    do {
+        let audioPlayer =
+            try AVAudioPlayer(
+                contentsOf: URL(fileURLWithPath: "/System/Library/LoginPlugins/BezelServices.loginPlugin/Contents/Resources/volume.aiff")
+            )
+        audioPlayer.volume = 1
+        audioPlayer.play()
+    } catch {
+        log.error(error.localizedDescription)
+    }
+}
+
 // MARK: - NonClosingMenuText
 
 class NonClosingMenuText: NSTextField {
