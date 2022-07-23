@@ -985,6 +985,11 @@ extension Defaults.Keys {
         default: true,
         suite: UserDefaults(suiteName: ".GlobalPreferences") ?? .standard
     )
+    static let beepFeedback = Key<Bool>(
+        "com.apple.sound.beep.feedback",
+        default: false,
+        suite: UserDefaults(suiteName: ".GlobalPreferences") ?? .standard
+    )
 
     static let silentUpdate = Key<Bool>("SUAutomaticallyUpdate", default: false)
     static let checkForUpdate = Key<Bool>("SUEnableAutomaticChecks", default: true)

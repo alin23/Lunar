@@ -1950,12 +1950,15 @@ class DisplayController: ObservableObject {
             }
         }
 
-        if CachedDefaults[.clamshellModeDetection], SyncMode.sourceDisplay?.isBuiltin ?? true {
-            if lidClosed {
-                activateClamshellMode()
-            } else if clamshellMode {
-                deactivateClamshellMode()
-            }
+        guard Sysctl.isMacBook, CachedDefaults[.clamshellModeDetection], SyncMode.sourceDisplay?.isBuiltin ?? true
+        else {
+            return
+        }
+
+        if lidClosed {
+            activateClamshellMode()
+        } else if clamshellMode {
+            deactivateClamshellMode()
         }
     }
 
@@ -2134,7 +2137,7 @@ class DisplayController: ObservableObject {
             {
                 display.forceShowSoftwareOSD = true
                 display.softwareBrightness = cap(
-                    display.softwareBrightness + (offset.f / 36),
+                    display.softwareBrightness + (abs(offset) == 1 ? (0.01 * offset.f) : (offset.f / 36)),
                     minVal: 0.0,
                     maxVal: 1.0
                 )
@@ -2153,7 +2156,7 @@ class DisplayController: ObservableObject {
                 display.maxEDR = display.computeMaxEDR()
                 display.forceShowSoftwareOSD = true
                 display.softwareBrightness = cap(
-                    display.softwareBrightness + (offset.f / 70),
+                    display.softwareBrightness + (abs(offset) == 1 ? (0.01 * offset.f) : (offset.f / 70)),
                     minVal: 1.01,
                     maxVal: display.maxSoftwareBrightness
                 )
