@@ -101,14 +101,16 @@ func fadeTransition(duration: TimeInterval) -> CATransition {
     return transition
 }
 
+var audioPlayer: AVAudioPlayer?
+
 func playVolumeChangedSound() {
     do {
-        let audioPlayer =
+        audioPlayer =
             try AVAudioPlayer(
                 contentsOf: URL(fileURLWithPath: "/System/Library/LoginPlugins/BezelServices.loginPlugin/Contents/Resources/volume.aiff")
             )
-        audioPlayer.volume = 1
-        audioPlayer.play()
+        audioPlayer?.volume = 1
+        audioPlayer?.play()
     } catch {
         log.error(error.localizedDescription)
     }
