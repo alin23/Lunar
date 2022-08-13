@@ -86,7 +86,7 @@ appcast: VERSION=$(shell xcodebuild -scheme "Lunar $(ENV)" -configuration $(ENV)
 appcast: Releases/Lunar-$(FULL_VERSION).html
 	rm Releases/Lunar.dmg || true
 ifneq (, $(CHANNEL))
-	"$(SPARKLE_BIN_DIR)/generate_appcast" --major-version "4.0.0" --link "https://lunar.fyi/" --full-release-notes-url "https://lunar.fyi/changelog" --channel "$(CHANNEL)" --release-notes-url-prefix https://files.lunar.fyi/ReleaseNotes/ --download-url-prefix https://files.lunar.fyi/releases/ -o Releases/appcast2.xml Releases
+	"$(SPARKLE_BIN_DIR)/generate_appcast" --maximum-deltas 1 --major-version "4.0.0" --link "https://lunar.fyi/" --full-release-notes-url "https://lunar.fyi/changelog" --channel "$(CHANNEL)" --release-notes-url-prefix https://files.lunar.fyi/ReleaseNotes/ --download-url-prefix https://files.lunar.fyi/releases/ -o Releases/appcast2.xml Releases
 else
 	rm Releases/Lunar-*{a,b}*.dmg || true
 	"$(SPARKLE_BIN_DIR)/generate_appcast" --major-version "4.0.0" --link "https://lunar.fyi/" --full-release-notes-url "https://lunar.fyi/changelog" --release-notes-url-prefix https://files.lunar.fyi/ReleaseNotes/ --download-url-prefix https://files.lunar.fyi/releases/ -o Releases/appcast2.xml Releases

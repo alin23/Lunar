@@ -71,9 +71,13 @@ class ALSInstallViewController: NSViewController {
     var boardID: String {
         switch board {
         case "Metro ESP32 S2":
-            return "metroesp32-s2"
+            return "adafruit_metro_esp32s2"
         case "Feather ESP32 S2":
-            return "featheresp32-s2"
+            return "adafruit_feather_esp32s2_tft"
+        case "MagTag ESP32 S2":
+            return "adafruit_magtag29_esp32s2"
+        case "Funhouse ESP32 S2":
+            return "adafruit_funhouse_esp32s2"
         case "WEMOS LOLIN32":
             return "lolin32"
         case "WEMOS LOLIN32 Lite":

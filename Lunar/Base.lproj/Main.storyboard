@@ -7245,10 +7245,16 @@ Keep this disabled when using f.lux</string>
                                     <font key="font" metaFont="smallSystemBold"/>
                                     <menu key="menu" id="BQt-pf-ORw">
                                         <items>
-                                            <menuItem title="Metro ESP32 S2" state="on" tag="30" identifier="metroesp32-s2" id="Qtb-lf-Oop">
+                                            <menuItem title="Metro ESP32 S2" state="on" tag="30" identifier="adafruit_metro_esp32s2" id="Qtb-lf-Oop">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="Feather ESP32 S2" state="on" tag="31" identifier="featheresp32-s2" id="Qtb-lf-Ool">
+                                            <menuItem title="Feather ESP32 S2" tag="31" identifier="adafruit_feather_esp32s2_tft" id="Qtb-lf-Ool">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="MagTag ESP32 S2" tag="32" identifier="adafruit_magtag29_esp32s2" id="Qtb-lf-kol">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Funhouse ESP32 S2" tag="33" identifier="adafruit_funhouse_esp32s2" id="Qtb-lf-mol">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                             <menuItem title="WEMOS LOLIN32" tag="29" identifier="lolin32" id="e7f-R5-jxy">
