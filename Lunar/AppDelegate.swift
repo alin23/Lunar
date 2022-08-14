@@ -781,11 +781,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
               let locationManager = locationManager else { return }
 
         switch locationManager.authorizationStatus {
-        case .notDetermined, .restricted, .denied:
+        case .notDetermined, .restricted:
             log.debug("Requesting location permissions")
             locationManager.requestAlwaysAuthorization()
         case .authorizedAlways:
             log.debug("Location authorized")
+        case .denied:
+            log.debug("Location denied")
         @unknown default:
             log.debug("Location status unknown")
         }
@@ -2252,10 +2254,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             locationManager!.distanceFilter = 10000
         }
 
-        locationManager!.stopUpdatingLocation()
-        locationManager!.startUpdatingLocation()
+        guard let locationManager = locationManager, locationManager.authorizationStatus != .denied else {
+            log.debug("Location authStatus: denied")
+            locationManager?.stopUpdatingLocation()
+            return
+        }
 
-        switch locationManager!.authorizationStatus {
+        locationManager.stopUpdatingLocation()
+        locationManager.startUpdatingLocation()
+
+        switch locationManager.authorizationStatus {
         case .authorizedAlways:
             log.debug("Location authStatus: authorizedAlways")
         case .denied:
