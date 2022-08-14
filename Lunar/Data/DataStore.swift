@@ -36,6 +36,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .adaptiveBrightnessMode,
     .colorScheme,
     .autoSubzero,
+    .customOSDVerticalOffset,
     .autoXdr,
     .autoXdrSensor,
     .autoXdrSensorShowOSD,
@@ -683,6 +684,7 @@ func initCache() {
     cacheKey(.autoXdrSensor)
     cacheKey(.autoXdrSensorShowOSD)
     cacheKey(.autoXdrSensorLuxThreshold)
+    cacheKey(.customOSDVerticalOffset)
     cacheKey(.allowAnySyncSource)
 
     cacheKey(.gammaDisabledCompletely)
@@ -849,6 +851,7 @@ extension Defaults.Keys {
     static let autoXdrSensor = Key<Bool>("autoXdrSensor", default: false)
     static let autoXdrSensorShowOSD = Key<Bool>("autoXdrSensorShowOSD", default: true)
     static let autoXdrSensorLuxThreshold = Key<Float>("autoXdrSensorLuxThreshold", default: XDR_DEFAULT_LUX)
+    static let customOSDVerticalOffset = Key<Float>("customOSDVerticalOffset", default: 0)
     static let allowAnySyncSource = Key<Bool>("allowAnySyncSource", default: false)
 
     static let gammaDisabledCompletely = Key<Bool>("gammaDisabledCompletely", default: false)
@@ -1045,6 +1048,8 @@ let autoXdrSensorPublisher = Defaults.publisher(.autoXdrSensor).removeDuplicates
 let autoXdrSensorShowOSDPublisher = Defaults.publisher(.autoXdrSensorShowOSD).removeDuplicates().dropFirst()
     .filter { $0.oldValue != $0.newValue }
 let autoXdrSensorLuxThresholdPublisher = Defaults.publisher(.autoXdrSensorLuxThreshold).removeDuplicates().dropFirst()
+    .filter { $0.oldValue != $0.newValue }
+let customOSDVerticalOffsetPublisher = Defaults.publisher(.customOSDVerticalOffset).removeDuplicates().dropFirst()
     .filter { $0.oldValue != $0.newValue }
 let allowAnySyncSourcePublisher = Defaults.publisher(.allowAnySyncSource).removeDuplicates().dropFirst()
     .filter { $0.oldValue != $0.newValue }
