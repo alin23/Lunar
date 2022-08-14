@@ -2188,10 +2188,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     internal func locationManager(_ lm: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard !CachedDefaults[.manualLocation] else { return }
 
-        guard let location = locations.last ?? lm.location, let geolocation = Geolocation(location: location)
+        guard lm.authorizationStatus != .denied, let location = locations.last ?? lm.location,
+              let geolocation = Geolocation(location: location)
         else {
             log.debug("Zero LocationManager coordinates")
-            geolocationFallback()
+            if lm.authorizationStatus != .denied {
+                geolocationFallback()
+            }
             return
         }
 
@@ -2205,10 +2208,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         log.error("Location manager failed with error: \(error)")
         guard !CachedDefaults[.manualLocation] else { return }
 
-        guard let location = lm.location, let geolocation = Geolocation(location: location)
+        guard lm.authorizationStatus != .denied, let location = lm.location, let geolocation = Geolocation(location: location)
         else {
             log.debug("Zero LocationManager coordinates")
-            geolocationFallback()
+            if lm.authorizationStatus != .denied {
+                geolocationFallback()
+            }
             return
         }
 
@@ -2222,10 +2227,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         switch status {
         case .notDetermined, .authorizedAlways:
             lm.startUpdatingLocation()
-        case .denied, .restricted:
+        case .restricted:
             log.warning("User has not authorised location services")
             lm.stopUpdatingLocation()
             geolocationFallback()
+        case .denied:
+            log.warning("User has denied location services")
+            lm.stopUpdatingLocation()
         @unknown default:
             log.error("Unknown location manager status \(status)")
         }
