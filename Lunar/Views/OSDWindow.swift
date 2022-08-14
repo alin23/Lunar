@@ -37,8 +37,11 @@ open class OSDWindow: NSWindow, NSWindowDelegate {
             setFrameOrigin(point)
         } else {
             let wsize = frame.size
-            let sframe = screen.visibleFrame
-            setFrameOrigin(CGPoint(x: (sframe.width / 2 - wsize.width / 2) + sframe.origin.x, y: sframe.origin.y))
+            let sframe = screen.frame
+            setFrameOrigin(CGPoint(
+                x: (sframe.width / 2 - wsize.width / 2) + sframe.origin.x,
+                y: sframe.origin.y + CachedDefaults[.customOSDVerticalOffset].cg
+            ))
         }
 
         contentView?.superview?.alphaValue = 1
