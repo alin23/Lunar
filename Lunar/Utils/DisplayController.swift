@@ -836,6 +836,8 @@ class DisplayController: ObservableObject {
     var autoXdrSensor: Bool = Defaults[.autoXdrSensor]
     var autoXdrSensorShowOSD: Bool = Defaults[.autoXdrSensorShowOSD]
 
+    var lastTimeBrightnessKeyPressed = Date.distantPast
+
     @Atomic var autoBlackoutPending = false {
         didSet {
             log.info("autoBlackoutPending=\(autoBlackoutPending)")
@@ -2132,7 +2134,7 @@ class DisplayController: ObservableObject {
 
             if autoSubzero || display.softwareBrightness < 1.0,
                !display.hasSoftwareControl, minBrightness <= 1, !display.isForTesting,
-               (value == minBrightness && value == oldValue) ||
+               (value == minBrightness && value == oldValue && timeSince(lastTimeBrightnessKeyPressed) < 3) ||
                (oldValue == minBrightness && display.softwareBrightness < 1.0)
             {
                 display.forceShowSoftwareOSD = true
@@ -2146,7 +2148,8 @@ class DisplayController: ObservableObject {
 
             if autoXdr || display.softwareBrightness > 1.0 || display.enhanced,
                display.supportsEnhance, !display.isForTesting,
-               (value == maxBrightness && value == oldValue) || (oldValue == maxBrightness && display.softwareBrightness > 1.01),
+               (value == maxBrightness && value == oldValue && timeSince(lastTimeBrightnessKeyPressed) < 3) ||
+               (oldValue == maxBrightness && display.softwareBrightness > 1.01),
                lunarProActive || lunarProOnTrial
             {
                 if !display.enhanced {
