@@ -45,7 +45,7 @@ install-deps: install-swiftformat install-sourcery install-git-secret
 codegen: $(GENERATED_FILES)
 
 CHANGELOG.md: $(RELEASE_NOTES_FILES)
-	tail -n +1 `ls -r ReleaseNotes/*.md` | sed -E 's/==> ReleaseNotes\/(.+)\.md <==/# \1/g' > CHANGELOG.md
+	tail -n +1 $$(ls -r ReleaseNotes/*.md | egrep -v '\d[ab]\d') | sed -E 's/==> ReleaseNotes\/(.+)\.md <==/# \1/g' > CHANGELOG.md
 
 changelog: CHANGELOG.md
 dev: install-deps install-hooks codegen
