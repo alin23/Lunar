@@ -1303,6 +1303,7 @@ extension AppDelegate: MediaKeyTapDelegate {
             let lidClosed = displayController.lidClosed || displayController.builtinDisplay == nil
             let event = handleBrightnessKeys(withLidClosed: lidClosed, mediaKey: mediaKey, modifiers: flags, event: event)
             if event != nil { log.debug("Forwarding brightness key event to the system") }
+            displayController.lastTimeBrightnessKeyPressed = Date()
             return event
         }
 
@@ -1480,6 +1481,8 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func brightnessUpAction(offset: Int? = nil) {
+        defer { displayController.lastTimeBrightnessKeyPressed = Date() }
+
         let allMonitors = CachedDefaults[.brightnessHotkeysControlAllMonitors]
         cancelScreenWakeAdapterTask()
         increaseBrightness(by: offset, currentDisplay: !allMonitors)
@@ -1500,6 +1503,8 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func brightnessDownAction(offset: Int? = nil) {
+        defer { displayController.lastTimeBrightnessKeyPressed = Date() }
+
         let allMonitors = CachedDefaults[.brightnessHotkeysControlAllMonitors]
         cancelScreenWakeAdapterTask()
         decreaseBrightness(by: offset, currentDisplay: !allMonitors)
