@@ -1,3 +1,33 @@
+# 5.7.4
+## Features
+
+* Beep feedback when pressing volume keys (follows system setting)
+    * Hold `Shift` while pressing volume keys to invert behaviour
+
+## Improvements
+
+* Detect when user doesn't want XDR to be auto disabled in low battery situations
+* Allow XDR/Subzero/BlackOut OSD to overlap the Dock
+    * This avoids overlapping the native brightness OSD
+* Delay XDR and Sub-zero until next key press if brightness is already at max/min
+* Disable Location Mode if permissions have been denied
+
+## Fixes
+
+* `Option`+`Shift` now uses 1% step for Subzero and XDR
+* Update sensor firmware installer
+    * Add support for MagTag and Funhouse boards
+* Stop checking for coordinates if location permissions have been denied
+
+# 5.7.3
+## Features
+
+* Support for the **M2 CPU** family and the new `T811xIO` controller
+
+## Fixes
+
+* Allow streaming HTTP body in CLI implementation
+
 # 5.7.2
 ## Hotfix
 
@@ -8,50 +38,6 @@
 
 * Copy ESPHome configuration outside the app folder to avoid altering the bundle
     * This fixes cases where the app was deactivated and deleted after installing the firmware on the ambient light sensor
-# 5.7.0a4
-## alpha 4
-
-### Features
-
-* Add `lunar facelight` CLI command
-
-# 5.7.0a3
-## alpha 3
-
-### Improvements
-
-* Add a way to stop sending the mute command and rely only on the volume value when muting audio
-
-# 5.7.0a2
-## alpha 2
-
-### Features
-
-* Add a mute/unmute button when hovering the volume slider
-
-### Improvements
-
-* Don't take volume DDC range into account when sending the mute workaround value
-
-# 5.7.0a1
-## alpha 1
-
-### Features
-
-* Add option to toggle Dark Mode when using XDR Brightness for lowering power usage and LED heat
-* The Night Shift disabling feature in XDR can now re-enable Night Shift if within the user schedule
-* Add ALS support for Feather ESP32-S2 boards
-* Add configurable mute workarounds for monitors where mute doesn't work because of non-standard DDC implementations
-
-![DDC mute workarounds](https://files.lunar.fyi/ddc-mute-workaround.png)
-
-### Improvements
-
-* React to screen sleep events faster to work around some buggy monitors that don't enter standby
-
-### Fixes
-
-* Don't show the Notch Disabled button on non-MacBook screens
 # 5.7.0
 ## Features
 
@@ -76,14 +62,6 @@
 
 * Don't show the Notch Disabled button on non-MacBook screens
 
-# 5.6.8a1
-## alpha 1
-
-### Hotfix
-
-* Fix deadlock caused by the new `delayDDCAfterWake` setting
-* Use `HUD` window level for the rounded corners mask window
-
 # 5.6.8
 ## Hotfix
 
@@ -95,49 +73,6 @@
     * People that actually need the setting can re-enable it from the [Advanced settings](https://app.lunar.fyi/advanced) tab inside the **Options** menu
 * Implement screen round corners using 4 corner mask windows instead of one large hidden window
     * This is done to work around a macOS bug preventing clicks on dialog buttons even though the window is set to allow clicks through it
-# 5.6.7a3
-## alpha 3
-
-### Improvements
-
-* Make it clear that DDC reading is experimental and should not be used unless really needed
-
-![experimental ddc reading](https://files.lunar.fyi/experimental-ddc-reading.png)
-
-* Add **Delay DDC requests after wake** setting for people that have trouble with monitor firmware bugs related to losing signal on simple DDC commands
-
-![delay ddc setting](https://files.lunar.fyi/delay-ddc.png)
-
-* Show an OSD when enabling XDR automatically based on ambient light
-    * Allows aborting the automatic XDR enabling by pressing the `Esc` key
-
-![auto xdr osd](https://files.lunar.fyi/auto-xdr-osd.png)
-
-* Separate the HDR and XDR settings into a new tab
-
-![hdr settings tab](https://files.lunar.fyi/hdr-tab.png)
-
-* Detect manual changes in XDR state and honor them in the Auto XDR logic
-# 5.6.7a2
-## alpha 2
-
-### Improvements
-
-* Show when brightness or contrast is locked
-* Add **Disable usage of Gamma API completely** setting for people that have trouble with macOS bugs related to the Gamma API
-* Add an **Unlock** button to quickly unlock brightness or contrast sliders
-
-![unlock button slider](https://files.lunar.fyi/unlock-slider-button.png)
-
-# 5.6.7a1
-## alpha 1
-
-### Improvements
-
-* Make sure brightness doesn't remain locked in non-DDC controls
-* Add **"Main display"** and **"Non-main displays"** choices for brightness keys
-
-![main display brightness keys](https://files.lunar.fyi/main-display-brightness-keys.png)
 # 5.6.7
 ## Features
 
@@ -180,50 +115,6 @@
 * Known issues:
     * Scrolling over the slider feels clunkier and less fluid in macOS 13, hoping this is an OS bug that will get addressed in next beta
     * Some animations feel slower
-# 5.6.6a4
-## alpha 4
-
-### Hotfix
-
-* **Auto XDR** based on **ambient light** was setting brightness to 100% wrongly
-# 5.6.6a3
-## alpha 3
-
-### Features
-
-* **Auto XDR** based on **ambient light**
-    * XDR will automatically enable when the ambient light is really bright
-    * It will also disable when the ambient light is low enough for visibility in normal brightness
-    * The feature will only work on the **MacBook Pro 2021** when it is used alone *(without external monitors)*
-
-![auto xdr ambient light setting](https://files.lunar.fyi/auto-xdr-ambient-light.png)
-
-### Improvements
-
-* Automatically set Curve Slope to middle point on target monitors identical to the source
-* Print single property on multiple displays when using the `displays` CLI command 
-* Add **Hide Menubar Icon** setting on the [Configuration page](lunar://configuration)
-
-# 5.6.6a2
-## alpha 2
-
-### Features
-
-* Add option to use non-Apple monitors as sources for Sync Mode
-
-![non apple monitor as sync source setting](https://files.lunar.fyi/sync-source-non-apple.png)
-
-### Fixes
-
-* Fix CLI hanging
-
-# 5.6.6a1
-## alpha 1
-
-### Hotfix
-
-* Run some UI logging async to avoid blocking the main thread
-
 # 5.6.6
 ## Features
 
@@ -249,19 +140,6 @@
 * Fix CLI hanging
 * Run some UI logging async to avoid blocking the main thread
 
-# 5.6.5a1
-## alpha 1
-
-### Hotfix
-
-* Update Paddle to fix a crash happening when there was no network connection
-
-### Improvements
-
-* Allow switching to the *old BlackOut mirroring system* for setups incompatible with the new API
-
-![old blackout system checkbox](https://files.lunar.fyi/old-blackout-system.png)
-
 # 5.6.5
 ## Improvements
 
@@ -276,73 +154,6 @@
 * Fix CLI hanging
 * Stop disabling logging when using the CLI
 * Fix min brightness set to 1 instead of 0 on BlackOut
-# 5.6.4a6
-## alpha 6
-
-### Improvements
-
-* Disable all Gamma reset calls when disabling the **HDR compatibility workaround**
-* Disable **Software Dimming** automatically if DDC/AppleNative works
-* Ensure CLI doesn't get stuck on a blocked socket
-* Show Screen Blanking dialog even if the zero gamma workaround worked
-* More reliable light sensor checker
-
-# 5.6.4a5
-## alpha 5
-
-### Improvements
-
-* Show XDR slider even on 100%
-* Hide XDR/Subzero text if XDR has just been disabled
-* Minimise chances of triggering the screen blanking bug by adding an artificial delay between Gamma API calls
-* Add detection for the screen blanking issue
-
-![screen blanking dialog](https://files.lunar.fyi/screen-blanking-dialog.png)
-
-# 5.6.4a4
-## alpha 4
-
-### Improvements
-
-* Better sensible defaults for contrast in Apple displays
-* Add option to keep Night Shift on when using XDR by default
-
-![disable night shift xdr](https://files.lunar.fyi/disable-night-shift-xdr.png)
-
-
-# 5.6.4a3
-## alpha 3
-
-### Improvements
-
-* Restrict HDR compatibility workaround only for setups with EDR-capable displays
-* Add a way to enforce DDC if the detection logic gives a false negative
-
-![enforce DDC checkbox](https://files.lunar.fyi/enforce-ddc-checkbox.png)
-
-### Fixes
-
-* Restore Gamma slider values properly
-# 5.6.4a2
-## alpha 2
-
-### Improvements
-
-* Smoother **XDR Brightness**, **Sub-zero Dimming** and **Software Dimming**
-* Update Paddle SDK to v4.3.0
-* Don't show licensing UI more than once to avoid locking the UI
-* Remove redundant Advanced Settings screen
-
-### Fixes
-
-* Stop handling brightness keys and forward them to the system when the adjustment limit is reached
-# 5.6.4a1
-## alpha 1
-
-### Hotfix
-
-* Fix crash caused by EDID UUID fetching on invalid displays
-
 # 5.6.4
 ## Hotfix
 
@@ -454,91 +265,6 @@ Developed in collaboration with the creator of [BetterDummy](https://github.com/
     * Brightness observer
 * Fix app info not hiding on first launch
 * Fix crash on fetching the refresh rate string for the resolution dropdown
-
-# 5.6.2b1
-## beta 1
-
-### Improvements
-
-* Disable Lunar if the user switches to another user
-
-# 5.6.2a8
-## alpha 8
-
-### Improvements
-
-* Make brightness text clickable in the menu bar
-* Ensure sub-zero dimming always works if `Allow zero brightness` is off
-* Pause menu scrolling while hovering over slider
-* Improve slider scroll sensitivity
-* Add slider scroll unwanted event detection
-
-# 5.6.2a7
-## alpha 7
-
-### Improvements
-
-* Better support for scroll up/down to adjust sliders
-* Don't use `refreshString` on resolutions as that can crash for some
-
-# 5.6.2a6
-## alpha 6
-
-### Improvements
-
-* Multi-user Fast Switching support
-    * Retry display list reconciliation when the system provides invalid IDs
-    * Disable Sync Mode if polling seconds is 0 and brightness observer fails to start
-    * Observe log in/out events and stop calling screen wake listener if logged out
-    * Pause HDR workaround while logged out
-
-# 5.6.2a5
-## alpha 5
-
-### Fixes
-
-* Pause some functions when switching users or going to standby
-    * Light sensor detection
-    * CLI server
-    * Color and Gamma reader
-    * Brightness observer
-* Fix app info not hiding on first launch
-
-# 5.6.2a4
-## alpha 4
-
-### Improvements
-
-* Move DDC reads outside the main thread
-* Improve brightness reponsiveness check
-* Collect average DDC read/write time
-
-# 5.6.2a3
-## alpha 3
-
-### Improvements
-
-* Show that XDR needs Pro license instead of doing nothing
-* Choose alpha upgrades over beta ones when the alpha channel is used
-
-# 5.6.2a10
-## alpha 10
-
-### Features
-
-#### XDR Contrast Enhancer slider
-
-Improve readability in direct sunlight when using `XDR Brightness`.
-
-The contrast slider allows adjusting the pixel value formula for the brightest/darkest areas, to get even more contrast out of the miniLED display.
-
-![enhance contrast slider in Advanced settings](https://files.lunar.fyi/xdr-contrast-slider.png)
-
-### Improvements
-
-* Use less restrictive EDID patterns for finding DDC ports
-* Improve DDC compatibility on monitors with missing metadata
-* Increase slider reponsiveness
 
 # 5.6.2
 ## Licensing model
