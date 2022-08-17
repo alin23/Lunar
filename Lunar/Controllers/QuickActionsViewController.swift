@@ -544,6 +544,7 @@ struct HDRSettingsView: View {
                     )
                     .font(.system(size: 10, weight: .semibold, design: .monospaced))
                     .foregroundColor(.black.opacity(0.4))
+                    .fixedSize()
                     .padding(.leading, 20)
                 }
                 HStack {
@@ -595,6 +596,7 @@ struct HDRSettingsView: View {
                         .font(.system(size: 10, weight: .heavy, design: .monospaced).leading(.tight))
                 )
                 .foregroundColor(.black.opacity(0.4))
+                .fixedSize()
                 .padding(.leading, 20)
             }.padding(.leading)
         }
@@ -815,6 +817,7 @@ struct AdvancedSettingsView: View {
                                 .font(.system(size: 10, weight: .semibold, design: .monospaced))
                                 .foregroundColor(.black.opacity(0.4))
                                 .frame(height: 28, alignment: .topLeading)
+                                .fixedSize()
                                 .lineLimit(2)
                                 .padding(.leading, 20)
                                 .padding(.top, -5)
@@ -848,6 +851,7 @@ struct QuickActionsLayoutView: View {
     @Default(.showHeaderOnHover) var showHeaderOnHover
     @Default(.showFooterOnHover) var showFooterOnHover
     @Default(.allowAnySyncSource) var allowAnySyncSource
+    @Default(.keepOptionsMenu) var keepOptionsMenu
 
     var body: some View {
         ZStack {
@@ -857,6 +861,7 @@ struct QuickActionsLayoutView: View {
                     Group {
                         SettingsToggle(text: "Only show top buttons on hover", setting: $showHeaderOnHover.animation(.fastSpring))
                         SettingsToggle(text: "Only show bottom buttons on hover", setting: $showFooterOnHover.animation(.fastSpring))
+                        SettingsToggle(text: "Save open-state for this menu", setting: $keepOptionsMenu.animation(.fastSpring))
                     }
                     Divider()
                     Group {
@@ -1149,7 +1154,7 @@ struct QuickActionsMenuView: View {
     @Default(.showHeaderOnHover) var showHeaderOnHover
     @Default(.showFooterOnHover) var showFooterOnHover
     @Default(.showOptionsMenu) var showOptionsMenu
-    @Default(.popoverClosed) var popoverClosed
+    @Default(.menuBarClosed) var menuBarClosed
     @Default(.menuDensity) var menuDensity
 
     @Default(.showBrightnessMenuBar) var showBrightnessMenuBar
@@ -1203,7 +1208,8 @@ struct QuickActionsMenuView: View {
     var topRightButtons: some View {
         Group {
             SwiftUI.Button(
-                action: { withAnimation(.fastSpring) { showOptionsMenu.toggle() } },
+                //                action: { withAnimation(.fastSpring){ showOptionsMenu.toggle()} },
+                action: { showOptionsMenu.toggle() },
                 label: {
                     HStack(spacing: 2) {
                         Image(systemName: "line.horizontal.3.decrease.circle.fill").font(.system(size: 12, weight: .semibold))
@@ -1212,52 +1218,6 @@ struct QuickActionsMenuView: View {
                 }
             )
             .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-            .popover(isPresented: $showOptionsMenu, arrowEdge: .trailing) {
-                PaddedPopoverView(background: AnyView(colorScheme == .dark ? Colors.sunYellow : Colors.lunarYellow)) {
-                    HStack {
-                        SwiftUI.Button("Menu layout") {
-                            withAnimation(.fastSpring) { env.optionsTab = .layout }
-                            showOptionsMenu = false
-                            showOptionsMenu = true
-                        }
-                        .buttonStyle(PickerButton(enumValue: $env.optionsTab, onValue: .layout))
-                        .font(.system(size: 12, weight: env.optionsTab == .layout ? .bold : .medium, design: .rounded))
-
-                        SwiftUI.Button("Advanced settings") {
-                            withAnimation(.fastSpring) { env.optionsTab = .advanced }
-                            showOptionsMenu = false
-                            showOptionsMenu = true
-                        }
-                        .buttonStyle(PickerButton(enumValue: $env.optionsTab, onValue: .advanced))
-                        .font(.system(size: 12, weight: env.optionsTab == .advanced ? .bold : .medium, design: .rounded))
-
-                        SwiftUI.Button("HDR") {
-                            withAnimation(.fastSpring) { env.optionsTab = .hdr }
-                            showOptionsMenu = false
-                            showOptionsMenu = true
-                        }
-                        .buttonStyle(PickerButton(enumValue: $env.optionsTab, onValue: .hdr))
-                        .font(.system(size: 12, weight: env.optionsTab == .hdr ? .bold : .medium, design: .rounded))
-                    }.frame(maxWidth: .infinity)
-
-                    switch env.optionsTab {
-                    case .layout:
-                        QuickActionsLayoutView().padding(10)
-                    case .advanced:
-                        AdvancedSettingsView().padding(10)
-                    case .hdr:
-                        HDRSettingsView().padding(10)
-                    }
-
-                    SwiftUI.Button("Reset all settings") {
-                        DataStore.reset()
-                    }
-                    .buttonStyle(FlatButton(color: Color.red.opacity(0.7), textColor: .white))
-                    .font(.system(size: 12, weight: .medium))
-                    .frame(maxWidth: .infinity, alignment: .center)
-
-                }.frame(width: 390, height: 640, alignment: .center)
-            }
             .onChange(of: showBrightnessMenuBar) { _ in
                 let old = showOptionsMenu
                 showOptionsMenu = false
@@ -1271,7 +1231,7 @@ struct QuickActionsMenuView: View {
 
             SwiftUI.Button(
                 action: {
-                    guard let view = menuPopover?.contentViewController?.view else { return }
+                    guard let view = menuWindow?.contentViewController?.view else { return }
                     appDelegate!.menu.popUp(
                         positioning: nil,
                         at: NSPoint(x: view.frame.width - (POPOVER_PADDING / 2), y: 0),
@@ -1488,7 +1448,13 @@ struct QuickActionsMenuView: View {
 
     var body: some View {
         let op = (showFooterOnHover && !showAdditionalInfo) ? footerOpacity : 1.0
-        GeometryReader { _ in
+        let optionsMenuOverflow = showOptionsMenu ? isOptionsMenuOverflowing() : false
+        HStack(alignment: .top, spacing: 1) {
+            if optionsMenuOverflow {
+                optionsMenu.padding(.leading, 20)
+                    .matchedGeometryEffect(id: "options-menu", in: namespace)
+            }
+
             VStack {
                 content
                 footer
@@ -1497,12 +1463,14 @@ struct QuickActionsMenuView: View {
             .scrollOnOverflow()
             .frame(width: env.menuWidth, height: cap(env.menuHeight, minVal: 100, maxVal: env.menuMaxHeight - 50), alignment: .top)
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .padding(.horizontal, MENU_HORIZONTAL_PADDING)
-            .padding(.bottom, op < 1 ? 20 : 40)
+            .padding(.bottom, op < 1 ? 0 : 20)
             .padding(.top, 0)
-            .background(bg, alignment: .top)
+            .background(bg(optionsMenuOverflow: optionsMenuOverflow), alignment: .top)
             .onAppear { setup() }
-            .onChange(of: popoverClosed) { closed in setup(closed) }
+            .onChange(of: menuBarClosed) { closed in
+                log.debug("MENU BAR CLOSED")
+                setup(closed)
+            }
             .frame(maxWidth: .infinity, alignment: .center)
             .onTapGesture { env.recording = false }
 
@@ -1513,35 +1481,103 @@ struct QuickActionsMenuView: View {
             .onChange(of: showAdditionalInfo, perform: setMenuWidth)
             .onChange(of: headerOpacity, perform: setMenuWidth)
             .onChange(of: footerOpacity, perform: setMenuWidth)
-        }
+            .onChange(of: showOptionsMenu) { show in
+                guard !menuBarClosed else { return }
+
+                setMenuWidth(show)
+                if !show, let menuWindow {
+                    menuWindow.setContentSize(.zero)
+                }
+                appDelegate?.statusItemButtonController?.repositionWindow()
+            }
+
+            if showOptionsMenu, !optionsMenuOverflow {
+                optionsMenu.padding(.trailing, 20)
+                    .matchedGeometryEffect(id: "options-menu", in: namespace)
+            }
+        }.frame(width: MENU_WIDTH + FULL_OPTIONS_MENU_WIDTH, height: env.menuMaxHeight, alignment: .top)
     }
 
-    var bg: some View {
+    @ViewBuilder var optionsMenu: some View {
+        VStack(spacing: 10) {
+            HStack {
+                SwiftUI.Button("Menu layout") {
+                    withAnimation(.fastSpring) { env.optionsTab = .layout }
+                }
+                .buttonStyle(PickerButton(enumValue: $env.optionsTab, onValue: .layout))
+                .font(.system(size: 12, weight: env.optionsTab == .layout ? .bold : .medium, design: .rounded))
+
+                SwiftUI.Button("Advanced settings") {
+                    withAnimation(.fastSpring) { env.optionsTab = .advanced }
+                }
+                .buttonStyle(PickerButton(enumValue: $env.optionsTab, onValue: .advanced))
+                .font(.system(size: 12, weight: env.optionsTab == .advanced ? .bold : .medium, design: .rounded))
+
+                SwiftUI.Button("HDR") {
+                    withAnimation(.fastSpring) { env.optionsTab = .hdr }
+                }
+                .buttonStyle(PickerButton(enumValue: $env.optionsTab, onValue: .hdr))
+                .font(.system(size: 12, weight: env.optionsTab == .hdr ? .bold : .medium, design: .rounded))
+            }.frame(maxWidth: .infinity)
+
+            switch env.optionsTab {
+            case .layout:
+                QuickActionsLayoutView().padding(10)
+            case .advanced:
+                AdvancedSettingsView().padding(10)
+            case .hdr:
+                HDRSettingsView().padding(10)
+            }
+
+            SwiftUI.Button("Reset all settings") {
+                DataStore.reset()
+            }
+            .buttonStyle(FlatButton(color: Color.red.opacity(0.7), textColor: .white))
+            .font(.system(size: 12, weight: .medium))
+            .frame(maxWidth: .infinity, alignment: .center)
+        }
+        .padding(20)
+        .frame(width: OPTIONS_MENU_WIDTH, alignment: .center)
+        .fixedSize()
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(colorScheme == .dark ? Colors.sunYellow : Colors.lunarYellow)
+                .shadow(color: Colors.blackMauve.opacity(colorScheme == .dark ? 0.5 : 0.2), radius: 8, x: 0, y: 6)
+        )
+        .padding(.bottom, 20)
+    }
+
+    func bg(optionsMenuOverflow: Bool) -> some View {
         ZStack {
             VisualEffectBlur(material: .hudWindow, blendingMode: .behindWindow, state: .active)
                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                .padding(.horizontal, MENU_HORIZONTAL_PADDING)
-                .padding(.bottom, 20)
-                .shadow(color: Colors.blackMauve.opacity(colorScheme == .dark ? 0.5 : 0.2), radius: 8, x: 0, y: 6)
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(colorScheme == .dark ? Colors.blackMauve.opacity(0.4) : Color.white.opacity(0.6))
-                .padding(.horizontal, MENU_HORIZONTAL_PADDING)
-                .padding(.bottom, 20)
         }
+        .shadow(color: Colors.blackMauve.opacity(colorScheme == .dark ? 0.5 : 0.2), radius: 8, x: 0, y: 6)
+    }
+
+    func isOptionsMenuOverflowing() -> Bool {
+        guard let position = appDelegate?.statusItemButtonController?.position, let screen = NSScreen.main else { return false }
+        return position.x + MENU_WIDTH + MENU_WIDTH / 2 + FULL_OPTIONS_MENU_WIDTH >= screen.visibleFrame.maxX
     }
 
     func setMenuWidth(_: Any) {
         withAnimation(.fastSpring) {
             env.menuWidth = (
-                showStandardPresets || showCustomPresets
+                showOptionsMenu || showStandardPresets || showCustomPresets
                     || !showHeaderOnHover || !showFooterOnHover
                     || showAdditionalInfo
                     || headerOpacity > 0 || footerOpacity > 0
-            ) ? MENU_WIDTH : MENU_WIDTH - 80
+            ) ? MENU_WIDTH : MENU_CLEAN_WIDTH
+        }
+        if let menuWindow, let size = menuWindow.contentView?.frame.size, size != menuWindow.frame.size {
+            menuWindow.setContentSize(size)
         }
     }
 
     func handleHeaderTransition(hovering: Bool) {
+        guard !menuBarClosed else { return }
         guard !showOptionsMenu else {
             headerShowHideTask = nil
             headerOpacity = 1.0
@@ -1560,7 +1596,7 @@ struct QuickActionsMenuView: View {
     }
 
     func setup(_ closed: Bool? = nil) {
-        guard !(closed ?? popoverClosed) else {
+        guard !(closed ?? menuBarClosed) else {
             displayHideTask = mainAsyncAfter(ms: 2000) {
                 cursorDisplay = nil
                 displays = []
@@ -1577,12 +1613,6 @@ struct QuickActionsMenuView: View {
         if showHeaderOnHover { headerOpacity = 0.0 }
         if showFooterOnHover { footerOpacity = 0.0 }
         env.menuMaxHeight = (NSScreen.main?.visibleFrame.height ?? 600) - 50
-
-        appDelegate?.statusItemButtonController?
-            .resize(NSSize(
-                width: MENU_WIDTH + (MENU_HORIZONTAL_PADDING * 2),
-                height: env.menuMaxHeight
-            ))
     }
 }
 
@@ -1614,7 +1644,6 @@ extension Defaults.Keys {
 
 struct QuickActionsView: View {
     @Environment(\.colorScheme) var colorScheme
-    @Default(.popoverClosed) var popoverClosed
 
     var body: some View {
         QuickActionsMenuView()
@@ -1625,8 +1654,12 @@ struct QuickActionsView: View {
 }
 
 let MENU_WIDTH: CGFloat = 380
+let OPTIONS_MENU_WIDTH: CGFloat = 390
+let FULL_OPTIONS_MENU_WIDTH: CGFloat = 412
+let MENU_CLEAN_WIDTH: CGFloat = 300
 let MENU_HORIZONTAL_PADDING: CGFloat = 24
 let MENU_VERTICAL_PADDING: CGFloat = 40
+let FULL_MENU_WIDTH: CGFloat = MENU_WIDTH + (MENU_HORIZONTAL_PADDING * 2)
 
 // MARK: - ViewSizeKey
 

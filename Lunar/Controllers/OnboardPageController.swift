@@ -60,7 +60,7 @@ class OnboardWindowController: ModernWindowController, NSWindowDelegate {
     func completeOnboarding() {
         completedOnboarding = true
         mainAsyncAfter(ms: 100) {
-            appDelegate!.statusItemButtonController?.showPopover()
+            appDelegate!.statusItemButtonController?.showMenuBar()
         }
 
         mainAsyncAfter(ms: 1000) {

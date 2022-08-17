@@ -61,7 +61,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .enableSentry,
     .paddleConsent,
     .presets,
-    .popoverClosed,
+    .menuBarClosed,
     .showVolumeSlider,
     .showRawValues,
     .showStandardPresets,
@@ -70,6 +70,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .showHeaderOnHover,
     .showFooterOnHover,
     .showOptionsMenu,
+    .keepOptionsMenu,
     .showSliderValues,
     .showAdvancedDisplaySettings,
     .notificationsPermissionsGranted,
@@ -727,6 +728,7 @@ func initCache() {
     cacheKey(.showHeaderOnHover)
     cacheKey(.showFooterOnHover)
     cacheKey(.showOptionsMenu)
+    cacheKey(.keepOptionsMenu)
     cacheKey(.showSliderValues)
     cacheKey(.showAdvancedDisplaySettings)
     cacheKey(.lunarProActive)
@@ -886,7 +888,7 @@ extension Defaults.Keys {
     static let enableSentry = Key<Bool>("enableSentry", default: true)
     static let paddleConsent = Key<Bool>("paddleConsent", default: false)
     static let presets = Key<[Preset]>("presets", default: [])
-    static let popoverClosed = Key<Bool>("popoverClosed", default: true)
+    static let menuBarClosed = Key<Bool>("menuBarClosed", default: true)
     static let showVolumeSlider = Key<Bool>("showVolumeSlider", default: true)
     static let showRawValues = Key<Bool>("showRawValues", default: false)
     static let showStandardPresets = Key<Bool>("showStandardPresets", default: true)
@@ -895,6 +897,7 @@ extension Defaults.Keys {
     static let showHeaderOnHover = Key<Bool>("showHeaderOnHover", default: false)
     static let showFooterOnHover = Key<Bool>("showFooterOnHover", default: false)
     static let showOptionsMenu = Key<Bool>("showOptionsMenu", default: false)
+    static let keepOptionsMenu = Key<Bool>("keepOptionsMenu", default: false)
     static let showSliderValues = Key<Bool>("showSliderValues", default: false)
     static let showAdvancedDisplaySettings = Key<Bool>("showAdvancedDisplaySettings", default: false)
     static let notificationsPermissionsGranted = Key<Bool>("notificationsPermissionsGranted", default: false)

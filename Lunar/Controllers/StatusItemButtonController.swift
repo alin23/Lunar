@@ -2,7 +2,9 @@ import Atomics
 import Cocoa
 import Defaults
 
-class StatusItemButtonController: NSView, NSPopoverDelegate {
+// MARK: - StatusItemButtonController
+
+class StatusItemButtonController: NSView, NSWindowDelegate {
     // MARK: Lifecycle
 
     convenience init(button: NSStatusBarButton) {
@@ -15,19 +17,38 @@ class StatusItemButtonController: NSView, NSPopoverDelegate {
     var statusButton: NSStatusBarButton?
     var backgroundView: PopoverBackgroundView?
 
-    func popoverWillShow(_ notification: Notification) {
-        Defaults[.popoverClosed] = false
+    var position: CGPoint? {
+        guard let statusButton, let menuBarIconPosition = statusButton.window?.convertPoint(toScreen: statusButton.frame.origin),
+              let screen = NSScreen.main, let menuWindow
+        else {
+            return nil
+        }
+
+        var middle = CGPoint(
+            x: menuBarIconPosition.x - MENU_WIDTH / 2 - OPTIONS_MENU_WIDTH / 2,
+            y: screen.visibleFrame.maxY - (menuWindow.frame.height + 1)
+        )
+
+        if middle.x + FULL_MENU_WIDTH > screen.visibleFrame.maxX {
+            middle = CGPoint(x: screen.visibleFrame.maxX - FULL_MENU_WIDTH, y: middle.y)
+        } else if middle.x < screen.visibleFrame.minX {
+            middle = CGPoint(x: screen.visibleFrame.minX, y: middle.y)
+        }
+
+        return middle
     }
 
-    func popoverDidClose(_: Notification) {
-        if let window = menuPopover?.contentViewController?.view.window {
-            window.identifier = nil
+    func windowWillClose(_ notification: Notification) {
+        mainAsyncAfter(ms: 50) {
+            Defaults[.menuBarClosed] = true
+            if Defaults[.showOptionsMenu], !Defaults[.keepOptionsMenu] {
+                Defaults[.showOptionsMenu] = false
+            }
         }
-        let positioningView = statusButton?.subviews.first {
-            $0.identifier == NSUserInterfaceItemIdentifier(rawValue: "positioningView")
-        }
-        positioningView?.removeFromSuperview()
-        Defaults[.popoverClosed] = true
+    }
+
+    func windowDidBecomeMain(_ notification: Notification) {
+        Defaults[.menuBarClosed] = false
     }
 
     override func rightMouseDown(with _: NSEvent) {
@@ -35,59 +56,50 @@ class StatusItemButtonController: NSView, NSPopoverDelegate {
         appDelegate!.menu.popUp(positioning: nil, at: NSPoint(x: 0, y: button.frame.height + 8), in: button)
     }
 
-    func togglePopover() {
-        if let menuPopover = menuPopover, menuPopover.isShown {
-            closePopover()
+    func toggleMenuBar() {
+        if let menuWindow = menuWindow, menuWindow.isVisible {
+            closeMenuBar()
         } else {
-            showPopover()
+            showMenuBar()
         }
     }
 
-    func resize(_ size: NSSize) {
-        guard let menuPopover = menuPopover else { return }
-
-        if size != menuPopover.contentSize {
-            menuPopover.contentSize = size
-        }
-        guard let positioningView = statusButton?.subviews.first(where: {
-            $0.identifier == NSUserInterfaceItemIdentifier(rawValue: "positioningView")
-        }) else { return }
-        menuPopover.positioningRect = positioningView.bounds
+    func closeMenuBar() {
+        menuWindow?.forceClose()
+//        menuWindow = nil
     }
 
-    func closePopover() {
-        guard let menuPopover = menuPopover, menuPopover.isShown else {
-            return
-        }
-        menuPopover.close()
-    }
+    func showMenuBar() {
+        guard let menuWindow = appDelegate?.initMenuWindow(), !menuWindow.isVisible else { return }
 
-    func showPopover() {
-        let menuPopover = appDelegate!.initMenuPopover()
-
-        guard !menuPopover.isShown else { return }
-
-        guard let button = statusButton, menuPopover.contentViewController != nil
-        else {
-            return
-        }
+        Defaults[.menuBarClosed] = false
+        guard let button = statusButton, menuWindow.contentViewController != nil else { return }
         button.menu = nil
-        menuPopover.delegate = self
 
-        let positioningView = NSView(frame: button.bounds)
-        positioningView.identifier = NSUserInterfaceItemIdentifier(rawValue: "positioningView")
-        button.addSubview(positioningView)
+        menuWindow.delegate = self
+        repositionWindow()
+    }
 
-        menuPopover.show(relativeTo: positioningView.bounds, of: positioningView, preferredEdge: .maxY)
-        positioningView.bounds = positioningView.bounds.offsetBy(dx: 0, dy: positioningView.bounds.height)
-        if let view = menuPopover.contentViewController?.view, let popoverWindow = view.window {
-            popoverWindow.setFrame(popoverWindow.frame.offsetBy(dx: 0, dy: 12), display: false)
+    func repositionWindow() {
+        guard let menuWindow, let screen = NSScreen.main, let appd = appDelegate else { return }
+        guard let position else {
+            menuWindow.show()
+            return
         }
-        menuPopover.contentViewController?.view.window?.makeKeyAndOrderFront(self)
+
+        if Defaults[.showOptionsMenu] {
+            if position.x + appd.env.menuWidth + appd.env.menuWidth / 2 + FULL_OPTIONS_MENU_WIDTH >= screen.visibleFrame.maxX {
+                menuWindow.show(at: position.applying(.init(translationX: -FULL_OPTIONS_MENU_WIDTH / 2, y: 1)))
+            } else {
+                menuWindow.show(at: position.applying(.init(translationX: FULL_OPTIONS_MENU_WIDTH / 2, y: 1)))
+            }
+        } else {
+            menuWindow.show(at: position)
+        }
     }
 
     override func mouseDown(with event: NSEvent) {
-        togglePopover()
+        toggleMenuBar()
         super.mouseDown(with: event)
     }
 }
