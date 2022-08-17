@@ -207,7 +207,7 @@ class DisplayController: ObservableObject {
     }
 
     func reset() {
-        menuPopover?.close()
+        menuWindow?.forceClose()
 
         displayController.manageClamshellMode()
         displayController.resetDisplayList(autoBlackOut: Defaults[.autoBlackoutBuiltin])

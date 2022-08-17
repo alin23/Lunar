@@ -9,7 +9,9 @@
 import Cocoa
 import Foundation
 
-var menuPopover: NSPopover?
+var menuWindow: PanelWindow? { didSet {
+    oldValue?.forceClose()
+}}
 var INPUT_HOTKEY_POPOVERS: [String: NSPopover?] = [:]
 var POPOVERS: [String: NSPopover?] = [
     "help": nil,
