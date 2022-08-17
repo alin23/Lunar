@@ -3345,7 +3345,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
                     panel.orientation = self.rotation.i32
                     guard self.modeChangeAsk, self.rotation != oldValue,
-                          let window = appDelegate!.windowController?.window ?? menuPopover?.contentViewController?.view.window
+                          let window = appDelegate!.windowController?.window ?? menuWindow
                     else { return }
                     ask(
                         message: "Orientation Change",

@@ -364,7 +364,7 @@ struct DynamicKey: View {
     @State var hoverColor = Self.darkHoverColor
     @State var fontSize: CGFloat = 13
     @State var width: CGFloat? = nil
-    @Default(.popoverClosed) var popoverClosed
+    @Default(.menuBarClosed) var menuBarClosed
 
     var body: some View {
         SwiftUI.Button(DynamicKey.keyString(keyCode)) {
@@ -398,7 +398,7 @@ struct DynamicKey: View {
             }
         }
         .onChange(of: colorScheme) { hoverColor = $0 == .dark ? Self.darkHoverColor : Self.lightHoverColor }
-        .onChange(of: popoverClosed) { if $0 { recording = false } }
+        .onChange(of: menuBarClosed) { if $0 { recording = false } }
         .onChange(of: env.recording) { newRecording in
             if recording, !newRecording {
                 recording = false

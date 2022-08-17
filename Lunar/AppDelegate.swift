@@ -465,20 +465,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     windowShowTask = mainAsyncAfter(ms: 2000) { showCheckout() }
                 }
             case "advanced":
-                statusItemButtonController?.showPopover()
+                statusItemButtonController?.showMenuBar()
                 Defaults[.showOptionsMenu] = true
 
                 env.optionsTab = .advanced
             case "xdr", "hdr":
-                statusItemButtonController?.showPopover()
+                statusItemButtonController?.showMenuBar()
                 Defaults[.showOptionsMenu] = true
 
                 env.optionsTab = .hdr
             case "menu":
-                statusItemButtonController?.showPopover()
+                statusItemButtonController?.showMenuBar()
                 Defaults[.showOptionsMenu] = false
             case "options", "layout":
-                statusItemButtonController?.showPopover()
+                statusItemButtonController?.showMenuBar()
                 Defaults[.showOptionsMenu] = true
 
                 env.optionsTab = .layout
@@ -486,7 +486,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 Defaults[.showAdditionalInfo] = false
                 additionInfoTask = nil
                 windowShowTask = mainAsyncAfter(ms: 100) {
-                    self.statusItemButtonController?.showPopover()
+                    self.statusItemButtonController?.showMenuBar()
                     additionInfoTask = mainAsyncAfter(ms: 500) {
                         withAnimation(.spring()) {
                             Defaults[.showAdditionalInfo] = true
@@ -1019,30 +1019,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }.store(in: &observers)
     }
 
-    @discardableResult func initMenuPopover() -> NSPopover {
-        if menuPopover == nil {
-            menuPopover = NSPopover()
-            guard let menuPopover = menuPopover else { return NSPopover() }
-            menuPopover.contentViewController = NSViewController()
-            menuPopover.contentViewController?.view = HostingView(rootView: QuickActionsView())
-            if let w = menuPopover.contentViewController?.view.window {
-                w.setAccessibilityRole(.popover)
-                w.setAccessibilitySubrole(.unknown)
-            }
-            menuPopover.animates = false
+    @discardableResult func initMenuWindow() -> PanelWindow {
+        if menuWindow == nil {
+            let view = AnyView(QuickActionsView())
+            menuWindow = PanelWindow(swiftuiView: view)
         }
 
-        guard let menuPopover = menuPopover else { return NSPopover() }
-
-        let size = NSSize(
-            width: MENU_WIDTH + (MENU_HORIZONTAL_PADDING * 2),
-            height: (NSScreen.main?.visibleFrame.height ?? 600) - 50
-        )
-        if menuPopover.contentSize != size {
-            menuPopover.contentSize = size
-        }
-
-        return menuPopover
+        return menuWindow!
     }
 
     func setExplanationStyle(_ menuItem: NSMenuItem, title: String? = nil) {
@@ -1084,7 +1067,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         statusItem.menu = nil
         initMenuItems()
 
-        initMenuPopover()
+        initMenuWindow()
         DistributedNotificationCenter.default()
             .publisher(for: NSNotification.Name(rawValue: kAppleInterfaceThemeChangedNotification), object: nil)
             .sink { [self] notification in
@@ -1583,9 +1566,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     self.statusItem.button?.imagePosition = .imageOnly
                 }
                 self.updateInfoMenuItem(showBrightnessMenuBar: change.newValue)
-                self.statusItemButtonController?.closePopover()
+                self.statusItemButtonController?.closeMenuBar()
                 mainAsync {
-                    self.statusItemButtonController?.showPopover()
+                    self.statusItemButtonController?.showMenuBar()
                 }
 
             }.store(in: &observers)
@@ -1792,8 +1775,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func addGlobalMouseDownMonitor() {
         NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]) { _ in
-            guard let menuPopover = menuPopover, menuPopover.isShown else { return }
-            menuPopover.close()
+            guard let menuWindow = menuWindow, menuWindow.isVisible else { return }
+            menuWindow.forceClose()
         }
     }
 

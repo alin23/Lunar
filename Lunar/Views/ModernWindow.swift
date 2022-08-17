@@ -161,8 +161,8 @@ class ModernWindow: WAYWindow {
                 c.onClick = nil
             }
         }
-        if let menuPopover = menuPopover, menuPopover.isShown {
-            menuPopover.close()
+        if let menuWindow = menuWindow, menuWindow.isVisible {
+            menuWindow.forceClose()
         }
 
         endEditing(for: nil)
