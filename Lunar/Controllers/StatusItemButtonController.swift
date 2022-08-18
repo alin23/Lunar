@@ -2,20 +2,47 @@ import Atomics
 import Cocoa
 import Defaults
 
+// MARK: - StatusItemButtonControllerDelegate
+
+class StatusItemButtonControllerDelegate: NSObject, NSWindowDelegate {
+    // MARK: Lifecycle
+
+    convenience init(statusItemButtonController: StatusItemButtonController) {
+        self.init()
+        self.statusItemButtonController = statusItemButtonController
+    }
+
+    // MARK: Internal
+
+    var statusItemButtonController: StatusItemButtonController!
+
+    func windowDidMove(_ notification: Notification) {
+        guard let frame = (notification.object as? NSWindow)?.frame, let menuWindow, menuWindow.isVisible else { return }
+        log.debug("STATUS BUTTON FRAME: \(frame)")
+
+        statusItemButtonController.repositionWindow(animate: true)
+    }
+}
+
 // MARK: - StatusItemButtonController
 
-class StatusItemButtonController: NSView, NSWindowDelegate {
+class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObject {
     // MARK: Lifecycle
 
     convenience init(button: NSStatusBarButton) {
         self.init(frame: button.frame)
         statusButton = button
+        delegate = StatusItemButtonControllerDelegate(statusItemButtonController: self)
+        statusButton?.window?.delegate = delegate
     }
 
     // MARK: Internal
 
     var statusButton: NSStatusBarButton?
+    var delegate: StatusItemButtonControllerDelegate?
     var backgroundView: PopoverBackgroundView?
+
+    @Published var storedPosition: CGPoint = .zero
 
     var position: CGPoint? {
         guard let statusButton, let menuBarIconPosition = statusButton.window?.convertPoint(toScreen: statusButton.frame.origin),
@@ -25,7 +52,8 @@ class StatusItemButtonController: NSView, NSWindowDelegate {
         }
 
         var middle = CGPoint(
-            x: menuBarIconPosition.x - MENU_WIDTH / 2 - OPTIONS_MENU_WIDTH / 2,
+            x: menuBarIconPosition
+                .x - MENU_WIDTH / 2 - OPTIONS_MENU_WIDTH / 2 - (CachedDefaults[.showOptionsMenu] ? MENU_HORIZONTAL_PADDING * 2 : 0),
             y: screen.visibleFrame.maxY - (menuWindow.frame.height + 1)
         )
 
@@ -35,6 +63,9 @@ class StatusItemButtonController: NSView, NSWindowDelegate {
             middle = CGPoint(x: screen.visibleFrame.minX, y: middle.y)
         }
 
+        if storedPosition != middle {
+            storedPosition = middle
+        }
         return middle
     }
 
@@ -80,8 +111,8 @@ class StatusItemButtonController: NSView, NSWindowDelegate {
         repositionWindow()
     }
 
-    func repositionWindow() {
-        guard let menuWindow, let screen = NSScreen.main, let appd = appDelegate else { return }
+    func repositionWindow(animate: Bool = false) {
+        guard var menuWindow, let screen = NSScreen.main, let appd = appDelegate else { return }
         guard let position else {
             menuWindow.show()
             return
@@ -89,12 +120,12 @@ class StatusItemButtonController: NSView, NSWindowDelegate {
 
         if Defaults[.showOptionsMenu] {
             if position.x + appd.env.menuWidth + appd.env.menuWidth / 2 + FULL_OPTIONS_MENU_WIDTH >= screen.visibleFrame.maxX {
-                menuWindow.show(at: position.applying(.init(translationX: -FULL_OPTIONS_MENU_WIDTH / 2, y: 1)))
+                menuWindow.show(at: position.applying(.init(translationX: -FULL_OPTIONS_MENU_WIDTH / 2, y: 1)), animate: animate)
             } else {
-                menuWindow.show(at: position.applying(.init(translationX: FULL_OPTIONS_MENU_WIDTH / 2, y: 1)))
+                menuWindow.show(at: position.applying(.init(translationX: FULL_OPTIONS_MENU_WIDTH / 2, y: 1)), animate: animate)
             }
         } else {
-            menuWindow.show(at: position)
+            menuWindow.show(at: position, animate: animate)
         }
     }
 

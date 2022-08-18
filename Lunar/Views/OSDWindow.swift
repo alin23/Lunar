@@ -937,12 +937,23 @@ open class PanelWindow: NSWindow {
 
     override open var canBecomeKey: Bool { true }
 
-    open func show(at point: NSPoint? = nil) {
+    open func show(at point: NSPoint? = nil, animate: Bool = false) {
         if let point = point {
-            setFrameOrigin(point)
+            if animate {
+                NSAnimationContext.runAnimationGroup { ctx in
+                    ctx.duration = 0.15
+                    ctx.timingFunction = .easeOut
+                    ctx.allowsImplicitAnimation = true
+                    setFrame(NSRect(origin: point, size: frame.size), display: true, animate: true)
+                }
+            } else {
+                setFrameOrigin(point)
+            }
         } else {
             center()
         }
+
+        guard !isVisible else { return }
 
         wc.showWindow(nil)
         makeKeyAndOrderFront(nil)

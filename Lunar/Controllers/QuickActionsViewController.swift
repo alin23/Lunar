@@ -1174,6 +1174,8 @@ struct QuickActionsMenuView: View {
 
     @State var displayCount = displayController.activeDisplayList.count
 
+    @ObservedObject var menuBarIcon: StatusItemButtonController
+
     var modeSelector: some View {
         let titleBinding = Binding<String>(
             get: { overrideAdaptiveMode ? "⁣\(dc.adaptiveModeKey.name)⁣" : "Auto: \(dc.adaptiveModeKey.str)" }, set: { _ in }
@@ -1495,7 +1497,9 @@ struct QuickActionsMenuView: View {
                 optionsMenu.padding(.trailing, 20)
                     .matchedGeometryEffect(id: "options-menu", in: namespace)
             }
-        }.frame(width: MENU_WIDTH + FULL_OPTIONS_MENU_WIDTH, height: env.menuMaxHeight, alignment: .top)
+        }
+        .frame(width: MENU_WIDTH + FULL_OPTIONS_MENU_WIDTH, height: env.menuMaxHeight, alignment: .top)
+        .padding(.horizontal, showOptionsMenu ? MENU_HORIZONTAL_PADDING * 2 : 0)
     }
 
     @ViewBuilder var optionsMenu: some View {
@@ -1558,8 +1562,8 @@ struct QuickActionsMenuView: View {
     }
 
     func isOptionsMenuOverflowing() -> Bool {
-        guard let position = appDelegate?.statusItemButtonController?.position, let screen = NSScreen.main else { return false }
-        return position.x + MENU_WIDTH + MENU_WIDTH / 2 + FULL_OPTIONS_MENU_WIDTH >= screen.visibleFrame.maxX
+        guard let screen = NSScreen.main else { return false }
+        return menuBarIcon.storedPosition.x + MENU_WIDTH + MENU_WIDTH / 2 + FULL_OPTIONS_MENU_WIDTH >= screen.visibleFrame.maxX
     }
 
     func setMenuWidth(_: Any) {
@@ -1646,7 +1650,7 @@ struct QuickActionsView: View {
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
-        QuickActionsMenuView()
+        QuickActionsMenuView(menuBarIcon: appDelegate!.statusItemButtonController!)
             .environmentObject(appDelegate!.env)
             .colors(colorScheme == .dark ? .dark : .light)
             .focusable(false)
