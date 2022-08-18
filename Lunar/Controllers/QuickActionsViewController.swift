@@ -1549,6 +1549,7 @@ struct QuickActionsMenuView: View {
                 .shadow(color: Colors.blackMauve.opacity(colorScheme == .dark ? 0.5 : 0.2), radius: 8, x: 0, y: 6)
         )
         .padding(.bottom, 20)
+        .preferredColorScheme(.light)
     }
 
     func bg(optionsMenuOverflow: Bool) -> some View {
