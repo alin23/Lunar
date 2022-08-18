@@ -1,3 +1,7 @@
+# 5.7.6
+## Hotfix
+
+* Fix **Options** menu not being readable in **Dark Mode**
 # 5.7.5
 ## Features
 
