@@ -18,7 +18,6 @@ class StatusItemButtonControllerDelegate: NSObject, NSWindowDelegate {
 
     func windowDidMove(_ notification: Notification) {
         guard let frame = (notification.object as? NSWindow)?.frame, let menuWindow, menuWindow.isVisible else { return }
-        log.debug("STATUS BUTTON FRAME: \(frame)")
 
         statusItemButtonController.repositionWindow(animate: true)
     }
