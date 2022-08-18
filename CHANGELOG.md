@@ -1,3 +1,16 @@
+# 5.7.5
+## Features
+
+* Allow keeping the Options menu open
+
+## Improvements
+
+* Move to a floating window approach for the menu bar to avoid blocking clicks under it
+
+## Fixes
+
+* Fix a crash caused by a recursive UI error
+
 # 5.7.4
 ## Features
 
