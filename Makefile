@@ -55,6 +55,7 @@ upload: ReleaseNotes/release.css
 	rsync -avz Releases/*.delta darkwoods:/static/Lunar/deltas/ || true
 	rsync -avzP Releases/*.dmg darkwoods:/static/Lunar/releases/
 	rsync -avz Releases/*.html ReleaseNotes/*.css darkwoods:/static/Lunar/ReleaseNotes/
+	fish -c 'upload -d Lunar Releases/appcast.xml'
 	fish -c 'upload -d Lunar Releases/appcast2.xml'
 	fish -c 'upload -d Lunar Releases/appcast-stable.xml'
 	cfcli -d lunar.fyi purge
