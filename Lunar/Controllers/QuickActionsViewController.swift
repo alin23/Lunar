@@ -1470,7 +1470,6 @@ struct QuickActionsMenuView: View {
             .background(bg(optionsMenuOverflow: optionsMenuOverflow), alignment: .top)
             .onAppear { setup() }
             .onChange(of: menuBarClosed) { closed in
-                log.debug("MENU BAR CLOSED")
                 setup(closed)
             }
             .frame(maxWidth: .infinity, alignment: .center)
