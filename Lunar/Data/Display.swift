@@ -5479,7 +5479,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             self.save()
             self.brightnessDataPointInsertionTask = nil
         }
-        serialAsyncAfter(ms: 5000, brightnessDataPointInsertionTask!)
+        serialAsyncAfter(ms: 2500, brightnessDataPointInsertionTask!)
 
         var userValues = userBrightness[modeKey]!
         Display.insertDataPoint(values: &userValues, featureValue: featureValue, targetValue: targetValue, logValue: false)
@@ -5514,7 +5514,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             self.save()
             self.contrastDataPointInsertionTask = nil
         }
-        serialAsyncAfter(ms: 5000, contrastDataPointInsertionTask!)
+        serialAsyncAfter(ms: 2500, contrastDataPointInsertionTask!)
 
         var userValues = userContrast[modeKey]!
         Display.insertDataPoint(values: &userValues, featureValue: featureValue, targetValue: targetValue, logValue: false)

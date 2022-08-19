@@ -3,6 +3,25 @@
     <channel>
         <title>Lunar</title>
         <item>
+            <title>5.7.7</title>
+            <pubDate>Fri, 19 Aug 2022 07:37:23 +0300</pubDate>
+            <link>https://lunar.fyi/</link>
+            <sparkle:fullReleaseNotesLink>https://lunar.fyi/changelog</sparkle:fullReleaseNotesLink>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <sparkle:version>5.7.7</sparkle:version>
+            <sparkle:shortVersionString>5.7.7</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-5.7.7.html</sparkle:releaseNotesLink>
+            <enclosure url="https://files.lunar.fyi/releases/Lunar-5.7.7.dmg" length="19040739" type="application/octet-stream" sparkle:edSignature="25AyqjABNAbFD/nNaWyhKY53IWvPi7sY5A7qQGLedunPIgZz1DfzvOFP4R4WO3kdxz5gYl8Ol/LL55cT+2XvDg=="/>
+            <sparkle:deltas>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.7.7-5.7.6.delta" sparkle:deltaFrom="5.7.6" length="344518" type="application/octet-stream" sparkle:edSignature="JOqbiATKZutDPksyaeyS2he/k3Vm5ztz8aiVr/Yq35erPN84ExwpEznsN/gg+H4kXQAbdqLWOwPjvLy2E38yDQ=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.7.7-5.7.5.delta" sparkle:deltaFrom="5.7.5" length="1447258" type="application/octet-stream" sparkle:edSignature="eHtGXE81fu2LmFAAs9ZG6KKTax5FsvmjQ0gfDH3MIrHCx1JqZB3SOdxIJgKocvQse+THNGpmISQGl/qBoUAhDA=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.7.7-5.7.4.delta" sparkle:deltaFrom="5.7.4" length="2391922" type="application/octet-stream" sparkle:edSignature="pOrQh4lj7Yc9ckWz9NewcKDBocBrhRlbgY8+N+Tf0bBP2cc82QjyOU6xvDI+URvyyY0rvernGGS+EeSadyA0DQ=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.7.7-5.7.3.delta" sparkle:deltaFrom="5.7.3" length="2842414" type="application/octet-stream" sparkle:edSignature="Gc2XeANy2XxAAK6cVnHS6QWwrA5M32HfNnGLJLRrUJYNXhLPl4m1PTE4Lx0jZ9pgMtVodmF4j3exH7qiXxDNCg=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.7.7-5.7.2.delta" sparkle:deltaFrom="5.7.2" length="4265966" type="application/octet-stream" sparkle:edSignature="DyyPlDoLpRlww6u9/Jpws+GTQLoZ5rx4/JRKXtaUEjYct5U4Fv0ArQRE77crNhk6nOtrbhyU8YpYL6QNxL2WAg=="/>
+            </sparkle:deltas>
+        </item>
+        <item>
             <title>5.7.6</title>
             <pubDate>Thu, 18 Aug 2022 23:27:47 +0300</pubDate>
             <link>https://lunar.fyi/</link>
