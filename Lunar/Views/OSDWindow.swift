@@ -930,7 +930,7 @@ open class PanelWindow: NSWindow {
         hasShadow = false
         styleMask = [.fullSizeContentView]
         hidesOnDeactivate = false
-        isMovableByWindowBackground = true
+        isMovableByWindowBackground = false
     }
 
     // MARK: Open
