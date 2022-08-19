@@ -1,3 +1,9 @@
+# 5.7.7
+## Hotfix
+
+* Fix **Options** menu not allowing slider dragging
+* Decrease decay time when adjusting the Sync Mode curve to increase responsiveness
+
 # 5.7.6
 ## Hotfix
 
