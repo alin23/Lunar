@@ -17,7 +17,7 @@ class StatusItemButtonControllerDelegate: NSObject, NSWindowDelegate {
     var statusItemButtonController: StatusItemButtonController!
 
     func windowDidMove(_ notification: Notification) {
-        guard let frame = (notification.object as? NSWindow)?.frame, let menuWindow, menuWindow.isVisible else { return }
+        guard let menuWindow, menuWindow.isVisible else { return }
 
         statusItemButtonController.repositionWindow(animate: true)
     }
@@ -50,14 +50,15 @@ class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObject {
             return nil
         }
 
+        let width = MENU_WIDTH / 2 + OPTIONS_MENU_WIDTH / 2 + (CachedDefaults[.showOptionsMenu] ? MENU_HORIZONTAL_PADDING * 2 : 0)
         var middle = CGPoint(
-            x: menuBarIconPosition
-                .x - MENU_WIDTH / 2 - OPTIONS_MENU_WIDTH / 2 - (CachedDefaults[.showOptionsMenu] ? MENU_HORIZONTAL_PADDING * 2 : 0),
+            x: menuBarIconPosition.x - width,
             y: screen.visibleFrame.maxY - (menuWindow.frame.height + 1)
         )
 
-        if middle.x + FULL_MENU_WIDTH > screen.visibleFrame.maxX {
-            middle = CGPoint(x: screen.visibleFrame.maxX - FULL_MENU_WIDTH, y: middle.y)
+        let fullWidth = MENU_WIDTH + OPTIONS_MENU_WIDTH / 2 + (CachedDefaults[.showOptionsMenu] ? MENU_HORIZONTAL_PADDING * 2 : 0) + 12
+        if middle.x + fullWidth > screen.visibleFrame.maxX {
+            middle = CGPoint(x: screen.visibleFrame.maxX - fullWidth, y: middle.y)
         } else if middle.x < screen.visibleFrame.minX {
             middle = CGPoint(x: screen.visibleFrame.minX, y: middle.y)
         }
@@ -96,7 +97,6 @@ class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObject {
 
     func closeMenuBar() {
         menuWindow?.forceClose()
-//        menuWindow = nil
     }
 
     func showMenuBar() {
@@ -111,7 +111,7 @@ class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObject {
     }
 
     func repositionWindow(animate: Bool = false) {
-        guard var menuWindow, let screen = NSScreen.main, let appd = appDelegate else { return }
+        guard let menuWindow, let screen = NSScreen.main, let appd = appDelegate else { return }
         guard let position else {
             menuWindow.show()
             return
