@@ -1,3 +1,8 @@
+# 5.7.8
+## Fixes
+
+* Fix **Options** menu overflowing the screen
+* Fix **Options** menu forcing light mode UI
 # 5.7.7
 ## Hotfix
 
