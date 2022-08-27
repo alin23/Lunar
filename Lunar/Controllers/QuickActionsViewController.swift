@@ -1507,29 +1507,50 @@ struct QuickActionsMenuView: View {
                 SwiftUI.Button("Menu layout") {
                     withAnimation(.fastSpring) { env.optionsTab = .layout }
                 }
-                .buttonStyle(PickerButton(enumValue: $env.optionsTab, onValue: .layout))
+                .buttonStyle(PickerButton(
+                    color: Colors.blackMauve.opacity(0.1),
+                    onColor: Colors.blackMauve.opacity(0.4),
+                    onTextColor: .white,
+                    offTextColor: Colors.darkGray,
+                    enumValue: $env.optionsTab,
+                    onValue: .layout
+                ))
                 .font(.system(size: 12, weight: env.optionsTab == .layout ? .bold : .medium, design: .rounded))
 
                 SwiftUI.Button("Advanced settings") {
                     withAnimation(.fastSpring) { env.optionsTab = .advanced }
                 }
-                .buttonStyle(PickerButton(enumValue: $env.optionsTab, onValue: .advanced))
+                .buttonStyle(PickerButton(
+                    color: Colors.blackMauve.opacity(0.1),
+                    onColor: Colors.blackMauve.opacity(0.4),
+                    onTextColor: .white,
+                    offTextColor: Colors.darkGray,
+                    enumValue: $env.optionsTab,
+                    onValue: .advanced
+                ))
                 .font(.system(size: 12, weight: env.optionsTab == .advanced ? .bold : .medium, design: .rounded))
 
                 SwiftUI.Button("HDR") {
                     withAnimation(.fastSpring) { env.optionsTab = .hdr }
                 }
-                .buttonStyle(PickerButton(enumValue: $env.optionsTab, onValue: .hdr))
+                .buttonStyle(PickerButton(
+                    color: Colors.blackMauve.opacity(0.1),
+                    onColor: Colors.blackMauve.opacity(0.4),
+                    onTextColor: .white,
+                    offTextColor: Colors.darkGray,
+                    enumValue: $env.optionsTab,
+                    onValue: .hdr
+                ))
                 .font(.system(size: 12, weight: env.optionsTab == .hdr ? .bold : .medium, design: .rounded))
             }.frame(maxWidth: .infinity)
 
             switch env.optionsTab {
             case .layout:
-                QuickActionsLayoutView().padding(10)
+                QuickActionsLayoutView().padding(10).foregroundColor(Colors.blackMauve)
             case .advanced:
-                AdvancedSettingsView().padding(10)
+                AdvancedSettingsView().padding(10).foregroundColor(Colors.blackMauve)
             case .hdr:
-                HDRSettingsView().padding(10)
+                HDRSettingsView().padding(10).foregroundColor(Colors.blackMauve)
             }
 
             SwiftUI.Button("Reset all settings") {
@@ -1548,7 +1569,7 @@ struct QuickActionsMenuView: View {
                 .shadow(color: Colors.blackMauve.opacity(colorScheme == .dark ? 0.5 : 0.2), radius: 8, x: 0, y: 6)
         )
         .padding(.bottom, 20)
-        .preferredColorScheme(.light)
+        .foregroundColor(Colors.blackMauve)
     }
 
     func bg(optionsMenuOverflow: Bool) -> some View {
