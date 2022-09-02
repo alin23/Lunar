@@ -23,7 +23,7 @@ struct SettingsToggle: View {
         HStack {
             Toggle(text, isOn: $setting)
                 .toggleStyle(CheckboxToggleStyle(style: .circle))
-                .foregroundColor(.primary)
+                .foregroundColor(Colors.blackMauve)
             if let help = help {
                 SwiftUI.Button(action: { helpShown = true }) {
                     Image(systemName: "questionmark.circle.fill")
