@@ -267,7 +267,7 @@ class DataStore: NSObject {
             Defaults[.firstRunAfterExperimentalDDCUpgrade] = true
         }
 
-        Defaults[.toolTipDelay] = 1
+        Defaults[.toolTipDelay] = 5
         if !shouldOnboard, !Defaults[.completedOnboarding] {
             Defaults[.completedOnboarding] = true
             Defaults[.lunarProAccessDialogShown] = true
