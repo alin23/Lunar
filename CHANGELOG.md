@@ -1,3 +1,8 @@
+# 5.7.9
+## Fixes
+
+* Improve text visibility in dark mode
+
 # 5.7.8
 ## Fixes
 
