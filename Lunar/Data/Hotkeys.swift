@@ -1367,6 +1367,11 @@ extension AppDelegate: MediaKeyTapDelegate {
 
     @objc func toggleHotkeyHandler() {
         displayController.toggle()
+        if displayController.adaptiveModeKey != .manual, displayController.activeDisplayList.contains(where: \.adaptivePaused) {
+            displayController.activeDisplayList.filter(\.adaptivePaused).forEach {
+                $0.adaptivePaused = false
+            }
+        }
         log.debug("Toggle Hotkey pressed")
     }
 

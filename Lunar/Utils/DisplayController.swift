@@ -582,7 +582,7 @@ class DisplayController: ObservableObject {
             }
 
             defer {
-                assert(IOObjectRelease(iterator) == KERN_SUCCESS)
+                IOObjectRelease(iterator)
             }
             log.info("Looking for service (names: \(names)) in iterator \(iterator)")
             return firstServiceMatching(iterator, names: names)
@@ -597,6 +597,7 @@ class DisplayController: ObservableObject {
                     log.info("Found service \(txIOChild) in iterator \(iterator): (names: \(names))")
                     break
                 }
+                IOObjectRelease(txIOChild)
             }
 
             return service
@@ -658,11 +659,17 @@ class DisplayController: ObservableObject {
                 txIOService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleT811xIO"))
             }
 
-            guard txIOService != 0, IORegistryEntryGetChildIterator(txIOService, kIOServicePlane, &txIOIterator) == KERN_SUCCESS
+            defer {
+                if txIOService != 0 {
+                    IOObjectRelease(txIOService)
+                }
+            }
+
+            let childIteratorErr = (txIOService != 0)
+                ? IORegistryEntryGetChildIterator(txIOService, kIOServicePlane, &txIOIterator)
+                : KERN_SUCCESS
+            guard txIOService != 0, childIteratorErr == KERN_SUCCESS
             else {
-                let childIteratorErr = (txIOService != 0)
-                    ? IORegistryEntryGetChildIterator(txIOService, kIOServicePlane, &txIOIterator)
-                    : KERN_SUCCESS
                 log.warning("Can't iterate AppleT810xIO/AppleT600xIO/AppleT811xIO")
                 log.info("""
                     No AVService for display \(displayID): (
@@ -674,11 +681,17 @@ class DisplayController: ObservableObject {
             }
 
             defer {
-                assert(IOObjectRelease(txIOIterator) == KERN_SUCCESS)
+                if txIOIterator != 0 {
+                    IOObjectRelease(txIOIterator)
+                }
             }
 
             var matchedDisplay: Display?
             while case let txIOChild = IOIteratorNext(txIOIterator), txIOChild != 0 {
+                defer {
+                    IOObjectRelease(txIOChild)
+                }
+
                 if IOServiceNameMatches(txIOChild, names: DISP_NAMES) {
                     clcd2Num += 1
                     guard clcd2Mapping[clcd2Num] == nil || clcd2Mapping[clcd2Num] == displayID else { continue }
@@ -704,8 +717,14 @@ class DisplayController: ObservableObject {
                 return nil
             }
 
-            if firstChildMatching(dcpService, names: ["AppleDCPMCDP29XX"]) != nil {
+            defer {
+                IOObjectRelease(dcpService)
+                IOObjectRelease(dcpAvServiceProxy)
+            }
+
+            if let mcdp = firstChildMatching(dcpService, names: ["AppleDCPMCDP29XX"]) {
                 log.warning("This HDMI port might not support DDC because of the MCDP29xx chip inside it (display: \(display))")
+                IOObjectRelease(mcdp)
                 display.badHDMI = true
                 if !forceDDC {
                     return nil
