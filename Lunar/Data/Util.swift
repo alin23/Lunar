@@ -2119,7 +2119,10 @@ func activeWindow(on screen: NSScreen? = nil) -> AXWindow? {
 
     let appException = displayController.runningAppExceptions.first { $0.identifier == frontMostApp.bundleIdentifier }
 
-    return frontMostApp.windows(appException: appException)?.first(where: { $0.screen?.displayID == screen?.displayID })
+    return frontMostApp.windows(appException: appException)?.first(where: { w in
+        !w.minimized && w.size != .zero
+            && w.screen?.displayID == screen?.displayID
+    })
 
 //    return windowList(for: frontMostApp, opaque: true, levels: [.normal, .modalPanel, .popUpMenu, .floating], appException: appException)?
 //        .filter { screen == nil || $0.screen?.displayID == screen!.displayID }

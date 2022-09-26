@@ -151,6 +151,7 @@ IOAVServiceRef AVServiceCreateFromDCPAVServiceProxy(io_service_t service)
     IOAVServiceRef avService = 0;
     if (&IOAVServiceCreateWithService != NULL) {
         avService = IOAVServiceCreateWithService(kCFAllocatorDefault, service);
+        IOObjectRelease(service);
     }
     return avService;
 }
