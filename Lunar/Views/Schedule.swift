@@ -158,7 +158,7 @@ class Schedule: NSView {
     var schedule: BrightnessSchedule? {
         get { display?.schedules[number - 1] }
         set {
-            guard let display = display, let newValue = newValue else { return }
+            guard let display, let newValue else { return }
             display.schedules[number - 1] = newValue
             display.save()
         }
@@ -166,14 +166,14 @@ class Schedule: NSView {
 
     @objc dynamic var preciseBrightnessContrast: Double {
         get {
-            guard let display = display, let schedule = schedule else {
+            guard let display, let schedule else {
                 return 0.5
             }
 
             return display.brightnessToSliderValue(schedule.brightness.ns)
         }
         set {
-            guard let display = display, let schedule = schedule else {
+            guard let display, let schedule else {
                 return
             }
             let (brightness, contrast) = display.sliderValueToBrightnessContrast(newValue)
@@ -184,14 +184,14 @@ class Schedule: NSView {
 
     @objc dynamic var preciseBrightness: Double {
         get {
-            guard let display = display, let schedule = schedule else {
+            guard let display, let schedule else {
                 return 0.5
             }
 
             return display.brightnessToSliderValue(schedule.brightness.ns)
         }
         set {
-            guard let display = display, let schedule = schedule else {
+            guard let display, let schedule else {
                 return
             }
             let brightness = display.sliderValueToBrightness(newValue)
@@ -202,14 +202,14 @@ class Schedule: NSView {
 
     @objc dynamic var preciseContrast: Double {
         get {
-            guard let display = display, let schedule = schedule else {
+            guard let display, let schedule else {
                 return 0.5
             }
 
             return display.contrastToSliderValue(schedule.contrast.ns, merged: CachedDefaults[.mergeBrightnessContrast])
         }
         set {
-            guard let display = display, let schedule = schedule else {
+            guard let display, let schedule else {
                 return
             }
 
@@ -221,7 +221,7 @@ class Schedule: NSView {
 
     @objc dynamic var negativeState = NSControl.StateValue.off {
         didSet {
-            guard let display = display, let schedule = display.schedules.prefix(number).last
+            guard let display, let schedule = display.schedules.prefix(number).last
             else {
                 return
             }
@@ -234,7 +234,7 @@ class Schedule: NSView {
 
     @objc dynamic var type: Int = ScheduleType.time.rawValue {
         didSet {
-            guard let display = display, let schedule = display.schedules.prefix(number).last
+            guard let display, let schedule = display.schedules.prefix(number).last
             else {
                 return
             }
@@ -274,7 +274,7 @@ class Schedule: NSView {
 
     weak var display: Display? {
         didSet {
-            guard let display = display else {
+            guard let display else {
                 return
             }
 
@@ -298,7 +298,7 @@ class Schedule: NSView {
             dropdown.selectItem(withTag: schedule.type.rawValue)
 
             hour.onValueChanged = { [weak self] value in
-                guard let self = self, let display = self.display,
+                guard let self, let display = self.display,
                       let schedule = display.schedules.prefix(self.number).last,
                       schedule.enabled
                 else { return }
@@ -318,7 +318,7 @@ class Schedule: NSView {
                 }
             }
             minute.onValueChanged = { [weak self] value in
-                guard let self = self, let display = self.display,
+                guard let self, let display = self.display,
                       let schedule = display.schedules.prefix(self.number).last,
                       schedule.enabled
                 else { return }
@@ -369,7 +369,7 @@ class Schedule: NSView {
     }
 
     @objc func useCurrentBrightness() {
-        guard let display = display else {
+        guard let display else {
             return
         }
         if CachedDefaults[.mergeBrightnessContrast] {
@@ -406,7 +406,7 @@ class Schedule: NSView {
 
     func addObservers() {
         mergeBrightnessContrastPublisher.sink { [weak self] change in
-            guard let self = self, let display = self.display else { return }
+            guard let self, let display = self.display else { return }
             if change.newValue {
                 self.preciseBrightnessContrast = display.brightnessToSliderValue(display.brightness)
             } else {
@@ -416,25 +416,25 @@ class Schedule: NSView {
         }.store(in: &observers)
 
         showTwoSchedulesPublisher.sink { [weak self] change in
-            guard let self = self else { return }
+            guard let self else { return }
             if self.number == 2 {
                 self.isEnabled = change.newValue
             }
         }.store(in: &observers)
         showThreeSchedulesPublisher.sink { [weak self] change in
-            guard let self = self else { return }
+            guard let self else { return }
             if self.number == 3 {
                 self.isEnabled = change.newValue
             }
         }.store(in: &observers)
         showFourSchedulesPublisher.sink { [weak self] change in
-            guard let self = self else { return }
+            guard let self else { return }
             if self.number == 4 {
                 self.isEnabled = change.newValue
             }
         }.store(in: &observers)
         showFiveSchedulesPublisher.sink { [weak self] change in
-            guard let self = self else { return }
+            guard let self else { return }
             if self.number == 5 {
                 self.isEnabled = change.newValue
             }
@@ -445,7 +445,7 @@ class Schedule: NSView {
         let view: NSView?
         view = NSView.loadFromNib(withName: nibName, for: self)
 
-        guard let view = view else { return }
+        guard let view else { return }
 
         addObservers()
 

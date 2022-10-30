@@ -120,14 +120,14 @@ class ScrollableBrightness: NSView {
         display.$minBrightness
             .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] value in
-                guard let self = self, let display = self.display, display.id != GENERIC_DISPLAY_ID else { return }
+                guard let self, let display = self.display, display.id != GENERIC_DISPLAY_ID else { return }
                 self.minValue?.integerValue = value.intValue
                 self.maxValue?.lowerLimit = value.doubleValue + 1
             }.store(in: &displayObservers, for: "minBrightness")
         display.$maxBrightness
             .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] value in
-                guard let self = self, let display = self.display, display.id != GENERIC_DISPLAY_ID else { return }
+                guard let self, let display = self.display, display.id != GENERIC_DISPLAY_ID else { return }
                 self.maxValue?.integerValue = value.intValue
                 self.minValue?.upperLimit = value.doubleValue - 1
             }.store(in: &displayObservers, for: "maxBrightness")
@@ -170,7 +170,7 @@ class ScrollableBrightness: NSView {
     func setup() {
         minValue?.onValueChangedInstant = minValue?.onValueChangedInstant ?? onMinValueChanged
         minValue?.onValueChanged = minValue?.onValueChanged ?? { [weak self] (value: Int) in
-            guard let self = self else { return }
+            guard let self else { return }
 
             self.maxValue?.lowerLimit = (value + 1).d
             self.currentValue?.lowerLimit = value.d
@@ -181,7 +181,7 @@ class ScrollableBrightness: NSView {
         }
         maxValue?.onValueChangedInstant = maxValue?.onValueChangedInstant ?? onMaxValueChanged
         maxValue?.onValueChanged = maxValue?.onValueChanged ?? { [weak self] (value: Int) in
-            guard let self = self else { return }
+            guard let self else { return }
 
             self.minValue?.upperLimit = (value - 1).d
             self.currentValue?.upperLimit = value.d

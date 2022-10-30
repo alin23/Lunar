@@ -25,7 +25,7 @@ class DDCPopoverController: NSViewController {
 
     @objc dynamic weak var display: Display? {
         didSet {
-            guard let display = display else {
+            guard let display else {
                 return
             }
 
@@ -35,14 +35,14 @@ class DDCPopoverController: NSViewController {
     }
 
     @IBAction func readColors(_ sender: ResetButton) {
-        guard let display = display, display.hasI2C, let control = display.control, !control.isSoftware else {
+        guard let display, display.hasI2C, let control = display.control, !control.isSoftware else {
             sender.attributedTitle = "DDC support needed".withAttribute(.textColor(sender.labelColor))
             return
         }
 
         display.refreshColors { success in
             mainAsyncAfter(ms: 1000) { [weak sender] in
-                guard let sender = sender else { return }
+                guard let sender else { return }
                 let text = success ? "Values refreshed successfully" : "Monitor not responding"
                 sender.attributedTitle = text.withAttribute(.textColor(sender.labelColor))
             }
@@ -53,25 +53,25 @@ class DDCPopoverController: NSViewController {
         guard let display = display ?? self.display else { return }
 
         volumeOSDToggle.callback = { [weak self] isOn in
-            guard let self = self, let display = self.display else { return }
+            guard let self, let display = self.display else { return }
             display.showVolumeOSD = isOn
         }
         display.$showVolumeOSD.sink { [weak self] value in
-            guard let self = self else { return }
+            guard let self else { return }
             self.volumeOSDToggle.toggleWithoutCallback(value: value)
         }.store(in: &displayObservers, for: "showVolumeOSD")
 
         volumeSliderToggle.callback = { [weak self] isOn in
-            guard let self = self, let display = self.display else { return }
+            guard let self, let display = self.display else { return }
             display.canChangeVolume = isOn
         }
         display.$canChangeVolume.sink { [weak self] value in
-            guard let self = self else { return }
+            guard let self else { return }
             self.volumeSliderToggle.toggleWithoutCallback(value: value)
         }.store(in: &displayObservers, for: "canChangeVolume")
 
         mainAsync { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.minDDCBrightnessField.integerValue = display.minDDCBrightness.intValue
             self.minDDCContrastField.integerValue = display.minDDCContrast.intValue
             self.minDDCVolumeField.integerValue = display.minDDCVolume.intValue
@@ -136,46 +136,46 @@ class DDCPopoverController: NSViewController {
         }
 
         display.$minDDCBrightness.sink { [weak self] value in
-            guard let self = self else { return }
+            guard let self else { return }
             self.minDDCBrightnessField.integerValue = value.intValue
             self.maxDDCBrightnessField.lowerLimit = value.doubleValue
         }.store(in: &displayObservers, for: "minDDCBrightness")
         display.$minDDCContrast.sink { [weak self] value in
-            guard let self = self else { return }
+            guard let self else { return }
             self.minDDCContrastField.integerValue = value.intValue
             self.maxDDCContrastField.lowerLimit = value.doubleValue
         }.store(in: &displayObservers, for: "minDDCContrast")
         display.$minDDCVolume.sink { [weak self] value in
-            guard let self = self else { return }
+            guard let self else { return }
             self.minDDCVolumeField.integerValue = value.intValue
             self.maxDDCVolumeField.lowerLimit = value.doubleValue
         }.store(in: &displayObservers, for: "minDDCVolume")
         display.$maxDDCBrightness.sink { [weak self] value in
-            guard let self = self else { return }
+            guard let self else { return }
             self.maxDDCBrightnessField.integerValue = value.intValue
             self.minDDCBrightnessField.upperLimit = value.doubleValue
         }.store(in: &displayObservers, for: "maxDDCBrightness")
         display.$maxDDCContrast.sink { [weak self] value in
-            guard let self = self else { return }
+            guard let self else { return }
             self.maxDDCContrastField.integerValue = value.intValue
             self.minDDCContrastField.upperLimit = value.doubleValue
         }.store(in: &displayObservers, for: "maxDDCContrast")
         display.$maxDDCVolume.sink { [weak self] value in
-            guard let self = self else { return }
+            guard let self else { return }
             self.maxDDCVolumeField.integerValue = value.intValue
             self.minDDCVolumeField.upperLimit = value.doubleValue
         }.store(in: &displayObservers, for: "maxDDCVolume")
 
         display.$muteByteValueOn.sink { [weak self] value in
-            guard let self = self else { return }
+            guard let self else { return }
             self.muteByteValueOnField.integerValue = value.i
         }.store(in: &displayObservers, for: "muteByteValueOn")
         display.$muteByteValueOff.sink { [weak self] value in
-            guard let self = self else { return }
+            guard let self else { return }
             self.muteByteValueOffField.integerValue = value.i
         }.store(in: &displayObservers, for: "muteByteValueOff")
         display.$volumeValueOnMute.sink { [weak self] value in
-            guard let self = self else { return }
+            guard let self else { return }
             self.volumeValueOnMuteField.integerValue = value.i
         }.store(in: &displayObservers, for: "volumeValueOnMute")
     }

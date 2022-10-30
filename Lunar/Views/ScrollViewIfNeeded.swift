@@ -270,9 +270,9 @@ extension View {
                     s.identifier = pauseScrolling ? SCROLL_VIEW_SWIZZLED_TAG : nil
 
                     swizzleScrollWheel(scrollView: s)
-                    guard let scrollWheelOriginal = scrollWheelOriginal,
-                          let scrollWheelSwizIMP = scrollWheelSwizIMP,
-                          let scrollWheelOriginalIMP = scrollWheelOriginalIMP
+                    guard let scrollWheelOriginal,
+                          let scrollWheelSwizIMP,
+                          let scrollWheelOriginalIMP
                     else {
                         return
                     }

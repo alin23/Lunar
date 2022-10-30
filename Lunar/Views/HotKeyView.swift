@@ -91,8 +91,8 @@ class HotkeyView: RecordView, RecordViewDelegate {
     func recordView(_: RecordView, didChangeKeyCombo keyCombo: KeyCombo?) {
         log.debug("Changed hotkey for \(hotkey?.identifier ?? "")")
 
-        guard let hotkey = hotkey else { return }
-        guard let keyCombo = keyCombo else {
+        guard let hotkey else { return }
+        guard let keyCombo else {
             hotkey.isEnabled = false
             for altHotkey in hotkey.alternates() {
                 altHotkey.isEnabled = false

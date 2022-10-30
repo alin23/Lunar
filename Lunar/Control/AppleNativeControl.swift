@@ -67,7 +67,7 @@ class AppleNativeControl: Control {
     }
 
     func testReadAndWrite(method: AppleNativeMethod) -> Bool {
-        guard let display = display else { return false }
+        guard let display else { return false }
 
         switch method {
         case .coreDisplay:
@@ -118,7 +118,7 @@ class AppleNativeControl: Control {
     }
 
     func isAvailable() -> Bool {
-        guard let display = display else { return false }
+        guard let display else { return false }
         return Self.isAvailable(for: display)
     }
 
@@ -137,7 +137,7 @@ class AppleNativeControl: Control {
     }
 
     func writeBrightness(_ brightness: Brightness, preciseBrightness: PreciseBrightness? = nil) -> Bool {
-        guard let display = display else { return false }
+        guard let display else { return false }
         let br = preciseBrightness ?? (brightness.d / 100.0)
         var success = true
 
@@ -153,49 +153,49 @@ class AppleNativeControl: Control {
     }
 
     func setPower(_ power: PowerState) -> Bool {
-        guard let display = display else { return false }
+        guard let display else { return false }
         guard let control = display.alternativeControlForAppleNative else { return false }
         return control.setPower(power)
     }
 
     func setRedGain(_ gain: UInt16) -> Bool {
-        guard let display = display else { return false }
+        guard let display else { return false }
         guard let control = display.alternativeControlForAppleNative else { return false }
         return control.setRedGain(gain)
     }
 
     func setGreenGain(_ gain: UInt16) -> Bool {
-        guard let display = display else { return false }
+        guard let display else { return false }
         guard let control = display.alternativeControlForAppleNative else { return false }
         return control.setGreenGain(gain)
     }
 
     func setBlueGain(_ gain: UInt16) -> Bool {
-        guard let display = display else { return false }
+        guard let display else { return false }
         guard let control = display.alternativeControlForAppleNative else { return false }
         return control.setBlueGain(gain)
     }
 
     func getRedGain() -> UInt16? {
-        guard let display = display else { return nil }
+        guard let display else { return nil }
         guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getRedGain()
     }
 
     func getGreenGain() -> UInt16? {
-        guard let display = display else { return nil }
+        guard let display else { return nil }
         guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getGreenGain()
     }
 
     func getBlueGain() -> UInt16? {
-        guard let display = display else { return nil }
+        guard let display else { return nil }
         guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getBlueGain()
     }
 
     func resetColors() -> Bool {
-        guard let display = display else { return false }
+        guard let display else { return false }
         guard let control = display.alternativeControlForAppleNative else { return false }
         return control.resetColors()
     }
@@ -206,10 +206,10 @@ class AppleNativeControl: Control {
         force: Bool = false,
         onChange: ((Brightness) -> Void)? = nil
     ) -> Bool {
-        guard let display = display else { return false }
+        guard let display else { return false }
         guard !display.isForTesting else { return false }
 
-        if brightnessTransition != .instant, !Self.sliderTracking, supportsSmoothTransition(for: .BRIGHTNESS), var oldValue = oldValue,
+        if brightnessTransition != .instant, !Self.sliderTracking, supportsSmoothTransition(for: .BRIGHTNESS), var oldValue,
            oldValue != brightness
         {
             if display.inSmoothTransition {
@@ -222,7 +222,7 @@ class AppleNativeControl: Control {
 
             smoothTransitionTask?.cancel()
             smoothTransitionTask = DispatchWorkItem(name: "smoothTransitionDisplayServices: \(display)", flags: .barrier) { [weak self] in
-                guard let self = self, let display = self.display else {
+                guard let self, let display = self.display else {
                     return
                 }
 
@@ -301,31 +301,31 @@ class AppleNativeControl: Control {
     }
 
     func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil, onChange: ((Contrast) -> Void)? = nil) -> Bool {
-        guard let display = display else { return false }
+        guard let display else { return false }
         guard let control = display.alternativeControlForAppleNative else { return false }
         return control.setContrast(contrast, oldValue: oldValue, onChange: onChange)
     }
 
     func setVolume(_ volume: UInt16) -> Bool {
-        guard let display = display else { return false }
+        guard let display else { return false }
         guard let control = display.alternativeControlForAppleNative else { return false }
         return control.setVolume(volume)
     }
 
     func setMute(_ muted: Bool) -> Bool {
-        guard let display = display else { return false }
+        guard let display else { return false }
         guard let control = display.alternativeControlForAppleNative else { return false }
         return control.setMute(muted)
     }
 
     func setInput(_ input: InputSource) -> Bool {
-        guard let display = display else { return false }
+        guard let display else { return false }
         guard let control = display.alternativeControlForAppleNative else { return false }
         return control.setInput(input)
     }
 
     func getBrightness() -> Brightness? {
-        guard let display = display else { return nil }
+        guard let display else { return nil }
         switch method {
         case .coreDisplay:
             return (CoreDisplay_Display_GetUserBrightness(display.id) * 100.0).u16
@@ -337,49 +337,49 @@ class AppleNativeControl: Control {
     }
 
     func getContrast() -> Contrast? {
-        guard let display = display else { return nil }
+        guard let display else { return nil }
         guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getContrast()
     }
 
     func getMaxBrightness() -> Brightness? {
-        guard let display = display else { return nil }
+        guard let display else { return nil }
         guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getMaxBrightness()
     }
 
     func getMaxContrast() -> Contrast? {
-        guard let display = display else { return nil }
+        guard let display else { return nil }
         guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getMaxContrast()
     }
 
     func getMaxVolume() -> UInt16? {
-        guard let display = display else { return nil }
+        guard let display else { return nil }
         guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getMaxVolume()
     }
 
     func getVolume() -> UInt16? {
-        guard let display = display else { return nil }
+        guard let display else { return nil }
         guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getVolume()
     }
 
     func getMute() -> Bool? {
-        guard let display = display else { return nil }
+        guard let display else { return nil }
         guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getMute()
     }
 
     func getInput() -> InputSource? {
-        guard let display = display else { return nil }
+        guard let display else { return nil }
         guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getInput()
     }
 
     func reset() -> Bool {
-        guard let display = display else { return false }
+        guard let display else { return false }
         guard let control = display.alternativeControlForAppleNative else { return false }
         return control.reset()
     }
@@ -389,7 +389,7 @@ class AppleNativeControl: Control {
         case .BRIGHTNESS:
             return true
         default:
-            guard let display = display else { return false }
+            guard let display else { return false }
             guard let control = display.alternativeControlForAppleNative else { return false }
             return control.supportsSmoothTransition(for: controlID)
         }

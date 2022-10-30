@@ -167,14 +167,14 @@ class Button: NSButton {
 
     func highlight() {
         mainAsync { [weak self] in
-            guard let self = self, !self.isHidden, self.window?.isVisible ?? false, self.highligherTask == nil
+            guard let self, !self.isHidden, self.window?.isVisible ?? false, self.highligherTask == nil
             else { return }
 
             self.highligherTask = Repeater(
                 every: 5,
                 name: self.highlighterKey
             ) { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
 
                 guard self.window?.isVisible ?? false, let notice = self.notice
                 else {
@@ -203,7 +203,7 @@ class Button: NSButton {
 
     func stopHighlighting() {
         mainAsync { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.highligherTask = nil
 
             if let notice = self.notice {

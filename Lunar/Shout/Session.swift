@@ -85,7 +85,7 @@ public class Session {
     }
 
     func openAgent() throws -> Agent {
-        if let agent = agent {
+        if let agent {
             return agent
         }
         let newAgent = try Agent(cSession: cSession)

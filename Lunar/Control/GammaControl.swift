@@ -222,10 +222,10 @@ enum NightShift {
     static func enable(mode: Int32? = nil, strength: Float? = nil) {
         isEnabled = true
 
-        if let mode = mode {
+        if let mode {
             self.mode = mode
         }
-        if let strength = strength {
+        if let strength {
             self.strength = strength
         }
 
@@ -268,7 +268,7 @@ class GammaControl: Control {
     var isSoftware: Bool { true }
 
     func fluxChecker(flux: NSRunningApplication) {
-        guard let display = display, display.supportsGamma else { return }
+        guard let display, display.supportsGamma else { return }
         guard !CachedDefaults[.neverAskAboutFlux], !displayController.screensSleeping,
               fluxPromptTime == nil || timeSince(fluxPromptTime!) > 10.minutes.timeInterval
         else { return }
@@ -339,7 +339,7 @@ class GammaControl: Control {
     }
 
     func isAvailable() -> Bool {
-        guard let display = display else { return false }
+        guard let display else { return false }
         guard display.active else { return false }
         guard let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else {
             return display.enabledControls.values.allSatisfy { enabled in !enabled }
@@ -367,7 +367,7 @@ class GammaControl: Control {
         force: Bool = false,
         onChange: ((Brightness) -> Void)? = nil
     ) -> Bool {
-        guard let display = display else { return false }
+        guard let display else { return false }
 
         guard force || display.active, let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else {
             return true
@@ -438,7 +438,7 @@ class GammaControl: Control {
     }
 
     func reset() -> Bool {
-        guard let display = display else { return false }
+        guard let display else { return false }
 
         display.resetSoftwareControl()
         return true

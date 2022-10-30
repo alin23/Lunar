@@ -98,7 +98,7 @@ class SliderCell: NSSliderCell {
                 .draw(in: textRect)
         }
 
-        guard let knobImage = knobImage else {
+        guard let knobImage else {
             return
         }
 

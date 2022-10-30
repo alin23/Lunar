@@ -26,7 +26,7 @@ class HotkeyButton: PopoverButton<HotkeyPopoverController> {
     weak var display: Display?
 
     override var popoverController: HotkeyPopoverController? {
-        guard let display = display else {
+        guard let display else {
             return nil
         }
         return display.hotkeyPopoverController
@@ -53,7 +53,7 @@ class HotkeyButton: PopoverButton<HotkeyPopoverController> {
         }
 
         for dropdown in [controller.dropdown1, controller.dropdown2, controller.dropdown3] {
-            guard let dropdown = dropdown else { continue }
+            guard let dropdown else { continue }
             dropdown.removeAllItems()
             dropdown.addItems(
                 withTitles: InputSource.mostUsed
@@ -114,7 +114,7 @@ class HotkeyButton: PopoverButton<HotkeyPopoverController> {
     override func mouseDown(with event: NSEvent) {
         onClick?()
 
-        guard let display = display, let popover = display._hotkeyPopover, isEnabled else { return }
+        guard let display, let popover = display._hotkeyPopover, isEnabled else { return }
         if popover.contentViewController == nil {
             setup(from: display)
         }

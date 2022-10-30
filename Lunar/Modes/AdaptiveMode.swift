@@ -459,7 +459,7 @@ extension AdaptiveMode {
     }
 }
 
-extension Array where Element == Float {
+extension [Float] {
     @inline(__always) var d: [Double] {
         vDSP.floatToDouble(self)
     }

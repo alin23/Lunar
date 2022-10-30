@@ -103,7 +103,7 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
         tableView.headerView = nil
         initAddAppButton()
         observer = appExceptionsPublisher.sink { [weak self] change in
-            guard let self = self, let newVal = change.newValue, newVal.count != self.appExceptions.count else {
+            guard let self, let newVal = change.newValue, newVal.count != self.appExceptions.count else {
                 return
             }
             mainAsync { [weak self] in
@@ -121,7 +121,7 @@ class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableVi
             NSWorkspace.shared.open("https://lunar.fyi/#pro".asURL()!)
             // } else if lunarProBadSignature {
             //     NSWorkspace.shared.open("https://lunar.fyi/download/latest".asURL()!)
-        } else if let paddle = paddle, let lunarProProduct = lunarProProduct {
+        } else if let paddle, let lunarProProduct {
             if lunarProProduct.licenseCode != nil {
                 deactivateLicense {
                     paddle.showProductAccessDialog(with: lunarProProduct)

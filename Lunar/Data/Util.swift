@@ -172,7 +172,7 @@ func shell(
         )
     }
 
-    guard let timeout = timeout else {
+    guard let timeout else {
         task.waitUntilExit()
         return ProcessStatus(
             output: stdout(of: task),
@@ -216,7 +216,7 @@ class DispatchWorkItem {
 
     @discardableResult
     @inline(__always) func wait(for timeout: DateComponents?) -> DispatchTimeoutResult {
-        guard let timeout = timeout else {
+        guard let timeout else {
             return wait(for: 0)
         }
         return wait(for: timeout.timeInterval)
@@ -274,7 +274,7 @@ class DispatchSemaphore: CustomStringConvertible {
 
     @discardableResult
     @inline(__always) func wait(for timeout: DateComponents?, context: Any? = nil) -> DispatchTimeoutResult {
-        guard let timeout = timeout else {
+        guard let timeout else {
             return wait(for: 0, context: context)
         }
         return wait(for: timeout.timeInterval, context: context)
@@ -546,10 +546,10 @@ func createAndShowWindow(
         }
 
         if show, let wc = controller {
-            if let screen = screen, let w = wc.window, w.screen != screen {
+            if let screen, let w = wc.window, w.screen != screen {
                 let size = w.frame.size
                 w.setFrameOrigin(CGPoint(x: screen.visibleFrame.midX - size.width / 2, y: screen.visibleFrame.midY - size.height / 2))
-            } else if let position = position, let w = wc.window {
+            } else if let position, let w = wc.window {
                 w.setFrameOrigin(position)
             }
 
@@ -823,7 +823,7 @@ func asyncEvery(
                 (taskManager(key) as? DispatchSourceTimer)?.cancel()
                 taskManager(key, timer)
 
-                if let runs = runs {
+                if let runs {
                     taskManager("\(key)-maxRuns", runs)
                     taskManager("\(key)-runs", 0)
                 }
@@ -875,7 +875,7 @@ func asyncEvery(
             (taskManager(key) as? Timer)?.invalidate()
             taskManager(key, timer)
 
-            if let runs = runs {
+            if let runs {
                 taskManager("\(key)-maxRuns", runs)
                 taskManager("\(key)-runs", 0)
             }
@@ -914,7 +914,7 @@ func cancelTask(_ key: String, subscriberKey: String? = nil) {
     _ action: @escaping () -> Void
 ) -> DispatchTimeoutResult {
     if threaded {
-        guard let timeout = timeout else {
+        guard let timeout else {
             let thread = Thread { action() }
             thread.start()
             return .success
@@ -937,7 +937,7 @@ func cancelTask(_ key: String, subscriberKey: String? = nil) {
     }
 
     if let queue = runLoopQueue {
-        guard let timeout = timeout else {
+        guard let timeout else {
             queue.async { action() }
             return .success
         }
@@ -955,7 +955,7 @@ func cancelTask(_ key: String, subscriberKey: String? = nil) {
     }
 
     let queue = queue ?? concurrentQueue
-    guard let timeout = timeout else {
+    guard let timeout else {
         if barrier {
             queue.asyncAfter(deadline: DispatchTime.now(), flags: .barrier) { action() }
         } else {
@@ -992,7 +992,7 @@ func asyncEvery(_ interval: DateComponents, qos: QualityOfService? = nil, _ acti
         }
     }
 
-    if let qos = qos {
+    if let qos {
         thread.qualityOfService = qos
     }
 
@@ -1150,9 +1150,7 @@ func ramp(targetValue: Float, lastTargetValue: inout Float, samples: Int, step _
 struct Zip3Sequence<E1, E2, E3>: Sequence, IteratorProtocol {
     // MARK: Lifecycle
 
-    init<S1: Sequence, S2: Sequence, S3: Sequence>(_ s1: S1, _ s2: S2, _ s3: S3) where S1.Element == E1, S2.Element == E2,
-        S3.Element == E3
-    {
+    init(_ s1: some Sequence<E1>, _ s2: some Sequence<E2>, _ s3: some Sequence<E3>) {
         var it1 = s1.makeIterator()
         var it2 = s2.makeIterator()
         var it3 = s3.makeIterator()
@@ -1182,9 +1180,7 @@ func zip3<S1: Sequence, S2: Sequence, S3: Sequence>(_ s1: S1, _ s2: S2, _ s3: S3
 struct Zip4Sequence<E1, E2, E3, E4>: Sequence, IteratorProtocol {
     // MARK: Lifecycle
 
-    init<S1: Sequence, S2: Sequence, S3: Sequence, S4: Sequence>(_ s1: S1, _ s2: S2, _ s3: S3, _ s4: S4) where S1.Element == E1,
-        S2.Element == E2, S3.Element == E3, S4.Element == E4
-    {
+    init(_ s1: some Sequence<E1>, _ s2: some Sequence<E2>, _ s3: some Sequence<E3>, _ s4: some Sequence<E4>) {
         var it1 = s1.makeIterator()
         var it2 = s2.makeIterator()
         var it3 = s3.makeIterator()
@@ -1245,7 +1241,7 @@ func createWindow(
         }
 
         if let wc = controller {
-            if let screen = screen, let w = wc.window {
+            if let screen, let w = wc.window {
                 if let size {
                     w.contentMaxSize = size
                     w.contentMinSize = size
@@ -1337,22 +1333,22 @@ func dialog(
             alert.accessoryView = NSView(frame: NSRect(origin: .zero, size: NSSize(width: 500, height: 0)))
         }
 
-        if let okButton = okButton {
+        if let okButton {
             alert.addButton(withTitle: okButton)
         }
-        if let cancelButton = cancelButton {
+        if let cancelButton {
             alert.addButton(withTitle: cancelButton)
         }
-        if let thirdButton = thirdButton {
+        if let thirdButton {
             alert.addButton(withTitle: thirdButton)
         }
 
-        if let suppressionText = suppressionText {
+        if let suppressionText {
             alert.showsSuppressionButton = true
             alert.suppressionButton?.title = suppressionText
         }
 
-        if let screen = screen, !screen.isVirtual {
+        if let screen, !screen.isVirtual {
             let w = window ?? alert.window
 
             let alertSize = w.frame.size
@@ -1550,7 +1546,7 @@ func ask(
             markdown: markdown
         )
 
-        if let window = window {
+        if let window {
             if let wc = window.windowController {
                 log.debug("Showing window '\(window.title)'")
                 wc.showWindow(nil)
@@ -1576,7 +1572,7 @@ func ask(
 
         let resp = alert.runModal()
 
-        if let onSuppression = onSuppression {
+        if let onSuppression {
             onSuppression((alert.suppressionButton?.state ?? .off) == .on)
         }
 
@@ -2096,9 +2092,9 @@ func windowList(
 
     let windows = cgWindowListInfo.filter { windowDict in
         guard let ownerProcessID = windowDict[kCGWindowOwnerPID as String] as? Int else { return false }
-        if let opaque = opaque, (((windowDict[kCGWindowAlpha as String] as? Float) ?? 0) > 0) != opaque { return false }
-        if let withTitle = withTitle, ((windowDict[kCGWindowName as String] as? String) ?? "").isEmpty != withTitle { return false }
-        if let levels = levels, !levels.contains(
+        if let opaque, (((windowDict[kCGWindowAlpha as String] as? Float) ?? 0) > 0) != opaque { return false }
+        if let withTitle, ((windowDict[kCGWindowName as String] as? String) ?? "").isEmpty != withTitle { return false }
+        if let levels, !levels.contains(
             NSWindow.Level(rawValue: (windowDict[kCGWindowLayer as String] as? Int) ?? NSWindow.Level.normal.rawValue)
         ) {
             return false
@@ -2154,7 +2150,7 @@ class LineReader {
         var line: UnsafeMutablePointer<CChar>?
         var linecap = 0
         defer {
-            if let line = line {
+            if let line {
                 free(line)
             }
         }
@@ -2181,7 +2177,7 @@ extension LineReader: Sequence {
 }
 
 func getModeDetails(_ mode: MPDisplayMode?, prefix: String = "\t") -> String {
-    guard let mode = mode else { return "nil" }
+    guard let mode else { return "nil" }
     return """
         \(prefix)refreshString: \(mode.refreshStringSafe)
         \(prefix)resolutionString: \(mode.resolutionStringSafe)
@@ -2217,7 +2213,7 @@ func getModeDetails(_ mode: MPDisplayMode?, prefix: String = "\t") -> String {
 import AnyCodable
 
 func getModeDetailsJSON(_ mode: MPDisplayMode?) -> [String: Any]? {
-    guard let mode = mode else { return nil }
+    guard let mode else { return nil }
     return [
         "refreshString": mode.refreshStringSafe,
         "resolutionString": mode.resolutionStringSafe,
@@ -2301,40 +2297,42 @@ func getMonitorPanelDataJSON(
 
 func getMonitorPanelData(_ display: MPDisplay) -> String {
     """
-        ID: \(display.displayID)
-        Alias ID: \(display.aliasID)
-        canChangeOrientation: \(display.canChangeOrientation())
-        hasRotationSensor: \(display.hasRotationSensor)
-        hasZeroRate: \(display.hasZeroRate)
-        hasMultipleRates: \(display.hasMultipleRates)
-        isSidecarDisplay: \(display.isSidecarDisplay)
-        isAirPlayDisplay: \(display.isAirPlayDisplay)
-        isProjector: \(display.isProjector)
-        is4K: \(display.is4K)
-        isTV: \(display.isTV)
-        isMirrorMaster: \(display.isMirrorMaster)
-        isMirrored: \(display.isMirrored)
-        isBuiltIn: \(display.isBuiltIn)
-        isHiDPI: \(display.isHiDPI)
-        hasTVModes: \(display.hasTVModes)
-        hasSimulscan: \(display.hasSimulscan)
-        hasSafeMode: \(display.hasSafeMode)
-        isSmartDisplay: \(display.isSmartDisplay)
-        orientation: \(display.orientation)
+    ID: \(display.displayID)
+    Alias ID: \(display.aliasID)
+    canChangeOrientation: \(display.canChangeOrientation())
+    hasRotationSensor: \(display.hasRotationSensor)
+    hasZeroRate: \(display.hasZeroRate)
+    hasMultipleRates: \(display.hasMultipleRates)
+    isSidecarDisplay: \(display.isSidecarDisplay)
+    isAirPlayDisplay: \(display.isAirPlayDisplay)
+    isProjector: \(display.isProjector)
+    is4K: \(display.is4K)
+    isTV: \(display.isTV)
+    isMirrorMaster: \(display.isMirrorMaster)
+    isMirrored: \(display.isMirrored)
+    isBuiltIn: \(display.isBuiltIn)
+    isHiDPI: \(display.isHiDPI)
+    hasTVModes: \(display.hasTVModes)
+    hasSimulscan: \(display.hasSimulscan)
+    hasSafeMode: \(display.hasSafeMode)
+    isSmartDisplay: \(display.isSmartDisplay)
+    orientation: \(display.orientation)
 
-        Default mode:
-        \(getModeDetails(display.defaultMode, prefix: "\t"))
+    Default mode:
+    \(getModeDetails(display.defaultMode, prefix: "\t"))
 
-        Native mode:
-        \(getModeDetails(display.nativeMode, prefix: "\t"))
+    Native mode:
+    \(getModeDetails(display.nativeMode, prefix: "\t"))
 
-        Current mode:
-        \(getModeDetails(display.currentMode, prefix: "\t"))
+    Current mode:
+    \(getModeDetails(display.currentMode, prefix: "\t"))
 
-        All modes:
-        \((display.allModes() as? [MPDisplayMode])?
-        .map { "\t\($0.description.replacingOccurrences(of: "\n", with: ", ")):\n\(getModeDetails($0, prefix: "\t\t"))" }
-        .joined(separator: "\n\n") ?? "nil")
+    All modes:
+    \(
+        (display.allModes() as? [MPDisplayMode])?
+            .map { "\t\($0.description.replacingOccurrences(of: "\n", with: ", ")):\n\(getModeDetails($0, prefix: "\t\t"))" }
+            .joined(separator: "\n\n") ?? "nil"
+    )
     """
 }
 

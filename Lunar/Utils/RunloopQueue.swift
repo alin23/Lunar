@@ -155,7 +155,7 @@ public class RunloopQueue: NSObject {
             conditionLock.lock()
             defer { conditionLock.unlock(withCondition: 1) }
 
-            guard let self = self else { return }
+            guard let self else { return }
             self.runloop = runloop
         }
 

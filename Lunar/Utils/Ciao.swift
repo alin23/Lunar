@@ -103,7 +103,7 @@ public class CiaoBrowser {
         serviceFoundHandler?(service)
 
         // resolve services if handler is registered
-        guard let serviceResolvedHandler = serviceResolvedHandler else { return }
+        guard let serviceResolvedHandler else { return }
         var resolver: CiaoResolver? = CiaoResolver(service: service)
         resolver?.resolve(withTimeout: 0) { result in
             serviceResolvedHandler(result)
@@ -209,6 +209,8 @@ public typealias ErrorDictionary = [String: Int]
 // MARK: Error
 
 extension ErrorDictionary: Error {}
+
+// MARK: - CiaoResolver.CiaoResolverDelegate
 
 extension CiaoResolver {
     class CiaoResolverDelegate: NSObject, NetServiceDelegate {
@@ -380,7 +382,7 @@ public extension NetService {
     }
 
     func setTXTRecord(dictionary: [String: String]?) {
-        guard let dictionary = dictionary else {
+        guard let dictionary else {
             setTXTRecord(nil)
             return
         }

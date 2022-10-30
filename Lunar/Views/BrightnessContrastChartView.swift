@@ -67,7 +67,7 @@ class BrightnessContrastChartView: LineChartView {
         now: Date? = nil
     ) {
         mainAsync { [self] in
-            guard let data = data, data.dataSetCount >= 2 else { return }
+            guard let data, data.dataSetCount >= 2 else { return }
 
             guard CachedDefaults[.moreGraphData] else {
                 highlightValues(nil)
@@ -125,7 +125,7 @@ class BrightnessContrastChartView: LineChartView {
                     Highlight(x: x, dataSetIndex: 1, stackIndex: 1),
                 ])
             case is ManualMode:
-                guard let display = display else { return }
+                guard let display else { return }
                 highlightValues([
                     Highlight(x: brightness ?? display.brightness.doubleValue, dataSetIndex: 0, stackIndex: 0),
                     Highlight(x: contrast ?? display.contrast.doubleValue, dataSetIndex: 1, stackIndex: 1),
@@ -159,7 +159,7 @@ class BrightnessContrastChartView: LineChartView {
                     .map { x in ChartDataEntry(x: x.d, y: 0.0) }
                 contrastChartEntry = stride(from: 0, to: adaptiveMode.maxChartDataPoints, by: 1).map { x in ChartDataEntry(x: x.d, y: 0.0) }
             }
-        } else if let display = display {
+        } else if let display {
             switch adaptiveMode {
             case let mode as SensorMode:
                 let xs = stride(from: 0.0, to: (mode.maxChartDataPoints - 1).d, by: 30.0)

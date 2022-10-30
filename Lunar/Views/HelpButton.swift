@@ -127,7 +127,7 @@ class HelpButton: PopoverButton<HelpPopoverController> {
            let c = popoverController
         {
             c.helpTextField?.attributedStringValue = parsedHelpText
-            if let link = link {
+            if let link {
                 c.onClick = {
                     if let url = URL(string: link) {
                         NSWorkspace.shared.open(url)

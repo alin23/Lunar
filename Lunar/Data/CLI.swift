@@ -204,7 +204,7 @@ struct ForgivingEncodable: Encodable {
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
-        if let key = key, let displayKey = Display.CodingKeys(stringValue: key), Display.CodingKeys.bool.contains(displayKey),
+        if let key, let displayKey = Display.CodingKeys(stringValue: key), Display.CodingKeys.bool.contains(displayKey),
            let b = value as? Bool
         {
             try container.encode(b)
@@ -1694,7 +1694,7 @@ private func handleDisplays(
 
     for (i, display) in displays.enumerated() {
         do {
-            guard let property = property else {
+            guard let property else {
                 if json {
                     try printDisplay(
                         display,
@@ -1740,7 +1740,7 @@ private func handleDisplays(
                 throw LunarCommandError.propertyNotValid(property.rawValue)
             }
 
-            guard var value = value else {
+            guard var value else {
                 // MARK: - Get display property
 
                 if !read {
@@ -1937,7 +1937,7 @@ class LunarServer {
 
     func run(host: String = "127.0.0.1") {
         Self.queue.async {
-            if let cliServerTask = cliServerTask, !cliServerTask.isCancelled {
+            if let cliServerTask, !cliServerTask.isCancelled {
                 Self.queue.async {
                     cliServerTask.wait(for: 60.seconds)
                 }
@@ -1971,7 +1971,7 @@ class LunarServer {
                         return
                     }
 
-                    if let self = self, self.continueRunning {
+                    if let self, self.continueRunning {
                         log.error("Error reported:\n \(socketError.description)")
                     }
                 }
@@ -2181,7 +2181,7 @@ let LUNAR_CLI_PORT: Int32 = 23803
 
 func serve(host: String) {
     isServer = true
-    guard let appDelegate = appDelegate else { return }
+    guard let appDelegate else { return }
     appDelegate.server = LunarServer()
     appDelegate.server.run(host: host)
 }

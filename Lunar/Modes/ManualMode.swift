@@ -68,7 +68,7 @@ class ManualMode: AdaptiveMode {
             if display.ambientLightAdaptiveBrightnessEnabled {
                 display.ambientLightAdaptiveBrightnessEnabled = false
             }
-        } else if let lastAppPreset = lastAppPreset {
+        } else if let lastAppPreset {
             if display.hasAmbientLightAdaptiveBrightness, !display.ambientLightAdaptiveBrightnessEnabled {
                 display.ambientLightAdaptiveBrightnessEnabled = true
             }

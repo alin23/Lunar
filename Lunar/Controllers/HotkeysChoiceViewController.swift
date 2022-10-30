@@ -28,7 +28,7 @@ class OnboardingDisplayCellView: NSTableCellView {
 
     func setup() {
         mainThread {
-            guard let display = display, let button = controlButton, let syncButton = syncButton else { return }
+            guard let display, let button = controlButton, let syncButton else { return }
 
             syncButton.isHidden = CachedDefaults[.adaptiveBrightnessMode] != .sync
 

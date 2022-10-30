@@ -141,7 +141,7 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
         }
         let keyCombo = KeyCombo(QWERTYKeyCode: keyCode, carbonModifiers: modifiers)!
 
-        if let handler = handler {
+        if let handler {
             hotkey = Magnet.HotKey(
                 identifier: identifier,
                 keyCombo: keyCombo,
@@ -732,7 +732,7 @@ enum Hotkey {
     ]
 
     static func allowHold(for identifier: HotkeyIdentifier?) -> Bool {
-        guard let identifier = identifier else {
+        guard let identifier else {
             return false
         }
 
@@ -834,7 +834,7 @@ enum Hotkey {
     }
 
     static func setKeyEquivalent(_ identifier: String, menuItem: NSMenuItem?, hotkeys: Set<PersistentHotkey>) {
-        guard let menuItem = menuItem, let hotkey = hotkeys.first(where: { $0.identifier == identifier }) else { return }
+        guard let menuItem, let hotkey = hotkeys.first(where: { $0.identifier == identifier }) else { return }
         if hotkey.isEnabled {
             if menuItem.isAlternate {
                 menuItem.isHidden = false
