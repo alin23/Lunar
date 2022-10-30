@@ -375,7 +375,7 @@ class ConfigurationViewController: NSViewController {
     }
 
     func resetScrollableTextField(_ field: ScrollableTextField?) {
-        if let field = field {
+        if let field {
             field.onValueChanged = nil
             field.onValueChangedDouble = nil
             field.onMouseEnter = nil
@@ -414,7 +414,7 @@ class ConfigurationViewController: NSViewController {
         field.upperLimit = upperLimit
         if let handler = onValueChanged {
             field.onValueChanged = { [weak self] value in
-                guard let self = self else { return }
+                guard let self else { return }
                 if let key = settingKeyInt {
                     CachedDefaults[key] = value
                 }
@@ -423,7 +423,7 @@ class ConfigurationViewController: NSViewController {
         }
         if let handler = onValueChangedDouble {
             field.onValueChangedDouble = { [weak self] value in
-                guard let self = self else { return }
+                guard let self else { return }
                 if let key = settingKeyDouble {
                     CachedDefaults[key] = value
                 }
@@ -432,14 +432,14 @@ class ConfigurationViewController: NSViewController {
         }
         if let handler = onMouseExit {
             field.onMouseExit = { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 handler(self.settingsController)
             }
         }
 
         if let handler = onMouseEnter {
             field.onMouseEnter = { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 handler(self.settingsController)
             }
         }

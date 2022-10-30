@@ -24,7 +24,7 @@ struct SettingsToggle: View {
             Toggle(text, isOn: $setting)
                 .toggleStyle(CheckboxToggleStyle(style: .circle))
                 .foregroundColor(Colors.blackMauve)
-            if let help = help {
+            if let help {
                 SwiftUI.Button(action: { helpShown = true }) {
                     Image(systemName: "questionmark.circle.fill")
                         .font(.system(size: 13, weight: .black))
@@ -98,7 +98,7 @@ extension View {
     ///   - condition: The condition to evaluate.
     ///   - transform: The transform to apply to the source `View`.
     /// - Returns: Either the original `View` or the modified `View` if the condition is `true`.
-    @ViewBuilder func `if`<Content: View>(_ condition: @autoclosure () -> Bool, transform: (Self) -> Content) -> some View {
+    @ViewBuilder func `if`(_ condition: @autoclosure () -> Bool, transform: (Self) -> some View) -> some View {
         if condition() {
             transform(self)
         } else {
@@ -347,7 +347,7 @@ class SizedPopUpButton: NSPopUpButton {
     var height: CGFloat?
 
     override var intrinsicContentSize: NSSize {
-        guard let width = width, let height = height else {
+        guard let width, let height else {
             return super.intrinsicContentSize
         }
 
@@ -409,7 +409,7 @@ struct Dropdown<T: Nameable>: NSViewRepresentable {
                 item.tag = tag
             }
 
-            if let validate = validate {
+            if let validate {
                 item.isEnabled = validate(item)
             } else {
                 item.isEnabled = input.enabled
@@ -442,7 +442,7 @@ struct Dropdown<T: Nameable>: NSViewRepresentable {
         button.menu = menu
         button.select(menu.items.first(where: { $0.title == selection.name }) ?? context.coordinator.defaultMenuItem)
         context.coordinator.observer = button.selectedTitlePublisher.sink { inputName in
-            guard let inputName = inputName else { return }
+            guard let inputName else { return }
             selection = content.first(where: { $0.name == inputName }) ?? selection
         }
         setTitleAndImage(button)
@@ -467,7 +467,7 @@ struct Dropdown<T: Nameable>: NSViewRepresentable {
         menu.items = makeMenuItems(context: context)
         button.select(menu.items.first(where: { $0.title == selection.name }) ?? context.coordinator.defaultMenuItem)
         context.coordinator.observer = button.selectedTitlePublisher.sink { inputName in
-            guard let inputName = inputName else { return }
+            guard let inputName else { return }
             selection = content.first(where: { $0.name == inputName }) ?? selection
         }
 

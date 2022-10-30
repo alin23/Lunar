@@ -61,7 +61,7 @@ class LunarTestViewController: NSViewController {
             onFinish: end,
             onCancel: end
         ) { [weak self] in
-            guard let self = self else {
+            guard let self else {
                 end()
                 return
             }
@@ -183,7 +183,7 @@ class ControlChoiceViewController: NSViewController {
             actionLabel.textColor = color
         }
         mainAsyncAfter(ms: 1000) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.actionLabel.transition(1.0, easing: .easeOutCubic)
             self.actionLabel.textColor = self.actionLabelColor
         }
@@ -191,7 +191,7 @@ class ControlChoiceViewController: NSViewController {
 
     func hideAction() {
         mainThread {
-            if let ddcBlockersButton = ddcBlockersButton {
+            if let ddcBlockersButton {
                 ddcBlockersButton.transition(0.8, easing: .easeOutExpo)
                 ddcBlockersButton.alphaValue = 0.0
                 ddcBlockersButton.close()
@@ -211,7 +211,7 @@ class ControlChoiceViewController: NSViewController {
 
     func hideQuestion() {
         mainThread {
-            if let ddcBlockersButton = ddcBlockersButton {
+            if let ddcBlockersButton {
                 ddcBlockersButton.transition(0.8, easing: .easeOutExpo)
                 ddcBlockersButton.alphaValue = 0.0
                 ddcBlockersButton.close()
@@ -236,7 +236,7 @@ class ControlChoiceViewController: NSViewController {
 
     func waitForAction(_ text: String, buttonColor: NSColor, buttonText: NSAttributedString, action: @escaping (() -> Void)) {
         mainAsyncAfter(ms: 1100) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.actionInfo.transition(0.5, easing: .easeInOutExpo)
             self.actionInfo.textColor = self.actionInfoColor
         }
@@ -256,7 +256,7 @@ class ControlChoiceViewController: NSViewController {
         }
         actionButton.onClick = { [weak self] in
             log.info("Clicked '\(buttonText.string)' on '\(text)'")
-            guard let self = self else {
+            guard let self else {
                 self?.semaphore.signal()
                 return
             }
@@ -276,7 +276,7 @@ class ControlChoiceViewController: NSViewController {
         answer: @escaping ((Bool) -> Void)
     ) {
         mainAsyncAfter(ms: 1100) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.actionInfo.transition(0.8, easing: .easeOutCubic)
             self.actionInfo.textColor = self.actionInfoColor
         }
@@ -298,7 +298,7 @@ class ControlChoiceViewController: NSViewController {
             yesButton.isEnabled = true
             yesButton.attributedTitle = yesButtonText.withTextColor(white)
 
-            if let ddcBlockerText = ddcBlockerText, let ddcBlockersButton = ddcBlockersButton {
+            if let ddcBlockerText, let ddcBlockersButton {
                 ddcBlockersButton.helpText = ddcBlockerText
                 ddcBlockersButton.isEnabled = true
                 ddcBlockersButton.isHidden = false
@@ -310,7 +310,7 @@ class ControlChoiceViewController: NSViewController {
         var answerResult = false
         noButton.onClick = { [weak self] in
             log.info("Answered 'no' to '\(question)'")
-            guard let self = self else {
+            guard let self else {
                 self?.semaphore.signal()
                 return
             }
@@ -321,7 +321,7 @@ class ControlChoiceViewController: NSViewController {
         }
         yesButton.onClick = { [weak self] in
             log.info("Answered 'yes' to '\(question)'")
-            guard let self = self else {
+            guard let self else {
                 self?.semaphore.signal()
                 return
             }
@@ -448,7 +448,7 @@ class ControlChoiceViewController: NSViewController {
                 "Reading didn't work for some values\nWrite the missing values manually and click the Continue button",
                 buttonColor: lunarYellow, buttonText: "Continue".withTextColor(mauve)
             ) { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 writeWorked = self.testControlWrite(control, for: display)
             }
             return ControlResult(type: control.displayControl, read: readWorked, write: writeWorked)
@@ -546,7 +546,7 @@ class ControlChoiceViewController: NSViewController {
                     "Was there any change in brightness on the tested display?" :
                     "Was there any change in brightness on the tested display?\nThe brightness value in the monitor settings should now be set to 67"
             ) { [weak self] itWorked in
-                guard let self = self else { return }
+                guard let self else { return }
                 if itWorked {
                     self.setResult(self.brightnessWriteResult, text: "Write worked", color: green)
                 } else {
@@ -596,7 +596,7 @@ class ControlChoiceViewController: NSViewController {
             askQuestion(
                 "Was there any change in contrast on the tested display?\nThe contrast value in the monitor settings should now be set to 67"
             ) { [weak self] itWorked in
-                guard let self = self else { return }
+                guard let self else { return }
                 if itWorked {
                     self.setResult(self.contrastWriteResult, text: "Write worked", color: green)
                 } else {
@@ -633,7 +633,7 @@ class ControlChoiceViewController: NSViewController {
             askQuestion(
                 "Was there any change in volume on the tested display?\nThe volume value in the monitor settings should now be set to 23"
             ) { [weak self] itWorked in
-                guard let self = self else { return }
+                guard let self else { return }
                 if itWorked {
                     self.setResult(self.volumeWriteResult, text: "Write worked", color: white)
                 } else {
@@ -917,7 +917,7 @@ class ControlChoiceViewController: NSViewController {
                     cancelButton: "Skip Onboarding",
                     window: w,
                     onCompletion: { [weak self] (restart: Bool) in
-                        guard let self = self, let w = self.view.window, let wc = w.windowController as? OnboardWindowController else {
+                        guard let self, let w = self.view.window, let wc = w.windowController as? OnboardWindowController else {
                             return
                         }
 
@@ -988,7 +988,7 @@ class ControlChoiceViewController: NSViewController {
         }
 
         asyncAfter(ms: 10, uniqueTaskKey: ONBOARDING_TASK_KEY) { [weak self] in
-            guard let self = self, !self.cancelled, let firstDisplay = displayController.externalActiveDisplays.first else { return }
+            guard let self, !self.cancelled, let firstDisplay = displayController.externalActiveDisplays.first else { return }
             mainThread {
                 self.displayName.transition(0.5, easing: .easeOutExpo)
                 self.displayName.alphaValue = 1.0
@@ -1205,12 +1205,12 @@ class ControlChoiceViewController: NSViewController {
         volumeSlider.isEnabled = false
         volumeSlider.isHidden = true
 
-        if let controlButton = controlButton {
+        if let controlButton {
             controlButton.isEnabled = false
             controlButton.isHidden = true
         }
 
-        if let ddcBlockersButton = ddcBlockersButton {
+        if let ddcBlockersButton {
             ddcBlockersButton.isEnabled = false
             ddcBlockersButton.isHidden = true
         }

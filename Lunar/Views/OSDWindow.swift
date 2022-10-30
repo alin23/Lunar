@@ -33,7 +33,7 @@ open class OSDWindow: NSWindow, NSWindowDelegate {
 
     open func show(at point: NSPoint? = nil, closeAfter closeMilliseconds: Int = 3050, fadeAfter fadeMilliseconds: Int = 2000) {
         guard let screen = display?.screen else { return }
-        if let point = point {
+        if let point {
             setFrameOrigin(point)
         } else {
             let wsize = frame.size
@@ -262,7 +262,7 @@ public struct BigSurSlider: View {
         _mark = mark ?? .constant(0)
 
         _knobColor = knobColorBinding ?? colorBinding ?? .constant(knobColor ?? colors.accent)
-        _knobTextColor = knobTextColorBinding ?? .constant(knobTextColor ?? ((color ?? colors.accent).textColor))
+        _knobTextColor = knobTextColorBinding ?? .constant(knobTextColor ?? ((color ?? Colors.peach).textColor))
     }
 
     // MARK: Public
@@ -279,7 +279,7 @@ public struct BigSurSlider: View {
                     Rectangle()
                         .foregroundColor(color ?? colors.accent)
                         .frame(width: cgPercentage == 1 ? geometry.size.width : w * cgPercentage + sliderHeight / 2)
-                    if let image = image {
+                    if let image {
                         Image(systemName: image)
                             .resizable()
                             .frame(width: 12, height: 12, alignment: .center)
@@ -318,7 +318,7 @@ public struct BigSurSlider: View {
                 .contrast(disabled ? 0.4 : 1.0)
                 .saturation(disabled ? 0.4 : 1.0)
 
-                if disabled, hovering, let enableText = enableText {
+                if disabled, hovering, let enableText {
                     SwiftUI.Button(enableText) {
                         disabled = false
                     }
@@ -423,8 +423,8 @@ public struct BigSurSlider: View {
                 .filter { event in event?.type == .scrollWheel }
                 .throttle(for: .milliseconds(20), scheduler: DispatchQueue.main, latest: true)
                 .sink { event in
-                    guard hovering, env.hoveringSlider, let event = event, event.momentumPhase.rawValue == 0 else {
-                        if let event = event, event.scrollingDeltaX + event.scrollingDeltaY == 0, event.phase.rawValue == 0,
+                    guard hovering, env.hoveringSlider, let event, event.momentumPhase.rawValue == 0 else {
+                        if let event, event.scrollingDeltaX + event.scrollingDeltaY == 0, event.phase.rawValue == 0,
                            env.draggingSlider
                         {
                             env.draggingSlider = false
@@ -603,7 +603,7 @@ struct BrightnessOSDView: View {
 
     var body: some View {
         VStack {
-            if let sliderText = sliderText {
+            if let sliderText {
                 Text(sliderText)
                     .font(.system(size: 16, weight: .semibold, design: .monospaced))
             }
@@ -831,7 +831,7 @@ struct AutoXdrOSDView_Previews: PreviewProvider {
 extension Display {
     func showSoftwareOSD() {
         mainAsync { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             if self.osdWindowController == nil {
                 self.osdWindowController = OSDWindow(
                     swiftuiView: AnyView(
@@ -852,7 +852,7 @@ extension Display {
 
     func showAutoBlackOutOSD() {
         mainAsync { [weak self] in
-            guard let self = self, !self.blackOutEnabled else {
+            guard let self, !self.blackOutEnabled else {
                 self?.autoOsdWindowController?.close()
                 return
             }
@@ -881,7 +881,7 @@ extension Display {
 
     func showAutoXdrOSD(xdrEnabled: Bool, reason: String) {
         mainAsync { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
 
             self.autoOsdWindowController?.close()
             self.autoOsdWindowController = OSDWindow(
@@ -938,7 +938,7 @@ open class PanelWindow: NSWindow {
     override open var canBecomeKey: Bool { true }
 
     open func show(at point: NSPoint? = nil, animate: Bool = false) {
-        if let point = point {
+        if let point {
             if animate {
                 NSAnimationContext.runAnimationGroup { ctx in
                     ctx.duration = 0.15

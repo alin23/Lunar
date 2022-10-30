@@ -145,19 +145,19 @@ class DisplayController: ObservableObject {
         if let displayProductID = infoDict[kDisplayProductID] as? Int64, abs(displayProductID.i - productID) < 3 {
             score += 3 - abs(displayProductID.i - productID)
         }
-        if let vendorID = vendorID, let displayVendorID = infoDict[kDisplayVendorID] as? Int64,
+        if let vendorID, let displayVendorID = infoDict[kDisplayVendorID] as? Int64,
            abs(displayVendorID.i - vendorID) < 3
         {
             score += 3 - abs(displayVendorID.i - vendorID)
         }
 
-        if let width = width, let displayWidth = infoDict["kCGDisplayPixelWidth"] as? Int64,
+        if let width, let displayWidth = infoDict["kCGDisplayPixelWidth"] as? Int64,
            abs(displayWidth.i - width) < 3
         {
             score += 3 - abs(displayWidth.i - width)
         }
 
-        if let height = height, let displayHeight = infoDict["kCGDisplayPixelHeight"] as? Int64,
+        if let height, let displayHeight = infoDict["kCGDisplayPixelHeight"] as? Int64,
            abs(displayHeight.i - height) < 3
         {
             score += 3 - abs(displayHeight.i - height)
@@ -191,15 +191,15 @@ class DisplayController: ObservableObject {
                 displayProductID == productID
         )
 
-        if let vendorID = vendorID {
+        if let vendorID {
             matches = matches || displayVendorID == vendorID
         }
 
-        if let width = width, let displayWidth = infoDict["kCGDisplayPixelWidth"] as? Int64 {
+        if let width, let displayWidth = infoDict["kCGDisplayPixelWidth"] as? Int64 {
             matches = matches || displayWidth == width
         }
 
-        if let height = height, let displayHeight = infoDict["kCGDisplayPixelHeight"] as? Int64 {
+        if let height, let displayHeight = infoDict["kCGDisplayPixelHeight"] as? Int64 {
             matches = matches || displayHeight == height
         }
 
@@ -225,7 +225,7 @@ class DisplayController: ObservableObject {
 
         pausedOverrideAdaptiveModeObserver = true
         modeWatcherTask = Repeater(every: 5, name: MODE_WATCHER_TASK_KEY) { [weak self] in
-            guard !displayController.screensSleeping, let self = self else { return }
+            guard !displayController.screensSleeping, let self else { return }
             self.autoAdaptMode()
         }
         pausedOverrideAdaptiveModeObserver = false
@@ -237,7 +237,7 @@ class DisplayController: ObservableObject {
         }
 
         screencaptureWatcherTask = Repeater(every: 1, name: SCREENCAPTURE_WATCHER_TASK_KEY) { [weak self] in
-            guard !displayController.screensSleeping, let self = self,
+            guard !displayController.screensSleeping, let self,
                   self.activeDisplayList.contains(where: { $0.hasSoftwareControl && !$0.supportsGamma })
             else { return }
             let pids = pidCount()
@@ -539,7 +539,7 @@ class DisplayController: ObservableObject {
             }
 
             var allActiveDisplays = Set(activeDisplays.values.map { $0 })
-            if let displays = displays {
+            if let displays {
                 allActiveDisplays.formUnion(displays)
             }
 
@@ -818,7 +818,7 @@ class DisplayController: ObservableObject {
                     self.autoXdrPendingEnabled = false
                     self.autoXdrPendingDisabled = false
                 }
-                guard let xdrEnabled = xdrEnabled, let d = self.builtinDisplay else { return }
+                guard let xdrEnabled, let d = self.builtinDisplay else { return }
 
                 d.enhanced = xdrEnabled
                 self.xdrState = xdrEnabled ? .enabledAutomatically : .disabledAutomatically
@@ -1025,7 +1025,7 @@ class DisplayController: ObservableObject {
     }
 
     var nonCursorDisplays: [Display] {
-        guard let cursorDisplay = cursorDisplay else { return [] }
+        guard let cursorDisplay else { return [] }
         return activeDisplayList.filter { $0.id != cursorDisplay.id }
     }
 
@@ -1035,7 +1035,7 @@ class DisplayController: ObservableObject {
     }
 
     var nonMainDisplays: [Display] {
-        guard let mainDisplay = mainDisplay else { return [] }
+        guard let mainDisplay else { return [] }
         return activeDisplayList.filter { $0.id != mainDisplay.id }
     }
 
@@ -1180,7 +1180,9 @@ class DisplayController: ObservableObject {
     }
 
     static func armDisplayProperties(display: Display) -> [String: Any]? {
-        // "DisplayAttributes" = {"ProductAttributes"={"ManufacturerID"="GSM","YearOfManufacture"=2017,"SerialNumber"=314041,"ProductName"="LG Ultra HD","LegacyManufacturerID"=7789,"ProductID"=23305,"WeekOfManufacture"=8}
+        // "DisplayAttributes" =
+        // {"ProductAttributes"={"ManufacturerID"="GSM","YearOfManufacture"=2017,"SerialNumber"=314041,"ProductName"="LG Ultra
+        // HD","LegacyManufacturerID"=7789,"ProductID"=23305,"WeekOfManufacture"=8}
 
         let allProps = allDisplayProperties()
 
@@ -1211,7 +1213,7 @@ class DisplayController: ObservableObject {
             )
         })
 
-        if let fullyMatchedProps = fullyMatchedProps {
+        if let fullyMatchedProps {
             return fullyMatchedProps
         }
 
@@ -1543,7 +1545,7 @@ class DisplayController: ObservableObject {
             .debounce(for: .milliseconds(10), scheduler: RunLoop.main)
             .sink { [weak self] change in
                 adaptiveCrumb("Changed mode from \(change.oldValue) to \(change.newValue)")
-                guard let self = self else { return }
+                guard let self else { return }
 
                 guard !self.pausedAdaptiveModeObserver else {
                     return
@@ -1647,7 +1649,7 @@ class DisplayController: ObservableObject {
                     }
                 }
 
-                guard let autoBlackOut = autoBlackOut, autoBlackOut, lunarProOnTrial || lunarProActive else { return }
+                guard let autoBlackOut, autoBlackOut, lunarProOnTrial || lunarProActive else { return }
                 if let d = activeOldDisplays.first, activeOldDisplays.count == 1, d.isBuiltin, activeNewDisplays.count > 1,
                    !d.blackOutEnabled
                 {
@@ -1896,7 +1898,7 @@ class DisplayController: ObservableObject {
             }
             scope.setTag(value: String(describing: self?.lidClosed ?? isLidClosed()), key: "lidClosed")
 
-            guard let self = self else { return }
+            guard let self else { return }
             for display in self.activeDisplayList {
                 display.addSentryData()
                 if display.isUltraFine() {
@@ -1966,7 +1968,7 @@ class DisplayController: ObservableObject {
         log.info("Lid closed: \(lidClosed)")
         if CachedDefaults[.enableSentry] {
             SentrySDK.configureScope { [weak self] scope in
-                guard let self = self else { return }
+                guard let self else { return }
                 scope.setTag(value: String(describing: self.lidClosed), key: "clamshellMode")
             }
         }
@@ -2087,7 +2089,7 @@ class DisplayController: ObservableObject {
     }
 
     func setBrightness(brightness: NSNumber, for displays: [Display]? = nil) {
-        if let displays = displays {
+        if let displays {
             displays.forEach { display in display.brightness = brightness }
         } else {
             activeDisplays.values.forEach { display in display.brightness = brightness }
@@ -2095,7 +2097,7 @@ class DisplayController: ObservableObject {
     }
 
     func setContrast(contrast: NSNumber, for displays: [Display]? = nil) {
-        if let displays = displays {
+        if let displays {
             displays.forEach { display in display.contrast = contrast }
         } else {
             activeDisplays.values.forEach { display in display.contrast = contrast }
@@ -2290,7 +2292,7 @@ class DisplayController: ObservableObject {
             self.nonMainDisplays.forEach { display in
                 setValue(display)
             }
-        } else if let displays = displays {
+        } else if let displays {
             displays.forEach { display in
                 setValue(display)
             }

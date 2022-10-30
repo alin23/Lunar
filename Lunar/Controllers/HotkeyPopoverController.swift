@@ -56,7 +56,7 @@ class HotkeyPopoverController: NSViewController {
     var hotkey3: PersistentHotkey?
 
     @objc func handler1() {
-        guard let display = display else { return }
+        guard let display else { return }
         switchInput(
             to: display.hotkeyInput1,
             brightness: display.brightnessOnInputChange1,
@@ -66,7 +66,7 @@ class HotkeyPopoverController: NSViewController {
     }
 
     @objc func handler2() {
-        guard let display = display else { return }
+        guard let display else { return }
         switchInput(
             to: display.hotkeyInput2,
             brightness: display.brightnessOnInputChange2,
@@ -76,7 +76,7 @@ class HotkeyPopoverController: NSViewController {
     }
 
     @objc func handler3() {
-        guard let display = display else { return }
+        guard let display else { return }
         switchInput(
             to: display.hotkeyInput3,
             brightness: display.brightnessOnInputChange3,
@@ -89,7 +89,7 @@ class HotkeyPopoverController: NSViewController {
         // #if DEBUG
         //     log.verbose("TRYING CHANGE TO INPUT \(input) ON DISPLAY \(display)")
         // #endif
-        guard let display = display, input.uint16Value != InputSource.unknown.rawValue else { return }
+        guard let display, input.uint16Value != InputSource.unknown.rawValue else { return }
 
         // #if DEBUG
         //     log.verbose("CHANGING TO INPUT \(input) ON DISPLAY \(display)")
@@ -197,7 +197,7 @@ class HotkeyPopoverController: NSViewController {
     override func viewDidLoad() {
         backingView.radius = 8.ns
 
-        if let display = display {
+        if let display {
             setup(from: display)
         }
 

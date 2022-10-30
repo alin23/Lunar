@@ -31,7 +31,7 @@ class SettingsPopoverController: NSViewController {
 
     @objc dynamic weak var display: Display? {
         didSet {
-            guard let display = display else { return }
+            guard let display else { return }
             display.refreshPanel()
             setAdaptiveNotice()
             setAdaptiveSelectorTooltips()
@@ -40,7 +40,7 @@ class SettingsPopoverController: NSViewController {
     }
 
     func setDimmingModeSelectorTooltips() {
-        guard let dimmingModeSelector = dimmingModeSelector, let display = display else {
+        guard let dimmingModeSelector, let display else {
             return
         }
         dimmingModeSelector.setEnabled(display.supportsGammaByDefault, forSegment: DimmingMode.gamma.rawValue)
@@ -51,7 +51,7 @@ class SettingsPopoverController: NSViewController {
     }
 
     func setAdaptiveSelectorTooltips(mode: AdaptiveModeKey? = nil) {
-        guard let adaptiveSelector = adaptiveSelector, let display = display else { return }
+        guard let adaptiveSelector, let display else { return }
         if !display.hasAmbientLightAdaptiveBrightness {
             adaptiveSelector.setEnabled(false, forSegment: AdaptiveController.system.rawValue)
             adaptiveSelector.setToolTip(
@@ -88,7 +88,7 @@ class SettingsPopoverController: NSViewController {
     }
 
     func setAdaptiveNotice(mode: AdaptiveModeKey? = nil) {
-        guard let display = display else { return }
+        guard let display else { return }
 
         guard !display.hasAmbientLightAdaptiveBrightness else {
             adaptiveBrightnessNotice =
@@ -142,7 +142,7 @@ class SettingsButton: PopoverButton<SettingsPopoverController> {
     }
 
     override func mouseDown(with event: NSEvent) {
-        if let popoverController = popoverController {
+        if let popoverController {
             popoverController.display = display
             popoverController.displayViewController = displayViewController
         }

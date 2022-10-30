@@ -131,7 +131,7 @@ let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
 
     @IBAction func install(_: Any) {
         commitEditing()
-        guard let hostname = hostname, let username = username else { return }
+        guard let hostname, let username else { return }
         if sshKeySelected, sshKeyPath == nil {
             return
         }
@@ -152,7 +152,7 @@ let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
         ])
 
         asyncNow { [weak self] in
-            guard let self = self, !self.cancelled else { return }
+            guard let self, !self.cancelled else { return }
 
             mainThread {
                 self.connecting = true
@@ -218,7 +218,7 @@ let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
     @IBAction func cancel(_: Any) {
         cancelled = true
         asyncNow { [weak self] in
-            guard let self = self, let channel = self.commandChannel else { return }
+            guard let self, let channel = self.commandChannel else { return }
 
             mainThread {
                 self.cancellingCommand = true

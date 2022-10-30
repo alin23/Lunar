@@ -82,7 +82,7 @@ public struct SSHKey: SSHAuthMethod {
     ///   - passphrase: the passphrase encrypting the key; defaults to nil
     public init(privateKey: String, publicKey: String? = nil, passphrase: String? = nil) {
         self.privateKey = NSString(string: privateKey).expandingTildeInPath
-        if let publicKey = publicKey {
+        if let publicKey {
             self.publicKey = NSString(string: publicKey).expandingTildeInPath
         } else {
             self.publicKey = self.privateKey + ".pub"
@@ -98,7 +98,7 @@ public struct SSHKey: SSHAuthMethod {
 
     public func authenticate(ssh: SSH, username: String) throws {
         // If programatically given a passphrase, use it
-        if let passphrase = passphrase {
+        if let passphrase {
             try ssh.session.authenticate(
                 username: username,
                 privateKey: privateKey,

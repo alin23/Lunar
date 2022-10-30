@@ -28,6 +28,7 @@
 		C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EA201F1DE50055934F /* ExceptionsViewController.swift */; };
 		C72776ED201F26CB0055934F /* AppException.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EC201F26CB0055934F /* AppException.swift */; };
 		C728D7ED2296D81B003CAD65 /* TextButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C728D7EC2296D81B003CAD65 /* TextButton.swift */; };
+		C72AB9C7290E978A0030CA79 /* FuzzyFind in Frameworks */ = {isa = PBXBuildFile; productRef = C72AB9C6290E978A0030CA79 /* FuzzyFind */; };
 		C72BB4B62727E03500941708 /* Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = C72BB4B32727E03400941708 /* Extensions.h */; };
 		C72BB4B72727E03500941708 /* Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C72BB4B52727E03400941708 /* Extensions.m */; };
 		C72CFB962586B36E005F0340 /* WAYWindow.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C72CFB912586AE7E005F0340 /* WAYWindow.framework */; };
@@ -48,7 +49,6 @@
 		C740A1F4262490E1004BC1C7 /* CLI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C740A1F3262490E1004BC1C7 /* CLI.swift */; };
 		C740A1F826249176004BC1C7 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = C740A1F726249176004BC1C7 /* ArgumentParser */; };
 		C74820FA26DE6CFA00556EA8 /* PageNavigationControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74820F926DE6CFA00556EA8 /* PageNavigationControl.swift */; };
-		C748210426DFA44400556EA8 /* FuzzyFind in Frameworks */ = {isa = PBXBuildFile; productRef = C748210326DFA44400556EA8 /* FuzzyFind */; };
 		C7482C3427D2874D00A12E82 /* ColorizeSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7482C3227D2874D00A12E82 /* ColorizeSwift.swift */; };
 		C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */; };
 		C74D07C8265BA68D00291FC2 /* LoginServiceKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74D07C7265BA68D00291FC2 /* LoginServiceKit.swift */; };
@@ -402,13 +402,13 @@
 				C78BD04A259B33D500FC823F /* Path in Frameworks */,
 				C7045DB22440DC5E002289E5 /* SwiftyBeaver in Frameworks */,
 				C74F8DC425EB94660077DF27 /* DisplayServices.framework in Frameworks */,
-				C748210426DFA44400556EA8 /* FuzzyFind in Frameworks */,
 				C7E80E3A2637060F004718A4 /* libssh2.a in Frameworks */,
 				C740A1F826249176004BC1C7 /* ArgumentParser in Frameworks */,
 				C7045DC12441015C002289E5 /* SwiftDate in Frameworks */,
 				C7E80E392637060F004718A4 /* libssl.a in Frameworks */,
 				C7BD5F85287B44130077CCB7 /* Charts in Frameworks */,
 				C7F48C4A2657A258000715A8 /* DataCompression in Frameworks */,
+				C72AB9C7290E978A0030CA79 /* FuzzyFind in Frameworks */,
 				C72CFB962586B36E005F0340 /* WAYWindow.framework in Frameworks */,
 				C731E85E27E1E5090016B36D /* Sentry in Frameworks */,
 				C7DA10F7259B8979006DD876 /* Regex in Frameworks */,
@@ -822,7 +822,6 @@
 				C75FFA09266D24AA0034DDD6 /* Burritos */,
 				C705A04C268BA02E001ABBA9 /* AXSwift */,
 				C77AB65B269A032E0046BA78 /* Magnet */,
-				C748210326DFA44400556EA8 /* FuzzyFind */,
 				C765E4FA26FF9F3500FD6463 /* CryptorECC */,
 				C7F99AC627175E0C00FBF192 /* SwiftyMarkdown */,
 				C7ECB6712750C75C00DA212D /* LDSwiftEventSourceStatic */,
@@ -831,6 +830,7 @@
 				C731E85D27E1E5090016B36D /* Sentry */,
 				C77C77572812AA80006326BE /* Introspect */,
 				C7BD5F84287B44130077CCB7 /* Charts */,
+				C72AB9C6290E978A0030CA79 /* FuzzyFind */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -886,7 +886,6 @@
 				C75FFA08266D24AA0034DDD6 /* XCRemoteSwiftPackageReference "Burritos" */,
 				C705A04B268BA02E001ABBA9 /* XCRemoteSwiftPackageReference "AXSwift" */,
 				C77AB65A269A032E0046BA78 /* XCRemoteSwiftPackageReference "Magnet" */,
-				C748210226DFA44400556EA8 /* XCRemoteSwiftPackageReference "FuzzyFind" */,
 				C765E4F926FF9F3500FD6463 /* XCRemoteSwiftPackageReference "BlueECC" */,
 				C7F99AC527175E0C00FBF192 /* XCRemoteSwiftPackageReference "SwiftyMarkdown" */,
 				C7ECB6702750C75C00DA212D /* XCRemoteSwiftPackageReference "swift-eventsource" */,
@@ -895,6 +894,7 @@
 				C731E85C27E1E5090016B36D /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 				C77C77562812AA80006326BE /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
 				C7BD5F83287B44130077CCB7 /* XCRemoteSwiftPackageReference "Charts" */,
+				C72AB9C5290E978A0030CA79 /* XCRemoteSwiftPackageReference "FuzzyFind" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -1179,7 +1179,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.8.0a1;
+				CURRENT_PROJECT_VERSION = 5.8.0a3;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -1207,7 +1207,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 5.8.0a1;
+				MARKETING_VERSION = 5.8.0a3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1301,7 +1301,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.8.0a1;
+				CURRENT_PROJECT_VERSION = 5.8.0a3;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1329,7 +1329,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 5.8.0a1;
+				MARKETING_VERSION = 5.8.0a3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
@@ -1485,7 +1485,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.8.0a1;
+				CURRENT_PROJECT_VERSION = 5.8.0a3;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -1513,7 +1513,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 5.8.0a1;
+				MARKETING_VERSION = 5.8.0a3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1551,7 +1551,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.8.0a1;
+				CURRENT_PROJECT_VERSION = 5.8.0a3;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1579,7 +1579,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 5.8.0a1;
+				MARKETING_VERSION = 5.8.0a3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1685,6 +1685,14 @@
 				kind = branch;
 			};
 		};
+		C72AB9C5290E978A0030CA79 /* XCRemoteSwiftPackageReference "FuzzyFind" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/alin23/FuzzyFind";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		C731E85C27E1E5090016B36D /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/alin23/sentry-cocoa.git";
@@ -1715,14 +1723,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.0.0;
-			};
-		};
-		C748210226DFA44400556EA8 /* XCRemoteSwiftPackageReference "FuzzyFind" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/truizlop/FuzzyFind.git";
-			requirement = {
-				branch = main;
-				kind = branch;
 			};
 		};
 		C75FFA08266D24AA0034DDD6 /* XCRemoteSwiftPackageReference "Burritos" */ = {
@@ -1891,6 +1891,11 @@
 			package = C7138D8B2634AF0500406EE3 /* XCRemoteSwiftPackageReference "KeyHolder" */;
 			productName = KeyHolder;
 		};
+		C72AB9C6290E978A0030CA79 /* FuzzyFind */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C72AB9C5290E978A0030CA79 /* XCRemoteSwiftPackageReference "FuzzyFind" */;
+			productName = FuzzyFind;
+		};
 		C731E85D27E1E5090016B36D /* Sentry */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C731E85C27E1E5090016B36D /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
@@ -1910,11 +1915,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C740A1F626249176004BC1C7 /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
 			productName = ArgumentParser;
-		};
-		C748210326DFA44400556EA8 /* FuzzyFind */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C748210226DFA44400556EA8 /* XCRemoteSwiftPackageReference "FuzzyFind" */;
-			productName = FuzzyFind;
 		};
 		C75FFA09266D24AA0034DDD6 /* Burritos */ = {
 			isa = XCSwiftPackageProductDependency;

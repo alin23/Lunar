@@ -1340,7 +1340,7 @@ struct QuickActionsMenuView: View {
                     }
             }.frame(maxWidth: .infinity, maxHeight: footerOpacity == 0.0 ? 8 : nil)
 
-            if let appDelegate = appDelegate, showAdditionalInfo {
+            if let appDelegate, showAdditionalInfo {
                 Divider()
                     .padding(.top, 10 * footerOpacity)
                     .padding(.bottom, 10)

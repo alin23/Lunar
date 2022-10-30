@@ -28,7 +28,7 @@ extension NSVisualEffectView {
     @objc dynamic
     func replacement() {
         super.updateLayer()
-        guard let layer = layer, layer.name == "NSPopoverFrame", let window = window, identifier == MAIN_MENU_ID
+        guard let layer, layer.name == "NSPopoverFrame", let window, identifier == MAIN_MENU_ID
         else {
             unsafeBitCast(
                 updateLayerOriginalIMP, to: Self.UpdateLayer.self
@@ -75,7 +75,7 @@ class PopoverClearView: NSView {
 let POPOVER_BLUR_VIEW_ID = NSUserInterfaceItemIdentifier("POPOVER_BLUR_VIEW_ID")
 let POPOVER_BACKING_VIEW_ID = NSUserInterfaceItemIdentifier("POPOVER_BACKING_VIEW_ID")
 func fixPopoverView(_ view: NSView?, backgroundColor: NSColor? = nil) {
-    if let view = view {
+    if let view {
         view.layer = nil
         let backView = NSVisualEffectView(frame: NSRect(
             x: POPOVER_PADDING / 2,

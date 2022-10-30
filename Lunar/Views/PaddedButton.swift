@@ -99,7 +99,7 @@ class PaddedButton: NSButton {
     func setColors(fadeDuration: TimeInterval = 0.3, resize: Bool = true) {
         transition(fadeDuration)
 
-        guard let bgColor = bgColor else { return }
+        guard let bgColor else { return }
         if hoverState == .hover {
             bg = hoverBgColor
             shadow = buttonShadow

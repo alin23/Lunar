@@ -173,7 +173,7 @@ class ALSInstallViewController: NSViewController {
     }
 
     func startFirmwareInstallation() {
-        guard let ssid = ssid, let password = password,
+        guard let ssid, let password,
               let installScript = (try? Bundle.main.path(forResource: "install", ofType: "sh")?.realpath())?.string,
               let process = shellProc(
                   args: [installScript],
@@ -194,7 +194,7 @@ class ALSInstallViewController: NSViewController {
 
         installProcess = process
         installProcess?.terminationHandler = { [weak self] proc in
-            guard let self = self else {
+            guard let self else {
                 return
             }
 
@@ -223,7 +223,7 @@ class ALSInstallViewController: NSViewController {
         }
 
         asyncEvery(1.seconds) { [weak self] (timer: Timer) in
-            guard let self = self, !self.stopped else {
+            guard let self, !self.stopped else {
                 timer.invalidate()
                 return
             }

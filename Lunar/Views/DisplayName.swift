@@ -97,7 +97,7 @@ class DisplayName: NSTextField, NSTextFieldDelegate {
     }
 
     override func textDidEndEditing(_: Notification) {
-        if let display = display {
+        if let display {
             log.info("Changing display name from \(display.name) to \(stringValue)")
             display.name = stringValue
         }

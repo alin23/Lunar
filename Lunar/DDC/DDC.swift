@@ -825,14 +825,18 @@ enum DDC {
             return false
         }
 
-        if let panel = DisplayController.panel(with: id), panel.isProjector {
+        let realName = (name ?? Display.printableName(id)).lowercased()
+        if let panel = DisplayController.panel(with: id), panel.isProjector, !realName.contains("vx2453") {
             return true
         }
 
         if checkName {
-            let realName = (name ?? Display.printableName(id)).lowercased()
-            return realName.contains("crestron") || realName.contains("optoma") || realName.contains("epson") || realName
-                .contains("projector")
+            return (
+                realName.contains("crestron") ||
+                    realName.contains("optoma") ||
+                    realName.contains("epson") ||
+                    realName.contains("projector")
+            )
         }
 
         return false
@@ -1179,7 +1183,7 @@ enum DDC {
                 ).takeRetainedValue()
                 let info = infoDict as NSDictionary as? [String: AnyObject]
 
-                if let info = info, let displayEDID = info[kIODisplayEDIDKey] as? Data {
+                if let info, let displayEDID = info[kIODisplayEDIDKey] as? Data {
                     result.append(displayEDID)
                 }
 

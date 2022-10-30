@@ -189,7 +189,8 @@ public enum Sysctl {
         return keysBuffer
     }
 
-    /// Invoke `sysctl` with an array of identifers, interpreting the returned buffer as the specified type. This function will throw `Error.invalidSize` if the size of buffer returned from `sysctl` fails to match the size of `T`.
+    /// Invoke `sysctl` with an array of identifers, interpreting the returned buffer as the specified type. This function will throw
+    /// `Error.invalidSize` if the size of buffer returned from `sysctl` fails to match the size of `T`.
     public static func value<T>(ofType _: T.Type, forKeys keys: [Int32]) throws -> T {
         let buffer = try data(for: keys)
         if buffer.count != MemoryLayout<T>.size {
@@ -201,17 +202,20 @@ public enum Sysctl {
         }
     }
 
-    /// Invoke `sysctl` with an array of identifers, interpreting the returned buffer as the specified type. This function will throw `Error.invalidSize` if the size of buffer returned from `sysctl` fails to match the size of `T`.
+    /// Invoke `sysctl` with an array of identifers, interpreting the returned buffer as the specified type. This function will throw
+    /// `Error.invalidSize` if the size of buffer returned from `sysctl` fails to match the size of `T`.
     public static func value<T>(ofType type: T.Type, forKeys keys: Int32...) throws -> T {
         try value(ofType: type, forKeys: keys)
     }
 
-    /// Invoke `sysctl` with the specified name, interpreting the returned buffer as the specified type. This function will throw `Error.invalidSize` if the size of buffer returned from `sysctl` fails to match the size of `T`.
+    /// Invoke `sysctl` with the specified name, interpreting the returned buffer as the specified type. This function will throw
+    /// `Error.invalidSize` if the size of buffer returned from `sysctl` fails to match the size of `T`.
     public static func value<T>(ofType type: T.Type, forName name: String) throws -> T {
         try value(ofType: type, forKeys: keys(for: name))
     }
 
-    /// Invoke `sysctl` with an array of identifers, interpreting the returned buffer as a `String`. This function will throw `Error.malformedUTF8` if the buffer returned from `sysctl` cannot be interpreted as a UTF8 buffer.
+    /// Invoke `sysctl` with an array of identifers, interpreting the returned buffer as a `String`. This function will throw
+    /// `Error.malformedUTF8` if the buffer returned from `sysctl` cannot be interpreted as a UTF8 buffer.
     public static func string(for keys: [Int32]) throws -> String {
         let optionalString = try data(for: keys).withUnsafeBufferPointer { dataPointer -> String? in
             dataPointer.baseAddress.flatMap { String(validatingUTF8: $0) }
@@ -222,12 +226,14 @@ public enum Sysctl {
         return s
     }
 
-    /// Invoke `sysctl` with an array of identifers, interpreting the returned buffer as a `String`. This function will throw `Error.malformedUTF8` if the buffer returned from `sysctl` cannot be interpreted as a UTF8 buffer.
+    /// Invoke `sysctl` with an array of identifers, interpreting the returned buffer as a `String`. This function will throw
+    /// `Error.malformedUTF8` if the buffer returned from `sysctl` cannot be interpreted as a UTF8 buffer.
     public static func string(for keys: Int32...) throws -> String {
         try string(for: keys)
     }
 
-    /// Invoke `sysctl` with the specified name, interpreting the returned buffer as a `String`. This function will throw `Error.malformedUTF8` if the buffer returned from `sysctl` cannot be interpreted as a UTF8 buffer.
+    /// Invoke `sysctl` with the specified name, interpreting the returned buffer as a `String`. This function will throw
+    /// `Error.malformedUTF8` if the buffer returned from `sysctl` cannot be interpreted as a UTF8 buffer.
     public static func string(for name: String) throws -> String {
         try string(for: keys(for: name))
     }

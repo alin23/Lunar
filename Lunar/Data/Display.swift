@@ -748,6 +748,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         if isLEDCinema() || isThunderbolt() {
             maxDDCBrightness = 255
         }
+        if isLEDCinema() {
+            maxDDCVolume = 255
+        }
 
         useOverlay = !supportsGammaByDefault
         enabledControls[.gamma] = !isSmartBuiltin
@@ -1142,7 +1145,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc dynamic lazy var hasAmbientLightAdaptiveBrightness: Bool = DisplayServicesHasAmbientLightCompensation(id)
     @objc dynamic lazy var canBeSource: Bool = {
         allowAnySyncSourcePublisher.sink { [weak self] change in
-            guard let self = self else { return }
+            guard let self else { return }
             self.canBeSource = (self.hasAmbientLightAdaptiveBrightness && self.supportsGammaByDefault) || change.newValue
         }.store(in: &observers)
         return (hasAmbientLightAdaptiveBrightness && supportsGammaByDefault) || CachedDefaults[.allowAnySyncSource]
@@ -1244,10 +1247,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
             .debounce(for: .seconds(2), scheduler: RunLoop.main)
             .sink { [weak self] _ in
-                guard let self = self else { return }
+                guard let self else { return }
                 self.primaryMirrorScreen = self.getPrimaryMirrorScreen()
                 self.primaryMirrorScreenFetcher = Repeater(every: 2, times: 5, name: "primaryMirrorScreen-\(self.serial)") { [weak self] in
-                    guard let self = self else { return }
+                    guard let self else { return }
                     self.primaryMirrorScreen = self.getPrimaryMirrorScreen()
                 }
             }
@@ -1385,7 +1388,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         let p = PassthroughSubject<Bool, Never>()
         p.debounce(for: .seconds(2), scheduler: RunLoop.main)
             .sink { [weak self] shouldDisable in
-                guard shouldDisable, let self = self, !self.isInMirrorSet else { return }
+                guard shouldDisable, let self, !self.isInMirrorSet else { return }
                 lastBlackOutToggleDate = .distantPast
                 self.disableBlackOut()
             }
@@ -1708,7 +1711,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     var noControls: Bool {
-        guard let control = control else { return true }
+        guard let control else { return true }
         return control.isSoftware && !gammaEnabled
     }
 
@@ -1877,7 +1880,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     panelMode = modeWithNotch
                     modeNumber = panelMode?.modeNumber ?? -1
 
-                    if let cornerRadiusBeforeNotchDisable = cornerRadiusBeforeNotchDisable, cornerRadiusBeforeNotchDisable == 0 {
+                    if let cornerRadiusBeforeNotchDisable, cornerRadiusBeforeNotchDisable == 0 {
                         cornerRadius = 0
                         cornerRadiusApplier = Repeater(every: 0.1, times: 20) { [weak self] in
                             self?.updateCornerWindow()
@@ -1889,7 +1892,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     panelMode = modeWithoutNotch
                     modeNumber = panelMode?.modeNumber ?? -1
 
-                    if let cornerRadiusBeforeNotchDisable = cornerRadiusBeforeNotchDisable, cornerRadiusBeforeNotchDisable == 0 {
+                    if let cornerRadiusBeforeNotchDisable, cornerRadiusBeforeNotchDisable == 0 {
                         cornerRadius = 12
                         cornerRadiusApplier = Repeater(every: 0.1, times: 20) { [weak self] in
                             self?.updateCornerWindow()
@@ -1918,7 +1921,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         let result = DisplayServicesRegisterForBrightnessChangeNotifications(id, id) { _, observer, _, _, userInfo in
             guard !displayController.screensSleeping else { return }
             OperationQueue.main.addOperation {
-                guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let observer = observer else { return }
+                guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let observer else { return }
                 let id = CGDirectDisplayID(UInt(bitPattern: observer))
                 guard !AppleNativeControl.sliderTracking, let display = displayController.activeDisplays[id],
                       !display.inSmoothTransition
@@ -2219,7 +2222,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         // MARK: Internal
 
         static func fromTransport(_ transport: Transport?) -> ConnectionType? {
-            guard let transport = transport else {
+            guard let transport else {
                 return nil
             }
 
@@ -2289,7 +2292,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         p
             .debounce(for: .seconds(3), scheduler: RunLoop.main)
             .sink { [weak self] _ in
-                guard let self = self else { return }
+                guard let self else { return }
                 DataStore.storeDisplay(display: self)
             }.store(in: &observers)
 
@@ -2301,7 +2304,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         p
             .debounce(for: .seconds(10), scheduler: RunLoop.main)
             .sink { [weak self] _ in
-                guard let self = self else { return }
+                guard let self else { return }
                 DataStore.storeDisplay(display: self)
             }.store(in: &observers)
 
@@ -2315,7 +2318,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         let p = PassthroughSubject<Bool, Never>()
         p.debounce(for: .milliseconds(10), scheduler: RunLoop.main)
             .sink { [weak self] run in
-                guard run, let self = self else { return }
+                guard run, let self else { return }
 
                 if self.control is DDCControl {
                     self.control?.resetState()
@@ -2336,7 +2339,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         let p = PassthroughSubject<Bool, Never>()
         p.debounce(for: .milliseconds(10), scheduler: RunLoop.main)
             .sink { [weak self] run in
-                guard run, let self = self else { return }
+                guard run, let self else { return }
 
                 if self.control is NetworkControl {
                     self.control?.resetState()
@@ -2357,7 +2360,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         let p = PassthroughSubject<String, Never>()
         p.debounce(for: .seconds(5), scheduler: RunLoop.main)
             .sink { [weak self] name in
-                guard let self = self else { return }
+                guard let self else { return }
                 let conditionName = name.replacingOccurrences(of: "sending", with: "sent") + "Condition"
 
                 self.setValue(false, forKey: name)
@@ -2379,7 +2382,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         p
             .debounce(for: .milliseconds(5000), scheduler: RunLoop.main)
             .sink { [weak self] shouldDisable in
-                guard let self = self, shouldDisable else { return }
+                guard let self, shouldDisable else { return }
                 self.handleEnhance(false, withoutSettingBrightness: true)
             }.store(in: &observers)
 
@@ -2415,7 +2418,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     context: context
                 )
                 mainAsyncAfter(ms: 1) { [weak self] in
-                    guard let self = self else { return }
+                    guard let self else { return }
                     self.hasNetworkControl = control is NetworkControl || self.alternativeControlForAppleNative is NetworkControl
                 }
             }
@@ -2426,7 +2429,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         didSet {
             context = getContext()
             mainAsync { self.supportsEnhance = self.getSupportsEnhance() }
-            guard let control = control else {
+            guard let control else {
                 usesDDCBrightnessControl = false
                 hasSoftwareControl = false
                 isNative = false
@@ -2441,11 +2444,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 context: context
             )
             mainAsync { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 self.activeAndResponsive = (self.active && self.responsiveDDC) || !(self.control is DDCControl)
                 self.hasNetworkControl = self.control is NetworkControl || self.alternativeControlForAppleNative is NetworkControl
             }
-            if let oldValue = oldValue, !oldValue.isSoftware, control.isSoftware {
+            if let oldValue, !oldValue.isSoftware, control.isSoftware {
                 if let app = NSRunningApplication.runningApplications(withBundleIdentifier: FLUX_IDENTIFIER).first {
                     (control as! GammaControl).fluxChecker(flux: app)
                 }
@@ -2531,7 +2534,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var onlySoftwareDimmingEnabled: Bool { !ddcEnabled && !networkEnabled && !appleNativeEnabled }
 
     var supportsVolumeControl: Bool {
-        guard let control = control, !hasSoftwareControl else { return false }
+        guard let control, !hasSoftwareControl else { return false }
         if control is AppleNativeControl, let alternativeControl = alternativeControlForAppleNative {
             return alternativeControl is DDCControl || alternativeControl is NetworkControl
         }
@@ -2768,7 +2771,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         didSet {
             save()
             guard DDC.apply else { return }
-            if let control = control, !control.setRedGain(redGain.uint16Value) {
+            if let control, !control.setRedGain(redGain.uint16Value) {
                 log.warning(
                     "Error writing RedGain using \(control.str)",
                     context: context
@@ -2781,7 +2784,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         didSet {
             save()
             guard DDC.apply else { return }
-            if let control = control, !control.setGreenGain(greenGain.uint16Value) {
+            if let control, !control.setGreenGain(greenGain.uint16Value) {
                 log.warning(
                     "Error writing GreenGain using \(control.str)",
                     context: context
@@ -2794,7 +2797,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         didSet {
             save()
             guard DDC.apply else { return }
-            if let control = control, !control.setBlueGain(blueGain.uint16Value) {
+            if let control, !control.setBlueGain(blueGain.uint16Value) {
                 log.warning(
                     "Error writing BlueGain using \(control.str)",
                     context: context
@@ -3196,7 +3199,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             if let control = control as? DDCControl {
                 _ = control.setBrightnessDebounced(brightness, oldValue: oldBrightness)
-            } else if let control = control, !control.setBrightness(brightness, oldValue: oldBrightness, force: false, onChange: nil) {
+            } else if let control, !control.setBrightness(brightness, oldValue: oldBrightness, force: false, onChange: nil) {
                 log.warning(
                     "Error writing brightness using \(control.str)",
                     context: context
@@ -3276,7 +3279,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             if let control = control as? DDCControl {
                 _ = control.setContrastDebounced(contrast, oldValue: oldContrast)
-            } else if let control = control, !control.setContrast(contrast, oldValue: oldContrast, onChange: nil) {
+            } else if let control, !control.setContrast(contrast, oldValue: oldContrast, onChange: nil) {
                 log.warning(
                     "Error writing contrast using \(control.str)",
                     context: context
@@ -3302,12 +3305,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             guard !isForTesting else { return }
 
             var volume = volume.uint16Value
-            if DDC.applyLimits, maxDDCVolume.uint16Value != 100, minDDCVolume.uint16Value != 0, !hasSoftwareControl {
+            if DDC.applyLimits, maxDDCVolume.uint16Value != 100 || minDDCVolume.uint16Value != 0, !hasSoftwareControl {
                 volume = mapNumber(volume.d, fromLow: 0, fromHigh: 100, toLow: minDDCVolume.doubleValue, toHigh: maxDDCVolume.doubleValue)
                     .rounded().u16
             }
 
-            if let control = control, !control.setVolume(volume) {
+            if let control, !control.setVolume(volume) {
                 log.warning(
                     "Error writing volume using \(control.str)",
                     context: context
@@ -3341,7 +3344,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             mainAsync { [weak self] in
                 self?.reconfigure { panel in
-                    guard let self = self else { return }
+                    guard let self else { return }
 
                     panel.orientation = self.rotation.i32
                     guard self.modeChangeAsk, self.rotation != oldValue,
@@ -3353,7 +3356,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                         window: window,
                         okButton: "Keep", cancelButton: "Revert",
                         onCompletion: { [weak self] keep in
-                            if !keep, let self = self {
+                            if !keep, let self {
                                 self.withoutModeChangeAsk {
                                     mainThread { self.rotation = oldValue }
                                 }
@@ -3380,7 +3383,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     window: window,
                     okButton: "Keep", cancelButton: "Revert",
                     onCompletion: { [weak self] keep in
-                        if !keep, let self = self {
+                        if !keep, let self {
                             self.withoutModeChangeAsk {
                                 mainThread {
                                     self.panelMode = oldValue
@@ -3423,7 +3426,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             guard !isForTesting, input != .unknown else { return }
 
-            if let control = control, !control.setInput(input) {
+            if let control, !control.setInput(input) {
                 log.warning(
                     "Error writing input using \(control.str)",
                     context: context
@@ -3451,7 +3454,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         didSet {
             save()
 
-            guard !isForTesting, let control = control else { return }
+            guard !isForTesting, let control else { return }
 
             if applyMuteValueOnMute {
                 log.info("Sending mute value \(audioMuted ? muteByteValueOn : muteByteValueOff) to \(audioMuted ? "mute" : "unmute") audio")
@@ -3580,10 +3583,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
             .debounce(for: .seconds(2), scheduler: RunLoop.main)
             .sink { [weak self] _ in
-                guard let self = self else { return }
+                guard let self else { return }
                 self.screen = self.getScreen()
                 self.screenFetcher = Repeater(every: 2, times: 5, name: "screen-\(self.serial)") { [weak self] in
-                    guard let self = self else { return }
+                    guard let self else { return }
                     self.screen = self.getScreen()
                 }
             }
@@ -3923,7 +3926,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             if amount <= 0.01, smooth {
                 shadeTask = mainAsyncAfter(ms: (delay * 1000).intround + 100) { [weak self] in
-                    guard let self = self else { return }
+                    guard let self else { return }
                     log.verbose("Removing shade for \(self.description)")
                     self.shadeWindowController?.close()
                     self.shadeWindowController = nil
@@ -3938,7 +3941,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         shadeWindowController?.close()
         shadeWindowController = nil
         mainAsync { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.withoutApply {
                 self.softwareBrightness = self.softwareBrightness
             }
@@ -3946,7 +3949,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func reconfigure(_ action: (MPDisplay) -> Void) {
-        guard let panel = panel else { return }
+        guard let panel else { return }
         Self.reconfigure(panel: panel, action)
     }
 
@@ -4109,7 +4112,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         if CachedDefaults[.refreshValues] {
             mainAsync { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 self.refreshBrightness()
                 self.refreshContrast()
                 self.refreshVolume()
@@ -4123,9 +4126,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         detectI2C()
 
         control = getBestControl()
-        if let control = control, control.isSoftware {
+        if let control, control.isSoftware {
             mainAsyncAfter(ms: 5001) { [weak self] in
-                guard let self = self, self.hasSoftwareControl,
+                guard let self, self.hasSoftwareControl,
                       self.enabledControls[.gamma] ?? false, self.preciseBrightness > 0 else { return }
                 self.preciseBrightness = Double(self.preciseBrightness)
             }
@@ -4135,13 +4138,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         let listensForBrightnessChange = observeBrightnessChangeDS() && hasBrightnessChangeObserver
         let refreshSeconds = listensForBrightnessChange ? 5.0 : 2.0
         builtinBrightnessRefresher = Repeater(every: refreshSeconds, name: "Builtin Brightness Refresher") { [weak self] in
-            guard let self = self, !displayController.screensSleeping, !self.hasSoftwareControl else {
+            guard let self, !displayController.screensSleeping, !self.hasSoftwareControl else {
                 return
             }
             self.refreshBrightness()
         }
         builtinContrastRefresher = Repeater(every: 15, name: "Builtin Contrast Refresher") { [weak self] in
-            guard let self = self, !displayController.screensSleeping, !self.hasSoftwareControl else {
+            guard let self, !displayController.screensSleeping, !self.hasSoftwareControl else {
                 return
             }
 
@@ -4266,7 +4269,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func startI2CDetection() {
         i2cDetectionTask = Repeater(every: 1, times: 15, name: "i2c-detector-\(serial)") { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.updateCornerWindow()
             self.detectI2C()
             if self.hasI2C {
@@ -4319,7 +4322,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc func resetColors() {
         _ = control?.resetColors()
         refreshColors { [weak self] success in
-            guard !success, let self = self else { return }
+            guard !success, let self else { return }
             self.redGain = DEFAULT_COLOR_GAIN.ns
             self.greenGain = DEFAULT_COLOR_GAIN.ns
             self.blueGain = DEFAULT_COLOR_GAIN.ns
@@ -4339,14 +4342,19 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         minDDCContrast = 0.ns
         minDDCVolume = 0.ns
 
-        maxDDCBrightness = 100.ns
+        if isLEDCinema() || isThunderbolt() {
+            maxDDCBrightness = 255
+        }
+        if isLEDCinema() {
+            maxDDCVolume = 255
+        }
+
         maxDDCContrast = 100.ns
-        maxDDCVolume = 100.ns
     }
 
     func resetControl() {
         control = getBestControl()
-        if let control = control, let onControlChange = onControlChange {
+        if let control, let onControlChange {
             onControlChange(control)
         }
 
@@ -4355,7 +4363,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         mainAsync { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.withForce {
                 #if DEBUG
                     log.debug("Setting brightness to \(self.brightness) for \(self.description)")
@@ -4597,7 +4605,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     func addSentryData() {
         guard CachedDefaults[.enableSentry] else { return }
         SentrySDK.configureScope { [weak self] scope in
-            guard let self = self, var dict = self.dictionary else { return }
+            guard let self, var dict = self.dictionary else { return }
             if let panel = self.panel,
                let encoded = try? encoder.encode(
                    ForgivingEncodable(
@@ -4726,7 +4734,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         inSmoothTransition = true
 
         let task = DispatchWorkItem(name: "smoothTransitionDDC: \(self)", flags: .barrier) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
 
             var steps = abs(value.distance(to: currentValue))
             log.debug("Smooth transition STEPS=\(steps) for \(self.description) from \(currentValue) to \(value)")
@@ -4771,7 +4779,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             for newValue in stride(from: currentValue.i, through: value.i, by: step) {
                 adjust(cap(newValue.u16, minVal: minVal, maxVal: maxVal))
-                if let delay = delay {
+                if let delay {
                     print("Sleeping for \(delay * 1000)ms")
                     Thread.sleep(forTimeInterval: delay)
                 }
@@ -4931,7 +4939,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
               !displayController.screensSleeping
         else { return }
         colorRefresher = asyncAfter(ms: 10) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             let newRedGain = self.readRedGain()
             let newGreenGain = self.readGreenGain()
             let newBlueGain = self.readBlueGain()
@@ -4942,15 +4950,15 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     return
                 }
 
-                if let newRedGain = newRedGain, newRedGain != self.redGain.uint16Value {
+                if let newRedGain, newRedGain != self.redGain.uint16Value {
                     log.info("Refreshing red gain value: \(self.redGain.uint16Value) <> \(newRedGain)")
                     self.withoutSmoothTransition { self.withoutDDC { self.redGain = newRedGain.ns } }
                 }
-                if let newGreenGain = newGreenGain, newGreenGain != self.greenGain.uint16Value {
+                if let newGreenGain, newGreenGain != self.greenGain.uint16Value {
                     log.info("Refreshing green gain value: \(self.greenGain.uint16Value) <> \(newGreenGain)")
                     self.withoutSmoothTransition { self.withoutDDC { self.greenGain = newGreenGain.ns } }
                 }
-                if let newBlueGain = newBlueGain, newBlueGain != self.blueGain.uint16Value {
+                if let newBlueGain, newBlueGain != self.blueGain.uint16Value {
                     log.info("Refreshing blue gain value: \(self.blueGain.uint16Value) <> \(newBlueGain)")
                     self.withoutSmoothTransition { self.withoutDDC { self.blueGain = newBlueGain.ns } }
                 }
@@ -4965,7 +4973,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         else { return }
 
         brightnessRefresher = asyncAfter(ms: 10) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             guard let newBrightness = self.readBrightness() else {
                 log.warning("Can't read brightness for \(self.name)")
                 return
@@ -5001,7 +5009,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         else { return }
 
         contrastRefresher = asyncAfter(ms: 10) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             guard let newContrast = self.readContrast() else {
                 log.warning("Can't read contrast for \(self.name)")
                 return
@@ -5042,7 +5050,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         else { return }
 
         inputRefresher = asyncAfter(ms: 10) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             guard let newInput = self.readInput() else {
                 log.warning("Can't read input for \(self.name)")
                 return
@@ -5067,7 +5075,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         else { return }
 
         volumeRefresher = asyncAfter(ms: 10) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             guard let newVolume = self.readVolume(), let newAudioMuted = self.readAudioMuted() else {
                 log.warning("Can't read volume for \(self.name)")
                 return
@@ -5185,7 +5193,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         gammaSetterTask = serialAsyncAfter(ms: 1, name: "gamma-setter") { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
 
             self.settingGamma = true
             self.gammaChanged = true
@@ -5228,13 +5236,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func resetBlackOut() {
         mainAsync { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.resetSoftwareControl()
             displayController.blackOut(display: self.id, state: .off)
         }
 
         mainAsyncAfter(ms: 1000) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.blackOutEnabled = false
             self.blackOutMirroringAllowed = self.supportsGammaByDefault || self.isFakeDummy
             self.mirroredBeforeBlackOut = false
@@ -5249,9 +5257,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         } else {
             maxDDCBrightness = 100.ns
         }
+        if isLEDCinema() {
+            maxDDCVolume = 255.ns
+        } else {
+            maxDDCVolume = 100.ns
+        }
 
         maxDDCContrast = 100.ns
-        maxDDCVolume = 100.ns
 
         minDDCBrightness = 0.ns
         minDDCContrast = 0.ns
@@ -5470,11 +5482,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         )
 
         brightnessDataPointInsertionTask = DispatchWorkItem(name: "brightnessDataPointInsertionTask") { [weak self] in
-            while let self = self, self.sendingBrightness {
+            while let self, self.sendingBrightness {
                 self.sentBrightnessCondition.wait(until: Date().addingTimeInterval(5.seconds.timeInterval))
             }
 
-            guard let self = self, var userValues = self.userBrightness[modeKey] else { return }
+            guard let self, var userValues = self.userBrightness[modeKey] else { return }
             Display.insertDataPoint(values: &userValues, featureValue: featureValue, targetValue: targetValue)
             self.save()
             self.brightnessDataPointInsertionTask = nil
@@ -5505,11 +5517,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         )
 
         contrastDataPointInsertionTask = DispatchWorkItem(name: "contrastDataPointInsertionTask") { [weak self] in
-            while let self = self, self.sendingContrast {
+            while let self, self.sendingContrast {
                 self.sentContrastCondition.wait(until: Date().addingTimeInterval(5.seconds.timeInterval))
             }
 
-            guard let self = self, var userValues = self.userContrast[modeKey] else { return }
+            guard let self, var userValues = self.userContrast[modeKey] else { return }
             Display.insertDataPoint(values: &userValues, featureValue: featureValue, targetValue: targetValue)
             self.save()
             self.contrastDataPointInsertionTask = nil

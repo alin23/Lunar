@@ -129,7 +129,7 @@ protocol Control {
 
 extension Control {
     func reapply() {
-        guard let display = display else { return }
+        guard let display else { return }
         _ = setBrightness(display.limitedBrightness, oldValue: nil, force: false, onChange: nil)
         _ = setContrast(display.limitedContrast, oldValue: nil, onChange: nil)
     }

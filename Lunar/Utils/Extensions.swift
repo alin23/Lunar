@@ -155,7 +155,7 @@ extension Bool {
     }
 }
 
-extension Array where Element == CGGammaValue {
+extension [CGGammaValue] {
     func str(decimals: UInt8) -> String {
         map { $0.str(decimals: decimals) }.joined(separator: ", ")
     }
@@ -326,13 +326,13 @@ extension Data {
     }
 }
 
-extension Array where Element == Character {
+extension [Character] {
     func str() -> String {
         String(self)
     }
 }
 
-extension Array where Element == UInt8 {
+extension [UInt8] {
     func str(hex: Bool = false, base64: Bool = false, urlSafe: Bool = false, separator: String = " ") -> String {
         if base64 {
             return Data(bytes: self, count: count).str(hex: hex, base64: base64, urlSafe: urlSafe, separator: separator)
@@ -795,7 +795,7 @@ extension ArraySlice {
     }
 }
 
-extension Collection where Element == NSAttributedString {
+extension Collection<NSAttributedString> {
     func joined(separator: String) -> NSAttributedString {
         interspersed(with: separator.attributedString).reduce("".attributedString) { $0 + $1 }
     }
@@ -943,7 +943,7 @@ class ModePopupButton: NSPopUpButton {
                 }
                 defer { mgr.unlockAccess() }
 
-                guard let item = item, let mode = item.representedObject as? MPDisplayMode else {
+                guard let item, let mode = item.representedObject as? MPDisplayMode else {
                     item?.isEnabled = false
                     return
                 }
@@ -1046,7 +1046,8 @@ extension NSWindow.Level {
 
 extension NSScreen {
     // override open var description: String {
-    //     "NSScreen \(localizedName)(id: \(displayID ?? 0), builtin: \(isBuiltin), virtual: \(isVirtual), screen: \(isScreen), hasMouse: \(hasMouse))"
+    //     "NSScreen \(localizedName)(id: \(displayID ?? 0), builtin: \(isBuiltin), virtual: \(isVirtual), screen: \(isScreen), hasMouse:
+    //     \(hasMouse))"
     // }
 
     static func isOnline(_ id: CGDirectDisplayID) -> Bool {
@@ -1282,7 +1283,7 @@ extension NSView {
 
     @objc dynamic var bg: NSColor? {
         get {
-            guard let layer = layer, let backgroundColor = layer.backgroundColor else { return nil }
+            guard let layer, let backgroundColor = layer.backgroundColor else { return nil }
             return NSColor(cgColor: backgroundColor)
         }
         set {
@@ -1295,7 +1296,7 @@ extension NSView {
 
     @objc dynamic var radius: NSNumber? {
         get {
-            guard let layer = layer else { return nil }
+            guard let layer else { return nil }
             return NSNumber(value: Float(layer.cornerRadius))
         }
         set {
@@ -1353,7 +1354,7 @@ extension URL {
         url.appendingPathComponent(String(describing: component).lowercased())
     }
 
-    static func / <T: BinaryInteger>(_ url: URL, _ component: T) -> URL {
+    static func / (_ url: URL, _ component: some BinaryInteger) -> URL {
         url.appendingPathComponent(String(component))
     }
 }
@@ -1671,7 +1672,7 @@ extension Array where Element: Equatable & Hashable {
 
 extension StringProtocol {
     func distance(of element: Element) -> Int? { firstIndex(of: element)?.distance(in: self) }
-    func distance<S: StringProtocol>(of string: S) -> Int? { range(of: string)?.lowerBound.distance(in: self) }
+    func distance(of string: some StringProtocol) -> Int? { range(of: string)?.lowerBound.distance(in: self) }
 }
 
 extension Collection {
@@ -1679,7 +1680,7 @@ extension Collection {
 }
 
 extension String.Index {
-    func distance<S: StringProtocol>(in string: S) -> Int { string.distance(to: self) }
+    func distance(in string: some StringProtocol) -> Int { string.distance(to: self) }
 }
 
 import Defaults
@@ -1697,13 +1698,13 @@ extension ThreadSafeDictionary where T == Double, V == Double {
     }
 }
 
-extension Dictionary where Key == Int, Value == Int {
+extension [Int: Int] {
     var userValues: [UserValue] {
         map { k, v in UserValue(source: k.d, target: v.d) }
     }
 }
 
-extension Array where Element == UserValue {
+extension [UserValue] {
     var dictionary: [Double: Double] {
         Dictionary(map { ($0.source.rounded(to: 4), $0.target) }, uniquingKeysWith: first(this:other:))
     }

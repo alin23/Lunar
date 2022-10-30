@@ -233,7 +233,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     }
 
     func trackHover() {
-        if let trackingArea = trackingArea {
+        if let trackingArea {
             removeTrackingArea(trackingArea)
         }
         trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
@@ -274,7 +274,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         trackHover()
         setBgAlpha()
         needsDisplay = true
-        if let font = font {
+        if let font {
             self.font = .monospacedSystemFont(
                 ofSize: font.pointSize,
                 weight: font.pointSize >= 50 ? .bold : (font.pointSize > 40 ? .bold : .heavy)
@@ -412,7 +412,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     func highlight(message: String) {
         let windowVisible: Bool = mainThread { window?.isVisible ?? false }
 
-        guard highlighterTask == nil, let caption = caption, windowVisible else {
+        guard highlighterTask == nil, let caption, windowVisible else {
             return
         }
 

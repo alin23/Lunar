@@ -409,7 +409,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     fillScreen: false,
                     stationary: true
                 )
-                if let text = text, let wc = d.testWindowController, let w = wc.window,
+                if let text, let wc = d.testWindowController, let w = wc.window,
                    let view = w.contentViewController as? LunarTestViewController
                 {
                     view.lunarTestText = text
@@ -726,7 +726,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func showWindow(after ms: Int? = nil, position: NSPoint? = nil, focus: Bool = true) {
-        guard let ms = ms else {
+        guard let ms else {
             createAndShowWindow(
                 "windowController",
                 controller: &windowController,
@@ -778,7 +778,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func windowDidBecomeMain(_ notification: Notification) {
         log.debug("windowDidBecomeMain")
         guard let w = notification.object as? ModernWindow, w.isVisible, w.title == "Settings",
-              let locationManager = locationManager else { return }
+              let locationManager else { return }
 
         switch locationManager.authorizationStatus {
         case .notDetermined, .restricted:
@@ -871,7 +871,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
         }
 
-        if !ignoreUIElement, let uiElement = uiElement {
+        if !ignoreUIElement, let uiElement {
             mainAsyncAfter(ms: 500) { [self] in
                 activateUIElement(uiElement, page: currentPage, highlight: highlight)
                 self.uiElement = nil
@@ -1075,7 +1075,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 mainAsync { [self] in
                     initMenuItems()
                     for (key, popover) in POPOVERS {
-                        guard let popover = popover else { continue }
+                        guard let popover else { continue }
                         popover.close()
                         popover.contentViewController = nil
                         POPOVERS[key] = nil
@@ -1479,7 +1479,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             windowController?.close()
             windowController?.window = nil
             windowController = nil
-            if let page = page {
+            if let page {
                 currentPage = page
             }
             if shouldShow {
@@ -1775,7 +1775,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func addGlobalMouseDownMonitor() {
         NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]) { _ in
-            guard let menuWindow = menuWindow, menuWindow.isVisible else { return }
+            guard let menuWindow, menuWindow.isVisible else { return }
             menuWindow.forceClose()
         }
     }
@@ -1868,7 +1868,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
             }
 
-            if let exc = exc {
+            if let exc {
                 log.error(exc)
                 cliExit(1)
             }
@@ -2237,7 +2237,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             locationManager!.distanceFilter = 10000
         }
 
-        guard let locationManager = locationManager, locationManager.authorizationStatus != .denied else {
+        guard let locationManager, locationManager.authorizationStatus != .denied else {
             log.debug("Location authStatus: denied")
             locationManager?.stopUpdatingLocation()
             return

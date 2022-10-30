@@ -152,7 +152,7 @@ public class SSH {
     ) throws -> Int32 {
         let channel = try session.openCommandChannel()
 
-        if let ptyType = ptyType {
+        if let ptyType {
             try channel.requestPty(type: ptyType.rawValue)
         }
 

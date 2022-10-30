@@ -366,7 +366,7 @@ class DataStore: NSObject {
 
     func displays(serials: [String]? = nil) -> [Display]? {
         guard let displays = CachedDefaults[.displays] else { return nil }
-        if let serials = serials {
+        if let serials {
             return displays.filter { display in serials.contains(display.serial) }
         }
         return displays
@@ -641,7 +641,7 @@ enum CachedDefaults {
 
 let displayEncodingLock = NSRecursiveLock()
 
-func cacheKey<Value>(_ key: Defaults.Key<Value>, load: Bool = true) {
+func cacheKey(_ key: Defaults.Key<some Any>, load: Bool = true) {
     if load {
         CachedDefaults.cache[key.name] = AnyCodable(Defaults[key])
     }

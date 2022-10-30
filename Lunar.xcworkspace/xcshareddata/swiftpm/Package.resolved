@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Flight-School/AnyCodable",
       "state" : {
-        "revision" : "f9fda69a7b704d46fb5123005f2f7e43dbb8a0fa",
-        "version" : "0.6.5"
+        "revision" : "862808b2070cd908cb04f9aafe7de83d35f81b05",
+        "version" : "0.6.7"
       }
     },
     {
@@ -24,7 +24,7 @@
       "location" : "https://github.com/Kitura/BlueECC.git",
       "state" : {
         "branch" : "master",
-        "revision" : "baf6ed3fc1a622675f0041b4aff7c02dd1a93818"
+        "revision" : "1485268a54f8135435a825a855e733f026fa6cc8"
       }
     },
     {
@@ -75,10 +75,10 @@
     {
       "identity" : "fuzzyfind",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/truizlop/FuzzyFind.git",
+      "location" : "https://github.com/alin23/FuzzyFind",
       "state" : {
         "branch" : "main",
-        "revision" : "6070503243bf2e9cbe55332516fad01d5edf7534"
+        "revision" : "549d644bbebdbc8792ee5ceb2c2801c80a225af3"
       }
     },
     {
@@ -159,7 +159,7 @@
       "location" : "https://github.com/rnine/SimplyCoreAudio",
       "state" : {
         "branch" : "develop",
-        "revision" : "343d463cffef1f30458d02ce2dc441138e9e0134"
+        "revision" : "73014324f2a916b445b4da5a4232aa57033267af"
       }
     },
     {
@@ -194,8 +194,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
-        "revision" : "df9ee6676cd5b3bf5b330ec7568a5644f547201b",
-        "version" : "1.1.3"
+        "revision" : "9f39744e025c7d377987f30b03770805dcb0bcd1",
+        "version" : "1.1.4"
       }
     },
     {
@@ -203,8 +203,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-atomics.git",
       "state" : {
-        "revision" : "3e95ba32cd1b4c877f6163e8eea54afc4e63bf9f",
-        "version" : "0.0.3"
+        "revision" : "919eb1d83e02121cdb434c7bfc1f0c66ef17febe",
+        "version" : "1.0.2"
       }
     },
     {

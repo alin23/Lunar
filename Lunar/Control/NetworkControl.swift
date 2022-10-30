@@ -341,7 +341,7 @@ class NetworkControl: Control {
             defer {
                 browserSemaphore.signal()
             }
-            if let serial = serial {
+            if let serial {
                 _ = controllersForDisplay.removeValue(forKey: serial)
             }
             for display in displayController.activeDisplays.values {
@@ -356,7 +356,7 @@ class NetworkControl: Control {
     }
 
     func manageSendingState(for controlID: ControlID, sending: Bool) {
-        guard let display = display else { return }
+        guard let display else { return }
 
         switch controlID {
         case .BRIGHTNESS:
@@ -378,12 +378,12 @@ class NetworkControl: Control {
 
     func listenForRequests() {
         serviceBrowserQueue.async { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.requestsPublisher
                 .removeDuplicates()
                 .throttle(for: .milliseconds(500), scheduler: RunLoop.current, latest: true)
                 .sink { [weak self] request in
-                    guard let self = self, !displayController.screensSleeping else { return }
+                    guard let self, !displayController.screensSleeping else { return }
 
                     defer {
                         self.manageSendingState(for: request.controlID, sending: false)
@@ -403,7 +403,7 @@ class NetworkControl: Control {
             self.responsiveCheckPublisher
                 .debounce(for: .milliseconds(500), scheduler: RunLoop.current)
                 .sink { [weak self] _ in
-                    guard let self = self, let display = self.display else { return }
+                    guard let self, let display = self.display else { return }
                     guard let service = NetworkControl.controllersForDisplay[display.serial],
                           let url = service.url, let newURL = service.getFirstRespondingURL(
                               urls: service.urls,
@@ -431,7 +431,7 @@ class NetworkControl: Control {
     }
 
     func set(_ value: UInt16, for controlID: ControlID, smooth: Bool = false, oldValue: UInt16? = nil) -> Bool {
-        guard let display = display else { return false }
+        guard let display else { return false }
 
         guard let service = NetworkControl.controllersForDisplay[display.serial],
               let url = smooth ? service.smoothTransitionUrl : service.url,
@@ -461,7 +461,7 @@ class NetworkControl: Control {
     }
 
     func get(_ controlID: ControlID, max: Bool = false) -> UInt16? {
-        guard let display = display else { return nil }
+        guard let display else { return nil }
 
         guard !displayController.screensSleeping else { return nil }
 
@@ -524,7 +524,7 @@ class NetworkControl: Control {
         onChange: ((Brightness) -> Void)? = nil
     ) -> Bool {
         defer { onChange?(brightness) }
-        if brightnessTransition != .instant, supportsSmoothTransition(for: .BRIGHTNESS), let oldValue = oldValue,
+        if brightnessTransition != .instant, supportsSmoothTransition(for: .BRIGHTNESS), let oldValue,
            oldValue != brightness
         {
             return set(brightness, for: .BRIGHTNESS, smooth: true, oldValue: oldValue)
@@ -534,7 +534,7 @@ class NetworkControl: Control {
 
     func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil, onChange: ((Contrast) -> Void)? = nil) -> Bool {
         defer { onChange?(contrast) }
-        if brightnessTransition != .instant, supportsSmoothTransition(for: .CONTRAST), let oldValue = oldValue,
+        if brightnessTransition != .instant, supportsSmoothTransition(for: .CONTRAST), let oldValue,
            oldValue != contrast
         {
             return set(contrast, for: .CONTRAST, smooth: true, oldValue: oldValue)
@@ -595,7 +595,7 @@ class NetworkControl: Control {
     }
 
     func isAvailable() -> Bool {
-        guard let display = display else { return false }
+        guard let display else { return false }
 
         guard display.active else { return false }
         if display.isForTesting, let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay {
@@ -619,7 +619,7 @@ class NetworkControl: Control {
     }
 
     func isResponsive() -> Bool {
-        guard let display = display else { return false }
+        guard let display else { return false }
 
         #if DEBUG
             if TEST_IDS.contains(display.id) {
@@ -645,13 +645,13 @@ class NetworkControl: Control {
     }
 
     func resetState() {
-        guard let display = display else { return }
+        guard let display else { return }
 
         Self.resetState(serial: display.serial)
     }
 
     func supportsSmoothTransition(for _: ControlID) -> Bool {
-        guard let display = display else { return false }
+        guard let display else { return false }
 
         guard let service = NetworkControl.controllersForDisplay[display.serial] else { return false }
         return service.smoothTransitionUrl != nil

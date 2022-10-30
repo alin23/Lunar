@@ -29,7 +29,7 @@ struct DDCCTLControl: Control {
     var isSoftware: Bool { false }
 
     var displayIndex: Int? {
-        guard let display = display else { return nil }
+        guard let display else { return nil }
         return display.screen != nil ? NSScreen.screens.filter { !$0.isBuiltin }.firstIndex(of: display.screen!) : nil
     }
 

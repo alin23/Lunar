@@ -125,7 +125,7 @@ class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = adaptiveModeObserver ?? adaptiveBrightnessModePublisher.sink { [weak self] change in
             mainAsync {
-                guard let self = self, !self.pausedAdaptiveModeObserver else { return }
+                guard let self, !self.pausedAdaptiveModeObserver else { return }
                 self.pausedAdaptiveModeObserver = true
                 Defaults.withoutPropagation { self.update(modeKey: change.newValue) }
                 self.pausedAdaptiveModeObserver = false
@@ -174,7 +174,7 @@ class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
     }
 
     @IBAction func setAdaptiveMode(sender button: AdaptiveModeButton?) {
-        guard let button = button else { return }
+        guard let button else { return }
         if let mode = AdaptiveModeKey(rawValue: button.selectedTag()), mode != .auto {
             if !mode.available {
                 log.warning("Mode \(mode) not available!")
