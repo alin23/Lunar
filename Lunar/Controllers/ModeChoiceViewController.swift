@@ -318,12 +318,12 @@ class ModeChoiceViewController: NSViewController {
         )
 
         mainAsyncAfter(ms: 500) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.heading.transition(0.3)
             self.heading.alphaValue = 1
         }
         mainAsyncAfter(ms: 1000) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.subheading.transition(0.8)
             self.subheading.alphaValue = 1
         }

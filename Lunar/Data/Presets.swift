@@ -446,7 +446,7 @@ struct KeyEventHandling: NSViewRepresentable {
         override var acceptsFirstResponder: Bool { true }
 
         override func keyDown(with event: NSEvent) {
-            guard let context = context else {
+            guard let context else {
                 return
             }
 

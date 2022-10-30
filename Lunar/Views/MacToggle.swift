@@ -294,7 +294,7 @@ class MacToggle: NSView {
             leftConstraint?.constant = isOn ? CGFloat(push) : outlineWidth
             animator().layoutSubtreeIfNeeded()
         }) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.allowedTouchTypes = [.direct, .indirect]
             callback?(self.isOn)
         }

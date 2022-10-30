@@ -85,7 +85,7 @@ class InstallOutputViewController: NSViewController {
 
     func startInstall(ssh: SSH) {
         asyncNow { [weak self] in
-            guard let self = self, let textView = mainThread({ self.outputScrollView.documentView as? NSTextView }) else { return }
+            guard let self, let textView = mainThread({ self.outputScrollView.documentView as? NSTextView }) else { return }
             var status: Int32 = -1
             var newHostname = ssh.host
             do {
@@ -184,7 +184,7 @@ class InstallOutputViewController: NSViewController {
 
     @IBAction func cancelInstall(_: Any) {
         asyncNow { [weak self] in
-            guard let self = self, let channel = self.commandChannel,
+            guard let self, let channel = self.commandChannel,
                   let textView = mainThread({ self.outputScrollView.documentView as? NSTextView }) else { return }
 
             mainThread {
@@ -218,7 +218,7 @@ class InstallOutputViewController: NSViewController {
         outputScrollView.radius = 14.0.ns
 
         outputScrollView.onScroll = { [weak self] event in
-            if let self = self, self.scrollAutomatically, abs(event.scrollingDeltaY) > 1 {
+            if let self, self.scrollAutomatically, abs(event.scrollingDeltaY) > 1 {
                 self.scrollAutomatically = false
             }
         }

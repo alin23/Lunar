@@ -459,7 +459,7 @@ class DisplayViewController: NSViewController {
     }
 
     @IBOutlet var notchButton: LockButton! { didSet {
-        guard let notchButton = notchButton else { return }
+        guard let notchButton else { return }
         notchButton.layer?.cornerCurve = .continuous
         notchButton.layer?.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
     }}
@@ -514,7 +514,7 @@ class DisplayViewController: NSViewController {
 
     @objc dynamic weak var display: Display? {
         didSet {
-            if let display = display {
+            if let display {
                 mainAsync { [weak self] in self?.update(display) }
                 noDisplay = display.id == GENERIC_DISPLAY_ID
             }
@@ -537,11 +537,11 @@ class DisplayViewController: NSViewController {
 
     @IBOutlet var deleteButton: Button! {
         didSet {
-            guard let deleteButton = deleteButton, let display = display else { return }
+            guard let deleteButton, let display else { return }
             let f = deleteButton.frame
             if deleteButtonY == nil { deleteButtonY = f.origin.y }
 
-            guard let deleteButtonY = deleteButtonY else { return }
+            guard let deleteButtonY else { return }
             deleteButton
                 .setFrameOrigin(NSPoint(
                     x: f.origin.x,
@@ -552,11 +552,11 @@ class DisplayViewController: NSViewController {
 
     @IBOutlet var powerButton: Button! {
         didSet {
-            guard let powerButton = powerButton, let display = display else { return }
+            guard let powerButton, let display else { return }
             let f = powerButton.frame
             if powerButtonY == nil { powerButtonY = f.origin.y }
 
-            guard let powerButtonY = powerButtonY else { return }
+            guard let powerButtonY else { return }
             powerButton
                 .setFrameOrigin(NSPoint(
                     x: f.origin.x,
@@ -567,11 +567,11 @@ class DisplayViewController: NSViewController {
 
     @IBOutlet var syncSourceButton: LockButton! {
         didSet {
-            guard let syncSourceButton = syncSourceButton, let display = display else { return }
+            guard let syncSourceButton, let display else { return }
             let f = syncSourceButton.frame
             if syncSourceButtonY == nil { syncSourceButtonY = f.origin.y }
 
-            guard let syncSourceButtonY = syncSourceButtonY else { return }
+            guard let syncSourceButtonY else { return }
             syncSourceButton
                 .setFrameOrigin(NSPoint(
                     x: f.origin.x,
@@ -582,11 +582,11 @@ class DisplayViewController: NSViewController {
 
     @IBOutlet var offText: NSTextField! {
         didSet {
-            guard let offText = offText, let display = display else { return }
+            guard let offText, let display else { return }
             let f = offText.frame
             if offTextY == nil { offTextY = f.origin.y }
 
-            guard let offTextY = offTextY else { return }
+            guard let offTextY else { return }
             offText
                 .setFrameOrigin(NSPoint(
                     x: f.origin.x,
@@ -596,11 +596,11 @@ class DisplayViewController: NSViewController {
     }
 
     func placeAddScheduleButton() {
-        guard let addScheduleButton = addScheduleButton,
-              let schedule2 = schedule2,
-              let schedule3 = schedule3,
-              let schedule4 = schedule4,
-              let schedule5 = schedule5
+        guard let addScheduleButton,
+              let schedule2,
+              let schedule3,
+              let schedule4,
+              let schedule5
         else { return }
 
         if schedule5.isEnabled {
@@ -676,18 +676,18 @@ class DisplayViewController: NSViewController {
 
     func refreshView() {
         mainAsync { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.view.setNeedsDisplay(self.view.visibleRect)
         }
     }
 
     @discardableResult
     func initHotkeys() -> Bool {
-        guard let button = inputDropdownHotkeyButton, let display = display, !display.isBuiltin, display.hotkeyPopoverController != nil
+        guard let button = inputDropdownHotkeyButton, let display, !display.isBuiltin, display.hotkeyPopoverController != nil
         else {
             if let button = inputDropdownHotkeyButton {
                 button.onClick = { [weak self] in
-                    guard let self = self else { return }
+                    guard let self else { return }
                     if self.initHotkeys() {
                         button.onClick = nil
                     }
@@ -701,12 +701,12 @@ class DisplayViewController: NSViewController {
     }
 
     @objc func adaptToDataPointBounds(notification _: Notification) {
-        guard let display = display, brightnessContrastChart != nil, display.id != GENERIC_DISPLAY_ID else { return }
+        guard let display, brightnessContrastChart != nil, display.id != GENERIC_DISPLAY_ID else { return }
         initGraph()
     }
 
     @objc func highlightChartValue(notification _: Notification) {
-        guard CachedDefaults[.moreGraphData], let display = display, let brightnessContrastChart = brightnessContrastChart,
+        guard CachedDefaults[.moreGraphData], let display, let brightnessContrastChart,
               display.id != GENERIC_DISPLAY_ID else { return }
         brightnessContrastChart.highlightCurrentValues(adaptiveMode: displayController.adaptiveMode, for: display)
     }
@@ -785,7 +785,7 @@ class DisplayViewController: NSViewController {
     @IBAction func proButtonClick(_: Any) {
         if lunarProActive, !lunarProOnTrial {
             NSWorkspace.shared.open("https://lunar.fyi/#pro".asURL()!)
-        } else if let paddle = paddle, let lunarProProduct = lunarProProduct {
+        } else if let paddle, let lunarProProduct {
             if lunarProProduct.licenseCode != nil {
                 deactivateLicense {
                     paddle.showProductAccessDialog(with: lunarProProduct)
@@ -798,7 +798,7 @@ class DisplayViewController: NSViewController {
 
     func setupProButton() {
         mainAsync { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             guard let button = self.proButton else { return }
 
             let width = button.frame.width
@@ -821,7 +821,7 @@ class DisplayViewController: NSViewController {
         setupProButton()
     }
 
-    func styleButton<T>(_ button: PopoverButton<T>, icon: String, display: Display) -> Void {
+    func styleButton(_ button: PopoverButton<some Any>, icon: String, display: Display) {
         if buttonY == nil { buttonY = button.frame.origin.y }
 
         let color = NSColor(named: "Caption Tertiary")!
@@ -830,7 +830,7 @@ class DisplayViewController: NSViewController {
         button.textColor = color
         button.contentTintColor = color
         button.image = NSImage(systemSymbolName: icon, accessibilityDescription: nil)?.withSymbolConfiguration(symbol)
-        if let buttonY = buttonY {
+        if let buttonY {
             let f = button.frame
             button.setFrameOrigin(NSPoint(x: f.origin.x, y: buttonY + (display.isMacBook ? -26 : 0)))
         }
@@ -839,10 +839,10 @@ class DisplayViewController: NSViewController {
     func update(_ display: Display? = nil) {
         guard let display = display ?? self.display else { return }
 
-        if let resolutionsDropdown = resolutionsDropdown {
+        if let resolutionsDropdown {
             resolutionsDropdown.setItemStyles()
         }
-        if let inputDropdown = inputDropdown {
+        if let inputDropdown {
             for item in inputDropdown.itemArray {
                 item.attributedTitle = item.title.withFont(.monospacedSystemFont(ofSize: 12, weight: .semibold)).withTextColor(.labelColor)
             }
@@ -853,7 +853,7 @@ class DisplayViewController: NSViewController {
         displayImage?.isMacBook = display.isMacBook
         displayImage?.isSidecar = display.isSidecar
 
-        if let cornerRadiusField = cornerRadiusField {
+        if let cornerRadiusField {
             cornerRadiusField.isHidden = display.isSidecar
             cornerRadiusFieldCaption?.isHidden = display.isSidecar
 
@@ -865,11 +865,11 @@ class DisplayViewController: NSViewController {
 
             if cornerRadiusFieldY == nil { cornerRadiusFieldY = cornerRadiusField.frame.origin.y }
             if cornerRadiusFieldCaptionY == nil { cornerRadiusFieldCaptionY = cornerRadiusFieldCaption?.frame.origin.y }
-            if let cornerRadiusFieldY = cornerRadiusFieldY {
+            if let cornerRadiusFieldY {
                 cornerRadiusField
                     .setFrameOrigin(NSPoint(x: cornerRadiusField.frame.origin.x, y: cornerRadiusFieldY + (display.isMacBook ? -42 : 0)))
             }
-            if let cornerRadiusFieldCaptionY = cornerRadiusFieldCaptionY, let cornerRadiusFieldCaption = cornerRadiusFieldCaption {
+            if let cornerRadiusFieldCaptionY, let cornerRadiusFieldCaption {
                 cornerRadiusFieldCaption
                     .setFrameOrigin(NSPoint(
                         x: cornerRadiusFieldCaption.frame.origin.x,
@@ -886,13 +886,13 @@ class DisplayViewController: NSViewController {
             }
         }
         cornerRadiusField?.onMouseEnter = { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.cornerRadiusFieldCaption?.transition(1.5, easing: .easeInEaseOut)
             self.cornerRadiusFieldCaption?.textColor = self.cornerRadiusField?.textColor
             self.cornerRadiusFieldCaption?.alphaValue = 0.8
         }
         cornerRadiusField?.onMouseExit = { [weak self] in
-            guard let self = self, let f = self.cornerRadiusField, !f.editing else { return }
+            guard let self, let f = self.cornerRadiusField, !f.editing else { return }
             self.cornerRadiusFieldCaption?.transition(1)
             self.cornerRadiusFieldCaption?.alphaValue = 0.0
         }
@@ -905,9 +905,9 @@ class DisplayViewController: NSViewController {
             }
         }
 
-        if let resolutionsDropdown = resolutionsDropdown {
+        if let resolutionsDropdown {
             if resolutionsY == nil { resolutionsY = resolutionsDropdown.frame.origin.y }
-            if let resolutionsY = resolutionsY {
+            if let resolutionsY {
                 let f = resolutionsDropdown.frame
                 resolutionsDropdown.setFrameOrigin(NSPoint(x: f.origin.x, y: resolutionsY + (display.isMacBook ? 40 : 0)))
             }
@@ -963,12 +963,12 @@ class DisplayViewController: NSViewController {
         scheduleBox?.isHidden = displayController.adaptiveModeKey != .clock
 
         display.onBrightnessCurveFactorChange = { [weak self] factor in
-            guard let self = self else { return }
+            guard let self else { return }
             self.updateDataset(brightnessFactor: factor)
         }
 
         display.onContrastCurveFactorChange = { [weak self] factor in
-            guard let self = self else { return }
+            guard let self else { return }
             self.updateDataset(contrastFactor: factor)
         }
 
@@ -980,32 +980,32 @@ class DisplayViewController: NSViewController {
         maxBrightnessField?.lowerLimit = (display.minBrightness.intValue + 1).d
 
         minBrightnessField?.onValueChangedInstant = { [weak self] (value: Int) in
-            guard let self = self, let display = self.display else { return }
+            guard let self, let display = self.display else { return }
 
             self.updateDataset(minBrightness: value.u16)
             display.minBrightness = value.ns
         }
         minBrightnessField?.onValueChanged = { [weak self] (value: Int) in
-            guard let self = self, let display = self.display else { return }
+            guard let self, let display = self.display else { return }
 
             self.updateDataset(minBrightness: value.u16)
             display.minBrightness = value.ns
         }
         maxBrightnessField?.onValueChangedInstant = { [weak self] (value: Int) in
-            guard let self = self, let display = self.display else { return }
+            guard let self, let display = self.display else { return }
 
             self.updateDataset(maxBrightness: value.u16)
             display.maxBrightness = value.ns
         }
         maxBrightnessField?.onValueChanged = { [weak self] (value: Int) in
-            guard let self = self, let display = self.display else { return }
+            guard let self, let display = self.display else { return }
 
             self.updateDataset(maxBrightness: value.u16)
             display.maxBrightness = value.ns
         }
 
         scrollableBrightness?.onCurrentValueChanged = { [weak self] brightness in
-            guard let self = self, let display = self.display,
+            guard let self, let display = self.display,
                   displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
                   !display.lockedBrightnessCurve
             else {
@@ -1021,7 +1021,7 @@ class DisplayViewController: NSViewController {
             self.updateDataset(currentBrightness: brightness.u16, userBrightness: userValues.dictionary)
         }
         scrollableContrast?.onCurrentValueChanged = { [weak self] contrast in
-            guard let self = self, let display = self.display,
+            guard let self, let display = self.display,
                   displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
                   !display.lockedContrastCurve
             else {
@@ -1038,7 +1038,7 @@ class DisplayViewController: NSViewController {
 
         display.onControlChange = { [weak self] control in
             mainAsyncAfter(ms: 10) { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 self.updateControlsButton(control: control)
                 if control.isSoftware, display.enabledControls[.gamma] ?? false {
                     self.showGammaNotice()
@@ -1069,7 +1069,7 @@ class DisplayViewController: NSViewController {
     }
 
     override func viewDidAppear() {
-        if let resolutionsDropdown = resolutionsDropdown {
+        if let resolutionsDropdown {
             resolutionsDropdown.setItemStyles()
         }
     }
@@ -1083,7 +1083,7 @@ class DisplayViewController: NSViewController {
 
     func updateControlsButton(control: Control? = nil) {
         mainAsync { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             guard let button = self.controlsButton, let softwareDimmingButton = self.softwareDimmingButton,
                   let display = self.display
             else {
@@ -1231,7 +1231,7 @@ class DisplayViewController: NSViewController {
         userContrast: [Double: Double]? = nil,
         force: Bool = false
     ) {
-        guard let display = display, let brightnessContrastChart = brightnessContrastChart, display.id != GENERIC_DISPLAY_ID
+        guard let display, let brightnessContrastChart, display.id != GENERIC_DISPLAY_ID
         else { return }
 
         let brightnessChartEntry = brightnessContrastChart.brightnessGraph.entries
@@ -1369,22 +1369,22 @@ class DisplayViewController: NSViewController {
     }
 
     @objc func resetDDC() {
-        guard let display = display else { return }
+        guard let display else { return }
         display.resetDDC()
     }
 
     @objc func resetBlackOut() {
-        guard let display = display else { return }
+        guard let display else { return }
         display.resetBlackOut()
     }
 
     @objc func resetNetworkController() {
-        guard let display = display else { return }
+        guard let display else { return }
         display.resetNetworkController()
     }
 
     @objc func resetAlgorithmCurve() {
-        guard let display = display else {
+        guard let display else {
             return
         }
 
@@ -1401,7 +1401,7 @@ class DisplayViewController: NSViewController {
     }
 
     @objc func resetBrightnessAndContrast() {
-        guard let display = display else {
+        guard let display else {
             return
         }
         display.adaptive = false
@@ -1439,10 +1439,10 @@ class DisplayViewController: NSViewController {
     }
 
     func resetDisplay(askBefore: Bool = true, resetControl: Bool = true) {
-        guard let display = display else { return }
+        guard let display else { return }
 
         let resetHandler = { [weak self] (shouldReset: Bool) in
-            guard shouldReset, let display = self?.display, let self = self else { return }
+            guard shouldReset, let display = self?.display, let self else { return }
             display.adaptivePaused = true
             defer {
                 display.adaptivePaused = false
@@ -1526,7 +1526,7 @@ class DisplayViewController: NSViewController {
         display?.$maxBrightness
             .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] value in
-                guard let self = self else { return }
+                guard let self else { return }
                 // self.scrollableBrightness?.maxValue.integerValue = value.intValue
                 // self.scrollableBrightness?.minValue.upperLimit = value.doubleValue - 1
 
@@ -1544,7 +1544,7 @@ class DisplayViewController: NSViewController {
         display?.$minBrightness
             .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] value in
-                guard let self = self else { return }
+                guard let self else { return }
                 // self.scrollableBrightness?.minValue.integerValue = value.intValue
                 // self.scrollableBrightness?.maxValue.lowerLimit = value.doubleValue + 1
 
@@ -1579,11 +1579,11 @@ class DisplayViewController: NSViewController {
     }
 
     func listenForDisplayBoolChange() {
-        guard let display = display else { return }
+        guard let display else { return }
         display.$hasDDC
             .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] hasDDC in
-                guard let self = self else { return }
+                guard let self else { return }
 
                 self.powerOffEnabled = self.getPowerOffEnabled(hasDDC: hasDDC)
                 self.powerOffTooltip = self.getPowerOffTooltip(hasDDC: hasDDC)
@@ -1595,7 +1595,7 @@ class DisplayViewController: NSViewController {
         display.$adaptive
             .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] newAdaptive in
-                guard let self = self else { return }
+                guard let self else { return }
                 guard let display = self.display else {
                     self.hideAdaptiveNotice()
                     return
@@ -1614,9 +1614,9 @@ class DisplayViewController: NSViewController {
     func listenForGraphDataChange() {
         graphObserver = moreGraphDataPublisher.sink { [weak self] change in
             log.debug("More graph data: \(change.newValue)")
-            guard let self = self else { return }
+            guard let self else { return }
             mainAsyncAfter(ms: 1000) { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 self.initGraph()
             }
         }
@@ -1625,7 +1625,7 @@ class DisplayViewController: NSViewController {
     func listenForAdaptiveModeChange() {
         adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [weak self] change in
             mainAsync {
-                guard let self = self, !self.pausedAdaptiveModeObserver else { return }
+                guard let self, !self.pausedAdaptiveModeObserver else { return }
                 self.pausedAdaptiveModeObserver = true
 
                 self.chartHidden = self.display == nil || self.noDisplay || self.display!.ambientLightAdaptiveBrightnessEnabled || change
@@ -1722,13 +1722,13 @@ class DisplayViewController: NSViewController {
     }
 
     @IBAction func powerOff(_: Any) {
-        guard let display = display else { return }
+        guard let display else { return }
         display.powerOff()
     }
 
     func showGammaNotice() {
         mainAsync { [weak self] in
-            guard let self = self, self.display?.active ?? false, self.view.window?.isVisible ?? false,
+            guard let self, self.display?.active ?? false, self.view.window?.isVisible ?? false,
                   self.gammaNoticeHighlighterTask == nil
             else { return }
 
@@ -1736,7 +1736,7 @@ class DisplayViewController: NSViewController {
                 every: 5,
                 name: "gammaNoticeHighlighter-\(self.display?.serial ?? "display")"
             ) { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
 
                 guard self.view.window?.isVisible ?? false, let gammaNotice = self.gammaNotice
                 else {
@@ -1759,7 +1759,7 @@ class DisplayViewController: NSViewController {
 
     func hideGammaNotice() {
         mainAsync { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.gammaNoticeHighlighterTask = nil
 
             guard let gammaNotice = self.gammaNotice else { return }
@@ -1789,7 +1789,7 @@ class DisplayViewController: NSViewController {
         lockBrightnessHelpButton?.helpText = LOCK_BRIGHTNESS_HELP_TEXT
         lockContrastHelpButton?.helpText = LOCK_CONTRAST_HELP_TEXT
 
-        if let display = display, display.id != GENERIC_DISPLAY_ID {
+        if let display, display.id != GENERIC_DISPLAY_ID {
             update()
 
             scrollableBrightness?.label.textColor = scrollableViewLabelColor

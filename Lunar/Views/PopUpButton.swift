@@ -32,7 +32,7 @@ class PopUpButtonCell: NSPopUpButtonCell {
         paragraphStyle.alignment = .center
         var title = title.string.withTextColor(color).withFont(.boldSystemFont(ofSize: NSFont.smallSystemFontSize))
             .withParagraphStyle(paragraphStyle)
-        if !prefix.isEmpty || titleString.starts(with: DOT_PREFIX), titleString.count > 5, let dotColor = dotColor,
+        if !prefix.isEmpty || titleString.starts(with: DOT_PREFIX), titleString.count > 5, let dotColor,
            let font = NSFont(name: "HiraKakuProN-W3", size: 11.0)
         {
             title = titleString.withAttribute(.textColor(color))

@@ -88,7 +88,7 @@ class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObject {
     }
 
     func toggleMenuBar() {
-        if let menuWindow = menuWindow, menuWindow.isVisible {
+        if let menuWindow, menuWindow.isVisible {
             closeMenuBar()
         } else {
             showMenuBar()

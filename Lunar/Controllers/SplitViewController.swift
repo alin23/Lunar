@@ -218,7 +218,7 @@ class SplitViewController: NSSplitViewController {
     weak var pageController: PageController? {
         didSet {
             nameObservers = []
-            guard let pageController = pageController else { return }
+            guard let pageController else { return }
             var tabIndex = 0
             pages = pageController.arrangedObjects.compactMap { obj in
                 defer { tabIndex += 1 }
@@ -234,7 +234,7 @@ class SplitViewController: NSSplitViewController {
                     display.$name
                         .debounce(for: .milliseconds(10), scheduler: RunLoop.main)
                         .sink { [weak self] name in
-                            guard let self = self else { return }
+                            guard let self else { return }
 
                             self.pages = self.pages.map { tab in
                                 guard (tab.identifier as? String) == serial else { return tab }
@@ -262,10 +262,10 @@ class SplitViewController: NSSplitViewController {
 
     func listenForAdaptiveModeChange() {
         overrideAdaptiveModeObserver = overrideAdaptiveModePublisher.sink { [weak self] _ in
-            guard let self = self, let button = self.activeModeButton else { return }
+            guard let self, let button = self.activeModeButton else { return }
 
             mainAsync { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 Defaults.withoutPropagation {
                     button.update()
                     self.updateHelpButton()
@@ -275,7 +275,7 @@ class SplitViewController: NSSplitViewController {
 
         adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [weak self] change in
             mainAsync {
-                guard let self = self, !self.pausedAdaptiveModeObserver, let button = self.activeModeButton
+                guard let self, !self.pausedAdaptiveModeObserver, let button = self.activeModeButton
                 else { return }
 
                 self.pausedAdaptiveModeObserver = true
@@ -307,7 +307,7 @@ class SplitViewController: NSSplitViewController {
     }
 
     func setPage(_ pageNumber: Int?) {
-        guard let pageNumber = pageNumber else { return }
+        guard let pageNumber else { return }
         applyPage = false
         page = pageNumber
         applyPage = true
@@ -322,7 +322,7 @@ class SplitViewController: NSSplitViewController {
         uiCrumb("Display Page \(pageController?.selectedIndex ?? 0)")
         setPage(pageController?.selectedIndex)
         view.transition(0.2)
-        if let logo = logo {
+        if let logo {
             logo.transition(0.2)
             logo.textColor = logoColor
             logo.stringValue = "LUNAR"
@@ -352,7 +352,7 @@ class SplitViewController: NSSplitViewController {
     func configurationPage() {
         uiCrumb("Configuration Page")
         setPage(pageController?.selectedIndex)
-        if let logo = logo {
+        if let logo {
             logo.transition(0.2)
             logo.textColor = bgColor
             logo.stringValue = "SETTINGS"
@@ -369,7 +369,7 @@ class SplitViewController: NSSplitViewController {
         uiCrumb("Hotkeys Page")
 
         setPage(pageController?.selectedIndex)
-        if let logo = logo {
+        if let logo {
             logo.transition(0.2)
             logo.textColor = logoColor
             logo.stringValue = "HOTKEYS"

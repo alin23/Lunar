@@ -54,7 +54,7 @@ class CornerWindowController: NSWindowController {
     weak var display: Display? {
         didSet {
             mainAsync { [self] in
-                guard let display = display, let screen = display.screen ?? display.primaryMirrorScreen,
+                guard let display, let screen = display.screen ?? display.primaryMirrorScreen,
                       let w = window as? CornerWindow, let view = w.contentView
                 else { return }
 
@@ -148,7 +148,7 @@ class ModernWindow: WAYWindow {
     // MARK: Internal
 
     var pageController: PageController? {
-        guard let contentView = contentView,
+        guard let contentView,
               !contentView.subviews.isEmpty, !contentView.subviews[0].subviews.isEmpty,
               let controller = contentView.subviews[0].subviews[0].nextResponder as? PageController else { return nil }
         return controller
@@ -161,7 +161,7 @@ class ModernWindow: WAYWindow {
                 c.onClick = nil
             }
         }
-        if let menuWindow = menuWindow, menuWindow.isVisible {
+        if let menuWindow, menuWindow.isVisible {
             menuWindow.forceClose()
         }
 
