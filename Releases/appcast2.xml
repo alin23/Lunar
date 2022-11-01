@@ -3,6 +3,22 @@
     <channel>
         <title>Lunar</title>
         <item>
+            <title>5.8.0a4</title>
+            <pubDate>Mon, 31 Oct 2022 18:52:49 +0200</pubDate>
+            <link>https://lunar.fyi/</link>
+            <sparkle:fullReleaseNotesLink>https://lunar.fyi/changelog</sparkle:fullReleaseNotesLink>
+            <sparkle:channel>alpha</sparkle:channel>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <sparkle:version>5.8.0a4</sparkle:version>
+            <sparkle:shortVersionString>5.8.0a4</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-5.8.0a4.html</sparkle:releaseNotesLink>
+            <enclosure url="https://files.lunar.fyi/releases/Lunar-5.8.0a4.dmg" length="19094944" type="application/octet-stream" sparkle:edSignature="RloOXuohcT5tSj6ZRqHIHkH+coKgeSj3dFE4K5ukNqy14zeGe0Jta7HM8vhKO294JTtbTHVxmkLOIJtXiSDHCg=="/>
+            <sparkle:deltas>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.8.0a4-5.8.0a3.delta" sparkle:deltaFrom="5.8.0a3" length="2032986" type="application/octet-stream" sparkle:edSignature="MebaOKrAXjNBTjmlc/A34UY8PhC23RxVeDTFESoQPoKr7ehDhr8Ie4NPwxckEoM88HuhP0a6f4asF203DLACAg=="/>
+            </sparkle:deltas>
+        </item>
+        <item>
             <title>5.8.0a3</title>
             <pubDate>Sun, 30 Oct 2022 17:11:18 +0200</pubDate>
             <link>https://lunar.fyi/</link>

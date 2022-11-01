@@ -627,6 +627,9 @@ struct AdvancedSettingsView: View {
     @Default(.waitAfterWakeSeconds) var waitAfterWakeSeconds
     @Default(.delayDDCAfterWake) var delayDDCAfterWake
 
+    @Default(.autoRestartOnFailedDDC) var autoRestartOnFailedDDC
+    @Default(.autoRestartOnFailedDDCSooner) var autoRestartOnFailedDDCSooner
+
     var body: some View {
         ZStack {
             Color.clear.frame(maxWidth: .infinity, alignment: .leading)
@@ -769,6 +772,29 @@ struct AdvancedSettingsView: View {
                             • Sub-zero Dimming
                             """
                         )
+
+                        SettingsToggle(
+                            text: "Auto restart Lunar when DDC fails", setting: $autoRestartOnFailedDDC,
+                            help: """
+                            Experimental: for people running into macOS bugs where a monitor can no longer
+                            be controlled. You might see a lock icon when brightness keys are pressed.
+
+                            To avoid jarring brightness changes, this will not restart the app
+                            if any of the following features are in active use:
+
+                            • XDR Brightness
+                            • Facelight
+                            • Blackout
+                            • Sub-zero Dimming
+                            """
+                        )
+                        SettingsToggle(
+                            text: "Avoid safety checks", setting: $autoRestartOnFailedDDCSooner,
+                            help: """
+                            Don't wait for the detection of DDC fail to happen more than once, and restart
+                            the app even if it could cause a jarring brightness change.
+                            """
+                        ).padding(.leading)
 
                         SettingsToggle(
                             text: "Delay DDC commands after wake", setting: $delayDDCAfterWake,

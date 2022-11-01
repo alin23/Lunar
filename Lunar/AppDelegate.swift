@@ -1940,7 +1940,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func handleCLIUpdate() {
-        let lunarBin = "/usr/local/bin/lunar"
+        let lunarBin = "\(CLI_BIN_DIR)/lunar"
         if fm.fileExists(atPath: lunarBin), let currentScript = fm.contents(atPath: lunarBin)?.s,
            currentScript.contains("Contents/MacOS/Lunar"), currentScript.contains(" $@ ")
         {
@@ -2041,7 +2041,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }.store(in: &observers)
         serve(host: CachedDefaults[.listenForRemoteCommands] ? "0.0.0.0" : "127.0.0.1")
 
-        Defaults[.cliInstalled] = fm.isExecutableBinary(atPath: "/usr/local/bin/lunar")
+        Defaults[.cliInstalled] = fm.isExecutableBinary(atPath: "\(CLI_BIN_DIR)/lunar")
         checkPermissions()
         setupValueTransformers()
         configureSentry()
@@ -2095,7 +2095,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 //            }
 
             fm.createFile(
-                atPath: "/usr/local/bin/lunar",
+                atPath: "\(CLI_BIN_DIR)/lunar",
                 contents: LUNAR_CLI_SCRIPT.data(using: .utf8),
                 attributes: [.posixPermissions: 0o755]
             )
@@ -2155,11 +2155,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     @IBAction func restartApp(_: Any) {
-        _ = shell(
-            command: "while ps -p \(ProcessInfo.processInfo.processIdentifier) >/dev/null 2>/dev/null; do sleep 0.1; done; open '\(Bundle.main.path.string)'",
-            wait: false
-        )
-        exit(0)
+        restart()
     }
 
     func applicationWillTerminate(_: Notification) {
@@ -2533,7 +2529,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @IBAction func installCLI(_: Any) {
         let shouldInstall: Bool = ask(
             message: "Lunar CLI",
-            info: "This will install the `lunar` script into `/usr/local/bin`.\n\nDo you want to proceed?",
+            info: "This will install the `lunar` script into `\(CLI_BIN_DIR)`.\n\nDo you want to proceed?",
             okButton: "Yes",
             cancelButton: "No",
             unique: true,
@@ -2558,33 +2554,38 @@ struct InstallCLIError: Error {
     let info: String
 }
 
+let CLI_BIN_DIR = ["/usr/local/bin", "/opt/homebrew/bin", (Path.home / ".bin").string, (Path.home / ".local" / "bin").string]
+    .first { path in
+        fm.fileExists(path) && fm.isWritableFile(path)
+    } ?? "/usr/local/bin"
+
 func installCLIBinary() throws {
-    if !fm.fileExists(atPath: "/usr/local/bin") {
+    if !fm.fileExists(atPath: CLI_BIN_DIR) {
         do {
-            try fm.createDirectory(atPath: "/usr/local/bin", withIntermediateDirectories: false)
+            try fm.createDirectory(atPath: CLI_BIN_DIR, withIntermediateDirectories: true)
         } catch {
-            log.error("Error on creating /usr/local/bin: \(error)")
+            log.error("Error on creating \(CLI_BIN_DIR): \(error)")
             throw InstallCLIError(
-                message: "Missing /usr/local/bin",
-                info: "Error on creating the '/usr/local/bin' directory: \(error)"
+                message: "Missing \(CLI_BIN_DIR)",
+                info: "Error on creating the '\(CLI_BIN_DIR)' directory: \(error)"
             )
         }
     }
 
     fm.createFile(
-        atPath: "/usr/local/bin/lunar",
+        atPath: "\(CLI_BIN_DIR)/lunar",
         contents: LUNAR_CLI_SCRIPT.data(using: .utf8),
         attributes: [.posixPermissions: 0o755]
     )
 
-    guard fm.isExecutableBinary(atPath: "/usr/local/bin/lunar") else {
+    guard fm.isExecutableBinary(atPath: "\(CLI_BIN_DIR)/lunar") else {
         throw InstallCLIError(
             message: "File permissions error",
             info: """
             You can fix permissions by running the following commands in a terminal:
 
-            sudo chown -R $(whoami) /usr/local/bin
-            sudo chmod 755 /usr/local/bin
+            sudo chown -R $(whoami) '\(CLI_BIN_DIR)'
+            sudo chmod 755 '\(CLI_BIN_DIR)'
             """
         )
     }
@@ -2640,4 +2641,12 @@ func isLidClosed() -> Bool {
     guard !Sysctl.isiMac else { return false }
     guard Sysctl.isMacBook else { return true }
     return IsLidClosed()
+}
+
+func restart() {
+    _ = shell(
+        command: "while ps -p \(ProcessInfo.processInfo.processIdentifier) >/dev/null 2>/dev/null; do sleep 0.1; done; open '\(Bundle.main.path.string)'",
+        wait: false
+    )
+    exit(0)
 }
