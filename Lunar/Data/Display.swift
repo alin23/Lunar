@@ -2258,6 +2258,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
+    static var ddcWorkingCount: [String: Int] = [:]
+    static var ddcNotWorkingCount: [String: Int] = [:]
+
     // #if DEBUG
     //     @objc dynamic lazy var showVolumeSlider: Bool = CachedDefaults[.showVolumeSlider]
     // #else
@@ -2425,14 +2428,29 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
+    var ddcNotWorking: Bool {
+        active && ddcEnabled && (control == nil || (control is GammaControl && !(enabledControls[.gamma] ?? false)))
+    }
+
     @AtomicLock var control: Control? = nil {
         didSet {
             context = getContext()
-            mainAsync { self.supportsEnhance = self.getSupportsEnhance() }
+            mainAsync {
+                self.supportsEnhance = self.getSupportsEnhance()
+                if self.control is DDCControl {
+                    self.ddcWorkingCount = self.ddcWorkingCount + 1
+                }
+            }
+
+            if ddcNotWorking {
+                ddcNotWorkingCount = ddcNotWorkingCount + 1
+            }
+
             guard let control else {
                 usesDDCBrightnessControl = false
                 hasSoftwareControl = false
                 isNative = false
+
                 return
             }
             usesDDCBrightnessControl = control is DDCControl || control is NetworkControl
@@ -3536,6 +3554,33 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 activeAndResponsive = (active && responsiveDDC) || !(control is DDCControl)
                 hasDDC = active && (hasI2C || hasNetworkControl)
             }
+        }
+    }
+
+    var ddcWorkingCount: Int {
+        get { Self.ddcWorkingCount[serial] ?? 0 }
+        set { Self.ddcWorkingCount[serial] = newValue }
+    }
+
+    var ddcNotWorkingCount: Int {
+        get { Self.ddcNotWorkingCount[serial] ?? 0 }
+        set {
+            guard CachedDefaults[.autoRestartOnFailedDDC] else {
+                Self.ddcNotWorkingCount[serial] = newValue
+                return
+            }
+
+            let avoidSafetyChecks = CachedDefaults[.autoRestartOnFailedDDCSooner]
+            if newValue >= (avoidSafetyChecks ? 1 : 2), ddcWorkingCount >= 3,
+               avoidSafetyChecks || !displayController.activeDisplayList.contains(where: {
+                   $0.blackOutEnabled || $0.faceLightEnabled || $0.enhanced || $0.subzero
+               })
+            {
+                log.info("Restarting because DDC failed")
+                restart()
+            }
+
+            Self.ddcNotWorkingCount[serial] = newValue
         }
     }
 

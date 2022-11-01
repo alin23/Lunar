@@ -1126,6 +1126,17 @@ class DisplayController: ObservableObject {
         }
     }
 
+    var volumeHotkeysEnabled: Bool {
+        CachedDefaults[.volumeKeysEnabled] || (
+            !CachedDefaults[.volumeHotkeysControlAllMonitors] &&
+                (
+                    CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.volumeUp.rawValue }?.isEnabled ?? true
+                        || CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.volumeDown.rawValue }?.isEnabled ?? true
+                        || CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.muteAudio.rawValue }?.isEnabled ?? true
+                )
+        )
+    }
+
     static func getAdaptiveMode() -> AdaptiveMode {
         if CachedDefaults[.overrideAdaptiveMode] {
             return CachedDefaults[.adaptiveBrightnessMode].mode
@@ -1403,7 +1414,10 @@ class DisplayController: ObservableObject {
     }
 
     func getCurrentAudioDisplay() -> Display? {
-        guard let audioDevice = simplyCA.defaultOutputDevice, !audioDevice.canSetVirtualMainVolume(scope: .output) else {
+        guard let audioDevice = simplyCA.defaultOutputDevice,
+              !audioDevice.canSetVirtualMainVolume(scope: .output),
+              volumeHotkeysEnabled
+        else {
             return nil
         }
 
