@@ -136,6 +136,8 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .apiKey,
     .listenForRemoteCommands,
     .neverAskAboutXDR,
+    .autoRestartOnFailedDDC,
+    .autoRestartOnFailedDDCSooner,
     .nonManualMode,
     .clockMode,
     .syncMode,
@@ -808,6 +810,8 @@ func initCache() {
     cacheKey(.ignoredVolumes)
     cacheKey(.listenForRemoteCommands)
     cacheKey(.neverAskAboutXDR)
+    cacheKey(.autoRestartOnFailedDDC)
+    cacheKey(.autoRestartOnFailedDDCSooner)
     cacheKey(.apiKey)
 
     cacheKey(.location)
@@ -1003,6 +1007,9 @@ extension Defaults.Keys {
     static let apiKey = Key<String>("apiKey", default: "")
     static let listenForRemoteCommands = Key<Bool>("listenForRemoteCommands", default: false)
     static let neverAskAboutXDR = Key<Bool>("neverAskAboutXDR", default: false)
+
+    static let autoRestartOnFailedDDC = Key<Bool>("autoRestartOnFailedDDC", default: true)
+    static let autoRestartOnFailedDDCSooner = Key<Bool>("autoRestartOnFailedDDCSooner", default: false)
 }
 
 let datastore = DataStore()
