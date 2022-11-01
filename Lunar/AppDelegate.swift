@@ -2554,10 +2554,16 @@ struct InstallCLIError: Error {
     let info: String
 }
 
-let CLI_BIN_DIR = ["/usr/local/bin", "/opt/homebrew/bin", (Path.home / ".bin").string, (Path.home / ".local" / "bin").string]
-    .first { path in
-        fm.fileExists(path) && fm.isWritableFile(path)
-    } ?? "/usr/local/bin"
+let CLI_BIN_DIR = (Path.home / ".local" / "bin").string
+let CLI_BIN_DIR_ENV = "$HOME/.local/bin"
+let ZSHRC = (Path.home / ".zshrc").string
+let BASHRC = (Path.home / ".bashrc").string
+let FISHRC = (Path.home / ".config" / "fish" / "config.fish").string
+let PATH_EXPORT = """
+
+export PATH="$PATH:\(CLI_BIN_DIR_ENV)"
+
+"""
 
 func installCLIBinary() throws {
     if !fm.fileExists(atPath: CLI_BIN_DIR) {
@@ -2589,6 +2595,20 @@ func installCLIBinary() throws {
             """
         )
     }
+
+    for config in [BASHRC, ZSHRC, FISHRC] {
+        let contents = fm.contents(atPath: config)?.s ?? ""
+        guard !contents.contains(CLI_BIN_DIR_ENV), !contents.contains(CLI_BIN_DIR) else {
+            continue
+        }
+
+        fm.createFile(
+            atPath: config,
+            contents: (contents + PATH_EXPORT).data(using: .utf8),
+            attributes: [.posixPermissions: 0o644]
+        )
+    }
+
     Defaults[.cliInstalled] = true
 }
 
