@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mw99/DataCompression/",
       "state" : {
-        "revision" : "4ac2c9c108d80b690a74252a4ec48f47e9995e00",
-        "version" : "3.7.0"
+        "revision" : "5ab15951321b08b74511601cbd0497667649d70b",
+        "version" : "3.8.0"
       }
     },
     {
@@ -73,12 +73,12 @@
       }
     },
     {
-      "identity" : "fuzzyfind",
+      "identity" : "fuzzymatcher",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/alin23/FuzzyFind",
+      "location" : "https://github.com/alin23/FuzzyMatcher",
       "state" : {
         "branch" : "main",
-        "revision" : "549d644bbebdbc8792ee5ceb2c2801c80a225af3"
+        "revision" : "dface477a7fe0f6350890284f014ab386ed526cf"
       }
     },
     {

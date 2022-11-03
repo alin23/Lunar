@@ -13,7 +13,7 @@ import Combine
 import Compression
 import CoreLocation
 import Defaults
-import FuzzyFind
+import FuzzyMatcher
 import LetsMove
 import Magnet
 import MediaKeyTap
@@ -520,8 +520,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                            !view.subviews.isEmpty, !view.subviews[0].subviews.isEmpty,
                            let pageController = view.subviews[0].subviews[0].nextResponder as? PageController
                         {
-                            let alignments = fuzzyFind(queries: [firstPath], inputs: displayController.displays.values.map(\.name))
-                            if let name = alignments.first?.result.asString {
+                            if let name = displayController.displays.values.map(\.name).fuzzyFind(firstPath) {
                                 currentPage = pageController.arrangedObjects.firstIndex {
                                     (($0 as? Display)?.name ?? "") == name
                                 } ?? currentPage

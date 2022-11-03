@@ -11,7 +11,7 @@ import ArgumentParser
 import Cocoa
 import Dispatch
 import Foundation
-import FuzzyFind
+import FuzzyMatcher
 import Regex
 import SwiftyJSON
 
@@ -276,8 +276,7 @@ private func getDisplays(displays: [Display], filter: DisplayFilter) -> [Display
     case let .serial(serial):
         return displays.filter { $0.serial == serial }
     case let .name(name):
-        let alignments = fuzzyFind(queries: [name], inputs: displays.map(\.name))
-        guard let name = alignments.first?.result.asString else { return [] }
+        guard let name = displays.map(\.name).fuzzyFind(name) else { return [] }
 
         return displays.filter { $0.name == name }
     case .external:
