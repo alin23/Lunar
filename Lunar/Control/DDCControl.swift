@@ -23,6 +23,7 @@ class DDCControl: Control, ObservableObject {
         let displayID: CGDirectDisplayID
         let value: UInt16
         let oldValue: UInt16?
+        let transition: BrightnessTransition
     }
 
     @Atomic static var sliderTracking = false
@@ -45,12 +46,12 @@ class DDCControl: Control, ObservableObject {
             .sink { [weak self] range in
                 guard let self else {
                     if let display = displayController.activeDisplays[range.displayID], let control = display.control as? DDCControl {
-                        _ = control.setBrightnessDebounced(range.value, oldValue: range.oldValue)
+                        _ = control.setBrightnessDebounced(range.value, oldValue: range.oldValue, transition: range.transition)
                     }
                     return
                 }
 
-                _ = self.setBrightness(range.value, oldValue: range.oldValue, onChange: nil)
+                _ = self.setBrightness(range.value, oldValue: range.oldValue, transition: range.transition, onChange: nil)
             }.store(in: &observers)
         return p
     }()
@@ -61,12 +62,12 @@ class DDCControl: Control, ObservableObject {
             .sink { [weak self] range in
                 guard let self else {
                     if let display = displayController.activeDisplays[range.displayID], let control = display.control as? DDCControl {
-                        _ = control.setContrastDebounced(range.value, oldValue: range.oldValue)
+                        _ = control.setContrastDebounced(range.value, oldValue: range.oldValue, transition: range.transition)
                     }
                     return
                 }
 
-                _ = self.setContrast(range.value, oldValue: range.oldValue, onChange: nil)
+                _ = self.setContrast(range.value, oldValue: range.oldValue, transition: range.transition, onChange: nil)
             }.store(in: &observers)
         return p
     }()
@@ -183,20 +184,22 @@ class DDCControl: Control, ObservableObject {
         return DDC.resetColors(for: display.id)
     }
 
-    func setBrightnessDebounced(_ brightness: Brightness, oldValue: Brightness? = nil) -> Bool {
+    func setBrightnessDebounced(_ brightness: Brightness, oldValue: Brightness? = nil, transition: BrightnessTransition? = nil) -> Bool {
         guard let display else {
             log.warning("No display for DDCControl?", context: ["brightness": brightness, "oldBrightness": oldValue])
             return false
         }
 
-        brightnessPublisher.send(ValueRange(displayID: display.id, value: brightness, oldValue: oldValue))
+        brightnessPublisher
+            .send(ValueRange(displayID: display.id, value: brightness, oldValue: oldValue, transition: transition ?? brightnessTransition))
         return true
     }
 
-    func setContrastDebounced(_ contrast: Contrast, oldValue: Contrast? = nil) -> Bool {
+    func setContrastDebounced(_ contrast: Contrast, oldValue: Contrast? = nil, transition: BrightnessTransition? = nil) -> Bool {
         guard let display else { return false }
 
-        contrastPublisher.send(ValueRange(displayID: display.id, value: contrast, oldValue: oldValue))
+        contrastPublisher
+            .send(ValueRange(displayID: display.id, value: contrast, oldValue: oldValue, transition: transition ?? brightnessTransition))
         return true
     }
 
@@ -204,11 +207,14 @@ class DDCControl: Control, ObservableObject {
         _ brightness: Brightness,
         oldValue: Brightness? = nil,
         force: Bool = false,
+        transition: BrightnessTransition? = nil,
         onChange: ((Brightness) -> Void)? = nil
     ) -> Bool {
         guard let display else { return false }
         defer { mainAsync { self.lastBrightness = brightness } }
-        if brightnessTransition != .instant, !Self.sliderTracking, supportsSmoothTransition(for: .BRIGHTNESS), var oldValue,
+
+        let transition = transition ?? brightnessTransition
+        if transition != .instant, !Self.sliderTracking, supportsSmoothTransition(for: .BRIGHTNESS), var oldValue,
            oldValue != brightness
         {
             if display.inSmoothTransition {
@@ -217,7 +223,7 @@ class DDCControl: Control, ObservableObject {
             }
 
             var faults = 0
-            let delay = brightnessTransition == .smooth ? nil : 0.01
+            let delay = transition == .smooth ? nil : 0.01
 
             smoothTransitionBrightnessTask?.cancel()
             smoothTransitionBrightnessTask = display.smoothTransition(
@@ -254,11 +260,17 @@ class DDCControl: Control, ObservableObject {
         return DDC.setBrightness(for: display.id, brightness: brightness)
     }
 
-    func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil, onChange: ((Contrast) -> Void)? = nil) -> Bool {
+    func setContrast(
+        _ contrast: Contrast,
+        oldValue: Contrast? = nil,
+        transition: BrightnessTransition? = nil,
+        onChange: ((Contrast) -> Void)? = nil
+    ) -> Bool {
         guard let display else { return false }
         defer { mainAsync { self.lastContrast = contrast } }
 
-        if brightnessTransition != .instant, !Self.sliderTracking, supportsSmoothTransition(for: .CONTRAST), var oldValue,
+        let transition = transition ?? brightnessTransition
+        if transition != .instant, !Self.sliderTracking, supportsSmoothTransition(for: .CONTRAST), var oldValue,
            oldValue != contrast
         {
             if display.inSmoothTransition {
@@ -267,7 +279,7 @@ class DDCControl: Control, ObservableObject {
             }
 
             var faults = 0
-            let delay = brightnessTransition == .smooth ? nil : 0.01
+            let delay = transition == .smooth ? nil : 0.01
 
             smoothTransitionContrastTask?.cancel()
             smoothTransitionContrastTask = display.smoothTransition(

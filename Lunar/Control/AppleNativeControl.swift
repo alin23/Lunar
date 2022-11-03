@@ -204,11 +204,13 @@ class AppleNativeControl: Control {
         _ brightness: Brightness,
         oldValue: Brightness? = nil,
         force: Bool = false,
+        transition: BrightnessTransition? = nil,
         onChange: ((Brightness) -> Void)? = nil
     ) -> Bool {
         guard let display else { return false }
         guard !display.isForTesting else { return false }
 
+        let brightnessTransition = transition ?? brightnessTransition
         if brightnessTransition != .instant, !Self.sliderTracking, supportsSmoothTransition(for: .BRIGHTNESS), var oldValue,
            oldValue != brightness
         {
@@ -300,10 +302,15 @@ class AppleNativeControl: Control {
         return writeBrightness(brightness)
     }
 
-    func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil, onChange: ((Contrast) -> Void)? = nil) -> Bool {
+    func setContrast(
+        _ contrast: Contrast,
+        oldValue: Contrast? = nil,
+        transition: BrightnessTransition? = nil,
+        onChange: ((Contrast) -> Void)? = nil
+    ) -> Bool {
         guard let display else { return false }
         guard let control = display.alternativeControlForAppleNative else { return false }
-        return control.setContrast(contrast, oldValue: oldValue, onChange: onChange)
+        return control.setContrast(contrast, oldValue: oldValue, transition: transition, onChange: onChange)
     }
 
     func setVolume(_ volume: UInt16) -> Bool {

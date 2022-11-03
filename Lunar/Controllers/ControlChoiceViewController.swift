@@ -493,7 +493,7 @@ class ControlChoiceViewController: NSViewController {
             let write1Worked = control.setBrightness(
                 newBr,
                 oldValue: currentBrightness,
-                force: true,
+                force: true, transition: .smooth,
                 onChange: { [weak self] br in self?.setBrightness(br) }
             )
             if control.isSoftware, !display.supportsGamma {
@@ -506,7 +506,7 @@ class ControlChoiceViewController: NSViewController {
             let write2Worked = control.setBrightness(
                 newBr,
                 oldValue: 0,
-                force: true,
+                force: true, transition: .smooth,
                 onChange: { [weak self] br in self?.setBrightness(br) }
             )
             if control.isSoftware, !display.supportsGamma {
@@ -519,7 +519,7 @@ class ControlChoiceViewController: NSViewController {
             let write3Worked = control.setBrightness(
                 newBr,
                 oldValue: 75,
-                force: true,
+                force: true, transition: .smooth,
                 onChange: { [weak self] br in self?.setBrightness(br) }
             )
             if control.isSoftware, !display.supportsGamma {
@@ -577,16 +577,27 @@ class ControlChoiceViewController: NSViewController {
             setWriteProgress(0.35)
             let write1Worked = control.setContrast(
                 currentContrast != 0 ? 0 : 50,
-                oldValue: currentContrast, onChange: { [weak self] br in self?.setContrast(br) }
+                oldValue: currentContrast, transition: .smooth,
+                onChange: { [weak self] br in self?.setContrast(br) }
             )
             guard wait(4) else { return }
             setWriteProgress(0.4)
 
-            let write2Worked = control.setContrast(75, oldValue: 0, onChange: { [weak self] br in self?.setContrast(br) })
+            let write2Worked = control.setContrast(
+                75,
+                oldValue: 0,
+                transition: .smooth,
+                onChange: { [weak self] br in self?.setContrast(br) }
+            )
             guard wait(4) else { return }
             setWriteProgress(0.45)
 
-            let write3Worked = control.setContrast(67, oldValue: 75, onChange: { [weak self] br in self?.setContrast(br) })
+            let write3Worked = control.setContrast(
+                67,
+                oldValue: 75,
+                transition: .smooth,
+                onChange: { [weak self] br in self?.setContrast(br) }
+            )
             contrastWriteWorked = (write1Worked.i + write2Worked.i + write3Worked.i) >= 2
             setWriteProgress(0.5)
         }
@@ -650,11 +661,11 @@ class ControlChoiceViewController: NSViewController {
         info("Setting values before test", color: peach)
         guard wait(2) else { return .allWorked }
 
-        _ = control.setBrightness(currentBrightness, oldValue: nil, force: true, onChange: nil)
+        _ = control.setBrightness(currentBrightness, oldValue: nil, force: true, transition: .smooth, onChange: nil)
         setBrightness(currentBrightness)
         setWriteProgress(0.85)
 
-        _ = control.setContrast(currentContrast, oldValue: nil, onChange: nil)
+        _ = control.setContrast(currentContrast, oldValue: nil, transition: .smooth, onChange: nil)
         setContrast(currentContrast)
         setWriteProgress(0.9)
 
