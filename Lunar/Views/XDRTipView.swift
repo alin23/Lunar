@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import FuzzyFind
 import SwiftUI
 
 // MARK: - XDRTipView

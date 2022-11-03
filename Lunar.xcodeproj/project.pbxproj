@@ -28,7 +28,6 @@
 		C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EA201F1DE50055934F /* ExceptionsViewController.swift */; };
 		C72776ED201F26CB0055934F /* AppException.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EC201F26CB0055934F /* AppException.swift */; };
 		C728D7ED2296D81B003CAD65 /* TextButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C728D7EC2296D81B003CAD65 /* TextButton.swift */; };
-		C72AB9C7290E978A0030CA79 /* FuzzyFind in Frameworks */ = {isa = PBXBuildFile; productRef = C72AB9C6290E978A0030CA79 /* FuzzyFind */; };
 		C72BB4B62727E03500941708 /* Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = C72BB4B32727E03400941708 /* Extensions.h */; };
 		C72BB4B72727E03500941708 /* Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C72BB4B52727E03400941708 /* Extensions.m */; };
 		C72CFB962586B36E005F0340 /* WAYWindow.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C72CFB912586AE7E005F0340 /* WAYWindow.framework */; };
@@ -110,6 +109,7 @@
 		C7A6A08927BF8F5D008E52E0 /* Schedule.xib in Resources */ = {isa = PBXBuildFile; fileRef = C7AF321C26F62F5C00AC14AF /* Schedule.xib */; };
 		C7A7C248259391C200745637 /* HotkeyPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A7C247259391C200745637 /* HotkeyPopoverController.swift */; };
 		C7A7C24A2593B5EA00745637 /* HotkeyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A7C2492593B5EA00745637 /* HotkeyButton.swift */; };
+		C7A7F2542913ECCA00CD450C /* FuzzyMatcher in Frameworks */ = {isa = PBXBuildFile; productRef = C7A7F2532913ECCA00CD450C /* FuzzyMatcher */; };
 		C7A82D9F2618E1B9004146A8 /* InstallOutputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A82D9E2618E1B9004146A8 /* InstallOutputViewController.swift */; };
 		C7A82DB7261B779E004146A8 /* SettingsPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A82DB5261B779E004146A8 /* SettingsPopoverController.swift */; };
 		C7A82DC3261DF513004146A8 /* Pro.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A82DC2261DF513004146A8 /* Pro.swift */; };
@@ -399,6 +399,7 @@
 				C7138D962634B02900406EE3 /* Paddle.framework in Frameworks */,
 				C7E80E352637060F004718A4 /* libcrypto.a in Frameworks */,
 				C7E99267260A90E70055370A /* Solar in Frameworks */,
+				C7A7F2542913ECCA00CD450C /* FuzzyMatcher in Frameworks */,
 				C78BD04A259B33D500FC823F /* Path in Frameworks */,
 				C7045DB22440DC5E002289E5 /* SwiftyBeaver in Frameworks */,
 				C74F8DC425EB94660077DF27 /* DisplayServices.framework in Frameworks */,
@@ -408,7 +409,6 @@
 				C7E80E392637060F004718A4 /* libssl.a in Frameworks */,
 				C7BD5F85287B44130077CCB7 /* Charts in Frameworks */,
 				C7F48C4A2657A258000715A8 /* DataCompression in Frameworks */,
-				C72AB9C7290E978A0030CA79 /* FuzzyFind in Frameworks */,
 				C72CFB962586B36E005F0340 /* WAYWindow.framework in Frameworks */,
 				C731E85E27E1E5090016B36D /* Sentry in Frameworks */,
 				C7DA10F7259B8979006DD876 /* Regex in Frameworks */,
@@ -830,7 +830,7 @@
 				C731E85D27E1E5090016B36D /* Sentry */,
 				C77C77572812AA80006326BE /* Introspect */,
 				C7BD5F84287B44130077CCB7 /* Charts */,
-				C72AB9C6290E978A0030CA79 /* FuzzyFind */,
+				C7A7F2532913ECCA00CD450C /* FuzzyMatcher */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -894,7 +894,7 @@
 				C731E85C27E1E5090016B36D /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 				C77C77562812AA80006326BE /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
 				C7BD5F83287B44130077CCB7 /* XCRemoteSwiftPackageReference "Charts" */,
-				C72AB9C5290E978A0030CA79 /* XCRemoteSwiftPackageReference "FuzzyFind" */,
+				C7A7F2522913ECCA00CD450C /* XCRemoteSwiftPackageReference "FuzzyMatcher" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -1685,14 +1685,6 @@
 				kind = branch;
 			};
 		};
-		C72AB9C5290E978A0030CA79 /* XCRemoteSwiftPackageReference "FuzzyFind" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/alin23/FuzzyFind";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
 		C731E85C27E1E5090016B36D /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/alin23/sentry-cocoa.git";
@@ -1778,6 +1770,14 @@
 			repositoryURL = "https://github.com/alin23/BlueSocket";
 			requirement = {
 				branch = master;
+				kind = branch;
+			};
+		};
+		C7A7F2522913ECCA00CD450C /* XCRemoteSwiftPackageReference "FuzzyMatcher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/alin23/FuzzyMatcher";
+			requirement = {
+				branch = main;
 				kind = branch;
 			};
 		};
@@ -1891,11 +1891,6 @@
 			package = C7138D8B2634AF0500406EE3 /* XCRemoteSwiftPackageReference "KeyHolder" */;
 			productName = KeyHolder;
 		};
-		C72AB9C6290E978A0030CA79 /* FuzzyFind */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C72AB9C5290E978A0030CA79 /* XCRemoteSwiftPackageReference "FuzzyFind" */;
-			productName = FuzzyFind;
-		};
 		C731E85D27E1E5090016B36D /* Sentry */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C731E85C27E1E5090016B36D /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
@@ -1950,6 +1945,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C799C2F327BF67C4003A2FB9 /* XCRemoteSwiftPackageReference "BlueSocket" */;
 			productName = Socket;
+		};
+		C7A7F2532913ECCA00CD450C /* FuzzyMatcher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7A7F2522913ECCA00CD450C /* XCRemoteSwiftPackageReference "FuzzyMatcher" */;
+			productName = FuzzyMatcher;
 		};
 		C7B5E8582548B3F900530B47 /* Defaults */ = {
 			isa = XCSwiftPackageProductDependency;

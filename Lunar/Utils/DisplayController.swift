@@ -12,7 +12,7 @@ import Combine
 import CoreLocation
 import Defaults
 import Foundation
-import FuzzyFind
+import FuzzyMatcher
 import Sentry
 import Solar
 import Surge
@@ -1432,8 +1432,13 @@ class DisplayController: ObservableObject {
             log.info("Audio Display UID \(activeDisplayList.map { ($0.name, $0.audioIdentifier ?? "nil") })")
         }
 
-        let alignments = fuzzyFind(queries: [audioDevice.name], inputs: activeDisplays.values.map(\.name))
-        guard let name = alignments.first?.result.asString else { return mainExternalOrCGMainDisplay }
+        let audioDeviceName = audioDevice.name
+        guard !audioDeviceName.isEmpty else { return nil }
+
+        guard let name = activeDisplays.values.map(\.name).fuzzyFind(audioDeviceName)
+        else {
+            return mainExternalOrCGMainDisplay
+        }
 
         return activeDisplays.values.first(where: { $0.name == name }) ?? mainExternalOrCGMainDisplay
     }
