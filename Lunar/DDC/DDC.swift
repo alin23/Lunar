@@ -11,7 +11,7 @@ import Cocoa
 import Combine
 import CoreGraphics
 import Foundation
-import FuzzyFind
+import FuzzyMatcher
 import Regex
 
 let MAX_REQUESTS = 10
@@ -490,14 +490,11 @@ enum ControlID: UInt8, ExpressibleByArgument, CaseIterable {
         case "color preset c": self = ControlID.COLOR_PRESET_C
         case "power control": self = ControlID.POWER_CONTROL
         default:
-            let alignments = fuzzyFind(
-                queries: [arg],
-                inputs: CONTROLS_BY_NAME.keys.map { $0 },
-                match: Score(integerLiteral: Score.defaultMatch.value / 2),
-                camelCaseBonus: Score(integerLiteral: Score.defaultCamelCase.value + 3)
-            )
-            guard let control = alignments.first?.result.asString else { return nil }
-            guard let controlID = CONTROLS_BY_NAME[control] else { return nil }
+            guard let control = CONTROLS_BY_NAME.keys.map({ $0 }).fuzzyFind(arg),
+                  let controlID = CONTROLS_BY_NAME[control]
+            else {
+                return nil
+            }
             self = controlID
         }
     }
