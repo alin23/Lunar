@@ -3054,10 +3054,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 if supportsGamma {
                     setGamma(
                         brightness: brightness.u16,
-                        preciseBrightness: preciseBrightness
+                        preciseBrightness: preciseBrightness,
+                        transition: brightnessTransition
                     )
                 } else {
-                    shade(amount: 1.0 - preciseBrightness, smooth: !smallDiff)
+                    shade(amount: 1.0 - preciseBrightness, smooth: !smallDiff, transition: brightnessTransition)
                 }
                 withoutDDC {
                     self.brightness = brightness.ns
@@ -3216,8 +3217,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             if let control = control as? DDCControl {
-                _ = control.setBrightnessDebounced(brightness, oldValue: oldBrightness)
-            } else if let control, !control.setBrightness(brightness, oldValue: oldBrightness, force: false, onChange: nil) {
+                _ = control.setBrightnessDebounced(brightness, oldValue: oldBrightness, transition: brightnessTransition)
+            } else if let control, !control.setBrightness(
+                brightness,
+                oldValue: oldBrightness,
+                force: false,
+                transition: brightnessTransition,
+                onChange: nil
+            ) {
                 log.warning(
                     "Error writing brightness using \(control.str)",
                     context: context
@@ -3296,8 +3303,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             if let control = control as? DDCControl {
-                _ = control.setContrastDebounced(contrast, oldValue: oldContrast)
-            } else if let control, !control.setContrast(contrast, oldValue: oldContrast, onChange: nil) {
+                _ = control.setContrastDebounced(contrast, oldValue: oldContrast, transition: brightnessTransition)
+            } else if let control, !control.setContrast(contrast, oldValue: oldContrast, transition: brightnessTransition, onChange: nil) {
                 log.warning(
                     "Error writing contrast using \(control.str)",
                     context: context
@@ -3521,7 +3528,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 if supportsGamma {
                     reapplyGamma()
                 } else if !supportsGammaByDefault, hasSoftwareControl {
-                    shade(amount: 1.0 - preciseBrightness)
+                    shade(amount: 1.0 - preciseBrightness, transition: brightnessTransition)
                 }
 
                 if let controller = hotkeyPopoverController {
@@ -3571,12 +3578,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             let avoidSafetyChecks = CachedDefaults[.autoRestartOnFailedDDCSooner]
-            if newValue >= (avoidSafetyChecks ? 1 : 2), ddcWorkingCount >= 3,
+            if newValue >= 1, ddcWorkingCount >= 3,
                avoidSafetyChecks || !displayController.activeDisplayList.contains(where: {
                    $0.blackOutEnabled || $0.faceLightEnabled || $0.enhanced || $0.subzero
                })
             {
-                log.info("Restarting because DDC failed")
+                log.warning("Restarting because DDC failed")
                 restart()
             }
 
@@ -3913,11 +3920,17 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         if supportsGamma {
             reapplyGamma()
         } else if !supportsGammaByDefault, hasSoftwareControl {
-            shade(amount: 1.0 - preciseBrightness)
+            shade(amount: 1.0 - preciseBrightness, transition: brightnessTransition)
         }
     }
 
-    func shade(amount: Double, smooth: Bool = true, force: Bool = false, onChange _: ((Brightness) -> Void)? = nil) {
+    func shade(
+        amount: Double,
+        smooth: Bool = true,
+        force: Bool = false,
+        transition: BrightnessTransition? = nil,
+        onChange _: ((Brightness) -> Void)? = nil
+    ) {
         guard let screen = screen ?? primaryMirrorScreen, force || (
             !isInHardwareMirrorSet && !isIndependentDummy &&
                 timeSince(lastConnectionTime) >= 1 || onlySoftwareDimmingEnabled
@@ -3930,6 +3943,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         shadeTask = nil
         mainThread {
+            let brightnessTransition = transition ?? brightnessTransition
             if shadeWindowController?.window == nil {
                 createWindow(
                     "shadeWindowController",
@@ -4006,7 +4020,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         if hasSoftwareControl {
-            setGamma()
+            setGamma(transition: .instant)
         } else if applyGamma, !blackOutEnabled {
             resetSoftwareControl()
         }
@@ -5203,6 +5217,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         brightness: UInt16? = nil,
         preciseBrightness: Double? = nil,
         force: Bool = false,
+        transition: BrightnessTransition? = nil,
         onChange: ((Brightness) -> Void)? = nil
     ) {
         #if DEBUG
@@ -5220,6 +5235,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         let brightness = brightness ?? limitedBrightness
         let gammaTable = lunarGammaTable ?? defaultGammaTable
         let newGammaTable = gammaTable.adjust(brightness: brightness, preciseBrightness: preciseBrightness, maxValue: maxEDR)
+        let brightnessTransition = transition ?? brightnessTransition
 
         guard !GammaControl.sliderTracking, lastGammaBrightness != brightness else {
             defer {

@@ -116,12 +116,18 @@ struct DDCCTLControl: Control {
         _ value: Brightness,
         oldValue _: Brightness? = nil,
         force: Bool = false,
+        transition: BrightnessTransition? = nil,
         onChange: ((Brightness) -> Void)? = nil
     ) -> Bool {
         ddcctlSet(.BRIGHTNESS, value: value)
     }
 
-    func setContrast(_ value: Contrast, oldValue _: Brightness?, onChange: ((Contrast) -> Void)? = nil) -> Bool {
+    func setContrast(
+        _ value: Contrast,
+        oldValue _: Brightness?,
+        transition: BrightnessTransition? = nil,
+        onChange: ((Contrast) -> Void)? = nil
+    ) -> Bool {
         ddcctlSet(.CONTRAST, value: value)
     }
 

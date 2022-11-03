@@ -365,6 +365,7 @@ class GammaControl: Control {
         _ brightness: Brightness,
         oldValue: Brightness? = nil,
         force: Bool = false,
+        transition: BrightnessTransition? = nil,
         onChange: ((Brightness) -> Void)? = nil
     ) -> Bool {
         guard let display else { return false }
@@ -376,16 +377,21 @@ class GammaControl: Control {
         let brightness = cap(brightness, minVal: 0, maxVal: 100)
 
         guard display.supportsGamma else {
-            display.shade(amount: 1.0 - (brightness.d / 100.0), force: force, onChange: onChange)
+            display.shade(amount: 1.0 - (brightness.d / 100.0), force: force, transition: transition, onChange: onChange)
             return true
         }
 
-        display.setGamma(brightness: brightness, force: force, onChange: onChange)
+        display.setGamma(brightness: brightness, force: force, transition: transition, onChange: onChange)
         onChange?(brightness)
         return true
     }
 
-    func setContrast(_ contrast: Contrast, oldValue: Contrast? = nil, onChange: ((Contrast) -> Void)? = nil) -> Bool {
+    func setContrast(
+        _ contrast: Contrast,
+        oldValue: Contrast? = nil,
+        transition: BrightnessTransition? = nil,
+        onChange: ((Contrast) -> Void)? = nil
+    ) -> Bool {
         true
     }
 
