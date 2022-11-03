@@ -2220,9 +2220,13 @@ class DisplayController: ObservableObject {
                     preciseValue = cap(display.preciseBrightnessContrast + (offset.d / 100), minVal: 0.0, maxVal: 1.0)
                 }
 
-                display.preciseBrightnessContrast = preciseValue
+                withoutSlowTransition {
+                    display.preciseBrightnessContrast = preciseValue
+                }
             } else {
-                display.brightness = value.ns
+                withoutSlowTransition {
+                    display.brightness = value.ns
+                }
             }
 
             if adaptiveModeKey != .manual {
@@ -2233,6 +2237,17 @@ class DisplayController: ObservableObject {
                 )
             }
         }
+    }
+
+    @inline(__always) func withoutSlowTransition(_ block: () -> Void) {
+        guard brightnessTransition == .slow else {
+            block()
+            return
+        }
+
+        brightnessTransition = .smooth
+        block()
+        brightnessTransition = .slow
     }
 
     func adjustContrast(
@@ -2261,7 +2276,10 @@ class DisplayController: ObservableObject {
                 minVal: display.minContrast.intValue,
                 maxVal: display.maxContrast.intValue
             )
-            display.contrast = value.ns
+
+            withoutSlowTransition {
+                display.contrast = value.ns
+            }
 
             if adaptiveModeKey != .manual {
                 display.insertContrastUserDataPoint(

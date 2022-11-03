@@ -93,8 +93,14 @@ protocol Control {
     var displayControl: DisplayControl { get }
     var isSoftware: Bool { get }
 
-    func setBrightness(_ brightness: Brightness, oldValue: Brightness?, force: Bool, onChange: ((Brightness) -> Void)?) -> Bool
-    func setContrast(_ contrast: Contrast, oldValue: Contrast?, onChange: ((Contrast) -> Void)?) -> Bool
+    func setBrightness(
+        _ brightness: Brightness,
+        oldValue: Brightness?,
+        force: Bool,
+        transition: BrightnessTransition?,
+        onChange: ((Brightness) -> Void)?
+    ) -> Bool
+    func setContrast(_ contrast: Contrast, oldValue: Contrast?, transition: BrightnessTransition?, onChange: ((Contrast) -> Void)?) -> Bool
     func setVolume(_ volume: UInt16) -> Bool
     func setInput(_ input: InputSource) -> Bool
     func setMute(_ muted: Bool) -> Bool
@@ -130,8 +136,8 @@ protocol Control {
 extension Control {
     func reapply() {
         guard let display else { return }
-        _ = setBrightness(display.limitedBrightness, oldValue: nil, force: false, onChange: nil)
-        _ = setContrast(display.limitedContrast, oldValue: nil, onChange: nil)
+        _ = setBrightness(display.limitedBrightness, oldValue: nil, force: false, transition: brightnessTransition, onChange: nil)
+        _ = setContrast(display.limitedContrast, oldValue: nil, transition: brightnessTransition, onChange: nil)
     }
 
     func read(_ key: Display.CodingKeys) -> Any? {
@@ -167,9 +173,15 @@ extension Control {
     @discardableResult func write(_ key: Display.CodingKeys, _ value: Any, _ oldValue: Any? = nil) -> Any? {
         switch key {
         case .brightness:
-            return setBrightness(value as! Brightness, oldValue: oldValue as! Brightness?, force: false, onChange: nil)
+            return setBrightness(
+                value as! Brightness,
+                oldValue: oldValue as! Brightness?,
+                force: false,
+                transition: brightnessTransition,
+                onChange: nil
+            )
         case .contrast:
-            return setContrast(value as! Contrast, oldValue: oldValue as! Contrast?, onChange: nil)
+            return setContrast(value as! Contrast, oldValue: oldValue as! Contrast?, transition: brightnessTransition, onChange: nil)
         case .volume:
             return setVolume(value as! UInt16)
         case .input:
