@@ -7257,6 +7257,9 @@ Keep this disabled when using f.lux</string>
                                             <menuItem title="Funhouse ESP32 S2" tag="33" identifier="adafruit_funhouse_esp32s2" id="Qtb-lf-mol">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
+                                            <menuItem title="SparkFun Thing Plus ESP32 S2" tag="34" identifier="sparkfun_esp32s2_thing_plus" id="Qtb-lf-nol">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
                                             <menuItem title="WEMOS LOLIN32" tag="29" identifier="lolin32" id="e7f-R5-jxy">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>

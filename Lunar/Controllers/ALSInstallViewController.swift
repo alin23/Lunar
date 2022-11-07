@@ -72,6 +72,8 @@ class ALSInstallViewController: NSViewController {
         switch board {
         case "Metro ESP32 S2":
             return "adafruit_metro_esp32s2"
+        case "SparkFun Thing Plus ESP32 S2":
+            return "sparkfun_esp32s2_thing_plus"
         case "Feather ESP32 S2":
             return "adafruit_feather_esp32s2_tft"
         case "MagTag ESP32 S2":
