@@ -11,7 +11,12 @@ export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 LOG_PATH=${LOG_PATH:-/tmp/lunar-sensor-install.log}
 BOARD="${BOARD:-esp32dev}"
 
-if [[ "$BOARD" == "adafruit_metro_esp32s2" || "$BOARD" == "adafruit_funhouse_esp32s2"  || "$BOARD" == "adafruit_feather_esp32s2_tft"  || "$BOARD" == "adafruit_magtag29_esp32s2" ]]; then
+if [[ "$BOARD" == "sparkfun_esp32s2_thing_plus" ]]; then
+    PLATFORM_VERSION="${PLATFORM_VERSION:-platformio/espressif32@5.1.0}"
+    PLATFORM="${PLATFORM:-ESP32}"
+    SDA="${SDA:-01}"
+    SCL="${SCL:-02}"
+elif [[ "$BOARD" == "adafruit_metro_esp32s2" || "$BOARD" == "adafruit_funhouse_esp32s2"  || "$BOARD" == "adafruit_feather_esp32s2_tft"  || "$BOARD" == "adafruit_magtag29_esp32s2" ]]; then
     PLATFORM_VERSION="${PLATFORM_VERSION:-platformio/espressif32@5.1.0}"
     PLATFORM="${PLATFORM:-ESP32}"
     SDA="${SDA:-33}"
