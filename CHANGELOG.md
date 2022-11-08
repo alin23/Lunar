@@ -1,3 +1,27 @@
+# 5.8.0
+## Fixes
+
+* Fix some memory leaks in the DDC AVService matching logic
+* Fix volume not respecting the DDC configured range in some cases
+
+## Improvements
+
+* Resume **Adaptive Paused** after toggling from Manual to any other adaptive mode
+* Print lux from external light sensor if available when using the `lunar lux` CLI command
+* Add exception for VX2453 being detected as projector
+* Add **Auto Restart** workaround for when DDC fails on rare setups
+    * The option is enabled by default and can be configured from [Advanced settings](https://app.lunar.fyi/advanced)
+    * [![auto restart ddc fail](https://files.lunar.fyi/auto-restart-ddc-fail.png)](https://files.lunar.fyi/auto-restart-ddc-fail.png)
+* Disable logic for fuzzy matching audio output devices when volume hotkeys are disabled
+* Install CLI in the home dir to avoid permission errors
+* When brightness transition is set to **Slow**, use faster **Smooth** transitions for manual brightness key adjustments
+
+## Features
+
+* Replace buggy fuzzy-matching logic with the Smith-Waterman algorithm written in Rust from Skim v2
+    * This should fix some crashes and make some monitor matching logic faster
+* Add ALS support for SparkFun Thing Plus
+
 # 5.7.9
 ## Fixes
 
