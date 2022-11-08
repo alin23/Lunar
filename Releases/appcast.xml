@@ -3,6 +3,18 @@
     <channel>
         <title>Lunar</title>
         <item>
+            <title>5.8.0</title>
+            <pubDate>Tue, 08 Nov 2022 10:19:27 +0100</pubDate>
+            <link>https://lunar.fyi/</link>
+            <sparkle:fullReleaseNotesLink>https://lunar.fyi/changelog</sparkle:fullReleaseNotesLink>
+            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
+            <sparkle:version>5.8.0</sparkle:version>
+            <sparkle:shortVersionString>5.8.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-5.8.0.html</sparkle:releaseNotesLink>
+            <enclosure url="https://files.lunar.fyi/releases/Lunar-5.8.0.dmg" length="19924584" type="application/octet-stream" sparkle:edSignature="QP0WV0BrX6m/HnMb+1clfBpZCLrcZMYtJQLzh+QOOQwEgessS/3wFLxs+QA+CThoeSLtW75cn1XzJdOZjoqNAg=="/>
+        </item>
+        <item>
             <title>5.7.9</title>
             <pubDate>Sat, 03 Sep 2022 18:55:52 +0300</pubDate>
             <link>https://lunar.fyi/</link>
