@@ -23,8 +23,8 @@ func getDevices() -> [String] {
         devicePaths.append("/dev/cu.usbserial-110")
     #endif
 
-    if shell("/sbin/ping", args: ["-o", "-t", "3", SENSOR_DEFAULT_HOSTNAME], timeout: 5.seconds).success {
-        devicePaths.append(SENSOR_DEFAULT_HOSTNAME)
+    if shell("/sbin/ping", args: ["-o", "-t", "3", CachedDefaults[.sensorHostname]], timeout: 5.seconds).success {
+        devicePaths.append(CachedDefaults[.sensorHostname])
     }
 
     guard !devicePaths.isEmpty else {
