@@ -138,6 +138,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .neverAskAboutXDR,
     .autoRestartOnFailedDDC,
     .autoRestartOnFailedDDCSooner,
+    .sensorHostname,
     .nonManualMode,
     .clockMode,
     .syncMode,
@@ -812,6 +813,7 @@ func initCache() {
     cacheKey(.neverAskAboutXDR)
     cacheKey(.autoRestartOnFailedDDC)
     cacheKey(.autoRestartOnFailedDDCSooner)
+    cacheKey(.sensorHostname)
     cacheKey(.apiKey)
 
     cacheKey(.location)
@@ -1010,6 +1012,8 @@ extension Defaults.Keys {
 
     static let autoRestartOnFailedDDC = Key<Bool>("autoRestartOnFailedDDC", default: true)
     static let autoRestartOnFailedDDCSooner = Key<Bool>("autoRestartOnFailedDDCSooner", default: false)
+
+    static let sensorHostname = Key<String>("sensorHostname", default: "lunarsensor.local")
 }
 
 let datastore = DataStore()
