@@ -1419,6 +1419,15 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var maxSoftwareBrightness: Float { max(maxEDR, 1.02) }
     @Published @objc dynamic var subzero = false {
         didSet {
+            if subzero, !oldValue, isBuiltin, displayController.adaptiveMode is SyncMode {
+                DisplayController.manualModeFromSyncMode = true
+                displayController.disable()
+            }
+            if !subzero, oldValue, isBuiltin, displayController.adaptiveMode is ManualMode, DisplayController.manualModeFromSyncMode {
+                DisplayController.manualModeFromSyncMode = false
+                displayController.enable()
+            }
+
             guard apply else { return }
             if subzero, !oldValue {
                 adaptivePaused = true
@@ -2561,6 +2570,16 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var enhanced = false {
         didSet {
+            if enhanced, !oldValue, isBuiltin, displayController.adaptiveMode is SyncMode,
+               displayController.activeDisplayList.allSatisfy(\.supportsEnhance)
+            {
+                DisplayController.manualModeFromSyncMode = true
+                displayController.disable()
+            }
+            if !enhanced, oldValue, isBuiltin, displayController.adaptiveMode is ManualMode, DisplayController.manualModeFromSyncMode {
+                DisplayController.manualModeFromSyncMode = false
+                displayController.enable()
+            }
             guard apply else { return }
             handleEnhance(enhanced)
         }

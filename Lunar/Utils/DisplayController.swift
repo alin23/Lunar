@@ -53,6 +53,7 @@ class DisplayController: ObservableObject {
     // MARK: Internal
 
     static var panelManager: MPDisplayMgr? = MPDisplayMgr()
+    static var manualModeFromSyncMode = false
 
     var averageDDCWriteNanoseconds: ThreadSafeDictionary<CGDirectDisplayID, UInt64> = ThreadSafeDictionary()
     var averageDDCReadNanoseconds: ThreadSafeDictionary<CGDirectDisplayID, UInt64> = ThreadSafeDictionary()
