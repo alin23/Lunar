@@ -2613,8 +2613,11 @@ func installCLIBinary() throws {
 
 func acquirePrivileges(notificationTitle: String = "Lunar is now listening for media keys", notificationBody: String? = nil) {
     #if DEBUG
-        return
+        if CommandLine.arguments.contains("-NSDocumentRevisionsDebugMode") {
+            return
+        }
     #endif
+
     let onAcquire = {
         mainAsync { Defaults[.accessibilityPermissionsGranted] = true }
         appDelegate!.startOrRestartMediaKeyTap()
