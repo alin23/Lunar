@@ -1236,7 +1236,6 @@ struct QuickActionsMenuView: View {
     var topRightButtons: some View {
         Group {
             SwiftUI.Button(
-                //                action: { withAnimation(.fastSpring){ showOptionsMenu.toggle()} },
                 action: { showOptionsMenu.toggle() },
                 label: {
                     HStack(spacing: 2) {
@@ -1262,7 +1261,12 @@ struct QuickActionsMenuView: View {
                     guard let view = menuWindow?.contentViewController?.view else { return }
                     appDelegate!.menu.popUp(
                         positioning: nil,
-                        at: NSPoint(x: view.frame.width - (POPOVER_PADDING / 2), y: 0),
+                        at: NSPoint(
+                            x: env
+                                .menuWidth +
+                                (showOptionsMenu ? MENU_HORIZONTAL_PADDING * 2 : OPTIONS_MENU_WIDTH / 2 + MENU_HORIZONTAL_PADDING / 2),
+                            y: 0
+                        ),
                         in: view
                     )
                 },
