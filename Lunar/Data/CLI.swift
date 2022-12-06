@@ -967,7 +967,7 @@ struct Lunar: ParsableCommand {
         @Flag(help: "Include displays marked as projectors")
         var projector = false
 
-        @Flag(help: "Include displays marked as dummy (e.g. BetterDummy virtual displays or HDMI dongles)")
+        @Flag(help: "Include displays marked as dummy (e.g. BetterDummy/BetterDisplay virtual displays or HDMI dongles)")
         var dummy = false
 
         @Flag(name: .shortAndLong, help: "Include EDID in the output")
