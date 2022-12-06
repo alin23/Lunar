@@ -2132,7 +2132,7 @@ class DisplayController: ObservableObject {
 
     func adjustVolume(by offset: Int, for displays: [Display]? = nil, currentDisplay: Bool = false, currentAudioDisplay: Bool = true) {
         adjustValue(for: displays, currentDisplay: currentDisplay, currentAudioDisplay: currentAudioDisplay) { (display: Display) in
-            var value = getFilledChicletValue(display.volume.intValue, offset: offset)
+            var value = getFilledChicletValue(display.volume.floatValue, offset: offset.f).i
             value = cap(value, minVal: MIN_VOLUME, maxVal: MAX_VOLUME)
             display.volume = value.ns
         }
@@ -2162,7 +2162,7 @@ class DisplayController: ObservableObject {
                 guard builtinDisplay || currentDisplay || sourceDisplay || mainDisplay else { return }
             }
 
-            var value = getFilledChicletValue(display.brightness.intValue, offset: offset)
+            var value = getFilledChicletValue(display.brightness.floatValue, offset: offset.f).i
 
             let minBrightness = display.minBrightness.intValue
             let maxBrightness = display.maxBrightness.intValue
@@ -2180,17 +2180,30 @@ class DisplayController: ObservableObject {
             {
                 display.forceShowSoftwareOSD = true
                 display.softwareBrightness = cap(
-                    display.softwareBrightness + (abs(offset) == 1 ? (0.01 * offset.f) : (offset.f / 36)),
+                    getFilledChicletValue(
+                        display.softwareBrightness,
+                        offset: offset.f / 96,
+                        thresholds: Display.SUBZERO_FILLED_CHICLETS_THRESHOLDS,
+                        fillOffset: Display.FILLED_CHICLET_OFFSET
+                    ),
                     minVal: 0.0,
                     maxVal: 1.0
                 )
+                if adaptiveModeKey != .manual {
+                    display.insertBrightnessUserDataPoint(
+                        adaptiveMode.brightnessDataPoint.last,
+                        value.d,
+                        modeKey: adaptiveModeKey
+                    )
+                }
+
                 return
             }
 
             if autoXdr || display.softwareBrightness > 1.0 || display.enhanced,
                display.supportsEnhance, !display.isForTesting,
                (value == maxBrightness && value == oldValue && timeSince(lastTimeBrightnessKeyPressed) < 3) ||
-               (oldValue == maxBrightness && display.softwareBrightness > 1.01),
+               (oldValue == maxBrightness && display.softwareBrightness > Display.MIN_SOFTWARE_BRIGHTNESS),
                lunarProActive || lunarProOnTrial
             {
                 if !display.enhanced {
@@ -2198,12 +2211,22 @@ class DisplayController: ObservableObject {
                 }
 
                 display.maxEDR = display.computeMaxEDR()
-                display.forceShowSoftwareOSD = true
-                display.softwareBrightness = cap(
-                    display.softwareBrightness + (abs(offset) == 1 ? (0.01 * offset.f) : (offset.f / 70)),
-                    minVal: 1.01,
+
+                let range = (display.maxSoftwareBrightness - Display.MIN_SOFTWARE_BRIGHTNESS)
+                let softOffset = (offset.f / (96 * (1 / range)))
+                let nextSoftwareBrightness = cap(
+                    getFilledChicletValue(
+                        display.softwareBrightness,
+                        offset: softOffset,
+                        thresholds: display.xdrFilledChicletsThresholds,
+                        fillOffset: display.xdrFilledChicletOffset
+                    ),
+                    minVal: Display.MIN_SOFTWARE_BRIGHTNESS,
                     maxVal: display.maxSoftwareBrightness
                 )
+
+                display.forceShowSoftwareOSD = true
+                display.softwareBrightness = nextSoftwareBrightness
                 return
             }
 
@@ -2270,7 +2293,7 @@ class DisplayController: ObservableObject {
         ) { (display: Display) in
             guard !display.isBuiltin, !display.blackOutEnabled else { return }
 
-            var value = getFilledChicletValue(display.contrast.intValue, offset: offset)
+            var value = getFilledChicletValue(display.contrast.floatValue, offset: offset.f).i
 
             value = cap(
                 value,
@@ -2341,14 +2364,17 @@ class DisplayController: ObservableObject {
         }
     }
 
-    func getFilledChicletValue(_ value: Int, offset: Int) -> Int {
+    func getFilledChicletValue(_ value: Float, offset: Float, thresholds: [Float]? = nil, fillOffset: Float = 6) -> Float {
         let newValue = value + offset
-        guard abs(offset) == 6 else { return newValue }
-        let diffs = FILLED_CHICLETS_THRESHOLDS - newValue.f
+        guard abs(offset) == fillOffset else { return newValue }
+
+        let thresholds = thresholds ?? FILLED_CHICLETS_THRESHOLDS
+
+        let diffs = thresholds - newValue
         if let index = abs(diffs).enumerated().min(by: { $0.element <= $1.element })?.offset {
-            let backupIndex = cap(index + (offset < 0 ? -1 : 1), minVal: 0, maxVal: FILLED_CHICLETS_THRESHOLDS.count - 1)
-            let chicletValue = FILLED_CHICLETS_THRESHOLDS[index].i
-            return chicletValue != value ? chicletValue : FILLED_CHICLETS_THRESHOLDS[backupIndex].i
+            let backupIndex = cap(index + (offset < 0 ? -1 : 1), minVal: 0, maxVal: thresholds.count - 1)
+            let chicletValue = thresholds[index]
+            return chicletValue != value ? chicletValue : thresholds[backupIndex]
         }
         return newValue
     }
@@ -2359,4 +2385,4 @@ class DisplayController: ObservableObject {
 }
 
 let displayController = DisplayController()
-let FILLED_CHICLETS_THRESHOLDS: [Float] = [0, 6, 12, 19, 25, 31, 37, 44, 50, 56, 62, 69, 75, 81, 87, 94, 100]
+let FILLED_CHICLETS_THRESHOLDS: [Float] = [0, 6, 12, 18, 24, 31, 37, 43, 50, 56, 62, 68, 75, 81, 87, 93, 100]

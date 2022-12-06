@@ -234,6 +234,16 @@ extension AdaptiveMode {
         }
 
         let diff = maxVal - minVal
+//        let fact: Double
+//        if value >= 0 {
+//            fact = factor
+//        } else if factor < 1 {
+//            fact = (10 * factor * factor) - factor
+//        } else if factor > 1 {
+//            fact = 0.05 * pow(40 * factor + 1, 0.5) + 0.05
+//        } else {
+//            fact = 1
+//        }
         return pow((value - minVal) / diff, factor) * diff + minVal
     }
 
@@ -356,12 +366,14 @@ extension AdaptiveMode {
             newValue = userValue
         } else {
             let sorted = userValues.sorted(by: { pair1, pair2 in pair1.key <= pair2.key })
-            let userValueBefore = (sorted.last(where: { dataPoint, _ in
-                dataPoint <= value
-            }) ?? (key: dataPoint.min, value: MIN_BRIGHTNESS.d))
-            let userValueAfter = (sorted.first(where: { dataPoint, _ in
-                dataPoint > value
-            }) ?? (key: dataPoint.max, value: MAX_BRIGHTNESS.d))
+            let userValueBefore = (
+                sorted.last(where: { dataPoint, _ in dataPoint <= value })
+                    ?? (key: dataPoint.min, value: MIN_BRIGHTNESS.d - 100)
+            )
+            let userValueAfter = (
+                sorted.first(where: { dataPoint, _ in dataPoint > value })
+                    ?? (key: dataPoint.max, value: MAX_BRIGHTNESS.d)
+            )
 
             let sourceLow = userValueBefore.key
             let sourceHigh = userValueAfter.key
@@ -382,25 +394,25 @@ extension AdaptiveMode {
                     "NaN value?? Whyy?? WHAT DID I DO??",
                     context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset]
                 )
-                newValue = cap(value, minVal: MIN_BRIGHTNESS.d, maxVal: MAX_BRIGHTNESS.d)
+                newValue = cap(value, minVal: MIN_BRIGHTNESS.d - 100, maxVal: MAX_BRIGHTNESS.d)
             }
         }
 
-        newValue = cap(newValue + offset.d, minVal: MIN_BRIGHTNESS.d, maxVal: MAX_BRIGHTNESS.d)
+        newValue = cap(newValue + offset.d, minVal: MIN_BRIGHTNESS.d - 100, maxVal: MAX_BRIGHTNESS.d)
 
         if newValue.isNaN {
             log.error(
                 "NaN value?? WHAAT?? AGAIN?!",
                 context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset]
             )
-            newValue = cap(value, minVal: MIN_BRIGHTNESS.d, maxVal: MAX_BRIGHTNESS.d)
+            newValue = cap(value, minVal: MIN_BRIGHTNESS.d - 100, maxVal: MAX_BRIGHTNESS.d)
         }
 
         return mapNumber(
             newValue,
-            fromLow: MIN_BRIGHTNESS.d,
+            fromLow: MIN_BRIGHTNESS.d - 100,
             fromHigh: MAX_BRIGHTNESS.d,
-            toLow: minValue,
+            toLow: minValue - 90,
             toHigh: maxValue
         )
     }

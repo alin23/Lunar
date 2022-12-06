@@ -532,6 +532,7 @@ struct HDRSettingsView: View {
                 text: "Toggle Sub-zero Dimming when going below 0%",
                 setting: $autoSubzero.animation(.fastSpring)
             )
+
             Divider().padding(.horizontal)
             if Sysctl.isMacBook, displayController.builtinDisplay?.supportsEnhance ?? false {
                 VStack(alignment: .leading, spacing: 2) {

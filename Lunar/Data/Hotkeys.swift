@@ -13,6 +13,7 @@ import Defaults
 import Magnet
 import MediaKeyTap
 import Sauce
+import SwiftUI
 
 var upHotkey: Magnet.HotKey?
 var downHotkey: Magnet.HotKey?
@@ -856,7 +857,17 @@ enum Hotkey {
     }
 
     static func showOsd(osdImage: OSDImage, value: UInt32, display: Display, locked _: Bool = false) {
-        guard !display.blackOutEnabled, let manager = OSDManager.sharedManager() as? OSDManager else {
+        guard osdImage != .contrast else {
+            display.showSoftwareOSD(
+                image: "circle.lefthalf.filled",
+                value: value.f / 100,
+                text: "Contrast",
+                color: .white.opacity(0.6),
+                glowRadius: 0
+            )
+            return
+        }
+        guard !display.blackOutEnabled, display.softwareBrightness == 1.0, let manager = OSDManager.sharedManager() as? OSDManager else {
             log.warning("No OSDManager available")
             return
         }
@@ -877,13 +888,14 @@ enum Hotkey {
             || display.noControls
         let mirroredID = CGDisplayMirrorsDisplay(display.id)
         let osdID = (mirroredID != kCGNullDirectDisplay && mirroredID != UINT32_MAX) ? mirroredID : display.id
+
         manager.showImage(
             osdImage.rawValue,
             onDisplayID: osdID,
             priority: 0x1F4,
             msecUntilFade: 1500,
-            filledChiclets: value,
-            totalChiclets: 100,
+            filledChiclets: mapNumber(value.d, fromLow: 0, fromHigh: 100, toLow: 0, toHigh: 240).u32,
+            totalChiclets: 240,
             locked: locked
         )
     }
