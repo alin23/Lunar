@@ -177,6 +177,10 @@ class HostingView: NSHostingView<QuickActionsView> {
     }
 }
 
+extension NSVisualEffectView.Material {
+    static let osd = NSVisualEffectView.Material(rawValue: 26) ?? .hudWindow
+}
+
 // MARK: - VisualEffectBlur
 
 public struct VisualEffectBlur: View {
@@ -185,11 +189,13 @@ public struct VisualEffectBlur: View {
     public init(
         material: NSVisualEffectView.Material = .headerView,
         blendingMode: NSVisualEffectView.BlendingMode = .withinWindow,
-        state: NSVisualEffectView.State = .followsWindowActiveState
+        state: NSVisualEffectView.State = .followsWindowActiveState,
+        maskImage: NSImage? = nil
     ) {
         self.material = material
         self.blendingMode = blendingMode
         self.state = state
+        self.maskImage = maskImage
     }
 
     // MARK: Public
@@ -198,7 +204,8 @@ public struct VisualEffectBlur: View {
         Representable(
             material: material,
             blendingMode: blendingMode,
-            state: state
+            state: state,
+            maskImage: maskImage
         ).accessibility(hidden: true)
     }
 
@@ -207,6 +214,7 @@ public struct VisualEffectBlur: View {
     private var material: NSVisualEffectView.Material
     private var blendingMode: NSVisualEffectView.BlendingMode
     private var state: NSVisualEffectView.State
+    private var maskImage: NSImage?
 }
 
 // MARK: - Representable
@@ -216,6 +224,7 @@ extension VisualEffectBlur {
         var material: NSVisualEffectView.Material
         var blendingMode: NSVisualEffectView.BlendingMode
         var state: NSVisualEffectView.State
+        var maskImage: NSImage?
 
         func makeNSView(context: Context) -> NSVisualEffectView {
             context.coordinator.visualEffectView
@@ -225,6 +234,7 @@ extension VisualEffectBlur {
             context.coordinator.update(material: material)
             context.coordinator.update(blendingMode: blendingMode)
             context.coordinator.update(state: state)
+            context.coordinator.update(maskImage: maskImage)
         }
 
         func makeCoordinator() -> Coordinator {
@@ -253,6 +263,10 @@ extension VisualEffectBlur {
 
         func update(state: NSVisualEffectView.State) {
             visualEffectView.state = state
+        }
+
+        func update(maskImage: NSImage?) {
+            visualEffectView.maskImage = maskImage
         }
     }
 }

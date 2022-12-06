@@ -1726,7 +1726,7 @@ the ⌘ Command key more than 8 times in a row</string>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="R0g-6e-j2A">
                                 <rect key="frame" x="42" y="204" width="173" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="Dummy (BetterDummy)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="AWI-5a-gca">
+                                <buttonCell key="cell" type="check" title="Dummy" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="AWI-5a-gca">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="systemMedium" size="13"/>
                                 </buttonCell>

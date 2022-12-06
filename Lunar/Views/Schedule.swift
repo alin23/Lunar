@@ -35,8 +35,8 @@ struct BrightnessSchedule: Codable, Defaults.Serializable, Comparable {
     let type: ScheduleType
     let hour: UInt8
     let minute: UInt8
-    let brightness: Brightness
-    let contrast: Contrast
+    let brightness: PreciseBrightness
+    let contrast: PreciseContrast
     let negative: Bool
 
     var enabled: Bool { type != .disabled }
@@ -58,8 +58,8 @@ struct BrightnessSchedule: Codable, Defaults.Serializable, Comparable {
             type: ScheduleType(rawValue: dict["type"] as! Int) ?? .time,
             hour: dict["hour"] as! UInt8,
             minute: dict["minute"] as! UInt8,
-            brightness: dict["brightness"] as! UInt16,
-            contrast: dict["contrast"] as! UInt16,
+            brightness: dict["brightness"] as! Double,
+            contrast: dict["contrast"] as! Double,
             negative: dict["negative"] as! Bool
         )
     }
@@ -96,8 +96,8 @@ struct BrightnessSchedule: Codable, Defaults.Serializable, Comparable {
         type: ScheduleType? = nil,
         hour: UInt8? = nil,
         minute: UInt8? = nil,
-        brightness: UInt16? = nil,
-        contrast: UInt16? = nil,
+        brightness: Double? = nil,
+        contrast: Double? = nil,
         negative: Bool? = nil
     ) -> Self {
         BrightnessSchedule(
@@ -177,7 +177,7 @@ class Schedule: NSView {
                 return
             }
             let (brightness, contrast) = display.sliderValueToBrightnessContrast(newValue)
-            self.schedule = schedule.with(brightness: brightness, contrast: contrast)
+            self.schedule = schedule.with(brightness: brightness.d, contrast: contrast.d)
             display.save()
         }
     }
@@ -195,7 +195,7 @@ class Schedule: NSView {
                 return
             }
             let brightness = display.sliderValueToBrightness(newValue)
-            self.schedule = schedule.with(brightness: brightness.uint16Value)
+            self.schedule = schedule.with(brightness: brightness.doubleValue)
             display.save()
         }
     }
@@ -214,7 +214,7 @@ class Schedule: NSView {
             }
 
             let contrast = display.sliderValueToContrast(newValue)
-            self.schedule = schedule.with(contrast: contrast.uint16Value)
+            self.schedule = schedule.with(contrast: contrast.doubleValue)
             display.save()
         }
     }

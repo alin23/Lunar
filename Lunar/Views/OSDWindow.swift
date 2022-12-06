@@ -31,7 +31,12 @@ open class OSDWindow: NSWindow, NSWindowDelegate {
 
     // MARK: Open
 
-    open func show(at point: NSPoint? = nil, closeAfter closeMilliseconds: Int = 3050, fadeAfter fadeMilliseconds: Int = 2000) {
+    open func show(
+        at point: NSPoint? = nil,
+        closeAfter closeMilliseconds: Int = 3050,
+        fadeAfter fadeMilliseconds: Int = 2000,
+        verticalOffset: CGFloat? = nil
+    ) {
         guard let screen = display?.screen else { return }
         if let point {
             setFrameOrigin(point)
@@ -40,7 +45,7 @@ open class OSDWindow: NSWindow, NSWindowDelegate {
             let sframe = screen.frame
             setFrameOrigin(CGPoint(
                 x: (sframe.width / 2 - wsize.width / 2) + sframe.origin.x,
-                y: sframe.origin.y + CachedDefaults[.customOSDVerticalOffset].cg
+                y: sframe.origin.y + (verticalOffset ?? CachedDefaults[.customOSDVerticalOffset].cg)
             ))
         }
 
@@ -49,9 +54,10 @@ open class OSDWindow: NSWindow, NSWindowDelegate {
         makeKeyAndOrderFront(nil)
         orderFrontRegardless()
 
-        endFader?.cancel()
-        closer?.cancel()
-        fader?.cancel()
+        endFader = nil
+        closer = nil
+        fader = nil
+
         guard closeMilliseconds > 0 else { return }
         fader = mainAsyncAfter(ms: fadeMilliseconds) { [weak self] in
             guard let s = self, s.isVisible else { return }
@@ -67,6 +73,18 @@ open class OSDWindow: NSWindow, NSWindowDelegate {
     }
 
     // MARK: Public
+
+    public func hide() {
+        fader = nil
+        endFader = nil
+        closer = nil
+
+        if let v = contentView?.superview {
+            v.alphaValue = 0.0
+        }
+        close()
+        windowController?.close()
+    }
 
     public func windowShouldClose(_ sender: NSWindow) -> Bool {
         guard isReleasedWhenClosed else { return true }
@@ -132,96 +150,6 @@ extension Color {
 }
 
 // MARK: - BigSurSlider
-
-// public extension BigSurSlider where Label == AnyView {
-//    // MARK: Lifecycle
-//
-//    init(
-//        percentage: Binding<Float>,
-//        sliderWidth: CGFloat = 200,
-//        sliderHeight: CGFloat = 22,
-//        image: String? = nil,
-//        color: Color? = nil,
-//        colorBinding: Binding<Color?>? = nil,
-//        backgroundColor: Color = .black.opacity(0.1),
-//        backgroundColorBinding: Binding<Color>? = nil,
-//        knobColor: Color? = nil,
-//        knobColorBinding: Binding<Color?>? = nil,
-//        knobTextColor: Color? = nil,
-//        knobTextColorBinding: Binding<Color?>? = nil,
-//        showValue: Binding<Bool>? = nil,
-//        acceptsMouseEvents: Binding<Bool>? = nil,
-//        disabled: Binding<Bool>,
-//        enableText: String = "Enable"
-//    ) {
-//        self.init(
-//            percentage: percentage,
-//            sliderWidth: sliderWidth,
-//            sliderHeight: sliderHeight,
-//            image: image,
-//            color: color,
-//            colorBinding: colorBinding,
-//            backgroundColor: backgroundColor,
-//            backgroundColorBinding: backgroundColorBinding,
-//            knobColor: knobColor,
-//            knobColorBinding: knobColorBinding,
-//            knobTextColor: knobTextColor,
-//            knobTextColorBinding: knobTextColorBinding,
-//            showValue: showValue,
-//            acceptsMouseEvents: acceptsMouseEvents,
-//            disabled: disabled
-//        )
-//        label = AnyView(
-//            SwiftUI.Button(enableText) {
-//                self.disabled = false
-//            }
-//            .buttonStyle(FlatButton(color: Colors.red.opacity(0.7), textColor: .white, horizontalPadding: 6, verticalPadding: 2))
-//            .font(.system(size: 10, weight: .medium, design: .rounded))
-//        )
-//    }
-// }
-//
-// public extension BigSurSlider where Label == EmptyView {
-//    // MARK: Lifecycle
-//
-//    init(
-//        percentage: Binding<Float>,
-//        sliderWidth: CGFloat = 200,
-//        sliderHeight: CGFloat = 22,
-//        image: String? = nil,
-//        color: Color? = nil,
-//        colorBinding: Binding<Color?>? = nil,
-//        backgroundColor: Color = .black.opacity(0.1),
-//        backgroundColorBinding: Binding<Color>? = nil,
-//        knobColor: Color? = nil,
-//        knobColorBinding: Binding<Color?>? = nil,
-//        knobTextColor: Color? = nil,
-//        knobTextColorBinding: Binding<Color?>? = nil,
-//        showValue: Binding<Bool>? = nil,
-//        acceptsMouseEvents: Binding<Bool>? = nil,
-//        disabled: Binding<Bool>? = nil
-//    ) {
-//        self.init(
-//            percentage: percentage,
-//            sliderWidth: sliderWidth,
-//            sliderHeight: sliderHeight,
-//            image: image,
-//            color: color,
-//            colorBinding: colorBinding,
-//            backgroundColor: backgroundColor,
-//            backgroundColorBinding: backgroundColorBinding,
-//            knobColor: knobColor,
-//            knobColorBinding: knobColorBinding,
-//            knobTextColor: knobTextColor,
-//            knobTextColorBinding: knobTextColorBinding,
-//            showValue: showValue,
-//            acceptsMouseEvents: acceptsMouseEvents,
-//            disabled: disabled
-//        ) {
-//            EmptyView()
-//        }
-//    }
-// }
 
 public struct BigSurSlider: View {
     // MARK: Lifecycle
@@ -586,67 +514,60 @@ public extension View {
 struct BrightnessOSDView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.colors) var colors
-    @ObservedObject var display: Display
 
-    var sliderText: String? {
-        let b = display.softwareBrightness
-        let lb = display.lastSoftwareBrightness
+    @ObservedObject var osd = OSD_STATE
 
-        if b > 1 || (b == 1 && (lb > 1 || display.enhanced)) {
-            return "XDR Brightness"
+    var nsImage: NSImage? {
+        guard let img = NSImage(systemSymbolName: osd.image, accessibilityDescription: nil) else {
+            return nil
         }
-        if display.subzero {
-            return "Sub-zero brightness"
-        }
-        return nil
+        img.resizingMode = .stretch
+
+        return img
     }
 
     var body: some View {
-        VStack {
-            if let sliderText {
-                Text(sliderText)
-                    .font(.system(size: 16, weight: .semibold, design: .monospaced))
+        ZStack {
+            VStack {
+                Image(systemName: osd.image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: NATIVE_OSD_WIDTH * 0.5, height: NATIVE_OSD_WIDTH * 0.5)
+                    .font(.system(size: 48, weight: .light, design: .rounded))
+                    .foregroundColor(.primary.opacity(0.75))
+
+                Text(osd.text).font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.primary.opacity(0.75))
             }
 
-            if display.enhanced {
-                BigSurSlider(
-                    percentage: $display.xdrBrightness,
-                    image: "sun.max.circle.fill",
-                    color: Colors.xdr.opacity(0.6),
-                    backgroundColor: Colors.xdr.opacity(colorScheme == .dark ? 0.1 : 0.2),
-                    knobColor: Colors.xdr,
-                    showValue: .constant(true),
-                    acceptsMouseEvents: .constant(false)
-                )
-            } else {
-                BigSurSlider(
-                    percentage: $display.softwareBrightness,
-                    image: "moon.circle.fill",
-                    color: Colors.subzero.opacity(0.6),
-                    backgroundColor: Colors.subzero.opacity(colorScheme == .dark ? 0.1 : 0.2),
-                    knobColor: Colors.subzero,
-                    showValue: .constant(true),
-                    acceptsMouseEvents: .constant(false)
-                )
-            }
+            let value = mapNumber(osd.value, fromLow: 0, fromHigh: 1, toLow: 0, toHigh: 160).cg
+
+            ZStack {
+                Path { path in
+                    path.move(to: CGPoint(x: 0.0, y: 0))
+                    path.addLine(to: CGPoint(x: 161, y: 0))
+                }
+                .stroke(style: StrokeStyle(lineWidth: 8))
+                .foregroundColor(Color.black.opacity(0.9))
+                Path { path in
+                    path.move(to: CGPoint(x: 1, y: 0))
+                    path.addLine(to: CGPoint(x: value, y: 0))
+                }
+                .stroke(style: StrokeStyle(lineWidth: 6, dash: [9, 1]))
+                .foregroundColor(osd.color)
+                .shadow(color: osd.glowRadius == 0 ? .clear : osd.color, radius: osd.value.cg * osd.glowRadius, x: 0, y: 0)
+                .animation(.easeOut(duration: 0.15), value: osd.value)
+            }.offset(y: NATIVE_OSD_WIDTH * 0.78)
         }
-        .padding(.horizontal, 40)
+        .padding(.horizontal, 20)
         .padding(.bottom, 40)
         .padding(.top, 20)
         .background(
-            ZStack {
-                VisualEffectBlur(material: .hudWindow, blendingMode: .behindWindow, state: .active)
-                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 20)
-                    .shadow(color: Colors.blackMauve.opacity(0.2), radius: 8, x: 0, y: 4)
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill((colorScheme == .dark ? Colors.blackMauve : Color.white).opacity(0.4))
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 20)
-            }
+            VisualEffectBlur(material: .osd, blendingMode: .behindWindow, state: .active)
+                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         )
-        .padding(10)
+        .frame(width: NATIVE_OSD_WIDTH, height: NATIVE_OSD_WIDTH, alignment: .center)
+        .fixedSize()
         .colors(colorScheme == .dark ? .dark : .light)
     }
 }
@@ -743,102 +664,44 @@ struct AutoOSDView: View {
 }
 
 let AUTO_OSD_DEBOUNCE_SECONDS = 4.0
+let NATIVE_OSD_WIDTH: CGFloat = 200
 let OSD_WIDTH: CGFloat = 300
 
-// MARK: - AutoBlackOutOSDView_Previews
+// MARK: - OSDState
 
-struct AutoBlackOutOSDView_Previews: PreviewProvider {
-    static var previews: some View {
-        let display = displayController.firstDisplay
-        Group {
-            AutoOSDView(
-                display: display,
-                done: .constant(false),
-                title: "Turning off",
-                subtitle: display.name,
-                color: Colors.red,
-                icon: "power.circle.fill"
-            )
-            .environmentObject(EnvState())
-            .frame(maxWidth: OSD_WIDTH)
-            .colors(.light)
-            .preferredColorScheme(.light)
-            AutoOSDView(
-                display: display,
-                done: .constant(false),
-                title: "Turning off",
-                subtitle: display.name,
-                color: Colors.red,
-                icon: "power.circle.fill"
-            )
-            .environmentObject(EnvState())
-            .frame(maxWidth: OSD_WIDTH)
-            .colors(.dark)
-            .preferredColorScheme(.dark)
-        }
-    }
+class OSDState: ObservableObject {
+    @Published var image = "sun.max"
+    @Published var value: Float = 1.0
+    @Published var text = ""
+    @Published var color: Color = .white
+    @Published var glowRadius: CGFloat = 5
 }
 
-// MARK: - AutoXdrOSDView_Previews
-
-struct AutoXdrOSDView_Previews: PreviewProvider {
-    static var previews: some View {
-        let display = displayController.firstDisplay
-        Group {
-            AutoOSDView(
-                display: display,
-                done: .constant(false),
-                title: "Activating XDR",
-                subtitle: "Ambient light at 10000 lux",
-                color: Colors.xdr,
-                icon: "sun.max.circle.fill"
-            )
-            .environmentObject(EnvState())
-            .frame(maxWidth: OSD_WIDTH)
-            .colors(.light)
-            .preferredColorScheme(.light)
-            AutoOSDView(
-                display: display,
-                done: .constant(false),
-                title: "Disabling XDR",
-                subtitle: "Ambient light at 8000 lux",
-                color: Colors.xdr,
-                icon: "sun.max.circle.fill"
-            )
-            .environmentObject(EnvState())
-            .frame(maxWidth: OSD_WIDTH)
-            .colors(.dark)
-            .preferredColorScheme(.dark)
-        }
-    }
-}
-
-// MARK: - BrightnessOSDView_Previews
-
-// struct BrightnessOSDView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        Group {
-//            BrightnessOSDView(display: displayController.firstDisplay)
-//                .frame(maxWidth: OSD_WIDTH)
-//                .preferredColorScheme(.light)
-//            BrightnessOSDView(display: displayController.firstDisplay)
-//                .frame(maxWidth: OSD_WIDTH)
-//                .preferredColorScheme(.dark)
-//        }
-//    }
-// }
+let OSD_STATE = OSDState()
 
 extension Display {
-    func showSoftwareOSD() {
+    func hideSoftwareOSD() {
+        mainAsync { [weak self] in
+            guard let osd = self?.osdWindowController?.window as? OSDWindow else { return }
+            osd.hide()
+            self?.osdWindowController = nil
+        }
+    }
+
+    func showSoftwareOSD(image: String, value: Float, text: String, color: Color, glowRadius: CGFloat = 5) {
         mainAsync { [weak self] in
             guard let self else { return }
+
+            OSD_STATE.image = image
+            OSD_STATE.value = value
+            OSD_STATE.text = text
+            OSD_STATE.color = color
+            OSD_STATE.glowRadius = glowRadius
+
             if self.osdWindowController == nil {
+                let view = BrightnessOSDView()
                 self.osdWindowController = OSDWindow(
-                    swiftuiView: AnyView(
-                        BrightnessOSDView(display: self)
-                            .colors(darkMode ? .dark : .light)
-                            .environmentObject(EnvState())
-                    ),
+                    swiftuiView: AnyView(view),
                     display: self,
                     releaseWhenClosed: false
                 ).wc
@@ -846,7 +709,7 @@ extension Display {
 
             guard let osd = self.osdWindowController?.window as? OSDWindow else { return }
 
-            osd.show()
+            osd.show(verticalOffset: 140)
         }
     }
 
