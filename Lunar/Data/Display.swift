@@ -930,8 +930,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case applyBrightnessOnInputChange3
         case rotation
         case adaptiveController
-        case enhanced
         case subzero
+        case xdr
+        case hdr
         case softwareBrightness
         case xdrBrightness
         case averageDDCWriteNanoseconds
@@ -965,8 +966,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .blackOutMirroringAllowed,
             .allowBrightnessZero,
             .mirroredBeforeBlackOut,
-            .enhanced,
             .subzero,
+            .xdr,
+            .hdr,
             .applyBrightnessOnInputChange1,
             .applyBrightnessOnInputChange2,
             .applyBrightnessOnInputChange3,
@@ -1076,8 +1078,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .contrastOnInputChange3,
             .rotation,
             .adaptiveController,
-            .enhanced,
             .subzero,
+            .xdr,
+            .hdr,
             .softwareBrightness,
             .xdrBrightness,
         ]
@@ -3274,7 +3277,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             let avoidSafetyChecks = CachedDefaults[.autoRestartOnFailedDDCSooner]
-            if newValue >= 1, ddcWorkingCount >= 3,
+            if newValue >= 1, ddcWorkingCount >= 2,
                avoidSafetyChecks || !displayController.activeDisplayList.contains(where: {
                    $0.blackOutEnabled || $0.faceLightEnabled || $0.enhanced || $0.subzero
                })
@@ -4734,8 +4737,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try container.encode(applyGamma, forKey: .applyGamma)
             try container.encode(schedules, forKey: .schedules)
 
-            try container.encode(enhanced, forKey: .enhanced)
             try container.encode(subzero, forKey: .subzero)
+            try container.encode(hdr, forKey: .hdr)
+            try container.encode(xdr, forKey: .xdr)
             try container.encode(softwareBrightness, forKey: .softwareBrightness)
             try container.encode(xdrBrightness, forKey: .xdrBrightness)
             try container.encode(averageDDCWriteNanoseconds, forKey: .averageDDCWriteNanoseconds)
