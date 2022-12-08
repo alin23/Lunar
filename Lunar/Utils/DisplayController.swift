@@ -472,6 +472,7 @@ class DisplayController: ObservableObject {
     }
 
     #if arch(arm64)
+
         func clcd2Properties(_ dispService: io_service_t) -> [String: Any]? {
             guard let clcd2Service = firstChildMatching(dispService, names: ["AppleCLCD2"]) else { return nil }
 
@@ -606,25 +607,9 @@ class DisplayController: ObservableObject {
 
         var clcd2Mapping: ThreadSafeDictionary<Int, CGDirectDisplayID> = ThreadSafeDictionary()
 
-        let DCP_NAMES = ["dcp", "dcpext", "dcpext0", "dcpext1", "dcpext2", "dcpext3", "dcpext4", "dcpext5", "dcpext6", "dcpext7"]
-        let DISP_NAMES = [
-            "disp0",
-            "dispext0",
-            "dispext1",
-            "dispext2",
-            "dispext3",
-            "dispext4",
-            "dispext5",
-            "dispext6",
-            "dispext7",
-            "disp1",
-            "disp2",
-            "disp3",
-            "disp4",
-            "disp5",
-            "disp6",
-            "disp7",
-        ]
+        let DCP_NAMES = ["dcp", "dcpext"] + (0 ... 7).map { "dcpext\($0)" }
+        let DISP_EPIC_NAMES = (0 ... 7).map { "dispext\($0):dcpav-service-epic:0" }
+        let DISP_NAMES = (0 ... 7).map { "dispext\($0)" } + (0 ... 7).map { "disp\($0)" }
 
         func avService(displayID: CGDirectDisplayID, display: Display? = nil, match: AVServiceMatch) -> IOAVService? {
             guard match != .byExclusion || Set(DDC.avServiceCache.dictionary.keys)
@@ -723,19 +708,7 @@ class DisplayController: ObservableObject {
                 IOObjectRelease(dcpAvServiceProxy)
             }
 
-            if let mcdp = firstChildMatching(dcpService, names: ["AppleDCPMCDP29XX"]) {
-                log.warning("This HDMI port might not support DDC because of the MCDP29xx chip inside it (display: \(display))")
-                IOObjectRelease(mcdp)
-                display.badHDMI = true
-                if !forceDDC {
-                    return nil
-                }
-            }
-
-            if Sysctl.isMacMini, clcd2Num == 1, let transport = display.transport,
-               transport.upstream == "DP", transport.downstream == "HDMI"
-            {
-                log.warning("This Mac Mini's HDMI port might not support DDC (display: \(display))")
+            if isMCDP29XX(dcpService: dcpService, display: display, clcd2Num: clcd2Num) {
                 display.badHDMI = true
                 if !forceDDC {
                     return nil
