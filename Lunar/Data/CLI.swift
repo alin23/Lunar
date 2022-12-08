@@ -211,9 +211,24 @@ struct ForgivingEncodable: Encodable {
             return
         }
         switch value {
-        case is NSNumber, is NSNull, is Void, is Bool, is Int, is Int8, is Int16, is Int32, is Int64, is UInt, is UInt8, is UInt16,
-             is UInt32, is UInt64, is Float, is Double, is String, is Date, is URL:
-            try AnyEncodable(value).encode(to: encoder)
+        case let value as Float: try value.encode(to: encoder)
+        case let value as Double: try value.encode(to: encoder)
+        case let value as NSNumber: try value.doubleValue.encode(to: encoder)
+        case is NSNull, is Void: try container.encodeNil()
+        case let value as Int: try value.encode(to: encoder)
+        case let value as Int8: try value.encode(to: encoder)
+        case let value as Int16: try value.encode(to: encoder)
+        case let value as Int32: try value.encode(to: encoder)
+        case let value as Int64: try value.encode(to: encoder)
+        case let value as UInt: try value.encode(to: encoder)
+        case let value as UInt8: try value.encode(to: encoder)
+        case let value as UInt16: try value.encode(to: encoder)
+        case let value as UInt32: try value.encode(to: encoder)
+        case let value as UInt64: try value.encode(to: encoder)
+        case let value as Bool: try value.encode(to: encoder)
+        case let value as String: try value.encode(to: encoder)
+        case let value as Date: try value.encode(to: encoder)
+        case let value as URL: try value.encode(to: encoder)
         case let data as Data:
             try container.encode(data.str(base64: true))
         case let array as [PersistentHotkey]:
