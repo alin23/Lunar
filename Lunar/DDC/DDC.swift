@@ -967,7 +967,12 @@ enum DDC {
             let writeStartedAt = DispatchTime.now()
 
             #if arch(arm64)
-                let result = DDCWriteM1(avService, &command, CachedDefaults[.ddcSleepFactor].rawValue)
+                let result: Bool
+                if displayController.activeDisplays[displayID]?.mcdp ?? false {
+                    result = DDCWriteM2(avService, &command, VQAIISO)
+                } else {
+                    result = DDCWriteM1(avService, &command, CachedDefaults[.ddcSleepFactor].rawValue)
+                }
             #else
                 let result = DDCWrite(fb, &command)
             #endif

@@ -260,6 +260,8 @@ bool logToFile(char* format, ...);
 
 bool DDCWriteM1(IOAVServiceRef avService, struct DDCWriteCommand *write, uint8_t sleepFactor);
 bool DDCReadM1(IOAVServiceRef avService, struct DDCReadCommand *read, uint8_t sleepFactor);
+bool DDCWriteM2(IOAVServiceRef avService, struct DDCWriteCommand *write, uint8_t sleepFactor);
+bool DDCReadM2(IOAVServiceRef avService, struct DDCReadCommand *read, uint8_t sleepFactor);
 bool EDIDTestM1(IOAVServiceRef avService, struct EDID *edid, uint8_t edidData[256]);
 
 bool DDCWrite(io_service_t framebuffer, struct DDCWriteCommand *write);

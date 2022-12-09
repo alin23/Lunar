@@ -145,6 +145,7 @@
 		C7C68F0D201D3D9800F49A2B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F0C201D3D9800F49A2B /* SettingsView.swift */; };
 		C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */; };
 		C7CBEFFD238E81FF00031E93 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFFC238E81FF00031E93 /* Util.swift */; };
+		C7CC5D1629437E2C00DEA106 /* DDC2.h in Headers */ = {isa = PBXBuildFile; fileRef = C7CC5D1529437E2C00DEA106 /* DDC2.h */; };
 		C7CFF494271FF280002CB549 /* DDCPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CFF492271FF280002CB549 /* DDCPopoverController.swift */; };
 		C7DA10F7259B8979006DD876 /* Regex in Frameworks */ = {isa = PBXBuildFile; productRef = C7DA10F6259B8979006DD876 /* Regex */; };
 		C7DD622126120B7600B07B31 /* RaspberryPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD622026120B7600B07B31 /* RaspberryPageController.swift */; };
@@ -337,6 +338,7 @@
 		C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusItemButtonController.swift; sourceTree = "<group>"; };
 		C7CBEFFC238E81FF00031E93 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreDisplay.framework; path = /System/Library/Frameworks/CoreDisplay.framework; sourceTree = "<absolute>"; };
+		C7CC5D1529437E2C00DEA106 /* DDC2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDC2.h; sourceTree = "<group>"; };
 		C7CFF492271FF280002CB549 /* DDCPopoverController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DDCPopoverController.swift; sourceTree = "<group>"; };
 		C7DD622026120B7600B07B31 /* RaspberryPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RaspberryPageController.swift; sourceTree = "<group>"; };
 		C7DD62282612331700B07B31 /* PaddedTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddedTextField.swift; sourceTree = "<group>"; };
@@ -440,6 +442,7 @@
 		C7151945224E34BA0024C6F6 /* DDC */ = {
 			isa = PBXGroup;
 			children = (
+				C7CC5D1529437E2C00DEA106 /* DDC2.h */,
 				C7521D32226C762A0062EC81 /* DDC.c */,
 				C7151941224E34BA0024C6F6 /* DDC.h */,
 				C7151943224E34BA0024C6F6 /* Lunar-Bridging-Header.h */,
@@ -773,6 +776,7 @@
 				C7E80E3B2637060F004718A4 /* shim.h in Headers */,
 				C7E896DA2652C0F60079A328 /* CBBlueLightClient.h in Headers */,
 				C73716A526DE1F22008EEE53 /* CBTrueToneClient.h in Headers */,
+				C7CC5D1629437E2C00DEA106 /* DDC2.h in Headers */,
 				C73716A626DE1F22008EEE53 /* BrightnessSystemClient.h in Headers */,
 				C72BB4B62727E03500941708 /* Extensions.h in Headers */,
 				C73716A726DE1F22008EEE53 /* CBAdaptationClient.h in Headers */,

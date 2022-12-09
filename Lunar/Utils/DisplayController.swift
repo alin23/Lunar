@@ -617,15 +617,13 @@ class DisplayController: ObservableObject {
 
             let forceDDC = (display?.forceDDC ?? false)
             guard !isTestID(displayID), NSScreen.isOnline(displayID),
-                  forceDDC || (
-                      !(display?.badHDMI ?? false) && !DDC.isVirtualDisplay(displayID, checkName: false)
-                  )
+                  forceDDC || (!DDC.isVirtualDisplay(displayID, checkName: false))
             else {
                 log.info("""
                     No AVService for display \(displayID): (
                         isOnline: \(NSScreen.isOnline(displayID)),
                         isVirtual: \(DDC.isVirtualDisplay(displayID, checkName: false)),
-                        badHDMI: \(display?.badHDMI ?? false)
+                        MCDP: \(display?.mcdp ?? false)
                     )
                 """)
                 return nil
@@ -709,10 +707,10 @@ class DisplayController: ObservableObject {
             }
 
             if isMCDP29XX(dcpService: dcpService, display: display, clcd2Num: clcd2Num) {
-                display.badHDMI = true
-                if !forceDDC {
-                    return nil
-                }
+                display.mcdp = true
+//                if !forceDDC {
+//                    return nil
+//                }
             }
 
             guard let ioAvService = AVServiceCreateFromDCPAVServiceProxy(dcpAvServiceProxy)?.takeRetainedValue(),
