@@ -9,8 +9,6 @@
 
 /// Direct bindings to libssh2_agent
 class Agent {
-    // MARK: Lifecycle
-
     init(cSession: OpaquePointer) throws {
         guard let cAgent = libssh2_agent_init(cSession) else {
             throw SSHError.mostRecentError(session: cSession, backupMessage: "libssh2_agent_init failed")
@@ -28,22 +26,14 @@ class Agent {
         libssh2_agent_free(cAgent)
     }
 
-    // MARK: Internal
-
     class PublicKey: CustomStringConvertible {
-        // MARK: Lifecycle
-
         init(cIdentity: UnsafeMutablePointer<libssh2_agent_publickey>) {
             self.cIdentity = cIdentity
         }
 
-        // MARK: Internal
-
         var description: String {
             "Public key: " + String(cString: cIdentity.pointee.comment)
         }
-
-        // MARK: Fileprivate
 
         fileprivate let cIdentity: UnsafeMutablePointer<libssh2_agent_publickey>
     }
@@ -79,8 +69,6 @@ class Agent {
         let code = libssh2_agent_userauth(cAgent, username, key.cIdentity)
         return code == 0
     }
-
-    // MARK: Private
 
     private let cSession: OpaquePointer
     private let cAgent: OpaquePointer

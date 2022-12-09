@@ -35,8 +35,6 @@ enum Page: Int {
 // MARK: - ToggleButton
 
 class ToggleButton: NSButton {
-    // MARK: Lifecycle
-
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()
@@ -46,8 +44,6 @@ class ToggleButton: NSButton {
         super.init(coder: coder)
         setup()
     }
-
-    // MARK: Internal
 
     var hoverState = HoverState.noHover
     weak var notice: NSTextField?

@@ -517,8 +517,6 @@ public enum TerminalColor: UInt8 {
     case grey89
     case grey93
 
-    // MARK: Public
-
     public func foregroundStyleCode() -> TerminalStyleCode {
         ("\u{001B}[38;5;\(rawValue)m", TerminalStyle.reset.open)
     }

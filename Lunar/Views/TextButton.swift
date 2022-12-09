@@ -9,8 +9,6 @@
 import Cocoa
 
 class TextButton: NSButton {
-    // MARK: Lifecycle
-
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()
@@ -20,8 +18,6 @@ class TextButton: NSButton {
         super.init(coder: coder)
         setup()
     }
-
-    // MARK: Internal
 
     @IBInspectable var bgColor: CGColor = NSColor(deviceWhite: 1.0, alpha: 0.25).cgColor
     @IBInspectable var hoverBgColor: CGColor = mauve.withAlphaComponent(0.5).cgColor

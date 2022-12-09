@@ -15,8 +15,6 @@ import Paddle
 // MARK: - LicenseView
 
 public struct LicenseView: View {
-    // MARK: Public
-
     public var body: some View {
         HStack {
             Text("Licence:")
@@ -69,8 +67,6 @@ public struct LicenseView: View {
         .onAppear { product = lunarProProduct }
     }
 
-    // MARK: Internal
-
     @State var product: PADProduct? = lunarProProduct
 
     @Default(.lunarProActive) var lunarProActive
@@ -82,13 +78,9 @@ public struct LicenseView: View {
 // MARK: - VersionView
 
 public struct VersionView: View {
-    // MARK: Lifecycle
-
     public init(updater: SPUUpdater) {
         self.updater = updater
     }
-
-    // MARK: Public
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 5) {
@@ -177,8 +169,6 @@ public struct VersionView: View {
         .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.05)))
     }
 
-    // MARK: Internal
-
     @Default(.checkForUpdate) var checkForUpdates
     @Default(.updateCheckInterval) var updateCheckInterval
     @Default(.updateChannel) var updateChannel
@@ -190,8 +180,6 @@ public struct VersionView: View {
 // MARK: - MenuDensityView
 
 public struct MenuDensityView: View {
-    // MARK: Public
-
     public var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 3) {
@@ -249,8 +237,6 @@ public struct MenuDensityView: View {
         }
     }
 
-    // MARK: Internal
-
     @Default(.menuDensity) var menuDensity
     @Environment(\.colors) var colors
 }
@@ -268,18 +254,12 @@ extension SPUUpdater: ObservableObject {}
 // MARK: - DetailToggleStyle
 
 public struct DetailToggleStyle: ToggleStyle {
-    // MARK: Lifecycle
-
     public init(style: Style = .circle) {
         self.style = style
     }
 
-    // MARK: Public
-
     public enum Style {
         case square, circle, empty
-
-        // MARK: Public
 
         public var sfSymbolName: String {
             switch self {

@@ -10,8 +10,6 @@ import Socket
 
 /// Manages an SSH session
 public class SSH {
-    // MARK: Lifecycle
-
     /// Creates a new SSH session
     ///
     /// - Parameters:
@@ -29,8 +27,6 @@ public class SSH {
         try sock.connect(to: host, port: port)
         try session.handshake(over: sock)
     }
-
-    // MARK: Public
 
     public enum PtyType: String {
         case vanilla
@@ -251,11 +247,7 @@ public class SSH {
         try session.openSftp()
     }
 
-    // MARK: Internal
-
     let session: Session
-
-    // MARK: Private
 
     private let sock: Socket
 }

@@ -32,8 +32,6 @@ enum DisplayControl: Int, Codable, EnumerableFlag {
     case gamma
     case ddcctl
 
-    // MARK: Lifecycle
-
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         guard let strValue = try? container.decode(String.self) else {
@@ -44,8 +42,6 @@ enum DisplayControl: Int, Codable, EnumerableFlag {
 
         self = DisplayControl.fromstr(strValue)
     }
-
-    // MARK: Internal
 
     var str: String {
         switch self {
@@ -102,7 +98,7 @@ protocol Control {
     ) -> Bool
     func setContrast(_ contrast: Contrast, oldValue: Contrast?, transition: BrightnessTransition?, onChange: ((Contrast) -> Void)?) -> Bool
     func setVolume(_ volume: UInt16) -> Bool
-    func setInput(_ input: InputSource) -> Bool
+    func setInput(_ input: VideoInputSource) -> Bool
     func setMute(_ muted: Bool) -> Bool
     func setPower(_ power: PowerState) -> Bool
 
@@ -118,7 +114,7 @@ protocol Control {
     func getContrast() -> Contrast?
     func getVolume() -> UInt16?
     func getMute() -> Bool?
-    func getInput() -> InputSource?
+    func getInput() -> VideoInputSource?
 
     func getMaxBrightness() -> Brightness?
     func getMaxContrast() -> Contrast?
@@ -185,7 +181,7 @@ extension Control {
         case .volume:
             return setVolume(value as! UInt16)
         case .input:
-            return setInput(value as! InputSource)
+            return setInput(value as! VideoInputSource)
         case .audioMuted:
             return setMute(value as! Bool)
         case .power:

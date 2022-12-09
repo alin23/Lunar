@@ -10,8 +10,6 @@ import Cocoa
 import Defaults
 
 class ScrollableTextFieldCaption: NSTextField {
-    // MARK: Lifecycle
-
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()
@@ -21,8 +19,6 @@ class ScrollableTextFieldCaption: NSTextField {
         super.init(coder: coder)
         setup()
     }
-
-    // MARK: Internal
 
     var didScrollTextField: Bool = CachedDefaults[.didScrollTextField]
 

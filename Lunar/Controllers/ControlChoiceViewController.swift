@@ -349,7 +349,7 @@ class ControlChoiceViewController: NSViewController {
             by: brightnessField.integerValue < brightness.i ? 1 : -1
         ) {
             mainThread { brightnessField.integerValue = br }
-            guard wait(0.005) else { return }
+            guard wait(0.01) else { return }
         }
     }
 
@@ -365,7 +365,7 @@ class ControlChoiceViewController: NSViewController {
 
         for cr in stride(from: contrastField.integerValue, through: contrast.i, by: contrastField.integerValue < contrast.i ? 1 : -1) {
             mainThread { contrastField.integerValue = cr }
-            guard wait(0.005) else { return }
+            guard wait(0.01) else { return }
         }
     }
 
@@ -417,9 +417,9 @@ class ControlChoiceViewController: NSViewController {
             }
         }
 
-        for vol in stride(from: self.volume.i, through: volume.i, by: self.volume.i < volume.i ? 1 : -1) {
+        for vol in stride(from: self.volume.i, through: volume.i, by: self.volume.i < volume.i ? 4 : -4) {
             mainThread { self.volume = vol.d }
-            guard wait(0.008) else { return }
+            guard wait(0.02) else { return }
         }
     }
 
@@ -486,7 +486,7 @@ class ControlChoiceViewController: NSViewController {
         setWriteProgress(0.1)
         guard wait(1.1) else { return .allWorked }
 
-        display.withBrightnessTransition {
+        display.withBrightnessTransition(.slow) {
             display.enabledControls[control.displayControl] = true
 
             var newBr: UInt16 = currentBrightness != 0 ? (control.isSoftware ? 25 : 0) : 50
@@ -542,9 +542,9 @@ class ControlChoiceViewController: NSViewController {
         if brightnessWriteWorked {
             setResult(brightnessWriteResult, text: "Write seemed to work", color: peach)
             askQuestion(
-                control.isSoftware ?
-                    "Was there any change in brightness on the tested display?" :
-                    "Was there any change in brightness on the tested display?\nThe brightness value in the monitor settings should now be set to 67"
+                control.isSoftware
+                    ? "Was there any change in brightness on the tested display?"
+                    : "Was there any change in brightness on the tested display?\nThe brightness value in the monitor settings should now be set to 67"
             ) { [weak self] itWorked in
                 guard let self else { return }
                 if itWorked {
@@ -664,14 +664,17 @@ class ControlChoiceViewController: NSViewController {
         _ = control.setBrightness(currentBrightness, oldValue: nil, force: true, transition: .smooth, onChange: nil)
         setBrightness(currentBrightness)
         setWriteProgress(0.85)
+        guard wait(0.5) else { return .allWorked }
 
         _ = control.setContrast(currentContrast, oldValue: nil, transition: .smooth, onChange: nil)
         setContrast(currentContrast)
         setWriteProgress(0.9)
+        guard wait(0.5) else { return .allWorked }
 
         _ = control.setVolume(currentVolume)
         setVolume(currentVolume)
         setWriteProgress(0.95)
+        guard wait(0.5) else { return .allWorked }
 
         return ControlWriteResult(brightness: brightnessWriteWorked, contrast: contrastWriteWorked, volume: volumeWriteWorked)
     }
@@ -706,14 +709,17 @@ class ControlChoiceViewController: NSViewController {
 
         info("Reading brightness", color: peach)
         guard wait(1.1) else { return .allWorked }
+        var brightnessThatWasRead: UInt16 = 0
         if let br = (control.getBrightness() ?? control.getBrightness()), !(control is AppleNativeControl) || br <= 100 {
             brightnessReadWorked = true
             setBrightness(br)
+            brightnessThatWasRead = br
             guard wait(1.1) else { return .allWorked }
             setReadProgress(0.15)
 
             setResult(brightnessReadResult, text: "Read worked", color: green)
             guard wait(1.1) else { return .allWorked }
+            let _ = control.setBrightness(br, oldValue: nil, force: true, transition: .instant, onChange: nil)
         } else {
             setBrightness(0)
             guard wait(1.1) else { return .allWorked }
@@ -734,6 +740,11 @@ class ControlChoiceViewController: NSViewController {
 
             setResult(contrastReadResult, text: "Read worked", color: green)
             guard wait(1.1) else { return .allWorked }
+            if brightnessReadWorked {
+                let _ = control.setBrightness(brightnessThatWasRead, oldValue: nil, force: true, transition: .instant, onChange: nil)
+            } else {
+                let _ = control.setContrast(cr, oldValue: nil, transition: .instant, onChange: nil)
+            }
         } else {
             setContrast(0)
             guard wait(1.1) else { return .allWorked }
@@ -820,7 +831,7 @@ class ControlChoiceViewController: NSViewController {
             createWindow(
                 "testWindowController",
                 controller: &d.testWindowController,
-                screen: d.screen,
+                screen: d.nsScreen,
                 show: true,
                 backgroundColor: .clear,
                 level: .screenSaver,

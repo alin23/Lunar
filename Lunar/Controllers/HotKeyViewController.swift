@@ -10,19 +10,13 @@ import Cocoa
 import Defaults
 import Magnet
 
-// MARK: - HotkeyViewController
-
 class HotkeyViewController: NSViewController {
-    // MARK: Lifecycle
-
     deinit {
         #if DEBUG
             log.verbose("START DEINIT")
             do { log.verbose("END DEINIT") }
         #endif
     }
-
-    // MARK: Internal
 
     @IBOutlet var toggleHotkeyView: HotkeyView?
     @IBOutlet var lunarHotkeyView: HotkeyView?

@@ -17,18 +17,9 @@ import Surge
 let STRIDE = vDSP_Stride(1)
 let AUTO_MODE_TAG = 99
 
-// MARK: - AdaptiveModeKey
+// MARK: - AdaptiveModeKey + Codable, ExpressibleByArgument, Nameable
 
-enum AdaptiveModeKey: Int, Codable, Defaults.Serializable, CaseIterable, ExpressibleByArgument, Nameable {
-    case location = 1
-    case sync = -1
-    case manual = 0
-    case sensor = 2
-    case clock = 3
-    case auto = 99
-
-    // MARK: Lifecycle
-
+extension AdaptiveModeKey: Codable, ExpressibleByArgument, Nameable {
     init?(argument: String) {
         guard argument.lowercased().stripped != "auto" else {
             CachedDefaults[.overrideAdaptiveMode] = false
@@ -49,8 +40,6 @@ enum AdaptiveModeKey: Int, Codable, Defaults.Serializable, CaseIterable, Express
 
         self = AdaptiveModeKey.fromstr(strValue)
     }
-
-    // MARK: Internal
 
     var name: String {
         get { "\(str) Mode" }
@@ -350,14 +339,17 @@ extension AdaptiveMode {
 
         var dataPoint: DataPoint
         var curveFactor: Double
+        let applySubzero: Bool
 
         switch monitorValue {
         case .brightness, .nsBrightness, .preciseBrightness:
             dataPoint = datapointLock.around { brightnessDataPoint }
             curveFactor = factor ?? display.brightnessCurveFactor
+            applySubzero = true
         default:
             dataPoint = datapointLock.around { contrastDataPoint }
             curveFactor = factor ?? display.contrastCurveFactor
+            applySubzero = false
         }
 
         var newValue: Double
@@ -398,21 +390,21 @@ extension AdaptiveMode {
             }
         }
 
-        newValue = cap(newValue + offset.d, minVal: MIN_BRIGHTNESS.d - 100, maxVal: MAX_BRIGHTNESS.d)
+        newValue = cap(newValue + offset.d, minVal: MIN_BRIGHTNESS.d - (applySubzero ? 100 : 0), maxVal: MAX_BRIGHTNESS.d)
 
         if newValue.isNaN {
             log.error(
                 "NaN value?? WHAAT?? AGAIN?!",
                 context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset]
             )
-            newValue = cap(value, minVal: MIN_BRIGHTNESS.d - 100, maxVal: MAX_BRIGHTNESS.d)
+            newValue = cap(value, minVal: MIN_BRIGHTNESS.d - (applySubzero ? 100 : 0), maxVal: MAX_BRIGHTNESS.d)
         }
 
         return mapNumber(
             newValue,
-            fromLow: MIN_BRIGHTNESS.d - 100,
+            fromLow: MIN_BRIGHTNESS.d - (applySubzero ? 100 : 0),
             fromHigh: MAX_BRIGHTNESS.d,
-            toLow: minValue - 90,
+            toLow: minValue - (applySubzero ? 90 : 0),
             toHigh: maxValue
         )
     }

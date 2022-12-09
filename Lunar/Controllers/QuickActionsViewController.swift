@@ -171,7 +171,7 @@ struct DisplayRowView: View {
             height: 20,
             noValueText: "Video Input",
             noValueImage: "input",
-            content: .constant(InputSource.mostUsed)
+            content: .constant(VideoInputSource.mostUsed)
         )
         .frame(width: 150, height: 20, alignment: .center)
         .padding(.vertical, 2)
@@ -1094,8 +1094,6 @@ struct BlackoutPopoverView: View {
 // MARK: - PaddedTextFieldStyle
 
 public struct PaddedTextFieldStyle: TextFieldStyle {
-    // MARK: Public
-
     public func _body(configuration: TextField<Self._Label>) -> some View {
         configuration
             .textFieldStyle(.plain)
@@ -1108,8 +1106,6 @@ public struct PaddedTextFieldStyle: TextFieldStyle {
                     .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)
             )
     }
-
-    // MARK: Internal
 
     @State var font: Font = .system(size: 12, weight: .bold)
     @State var verticalPadding: CGFloat = 4

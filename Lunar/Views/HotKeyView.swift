@@ -13,8 +13,6 @@ import Magnet
 import Sauce
 
 class HotkeyView: RecordView, RecordViewDelegate {
-    // MARK: Lifecycle
-
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()
@@ -25,15 +23,11 @@ class HotkeyView: RecordView, RecordViewDelegate {
         setup()
     }
 
-    // MARK: Open
-
     override open func mouseDown(with _: NSEvent) {
         log.debug("Clicked on hotkey view: \(hotkey?.identifier ?? "")")
         beginRecording()
         transition()
     }
-
-    // MARK: Internal
 
     var hoverState: HoverState = .noHover
 

@@ -2,9 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:/Users/alin/Projects/Lunar/Lunar/Views/Components.swift">
-   </FileRef>
-   <FileRef
       location = "container:Lunar.xcodeproj">
    </FileRef>
 </Workspace>

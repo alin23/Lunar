@@ -65,12 +65,12 @@ class ManualMode: AdaptiveMode {
                 }
             }
 
-            if display.ambientLightAdaptiveBrightnessEnabled {
-                display.ambientLightAdaptiveBrightnessEnabled = false
+            if display.systemAdaptiveBrightness {
+                display.systemAdaptiveBrightness = false
             }
         } else if let lastAppPreset {
-            if display.hasAmbientLightAdaptiveBrightness, !display.ambientLightAdaptiveBrightnessEnabled {
-                display.ambientLightAdaptiveBrightnessEnabled = true
+            if display.hasAmbientLightAdaptiveBrightness, !display.systemAdaptiveBrightness {
+                display.systemAdaptiveBrightness = true
             }
             if lastAppPreset.reapplyPreviousBrightness {
                 let br: Brightness

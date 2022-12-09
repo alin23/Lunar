@@ -17,8 +17,6 @@ public protocol SSHAuthMethod {
 
 /// Password-based authentication method
 public struct SSHPassword: SSHAuthMethod {
-    // MARK: Lifecycle
-
     /// Creates a new password-based authentication using the given password
     ///
     /// - Parameter password: the password to authenticate with
@@ -26,13 +24,9 @@ public struct SSHPassword: SSHAuthMethod {
         self.password = password
     }
 
-    // MARK: Public
-
     public func authenticate(ssh: SSH, username: String) throws {
         try ssh.session.authenticate(username: username, password: password)
     }
-
-    // MARK: Internal
 
     let password: String
 }
@@ -41,12 +35,8 @@ public struct SSHPassword: SSHAuthMethod {
 
 /// Agent-based authentication method
 public struct SSHAgent: SSHAuthMethod {
-    // MARK: Lifecycle
-
     /// Creates a new agent-based authentication
     public init() {}
-
-    // MARK: Public
 
     public func authenticate(ssh: SSH, username: String) throws {
         let agent = try ssh.session.openAgent()
@@ -72,8 +62,6 @@ public struct SSHAgent: SSHAuthMethod {
 
 /// Key-based authentication method
 public struct SSHKey: SSHAuthMethod {
-    // MARK: Lifecycle
-
     /// Creates a new key-based authentication
     ///
     /// - Parameters:
@@ -89,8 +77,6 @@ public struct SSHKey: SSHAuthMethod {
         }
         self.passphrase = passphrase
     }
-
-    // MARK: Public
 
     public let privateKey: String
     public let publicKey: String

@@ -16,15 +16,11 @@ import UserNotifications
 // MARK: - Service
 
 class Service {
-    // MARK: Lifecycle
-
     init(_ service: NetService, scheme: String = "http", path: String = "") {
         self.service = service
         self.scheme = scheme
         self.path = path
     }
-
-    // MARK: Internal
 
     var scheme: String
     var path: String
@@ -122,14 +118,10 @@ class Service {
 // MARK: - NetworkControl
 
 class NetworkControl: Control {
-    // MARK: Lifecycle
-
     init(display: Display) {
         self.display = display
         listenForRequests()
     }
-
-    // MARK: Internal
 
     struct Request: Equatable {
         var url: URL
@@ -175,7 +167,7 @@ class NetworkControl: Control {
     static func shouldPromptForNetworkControl(_ display: Display) -> Bool {
         guard !display.neverUseNetworkControl else { return false }
 
-        if !displayController.screensSleeping, let screen = display.screen ?? display.primaryMirrorScreen,
+        if !displayController.screensSleeping, let screen = display.nsScreen ?? display.primaryMirrorScreen,
            !screen.visibleFrame.isEmpty
         {
             return true
@@ -560,7 +552,7 @@ class NetworkControl: Control {
         return set(muted ? display.muteByteValueOn : display.muteByteValueOff, for: .AUDIO_MUTE)
     }
 
-    func setInput(_ input: InputSource) -> Bool {
+    func setInput(_ input: VideoInputSource) -> Bool {
         set(input.rawValue, for: .INPUT_SOURCE)
     }
 
@@ -588,8 +580,8 @@ class NetworkControl: Control {
         get(.AUDIO_SPEAKER_VOLUME)
     }
 
-    func getInput() -> InputSource? {
-        guard let input = get(.INPUT_SOURCE), let inputSource = InputSource(rawValue: input) else { return nil }
+    func getInput() -> VideoInputSource? {
+        guard let input = get(.INPUT_SOURCE), let inputSource = VideoInputSource(rawValue: input) else { return nil }
         return inputSource
     }
 

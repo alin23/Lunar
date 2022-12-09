@@ -9,6 +9,7 @@
 // #import "CBTrueToneClient.h"
 // #import "CBAdaptationClient.h"
 #import "DDC.h"
+#import "DDC2.h"
 #import "LaunchAtLoginController.h"
 #import <CoreGraphics/CoreGraphics.h>
 #import <CommonCrypto/CommonDigest.h>

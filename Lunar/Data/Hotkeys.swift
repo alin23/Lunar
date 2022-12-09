@@ -128,8 +128,6 @@ extension String {
 // MARK: - PersistentHotkey
 
 class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringConvertible {
-    // MARK: Lifecycle
-
     init(_ identifier: String, dict hk: [HotkeyPart: Int], handler: ((HotKey) -> Void)? = nil) {
         let keyCode = hk[.keyCode]!
         let enabled = hk[.enabled]!
@@ -232,8 +230,6 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
             .allowsHold: allowsHold ? 1 : 0,
         ])
     }
-
-    // MARK: Internal
 
     enum CodingKeys: String, CodingKey, CaseIterable {
         case identifier
@@ -424,18 +420,6 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
         try container.encode(isEnabled, forKey: .enabled)
         try container.encode(allowsHold, forKey: .allowsHold)
     }
-}
-
-// MARK: - BrightnessKeyAction
-
-enum BrightnessKeyAction: Int, CaseIterable, Defaults.Serializable {
-    case all
-    case external
-    case cursor
-    case builtin
-    case source
-    case main
-    case nonMain
 }
 
 // MARK: - Hotkey

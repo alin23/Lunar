@@ -11,14 +11,6 @@ import Combine
 import Defaults
 import SwiftDate
 
-// MARK: - ScheduleTransition
-
-enum ScheduleTransition: Int, CaseIterable, Defaults.Serializable {
-    case none
-    case minutes30
-    case full
-}
-
 // MARK: - ScheduleType
 
 enum ScheduleType: Int, CaseIterable, Codable, Defaults.Serializable {
@@ -115,8 +107,6 @@ struct BrightnessSchedule: Codable, Defaults.Serializable, Comparable {
 
 // @IBDesignable
 class Schedule: NSView {
-    // MARK: Lifecycle
-
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()
@@ -126,8 +116,6 @@ class Schedule: NSView {
         super.init(coder: coder)
         setup()
     }
-
-    // MARK: Internal
 
     var sunriseOffsetHour: UInt8 = 0
     var sunriseOffsetMinute: UInt8 = 0

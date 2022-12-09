@@ -10,13 +10,9 @@ import Cocoa
 import Foundation
 
 struct DDCCTLControl: Control {
-    // MARK: Lifecycle
-
     init(display: Display) {
         self.display = display
     }
-
-    // MARK: Internal
 
     static let ddcctlBinary = Bundle.main.path(forResource: "ddcctl", ofType: nil)!
 
@@ -30,7 +26,7 @@ struct DDCCTLControl: Control {
 
     var displayIndex: Int? {
         guard let display else { return nil }
-        return display.screen != nil ? NSScreen.screens.filter { !$0.isBuiltin }.firstIndex(of: display.screen!) : nil
+        return display.nsScreen != nil ? NSScreen.screens.filter { !$0.isBuiltin }.firstIndex(of: display.nsScreen!) : nil
     }
 
     func propertyArg(_ property: ControlID) -> String {
@@ -135,7 +131,7 @@ struct DDCCTLControl: Control {
         ddcctlSet(.AUDIO_SPEAKER_VOLUME, value: value)
     }
 
-    func setInput(_ value: InputSource) -> Bool {
+    func setInput(_ value: VideoInputSource) -> Bool {
         ddcctlSet(.INPUT_SOURCE, value: value.rawValue)
     }
 
@@ -167,7 +163,7 @@ struct DDCCTLControl: Control {
         nil
     }
 
-    func getInput() -> InputSource? {
+    func getInput() -> VideoInputSource? {
         nil
     }
 
