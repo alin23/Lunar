@@ -12,16 +12,12 @@ import Magnet
 import Regex
 
 class HotkeyButton: PopoverButton<HotkeyPopoverController> {
-    // MARK: Lifecycle
-
     deinit {
         #if DEBUG
             log.verbose("START DEINIT")
             do { log.verbose("END DEINIT") }
         #endif
     }
-
-    // MARK: Internal
 
     weak var display: Display?
 
@@ -39,7 +35,7 @@ class HotkeyButton: PopoverButton<HotkeyPopoverController> {
         controller.setup(from: display)
 
         controller.onDropdownSelect = { [weak self] dropdown in
-            guard let input = InputSource(rawValue: dropdown.selectedTag().u16), let display = self?.display else { return }
+            guard let input = VideoInputSource(rawValue: dropdown.selectedTag().u16), let display = self?.display else { return }
             switch dropdown.tag {
             case 1:
                 display.hotkeyInput1 = input.rawValue.ns
@@ -56,8 +52,8 @@ class HotkeyButton: PopoverButton<HotkeyPopoverController> {
             guard let dropdown else { continue }
             dropdown.removeAllItems()
             dropdown.addItems(
-                withTitles: InputSource.mostUsed
-                    .map { input in input.str } + InputSource.leastUsed
+                withTitles: VideoInputSource.mostUsed
+                    .map { input in input.str } + VideoInputSource.leastUsed
                     .map { input in input.str } + ["Unknown"]
             )
             for item in dropdown.itemArray {
@@ -85,7 +81,7 @@ class HotkeyButton: PopoverButton<HotkeyPopoverController> {
                 }
             }
 
-            dropdown.menu?.insertItem(.separator(), at: InputSource.mostUsed.count)
+            dropdown.menu?.insertItem(.separator(), at: VideoInputSource.mostUsed.count)
             for item in dropdown.itemArray {
                 guard let input = inputSourceMapping[item.title] else { continue }
                 item.tag = input.rawValue.i

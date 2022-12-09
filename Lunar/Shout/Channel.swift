@@ -11,8 +11,6 @@ import struct Foundation.URL
 
 /// Direct bindings to libssh2_channel
 public class Channel {
-    // MARK: Lifecycle
-
     private init(cSession: OpaquePointer, cChannel: OpaquePointer) {
         self.cSession = cSession
         self.cChannel = cChannel
@@ -27,8 +25,6 @@ public class Channel {
         session = nil
     }
 
-    // MARK: Public
-
     public var cancelled = false
     public var session: Session?
 
@@ -39,8 +35,6 @@ public class Channel {
         try close()
         try waitClosed()
     }
-
-    // MARK: Internal
 
     static let windowDefault: UInt32 = 2 * 1024 * 1024
     static let packetDefaultSize: UInt32 = 32768
@@ -138,8 +132,6 @@ public class Channel {
     func exitStatus() -> Int32 {
         libssh2_channel_get_exit_status(cChannel)
     }
-
-    // MARK: Private
 
     private static let session = "session"
     private static let exec = "exec"

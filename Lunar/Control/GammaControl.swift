@@ -101,8 +101,6 @@ enum NightShiftScheduleType: Equatable {
     case solar
     case custom(start: Time, end: Time)
 
-    // MARK: Internal
-
     static func == (lhs: NightShiftScheduleType, rhs: NightShiftScheduleType) -> Bool {
         switch (lhs, rhs) {
         case (.off, .off), (.solar, .solar):
@@ -250,13 +248,9 @@ enum NightShift {
 // MARK: - GammaControl
 
 class GammaControl: Control {
-    // MARK: Lifecycle
-
     init(display: Display) {
         self.display = display
     }
-
-    // MARK: Internal
 
     @Atomic static var sliderTracking = false
 
@@ -321,7 +315,7 @@ class GammaControl: Control {
             """,
             okButton: "Use dark overlay",
             cancelButton: "Quit f.lux and switch to Night Shift",
-            screen: display.screen ?? display.primaryMirrorScreen,
+            screen: display.nsScreen ?? display.primaryMirrorScreen,
             window: window,
             suppressionText: "Never ask again",
             onSuppression: { shouldStopAsking in
@@ -407,7 +401,7 @@ class GammaControl: Control {
         false
     }
 
-    func setInput(_: InputSource) -> Bool {
+    func setInput(_: VideoInputSource) -> Bool {
         false
     }
 
@@ -439,7 +433,7 @@ class GammaControl: Control {
         nil
     }
 
-    func getInput() -> InputSource? {
+    func getInput() -> VideoInputSource? {
         nil
     }
 

@@ -161,8 +161,6 @@ var macbookScreenColor: NSColor { darkMode ? rouge.blended(withFraction: 0.3, of
 
 @IBDesignable
 class DisplayImage: NSView {
-    // MARK: Lifecycle
-
     override init(frame: NSRect) {
         super.init(frame: frame)
         setup(frame: frame)
@@ -172,8 +170,6 @@ class DisplayImage: NSView {
         super.init(coder: coder)
         setup(frame: frame)
     }
-
-    // MARK: Internal
 
     @IBInspectable var baseCornerRadius: CGFloat = 14
     @IBInspectable var maxCornerRadius: CGFloat = 24
@@ -326,8 +322,6 @@ class DisplayImage: NSView {
 // MARK: - DisplayViewController
 
 class DisplayViewController: NSViewController {
-    // MARK: Lifecycle
-
     deinit {
         #if DEBUG
             log.verbose("START DEINIT")
@@ -338,8 +332,6 @@ class DisplayViewController: NSViewController {
             observer.cancel()
         }
     }
-
-    // MARK: Internal
 
     enum ResetAction: Int {
         case algorithmCurve = 0
@@ -403,7 +395,7 @@ class DisplayViewController: NSViewController {
     @IBOutlet var lockBrightnessCurveButton: LockButton!
     @objc dynamic var noDisplay = false
     @objc dynamic lazy var chartHidden: Bool = display == nil || noDisplay || display!
-        .ambientLightAdaptiveBrightnessEnabled || displayController
+        .systemAdaptiveBrightness || displayController
         .adaptiveModeKey == .clock
 
     var graphObserver: Cancellable?
@@ -916,7 +908,7 @@ class DisplayViewController: NSViewController {
         deleteEnabled = getDeleteEnabled(display: display)
         powerOffEnabled = getPowerOffEnabled(display: display)
         powerOffTooltip = getPowerOffTooltip(display: display)
-        chartHidden = noDisplay || display.ambientLightAdaptiveBrightnessEnabled || displayController.adaptiveModeKey == .clock
+        chartHidden = noDisplay || display.systemAdaptiveBrightness || displayController.adaptiveModeKey == .clock
 
         if let button = colorsButton {
             button.display = display
@@ -1156,7 +1148,7 @@ class DisplayViewController: NSViewController {
                 self.view.bringSubviewToFront(button)
             case is GammaControl where display.enabledControls[.gamma] ?? false:
                 #if arch(arm64)
-                    let hasI2C = DDC.hasAVService(displayID: display.id, display: display, ignoreCache: true)
+                    let hasI2C = DDC.hasAVService(displayID: display.id, ignoreCache: true)
                 #else
                     let hasI2C = DDC.hasI2CController(displayID: display.id, ignoreCache: true)
                 #endif
@@ -1589,7 +1581,7 @@ class DisplayViewController: NSViewController {
                 self.powerOffTooltip = self.getPowerOffTooltip(hasDDC: hasDDC)
             }.store(in: &displayObservers, for: "hasDDC")
 
-        if !display.adaptive, !display.ambientLightAdaptiveBrightnessEnabled {
+        if !display.adaptive, !display.systemAdaptiveBrightness {
             showAdaptiveNotice()
         }
         display.$adaptive
@@ -1600,10 +1592,10 @@ class DisplayViewController: NSViewController {
                     self.hideAdaptiveNotice()
                     return
                 }
-                self.chartHidden = self.noDisplay || self.display!.ambientLightAdaptiveBrightnessEnabled || displayController
+                self.chartHidden = self.noDisplay || self.display!.systemAdaptiveBrightness || displayController
                     .adaptiveModeKey == .clock
 
-                if !newAdaptive, !display.ambientLightAdaptiveBrightnessEnabled {
+                if !newAdaptive, !display.systemAdaptiveBrightness {
                     self.showAdaptiveNotice()
                 } else {
                     self.hideAdaptiveNotice()
@@ -1628,7 +1620,7 @@ class DisplayViewController: NSViewController {
                 guard let self, !self.pausedAdaptiveModeObserver else { return }
                 self.pausedAdaptiveModeObserver = true
 
-                self.chartHidden = self.display == nil || self.noDisplay || self.display!.ambientLightAdaptiveBrightnessEnabled || change
+                self.chartHidden = self.display == nil || self.noDisplay || self.display!.systemAdaptiveBrightness || change
                     .newValue == .clock
                 self.scheduleBox?.isHidden = self.display == nil || self.noDisplay || change.newValue != .clock
 

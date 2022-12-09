@@ -14,8 +14,6 @@ import SwiftyBeaver
 // MARK: - Logger
 
 class Logger: SwiftyBeaver {
-    // MARK: Open
-
     override open class func verbose(
         _ message: @autoclosure () -> Any,
         _ file: String = #file,
@@ -74,8 +72,6 @@ class Logger: SwiftyBeaver {
         guard initialized else { return }
         super.error(message(), file, function, line: line, context: context)
     }
-
-    // MARK: Internal
 
     static var observers: Set<AnyCancellable> = []
 

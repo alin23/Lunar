@@ -19,8 +19,6 @@ let NO_SHADOW: NSShadow = {
 // MARK: - PaddedButton
 
 class PaddedButton: NSButton {
-    // MARK: Lifecycle
-
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()
@@ -30,8 +28,6 @@ class PaddedButton: NSButton {
         super.init(coder: coder)
         setup()
     }
-
-    // MARK: Internal
 
     var buttonShadow: NSShadow!
     var baseFrame: NSRect!

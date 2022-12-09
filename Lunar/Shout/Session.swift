@@ -10,8 +10,6 @@ import Socket
 
 /// Direct bindings to libssh2_session
 public class Session {
-    // MARK: Lifecycle
-
     init() throws {
         guard Session.initResult == 0 else {
             throw SSHError.genericError("libssh2_init failed")
@@ -31,8 +29,6 @@ public class Session {
         #endif
         libssh2_session_free(cSession)
     }
-
-    // MARK: Internal
 
     var blocking: Int32 {
         get {
@@ -92,8 +88,6 @@ public class Session {
         agent = newAgent
         return newAgent
     }
-
-    // MARK: Private
 
     private static let initResult = libssh2_init(0)
 

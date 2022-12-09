@@ -26,15 +26,11 @@ import Foundation
 /// let idSecond = nanoID.new()
 
 class NanoID {
-    // MARK: Lifecycle
-
     /// Inits an instance with Shared Parameters
     init(alphabet: NanoIDAlphabet..., size: Int) {
         self.size = size
         self.alphabet = NanoIDHelper.parse(alphabet)
     }
-
-    // MARK: Internal
 
     /// Generates a Nano ID using Default Parameters
     static func new() -> String {
@@ -56,8 +52,6 @@ class NanoID {
     func new() -> String {
         NanoIDHelper.generate(from: alphabet, of: size)
     }
-
-    // MARK: Private
 
     // Default Parameters
     private static let defaultSize = 21
@@ -110,8 +104,6 @@ enum NanoIDAlphabet {
     case lowercasedLatinLetters
     case numbers
 
-    // MARK: Internal
-
     func toString() -> String {
         switch self {
         case .uppercasedLatinLetters, .lowercasedLatinLetters, .numbers:
@@ -122,8 +114,6 @@ enum NanoIDAlphabet {
             )
         }
     }
-
-    // MARK: Private
 
     private func chars() -> String {
         switch self {

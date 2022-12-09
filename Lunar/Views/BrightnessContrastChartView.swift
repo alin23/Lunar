@@ -11,8 +11,6 @@ import Cocoa
 import SwiftDate
 
 class BrightnessContrastChartView: LineChartView {
-    // MARK: Lifecycle
-
     override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
@@ -21,8 +19,6 @@ class BrightnessContrastChartView: LineChartView {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
-
-    // MARK: Internal
 
     let brightnessGraph = LineChartDataSet(entries: [ChartDataEntry](), label: "Brightness")
     let contrastGraph = LineChartDataSet(entries: [ChartDataEntry](), label: "Contrast")

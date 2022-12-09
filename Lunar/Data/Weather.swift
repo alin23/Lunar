@@ -9,15 +9,11 @@ import Foundation
 // MARK: - Wttr
 
 struct Wttr: Codable, Defaults.Serializable {
-    // MARK: Lifecycle
-
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         currentCondition = try values.decodeIfPresent([WeatherCurrentCondition].self, forKey: .currentCondition)
         weather = try values.decodeIfPresent([Weather].self, forKey: .weather)
     }
-
-    // MARK: Internal
 
     enum CodingKeys: String, CodingKey {
         case currentCondition = "current_condition"
@@ -31,15 +27,11 @@ struct Wttr: Codable, Defaults.Serializable {
 // MARK: - Weather
 
 struct Weather: Codable, Defaults.Serializable {
-    // MARK: Lifecycle
-
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         date = try values.decodeIfPresent(String.self, forKey: .date)
         hourly = try values.decodeIfPresent([WeatherHourly].self, forKey: .hourly)
     }
-
-    // MARK: Internal
 
     enum CodingKeys: String, CodingKey {
         case date
@@ -53,8 +45,6 @@ struct Weather: Codable, Defaults.Serializable {
 // MARK: - WeatherHourly
 
 struct WeatherHourly: Codable, Defaults.Serializable {
-    // MARK: Lifecycle
-
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         cloudcover = (try? values.decodeIfPresent(UInt8.self, forKey: .cloudcover)) ??
@@ -63,8 +53,6 @@ struct WeatherHourly: Codable, Defaults.Serializable {
             (try? values.decodeIfPresent(String.self, forKey: .visibility))?.u32 ?? 100
         time = (try? values.decodeIfPresent(Int.self, forKey: .time)) ?? (try? values.decodeIfPresent(String.self, forKey: .time)?.i) ?? 0
     }
-
-    // MARK: Internal
 
     enum CodingKeys: String, CodingKey {
         case cloudcover
@@ -81,8 +69,6 @@ struct WeatherHourly: Codable, Defaults.Serializable {
 // MARK: - WeatherCurrentCondition
 
 struct WeatherCurrentCondition: Codable, Defaults.Serializable {
-    // MARK: Lifecycle
-
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         cloudcover = (try? values.decodeIfPresent(UInt8.self, forKey: .cloudcover)) ??
@@ -90,8 +76,6 @@ struct WeatherCurrentCondition: Codable, Defaults.Serializable {
         visibility = (try? values.decodeIfPresent(UInt32.self, forKey: .visibility)) ??
             (try? values.decodeIfPresent(String.self, forKey: .visibility))?.u32 ?? 100
     }
-
-    // MARK: Internal
 
     enum CodingKeys: String, CodingKey {
         case cloudcover

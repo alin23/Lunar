@@ -8,8 +8,6 @@
 // import CSSH
 
 public struct SSHError: Swift.Error, CustomStringConvertible {
-    // MARK: Lifecycle
-
     private init(kind: Kind, message: String) {
         self.kind = kind
         self.message = message
@@ -24,8 +22,6 @@ public struct SSHError: Swift.Error, CustomStringConvertible {
 
         self.init(kind: kind, message: message)
     }
-
-    // MARK: Public
 
     public enum Kind: Int32 {
         case genericError = 1
@@ -88,8 +84,6 @@ public struct SSHError: Swift.Error, CustomStringConvertible {
         }
         return "Error: \(message) (\(kindMessage))"
     }
-
-    // MARK: Internal
 
     static func check(code: Int32, session: OpaquePointer) throws {
         if code != 0 {

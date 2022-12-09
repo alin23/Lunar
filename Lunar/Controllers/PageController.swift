@@ -15,16 +15,12 @@ import Magnet
 // MARK: - PageController
 
 class PageController: NSPageController {
-    // MARK: Lifecycle
-
     deinit {
         #if DEBUG
             log.verbose("START DEINIT")
             do { log.verbose("END DEINIT") }
         #endif
     }
-
-    // MARK: Internal
 
     let hotkeyViewControllerIdentifier = NSPageController.ObjectIdentifier("Hotkeys")
     let settingsPageControllerIdentifier = NSPageController.ObjectIdentifier("Configuration")

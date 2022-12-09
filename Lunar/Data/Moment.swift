@@ -13,8 +13,6 @@ import SwiftDate
 import SwiftyJSON
 
 class Moment: NSObject {
-    // MARK: Lifecycle
-
     init(_ solar: inout Solar) {
         let (sevenAM, noon, sevenPM) = Moment.defaultMomentsAsDates()
 
@@ -55,8 +53,6 @@ class Moment: NSObject {
         astronomicalSunset = localTime("astronomical_twilight_end") ?? sevenPM
     }
 
-    // MARK: UserDefaults
-
     init?(defaults _: Bool = true) {
         let (sevenAM, noon, sevenPM) = Moment.defaultMoments()
 
@@ -94,8 +90,6 @@ class Moment: NSObject {
         astronomicalSunrise = localTime(astronomicalTwilightBegin) ?? sevenAM
         astronomicalSunset = localTime(astronomicalTwilightEnd) ?? sevenPM
     }
-
-    // MARK: Internal
 
     enum CodingKeys: String, CodingKey {
         case sunrise

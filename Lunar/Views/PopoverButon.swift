@@ -79,8 +79,6 @@ extension NSSize: Comparable {
 // MARK: - Box
 
 class Box: NSBox {
-    // MARK: Lifecycle
-
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()
@@ -90,8 +88,6 @@ class Box: NSBox {
         super.init(coder: coder)
         setup()
     }
-
-    // MARK: Internal
 
     var hover = false
 

@@ -13,9 +13,7 @@ import SwiftUI
 
 // MARK: - Preset
 
-struct Preset: Codable, Defaults.Serializable, Hashable, Equatable, Identifiable {
-    // MARK: Lifecycle
-
+struct Preset: Codable, Defaults.Serializable, Hashable, Equatable, Identifiable, Sendable {
     init(id: String, key: Int, configs: [PresetConfig]) {
         self.id = id
         self.key = key
@@ -32,8 +30,6 @@ struct Preset: Codable, Defaults.Serializable, Hashable, Equatable, Identifiable
         key = (try container.decodeIfPresent(Int.self, forKey: .key)) ?? 0
         hotkey = getHotkey()
     }
-
-    // MARK: Internal
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -100,8 +96,6 @@ struct Preset: Codable, Defaults.Serializable, Hashable, Equatable, Identifiable
 // MARK: - PresetConfig
 
 struct PresetConfig: Codable, Defaults.Serializable, Hashable, Equatable, Identifiable {
-    // MARK: Lifecycle
-
     init(id: String, brightness: Double, contrast: Double, softwareBrightness: Double) {
         self.id = id
         self.brightness = brightness
@@ -118,8 +112,6 @@ struct PresetConfig: Codable, Defaults.Serializable, Hashable, Equatable, Identi
 
         softwareBrightness = (try container.decodeIfPresent(Double.self, forKey: .softwareBrightness)) ?? 1.0
     }
-
-    // MARK: Internal
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -429,13 +421,9 @@ struct DynamicKey: View {
 
 struct KeyEventHandling: NSViewRepresentable {
     class Coordinator: NSObject {
-        // MARK: Lifecycle
-
         init(_ handler: KeyEventHandling) {
             eventHandler = handler
         }
-
-        // MARK: Internal
 
         var eventHandler: KeyEventHandling
     }

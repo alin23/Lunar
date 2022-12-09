@@ -5,14 +5,10 @@ import Defaults
 // MARK: - StatusItemButtonControllerDelegate
 
 class StatusItemButtonControllerDelegate: NSObject, NSWindowDelegate {
-    // MARK: Lifecycle
-
     convenience init(statusItemButtonController: StatusItemButtonController) {
         self.init()
         self.statusItemButtonController = statusItemButtonController
     }
-
-    // MARK: Internal
 
     var statusItemButtonController: StatusItemButtonController!
 
@@ -26,16 +22,12 @@ class StatusItemButtonControllerDelegate: NSObject, NSWindowDelegate {
 // MARK: - StatusItemButtonController
 
 class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObject {
-    // MARK: Lifecycle
-
     convenience init(button: NSStatusBarButton) {
         self.init(frame: button.frame)
         statusButton = button
         delegate = StatusItemButtonControllerDelegate(statusItemButtonController: self)
         statusButton?.window?.delegate = delegate
     }
-
-    // MARK: Internal
 
     var statusButton: NSStatusBarButton?
     var delegate: StatusItemButtonControllerDelegate?

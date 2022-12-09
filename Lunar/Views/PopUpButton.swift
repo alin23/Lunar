@@ -11,8 +11,6 @@ import Combine
 import Defaults
 import SwiftyAttributes
 
-// MARK: - PopUpButtonCell
-
 let DOT_PREFIX = "⚫︎  "
 
 // MARK: - PopUpButtonCell
@@ -55,8 +53,6 @@ enum Origin: Int {
 // MARK: - InputDropdown
 
 class InputDropdown: NSPopUpButton {
-    // MARK: Lifecycle
-
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()
@@ -65,11 +61,9 @@ class InputDropdown: NSPopUpButton {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setup()
-        selectItem(withTag: InputSource.unknown.rawValue.i)
+        selectItem(withTag: VideoInputSource.unknown.rawValue.i)
         title = "Video Input"
     }
-
-    // MARK: Internal
 
     var observers: Set<AnyCancellable> = []
 
@@ -77,8 +71,8 @@ class InputDropdown: NSPopUpButton {
         selectionPublisher
             .debounce(for: .milliseconds(100), scheduler: RunLoop.main)
             .sink { [weak self] selectedTag in
-                guard selectedTag != InputSource.unknown.rawValue else { return }
-                self?.selectItem(withTag: InputSource.unknown.rawValue.i)
+                guard selectedTag != VideoInputSource.unknown.rawValue else { return }
+                self?.selectItem(withTag: VideoInputSource.unknown.rawValue.i)
             }
             .store(in: &observers)
     }
@@ -87,8 +81,6 @@ class InputDropdown: NSPopUpButton {
 // MARK: - PopUpButton
 
 class PopUpButton: NSPopUpButton {
-    // MARK: Lifecycle
-
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()
@@ -98,8 +90,6 @@ class PopUpButton: NSPopUpButton {
         super.init(coder: coder)
         setup()
     }
-
-    // MARK: Internal
 
     @IBInspectable dynamic var dotColorSecondary = false
     @IBInspectable dynamic var dotColor: NSColor? = nil

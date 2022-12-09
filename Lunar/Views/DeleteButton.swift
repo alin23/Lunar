@@ -9,8 +9,6 @@
 import Cocoa
 
 class DeleteButton: NSButton {
-    // MARK: Lifecycle
-
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()
@@ -20,8 +18,6 @@ class DeleteButton: NSButton {
         super.init(coder: coder)
         setup()
     }
-
-    // MARK: Internal
 
     func setup() {
         alphaValue = 0.0

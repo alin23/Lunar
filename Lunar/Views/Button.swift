@@ -12,8 +12,6 @@ class ButtonCell: NSButtonCell {
 // MARK: - Button
 
 class Button: NSButton {
-    // MARK: Lifecycle
-
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()
@@ -23,8 +21,6 @@ class Button: NSButton {
         super.init(coder: coder)
         setup()
     }
-
-    // MARK: Internal
 
     @IBInspectable dynamic var grayDisabledText = true
     @IBInspectable dynamic var alternateTitleWhenDisabled = false

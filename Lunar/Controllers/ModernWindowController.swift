@@ -81,8 +81,6 @@ extension AppDelegate: NSWindowDelegate {
 // MARK: - ModernWindowController
 
 class ModernWindowController: NSWindowController {
-    // MARK: Lifecycle
-
     deinit {
         #if DEBUG
             log.verbose("START DEINIT")
@@ -90,8 +88,6 @@ class ModernWindowController: NSWindowController {
         #endif
         POPOVERS["settings"] = nil
     }
-
-    // MARK: Internal
 
     override func windowDidLoad() {
         super.windowDidLoad()

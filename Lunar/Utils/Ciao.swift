@@ -19,8 +19,6 @@ import Foundation
 //
 
 public class CiaoBrowser {
-    // MARK: Lifecycle
-
     public init() {
         netServiceBrowser = NetServiceBrowser()
         delegate = CiaoBrowserDelegate()
@@ -42,8 +40,6 @@ public class CiaoBrowser {
         services.removeAll()
         netServiceBrowser.delegate = nil
     }
-
-    // MARK: Public
 
     public var services = Set<NetService>()
 
@@ -87,12 +83,8 @@ public class CiaoBrowser {
         }
     }
 
-    // MARK: Internal
-
     var netServiceBrowser: NetServiceBrowser
     var delegate: CiaoBrowserDelegate
-
-    // MARK: Fileprivate
 
     fileprivate func serviceFound(_ service: NetService) {
         serviceBrowserQueue.sync {
@@ -126,8 +118,6 @@ public class CiaoBrowser {
 // MARK: - CiaoBrowserDelegate
 
 public class CiaoBrowserDelegate: NSObject, NetServiceBrowserDelegate {
-    // MARK: Public
-
     public func netServiceBrowser(_: NetServiceBrowser, didFind service: NetService, moreComing _: Bool) {
         Logger.info("Service found \(service)")
         browser?.serviceFound(service)
@@ -159,8 +149,6 @@ public class CiaoBrowserDelegate: NSObject, NetServiceBrowserDelegate {
         browser?.serviceUpdatedTXT(sender, data)
     }
 
-    // MARK: Internal
-
     weak var browser: CiaoBrowser?
     var onStop: (() -> Void)?
 }
@@ -175,8 +163,6 @@ public class CiaoBrowserDelegate: NSObject, NetServiceBrowserDelegate {
 //
 
 public class CiaoResolver {
-    // MARK: Lifecycle
-
     public init(service: NetService) {
         self.service = service
     }
@@ -190,15 +176,11 @@ public class CiaoResolver {
         service.stop()
     }
 
-    // MARK: Public
-
     public func resolve(withTimeout timeout: TimeInterval, completion: @escaping (Result<NetService, ErrorDictionary>) -> Void) {
         delegate.onResolve = completion
         service.delegate = delegate
         service.resolve(withTimeout: timeout)
     }
-
-    // MARK: Internal
 
     let service: NetService
     let delegate = CiaoResolverDelegate()
@@ -243,8 +225,6 @@ extension CiaoResolver {
 //
 
 public class CiaoServer {
-    // MARK: Lifecycle
-
     public convenience init(type: ServiceType, domain: String = "", name: String = "", port: Int32 = 0) {
         self.init(type: type.description, domain: domain, name: name, port: port)
     }
@@ -265,8 +245,6 @@ public class CiaoServer {
         netService.delegate = nil
         delegate = nil
     }
-
-    // MARK: Public
 
     public fileprivate(set) var started = false {
         didSet {
@@ -298,8 +276,6 @@ public class CiaoServer {
     public func stop() {
         netService.stop()
     }
-
-    // MARK: Internal
 
     var netService: NetService
     var delegate: CiaoServerDelegate?
@@ -343,8 +319,6 @@ public enum Level: Int {
     case info = 2
     case warning = 3
     case error = 4
-
-    // MARK: Internal
 
     var description: String {
         switch self {
@@ -408,8 +382,6 @@ public extension NetService {
 public enum ServiceType {
     case tcp(String)
     case udp(String)
-
-    // MARK: Public
 
     public var description: String {
         switch self {

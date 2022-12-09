@@ -20,13 +20,9 @@ enum AppleNativeMethod {
 // MARK: - AppleNativeControl
 
 class AppleNativeControl: Control {
-    // MARK: Lifecycle
-
     init(display: Display) {
         self.display = display
     }
-
-    // MARK: Internal
 
     @Atomic static var sliderTracking = false
 
@@ -325,7 +321,7 @@ class AppleNativeControl: Control {
         return control.setMute(muted)
     }
 
-    func setInput(_ input: InputSource) -> Bool {
+    func setInput(_ input: VideoInputSource) -> Bool {
         guard let display else { return false }
         guard let control = display.alternativeControlForAppleNative else { return false }
         return control.setInput(input)
@@ -379,7 +375,7 @@ class AppleNativeControl: Control {
         return control.getMute()
     }
 
-    func getInput() -> InputSource? {
+    func getInput() -> VideoInputSource? {
         guard let display else { return nil }
         guard let control = display.alternativeControlForAppleNative else { return nil }
         return control.getInput()

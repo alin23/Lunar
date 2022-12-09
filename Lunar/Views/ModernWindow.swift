@@ -54,7 +54,7 @@ class CornerWindowController: NSWindowController {
     weak var display: Display? {
         didSet {
             mainAsync { [self] in
-                guard let display, let screen = display.screen ?? display.primaryMirrorScreen,
+                guard let display, let screen = display.nsScreen ?? display.primaryMirrorScreen,
                       let w = window as? CornerWindow, let view = w.contentView
                 else { return }
 
@@ -126,8 +126,6 @@ class CornerWindow: NSWindow {}
 // MARK: - ModernWindow
 
 class ModernWindow: WAYWindow {
-    // MARK: Lifecycle
-
     override init(
         contentRect: NSRect,
         styleMask style: NSWindow.StyleMask,
@@ -144,8 +142,6 @@ class ModernWindow: WAYWindow {
             do { log.verbose("END DEINIT") }
         #endif
     }
-
-    // MARK: Internal
 
     var pageController: PageController? {
         guard let contentView,

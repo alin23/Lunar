@@ -183,7 +183,7 @@ let APPLE_DISPLAY_VENDOR_ID = 0x610
 
 // MARK: - Transport
 
-struct Transport: Equatable, CustomStringConvertible {
+struct Transport: Equatable, CustomStringConvertible, Encodable {
     var upstream: String
     var downstream: String
 
@@ -219,8 +219,6 @@ let STEP_256: Float = 1.0 / 256.0
 // MARK: - GammaTable
 
 struct GammaTable: Equatable {
-    // MARK: Lifecycle
-
     init(red: CGGammaValue = 1, green: CGGammaValue = 1, blue: CGGammaValue = 1, max: CGGammaValue = 1) {
         self.red = Swift.stride(from: 0.00, through: max, by: max / 256.0).map { index in
             powf(index, red)
@@ -297,8 +295,6 @@ struct GammaTable: Equatable {
         blue = blueTable
         samples = sampleCount
     }
-
-    // MARK: Internal
 
     static let original = GammaTable()
     static let zero = GammaTable(
@@ -377,9 +373,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
 // MARK: - Display
 
-@objc class Display: NSObject, Codable, Defaults.Serializable, ObservableObject, Identifiable {
-    // MARK: Lifecycle
-
+@objc final class Display: NSObject, Codable, Defaults.Serializable, ObservableObject, Identifiable {
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let userBrightnessContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userBrightness)
@@ -482,15 +476,15 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .decodeIfPresent(Bool.self, forKey: .applyVolumeValueOnMute) ?? CachedDefaults[.muteVolumeZero]
 
         applyGamma = try container.decodeIfPresent(Bool.self, forKey: .applyGamma) ?? false
-        input = (try container.decodeIfPresent(UInt16.self, forKey: .input))?.ns ?? InputSource.unknown.rawValue.ns
+        input = (try container.decodeIfPresent(UInt16.self, forKey: .input))?.ns ?? VideoInputSource.unknown.rawValue.ns
         forceDDC = (try container.decodeIfPresent(Bool.self, forKey: .forceDDC)) ?? false
 
         hotkeyInput1 = try (
             (try container.decodeIfPresent(UInt16.self, forKey: .hotkeyInput1))?
-                .ns ?? (try container.decodeIfPresent(UInt16.self, forKey: .hotkeyInput))?.ns ?? InputSource.unknown.rawValue.ns
+                .ns ?? (try container.decodeIfPresent(UInt16.self, forKey: .hotkeyInput))?.ns ?? VideoInputSource.unknown.rawValue.ns
         )
-        hotkeyInput2 = (try container.decodeIfPresent(UInt16.self, forKey: .hotkeyInput2))?.ns ?? InputSource.unknown.rawValue.ns
-        hotkeyInput3 = (try container.decodeIfPresent(UInt16.self, forKey: .hotkeyInput3))?.ns ?? InputSource.unknown.rawValue.ns
+        hotkeyInput2 = (try container.decodeIfPresent(UInt16.self, forKey: .hotkeyInput2))?.ns ?? VideoInputSource.unknown.rawValue.ns
+        hotkeyInput3 = (try container.decodeIfPresent(UInt16.self, forKey: .hotkeyInput3))?.ns ?? VideoInputSource.unknown.rawValue.ns
 
         brightnessOnInputChange1 = (try container.decodeIfPresent(Double.self, forKey: .brightnessOnInputChange1)) ?? 100.0
         brightnessOnInputChange2 = (try container.decodeIfPresent(Double.self, forKey: .brightnessOnInputChange2)) ?? 100.0
@@ -771,6 +765,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         useOverlay = !supportsGammaByDefault
+        enabledControls[.ddc] = !isTV
         enabledControls[.gamma] = !isSmartBuiltin
         guard active else { return }
         if let dict = displayInfoDictionary(id) {
@@ -816,10 +811,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         xdrTimer = nil
     }
 
-    // MARK: Internal
-
-    // MARK: Codable
-
     enum CodingKeys: String, CodingKey, CaseIterable, ExpressibleByArgument {
         case id
         case name
@@ -853,6 +844,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case contrastBeforeBlackout
         case minBrightnessBeforeBlackout
         case minContrastBeforeBlackout
+
+        case facelight
+        case blackout
+        case systemAdaptiveBrightness
 
         case faceLightEnabled
         case brightnessBeforeFacelight
@@ -934,13 +929,44 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case xdr
         case hdr
         case softwareBrightness
+        case subzeroDimming
         case xdrBrightness
         case averageDDCWriteNanoseconds
         case averageDDCReadNanoseconds
         case connection
 
-        // MARK: Internal
+        case normalizedBrightness
+        case normalizedContrast
+        case normalizedBrightnessContrast
 
+        static var needsLunarPro: Set<CodingKeys> = [
+            .faceLightEnabled,
+            .blackOutEnabled,
+            .facelight,
+            .blackout,
+            .xdr,
+            .xdrBrightness,
+        ]
+
+        static var double: Set<CodingKeys> = [
+            .defaultGammaRedMin,
+            .defaultGammaRedMax,
+            .defaultGammaRedValue,
+            .defaultGammaGreenMin,
+            .defaultGammaGreenMax,
+            .defaultGammaGreenValue,
+            .defaultGammaBlueMin,
+            .defaultGammaBlueMax,
+            .defaultGammaBlueValue,
+
+            .softwareBrightness,
+            .xdrBrightness,
+            .subzeroDimming,
+
+            .normalizedBrightness,
+            .normalizedContrast,
+            .normalizedBrightnessContrast,
+        ]
         static var bool: Set<CodingKeys> = [
             .active,
             .adaptive,
@@ -963,6 +989,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .applyGamma,
             .faceLightEnabled,
             .blackOutEnabled,
+            .facelight,
+            .blackout,
             .blackOutMirroringAllowed,
             .allowBrightnessZero,
             .mirroredBeforeBlackOut,
@@ -976,6 +1004,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .reapplyColorGain,
             .applyVolumeValueOnMute,
             .applyMuteValueOnMute,
+            .systemAdaptiveBrightness,
         ]
 
         static var hidden: Set<CodingKeys> = [
@@ -995,6 +1024,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .redGain,
             .greenGain,
             .blueGain,
+
+            .normalizedBrightness,
+            .normalizedContrast,
+            .normalizedBrightnessContrast,
         ]
 
         static var settableCommon: [CodingKeys] = [
@@ -1007,9 +1040,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .input,
             .rotation,
 
-            .redGain,
-            .greenGain,
-            .blueGain,
+            .xdrBrightness,
+            .subzeroDimming,
+            .facelight,
+            .blackout,
         ]
         static var settable: Set<CodingKeys> = [
             .name,
@@ -1029,6 +1063,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .minDDCBrightness,
             .minDDCContrast,
             .minDDCVolume,
+            .facelight,
+            .blackout,
             .faceLightBrightness,
             .faceLightContrast,
             .cornerRadius,
@@ -1082,7 +1118,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .xdr,
             .hdr,
             .softwareBrightness,
+            .subzeroDimming,
             .xdrBrightness,
+            .normalizedBrightness,
+            .normalizedContrast,
+            .normalizedBrightnessContrast,
+            .systemAdaptiveBrightness,
         ]
 
         var isHidden: Bool {
@@ -1204,8 +1245,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     lazy var _hotkeyPopover: NSPopover? = INPUT_HOTKEY_POPOVERS[serial] ?? nil
     lazy var hotkeyPopoverController: HotkeyPopoverController? = initHotkeyPopoverController()
 
-    // MARK: Stored Properties
-
     var _idLock = NSRecursiveLock()
     var _id: CGDirectDisplayID
 
@@ -1259,8 +1298,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var blueMax: CGGammaValue = 1.0
     var blueGamma: CGGammaValue = 1.0
 
-    // MARK: Misc Properties
-
     var onReadapt: (() -> Void)?
     var smoothStep = 1
     var slowRead = false
@@ -1296,6 +1333,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Atomic var force = false
 
     @Atomic var faceLightEnabled = false
+
     lazy var brightnessBeforeFacelight = brightness
     lazy var contrastBeforeFacelight = contrast
     lazy var maxBrightnessBeforeFacelight = maxBrightness
@@ -1325,14 +1363,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     let VALID_ROTATION_VALUES: Set<Int> = [0, 90, 180, 270]
     @objc dynamic lazy var rotationTooltip: String? = canRotate ? nil : "This monitor doesn't support rotation"
-    @objc dynamic lazy var inputTooltip: String? = hasDDC ? nil :
-        "This monitor doesn't support input switching because DDC is not available"
+    @objc dynamic lazy var inputTooltip: String? = hasDDC
+        ? nil
+        : "This monitor doesn't support input switching because DDC is not available"
 
     lazy var defaultGammaTable = AppDelegate.hdrWorkaround ? GammaTable(for: id) : GammaTable.original
     var lunarGammaTable: GammaTable? = nil
     var lastGammaTable: GammaTable? = nil
-
-    // MARK: Gamma
 
     let DEFAULT_GAMMA_PARAMETERS: (Float, Float, Float, Float, Float, Float, Float, Float, Float) = (0, 1, 1, 0, 1, 1, 0, 1, 1)
 
@@ -1359,8 +1396,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }()
 
     @Atomic var modeChangeAsk = true
-
-    lazy var isOnline = NSScreen.isOnline(id)
 
     @objc dynamic lazy var isSmartDisplay = panel?.isSmartDisplay ?? DisplayServicesIsSmartDisplay(id)
 
@@ -1408,7 +1443,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @objc dynamic lazy var hasNotch: Bool = {
         if #available(macOS 12.0, *), isMacBook {
-            return (self.screen?.safeAreaInsets.top ?? 0) > 0 || self.panelMode?.withNotch(modes: self.panelModes) != nil
+            return (self.nsScreen?.safeAreaInsets.top ?? 0) > 0 || self.panelMode?.withNotch(modes: self.panelModes) != nil
         } else {
             return false
         }
@@ -1463,7 +1498,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     lazy var savingLater: PassthroughSubject<Bool, Never> = {
         let p = PassthroughSubject<Bool, Never>()
         p
-            .debounce(for: .seconds(10), scheduler: RunLoop.main)
+            .debounce(for: .seconds(30), scheduler: RunLoop.main)
             .sink { [weak self] _ in
                 guard let self else { return }
                 DataStore.storeDisplay(display: self)
@@ -1567,7 +1602,29 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     lazy var usesDDCBrightnessControl: Bool = control is DDCControl || control is NetworkControl
 
-    // MARK: Initializers
+    @objc dynamic var facelight: Bool {
+        get { faceLightEnabled }
+        set {
+            if newValue {
+                appDelegate?.enableFaceLight(display: self)
+            } else {
+                appDelegate?.disableFaceLight(displays: [self])
+                disableFaceLight()
+            }
+            faceLightEnabled = newValue
+        }
+    }
+    @objc dynamic var blackout: Bool {
+        get { blackOutEnabled }
+        set {
+            displayController.blackOut(
+                display: id, state: newValue ? .on : .off,
+                mirroringAllowed: displayController.activeDisplayCount == 1 ? false : blackOutMirroringAllowed
+            )
+            blackOutEnabled = newValue
+        }
+    }
+    var isOnline: Bool { NSScreen.isOnline(id) }
 
     lazy var maxEDR = computeMaxEDR() {
         didSet {
@@ -1763,14 +1820,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc dynamic var sliderBrightnessCurveFactor: Double {
         get {
             let factor = brightnessCurveFactor
-            return factor <= 1 ?
-                mapNumber(factor, fromLow: 0.01, fromHigh: 1, toLow: 1, toHigh: 0.5) :
-                mapNumber(cap(factor, minVal: 1, maxVal: 9), fromLow: 1, fromHigh: 9, toLow: 0.5, toHigh: 0)
+            return factor <= 1
+                ? mapNumber(factor, fromLow: 0.01, fromHigh: 1, toLow: 1, toHigh: 0.5)
+                : mapNumber(cap(factor, minVal: 1, maxVal: 9), fromLow: 1, fromHigh: 9, toLow: 0.5, toHigh: 0)
         }
         set {
-            let factor = newValue <= 0.5 ?
-                mapNumber(newValue, fromLow: 0, fromHigh: 0.5, toLow: 9, toHigh: 1) :
-                mapNumber(newValue, fromLow: 0.5, fromHigh: 1, toLow: 1, toHigh: 0.01)
+            let factor = newValue <= 0.5
+                ? mapNumber(newValue, fromLow: 0, fromHigh: 0.5, toLow: 9, toHigh: 1)
+                : mapNumber(newValue, fromLow: 0.5, fromHigh: 1, toLow: 1, toHigh: 0.01)
             brightnessCurveFactor = factor
         }
     }
@@ -1778,14 +1835,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc dynamic var sliderContrastCurveFactor: Double {
         get {
             let factor = contrastCurveFactor
-            return factor <= 1 ?
-                mapNumber(factor, fromLow: 0.01, fromHigh: 1, toLow: 1, toHigh: 0.5) :
-                mapNumber(cap(factor, minVal: 1, maxVal: 9), fromLow: 1, fromHigh: 9, toLow: 0.5, toHigh: 0)
+            return factor <= 1
+                ? mapNumber(factor, fromLow: 0.01, fromHigh: 1, toLow: 1, toHigh: 0.5)
+                : mapNumber(cap(factor, minVal: 1, maxVal: 9), fromLow: 1, fromHigh: 9, toLow: 0.5, toHigh: 0)
         }
         set {
-            let factor = newValue <= 0.5 ?
-                mapNumber(newValue, fromLow: 0, fromHigh: 0.5, toLow: 9, toHigh: 1) :
-                mapNumber(newValue, fromLow: 0.5, fromHigh: 1, toLow: 1, toHigh: 0.01)
+            let factor = newValue <= 0.5
+                ? mapNumber(newValue, fromLow: 0, fromHigh: 0.5, toLow: 9, toHigh: 1)
+                : mapNumber(newValue, fromLow: 0.5, fromHigh: 1, toLow: 1, toHigh: 0.01)
             contrastCurveFactor = factor
         }
     }
@@ -1845,6 +1902,16 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var xdrBrightness: Float = 0.0 {
         didSet {
             guard apply else { return }
+
+            if xdrBrightness > 0, !enhanced {
+                handleEnhance(true, withoutSettingBrightness: true)
+            }
+            if xdrBrightness == 0, enhanced {
+                handleEnhance(false)
+            }
+
+            maxEDR = computeMaxEDR()
+
             softwareBrightness = mapNumber(
                 xdrBrightness,
                 fromLow: 0.0,
@@ -1855,6 +1922,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
+    @objc dynamic var subzeroDimming: Float {
+        get { min(softwareBrightness, 1.0) }
+        set { softwareBrightness = cap(newValue, minVal: 0.0, maxVal: 1.0) }
+    }
     @Published @objc dynamic var softwareBrightness: Float = 1.0 {
         didSet {
             lastSoftwareBrightness = oldValue
@@ -1914,7 +1985,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         return control.isSoftware && !gammaEnabled
     }
 
-    @objc dynamic var ambientLightAdaptiveBrightnessEnabled: Bool {
+    @objc dynamic var systemAdaptiveBrightness: Bool {
         get { Self.ambientLightCompensationEnabled(id) }
         set {
             guard ambientLightCompensationEnabledByUser || force else {
@@ -1936,12 +2007,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         guard let enabled = Self.getThreadDictValue(id, type: "ambientLightCompensationEnabledByUser") as? Bool
         else {
             // First time checking out this flag, set it manually
-            let value = ambientLightAdaptiveBrightnessEnabled
+            let value = systemAdaptiveBrightness
             Self.setThreadDictValue(id, type: "ambientLightCompensationEnabledByUser", value: value)
             return value
         }
         if enabled { return true }
-        if ambientLightAdaptiveBrightnessEnabled {
+        if systemAdaptiveBrightness {
             // User must have enabled this manually in the meantime, set it to true manually
             Self.setThreadDictValue(id, type: "ambientLightCompensationEnabledByUser", value: true)
             return true
@@ -2053,14 +2124,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             switch adaptiveController {
             case .disabled:
                 adaptive = false
-                ambientLightAdaptiveBrightnessEnabled = false
+                systemAdaptiveBrightness = false
             case .lunar:
                 adaptive = true
-                ambientLightAdaptiveBrightnessEnabled = false
+                systemAdaptiveBrightness = false
             case .system:
                 adaptive = false
                 withForce {
-                    ambientLightAdaptiveBrightnessEnabled = true
+                    systemAdaptiveBrightness = true
                 }
             }
         }
@@ -2132,10 +2203,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 self.supportsEnhance = self.getSupportsEnhance()
                 if self.control is DDCControl {
                     self.ddcWorkingCount = self.ddcWorkingCount + 1
+                    self.ddcNotWorkingCount = 0
                 }
             }
 
-            if ddcNotWorking {
+            if ddcNotWorking, !displayController.displays.isEmpty, isOnline {
                 ddcNotWorkingCount = ddcNotWorkingCount + 1
             }
 
@@ -2364,13 +2436,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-    var shouldAdapt: Bool { adaptive && !adaptivePaused && !ambientLightAdaptiveBrightnessEnabled }
+    var shouldAdapt: Bool { adaptive && !adaptivePaused && !systemAdaptiveBrightness }
     @Published @objc dynamic var adaptive: Bool {
         didSet {
             save()
             readapt(newValue: adaptive, oldValue: oldValue)
-            guard hasAmbientLightAdaptiveBrightness || (ambientLightAdaptiveBrightnessEnabled && adaptive) else { return }
-            ambientLightAdaptiveBrightnessEnabled = !adaptive
+            guard hasAmbientLightAdaptiveBrightness || (systemAdaptiveBrightness && adaptive) else { return }
+            systemAdaptiveBrightness = !adaptive
         }
     }
 
@@ -2832,7 +2904,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var brightness: NSNumber = 50 {
         didSet {
             brightnessU16 = brightness.uint16Value
-            save(later: !applyDisplayServices)
+            save(later: true)
             guard timeSince(lastConnectionTime) > 1 else { return }
 
             if applyDisplayServices { userAdjusting = true }
@@ -2936,7 +3008,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var contrast: NSNumber = 50 {
         didSet {
-            save()
+            save(later: true)
             guard timeSince(lastConnectionTime) > 1 else { return }
 
             userAdjusting = true
@@ -3020,7 +3092,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 lastVolume = oldValue
             }
 
-            save()
+            save(later: true)
 
             applyPreciseValue = false
             preciseVolume = volume.doubleValue / 100
@@ -3132,18 +3204,18 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-    @Published var inputSource: InputSource = .unknown {
+    @Published var inputSource: VideoInputSource = .unknown {
         didSet {
             guard apply else { return }
             input = inputSource.rawValue.ns
         }
     }
 
-    @Published @objc dynamic var input: NSNumber = InputSource.unknown.rawValue.ns {
+    @Published @objc dynamic var input: NSNumber = VideoInputSource.unknown.rawValue.ns {
         didSet {
             save()
 
-            guard let input = InputSource(rawValue: input.uint16Value) else { return }
+            guard let input = VideoInputSource(rawValue: input.uint16Value) else { return }
             withoutApply {
                 inputSource = input
             }
@@ -3159,9 +3231,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-    @Published @objc dynamic var hotkeyInput1: NSNumber = InputSource.unknown.rawValue.ns { didSet { save() } }
-    @Published @objc dynamic var hotkeyInput2: NSNumber = InputSource.unknown.rawValue.ns { didSet { save() } }
-    @Published @objc dynamic var hotkeyInput3: NSNumber = InputSource.unknown.rawValue.ns { didSet { save() } }
+    @Published @objc dynamic var hotkeyInput1: NSNumber = VideoInputSource.unknown.rawValue.ns { didSet { save() } }
+    @Published @objc dynamic var hotkeyInput2: NSNumber = VideoInputSource.unknown.rawValue.ns { didSet { save() } }
+    @Published @objc dynamic var hotkeyInput3: NSNumber = VideoInputSource.unknown.rawValue.ns { didSet { save() } }
 
     @Published @objc dynamic var brightnessOnInputChange1 = 100.0 { didSet { save() } }
     @Published @objc dynamic var brightnessOnInputChange2 = 100.0 { didSet { save() } }
@@ -3217,11 +3289,15 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-    // MARK: Computed Properties
-
     @Published @objc dynamic var active = false {
         didSet {
             if active {
+                #if arch(arm64)
+                    if !oldValue {
+                        DDC.dcpList = buildDCPList()
+                    }
+                #endif
+
                 startControls()
                 refreshGamma()
                 if supportsGamma {
@@ -3241,16 +3317,16 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     if let h = controller.hotkey2, h.isEnabled { h.register() }
                     if let h = controller.hotkey3, h.isEnabled { h.register() }
                 }
-            } else {
-                if let controller = hotkeyPopoverController {
-                    #if DEBUG
-                        log.info("Display \(description) is now inactive, disabling hotkeys")
-                    #endif
+            }
 
-                    controller.hotkey1?.unregister()
-                    controller.hotkey2?.unregister()
-                    controller.hotkey3?.unregister()
-                }
+            if !active, let controller = hotkeyPopoverController {
+                #if DEBUG
+                    log.info("Display \(description) is now inactive, disabling hotkeys")
+                #endif
+
+                controller.hotkey1?.unregister()
+                controller.hotkey2?.unregister()
+                controller.hotkey3?.unregister()
             }
 
             updateCornerWindow()
@@ -3277,13 +3353,15 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             let avoidSafetyChecks = CachedDefaults[.autoRestartOnFailedDDCSooner]
-            if newValue >= 1, ddcWorkingCount >= 2,
+            if newValue >= 2, ddcWorkingCount >= 3,
                avoidSafetyChecks || !displayController.activeDisplayList.contains(where: {
                    $0.blackOutEnabled || $0.faceLightEnabled || $0.enhanced || $0.subzero
                })
             {
                 log.warning("Restarting because DDC failed")
-                restart()
+                #if !DEBUG
+                    restart()
+                #endif
             }
 
             Self.ddcNotWorkingCount[serial] = newValue
@@ -3305,6 +3383,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             mainThread {
                 hasDDC = active && (hasI2C || hasNetworkControl)
             }
+            if hasI2C != oldValue {
+                control = getBestControl()
+            }
         }
     }
 
@@ -3313,6 +3394,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             context = getContext()
             mainThread {
                 hasDDC = active && (hasI2C || hasNetworkControl)
+            }
+            if hasNetworkControl != oldValue {
+                control = getBestControl()
             }
         }
     }
@@ -3329,16 +3413,16 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-    lazy var screen: NSScreen? = {
+    lazy var nsScreen: NSScreen? = {
         NotificationCenter.default
             .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
             .debounce(for: .seconds(2), scheduler: RunLoop.main)
             .sink { [weak self] _ in
                 guard let self else { return }
-                self.screen = self.getScreen()
+                self.nsScreen = self.getScreen()
                 self.screenFetcher = Repeater(every: 2, times: 5, name: "screen-\(self.serial)") { [weak self] in
                     guard let self else { return }
-                    self.screen = self.getScreen()
+                    self.nsScreen = self.getScreen()
                 }
             }
             .store(in: &observers)
@@ -3365,8 +3449,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
         }
     }
-
-    // MARK: Gamma and User values
 
     var infoDictionary: NSDictionary = [:] {
         didSet {
@@ -3396,9 +3478,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         )
     }
 
-    var shouldDetectI2C: Bool { ddcEnabled && !isSmartBuiltin && supportsGammaByDefault && !isDummy }
+    var shouldDetectI2C: Bool { ddcEnabled && !isBuiltin && !isDummy && (forceDDC || supportsGammaByDefault) }
 
-    var potentialEDR: CGFloat { screen?.maximumPotentialExtendedDynamicRangeColorComponentValue ?? 1.0 }
+    var potentialEDR: CGFloat { nsScreen?.maximumPotentialExtendedDynamicRangeColorComponentValue ?? 1.0 }
     var edr: CGFloat { NSScreen.forDisplayID(id)?.maximumExtendedDynamicRangeColorComponentValue ?? 1.0 }
 
     var brightnessRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
@@ -3467,8 +3549,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     static func setWindowController(_ id: CGDirectDisplayID, type: String, windowController: NSWindowController?) {
         windowControllerQueue.sync { Thread.current.threadDictionary["window-\(type)-\(id)"] = windowController }
     }
-
-    // MARK: EDID
 
     static func printableName(_ id: CGDirectDisplayID) -> String {
         #if DEBUG
@@ -3548,8 +3628,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     static func edid(id: CGDirectDisplayID) -> String? {
         DDC.getEdidData(displayID: id)?.map { $0 }.str(hex: true)
     }
-
-    // MARK: User Data Points
 
     static func insertDataPoint(
         values: inout ThreadSafeDictionary<Double, Double>,
@@ -3636,7 +3714,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func refetchScreens() {
         primaryMirrorScreen = getPrimaryMirrorScreen()
-        screen = getScreen()
+        nsScreen = getScreen()
     }
 
     func getPowerOffEnabled(hasDDC: Bool? = nil) -> Bool {
@@ -3771,8 +3849,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case vga
         case unknown
 
-        // MARK: Internal
-
         static func fromTransport(_ transport: Transport?) -> ConnectionType? {
             guard let transport else {
                 return nil
@@ -3827,8 +3903,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     var preciseContrastBeforeAppPreset = 0.5
 
-    @objc dynamic lazy var isDummy: Bool = (Self.dummyNamePattern.matches(name) || vendor == .dummy) && vendor != .samsung && !Self
-        .notDummyNamePattern.matches(name)
+    @objc dynamic lazy var isDummy: Bool = (
+        (Self.dummyNamePattern.matches(name) || vendor == .dummy)
+            && vendor != .samsung
+            && !Self.notDummyNamePattern.matches(name)
+    )
     @objc dynamic lazy var isFakeDummy: Bool = (Self.notDummyNamePattern.matches(name) && vendor == .dummy)
 
     @objc dynamic lazy var otherDisplays: [Display] = displayController.activeDisplayList.filter { $0.serial != serial }
@@ -3844,10 +3923,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
+    @objc dynamic var isTV: Bool {
+        (panel?.isTV ?? false) && edidName.contains("TV")
+    }
+
     func setNotchState() {
         mainAsync {
             if #available(macOS 12.0, *), Sysctl.isMacBook {
-                self.hasNotch = (self.screen?.safeAreaInsets.top ?? 0) > 0 || self.panelMode?.withNotch(modes: self.panelModes) != nil
+                self.hasNotch = (self.nsScreen?.safeAreaInsets.top ?? 0) > 0 || self.panelMode?.withNotch(modes: self.panelModes) != nil
             } else {
                 self.hasNotch = false
             }
@@ -3935,7 +4018,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     func updateCornerWindow() {
         mainThread {
             guard cornerRadius.intValue > 0, active, !isInHardwareMirrorSet,
-                  !isIndependentDummy, let screen = screen ?? primaryMirrorScreen
+                  !isIndependentDummy, let screen = nsScreen ?? primaryMirrorScreen
             else {
                 cornerWindowControllerTopLeft?.close()
                 cornerWindowControllerTopRight?.close()
@@ -4019,7 +4102,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         transition: BrightnessTransition? = nil,
         onChange _: ((Brightness) -> Void)? = nil
     ) {
-        guard let screen = screen ?? primaryMirrorScreen, force || (
+        guard let screen = nsScreen ?? primaryMirrorScreen, force || (
             !isInHardwareMirrorSet && !isIndependentDummy &&
                 timeSince(lastConnectionTime) >= 1 || onlySoftwareDimmingEnabled
         )
@@ -4121,8 +4204,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         return serial == other.serial
     }
 
-    // MARK: "Sending" states
-
     func manageSendingValue(_ key: CodingKeys, oldValue _: Bool) {
         let name = key.rawValue
         let conditionName = name.replacingOccurrences(of: "sending", with: "sent") + "Condition"
@@ -4139,8 +4220,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             sendingValuePublisher.send(name)
         }
     }
-
-    // MARK: Functions
 
     func getContext() -> [String: Any] {
         [
@@ -4269,8 +4348,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
         refreshGamma()
 
-        startI2CDetection()
         detectI2C()
+        startI2CDetection()
 
         control = getBestControl()
         if let control, control.isSoftware {
@@ -4346,14 +4425,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         let serialBytes = serialNumber.u32.str(reversed: false, separator: "").uppercased()
         let verticalBytes = (verticalPixels / 10).u8.hex.uppercased()
         let horizontalBytes = (horizontalPixels / 10).u8.hex.uppercased()
+        let transportByte = ((infoDict["kDisplayTransportType"] as? Int64) ?? 0) == 3 ? "03" : "04"
 
         return [
-            "\(vendorBytes)\(productBytes)-0000-0000-\(weekByte)\(yearByte)-0104B5\(horizontalBytes)\(verticalBytes)78",
-            "\(vendorBytes)\(productBytes)-\(serialBytes.prefix(4))-\(serialBytes.suffix(4))-\(weekByte)\(yearByte)-0104B5\(horizontalBytes)\(verticalBytes)78",
+            "\(vendorBytes)\(productBytes)-0000-0000-\(weekByte)\(yearByte)-01\(transportByte)[\\dA-F]{2}\(horizontalBytes)\(verticalBytes)[\\dA-F]{2}",
             "\(vendorBytes)\(productBytes)-0000-0000-\(weekByte)\(yearByte)-[\\dA-F]{6}\(horizontalBytes)\(verticalBytes)[\\dA-F]{2}",
-            "\(vendorBytes)\(productBytes)-\(serialBytes.prefix(4))-\(serialBytes.suffix(4))-\(weekByte)\(yearByte)-[\\dA-F]{6}\(horizontalBytes)\(verticalBytes)[\\dA-F]{2}",
             "\(vendorBytes)\(productBytes)-0000-0000-[\\dA-F]{4}-[\\dA-F]{6}\(horizontalBytes)\(verticalBytes)[\\dA-F]{2}",
-            "\(vendorBytes)\(productBytes)-\(serialBytes.prefix(4))-\(serialBytes.suffix(4))-[\\dA-F]{4}-[\\dA-F]{6}\(horizontalBytes)\(verticalBytes)[\\dA-F]{2}",
         ]
     }
 
@@ -4388,26 +4465,16 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         let i2c = {
             #if DEBUG
-                #if arch(arm64)
-                    return (id == TEST_DISPLAY_ID || id == TEST_DISPLAY_PERSISTENT_ID || id == TEST_DISPLAY_PERSISTENT2_ID) ? true : DDC
-                        .hasAVService(
-                            displayID: id,
-                            display: self,
-                            ignoreCache: true
-                        )
-                #else
-                    return (id == TEST_DISPLAY_ID || id == TEST_DISPLAY_PERSISTENT_ID || id == TEST_DISPLAY_PERSISTENT2_ID) ? true : DDC
-                        .hasI2CController(
-                            displayID: id,
-                            ignoreCache: true
-                        )
-                #endif
+                guard id != TEST_DISPLAY_ID, id != TEST_DISPLAY_PERSISTENT_ID, id != TEST_DISPLAY_PERSISTENT2_ID
+                else {
+                    return true
+                }
+            #endif
+
+            #if arch(arm64)
+                return DDC.hasAVService(displayID: id, ignoreCache: true)
             #else
-                #if arch(arm64)
-                    return DDC.hasAVService(displayID: id, display: self, ignoreCache: true)
-                #else
-                    return DDC.hasI2CController(displayID: id, ignoreCache: true)
-                #endif
+                return DDC.hasI2CController(displayID: id, ignoreCache: true)
             #endif
         }()
 
@@ -4416,7 +4483,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func startI2CDetection() {
         i2cDetectionTask = Repeater(every: 1, times: 15, name: "i2c-detector-\(serial)") { [weak self] in
-            guard let self else { return }
+            guard let self, self.shouldDetectI2C else {
+                mainAsync { self?.hasI2C = false }
+                return
+            }
             self.updateCornerWindow()
             self.detectI2C()
             if self.hasI2C {
@@ -4440,7 +4510,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func redraw() {
-        guard let screen = screen ?? primaryMirrorScreen else { return }
+        guard let screen = nsScreen ?? primaryMirrorScreen else { return }
         mainThread {
             createWindow(
                 "gammaWindowController",
@@ -4584,7 +4654,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             return
         }
 
-        if isSmartBuiltin, !allowBrightnessZero, !blackOutEnabled, minBrightness == 0 {
+        if isSmartBuiltin, !allowBrightnessZero, !blackOutEnabled, minBrightness == 0, softwareBrightness > 0 {
             minBrightness = 1
         }
 
@@ -4655,6 +4725,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try container.encode(redGain.uint16Value, forKey: .redGain)
             try container.encode(greenGain.uint16Value, forKey: .greenGain)
             try container.encode(blueGain.uint16Value, forKey: .blueGain)
+
+            try container.encode(preciseBrightness, forKey: .normalizedBrightness)
+            try container.encode(preciseContrast, forKey: .normalizedContrast)
+            try container.encode(preciseBrightnessContrast, forKey: .normalizedBrightnessContrast)
 
             try container.encode(id, forKey: .id)
             try container.encode(lockedBrightness, forKey: .lockedBrightness)
@@ -4741,14 +4815,16 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try container.encode(hdr, forKey: .hdr)
             try container.encode(xdr, forKey: .xdr)
             try container.encode(softwareBrightness, forKey: .softwareBrightness)
+            try container.encode(subzeroDimming, forKey: .subzeroDimming)
             try container.encode(xdrBrightness, forKey: .xdrBrightness)
             try container.encode(averageDDCWriteNanoseconds, forKey: .averageDDCWriteNanoseconds)
             try container.encode(averageDDCReadNanoseconds, forKey: .averageDDCReadNanoseconds)
             try container.encode(connection, forKey: .connection)
+            try container.encode(facelight, forKey: .facelight)
+            try container.encode(blackout, forKey: .blackout)
+            try container.encode(systemAdaptiveBrightness, forKey: .systemAdaptiveBrightness)
         }
     }
-
-    // MARK: Sentry
 
     func addSentryData() {
         guard CachedDefaults[.enableSentry] else { return }
@@ -4769,11 +4845,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             {
                 dict["panelData"] = compressed
             }
+
             if let encoded = try? encoder.encode(ForgivingEncodable(self.infoDictionary)),
                let compressed = encoded.gzip()?.base64EncodedString()
             {
                 dict["infoDictionary"] = compressed
             }
+
             if var armProps = self.armProps {
                 armProps.removeValue(forKey: "TimingElements")
                 armProps.removeValue(forKey: "ColorElements")
@@ -4783,6 +4861,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     dict["armProps"] = compressed
                 }
             }
+
             if let screen = NSScreen.forDisplayID(self.id) {
                 if let encoded = try? encoder.encode(ForgivingEncodable(screen.deviceDescription)),
                    let compressed = encoded.gzip()?.base64EncodedString()
@@ -4795,14 +4874,18 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     dict["maxFPS"] = screen.maximumFramesPerSecond
                 }
                 dict["maxEDR"] = screen.maximumExtendedDynamicRangeColorComponentValue
-                dict["potentialEDR"] = screen
-                    .maximumPotentialExtendedDynamicRangeColorComponentValue
-                dict["referenceEDR"] = screen
-                    .maximumReferenceExtendedDynamicRangeColorComponentValue
+                dict["potentialEDR"] = screen.maximumPotentialExtendedDynamicRangeColorComponentValue
+                dict["referenceEDR"] = screen.maximumReferenceExtendedDynamicRangeColorComponentValue
             }
+
             #if arch(arm64)
-                let avService = DDC.AVService(displayID: self.id)
-                dict["avService"] = avService == nil ? "NONE" : CFCopyDescription(avService!) as String
+                let dcp = DDC.DCP(displayID: self.id, display: self)
+                if let dcp {
+                    dict["avService"] = "YES"
+                    dict["dcp"] = dcp.description
+                } else {
+                    dict["avService"] = "NO"
+                }
             #else
                 dict["i2cController"] = DDC.I2CController(displayID: self.id)
             #endif
@@ -4827,8 +4910,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             scope.setExtra(value: dict, key: "display-\(self.serial)")
         }
     }
-
-    // MARK: AppleNative Detection
 
     func isStudioDisplay() -> Bool {
         name.contains(STUDIO_DISPLAY_NAME) || edidName.contains(STUDIO_DISPLAY_NAME)
@@ -5041,8 +5122,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         """
     }
 
-    // MARK: Reading Functions
-
     func readRedGain() -> UInt16? {
         control?.getRedGain()
     }
@@ -5113,6 +5192,37 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
             onComplete?(true)
         }
+    }
+
+    func refreshColors() async -> Bool {
+        guard !isTestID(id), !isSmartBuiltin,
+              !displayController.screensSleeping
+        else { return false }
+
+        let newRedGain = self.readRedGain()
+        let newGreenGain = self.readGreenGain()
+        let newBlueGain = self.readBlueGain()
+        guard newRedGain != nil || newGreenGain != nil || newBlueGain != nil else {
+            log.warning("Can't read color gain for \(self.description)")
+            return false
+        }
+
+        await MainActor.run {
+            if let newRedGain, newRedGain != self.redGain.uint16Value {
+                log.info("Refreshing red gain value: \(self.redGain.uint16Value) <> \(newRedGain)")
+                self.withoutSmoothTransition { self.withoutDDC { self.redGain = newRedGain.ns } }
+            }
+            if let newGreenGain, newGreenGain != self.greenGain.uint16Value {
+                log.info("Refreshing green gain value: \(self.greenGain.uint16Value) <> \(newGreenGain)")
+                self.withoutSmoothTransition { self.withoutDDC { self.greenGain = newGreenGain.ns } }
+            }
+            if let newBlueGain, newBlueGain != self.blueGain.uint16Value {
+                log.info("Refreshing blue gain value: \(self.blueGain.uint16Value) <> \(newBlueGain)")
+                self.withoutSmoothTransition { self.withoutDDC { self.blueGain = newBlueGain.ns } }
+            }
+        }
+
+        return true
     }
 
     func refreshBrightness() {
@@ -5439,7 +5549,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         enabledControls = [
             .network: true,
             .appleNative: true,
-            .ddc: true,
+            .ddc: !isTV,
             .gamma: !DDC.isSmartBuiltinDisplay(id),
         ]
         brightnessCurveFactors = [
@@ -5468,8 +5578,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
         readapt(newValue: false, oldValue: true)
     }
-
-    // MARK: "With/out" functions
 
     @inline(__always) func withoutDDCLimits(_ block: () -> Void) {
         DDC.sync {
@@ -5545,8 +5653,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         block()
         brightnessTransition = oldTransition
     }
-
-    // MARK: Computing Values
 
     func getMinMaxFactor(
         type: ValueType,
@@ -5697,7 +5803,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func getAdaptiveController() -> AdaptiveController {
-        guard adaptive || ambientLightAdaptiveBrightnessEnabled else {
+        guard adaptive || systemAdaptiveBrightness else {
             return .disabled
         }
 

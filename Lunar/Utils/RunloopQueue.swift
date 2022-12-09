@@ -13,8 +13,6 @@ import Foundation
 /// RunloopQueue is a serial queue based on CFRunLoop, running on the background thread.
 @objc(CBLRunloopQueue)
 public class RunloopQueue: NSObject {
-    // MARK: Lifecycle
-
     /// Init a new queue with the given name.
     ///
     /// - Parameter name: The name of the queue.
@@ -34,8 +32,6 @@ public class RunloopQueue: NSObject {
         let runloop = self.runloop
         sync { CFRunLoopStop(runloop) }
     }
-
-    // MARK: Public
 
     /// Returns `true` if the queue is running, otherwise `false`. Once stopped, a queue cannot be restarted.
     @objc public var running: Bool { true }
@@ -100,10 +96,6 @@ public class RunloopQueue: NSObject {
         CFEqual(CFRunLoopGetCurrent(), runloop)
     }
 
-    // MARK: Internal
-
-    // MARK: - Code That Runs On The Background Thread
-
     var runloop: CFRunLoop!
 
     /// Execute a block of code in a synchronous manner. Will return when the code has executed.
@@ -138,10 +130,6 @@ public class RunloopQueue: NSObject {
         return result
     }
 
-    // MARK: Private
-
-    // MARK: - Code That Runs On The Main/Creating Thread
-
     private let thread: RunloopQueueThread
     private var main: Bool
 
@@ -167,14 +155,10 @@ public class RunloopQueue: NSObject {
 // MARK: - RunloopQueueThread
 
 private class RunloopQueueThread: Thread {
-    // MARK: Lifecycle
-
     override init() {
         var sourceContext = CFRunLoopSourceContext()
         runloopSource = CFRunLoopSourceCreate(nil, 0, &sourceContext)
     }
-
-    // MARK: Internal
 
     /// The callback to be called once the runloop has started executing. Will be called on the runloop's own thread.
     var whenReadyCallback: ((CFRunLoop) -> Void)?
@@ -211,8 +195,6 @@ private class RunloopQueueThread: Thread {
 
         currentRunloop = nil
     }
-
-    // MARK: Private
 
     // Required to keep the runloop running when nothing is going on.
     private let runloopSource: CFRunLoopSource

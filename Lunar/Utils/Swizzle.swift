@@ -184,8 +184,6 @@ extension NSVisualEffectView.Material {
 // MARK: - VisualEffectBlur
 
 public struct VisualEffectBlur: View {
-    // MARK: Lifecycle
-
     public init(
         material: NSVisualEffectView.Material = .headerView,
         blendingMode: NSVisualEffectView.BlendingMode = .withinWindow,
@@ -198,8 +196,6 @@ public struct VisualEffectBlur: View {
         self.maskImage = maskImage
     }
 
-    // MARK: Public
-
     public var body: some View {
         Representable(
             material: material,
@@ -209,15 +205,11 @@ public struct VisualEffectBlur: View {
         ).accessibility(hidden: true)
     }
 
-    // MARK: Private
-
     private var material: NSVisualEffectView.Material
     private var blendingMode: NSVisualEffectView.BlendingMode
     private var state: NSVisualEffectView.State
     private var maskImage: NSImage?
 }
-
-// MARK: - Representable
 
 extension VisualEffectBlur {
     struct Representable: NSViewRepresentable {
@@ -243,13 +235,9 @@ extension VisualEffectBlur {
     }
 
     class Coordinator {
-        // MARK: Lifecycle
-
         init() {
             visualEffectView.blendingMode = .withinWindow
         }
-
-        // MARK: Internal
 
         let visualEffectView = NSVisualEffectView()
 
