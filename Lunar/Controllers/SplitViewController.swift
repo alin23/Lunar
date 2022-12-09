@@ -163,16 +163,12 @@ var rightHintsShown = false
 // MARK: - SplitViewController
 
 class SplitViewController: NSSplitViewController {
-    // MARK: Lifecycle
-
     deinit {
         #if DEBUG
             log.verbose("START DEINIT")
             do { log.verbose("END DEINIT") }
         #endif
     }
-
-    // MARK: Internal
 
     @objc dynamic var version = "v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "4")"
     var adaptiveModeObserver: Cancellable?

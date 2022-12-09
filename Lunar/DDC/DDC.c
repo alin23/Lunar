@@ -6,6 +6,7 @@
 //  See http://github.com/jontaylor/DDC-CI-Tools-for-OS-X
 //
 
+#include "SharedDDC.h"
 #include "DDC.h"
 #include <stdarg.h>
 
@@ -144,16 +145,6 @@ static CFDataRef EDIDCreateFromFramebuffer(io_service_t framebuffer)
     IOObjectRelease(iter);
     logToFile("No EDID for framebuffer %d\n\n", framebuffer);
     return NULL;
-}
-
-IOAVServiceRef AVServiceCreateFromDCPAVServiceProxy(io_service_t service)
-{
-    IOAVServiceRef avService = 0;
-    if (&IOAVServiceCreateWithService != NULL) {
-        avService = IOAVServiceCreateWithService(kCFAllocatorDefault, service);
-        IOObjectRelease(service);
-    }
-    return avService;
 }
 
 io_service_t IOFramebufferPortFromCGSServiceForDisplayNumber(CGDirectDisplayID displayID)
@@ -306,7 +297,7 @@ dispatch_semaphore_t I2CRequestQueue(io_service_t i2c_device_id)
     }* queues = NULL;
     dispatch_semaphore_t queue = NULL;
     if (!queues)
-        queues = calloc(100, sizeof(*queues)); //FIXME: specify
+        queues = calloc(100, sizeof(*queues)); // FIXME: specify
     UInt64 i = 0;
     while (i < queueCount)
         if (queues[i].id == i2c_device_id)
@@ -317,29 +308,6 @@ dispatch_semaphore_t I2CRequestQueue(io_service_t i2c_device_id)
         queue = queues[i].queue;
     else
         queues[queueCount++] = (struct ReqQueue) { i2c_device_id, (queue = dispatch_semaphore_create(1)) };
-    return queue;
-}
-
-dispatch_semaphore_t AVServiceI2CQueue(IOAVServiceRef i2c_device_id)
-{
-    static UInt64 queueCount = 0;
-    static struct AVReqQueue {
-        IOAVServiceRef id;
-        dispatch_semaphore_t queue;
-    }* queues = NULL;
-    dispatch_semaphore_t queue = NULL;
-    if (!queues)
-        queues = calloc(100, sizeof(*queues)); //FIXME: specify
-    UInt64 i = 0;
-    while (i < queueCount)
-        if (queues[i].id == i2c_device_id)
-            break;
-        else
-            i++;
-    if (queues[i].id == i2c_device_id)
-        queue = queues[i].queue;
-    else
-        queues[queueCount++] = (struct AVReqQueue) { i2c_device_id, (queue = dispatch_semaphore_create(1)) };
     return queue;
 }
 
@@ -372,44 +340,7 @@ bool FramebufferI2CRequest(io_service_t framebuffer, IOI2CRequest* request)
     return result && request->result == KERN_SUCCESS;
 }
 
-bool DDCWriteM1(IOAVServiceRef avService, struct DDCWriteCommand* write, uint8_t sleepFactor)
-{
-    dispatch_semaphore_t queue = AVServiceI2CQueue(avService);
-    dispatch_semaphore_wait(queue, DISPATCH_TIME_FOREVER);
-
-    IOReturn err;
-    UInt8 data[256];
-    bzero(&data, sizeof(data));
-
-    data[0] = 0x84;
-    data[1] = 0x03;
-    data[2] = write->control_id;
-    data[3] = (write->new_value) >> 8;
-    data[4] = write->new_value & 255;
-    data[5] = 0x6E ^ 0x51 ^ data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4];
-
-    err = IOAVServiceWriteI2C(avService, 0x37, 0x51, data, 6);
-    if (err) {
-        logToFile("E: DDCWriteM1.IOAVServiceWriteI2C error: %s try: %d\n", mach_error_string(err), 1);
-        dispatch_semaphore_signal(queue);
-        return false;
-    }
-
-    usleep(12000 * (sleepFactor + 1));
-
-    // Retry just in case
-    err = IOAVServiceWriteI2C(avService, 0x37, 0x51, data, 6);
-    if (err) {
-        logToFile("E: DDCWriteM1.IOAVServiceWriteI2C error: %s try: %d\n", mach_error_string(err), 2);
-        dispatch_semaphore_signal(queue);
-        return false;
-    }
-
-    dispatch_semaphore_signal(queue);
-    return true;
-}
-
-bool DDCWrite(io_service_t framebuffer, struct DDCWriteCommand* write)
+bool DDCWriteIntel(io_service_t framebuffer, struct DDCWriteCommand* write)
 {
     IOI2CRequest request;
     UInt8 data[256];
@@ -438,96 +369,6 @@ bool DDCWrite(io_service_t framebuffer, struct DDCWriteCommand* write)
     return result;
 }
 
-bool DDCReadM1(IOAVServiceRef avService, struct DDCReadCommand* read, uint8_t sleepFactor)
-{
-    dispatch_semaphore_t queue = AVServiceI2CQueue(avService);
-    dispatch_semaphore_wait(queue, DISPATCH_TIME_FOREVER);
-
-    IOReturn err;
-    UInt8 reply_data[12] = {};
-    UInt8 data[256];
-    bool result = false;
-    bzero(&data, sizeof(data));
-
-    data[0] = 0x84;
-    data[1] = 0x03;
-    data[2] = DPMS;
-    data[3] = (1) >> 8;
-    data[4] = 1 & 255;
-    data[5] = 0x6E ^ 0x51 ^ data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4];
-
-    err = IOAVServiceWriteI2C(avService, 0x37, 0x51, data, 6);
-    if (err) {
-        logToFile("E: Bogus Write: DDCReadM1.IOAVServiceWriteI2C error: %s\n", mach_error_string(err));
-        dispatch_semaphore_signal(queue);
-        return false;
-    }
-    usleep(32000 * (sleepFactor + 1));
-
-    data[0] = 0x82;
-    data[1] = 0x01;
-    data[2] = read->control_id;
-    data[3] = 0x6e ^ data[0] ^ data[1] ^ data[2];
-
-    for (int i = 1; i <= kMaxRequests; i++) {
-        bzero(&reply_data, sizeof(reply_data));
-
-        err = IOAVServiceWriteI2C(avService, 0x37, 0x51, data, 4);
-        usleep(5000 * (sleepFactor + 1));
-        if (err) {
-            read->success = false;
-            read->max_value = 0;
-            read->current_value = 0;
-            logToFile("E: DDCReadM1.IOAVServiceWriteI2C error: %s try: %d\n", mach_error_string(err), i);
-            dispatch_semaphore_signal(queue);
-            return false;
-        }
-
-        err = IOAVServiceReadI2C(avService, 0x37, 0x51, reply_data, 12);
-        if (err) {
-            read->success = false;
-            read->max_value = 0;
-            read->current_value = 0;
-            logToFile("E: DDCReadM1.IOAVServiceReadI2C error: %s try: %d\n", mach_error_string(err), i);
-            dispatch_semaphore_signal(queue);
-            return false;
-        }
-
-        result = (reply_data[0] == 0x6E && reply_data[2] == 0x2 && reply_data[4] == read->control_id && reply_data[10] == (0x6F ^ 0x51 ^ reply_data[1] ^ reply_data[2] ^ reply_data[3] ^ reply_data[4] ^ reply_data[5] ^ reply_data[6] ^ reply_data[7] ^ reply_data[8] ^ reply_data[9]));
-
-        if (result) { // checksum is ok
-            if (i > 1) {
-                logToFile("D: Tries required to get data: %d \n", i);
-            }
-            break;
-        }
-
-#if DEBUG
-        if (!result) {
-            printf("%02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X    ", reply_data[0], reply_data[1], reply_data[2], reply_data[3], reply_data[4], reply_data[5], reply_data[6], reply_data[7], reply_data[8], reply_data[9], reply_data[10]);
-            printf("Checksum: %02X   ", (0x6F ^ 0x51 ^ 0x88 ^ 0x2 ^ reply_data[3] ^ reply_data[4] ^ reply_data[5] ^ reply_data[6] ^ reply_data[7] ^ reply_data[8] ^ reply_data[9]));
-            printf("Control ID: %02X <> %02X\n", reply_data[4], read->control_id);
-        }
-#endif
-
-        // reset values and return 0, if data reading fails
-        if (i >= kMaxRequests) {
-            read->success = false;
-            read->max_value = 0;
-            read->current_value = 0;
-            logToFile("E: No data after %d tries! \n", i);
-            dispatch_semaphore_signal(queue);
-            return false;
-        }
-        usleep(40000 * (sleepFactor + 1));
-    }
-    read->success = true;
-    read->max_value = reply_data[7];
-    read->current_value = reply_data[9];
-    dispatch_semaphore_signal(queue);
-    return result;
-}
-
 long DDCDelayBase = 1; // nanoseconds
 
 long DDCDelay(io_service_t framebuffer)
@@ -546,7 +387,7 @@ long DDCDelay(io_service_t framebuffer)
     return DDCDelayBase;
 }
 
-bool DDCRead(io_service_t framebuffer, struct DDCReadCommand* read)
+bool DDCReadIntel(io_service_t framebuffer, struct DDCReadCommand* read)
 {
     IOI2CRequest request;
     UInt8 reply_data[11] = {};
@@ -683,7 +524,7 @@ UInt32 SupportedTransactionType()
                     logToFile("E: IOI2CCombinedTransactionType             unsupported \n");
                 } else {
                     logToFile("D: IOI2CCombinedTransactionType             supported \n");
-                    //supportedType = kIOI2CCombinedTransactionType;
+                    // supportedType = kIOI2CCombinedTransactionType;
                 }
 
                 // kIOI2CDisplayPortNativeTransactionType = 4
@@ -691,9 +532,9 @@ UInt32 SupportedTransactionType()
                     logToFile("E: IOI2CDisplayPortNativeTransactionType    unsupported\n");
                 } else {
                     logToFile("D: IOI2CDisplayPortNativeTransactionType    supported \n");
-                    //supportedType = kIOI2CDisplayPortNativeTransactionType;
-                    // http://hackipedia.org/Hardware/video/connectors/DisplayPort/VESA%20DisplayPort%20Standard%20v1.1a.pdf
-                    // http://www.electronic-products-design.com/geek-area/displays/display-port
+                    // supportedType = kIOI2CDisplayPortNativeTransactionType;
+                    //  http://hackipedia.org/Hardware/video/connectors/DisplayPort/VESA%20DisplayPort%20Standard%20v1.1a.pdf
+                    //  http://www.electronic-products-design.com/geek-area/displays/display-port
                 }
 #else
                 // kIOI2CSimpleTransactionType = 1
@@ -723,87 +564,40 @@ UInt32 SupportedTransactionType()
     return supportedType;
 }
 
-bool EDIDTestM1(IOAVServiceRef avService, struct EDID* edid, uint8_t edidData[256])
-{
-    dispatch_semaphore_t queue = AVServiceI2CQueue(avService);
-    dispatch_semaphore_wait(queue, DISPATCH_TIME_FOREVER);
-
-    CFDataRef data;
-    IOReturn err = IOAVServiceCopyEDID(avService, &data);
-    if (err) {
-        logToFile("E: EDIDTestM1.IOAVServiceCopyEDID error: %s\n", mach_error_string(err));
-        dispatch_semaphore_signal(queue);
-        return false;
-    }
-
-    if (!data) {
-        logToFile("E: EDIDTestM1.IOAVServiceCopyEDID no edid\n");
-        dispatch_semaphore_signal(queue);
-        return false;
-    }
-
-    if (edid) {
-
-#if DEBUG
-        UInt8 name[14];
-        bzero(&name, sizeof(name));
-        CFDataGetBytes(data, CFRangeMake(0x71, 13), name);
-        printf("EDID NAME: %s", name);
-#endif
-
-        memcpy(edid, &data, 256);
-        memcpy(edidData, &data, 256);
-    }
-
-    UInt32 i = 0;
-    UInt8 sum = 0;
-    const UInt8* dataPtr = CFDataGetBytePtr(data);
-    while (i < 256) {
-        if (i % 256 == 0) {
-            if (sum)
-                break;
-            sum = 0;
-        }
-        sum += dataPtr[i++];
-    }
-    dispatch_semaphore_signal(queue);
-    return !sum;
-}
-
-bool EDIDTest(io_service_t framebuffer, struct EDID* edid, uint8_t edidData[256])
+bool EDIDTestIntel(io_service_t framebuffer, struct EDID* edid, uint8_t edidData[256])
 {
     IOI2CRequest request = {};
     /*! from https://opensource.apple.com/source/IOGraphics/IOGraphics-513.1/IOGraphicsFamily/IOKit/i2c/IOI2CInterface.h.auto.html
- *  not in https://developer.apple.com/reference/kernel/1659924-ioi2cinterface.h/ioi2crequest?changes=latest_beta&language=objc
- * @abstract A structure defining an I2C bus transaction.
- * @discussion This structure is used to request an I2C transaction consisting of a send (write) to and reply (read) from a device, either of which is optional, to be carried out atomically on an I2C bus.
- * @field __reservedA Set to zero.
- * @field result The result of the transaction. Common errors are kIOReturnNoDevice if there is no device responding at the given address, kIOReturnUnsupportedMode if the type of transaction is unsupported on the requested bus.
- * @field completion A completion routine to be executed when the request completes. If NULL is passed, the request is synchronous, otherwise it may execute asynchronously.
- * @field commFlags Flags that modify the I2C transaction type. The following flags are defined:<br>
- *      kIOI2CUseSubAddressCommFlag Transaction includes a subaddress.<br>
- * @field minReplyDelay Minimum delay as absolute time between send and reply transactions.
- * @field sendAddress I2C address to write.
- * @field sendSubAddress I2C subaddress to write.
- * @field __reservedB Set to zero.
- * @field sendTransactionType The following types of transaction are defined for the send part of the request:<br>
- *      kIOI2CNoTransactionType No send transaction to perform. <br>
- *      kIOI2CSimpleTransactionType Simple I2C message. <br>
- *      kIOI2CCombinedTransactionType Combined format I2C R/~W transaction. <br>
- * @field sendBuffer Pointer to the send buffer.
- * @field sendBytes Number of bytes to send. Set to actual bytes sent on completion of the request.
- * @field replyAddress I2C Address from which to read.
- * @field replySubAddress I2C Address from which to read.
- * @field __reservedC Set to zero.
- * @field replyTransactionType The following types of transaction are defined for the reply part of the request:<br>
- *      kIOI2CNoTransactionType No reply transaction to perform. <br>
- *      kIOI2CSimpleTransactionType Simple I2C message. <br>
- *      kIOI2CDDCciReplyTransactionType DDC/ci message (with embedded length). See VESA DDC/ci specification. <br>
- *      kIOI2CCombinedTransactionType Combined format I2C R/~W transaction. <br>
- * @field replyBuffer Pointer to the reply buffer.
- * @field replyBytes Max bytes to reply (size of replyBuffer). Set to actual bytes received on completion of the request.
- * @field __reservedD Set to zero.
- */
+     *  not in https://developer.apple.com/reference/kernel/1659924-ioi2cinterface.h/ioi2crequest?changes=latest_beta&language=objc
+     * @abstract A structure defining an I2C bus transaction.
+     * @discussion This structure is used to request an I2C transaction consisting of a send (write) to and reply (read) from a device, either of which is optional, to be carried out atomically on an I2C bus.
+     * @field __reservedA Set to zero.
+     * @field result The result of the transaction. Common errors are kIOReturnNoDevice if there is no device responding at the given address, kIOReturnUnsupportedMode if the type of transaction is unsupported on the requested bus.
+     * @field completion A completion routine to be executed when the request completes. If NULL is passed, the request is synchronous, otherwise it may execute asynchronously.
+     * @field commFlags Flags that modify the I2C transaction type. The following flags are defined:<br>
+     *      kIOI2CUseSubAddressCommFlag Transaction includes a subaddress.<br>
+     * @field minReplyDelay Minimum delay as absolute time between send and reply transactions.
+     * @field sendAddress I2C address to write.
+     * @field sendSubAddress I2C subaddress to write.
+     * @field __reservedB Set to zero.
+     * @field sendTransactionType The following types of transaction are defined for the send part of the request:<br>
+     *      kIOI2CNoTransactionType No send transaction to perform. <br>
+     *      kIOI2CSimpleTransactionType Simple I2C message. <br>
+     *      kIOI2CCombinedTransactionType Combined format I2C R/~W transaction. <br>
+     * @field sendBuffer Pointer to the send buffer.
+     * @field sendBytes Number of bytes to send. Set to actual bytes sent on completion of the request.
+     * @field replyAddress I2C Address from which to read.
+     * @field replySubAddress I2C Address from which to read.
+     * @field __reservedC Set to zero.
+     * @field replyTransactionType The following types of transaction are defined for the reply part of the request:<br>
+     *      kIOI2CNoTransactionType No reply transaction to perform. <br>
+     *      kIOI2CSimpleTransactionType Simple I2C message. <br>
+     *      kIOI2CDDCciReplyTransactionType DDC/ci message (with embedded length). See VESA DDC/ci specification. <br>
+     *      kIOI2CCombinedTransactionType Combined format I2C R/~W transaction. <br>
+     * @field replyBuffer Pointer to the reply buffer.
+     * @field replyBytes Max bytes to reply (size of replyBuffer). Set to actual bytes received on completion of the request.
+     * @field __reservedD Set to zero.
+     */
 
     UInt8 data[256] = {};
     request.sendAddress = 0xA0;
@@ -834,4 +628,3 @@ bool EDIDTest(io_service_t framebuffer, struct EDID* edid, uint8_t edidData[256]
     return !sum;
 }
 
-#include "DDC2.h"

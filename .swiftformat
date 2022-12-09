@@ -1,15 +1,18 @@
+--acronyms ID,URL,UUID
 --allman false
 --assetliterals visual-width
---beforemarks
+--beforemarks 
 --binarygrouping 4,8
 --categorymark "MARK: %c"
 --classthreshold 0
 --closingparen balanced
+--closurevoid remove
 --commas always
 --conflictmarkers reject
 --decimalgrouping 3,6
 --elseposition same-line
 --emptybraces no-space
+--enumnamespaces always
 --enumthreshold 0
 --exponentcase lowercase
 --exponentgrouping disabled
@@ -19,6 +22,7 @@
 --fractiongrouping disabled
 --fragment false
 --funcattributes preserve
+--generictypes 
 --groupedextension "MARK: %c"
 --guardelse auto
 --header ignore
@@ -28,15 +32,18 @@
 --importgrouping alpha
 --indent 4
 --indentcase false
---lifecycle
+--indentstrings false
+--lifecycle 
+--lineaftermarks true
 --linebreaks lf
---markextensions always
---marktypes always
---maxwidth 140
---modifierorder
---nevertrailing
---nospaceoperators
---nowrapoperators
+--markcategories false
+--markextensions never
+--marktypes never
+--maxwidth 240
+--modifierorder 
+--nevertrailing 
+--nospaceoperators 
+--nowrapoperators 
 --octalgrouping 4,8
 --operatorfunc spaced
 --organizetypes class,enum,struct
@@ -44,15 +51,18 @@
 --ranges spaced
 --redundanttype inferred
 --self remove
---selfrequired
+--selfrequired 
 --semicolons inline
 --shortoptionals always
 --smarttabs enabled
+--someAny true
+--stripunusedargs always
 --structthreshold 0
 --tabwidth unspecified
---trailingclosures
+--trailingclosures 
 --trimwhitespace always
 --typeattributes preserve
+--typeblanklines remove
 --typemark "MARK: - %t"
 --varattributes preserve
 --voidtype void
@@ -61,8 +71,9 @@
 --wrapconditions after-first
 --wrapparameters before-first
 --wrapreturntype preserve
+--wrapternary before-operators
+--wraptypealiases preserve
 --xcodeindentation disabled
 --yodaswap always
---disable unusedArguments
+--disable blankLinesAtEndOfScope,blankLinesBetweenScopes,unusedArguments
 --enable markTypes,organizeDeclarations
---exclude Lunar/Generated/Secrets.generated.swift

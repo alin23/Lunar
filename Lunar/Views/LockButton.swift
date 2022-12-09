@@ -19,8 +19,6 @@ class LockButtonCell: NSButtonCell {
 // MARK: - LockButton
 
 class LockButton: NSButton {
-    // MARK: Lifecycle
-
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()
@@ -30,8 +28,6 @@ class LockButton: NSButton {
         super.init(coder: coder)
         setup()
     }
-
-    // MARK: Internal
 
     lazy var frameSize = frame.size
     @IBInspectable dynamic var grayDisabledText = true

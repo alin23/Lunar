@@ -17,8 +17,6 @@ public enum FileType {
     case fifo
     case socket
 
-    // MARK: Lifecycle
-
     public init?(rawValue: Int32) {
         switch rawValue & LIBSSH2_SFTP_S_IFMT {
         case LIBSSH2_SFTP_S_IFLNK:

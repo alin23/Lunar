@@ -11,8 +11,6 @@ import Combine
 import Defaults
 
 class ScrollableContrast: NSView {
-    // MARK: Lifecycle
-
     deinit {
         #if DEBUG
             log.verbose("START DEINIT")
@@ -32,8 +30,6 @@ class ScrollableContrast: NSView {
         super.init(coder: coder)
         setup()
     }
-
-    // MARK: Internal
 
     @IBOutlet var label: NSTextField!
     @IBOutlet var minValue: ScrollableTextField!

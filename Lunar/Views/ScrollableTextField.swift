@@ -21,8 +21,6 @@ var scrollDeltaYThreshold: CGFloat = NORMAL_SCROLL_Y_THRESHOLD
 // MARK: - ScrollableTextField
 
 class ScrollableTextField: NSTextField, NSTextFieldDelegate {
-    // MARK: Lifecycle
-
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()
@@ -32,8 +30,6 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         super.init(coder: coder)
         setup()
     }
-
-    // MARK: Internal
 
     @IBInspectable dynamic var step = 1.0
     @IBInspectable dynamic var leftPadding: UInt8 = 0

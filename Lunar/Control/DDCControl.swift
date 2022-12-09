@@ -11,13 +11,9 @@ import Defaults
 import Foundation
 
 class DDCControl: Control, ObservableObject {
-    // MARK: Lifecycle
-
     init(display: Display) {
         self.display = display
     }
-
-    // MARK: Internal
 
     struct ValueRange: Equatable {
         let displayID: CGDirectDisplayID
@@ -332,7 +328,7 @@ class DDCControl: Control, ObservableObject {
         )
     }
 
-    func setInput(_ input: InputSource) -> Bool {
+    func setInput(_ input: VideoInputSource) -> Bool {
         guard let display else { return false }
 
         return DDC.setInput(for: display.id, input: input)
@@ -373,9 +369,9 @@ class DDCControl: Control, ObservableObject {
         return DDC.isAudioMuted(for: display.id)
     }
 
-    func getInput() -> InputSource? {
+    func getInput() -> VideoInputSource? {
         guard let display else { return nil }
-        guard let input = DDC.getInput(for: display.id), let inputSource = InputSource(rawValue: input) else { return nil }
+        guard let input = DDC.getInput(for: display.id), let inputSource = VideoInputSource(rawValue: input) else { return nil }
         return inputSource
     }
 

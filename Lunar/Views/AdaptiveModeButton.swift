@@ -17,8 +17,6 @@ let MODE_DISABLED_REASON_PATTERN = "\\sMode.*".r!
 // MARK: - AdaptiveModeButton
 
 class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
-    // MARK: Lifecycle
-
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()
@@ -28,8 +26,6 @@ class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
         super.init(coder: coder)
         setup()
     }
-
-    // MARK: Internal
 
     static var syncDisabledReason: String {
         if Sysctl.isMacBook, displayController.lidClosed {

@@ -141,8 +141,6 @@ var lastXDRContrastResetTime = Date()
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate {
-    // MARK: Internal
-
     enum UIElement {
         case displayControls
         case displayDDC
@@ -402,7 +400,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 createWindow(
                     "testWindowController",
                     controller: &d.testWindowController,
-                    screen: d.screen,
+                    screen: d.nsScreen,
                     show: true,
                     backgroundColor: .clear,
                     level: .screenSaver,
@@ -623,8 +621,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                         guard d.hasAmbientLightAdaptiveBrightness, let lastAppPreset = d.appPreset
                         else { continue }
 
-                        if !d.ambientLightAdaptiveBrightnessEnabled {
-                            d.ambientLightAdaptiveBrightnessEnabled = true
+                        if !d.systemAdaptiveBrightness {
+                            d.systemAdaptiveBrightness = true
                         }
                         if lastAppPreset.reapplyPreviousBrightness {
                             if CachedDefaults[.mergeBrightnessContrast] {
@@ -932,9 +930,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func updateInfoMenuItem(showBrightnessMenuBar: Bool? = nil) {
         if showBrightnessMenuBar ?? CachedDefaults[.showBrightnessMenuBar],
            let button = statusItem.button,
-           let display = CachedDefaults[.showOnlyExternalBrightnessMenuBar] ?
-           displayController.mainExternalDisplay :
-           displayController.cursorDisplay
+           let display = CachedDefaults[.showOnlyExternalBrightnessMenuBar]
+           ? displayController.mainExternalDisplay
+           : displayController.cursorDisplay
         {
             button.imagePosition = .imageLeading
             let paragraphStyle = NSMutableParagraphStyle()
@@ -2539,8 +2537,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
     }
 
-    // MARK: Private
-
     @objc private func activate() {
         NSRunningApplication.current.activate(options: .activateIgnoringOtherApps)
     }
@@ -2625,7 +2621,7 @@ func acquirePrivileges(notificationTitle: String = "Lunar is now listening for m
         CachedDefaults[.mediaKeysNotified] = true
 
         var body = notificationBody ??
-            "You can now use PLACEHOLDER keys to control your monitors. Swipe right in the Lunar window to get to the Hotkeys page and manage this funtionality."
+            "You can now use PLACEHOLDER keys to control your monitors. Swipe right in the Lunar window to get to the Hotkeys page and manage this functionality."
 
         if CachedDefaults[.brightnessKeysEnabled], CachedDefaults[.volumeKeysEnabled] {
             body = body.replacingOccurrences(of: "PLACEHOLDER", with: "brightness and volume")
@@ -2667,7 +2663,7 @@ func isLidClosed() -> Bool {
 
 func restart() {
     _ = shell(
-        command: "while ps -p \(ProcessInfo.processInfo.processIdentifier) >/dev/null 2>/dev/null; do sleep 0.1; done; open '\(Bundle.main.path.string)'",
+        command: "while /bin/ps -p \(ProcessInfo.processInfo.processIdentifier) >/dev/null 2>/dev/null; do /bin/sleep 0.1; done; /usr/bin/open '\(Bundle.main.path.string)'",
         wait: false
     )
     exit(0)

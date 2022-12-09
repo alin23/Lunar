@@ -6,14 +6,10 @@
 //  Copyright © 2021 Alin. All rights reserved.
 //
 
-import AnyCodable
 import ArgumentParser
 import Cocoa
-import Dispatch
 import Foundation
-import FuzzyMatcher
 import Regex
-import SwiftyJSON
 
 private let UPPERCASE_LETTER_NAMES = #"e\s?d\s?i\s?d|id|d\s?d\s?c"#.r!
 var encoder: JSONEncoder = {
@@ -42,8 +38,6 @@ private enum LunarCommandError: Error, CustomStringConvertible {
     case ddcError(String)
     case gammaError(String)
     case noUUID(CGDirectDisplayID)
-
-    // MARK: Internal
 
     var description: String {
         switch self {
@@ -108,7 +102,7 @@ let ID_PATTERN = #"\d+"#.r!
 
 // MARK: - DisplayFilter
 
-enum DisplayFilter: ExpressibleByArgument, Codable, Equatable {
+enum DisplayFilter: ExpressibleByArgument, Codable, Equatable, CaseIterable {
     case all
     case first
     case mainExternal
@@ -125,8 +119,6 @@ enum DisplayFilter: ExpressibleByArgument, Codable, Equatable {
     case serial(String)
     case name(String)
     case id(CGDirectDisplayID)
-
-    // MARK: Lifecycle
 
     init?(argument: String) {
         switch argument {
@@ -167,10 +159,60 @@ enum DisplayFilter: ExpressibleByArgument, Codable, Equatable {
         }
     }
 
-    // MARK: Internal
+    static var allCases: [DisplayFilter] = [
+        .all,
+        .first,
+        .external,
+        .builtin,
+        .cursor,
+        .mainExternal,
+        .withoutCursor,
+        .main,
+        .nonMain,
+        .syncSource,
+        .syncTargets,
+    ]
 
     static var allValueStrings: [String] {
         ["first", "main", "cursor", "external", "builtin", "all", "non-main", "without-cursor", "sync-source", "sync-targets", "best-guess"]
+    }
+
+    @available(macOS 13, *)
+    var screen: Screen {
+        switch self {
+        case .all:
+            return Screen(id: UInt32.max.u32 - 1, name: "All screens", serial: "all", isDynamicFilter: true)
+        case .first:
+            return Screen(id: UInt32.max.u32 - 2, name: "First screen", serial: "first", isDynamicFilter: true)
+        case .mainExternal:
+            return Screen(id: UInt32.max.u32 - 3, name: "Main external screen", serial: "mainExternal", isDynamicFilter: true)
+        case .external:
+            return Screen(id: UInt32.max.u32 - 4, name: "External screens", serial: "external", isDynamicFilter: true)
+        case .main:
+            return Screen(id: UInt32.max.u32 - 5, name: "Main screen", serial: "main", isDynamicFilter: true)
+        case .nonMain:
+            return Screen(id: UInt32.max.u32 - 6, name: "Non-main screens", serial: "nonMain", isDynamicFilter: true)
+        case .cursor:
+            return Screen(id: UInt32.max.u32 - 7, name: "Screen with the cursor", serial: "cursor", isDynamicFilter: true)
+        case .withoutCursor:
+            return Screen(id: UInt32.max.u32 - 8, name: "Screens without the cursor", serial: "withoutCursor", isDynamicFilter: true)
+        case .bestGuess:
+            return Screen(id: UInt32.max.u32 - 9, name: "Best guess", serial: "bestGuess", isDynamicFilter: true)
+        case .builtin:
+            return Screen(id: UInt32.max.u32 - 10, name: "Built-in screen", serial: "builtin", isDynamicFilter: true)
+        case .syncSource:
+            return Screen(id: UInt32.max.u32 - 11, name: "Sync Mode Source", serial: "syncSource", isDynamicFilter: true)
+        case .syncTargets:
+            return Screen(id: UInt32.max.u32 - 12, name: "Sync Mode Targets", serial: "syncTargets", isDynamicFilter: true)
+        case .none:
+            return Screen(id: UInt32.max.u32 - 13, name: "None", serial: "none", isDynamicFilter: true)
+        case let .serial(string):
+            return Screen(id: UInt32.max.u32 - 14, name: string, serial: string)
+        case let .name(string):
+            return Screen(id: UInt32.max.u32 - 15, name: string, serial: string)
+        case let .id(id):
+            return Screen(id: id, name: id.s, serial: id.s)
+        }
     }
 
     var s: String {
@@ -190,14 +232,10 @@ extension NSDeviceDescriptionKey: Encodable {
 // MARK: - ForgivingEncodable
 
 struct ForgivingEncodable: Encodable {
-    // MARK: Lifecycle
-
     init(_ value: Any?, key: String? = nil) {
         self.value = value
         self.key = key
     }
-
-    // MARK: Internal
 
     var key: String?
     var value: Any?
@@ -235,6 +273,7 @@ struct ForgivingEncodable: Encodable {
             try container.encode(array)
         case let array as [Any?]:
             try container.encode(array.map { ForgivingEncodable($0) })
+
         case let dictionary as [String: Any?]:
             try container.encode(
                 Dictionary(uniqueKeysWithValues: dictionary.map {
@@ -255,7 +294,7 @@ struct ForgivingEncodable: Encodable {
     }
 }
 
-private func getDisplays(displays: [Display], filter: DisplayFilter) -> [Display] {
+func getFilteredDisplays(displays: [Display], filter: DisplayFilter) -> [Display] {
     switch filter {
     case .all:
         return displays
@@ -465,7 +504,7 @@ struct Lunar: ParsableCommand {
                 includeProjector: false,
                 includeDummy: false
             )
-            let displays = getDisplays(displays: displayController.activeDisplayList, filter: display)
+            let displays = getFilteredDisplays(displays: displayController.activeDisplayList, filter: display)
             guard !displays.isEmpty else {
                 throw LunarCommandError.displayNotFound(display.s)
             }
@@ -555,7 +594,7 @@ struct Lunar: ParsableCommand {
                 includeProjector: false,
                 includeDummy: false
             )
-            let displays = getDisplays(displays: displayController.activeDisplayList, filter: display)
+            let displays = getFilteredDisplays(displays: displayController.activeDisplayList, filter: display)
             guard !displays.isEmpty else {
                 throw LunarCommandError.displayNotFound(display.s)
             }
@@ -696,7 +735,7 @@ struct Lunar: ParsableCommand {
                 includeDummy: false
             )
 
-            let displays = getDisplays(displays: displayController.activeDisplayList, filter: display)
+            let displays = getFilteredDisplays(displays: displayController.activeDisplayList, filter: display)
             guard !displays.isEmpty else {
                 throw LunarCommandError.displayNotFound(display.s)
             }
@@ -1256,7 +1295,7 @@ struct Lunar: ParsableCommand {
 
             guard !isServer else { return }
 
-            let displays = getDisplays(displays: displayController.activeDisplayList, filter: display)
+            let displays = getFilteredDisplays(displays: displayController.activeDisplayList, filter: display)
             guard !displays.isEmpty else {
                 throw LunarCommandError.displayNotFound(display.s)
             }
@@ -1273,7 +1312,7 @@ struct Lunar: ParsableCommand {
         func run() throws {
             Lunar.configureLogging(options: globals)
 
-            let displays = getDisplays(displays: displayController.activeDisplayList, filter: display)
+            let displays = getFilteredDisplays(displays: displayController.activeDisplayList, filter: display)
             guard !displays.isEmpty else {
                 throw LunarCommandError.displayNotFound(display.s)
             }
@@ -1380,7 +1419,7 @@ struct Lunar: ParsableCommand {
                 includeDummy: CachedDefaults[.showDummyDisplays]
             )
 
-            let displays = getDisplays(displays: displayController.activeDisplayList, filter: display)
+            let displays = getFilteredDisplays(displays: displayController.activeDisplayList, filter: display)
             guard !displays.isEmpty else {
                 throw LunarCommandError.displayNotFound(display.s)
             }
@@ -1431,12 +1470,12 @@ struct Lunar: ParsableCommand {
                 includeDummy: CachedDefaults[.showDummyDisplays]
             )
 
-            let displays = getDisplays(displays: displayController.activeDisplayList, filter: display)
+            let displays = getFilteredDisplays(displays: displayController.activeDisplayList, filter: display)
             guard !displays.isEmpty else {
                 throw LunarCommandError.displayNotFound(display.s)
             }
 
-            let master: CGDirectDisplayID? = master == .none ? nil : getDisplays(
+            let master: CGDirectDisplayID? = master == .none ? nil : getFilteredDisplays(
                 displays: displayController.activeDisplayList,
                 filter: master
             ).first?.id
@@ -1689,10 +1728,8 @@ private func handleDisplays(
     panelDataAllResolutions: Bool = false,
     edid: Bool = false
 ) throws {
-    // MARK: - Apply display filter to get single display
-
     let property = property == .mute ? .audioMuted : property
-    let displays = getDisplays(displays: displays, filter: displayFilter)
+    let displays = getFilteredDisplays(displays: displays, filter: displayFilter)
     guard !displays.isEmpty else {
         throw LunarCommandError.displayNotFound(displayFilter.s)
     }
@@ -1731,8 +1768,6 @@ private func handleDisplays(
                 continue
             }
 
-            // MARK: - Enable command-line specified controls
-
             let oldEnabledControls = display.enabledControls
             display.enabledControls = [
                 .network: controls.contains(.network),
@@ -1755,16 +1790,12 @@ private func handleDisplays(
             }
 
             guard var value else {
-                // MARK: - Get display property
-
                 if !read {
                     log.debug("Fetching value for \(property.rawValue)")
                     cliPrint("\(i): \(display.name)")
                     cliPrint("\t\(property.stringValue): \(encodedValue(key: property, value: propertyValue))")
                     continue
                 }
-
-                // MARK: - Read display property
 
                 log.debug("Reading value for \(property.rawValue)")
                 guard let readValue = display.control?.read(property) else {
@@ -1776,8 +1807,6 @@ private func handleDisplays(
                 continue
             }
 
-            // MARK: - Set display property
-
             log.debug("Changing \(property.rawValue) from \(propertyValue) to \(value)")
             switch propertyValue {
             case is String:
@@ -1785,7 +1814,7 @@ private func handleDisplays(
                 display.save(now: true)
             case is NSNumber
                 where property == .input || property == .hotkeyInput1 || property == .hotkeyInput2 || property == .hotkeyInput3:
-                guard let input = InputSource(stringValue: value) else {
+                guard let input = VideoInputSource(rawValue: (value.i ?? 0).u16) ?? VideoInputSource(stringValue: value) else {
                     throw LunarCommandError.invalidValue("Unknown input \(value)")
                 }
                 display.setValue(input.rawValue.ns, forKey: property.rawValue)
@@ -1810,6 +1839,13 @@ private func handleDisplays(
                 } else {
                     display.control?.write(property, newValue)
                 }
+            case is NSNumber where property == .rotation:
+                guard let rotation = value.i, [0, 90, 180, 270].contains(rotation) else {
+                    throw LunarCommandError.invalidValue("Rotation needs to be one of 0, 90, 180 or 270. \(value) is invalid.")
+                }
+                display.withoutModeChangeAsk {
+                    display.rotation = rotation
+                }
             case let currentValue as NSNumber:
                 var operation = ""
                 if let firstChar = value.first?.unicodeScalars.first, !CharacterSet.decimalDigits.contains(firstChar) {
@@ -1820,10 +1856,14 @@ private func handleDisplays(
                 guard var value = value.d?.ns else { throw LunarCommandError.invalidValue("\(value) is not a number") }
 
                 switch operation {
-                case "+":
+                case "+" where !Display.CodingKeys.double.contains(property):
                     value = (currentValue.uint16Value + min(value.uint16Value, UINT16_MAX.u16 - currentValue.uint16Value)).ns
-                case "-":
+                case "+" where Display.CodingKeys.double.contains(property):
+                    value = (currentValue.doubleValue + min(value.doubleValue, 1.0 - currentValue.doubleValue)).ns
+                case "-" where !Display.CodingKeys.double.contains(property):
                     value = (currentValue.uint16Value - min(value.uint16Value, currentValue.uint16Value)).ns
+                case "-" where Display.CodingKeys.double.contains(property):
+                    value = (currentValue.doubleValue - min(value.doubleValue, currentValue.doubleValue)).ns
                 case "":
                     break
                 default:
@@ -1835,16 +1875,70 @@ private func handleDisplays(
                     let old = display.brightness
                     display.brightness = value
                     display.control?.write(property, display.limitedBrightness, old)
+                    display.insertBrightnessUserDataPoint(
+                        displayController.adaptiveMode.brightnessDataPoint.last,
+                        display.brightness.doubleValue, modeKey: displayController.adaptiveModeKey
+                    )
                 case .contrast:
                     let old = display.contrast
                     display.contrast = value
                     display.control?.write(property, display.limitedContrast, old)
+                    display.insertContrastUserDataPoint(
+                        displayController.adaptiveMode.contrastDataPoint.last,
+                        display.contrast.doubleValue, modeKey: displayController.adaptiveModeKey
+                    )
                 case .volume:
                     display.volume = value
                     display.control?.write(property, display.limitedVolume)
+                case .normalizedBrightness:
+                    let value = value.doubleValue
+                    guard value >= 0, value <= 1 else { throw LunarCommandError.invalidValue("Value must be between 0 and 1") }
+                    display.preciseBrightness = value
+                    display.control?.write(property, display.limitedBrightness)
+                    display.insertBrightnessUserDataPoint(
+                        displayController.adaptiveMode.brightnessDataPoint.last,
+                        display.brightness.doubleValue, modeKey: displayController.adaptiveModeKey
+                    )
+                case .normalizedContrast:
+                    let value = value.doubleValue
+                    guard value >= 0, value <= 1 else { throw LunarCommandError.invalidValue("Value must be between 0 and 1") }
+                    display.preciseContrast = value
+                    display.control?.write(property, display.limitedContrast)
+                    display.insertContrastUserDataPoint(
+                        displayController.adaptiveMode.contrastDataPoint.last,
+                        display.contrast.doubleValue, modeKey: displayController.adaptiveModeKey
+                    )
+                case .normalizedBrightnessContrast:
+                    let value = value.doubleValue
+                    guard value >= 0, value <= 1 else { throw LunarCommandError.invalidValue("Value must be between 0 and 1") }
+                    display.preciseBrightnessContrast = value
+                    display.control?.write(property, display.limitedBrightness)
+                    display.control?.write(property, display.limitedContrast)
+                    display.insertBrightnessUserDataPoint(
+                        displayController.adaptiveMode.brightnessDataPoint.last,
+                        display.brightness.doubleValue, modeKey: displayController.adaptiveModeKey
+                    )
+                    display.insertContrastUserDataPoint(
+                        displayController.adaptiveMode.contrastDataPoint.last,
+                        display.contrast.doubleValue, modeKey: displayController.adaptiveModeKey
+                    )
+                case .softwareBrightness:
+                    display.softwareBrightness = value.floatValue
+                    display.insertBrightnessUserDataPoint(
+                        displayController.adaptiveMode.brightnessDataPoint.last,
+                        display.brightness.doubleValue, modeKey: displayController.adaptiveModeKey
+                    )
+                case .xdrBrightness:
+                    display.xdrBrightness = value.floatValue
+                    display.insertBrightnessUserDataPoint(
+                        displayController.adaptiveMode.brightnessDataPoint.last,
+                        display.brightness.doubleValue, modeKey: displayController.adaptiveModeKey
+                    )
                 default:
                     display.setValue(value, forKey: property.rawValue)
-                    display.control?.write(property, value.uint16Value)
+                    if Display.CodingKeys.settableWithControl.contains(property) {
+                        display.control?.write(property, value.uint16Value)
+                    }
                 }
                 display.save(now: true)
             default:
@@ -1885,7 +1979,7 @@ private func encodedValue(key: Display.CodingKeys, value: Any, prefix: String = 
     case .brightnessCurveFactors, .contrastCurveFactors:
         return (try! encoder.encode(value as! [String: Double])).str()
     case .input, .hotkeyInput1, .hotkeyInput2, .hotkeyInput3:
-        return (InputSource(rawValue: value as! UInt16) ?? .unknown).str
+        return (VideoInputSource(rawValue: value as! UInt16) ?? .unknown).str
     case .power:
         return (value as! Bool) ? "on" : "off"
     case .schedules:
@@ -1927,16 +2021,12 @@ var cliServerTask: DispatchWorkItem? {
 // MARK: - LunarServer
 
 class LunarServer {
-    // MARK: Lifecycle
-
     deinit {
         for socket in connectedSockets.values {
             socket.close()
         }
         self.listenSocket?.close()
     }
-
-    // MARK: Internal
 
     static let bufferSize = 4096
     static let queue = DispatchQueue(label: "fyi.lunar.cliServer.queue", qos: .userInitiated)
@@ -2146,9 +2236,8 @@ class LunarServer {
     }
 }
 
-let CLI_ARG_SEPARATOR = "\u{01}"
-
 var isServer = false
+var isShortcut = false
 var serverOutput = ""
 var serverHTTP = false
 func cliSleep(_ time: TimeInterval) {
@@ -2167,7 +2256,7 @@ func cliExit(_ code: Int32) {
 }
 
 func cliPrint(_ s: Any, terminator: String = "\n") {
-    guard !isServer else {
+    guard !isServer || isShortcut else {
         serverOutput += "\(s)\(terminator)"
         return
     }
@@ -2190,8 +2279,6 @@ func cliGetDisplays(
         includeDummy: includeDummy
     )
 }
-
-let LUNAR_CLI_PORT: Int32 = 23803
 
 func serve(host: String) {
     isServer = true

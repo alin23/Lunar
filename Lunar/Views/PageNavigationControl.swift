@@ -9,8 +9,6 @@
 import Cocoa
 
 class PageNavigationControl: NSSegmentedControl {
-    // MARK: Lifecycle
-
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()
@@ -20,8 +18,6 @@ class PageNavigationControl: NSSegmentedControl {
         super.init(coder: coder)
         setup()
     }
-
-    // MARK: Internal
 
     var trackingArea: NSTrackingArea!
     var buttonShadow: NSShadow!

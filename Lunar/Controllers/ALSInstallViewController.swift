@@ -36,15 +36,11 @@ func getDevices() -> [String] {
 // MARK: - ALSInstallViewController
 
 class ALSInstallViewController: NSViewController {
-    // MARK: Lifecycle
-
     deinit {
         #if DEBUG
             log.debug("DEINIT")
         #endif
     }
-
-    // MARK: Internal
 
     @objc dynamic var operationTitle = "Ambient Light Sensor"
     @objc dynamic var operationDescription: NSAttributedString =

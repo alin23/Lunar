@@ -30,8 +30,6 @@
 		C728D7ED2296D81B003CAD65 /* TextButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C728D7EC2296D81B003CAD65 /* TextButton.swift */; };
 		C72BB4B62727E03500941708 /* Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = C72BB4B32727E03400941708 /* Extensions.h */; };
 		C72BB4B72727E03500941708 /* Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C72BB4B52727E03400941708 /* Extensions.m */; };
-		C72CFB962586B36E005F0340 /* WAYWindow.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C72CFB912586AE7E005F0340 /* WAYWindow.framework */; };
-		C72CFB972586B36E005F0340 /* WAYWindow.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C72CFB912586AE7E005F0340 /* WAYWindow.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C730421F2407E92C0016E591 /* Headers in Resources */ = {isa = PBXBuildFile; fileRef = C730421E2407E92C0016E591 /* Headers */; };
 		C731260C22B38899001ED199 /* HelpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C731260B22B38899001ED199 /* HelpButton.swift */; };
 		C731260F22B3A9CD001ED199 /* HelpPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C731260E22B3A9CD001ED199 /* HelpPopoverController.swift */; };
@@ -47,6 +45,7 @@
 		C73CC6AE24616462003B2658 /* Sauce in Frameworks */ = {isa = PBXBuildFile; productRef = C73CC6AD24616462003B2658 /* Sauce */; };
 		C740A1F4262490E1004BC1C7 /* CLI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C740A1F3262490E1004BC1C7 /* CLI.swift */; };
 		C740A1F826249176004BC1C7 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = C740A1F726249176004BC1C7 /* ArgumentParser */; };
+		C743892C29474597004C5D9B /* WAYWindow.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7B2EB212947458300D02BCB /* WAYWindow.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C74820FA26DE6CFA00556EA8 /* PageNavigationControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74820F926DE6CFA00556EA8 /* PageNavigationControl.swift */; };
 		C7482C3427D2874D00A12E82 /* ColorizeSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7482C3227D2874D00A12E82 /* ColorizeSwift.swift */; };
 		C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */; };
@@ -85,6 +84,7 @@
 		C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */; };
 		C780CF98269F241A007FFB58 /* tsl2591.h in Resources */ = {isa = PBXBuildFile; fileRef = C780CF96269F2370007FFB58 /* tsl2591.h */; };
 		C784143827DDFBC400E14941 /* OSDWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C784143727DDFBC400E14941 /* OSDWindow.swift */; };
+		C78A1964294E700800B0410A /* DDC2.c in Sources */ = {isa = PBXBuildFile; fileRef = C78A1963294E700800B0410A /* DDC2.c */; };
 		C78AB66720F0C73900863CB1 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78AB66620F0C73900863CB1 /* Logger.swift */; };
 		C78BD044259B2FB100FC823F /* SensorMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD043259B2FB100FC823F /* SensorMode.swift */; };
 		C78BD04A259B33D500FC823F /* Path in Frameworks */ = {isa = PBXBuildFile; productRef = C78BD049259B33D500FC823F /* Path */; };
@@ -97,6 +97,7 @@
 		C790D4BE259B9DC100868689 /* NanoID.swift in Sources */ = {isa = PBXBuildFile; fileRef = C790D4BD259B9DC100868689 /* NanoID.swift */; };
 		C794E1641FEE84DF00549462 /* ToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C794E1631FEE84DF00549462 /* ToggleButton.swift */; };
 		C794E1741FEFE31A00549462 /* ScrollableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C794E1731FEFE31A00549462 /* ScrollableTextField.swift */; };
+		C795104B2944F035004C6082 /* Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79510482944E9FD004C6082 /* Shared.swift */; };
 		C79975D725DEEDE000C797FF /* Control.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79975D625DEEDE000C797FF /* Control.swift */; };
 		C79975DB25DEEE9300C797FF /* DDCControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79975DA25DEEE9300C797FF /* DDCControl.swift */; };
 		C79975DE25DEEF9200C797FF /* AppleNativeControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79975DD25DEEF9200C797FF /* AppleNativeControl.swift */; };
@@ -182,6 +183,7 @@
 		C7E896DB2652C0F60079A328 /* ExceptionCatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = C7E896D92652C0F60079A328 /* ExceptionCatcher.h */; };
 		C7E896DD2652C37E0079A328 /* CoreBrightness.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7E896DC2652C37E0079A328 /* CoreBrightness.framework */; };
 		C7E99267260A90E70055370A /* Solar in Frameworks */ = {isa = PBXBuildFile; productRef = C7E99266260A90E70055370A /* Solar */; };
+		C7EBD80829452CB50075E6FD /* LunarShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = C795103C2944E912004C6082 /* LunarShortcuts.swift */; };
 		C7ECB6722750C75C00DA212D /* LDSwiftEventSourceStatic in Frameworks */ = {isa = PBXBuildFile; productRef = C7ECB6712750C75C00DA212D /* LDSwiftEventSourceStatic */; };
 		C7EF9535243F4E2200839A62 /* Sysctl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7EF9534243F4E2200839A62 /* Sysctl.swift */; };
 		C7F48C4A2657A258000715A8 /* DataCompression in Frameworks */ = {isa = PBXBuildFile; productRef = C7F48C492657A258000715A8 /* DataCompression */; };
@@ -190,16 +192,6 @@
 		C7FE724F238EDFB100EBA6DA /* CoreDisplay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		C72CFB902586AE7E005F0340 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = C72CFB8C2586AE7E005F0340 /* WAYWindow.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = C735DD681FD5AF8200FBD16F;
-			remoteInfo = WAYWindow;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXCopyFilesBuildPhase section */
 		C75083582222865F0020270E /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -207,9 +199,9 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				C743892C29474597004C5D9B /* WAYWindow.framework in Embed Frameworks */,
 				C73B41ED263BE02E006F6783 /* LetsMove.framework in Embed Frameworks */,
 				C7138D982634B03400406EE3 /* Paddle.framework in Embed Frameworks */,
-				C72CFB972586B36E005F0340 /* WAYWindow.framework in Embed Frameworks */,
 				C77C77532811A77B006326BE /* Sparkle.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -235,7 +227,6 @@
 		C728D7EC2296D81B003CAD65 /* TextButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextButton.swift; sourceTree = "<group>"; };
 		C72BB4B32727E03400941708 /* Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Extensions.h; sourceTree = "<group>"; };
 		C72BB4B52727E03400941708 /* Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Extensions.m; sourceTree = "<group>"; };
-		C72CFB8C2586AE7E005F0340 /* WAYWindow.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = WAYWindow.xcodeproj; path = WAYWindow/WAYWindow.xcodeproj; sourceTree = "<group>"; };
 		C730421E2407E92C0016E591 /* Headers */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Headers; path = OSD.framework/Headers; sourceTree = "<group>"; };
 		C731260B22B38899001ED199 /* HelpButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpButton.swift; sourceTree = "<group>"; };
 		C731260E22B3A9CD001ED199 /* HelpPopoverController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpPopoverController.swift; sourceTree = "<group>"; };
@@ -281,6 +272,8 @@
 		C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayView.swift; sourceTree = "<group>"; };
 		C780CF96269F2370007FFB58 /* tsl2591.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tsl2591.h; sourceTree = "<group>"; };
 		C784143727DDFBC400E14941 /* OSDWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSDWindow.swift; sourceTree = "<group>"; };
+		C78A1963294E700800B0410A /* DDC2.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = DDC2.c; sourceTree = "<group>"; };
+		C78A1965294E70D100B0410A /* SharedDDC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SharedDDC.h; sourceTree = "<group>"; };
 		C78AB66620F0C73900863CB1 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		C78BD043259B2FB100FC823F /* SensorMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorMode.swift; sourceTree = "<group>"; };
 		C78BD04B259B365500FC823F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
@@ -292,6 +285,8 @@
 		C790D4BD259B9DC100868689 /* NanoID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NanoID.swift; sourceTree = "<group>"; };
 		C794E1631FEE84DF00549462 /* ToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleButton.swift; sourceTree = "<group>"; };
 		C794E1731FEFE31A00549462 /* ScrollableTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextField.swift; sourceTree = "<group>"; };
+		C795103C2944E912004C6082 /* LunarShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LunarShortcuts.swift; sourceTree = "<group>"; };
+		C79510482944E9FD004C6082 /* Shared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared.swift; sourceTree = "<group>"; };
 		C79975D625DEEDE000C797FF /* Control.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Control.swift; sourceTree = "<group>"; };
 		C79975DA25DEEE9300C797FF /* DDCControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDCControl.swift; sourceTree = "<group>"; };
 		C79975DD25DEEF9200C797FF /* AppleNativeControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleNativeControl.swift; sourceTree = "<group>"; };
@@ -317,6 +312,7 @@
 		C7AF321426F5EEDE00AC14AF /* ClockMode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClockMode.swift; sourceTree = "<group>"; };
 		C7AF321A26F62D3B00AC14AF /* Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schedule.swift; sourceTree = "<group>"; };
 		C7AF321C26F62F5C00AC14AF /* Schedule.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Schedule.xib; sourceTree = "<group>"; };
+		C7B2EB212947458300D02BCB /* WAYWindow.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = WAYWindow.framework; sourceTree = "<group>"; };
 		C7B6EA0F201B41C10090EE0E /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		C7B9E47F2401767E00A48347 /* OSD.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OSD.framework; path = /System/Library/PrivateFrameworks/OSD.framework; sourceTree = "<absolute>"; };
 		C7BAD9BC263869920058974C /* Pro Meteor.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Pro Meteor.png"; sourceTree = "<group>"; };
@@ -411,7 +407,6 @@
 				C7E80E392637060F004718A4 /* libssl.a in Frameworks */,
 				C7BD5F85287B44130077CCB7 /* Charts in Frameworks */,
 				C7F48C4A2657A258000715A8 /* DataCompression in Frameworks */,
-				C72CFB962586B36E005F0340 /* WAYWindow.framework in Frameworks */,
 				C731E85E27E1E5090016B36D /* Sentry in Frameworks */,
 				C7DA10F7259B8979006DD876 /* Regex in Frameworks */,
 				C7C5AD9E26C5AD5400D68B7F /* MonitorPanel.framework in Frameworks */,
@@ -447,16 +442,10 @@
 				C7151941224E34BA0024C6F6 /* DDC.h */,
 				C7151943224E34BA0024C6F6 /* Lunar-Bridging-Header.h */,
 				C7151944224E34BA0024C6F6 /* DDC.swift */,
+				C78A1963294E700800B0410A /* DDC2.c */,
+				C78A1965294E70D100B0410A /* SharedDDC.h */,
 			);
 			path = DDC;
-			sourceTree = "<group>";
-		};
-		C72CFB8D2586AE7E005F0340 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				C72CFB912586AE7E005F0340 /* WAYWindow.framework */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		C73B41F3263BE46F006F6783 /* Localization */ = {
@@ -602,6 +591,15 @@
 			path = Utils;
 			sourceTree = "<group>";
 		};
+		C79510392944E912004C6082 /* LunarShortcuts */ = {
+			isa = PBXGroup;
+			children = (
+				C795103C2944E912004C6082 /* LunarShortcuts.swift */,
+				C79510482944E9FD004C6082 /* Shared.swift */,
+			);
+			path = LunarShortcuts;
+			sourceTree = "<group>";
+		};
 		C79975D025DEEDB100C797FF /* Control */ = {
 			isa = PBXGroup;
 			children = (
@@ -621,6 +619,7 @@
 				C705A03B268B4187001ABBA9 /* Packages */,
 				C73B41F3263BE46F006F6783 /* Localization */,
 				C7574F7F235468EE00358397 /* Scripts */,
+				C79510392944E912004C6082 /* LunarShortcuts */,
 				C7CFEA241FD3787B000AC4A6 /* Frameworks */,
 				C7AEC7F71FD0B4350039B562 /* Lunar */,
 				C7AEC7F61FD0B4350039B562 /* Products */,
@@ -685,6 +684,7 @@
 		C7CFEA241FD3787B000AC4A6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C7B2EB212947458300D02BCB /* WAYWindow.framework */,
 				C77C77512811A77B006326BE /* Sparkle.framework */,
 				C714C99A2805BDEA0061588E /* SkyLight.framework */,
 				C7C5AD9926C5AD5400D68B7F /* MonitorPanel.framework */,
@@ -692,7 +692,6 @@
 				C73B41EA263BE01F006F6783 /* LetsMove.framework */,
 				C7138D952634B02900406EE3 /* Paddle.framework */,
 				C74F8DBE25EB94660077DF27 /* DisplayServices.framework */,
-				C72CFB8C2586AE7E005F0340 /* WAYWindow.xcodeproj */,
 				C730421E2407E92C0016E591 /* Headers */,
 				C735DD791FD5C04D00FBD16F /* AppKit.framework */,
 				C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */,
@@ -846,7 +845,7 @@
 		C7AEC7ED1FD0B4350039B562 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1230;
+				LastSwiftUpdateCheck = 1410;
 				LastUpgradeCheck = 1400;
 				ORGANIZATIONNAME = Alin;
 				TargetAttributes = {
@@ -902,28 +901,12 @@
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = C72CFB8D2586AE7E005F0340 /* Products */;
-					ProjectRef = C72CFB8C2586AE7E005F0340 /* WAYWindow.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				C7AEC7F41FD0B4350039B562 /* Lunar */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		C72CFB912586AE7E005F0340 /* WAYWindow.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = WAYWindow.framework;
-			remoteRef = C72CFB902586AE7E005F0340 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		C7AEC7F31FD0B4350039B562 /* Resources */ = {
@@ -992,6 +975,7 @@
 				C7545E3225B1996300383AFB /* PopUpButton.swift in Sources */,
 				C76CB7A825CFD954007624DE /* ResetButton.swift in Sources */,
 				C7C1F7091FD639970039507C /* DataStore.swift in Sources */,
+				C795104B2944F035004C6082 /* Shared.swift in Sources */,
 				C794E1741FEFE31A00549462 /* ScrollableTextField.swift in Sources */,
 				C7E80E2D2637060F004718A4 /* Channel.swift in Sources */,
 				C7E242652119A65B0020326C /* LockButton.swift in Sources */,
@@ -1001,6 +985,7 @@
 				C7789AE01FF9029700D326A8 /* ScrollableContrast.swift in Sources */,
 				C7E0737A259CB2C20019C9C2 /* ManualMode.swift in Sources */,
 				C73AAC4B22241B690063AD2A /* Hotkeys.swift in Sources */,
+				C78A1964294E700800B0410A /* DDC2.c in Sources */,
 				C7714B0627E8F11C002E0B2E /* Presets.swift in Sources */,
 				C78BD04E259B369A00FC823F /* Popovers.swift in Sources */,
 				C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */,
@@ -1017,6 +1002,7 @@
 				C78F12222707328D009A3301 /* HotkeysChoiceViewController.swift in Sources */,
 				C7683425245227290087946C /* DisplayName.swift in Sources */,
 				C79975E125DEF2EC00C797FF /* GammaControl.swift in Sources */,
+				C7EBD80829452CB50075E6FD /* LunarShortcuts.swift in Sources */,
 				C7C68F09201B75C700F49A2B /* DeleteButton.swift in Sources */,
 				C76A12A020D8DDAD005D4BE3 /* BrightnessContrastChartView.swift in Sources */,
 				C731260F22B3A9CD001ED199 /* HelpPopoverController.swift in Sources */,
@@ -1158,7 +1144,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -1171,6 +1157,7 @@
 		C73B41E2263AA829006F6783 /* Test */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
 				BETA = NO;
@@ -1183,7 +1170,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.8.1a3;
+				CURRENT_PROJECT_VERSION = 5.8.1a6;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -1194,10 +1181,13 @@
 					"$(PROJECT_DIR)/Frameworks",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Frameworks/Sparkle",
+					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 				);
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/Frameworks/Shout/Sources/CSSH/libssh2";
 				INFOPLIST_FILE = Lunar/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Lunar;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -1211,7 +1201,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 5.8.1a3;
+				MARKETING_VERSION = 5.8.1a6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1222,11 +1212,10 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "Lunar/DDC/Lunar-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				SYSTEM_FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
-				);
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				SYSTEM_HEADER_SEARCH_PATHS = "";
 				TEST_MODE = YES;
+				USER_HEADER_SEARCH_PATHS = "";
 				WARNING_CFLAGS = (
 					"-Wno-deprecated-declarations",
 					"-Wno-incompatible-pointer-types-discards-qualifiers",
@@ -1281,7 +1270,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -1293,6 +1282,7 @@
 		C745CDC12636F65A00E119EB /* Beta */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
 				BETA = YES;
@@ -1305,7 +1295,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.8.1a3;
+				CURRENT_PROJECT_VERSION = 5.8.1a6;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1315,10 +1305,13 @@
 					"$(PROJECT_DIR)/Frameworks",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Frameworks/Sparkle",
+					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 				);
 				GCC_OPTIMIZATION_LEVEL = 1;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/Frameworks/Shout/Sources/CSSH/libssh2";
 				INFOPLIST_FILE = Lunar/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Lunar;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -1333,7 +1326,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 5.8.1a3;
+				MARKETING_VERSION = 5.8.1a6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
@@ -1344,11 +1337,10 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "Lunar/DDC/Lunar-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
-				SYSTEM_FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
-				);
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				SYSTEM_HEADER_SEARCH_PATHS = "";
 				TEST_MODE = NO;
+				USER_HEADER_SEARCH_PATHS = "";
 				WARNING_CFLAGS = (
 					"-Wno-deprecated-declarations",
 					"-Wno-incompatible-pointer-types-discards-qualifiers",
@@ -1409,7 +1401,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -1465,7 +1457,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -1477,6 +1469,7 @@
 		C7AEC81C1FD0B4350039B562 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
 				BETA = NO;
@@ -1489,7 +1482,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.8.1a3;
+				CURRENT_PROJECT_VERSION = 5.8.1a6;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -1500,10 +1493,13 @@
 					"$(PROJECT_DIR)/Frameworks",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Frameworks/Sparkle",
+					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 				);
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/Frameworks/Shout/Sources/CSSH/libssh2";
 				INFOPLIST_FILE = Lunar/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Lunar;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -1517,7 +1513,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 5.8.1a3;
+				MARKETING_VERSION = 5.8.1a6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1527,11 +1523,10 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "Lunar/DDC/Lunar-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				SYSTEM_FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
-				);
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				SYSTEM_HEADER_SEARCH_PATHS = "";
 				TEST_MODE = NO;
+				USER_HEADER_SEARCH_PATHS = "";
 				WARNING_CFLAGS = (
 					"-Wno-deprecated-declarations",
 					"-Wno-incompatible-pointer-types-discards-qualifiers",
@@ -1543,6 +1538,7 @@
 		C7AEC81D1FD0B4350039B562 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
 				BETA = NO;
@@ -1555,7 +1551,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.8.1a3;
+				CURRENT_PROJECT_VERSION = 5.8.1a6;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1565,10 +1561,13 @@
 					"$(PROJECT_DIR)/Frameworks",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Frameworks/Sparkle",
+					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 				);
 				GCC_OPTIMIZATION_LEVEL = 1;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/Frameworks/Shout/Sources/CSSH/libssh2";
 				INFOPLIST_FILE = Lunar/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Lunar;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -1583,7 +1582,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 5.8.1a3;
+				MARKETING_VERSION = 5.8.1a6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1592,11 +1591,10 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "Lunar/DDC/Lunar-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
-				SYSTEM_FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
-				);
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				SYSTEM_HEADER_SEARCH_PATHS = "";
 				TEST_MODE = NO;
+				USER_HEADER_SEARCH_PATHS = "";
 				WARNING_CFLAGS = (
 					"-Wno-deprecated-declarations",
 					"-Wno-incompatible-pointer-types-discards-qualifiers",

@@ -6,6 +6,7 @@
 //  Copyright © 2017 Alin. All rights reserved.
 //
 
+import AnyCodable
 import AXSwift
 import Cocoa
 import Combine
@@ -19,19 +20,331 @@ import Surge
 import SwiftDate
 import SwiftyJSON
 
-// MARK: - AVServiceMatch
+#if arch(arm64)
+    let DCP_NAMES = ["dcp", "dcpext", "dcp0"] + (0 ... 7).map { "dcpext\($0)" }
+    let DISP_NAMES = ["disp"] + (0 ... 7).map { "dispext\($0)" } + (0 ... 7).map { "disp\($0)" }
 
-enum AVServiceMatch {
-    case byEDIDUUID
-    case byProductAttributes
-    case byExclusion
+    func IOServiceNameMatches(_ service: io_service_t, names: [String]) -> Bool {
+        guard let name = IOServiceName(service) else { return false }
+        return names.contains(name)
+    }
+
+    func IOServiceName(_ service: io_service_t) -> String? {
+        let deviceNamePtr = UnsafeMutablePointer<CChar>.allocate(capacity: MemoryLayout<io_name_t>.size)
+        defer { deviceNamePtr.deallocate() }
+        deviceNamePtr.initialize(repeating: 0, count: MemoryLayout<io_name_t>.size)
+        defer { deviceNamePtr.deinitialize(count: MemoryLayout<io_name_t>.size) }
+
+        let kr = IORegistryEntryGetName(service, deviceNamePtr)
+        if kr != KERN_SUCCESS {
+            return nil
+        }
+
+        return String(cString: deviceNamePtr)
+    }
+
+    func isExternalDCPAVService(_ dcpAvServiceProxy: io_service_t) -> Bool {
+        var dcpAvServiceProperties: Unmanaged<CFMutableDictionary>?
+        let extractionResult = IORegistryEntryCreateCFProperties(
+            dcpAvServiceProxy,
+            &dcpAvServiceProperties,
+            kCFAllocatorDefault,
+            IOOptionBits()
+        )
+
+        guard extractionResult == KERN_SUCCESS,
+              let dcpAvCFProps = dcpAvServiceProperties, let dcpAvProps = dcpAvCFProps.takeRetainedValue() as? [String: Any],
+              let avServiceLocation = dcpAvProps["Location"] as? String
+        else { return false }
+        return avServiceLocation == "External"
+    }
+
+    func IOServiceFirstChildMatchingRecursively(_ service: io_service_t, names: [String]) -> io_service_t? {
+        var iterator = io_iterator_t()
+
+        guard IORegistryEntryCreateIterator(
+            service, kIOServicePlane, IOOptionBits(kIORegistryIterateRecursively), &iterator
+        ) == KERN_SUCCESS
+        else {
+            log.info("Can't create iterator for service \(service): (names: \(names))")
+            return nil
+        }
+
+        defer {
+            IOObjectRelease(iterator)
+        }
+        log.info("Looking for service (names: \(names)) in iterator \(iterator)")
+        return IOServiceFirstMatchingInIterator(iterator, names: names)
+    }
+
+    func IOServiceFirstMatchingInIterator(_ iterator: io_iterator_t, names: [String]) -> io_service_t? {
+        var service: io_service_t?
+
+        while case let txIOChild = IOIteratorNext(iterator), txIOChild != 0 {
+            if IOServiceNameMatches(txIOChild, names: names) {
+                service = txIOChild
+                log.info("Found service \(txIOChild) in iterator \(iterator): (names: \(names))")
+                break
+            }
+            IOObjectRelease(txIOChild)
+        }
+
+        return service
+    }
+
+    // MARK: - AVServiceMatch
+
+    enum AVServiceMatch {
+        case byEDIDUUID
+        case byProductAttributes
+        case byExclusion
+    }
+
+    class DCP: CustomStringConvertible, Hashable, Equatable {
+        deinit {
+            IOObjectRelease(dispService)
+            IOObjectRelease(dcpService)
+            IOObjectRelease(dcpAvServiceProxy)
+            IOObjectRelease(clcd2Service)
+        }
+        init?(dispService: io_service_t, txIOIterator: io_iterator_t, index: Int) {
+            guard let dispName = IOServiceName(dispService), DISP_NAMES.contains(dispName) else {
+                return nil
+            }
+
+            guard let dcpService = IOServiceFirstMatchingInIterator(txIOIterator, names: DCP_NAMES),
+                  let dcpName = IOServiceName(dcpService),
+                  let dcpAvServiceProxy = IOServiceFirstChildMatchingRecursively(dcpService, names: ["DCPAVServiceProxy"])
+            else {
+                log.debug("No DCPAVServiceProxy for \(dispName)")
+                return nil
+            }
+
+            guard let avService = AVServiceCreateFromDCPAVServiceProxy(dcpAvServiceProxy)?.takeRetainedValue(),
+                  !CFEqual(avService, 0 as IOAVService), isExternalDCPAVService(dcpAvServiceProxy)
+            else {
+                log.debug("No AVService for \(dispName)")
+                return nil
+            }
+
+            guard let clcd2Service = IOServiceFirstChildMatchingRecursively(dispService, names: ["AppleCLCD2"])
+            else {
+                log.debug("No AppleCLCD2 for \(dispName)")
+                return nil
+
+            }
+
+            var clcd2ServiceProperties: Unmanaged<CFMutableDictionary>?
+            var displayProps = [String: Any]()
+
+            let kernResult = IORegistryEntryCreateCFProperties(
+                clcd2Service, &clcd2ServiceProperties, kCFAllocatorDefault, IOOptionBits()
+            )
+            if kernResult == KERN_SUCCESS, let cfProps = clcd2ServiceProperties,
+               let props = cfProps.takeRetainedValue() as? [String: Any]
+            {
+                displayProps = props
+            } else {
+                log.debug("No display props for service \(dispName)")
+            }
+
+            var transport: Transport?
+            if let transportDict = displayProps["Transport"] as? [String: String] {
+                transport = Transport(
+                    upstream: transportDict["Upstream"] ?? "",
+                    downstream: transportDict["Downstream"] ?? ""
+                )
+            }
+
+            var displayAttributes = displayProps["DisplayAttributes"] as? [String: Any] ?? [:]
+            displayAttributes.removeValue(forKey: "TimingElements")
+            displayAttributes.removeValue(forKey: "ColorElements")
+
+            let productAttributes = displayAttributes["ProductAttributes"] as? [String: Any] ?? [:]
+
+            self.index = index
+            self.dispService = dispService
+            self.dcpService = dcpService
+            self.dcpAvServiceProxy = dcpAvServiceProxy
+            self.clcd2Service = clcd2Service
+            self.dispName = dispName
+            self.dcpName = dcpName
+            self.avService = avService
+            edidUUID = (displayProps["EDID UUID"] as? String) ?? (displayProps["IOMFBUUID"] as? String)
+            isMCDP = isMCDP29XX(dcpAvServiceProxy: dcpAvServiceProxy)
+            self.displayProps = displayAttributes
+            self.transport = transport
+            productName = productAttributes["ProductName"] as? String
+            productID = productAttributes["ProductID"] as? Int
+            serialNumber = productAttributes["SerialNumber"] as? Int
+            yearOfManufacture = productAttributes["YearOfManufacture"] as? Int
+            manufacturerID = productAttributes["ManufacturerID"] as? String
+            legacyManufacturerID = productAttributes["LegacyManufacturerID"] as? Int
+            nativeFormatHorizontalPixels = productAttributes["NativeFormatHorizontalPixels"] as? Int
+            nativeFormatVerticalPixels = productAttributes["NativeFormatVerticalPixels"] as? Int
+        }
+
+        let index: Int
+
+        let dispService: io_service_t
+        let dcpService: io_service_t
+        let dcpAvServiceProxy: io_service_t
+        let clcd2Service: io_service_t
+
+        let dispName: String
+        let dcpName: String
+
+        let avService: IOAVService
+        let edidUUID: String?
+        let isMCDP: Bool
+        let displayProps: [String: Any]
+        let transport: Transport?
+
+        let productName: String?
+        let productID: Int?
+        let serialNumber: Int?
+        let yearOfManufacture: Int?
+
+        let manufacturerID: String?
+        let legacyManufacturerID: Int?
+        let nativeFormatHorizontalPixels: Int?
+        let nativeFormatVerticalPixels: Int?
+
+        var scores: [CGDirectDisplayID: Int] = [:]
+
+        var scoreDict: [String: Int] {
+            scores.dict { id, score in
+                guard let display = displayController.activeDisplays[id] else { return nil }
+                return (display.description, score)
+            }
+        }
+
+        var description: String {
+            """
+            <DCP \(dispName)>
+                dispService: \(dispService)
+                dcpService: \(dcpService)
+                dcpAvServiceProxy: \(dcpAvServiceProxy)
+                clcd2Service: \(clcd2Service)
+                dcpName: \(dcpName)
+                avService: \(avService)
+                edidUUID: \(edidUUID ?? "nil")
+                isMCDP: \(isMCDP)
+                transport: \(transport ?? .init(upstream: "nil", downstream: "nil"))
+                productName: \(productName ?? "nil")
+                productID: \(productID ?? -1)
+                serialNumber: \(serialNumber ?? -1)
+                yearOfManufacture: \(yearOfManufacture ?? -1)
+                manufacturerID: \(manufacturerID ?? "nil")
+                legacyManufacturerID: \(legacyManufacturerID ?? -1)
+                nativeFormatHorizontalPixels: \(nativeFormatHorizontalPixels ?? -1)
+                nativeFormatVerticalPixels: \(nativeFormatVerticalPixels ?? -1)
+                displayProps: \((try? encoder.encode(ForgivingEncodable(displayProps)))?.s ?? "{}")
+                scores: \((try? encoder.encode(scoreDict))?.s ?? "{}")
+            """
+        }
+
+        static func == (lhs: DCP, rhs: DCP) -> Bool {
+            lhs.index == rhs.index &&
+                lhs.dispService == rhs.dispService &&
+                lhs.dispName == rhs.dispName
+        }
+
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(index)
+            hasher.combine(dispService)
+            hasher.combine(dispName)
+        }
+
+        func matchesEdidUUID(_ uuid: String) -> Bool {
+            guard let uuidPattern = uuid.r, let edidUUID else { return false }
+            log.debug("Testing EDID UUID pattern \(uuid) with \(edidUUID) for display \(self)")
+
+            let matched = uuidPattern.matches(edidUUID)
+            if matched {
+                log.debug("Matched EDID UUID pattern \(uuid) with \(edidUUID) for display \(self)")
+            }
+            return matched
+        }
+
+        func matchingScore(for display: Display, in displayIDs: [CGDirectDisplayID]? = nil) -> Int {
+            var score = 0
+
+//            let displayIDs = displayIDs ?? displayController.externalHardwareActiveDisplays.map(\.id).sorted()
+//            if let displayIndex = displayIDs.firstIndex(of: display.id) {
+//                score -= abs(index - displayIndex)
+//            }
+
+            if let edidUUID {
+                let uuids = display.possibleEDIDUUIDs()
+                if uuids.isEmpty {
+                    log.debug("No EDID UUID pattern to test with \(edidUUID) for display \(self)")
+                } else if let edidUUIDIndex = uuids.firstIndex(where: matchesEdidUUID(_:)) {
+                    score += uuids.count - edidUUIDIndex
+                }
+            }
+
+            score += DisplayController.displayInfoDictPartialMatchScore(
+                display: display,
+                name: productName,
+                serial: serialNumber,
+                productID: productID,
+                manufactureYear: yearOfManufacture,
+                vendorID: legacyManufacturerID,
+                width: nativeFormatHorizontalPixels,
+                height: nativeFormatVerticalPixels,
+                transport: transport
+            )
+
+            return score
+        }
+
+    }
+#endif
+
+public enum BackportSortOrder {
+    case forward
+    case reverse
+}
+
+public extension Collection {
+    func sorted(by keyPath: KeyPath<Element, some Comparable>, order: BackportSortOrder = .forward) -> [Element] {
+        sorted(by: { e1, e2 in
+            switch order {
+            case .forward:
+                return e1[keyPath: keyPath] < e2[keyPath: keyPath]
+            case .reverse:
+                return e1[keyPath: keyPath] > e2[keyPath: keyPath]
+            }
+        })
+    }
+
+}
+infix operator ?!: NilCoalescingPrecedence
+
+func ?! (_ str: String?, _ str2: String) -> String {
+    guard let str, !str.isEmpty else {
+        return str2
+    }
+    return str
+}
+
+func ?! (_ str: io_service_t?, _ str2: io_service_t?) -> io_service_t? {
+    guard let str, str != 0 else {
+        return str2
+    }
+    return str
+}
+func ?! (_ str: io_service_t?, _ str2: io_service_t) -> io_service_t {
+    guard let str, str != 0 else {
+        return str2
+    }
+    return str
 }
 
 // MARK: - DisplayController
 
 class DisplayController: ObservableObject {
-    // MARK: Lifecycle
-
     init() {
         watchControlAvailability()
         watchModeAvailability()
@@ -49,8 +362,6 @@ class DisplayController: ObservableObject {
         modeWatcherTask = nil
         screencaptureWatcherTask = nil
     }
-
-    // MARK: Internal
 
     static var panelManager: MPDisplayMgr? = MPDisplayMgr()
     static var manualModeFromSyncMode = false
@@ -92,10 +403,16 @@ class DisplayController: ObservableObject {
     let MODE_WATCHER_TASK_KEY = "modeWatcherTask"
     let CONTROL_WATCHER_TASK_KEY = "controlWatcherTask"
 
-    @Published var activeDisplayList: [Display] = []
-
     @Atomic var lastPidCount = 0
     @Atomic var gammaDisabledCompletely = CachedDefaults[.gammaDisabledCompletely]
+
+    @Published var activeDisplayList: [Display] = [] {
+        didSet {
+            #if arch(arm64)
+                DDC.dcpList = buildDCPList()
+            #endif
+        }
+    }
 
     @Atomic var lidClosed: Bool = isLidClosed() {
         didSet {
@@ -124,28 +441,39 @@ class DisplayController: ObservableObject {
 
     static func displayInfoDictPartialMatchScore(
         display: Display,
-        name: String,
-        serial: Int,
-        productID: Int,
-        manufactureYear: Int,
-        manufacturer _: String? = nil,
+        name: String?,
+        serial: Int?,
+        productID: Int?,
+        manufactureYear: Int?,
         vendorID: Int? = nil,
         width: Int? = nil,
-        height: Int? = nil
+        height: Int? = nil,
+        transport: Transport? = nil
     ) -> Int {
-        var score = (display.edidName.lowercased() == name.lowercased()).i
+        var score = 0
+
+        if let name {
+            score += display.edidName.lowercased() == name.lowercased() ? 1 : -1
+        }
 
         let infoDict = display.infoDictionary
 
-        if let displayYearManufacture = infoDict[kDisplayYearOfManufacture] as? Int64, displayYearManufacture != 0 {
+        if let manufactureYear, let displayYearManufacture = infoDict[kDisplayYearOfManufacture] as? Int64, displayYearManufacture != 0 {
             score += (displayYearManufacture == manufactureYear).i
         }
-        if let displaySerialNumber = infoDict[kDisplaySerialNumber] as? Int64, abs(displaySerialNumber.i - serial) < 3 {
+
+        if let serial, let displaySerialNumber = infoDict[kDisplaySerialNumber] as? Int64,
+           abs(displaySerialNumber.i - serial) < 3
+        {
             score += 3 - abs(displaySerialNumber.i - serial)
         }
-        if let displayProductID = infoDict[kDisplayProductID] as? Int64, abs(displayProductID.i - productID) < 3 {
+
+        if let productID, let displayProductID = infoDict[kDisplayProductID] as? Int64,
+           abs(displayProductID.i - productID) < 3
+        {
             score += 3 - abs(displayProductID.i - productID)
         }
+
         if let vendorID, let displayVendorID = infoDict[kDisplayVendorID] as? Int64,
            abs(displayVendorID.i - vendorID) < 3
         {
@@ -162,6 +490,13 @@ class DisplayController: ObservableObject {
            abs(displayHeight.i - height) < 3
         {
             score += 3 - abs(displayHeight.i - height)
+        }
+
+        if let transport, let transportType = infoDict["kDisplayTransportType"] as? Int,
+           let connection = Display.ConnectionType.fromTransport(transport),
+           let connection2 = Display.ConnectionType.fromTransportType(transportType)
+        {
+            score += connection == connection2 ? 1 : -1
         }
 
         return score
@@ -443,7 +778,6 @@ class DisplayController: ObservableObject {
                 serial: serial,
                 productID: productID,
                 manufactureYear: manufactureYear,
-                manufacturer: manufacturer,
                 vendorID: vendorID,
                 width: width,
                 height: height
@@ -456,25 +790,10 @@ class DisplayController: ObservableObject {
         return displayScores.max(count: 1, sortedBy: { first, second in first.1 <= second.1 }).first?.0
     }
 
-    func IOServiceNameMatches(_ service: io_service_t, names: [String]) -> Bool {
-        let deviceNamePtr = UnsafeMutablePointer<CChar>.allocate(capacity: MemoryLayout<io_name_t>.size)
-        defer { deviceNamePtr.deallocate() }
-        deviceNamePtr.initialize(repeating: 0, count: MemoryLayout<io_name_t>.size)
-        defer { deviceNamePtr.deinitialize(count: MemoryLayout<io_name_t>.size) }
-
-        let kr = IORegistryEntryGetName(service, deviceNamePtr)
-        if kr != KERN_SUCCESS {
-            return false
-        }
-        let deviceName = String(cString: deviceNamePtr)
-
-        return names.contains(deviceName)
-    }
-
     #if arch(arm64)
 
         func clcd2Properties(_ dispService: io_service_t) -> [String: Any]? {
-            guard let clcd2Service = firstChildMatching(dispService, names: ["AppleCLCD2"]) else { return nil }
+            guard let clcd2Service = IOServiceFirstChildMatchingRecursively(dispService, names: ["AppleCLCD2"]) else { return nil }
 
             var clcd2ServiceProperties: Unmanaged<CFMutableDictionary>?
             guard IORegistryEntryCreateCFProperties(
@@ -491,255 +810,205 @@ class DisplayController: ObservableObject {
             return displayProps
         }
 
-        func matchDisplayByEDIDUUID(_ service: io_service_t, displays: [Display]? = nil, props: [String: Any]? = nil) -> Display? {
-            guard let displayProps = props ?? clcd2Properties(service) else { return nil }
-            guard let edidUUID = displayProps["EDID UUID"] as? String
-            else {
-                log.info("No display matched for service \(service): (Can't find EDID UUID)")
-                return nil
-            }
+        // func matchDisplayByEDIDUUID(_ service: io_service_t, displays: [Display]? = nil, props: [String: Any]? = nil) -> Display? {
+        //     guard let displayProps = props ?? clcd2Properties(service) else { return nil }
+        //     guard let edidUUID = displayProps["EDID UUID"] as? String
+        //     else {
+        //         log.info("No display matched for service \(service): (Can't find EDID UUID)")
+        //         return nil
+        //     }
 
-            var transport: Transport?
-            if let transportDict = displayProps["Transport"] as? [String: String] {
-                transport = Transport(upstream: transportDict["Upstream"] ?? "", downstream: transportDict["Downstream"] ?? "")
-            }
+        //     var transport: Transport?
+        //     if let transportDict = displayProps["Transport"] as? [String: String] {
+        //         transport = Transport(upstream: transportDict["Upstream"] ?? "", downstream: transportDict["Downstream"] ?? "")
+        //     }
 
-            let activeDisplays = (displays ?? activeDisplays.values.map { $0 })
-            guard let display = activeDisplays.first(where: { $0.matchesEDIDUUID(edidUUID) }) else {
-                log.info("No UUID matched: (EDID UUID: \(edidUUID), Transport: \(transport?.description ?? "Unknown"))")
-                return nil
-            }
+        //     let activeDisplays = (displays ?? activeDisplays.values.map { $0 })
+        //     guard let display = activeDisplays.first(where: { $0.matchesEDIDUUID(edidUUID) }) else {
+        //         log.info("No UUID matched: (EDID UUID: \(edidUUID), Transport: \(transport?.description ?? "Unknown"))")
+        //         return nil
+        //     }
 
-            log.info("Matched display \(display) (EDID UUID: \(edidUUID), Transport: \(transport?.description ?? "Unknown"))")
-            display.transport = transport
-            display.audioIdentifier = edidUUID
-            return display
-        }
+        //     log.info("Matched display \(display) (EDID UUID: \(edidUUID), Transport: \(transport?.description ?? "Unknown"))")
+        //     display.transport = transport
+        //     display.audioIdentifier = edidUUID
+        //     return display
+        // }
 
-        func matchDisplayByExcludingOthers(_: io_service_t, displays: [Display]? = nil) -> Display? {
-            guard let display = displays?.first else { return nil }
+        // func matchDisplayByExcludingOthers(_: io_service_t, displays: [Display]? = nil) -> Display? {
+        //     guard let display = displays?.first else { return nil }
 
-            return display
-        }
+        //     return display
+        // }
 
-        func matchDisplayByProductAttributes(_ service: io_service_t, displays: [Display]? = nil, props: [String: Any]? = nil) -> Display? {
-            guard let displayProps = props ?? clcd2Properties(service) else { return nil }
+        // func matchDisplayByProductAttributes(_ service: io_service_t, displays: [Display]? = nil, props: [String: Any]? = nil) -> Display? {
+        //     guard let displayProps = props ?? clcd2Properties(service) else { return nil }
 
-            var transport: Transport?
-            if let transportDict = displayProps["Transport"] as? [String: String] {
-                transport = Transport(upstream: transportDict["Upstream"] ?? "", downstream: transportDict["Downstream"] ?? "")
-            }
+        //     var transport: Transport?
+        //     if let transportDict = displayProps["Transport"] as? [String: String] {
+        //         transport = Transport(upstream: transportDict["Upstream"] ?? "", downstream: transportDict["Downstream"] ?? "")
+        //     }
 
-            guard let displayAttributes = displayProps["DisplayAttributes"] as? [String: Any],
-                  let props = displayAttributes["ProductAttributes"] as? [String: Any],
-                  let name = props["ProductName"] as? String, let serial = props["SerialNumber"] as? Int,
-                  let productID = props["ProductID"] as? Int, let manufactureYear = props["YearOfManufacture"] as? Int
-            else {
-                log.info("No display matched for service \(service)")
-                log.verbose("displayProps: \(displayProps)")
-                return nil
-            }
+        //     guard let displayAttributes = displayProps["DisplayAttributes"] as? [String: Any],
+        //           let props = displayAttributes["ProductAttributes"] as? [String: Any],
+        //           let name = props["ProductName"] as? String, let serial = props["SerialNumber"] as? Int,
+        //           let productID = props["ProductID"] as? Int, let manufactureYear = props["YearOfManufacture"] as? Int
+        //     else {
+        //         log.info("No display matched for service \(service)")
+        //         log.verbose("displayProps: \(displayProps)")
+        //         return nil
+        //     }
 
-            var allActiveDisplays = Set(activeDisplays.values.map { $0 })
-            if let displays {
-                allActiveDisplays.formUnion(displays)
-            }
+        //     var allActiveDisplays = Set(activeDisplays.values.map { $0 })
+        //     if let displays {
+        //         allActiveDisplays.formUnion(displays)
+        //     }
 
-            guard let display = getMatchingDisplay(
-                name: name, serial: serial, productID: productID, manufactureYear: manufactureYear,
-                manufacturer: props["ManufacturerID"] as? String, vendorID: props["LegacyManufacturerID"] as? Int,
-                width: props["NativeFormatHorizontalPixels"] as? Int, height: props["NativeFormatVerticalPixels"] as? Int,
-                displays: Array(allActiveDisplays)
-            ) else {
-                return nil
-            }
+        //     guard let display = getMatchingDisplay(
+        //         name: name, serial: serial, productID: productID, manufactureYear: manufactureYear,
+        //         manufacturer: props["ManufacturerID"] as? String, vendorID: props["LegacyManufacturerID"] as? Int,
+        //         width: props["NativeFormatHorizontalPixels"] as? Int, height: props["NativeFormatVerticalPixels"] as? Int,
+        //         displays: Array(allActiveDisplays)
+        //     ) else {
+        //         return nil
+        //     }
 
-            log
-                .info(
-                    "Matched display \(display) (name: \(name), serial: \(serial), productID: \(productID), Transport: \(transport?.description ?? "Unknown"))"
-                )
-            display.transport = transport
-            return display
-        }
+        //     log
+        //         .info(
+        //             "Matched display \(display) (name: \(name), serial: \(serial), productID: \(productID), Transport: \(transport?.description ?? "Unknown"))"
+        //         )
+        //     display.transport = transport
+        //     return display
+        // }
 
-        func displayForIOService(_ service: io_service_t, displays: [Display]? = nil, match: AVServiceMatch) -> Display? {
-            switch match {
-            case .byEDIDUUID:
-                return matchDisplayByEDIDUUID(service, displays: displays)
-            case .byProductAttributes:
-                return matchDisplayByProductAttributes(service, displays: displays)
-            case .byExclusion:
-                return matchDisplayByExcludingOthers(service, displays: displays)
-            }
-        }
+        // func displayForIOService(_ service: io_service_t, displays: [Display]? = nil, match: AVServiceMatch) -> Display? {
+        //     switch match {
+        //     case .byEDIDUUID:
+        //         return matchDisplayByEDIDUUID(service, displays: displays)
+        //     case .byProductAttributes:
+        //         return matchDisplayByProductAttributes(service, displays: displays)
+        //     case .byExclusion:
+        //         return matchDisplayByExcludingOthers(service, displays: displays)
+        //     }
+        // }
 
-        func firstChildMatching(_ service: io_service_t, names: [String]) -> io_service_t? {
-            var iterator = io_iterator_t()
-
-            guard IORegistryEntryCreateIterator(service, kIOServicePlane, IOOptionBits(kIORegistryIterateRecursively), &iterator) ==
-                KERN_SUCCESS
-            else {
-                log.info("Can't create iterator for service \(service): (names: \(names))")
-                return nil
-            }
-
-            defer {
-                IOObjectRelease(iterator)
-            }
-            log.info("Looking for service (names: \(names)) in iterator \(iterator)")
-            return firstServiceMatching(iterator, names: names)
-        }
-
-        func firstServiceMatching(_ iterator: io_iterator_t, names: [String]) -> io_service_t? {
-            var service: io_service_t?
-
-            while case let txIOChild = IOIteratorNext(iterator), txIOChild != 0 {
-                if IOServiceNameMatches(txIOChild, names: names) {
-                    service = txIOChild
-                    log.info("Found service \(txIOChild) in iterator \(iterator): (names: \(names))")
-                    break
-                }
-                IOObjectRelease(txIOChild)
-            }
-
-            return service
-        }
-
-        var clcd2Mapping: ThreadSafeDictionary<Int, CGDirectDisplayID> = ThreadSafeDictionary()
-
-        let DCP_NAMES = ["dcp", "dcpext"] + (0 ... 7).map { "dcpext\($0)" }
-        let DISP_EPIC_NAMES = (0 ... 7).map { "dispext\($0):dcpav-service-epic:0" }
-        let DISP_NAMES = (0 ... 7).map { "dispext\($0)" } + (0 ... 7).map { "disp\($0)" }
-
-        func avService(displayID: CGDirectDisplayID, display: Display? = nil, match: AVServiceMatch) -> IOAVService? {
-            guard match != .byExclusion || Set(DDC.avServiceCache.dictionary.keys)
-                .isSuperset(of: activeDisplayList.filter(\.shouldDetectI2C).map(\.id)) else { return nil }
-
-            let forceDDC = (display?.forceDDC ?? false)
-            guard !isTestID(displayID), NSScreen.isOnline(displayID),
-                  forceDDC || (!DDC.isVirtualDisplay(displayID, checkName: false))
-            else {
-                log.info("""
-                    No AVService for display \(displayID): (
-                        isOnline: \(NSScreen.isOnline(displayID)),
-                        isVirtual: \(DDC.isVirtualDisplay(displayID, checkName: false)),
-                        MCDP: \(display?.mcdp ?? false)
-                    )
-                """)
-                return nil
-            }
-
-            if forceDDC {
-                log.info("Forcing DDC assignment for \(displayID)")
-            }
-
-            var clcd2Num = 0
-            var txIOIterator = io_iterator_t()
-            var txIOService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleT810xIO"))
-            if txIOService == 0 {
-                txIOService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleT600xIO"))
-            }
-            if txIOService == 0 {
-                txIOService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleT811xIO"))
-            }
-
-            defer {
-                if txIOService != 0 {
-                    IOObjectRelease(txIOService)
-                }
-            }
-
-            let childIteratorErr = (txIOService != 0)
-                ? IORegistryEntryGetChildIterator(txIOService, kIOServicePlane, &txIOIterator)
-                : KERN_SUCCESS
-            guard txIOService != 0, childIteratorErr == KERN_SUCCESS
-            else {
-                log.warning("Can't iterate AppleT810xIO/AppleT600xIO/AppleT811xIO")
-                log.info("""
-                    No AVService for display \(displayID): (
-                        txIOService: \(txIOService),
-                        childIteratorErr: \(childIteratorErr)
-                    )
-                """)
-                return nil
-            }
-
-            defer {
-                if txIOIterator != 0 {
-                    IOObjectRelease(txIOIterator)
-                }
-            }
-
-            var matchedDisplay: Display?
-            while case let txIOChild = IOIteratorNext(txIOIterator), txIOChild != 0 {
-                defer {
-                    IOObjectRelease(txIOChild)
-                }
-
-                if IOServiceNameMatches(txIOChild, names: DISP_NAMES) {
-                    clcd2Num += 1
-                    guard clcd2Mapping[clcd2Num] == nil || clcd2Mapping[clcd2Num] == displayID else { continue }
-
-                    if let d = displayForIOService(txIOChild, displays: display != nil ? [display!] : nil, match: match),
-                       d.id == displayID
-                    {
-                        matchedDisplay = d
-                        break
-                    }
-                }
-            }
-
-            guard let display = matchedDisplay else {
-                log.info("No AVService for display \(displayID): (no matched display)")
-                return nil
-            }
-
-            guard let dcpService = firstServiceMatching(txIOIterator, names: DCP_NAMES),
-                  let dcpAvServiceProxy = firstChildMatching(dcpService, names: ["DCPAVServiceProxy"])
-            else {
-                log.warning("No DCPAVServiceProxy for display with ID: \(displayID)")
-                return nil
-            }
-
-            defer {
-                IOObjectRelease(dcpService)
-                IOObjectRelease(dcpAvServiceProxy)
-            }
-
-            if isMCDP29XX(dcpService: dcpService, display: display, clcd2Num: clcd2Num) {
-                display.mcdp = true
-//                if !forceDDC {
-//                    return nil
+//        func avService(displayID: CGDirectDisplayID, display: Display? = nil, match: AVServiceMatch) -> IOAVService? {
+//            if match == .byExclusion {
+//                let matchedIDs = Set(DDC.avServiceCache.dictionary.keys)
+//                let idsToMatch = activeDisplayList.filter(\.shouldDetectI2C).map(\.id)
+//                guard matchedIDs.isSuperset(of: idsToMatch) else { return nil }
+//            }
+//
+//            let forceDDC = (display?.forceDDC ?? false)
+//            guard !isTestID(displayID), NSScreen.isOnline(displayID),
+//                  forceDDC || (!DDC.isVirtualDisplay(displayID, checkName: false))
+//            else {
+//                log.info("""
+//                    No AVService for display \(displayID): (
+//                        isOnline: \(NSScreen.isOnline(displayID)),
+//                        isVirtual: \(DDC.isVirtualDisplay(displayID, checkName: false)),
+//                        MCDP: \(display?.mcdp ?? false)
+//                    )
+//                """)
+//                return nil
+//            }
+//
+//            if forceDDC {
+//                log.info("Forcing DDC assignment for \(displayID)")
+//            }
+//
+//            var clcd2Num = 0
+//            var txIOIterator = io_iterator_t()
+//            var txIOService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleT810xIO"))
+//            if txIOService == 0 {
+//                txIOService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleT600xIO"))
+//            }
+//            if txIOService == 0 {
+//                txIOService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleT811xIO"))
+//            }
+//
+//            defer {
+//                if txIOService != 0 {
+//                    IOObjectRelease(txIOService)
 //                }
-            }
-
-            guard let ioAvService = AVServiceCreateFromDCPAVServiceProxy(dcpAvServiceProxy)?.takeRetainedValue(),
-                  !CFEqual(ioAvService, 0 as IOAVService), isExternalDCPAVService(dcpAvServiceProxy)
-            else {
-                log.warning("No AVService for display with ID: \(displayID)")
-                return nil
-            }
-            log.info("Found AVService for display \(display): \(CFCopyDescription(ioAvService) as String)")
-
-            clcd2Mapping[clcd2Num] = displayID
-            return ioAvService
-        }
-
-        func isExternalDCPAVService(_ dcpAvServiceProxy: io_service_t) -> Bool {
-            var dcpAvServiceProperties: Unmanaged<CFMutableDictionary>?
-            let extractionResult = IORegistryEntryCreateCFProperties(
-                dcpAvServiceProxy,
-                &dcpAvServiceProperties,
-                kCFAllocatorDefault,
-                IOOptionBits()
-            )
-
-            guard extractionResult == KERN_SUCCESS,
-                  let dcpAvCFProps = dcpAvServiceProperties, let dcpAvProps = dcpAvCFProps.takeRetainedValue() as? [String: Any],
-                  let avServiceLocation = dcpAvProps["Location"] as? String
-            else { return false }
-            return avServiceLocation == "External"
-        }
+//            }
+//
+//            let childIteratorErr = (txIOService != 0)
+//                ? IORegistryEntryGetChildIterator(txIOService, kIOServicePlane, &txIOIterator)
+//                : KERN_SUCCESS
+//            guard txIOService != 0, childIteratorErr == KERN_SUCCESS
+//            else {
+//                log.warning("Can't iterate AppleT810xIO/AppleT600xIO/AppleT811xIO")
+//                log.info("""
+//                    No AVService for display \(displayID): (
+//                        txIOService: \(txIOService),
+//                        childIteratorErr: \(childIteratorErr)
+//                    )
+//                """)
+//                return nil
+//            }
+//
+//            defer {
+//                if txIOIterator != 0 {
+//                    IOObjectRelease(txIOIterator)
+//                }
+//            }
+//
+//            var matchedDisplay: Display?
+//            while case let txIOChild = IOIteratorNext(txIOIterator), txIOChild != 0 {
+//                defer {
+//                    IOObjectRelease(txIOChild)
+//                }
+//
+//                if let name = IOServiceName(txIOChild), DISP_NAMES.contains(name) {
+//                    log.debug("Iterating \(name)")
+//                    clcd2Num += 1
+//                    guard clcd2Mapping[clcd2Num] == nil || clcd2Mapping[clcd2Num] == displayID else { continue }
+//
+//                    if let d = displayForIOService(txIOChild, displays: display != nil ? [display!] : nil, match: match),
+//                       d.id == displayID
+//                    {
+//                        matchedDisplay = d
+//                        break
+//                    }
+//                }
+//            }
+//
+//            guard let display = matchedDisplay else {
+//                log.info("No AVService for display \(displayID): (no matched display)")
+//                return nil
+//            }
+//
+//            guard let dcpService = IOServiceFirstMatchingInIterator(txIOIterator, names: DCP_NAMES),
+//                  let dcpAvServiceProxy = IOServiceFirstChildMatchingRecursively(dcpService, names: ["DCPAVServiceProxy"])
+//            else {
+//                log.warning("No DCPAVServiceProxy for display with ID: \(displayID)")
+//                return nil
+//            }
+//
+//            defer {
+//                IOObjectRelease(dcpService)
+//                IOObjectRelease(dcpAvServiceProxy)
+//            }
+//
+//            if isMCDP29XX(dcpAvServiceProxy: dcpAvServiceProxy) {
+//                display.mcdp = true
+        ////                if !forceDDC {
+        ////                    return nil
+        ////                }
+//            }
+//
+//            guard let ioAvService = AVServiceCreateFromDCPAVServiceProxy(dcpAvServiceProxy)?.takeRetainedValue(),
+//                  !CFEqual(ioAvService, 0 as IOAVService), isExternalDCPAVService(dcpAvServiceProxy)
+//            else {
+//                log.warning("No AVService for display with ID: \(displayID)")
+//                return nil
+//            }
+//            log.info("Found AVService for display \(display): \(CFCopyDescription(ioAvService) as String)")
+//
+//            clcd2Mapping[clcd2Num] = displayID
+//            return ioAvService
+//        }
     #endif
 
     enum XDRState {
@@ -749,6 +1018,8 @@ class DisplayController: ObservableObject {
         case enabledAutomatically
         case disabledAutomatically
     }
+
+    static var nonZeroBuiltinMinBrightness: NSNumber = -1
 
     var screencaptureIsRunning: CurrentValueSubject<Bool, Never> = .init(processIsRunning("/usr/sbin/screencapture", nil))
 
@@ -858,7 +1129,11 @@ class DisplayController: ObservableObject {
     }
 
     var externalActiveDisplays: [Display] {
-        activeDisplays.values.filter { !$0.isBuiltin }
+        activeDisplayList.filter { !$0.isBuiltin }
+    }
+
+    var externalHardwareActiveDisplays: [Display] {
+        activeDisplayList.filter { !$0.isBuiltin && !$0.isSidecar && !$0.isAirplay && !$0.isFakeDummy }
     }
 
     var nonDummyDisplays: [Display] {
@@ -900,7 +1175,6 @@ class DisplayController: ObservableObject {
     var targetDisplays: [Display] {
         activeDisplays.values.filter { !$0.isSource }
     }
-
     @AtomicLock var displays: [CGDirectDisplayID: Display] = [:] {
         didSet {
             activeDisplays = displays.filter { $1.active }
@@ -1450,10 +1724,10 @@ class DisplayController: ObservableObject {
 
     func appBrightnessContrastOffset(for display: Display) -> (Int, Int)? {
         guard lunarProActive, !display.enhanced, let exceptions = runningAppExceptions, !exceptions.isEmpty,
-              let screen = display.screen
+              let screen = display.nsScreen
         else {
             log.debug("!exceptions: \(runningAppExceptions ?? [])")
-            log.debug("!screen: \(display.screen?.description ?? "")")
+            log.debug("!screen: \(display.nsScreen?.description ?? "")")
             log.debug("!xdr: \(display.enhanced)")
             mainAsync { display.appPreset = nil }
             return nil
@@ -1722,7 +1996,7 @@ class DisplayController: ObservableObject {
               !display.isAppleDisplay() else { return false }
 
         if !SyncMode.possibleClamshellModeSoon, !displayController.screensSleeping,
-           let screen = display.screen, !screen.visibleFrame.isEmpty, timeSince(display.lastConnectionTime) > 10,
+           let screen = display.nsScreen, !screen.visibleFrame.isEmpty, timeSince(display.lastConnectionTime) > 10,
            let control = display.control, !control.isResponsive()
         {
             if let promptTime = display.fallbackPromptTime {
@@ -1743,7 +2017,7 @@ class DisplayController: ObservableObject {
 
         appDelegate?.valuesReaderThread = nil
         activeDisplayList.filter(\.ambientLightCompensationEnabledByUser).forEach { d in
-            d.ambientLightAdaptiveBrightnessEnabled = true
+            d.systemAdaptiveBrightness = true
         }
         if xdrContrastEnabled, displayController.xdrContrast > 0 {
             setXDRContrast(0, now: true)
@@ -1819,7 +2093,7 @@ class DisplayController: ObservableObject {
             okButton: "Yes",
             cancelButton: "Not now",
             thirdButton: "No, never ask again",
-            screen: display.screen ?? display.primaryMirrorScreen,
+            screen: display.nsScreen ?? display.primaryMirrorScreen,
             window: window,
             suppressionText: "Always fallback to software controls for this display when needed",
             onSuppression: { fallback in

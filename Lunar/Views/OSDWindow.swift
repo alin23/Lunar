@@ -6,10 +6,8 @@ import SwiftUI
 // MARK: - OSDWindow
 
 open class OSDWindow: NSWindow, NSWindowDelegate {
-    // MARK: Lifecycle
-
     convenience init(swiftuiView: AnyView, display: Display, releaseWhenClosed: Bool) {
-        self.init(contentRect: .zero, styleMask: .fullSizeContentView, backing: .buffered, defer: true, screen: display.screen)
+        self.init(contentRect: .zero, styleMask: .fullSizeContentView, backing: .buffered, defer: true, screen: display.nsScreen)
         self.display = display
         contentViewController = NSHostingController(rootView: swiftuiView)
 
@@ -29,15 +27,13 @@ open class OSDWindow: NSWindow, NSWindowDelegate {
         delegate = self
     }
 
-    // MARK: Open
-
     open func show(
         at point: NSPoint? = nil,
         closeAfter closeMilliseconds: Int = 3050,
         fadeAfter fadeMilliseconds: Int = 2000,
         verticalOffset: CGFloat? = nil
     ) {
-        guard let screen = display?.screen else { return }
+        guard let screen = display?.nsScreen else { return }
         if let point {
             setFrameOrigin(point)
         } else {
@@ -72,8 +68,6 @@ open class OSDWindow: NSWindow, NSWindowDelegate {
         }
     }
 
-    // MARK: Public
-
     public func hide() {
         fader = nil
         endFader = nil
@@ -92,8 +86,6 @@ open class OSDWindow: NSWindow, NSWindowDelegate {
         windowController = nil
         return true
     }
-
-    // MARK: Internal
 
     weak var display: Display?
     lazy var wc = NSWindowController(window: self)
@@ -152,8 +144,6 @@ extension Color {
 // MARK: - BigSurSlider
 
 public struct BigSurSlider: View {
-    // MARK: Lifecycle
-
     public init(
         percentage: Binding<Float>,
         sliderWidth: CGFloat = 200,
@@ -192,8 +182,6 @@ public struct BigSurSlider: View {
         _knobColor = knobColorBinding ?? colorBinding ?? .constant(knobColor ?? colors.accent)
         _knobTextColor = knobTextColorBinding ?? .constant(knobTextColor ?? ((color ?? Colors.peach).textColor))
     }
-
-    // MARK: Public
 
     public var body: some View {
         GeometryReader { geometry in
@@ -319,8 +307,6 @@ public struct BigSurSlider: View {
         }
     }
 
-    // MARK: Internal
-
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.colors) var colors
     @EnvironmentObject var env: EnvState
@@ -409,8 +395,6 @@ var draggingSliderSetter: DispatchWorkItem? {
 // MARK: - Colors
 
 public struct Colors {
-    // MARK: Lifecycle
-
     public init(_ colorScheme: SwiftUI.ColorScheme = .light, accent: Color) {
         self.accent = accent
         self.colorScheme = colorScheme
@@ -418,31 +402,21 @@ public struct Colors {
         fg = FG(colorScheme: colorScheme)
     }
 
-    // MARK: Public
-
     public struct FG {
-        // MARK: Public
-
         public var colorScheme: SwiftUI.ColorScheme
 
         public var isDark: Bool { colorScheme == .dark }
         public var isLight: Bool { colorScheme == .light }
-
-        // MARK: Internal
 
         var gray: Color { isDark ? Colors.lightGray : Colors.darkGray }
         var primary: Color { isDark ? .white : .black }
     }
 
     public struct BG {
-        // MARK: Public
-
         public var colorScheme: SwiftUI.ColorScheme
 
         public var isDark: Bool { colorScheme == .dark }
         public var isLight: Bool { colorScheme == .light }
-
-        // MARK: Internal
 
         var gray: Color { isDark ? Colors.darkGray : Colors.lightGray }
         var primary: Color { isDark ? .black : .white }
@@ -777,8 +751,6 @@ import SwiftUI
 // MARK: - PanelWindow
 
 open class PanelWindow: NSWindow {
-    // MARK: Lifecycle
-
     public convenience init(swiftuiView: AnyView) {
         self.init(contentViewController: NSHostingController(rootView: swiftuiView))
 
@@ -795,8 +767,6 @@ open class PanelWindow: NSWindow {
         hidesOnDeactivate = false
         isMovableByWindowBackground = false
     }
-
-    // MARK: Open
 
     override open var canBecomeKey: Bool { true }
 
@@ -824,15 +794,11 @@ open class PanelWindow: NSWindow {
         NSApp.activate(ignoringOtherApps: true)
     }
 
-    // MARK: Public
-
     public func forceClose() {
         wc.close()
         wc.window = nil
         close()
     }
-
-    // MARK: Private
 
     private lazy var wc = NSWindowController(window: self)
 }

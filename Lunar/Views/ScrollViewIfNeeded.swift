@@ -25,8 +25,6 @@ import SwiftUI
 // MARK: - ScrollViewIfNeeded
 
 public struct ScrollViewIfNeeded<Content>: View where Content: View {
-    // MARK: Lifecycle
-
     /// Creates a new instance that's scrollable in the direction of the given
     /// axis and can show indicators while scrolling if the
     /// Content's size is greater than the ScrollView's.
@@ -44,8 +42,6 @@ public struct ScrollViewIfNeeded<Content>: View where Content: View {
         self.showsIndicators = showsIndicators
         self.content = content()
     }
-
-    // MARK: Public
 
     /// The scroll view's content.
     public var content: Content
@@ -84,13 +80,9 @@ public struct ScrollViewIfNeeded<Content>: View where Content: View {
         }
     }
 
-    // MARK: Internal
-
     var activeScrollingDirections: Axis.Set {
         axes.intersection((fitsVertically ? [] : Axis.Set.vertical).union(fitsHorizontally ? [] : Axis.Set.horizontal))
     }
-
-    // MARK: Private
 
     private struct ViewSizeKey: PreferenceKey {
         static var defaultValue: CGSize { .zero }
@@ -186,8 +178,6 @@ struct ScrollViewIfNeeded_Previews: PreviewProvider {
     }
 }
 
-// MARK: - OverflowContentViewModifier
-
 var menuOverflowSetter: DispatchWorkItem? {
     didSet { oldValue?.cancel() }
 }
@@ -195,8 +185,6 @@ var menuOverflowSetter: DispatchWorkItem? {
 // MARK: - OverflowContentViewModifier
 
 struct OverflowContentViewModifier: ViewModifier {
-    // MARK: Internal
-
     @EnvironmentObject var env: EnvState
 
     func body(content: Content) -> some View {
@@ -226,8 +214,6 @@ struct OverflowContentViewModifier: ViewModifier {
             )
             .wrappedInScrollView(when: contentOverflow, pauseScrolling: pauseScrolling)
     }
-
-    // MARK: Private
 
     @State private var contentOverflow = false
     @State var pauseScrolling = false
@@ -294,8 +280,6 @@ extension View {
 // MARK: - BetterScrollView
 
 class BetterScrollView: NSScrollView {
-    // MARK: Lifecycle
-
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
     }
@@ -303,8 +287,6 @@ class BetterScrollView: NSScrollView {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
-
-    // MARK: Internal
 
     var scrollingEnabled = true
 

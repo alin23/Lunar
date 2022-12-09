@@ -4,13 +4,9 @@ import Foundation
 // MARK: - SliderCell
 
 class SliderCell: NSSliderCell {
-    // MARK: Lifecycle
-
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
-
-    // MARK: Internal
 
     @Atomic var pressed = false
 
@@ -54,13 +50,15 @@ class SliderCell: NSSliderCell {
     override func drawKnob(_ knobRect: NSRect) {
         let size = verticalPadding
         let rect = NSRect(x: knobRect.midX - (size / 2) + 0.5, y: knobRect.midY - (size / 2) - 1.5, width: size - 1, height: size - 1)
-        let value = (minValue == 0 && maxValue == 1) ? CGFloat(floatValue) : CGFloat(mapNumber(
-            doubleValue,
-            fromLow: minValue,
-            fromHigh: maxValue,
-            toLow: 0.0,
-            toHigh: 1.0
-        ))
+        let value = (minValue == 0 && maxValue == 1)
+            ? CGFloat(floatValue)
+            : CGFloat(mapNumber(
+                doubleValue,
+                fromLow: minValue,
+                fromHigh: maxValue,
+                toLow: 0.0,
+                toHigh: 1.0
+            ))
 
         // Stolen from @waydabber: https://github.com/MonitorControl/MonitorControl/blob/1f595ff1df40b65c77d26a91a7f0de231eabb921/MonitorControl/Support/SliderHandler.swift#L111-L117
         let knobShadowAlpha = 0.03 * CGFloat(
@@ -137,13 +135,15 @@ class SliderCell: NSSliderCell {
         sliderBorderColor.withAlphaComponent(borderOpacity).setStroke()
         bg.stroke()
 
-        let value = (minValue == 0 && maxValue == 1) ? CGFloat(floatValue) : CGFloat(mapNumber(
-            doubleValue,
-            fromLow: minValue,
-            fromHigh: maxValue,
-            toLow: 0.0,
-            toHigh: 1.0
-        ))
+        let value = (minValue == 0 && maxValue == 1)
+            ? CGFloat(floatValue)
+            : CGFloat(mapNumber(
+                doubleValue,
+                fromLow: minValue,
+                fromHigh: maxValue,
+                toLow: 0.0,
+                toHigh: 1.0
+            ))
 
         var fillWidth: CGFloat
         var fillRect: NSRect
@@ -197,8 +197,6 @@ class ClickThroughImageView: NSImageView {
 // MARK: - Slider
 
 class Slider: NSSlider {
-    // MARK: Lifecycle
-
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setup()
@@ -208,8 +206,6 @@ class Slider: NSSlider {
         super.init(frame: frameRect)
         setup()
     }
-
-    // MARK: Internal
 
     @IBInspectable dynamic var scrollPrecision: CGFloat = 1
 
@@ -288,13 +284,9 @@ class Slider: NSSlider {
 // MARK: - VolumeSliderCell
 
 class VolumeSliderCell: NSSliderCell {
-    // MARK: Lifecycle
-
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
-
-    // MARK: Internal
 
     let volumeImage = NSImage(named: "volume-low")
 
@@ -325,8 +317,6 @@ class VolumeSliderCell: NSSliderCell {
 // MARK: - VolumeSlider
 
 class VolumeSlider: NSSlider {
-    // MARK: Lifecycle
-
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setup()
@@ -336,8 +326,6 @@ class VolumeSlider: NSSlider {
         super.init(frame: frameRect)
         setup()
     }
-
-    // MARK: Internal
 
     override var knobThickness: CGFloat { 6 }
 

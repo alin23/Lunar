@@ -13,8 +13,6 @@ import Solar
 import SwiftyJSON
 
 class Geolocation: NSObject, Codable, Defaults.Serializable {
-    // MARK: Lifecycle
-
     init?(location: CLLocation) {
         guard location.coordinate.latitude != 0 || location.coordinate.longitude != 0 else { return nil }
         latitude = location.coordinate.latitude
@@ -54,10 +52,6 @@ class Geolocation: NSObject, Codable, Defaults.Serializable {
         super.init()
     }
 
-    // MARK: Internal
-
-    // MARK: Codable
-
     enum CodingKeys: String, CodingKey {
         case latitude
         case longitude
@@ -92,8 +86,6 @@ class Geolocation: NSObject, Codable, Defaults.Serializable {
     func sun(date: Date? = nil) -> Sun? {
         solar?.computeSunPosition(date: date)
     }
-
-    // MARK: UserDefaults
 
     func store() {
         CachedDefaults[.location] = self

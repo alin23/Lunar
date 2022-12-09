@@ -89,7 +89,7 @@ class HotkeyPopoverController: NSViewController {
         // #if DEBUG
         //     log.verbose("TRYING CHANGE TO INPUT \(input) ON DISPLAY \(display)")
         // #endif
-        guard let display, input.uint16Value != InputSource.unknown.rawValue else { return }
+        guard let display, input.uint16Value != VideoInputSource.unknown.rawValue else { return }
 
         // #if DEBUG
         //     log.verbose("CHANGING TO INPUT \(input) ON DISPLAY \(display)")

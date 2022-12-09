@@ -28,11 +28,7 @@ import Cocoa
 
 // @IBDesignable
 class MacToggle: NSView {
-    // MARK: Lifecycle
-
     //================================================================================
-
-    // MARK: Initialization
 
     //================================================================================
 
@@ -47,11 +43,7 @@ class MacToggle: NSView {
         drawView()
     }
 
-    // MARK: Public
-
     //================================================================================
-
-    // MARK: Properties
 
     //================================================================================
 
@@ -74,8 +66,6 @@ class MacToggle: NSView {
     }
 
     //================================================================================
-
-    // MARK: Public Parameters
 
     //================================================================================
 
@@ -133,11 +123,7 @@ class MacToggle: NSView {
         didSet { backVw.bg = backColor }
     }
 
-    // MARK: Internal
-
     //================================================================================
-
-    // MARK: Callback
 
     //================================================================================
 
@@ -174,8 +160,6 @@ class MacToggle: NSView {
 
         isOn = !isOn
     }
-
-    // MARK: Fileprivate
 
     fileprivate var height: CGFloat = 26
     fileprivate var leftConstraint: NSLayoutConstraint?
@@ -222,8 +206,6 @@ class MacToggle: NSView {
     fileprivate var toggleSize: CGFloat { height - (outlineWidth * 2) }
 
     //================================================================================
-
-    // MARK: Helpers
 
     //================================================================================
 

@@ -9,8 +9,6 @@
 import Cocoa
 
 class DisplayName: NSTextField, NSTextFieldDelegate {
-    // MARK: Lifecycle
-
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()
@@ -20,8 +18,6 @@ class DisplayName: NSTextField, NSTextFieldDelegate {
         super.init(coder: coder)
         setup()
     }
-
-    // MARK: Internal
 
     var centerAlign: NSParagraphStyle?
     var trackingArea: NSTrackingArea?

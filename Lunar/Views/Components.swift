@@ -49,8 +49,6 @@ struct SettingsToggle: View {
     }
 }
 
-// MARK: - Extensions
-
 extension Animation {
     #if os(iOS)
         static var fastTransition = Animation.easeOut(duration: 0.1)
@@ -110,8 +108,6 @@ extension View {
 // MARK: - FlatButton
 
 public struct FlatButton: ButtonStyle {
-    // MARK: Lifecycle
-
     public init(
         color: Color? = nil,
         textColor: Color? = nil,
@@ -142,8 +138,6 @@ public struct FlatButton: ButtonStyle {
         _stretch = State(initialValue: stretch)
         _disabled = disabled ?? .constant(false)
     }
-
-    // MARK: Public
 
     public func makeBody(configuration: Configuration) -> some View {
         configuration
@@ -216,8 +210,6 @@ public struct FlatButton: ButtonStyle {
             .disabled(disabled)
     }
 
-    // MARK: Internal
-
     @Environment(\.colors) var colors
 
     @Binding var color: Color
@@ -240,14 +232,13 @@ public struct FlatButton: ButtonStyle {
 // MARK: - PickerButton
 
 public struct PickerButton<T: Equatable>: ButtonStyle {
-    // MARK: Public
-
     public func makeBody(configuration: Configuration) -> some View {
         configuration
             .label
             .foregroundColor(
-                enumValue == onValue ? (onTextColor ?? (colorScheme == .dark ? colors.accent : Color.white)) :
-                    offTextColor
+                enumValue == onValue
+                    ? (onTextColor ?? (colorScheme == .dark ? colors.accent : Color.white))
+                    : offTextColor
             )
             .padding(.vertical, verticalPadding)
             .padding(.horizontal, horizontalPadding)
@@ -257,8 +248,9 @@ public struct PickerButton<T: Equatable>: ButtonStyle {
                     style: .continuous
                 )
                 .fill(
-                    enumValue == onValue ? (onColor ?? Color.primary.opacity(colorScheme == .dark ? 0.15 : 0.9)) :
-                        (offColor ?? color.opacity(colorScheme == .dark ? 0.5 : 0.8))
+                    enumValue == onValue
+                        ? (onColor ?? Color.primary.opacity(colorScheme == .dark ? 0.15 : 0.9))
+                        : (offColor ?? color.opacity(colorScheme == .dark ? 0.5 : 0.8))
                 )
 
             ).scaleEffect(scale).colorMultiply(hoverColor)
@@ -275,8 +267,6 @@ public struct PickerButton<T: Equatable>: ButtonStyle {
                 }
             })
     }
-
-    // MARK: Internal
 
     @Environment(\.colors) var colors
     @Environment(\.colorScheme) var colorScheme
@@ -300,8 +290,6 @@ public struct PickerButton<T: Equatable>: ButtonStyle {
 struct CheckboxToggleStyle: ToggleStyle {
     enum Style {
         case square, circle
-
-        // MARK: Internal
 
         var sfSymbolName: String {
             switch self {
@@ -359,13 +347,9 @@ class SizedPopUpButton: NSPopUpButton {
 
 struct Dropdown<T: Nameable>: NSViewRepresentable {
     class Coordinator: NSObject {
-        // MARK: Lifecycle
-
         init(_ popUpButton: Dropdown) {
             button = popUpButton
         }
-
-        // MARK: Internal
 
         var button: Dropdown
         var observer: Cancellable?

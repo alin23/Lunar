@@ -18,8 +18,6 @@ let DEFAULT_APP_BRIGHTNESS_CONTRAST = 0.8
 // MARK: - AppException
 
 @objc class AppException: NSObject, Codable, Defaults.Serializable {
-    // MARK: Lifecycle
-
     init(identifier: String, name: String) {
         self.identifier = identifier
         self.name = name
@@ -42,8 +40,6 @@ let DEFAULT_APP_BRIGHTNESS_CONTRAST = 0.8
         applyBuiltin = try container.decodeIfPresent(Bool.self, forKey: .applyBuiltin) ?? false
         reapplyPreviousBrightness = try container.decodeIfPresent(Bool.self, forKey: .reapplyPreviousBrightness) ?? true
     }
-
-    // MARK: Internal
 
     enum CodingKeys: String, CodingKey {
         case identifier

@@ -10,8 +10,6 @@ import Foundation
 
 /// Manages an SFTP session
 public class SFTP {
-    // MARK: Lifecycle
-
     init(session: Session, cSession: OpaquePointer) throws {
         guard let sftpSession = libssh2_sftp_init(cSession) else {
             throw SSHError.mostRecentError(session: cSession, backupMessage: "libssh2_sftp_init failed")
@@ -28,8 +26,6 @@ public class SFTP {
         #endif
         libssh2_sftp_shutdown(sftpSession)
     }
-
-    // MARK: Public
 
     /// Download a file from the remote server to the local device
     ///
@@ -220,12 +216,8 @@ public class SFTP {
         return files
     }
 
-    // MARK: Private
-
     /// Direct bindings to libssh2_sftp
     private class SFTPHandle {
-        // MARK: Lifecycle
-
         init(
             cSession: OpaquePointer,
             sftpSession: OpaquePointer,
@@ -256,8 +248,6 @@ public class SFTP {
             libssh2_sftp_close_handle(sftpHandle)
         }
 
-        // MARK: Internal
-
         func read() -> ReadWriteProcessor.ReadResult {
             let result = libssh2_sftp_read(sftpHandle, &buffer, SFTPHandle.bufferSize)
             return ReadWriteProcessor.processRead(result: result, buffer: &buffer, session: cSession)
@@ -283,13 +273,9 @@ public class SFTP {
             return ReadWriteProcessor.processRead(result: Int(result), buffer: &buffer, session: cSession)
         }
 
-        // MARK: Fileprivate
-
         // Recommended buffer size accordingly to the docs:
         // https://www.libssh2.org/libssh2_sftp_write.html
         fileprivate static let bufferSize = 32768
-
-        // MARK: Private
 
         private let cSession: OpaquePointer
         private let sftpHandle: OpaquePointer

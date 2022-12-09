@@ -35,8 +35,6 @@ extension NSView {
     }
 }
 
-// MARK: private functionality
-
 extension DispatchQueue {
     private struct QueueReference { weak var queue: DispatchQueue? }
 
@@ -67,8 +65,6 @@ extension DispatchQueue {
         _registerDetection(of: queues, key: key)
     }
 }
-
-// MARK: public functionality
 
 extension DispatchQueue {
     static func registerDetection(of queue: DispatchQueue) {
@@ -928,8 +924,6 @@ extension MPDisplayMode {
 // MARK: - ModePopupButton
 
 class ModePopupButton: NSPopUpButton {
-    // MARK: Lifecycle
-
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         font = .monospacedSystemFont(ofSize: 12, weight: .semibold)
@@ -960,8 +954,6 @@ class ModePopupButton: NSPopUpButton {
 //                self?.setItemStyles()
 //            }.store(in: &observers)
     }
-
-    // MARK: Internal
 
     var observers: Set<AnyCancellable> = []
 
@@ -1404,6 +1396,10 @@ func first<T>(this: T, other _: T) -> T {
     this
 }
 
+func last<T>(this _: T, other: T) -> T {
+    other
+}
+
 extension Dictionary {
     func with(_ dict: [Key: Value]) -> Self {
         merging(dict, uniquingKeysWith: first(this:other:))
@@ -1718,5 +1714,11 @@ import SwiftUI
 extension Binding {
     static func oneway(getter: @escaping () -> Value) -> Binding {
         Binding(get: getter, set: { _ in })
+    }
+}
+
+public extension Sequence {
+    func dict<K: Hashable, V>(uniqueByLast: Bool = false, _ transformer: (Element) -> (K, V)?) -> [K: V] {
+        Dictionary(compactMap(transformer), uniquingKeysWith: uniqueByLast ? last(this:other:) : first(this:other:))
     }
 }
