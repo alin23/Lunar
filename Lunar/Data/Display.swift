@@ -1265,7 +1265,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var smoothStep = 1
     var slowRead = false
     var slowWrite = false
-    var badHDMI = false
+    var mcdp = false
     var onControlChange: ((Control) -> Void)? = nil
     @AtomicLock var context: [String: Any]? = nil
 

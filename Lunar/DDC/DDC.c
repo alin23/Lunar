@@ -833,3 +833,5 @@ bool EDIDTest(io_service_t framebuffer, struct EDID* edid, uint8_t edidData[256]
     }
     return !sum;
 }
+
+#include "DDC2.h"
