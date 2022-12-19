@@ -149,10 +149,11 @@ final class Screen: NSObject, AppEntity {
 @available(iOS 16, macOS 13, *)
 struct ScreenQuery: EntityPropertyQuery {
     init() {}
-    init(filter: ((Display) -> Bool)? = nil, single: Bool = false, additionalScreens: [Screen]? = nil) {
+    init(filter: ((Display) -> Bool)? = nil, single: Bool = false, additionalScreens: [Screen]? = nil, noDefault: Bool = false) {
         self.filter = filter
         self.single = single
         self.additionalScreens = additionalScreens
+        self.noDefault = noDefault
     }
 
     typealias Entity = Screen
@@ -295,6 +296,7 @@ struct ScreenQuery: EntityPropertyQuery {
     var filter: ((Display) -> Bool)?
     var single = false
     var additionalScreens: [Screen]?
+    var noDefault = false
 
     func entities(
         matching comparators: [NSPredicate],
@@ -326,6 +328,8 @@ struct ScreenQuery: EntityPropertyQuery {
     }
 
     func defaultResult() async -> Screen? {
+        guard !noDefault else { return nil }
+
         if let additionalScreens, !additionalScreens.isEmpty {
             return additionalScreens.first
         }
@@ -437,7 +441,8 @@ struct SetBrightnessIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        try controlScreen(screen: $screen, property: .normalizedBrightness, value: value.str(decimals: 3))
+        try checkShortcutsLimit()
+        return try controlScreen(screen: $screen, property: .normalizedBrightness, value: value.str(decimals: 3))
     }
 }
 
@@ -458,7 +463,8 @@ struct SetContrastIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        try controlScreen(screen: $screen, property: .normalizedContrast, value: value.str(decimals: 3))
+        try checkShortcutsLimit()
+        return try controlScreen(screen: $screen, property: .normalizedContrast, value: value.str(decimals: 3))
     }
 }
 
@@ -482,7 +488,8 @@ struct SetBrightnessContrastIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        try controlScreen(screen: $screen, property: .normalizedBrightnessContrast, value: value.str(decimals: 3))
+        try checkShortcutsLimit()
+        return try controlScreen(screen: $screen, property: .normalizedBrightnessContrast, value: value.str(decimals: 3))
     }
 }
 
@@ -503,7 +510,8 @@ struct SetSubZeroDimmingIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        try controlScreen(screen: $screen, property: .softwareBrightness, value: value.str(decimals: 3))
+        try checkShortcutsLimit()
+        return try controlScreen(screen: $screen, property: .softwareBrightness, value: value.str(decimals: 3))
     }
 }
 
@@ -548,7 +556,8 @@ struct SetVolumeIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        try controlScreen(screen: $screen, property: .volume, value: (value * 100).rounded().u16.s)
+        try checkShortcutsLimit()
+        return try controlScreen(screen: $screen, property: .volume, value: (value * 100).rounded().u16.s)
     }
 }
 
@@ -596,7 +605,8 @@ struct ToggleAudioMuteIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        try controlScreen(screen: $screen, property: .mute, value: state.rawValue)
+        try checkShortcutsLimit()
+        return try controlScreen(screen: $screen, property: .mute, value: state.rawValue)
     }
 }
 
@@ -617,7 +627,8 @@ struct ToggleSystemAdaptiveBrightnessIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        try controlScreen(screen: $screen, property: .systemAdaptiveBrightness, value: state.rawValue)
+        try checkShortcutsLimit()
+        return try controlScreen(screen: $screen, property: .systemAdaptiveBrightness, value: state.rawValue)
     }
 }
 
@@ -638,7 +649,8 @@ struct ToggleHDRIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        try controlScreen(screen: $screen, property: .hdr, value: state.rawValue)
+        try checkShortcutsLimit()
+        return try controlScreen(screen: $screen, property: .hdr, value: state.rawValue)
     }
 }
 
@@ -683,7 +695,8 @@ struct ToggleSubZeroIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        try controlScreen(screen: $screen, property: .subzero, value: state.rawValue)
+        try checkShortcutsLimit()
+        return try controlScreen(screen: $screen, property: .subzero, value: state.rawValue)
     }
 }
 
@@ -820,6 +833,7 @@ struct PowerOnSoftwareIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
         let displays = screen.displays
 
         guard !displays.isEmpty else {
@@ -929,7 +943,8 @@ struct RotateScreenIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        try controlScreen(screen: $screen, property: .rotation, value: rotation.rawValue.s)
+        try checkShortcutsLimit()
+        return try controlScreen(screen: $screen, property: .rotation, value: rotation.rawValue.s)
     }
 }
 
@@ -1004,6 +1019,7 @@ struct ApplyPresetIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
         if let percent = preset.i8 ?? preset.replacingOccurrences(of: "%", with: "").i8 {
             displayController.setBrightnessPercent(value: percent, now: true)
             displayController.setContrastPercent(value: percent, now: true)
@@ -1056,7 +1072,8 @@ Note: a screen can't also be powered on using this method because a powered off 
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        try controlScreen(screen: $screen, property: .power, value: "off")
+        try checkShortcutsLimit()
+        return try controlScreen(screen: $screen, property: .power, value: "off")
     }
 }
 
@@ -1074,6 +1091,7 @@ struct ResetColorGainIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
         screen.displays.forEach {
             $0.resetColors()
         }
@@ -1096,6 +1114,7 @@ struct ResetColorGammaIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
         screen.displays.forEach {
             $0.resetDefaultGamma()
             $0.applyGamma = false
@@ -1122,6 +1141,7 @@ struct ToggleGammaIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
         screen.displays.forEach {
             $0.applyGamma = state == .toggle ? (!$0.applyGamma) : (state == .on)
         }
@@ -1155,7 +1175,8 @@ Note: Not all inputs are supported by all monitors, and some monitors may use no
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        try controlScreen(screen: $screen, property: .input, value: input.s)
+        try checkShortcutsLimit()
+        return try controlScreen(screen: $screen, property: .input, value: input.s)
     }
 
     private struct InputProvider: DynamicOptionsProvider {
@@ -1192,12 +1213,13 @@ struct WriteDDCIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
         guard let control = ControlID(rawValue: vcp.u8) else {
             throw $vcp.needsValueError()
         }
 
-        let result = screen.displays.filter(\.hasDDC).dict { display in
-            (display.description, DDC.write(displayID: display.id, controlID: control, newValue: value.u16))
+        screen.displays.filter(\.hasDDC).forEach { display in
+            let _ = DDC.write(displayID: display.id, controlID: control, newValue: value.u16)
         }
 
         return .result()
@@ -1245,6 +1267,7 @@ Note: DDC reads rarely work and can return wrong values.
 
     @MainActor
     func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
         guard let control = ControlID(rawValue: vcp.u8) else {
             throw $vcp.needsValueError()
         }
@@ -1296,6 +1319,7 @@ struct ControlScreenValueFloatNumeric: AppIntent {
         guard !Display.CodingKeys.needsLunarPro.contains(property.id) || lunarProActive else {
             throw IntentError.message("A Lunar Pro license is needed for controlling \"\(property.name)\".")
         }
+        try checkShortcutsLimit()
         return try controlScreen(screen: $screen, property: property.id, value: value.str(decimals: 3))
     }
 }
@@ -1323,6 +1347,7 @@ struct ControlScreenValueNumeric: AppIntent {
         guard !Display.CodingKeys.needsLunarPro.contains(property.id) || lunarProActive else {
             throw IntentError.message("A Lunar Pro license is needed for controlling \"\(property.name)\".")
         }
+        try checkShortcutsLimit()
         return try controlScreen(screen: $screen, property: property.id, value: value.s)
     }
 }
@@ -1350,6 +1375,7 @@ struct ControlScreenValueBool: AppIntent {
         guard !Display.CodingKeys.needsLunarPro.contains(property.id) || lunarProActive else {
             throw IntentError.message("A Lunar Pro license is needed for controlling \"\(property.name)\".")
         }
+        try checkShortcutsLimit()
         return try controlScreen(screen: $screen, property: property.id, value: state.rawValue)
     }
 }
@@ -1420,6 +1446,7 @@ The blue component of the Gamma curve
 
     @MainActor
     func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
         screen.displays.forEach { display in
             display.applyGamma = true
             display.red = red
@@ -1442,7 +1469,7 @@ struct AdjustHardwareColorsIntent: AppIntent {
             """
 Adjusts screen colors by changing the Color Gain values for Red, Green and Blue using DDC. The adjustments are stored in the monitor memory and should persist over different ports.
 
-On most monitors, 90 is the default value, but this can vary and is not easily detectable. Use the "Reset Color Adjustments (in hardware)" action if you need to reset these values to default.
+On most monitors, 50 is the default value, but this can vary and is not easily detectable. Use the "Reset Color Adjustments (in hardware)" action if you need to reset these values to default.
 
 Note: not all monitors support color gain control through DDC and value effect can vary a lot.
 """,
@@ -1460,7 +1487,7 @@ Note: not all monitors support color gain control through DDC and value effect c
     @Parameter(
         title: "Red",
         description: "The red color gain value.",
-        default: 90,
+        default: 50,
         controlStyle: .field,
         inclusiveRange: (0, 255)
     )
@@ -1469,7 +1496,7 @@ Note: not all monitors support color gain control through DDC and value effect c
     @Parameter(
         title: "Green",
         description: "The green color gain value.",
-        default: 90,
+        default: 50,
         controlStyle: .field,
         inclusiveRange: (0, 255)
     )
@@ -1478,7 +1505,7 @@ Note: not all monitors support color gain control through DDC and value effect c
     @Parameter(
         title: "Blue",
         description: "The blue color gain value.",
-        default: 90,
+        default: 50,
         controlStyle: .field,
         inclusiveRange: (0, 255)
     )
@@ -1486,6 +1513,7 @@ Note: not all monitors support color gain control through DDC and value effect c
 
     @MainActor
     func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
         screen.displays.forEach { display in
             display.redGain = red.ns
             display.greenGain = green.ns
@@ -1522,6 +1550,7 @@ Note: very few monitors implement this functionality
 
     @MainActor
     func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
         guard let display = screen.displays.first else {
             throw $screen.needsValueError()
         }
@@ -1540,7 +1569,6 @@ Note: very few monitors implement this functionality
 struct ReadSoftwareColorsIntent: AppIntent {
     init() {}
 
-    // swiftformat:disable all
     static var title: LocalizedStringResource = "Read Color Gamma Tables (in software)"
     static var description =
         IntentDescription(
@@ -1548,7 +1576,6 @@ struct ReadSoftwareColorsIntent: AppIntent {
             categoryName: "Colors"
         )
 
-    // swiftformat:enable all
     static var parameterSummary: some ParameterSummary {
         Summary("Read color Gamma values from \(\.$screen)")
     }
@@ -1558,6 +1585,7 @@ struct ReadSoftwareColorsIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
         guard let display = screen.displays.first else {
             throw $screen.needsValueError()
         }
@@ -1570,7 +1598,6 @@ struct ReadSoftwareColorsIntent: AppIntent {
 struct MirrorSetIntent: AppIntent {
     init() {}
 
-    // swiftformat:disable all
     static var title: LocalizedStringResource = "Mirror Screens"
     static var description =
         IntentDescription(
@@ -1578,7 +1605,6 @@ struct MirrorSetIntent: AppIntent {
             categoryName: "Arrangement"
         )
 
-    // swiftformat:enable all
     static var parameterSummary: some ParameterSummary {
         Summary("Mirror \(\.$mirrorMaster) onto \(\.$mirrors)")
     }
@@ -1591,9 +1617,11 @@ struct MirrorSetIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
         guard let mirrorMaster = mirrorMaster.displays.first else {
             throw $mirrorMaster.needsValueError()
         }
+        mirrorMaster.refreshPanel()
 
         guard let panel = mirrorMaster.panel, let mgr = DisplayController.panelManager else {
             throw IntentError.message("System error when setting up mirror set.")
@@ -1610,7 +1638,10 @@ struct MirrorSetIntent: AppIntent {
             return .result()
         }
 
-        mirrorMaster.resolutionBlackoutResetterTask = Repeater(every: 1, times: 5, name: "master-resolution-blackout-on") {
+        mirrorMaster.resolutionBlackoutResetterTask = Repeater(
+            every: 1, times: 5, name: "master-resolution-blackout-on",
+            onFinish: { mirrorMaster.refreshPanel() }
+        ) {
             Display.reconfigure(panel: panel) { panel in
                 panel.setModeNumber(mode.modeNumber)
             }
@@ -1624,7 +1655,6 @@ struct MirrorSetIntent: AppIntent {
 struct StopMirroringIntent: AppIntent {
     init() {}
 
-    // swiftformat:disable all
     static var title: LocalizedStringResource = "Stop Mirroring"
     static var description =
         IntentDescription(
@@ -1632,7 +1662,6 @@ struct StopMirroringIntent: AppIntent {
             categoryName: "Arrangement"
         )
 
-    // swiftformat:enable all
     static var parameterSummary: some ParameterSummary {
         Summary("Stop mirroring for \(\.$mirrorMaster).")
     }
@@ -1644,6 +1673,7 @@ struct StopMirroringIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
         if mirrorMaster.id == UInt32.max - 40 {
             Display.reconfigure { mgr in
                 mgr.stopAllMirroring()
@@ -1655,26 +1685,354 @@ struct StopMirroringIntent: AppIntent {
         guard let mirrorMaster = mirrorMaster.displays.first else {
             throw $mirrorMaster.needsValueError()
         }
+        mirrorMaster.refreshPanel()
 
-        guard let panel = mirrorMaster.panel, let mgr = DisplayController.panelManager else {
-            throw IntentError.message("System error when setting up mirror set.")
+        guard let panel = mirrorMaster.panel else {
+            throw IntentError.message("System error when stopping mirroring.")
         }
 
         mirrorMaster.resolutionBlackoutResetterTask = nil
         let mode = panel.currentMode
-        Display.reconfigure(panel: panel) { panel in
-            mgr.stopMirroring(forDisplay: panel)
+        Display.reconfigure { mgr in
+            if panel.isMirrorMaster, let mirrors = mgr.mirrorSet(forDisplay: panel) as? [MPDisplay] {
+                for mirror in mirrors {
+                    mgr.stopMirroring(forDisplay: mirror)
+                }
+            } else {
+                mgr.stopMirroring(forDisplay: panel)
+            }
         }
 
         guard let mode, let panel = DisplayController.panel(with: mirrorMaster.id) else {
             return .result()
         }
 
-        mirrorMaster.resolutionBlackoutResetterTask = Repeater(every: 1, times: 5, name: "master-resolution-blackout-on") {
+        mirrorMaster.resolutionBlackoutResetterTask = Repeater(
+            every: 1, times: 5, name: "master-resolution-blackout-on",
+            onFinish: { mirrorMaster.refreshPanel() }
+        ) {
             Display.reconfigure(panel: panel) { panel in
                 panel.setModeNumber(mode.modeNumber)
             }
         }
+
+        return .result()
+    }
+}
+
+@available(iOS 16, macOS 13, *)
+struct SwapMonitorsIntent: AppIntent {
+    init() {}
+
+    static var title: LocalizedStringResource = "Swap Screen Positions"
+    static var description =
+        IntentDescription(
+            "Swap 2 screens between each other. Useful for when the system confuses the screens and positions them wrongly.",
+            categoryName: "Arrangement"
+        )
+
+    static var parameterSummary: some ParameterSummary {
+        Summary("Swap screen \(\.$screen1) with \(\.$screen2)") {
+            \.$swapOrientations
+        }
+    }
+
+    @Parameter(title: "Screen", optionsProvider: ScreenQuery(single: true, noDefault: true))
+    var screen1: Screen
+
+    @Parameter(title: "Screen", optionsProvider: ScreenQuery(single: true, noDefault: true))
+    var screen2: Screen
+
+    @Parameter(title: "Swap orientations", default: true)
+    var swapOrientations: Bool
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
+        guard let display1 = screen1.display, let display2 = screen2.display, display1 != display2 else {
+            throw IntentError.message("Two different screens are needed to perform swapping.")
+        }
+        displayController.swap(firstDisplay: display1.id, secondDisplay: display2.id, rotation: swapOrientations)
+        notify(identifier: "fyi.lunar.Lunar.Shortcuts", title: "Swapped monitors", body: "\"\(display1.name)\" swapped positions with \"\(display2.name)\"")
+        return .result()
+    }
+}
+
+@available(iOS 16, macOS 13, *)
+struct VerticalMonitorLayoutIntent: AppIntent {
+    init() {}
+
+    static var title: LocalizedStringResource = "Arrange 2 Screens Vertically ■̳̲"
+    static var description =
+        IntentDescription(
+            "Arrange screens in a vertical layout, one above the other. Helpful for a MacBook with one external monitor.",
+            categoryName: "Arrangement"
+        )
+
+    static var parameterSummary: some ParameterSummary {
+        Summary("Arrange \(\.$screenTop) at the top and \(\.$screenBottom) at the bottom")
+    }
+
+    @Parameter(title: "Top Screen", description: "The screen that will be placed at the top.", optionsProvider: ScreenQuery(single: true, noDefault: true))
+    var screenTop: Screen
+
+    @Parameter(title: "Bottom Screen", description: "The screen that will be placed at the bottom.", optionsProvider: ScreenQuery(single: true, noDefault: true))
+    var screenBottom: Screen
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
+        guard let display1 = screenTop.display, let display2 = screenBottom.display, display1 != display2 else {
+            throw IntentError.message("Two different screens are needed to perform arrangement.")
+        }
+
+        Display.configure { config in
+            let topScreenBounds = CGDisplayBounds(display1.id)
+            let bottomScreenBounds = CGDisplayBounds(display2.id)
+
+            let topScreenX = bottomScreenBounds.midX - topScreenBounds.width / 2
+            let topScreenY = bottomScreenBounds.minY - topScreenBounds.height
+
+            CGConfigureDisplayOrigin(config, display1.id, Int32(topScreenX.rounded()), Int32(topScreenY.rounded()))
+            return true
+        }
+
+        notify(identifier: "fyi.lunar.Lunar.Shortcuts", title: "Arranged monitors", body: "\"\(display1.name)\" was positioned above \"\(display2.name)\"")
+
+        return .result()
+    }
+}
+
+@available(iOS 16, macOS 13, *)
+struct HorizontalMonitorLayoutIntent: AppIntent {
+    init() {}
+
+    static var title: LocalizedStringResource = "Arrange 2 Screens Horizontally ⫍⃮݄⫎⃯"
+    static var description =
+        IntentDescription(
+            "Arrange screens in a horizontal layout, one beside the other. Helpful for setups with exactly two external monitors.",
+            categoryName: "Arrangement"
+        )
+
+    static var parameterSummary: some ParameterSummary {
+        Summary("Arrange \(\.$screenLeft) to the left and \(\.$screenRight) to the right")
+    }
+
+    @Parameter(title: "Left Screen", description: "The screen that will be placed at the left.", optionsProvider: ScreenQuery(single: true, noDefault: true))
+    var screenLeft: Screen
+
+    @Parameter(title: "Right Screen", description: "The screen that will be placed at the right.", optionsProvider: ScreenQuery(single: true, noDefault: true))
+    var screenRight: Screen
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
+        guard let display1 = screenLeft.display, let display2 = screenRight.display, display1 != display2 else {
+            throw IntentError.message("Two different screens are needed to perform arrangement.")
+        }
+
+        Display.configure { config in
+            let leftScreenBounds = CGDisplayBounds(display1.id)
+            let rightScreenBounds = CGDisplayBounds(display2.id)
+
+            let leftScreenX = rightScreenBounds.minX - leftScreenBounds.width
+            let leftScreenY = rightScreenBounds.midY - leftScreenBounds.height / 2
+
+            CGConfigureDisplayOrigin(config, display1.id, Int32(leftScreenX.rounded()), Int32(leftScreenY.rounded()))
+            return true
+        }
+
+        notify(identifier: "fyi.lunar.Lunar.Shortcuts", title: "Arranged monitors", body: "\"\(display1.name)\" was positioned to the left of \"\(display2.name)\"")
+
+        return .result()
+    }
+}
+
+@available(iOS 16, macOS 13, *)
+struct ThreeAboveOneMonitorLayoutIntent: AppIntent {
+    init() {}
+
+    static var title: LocalizedStringResource = "Arrange 4 Screens in a 3-above-1 configuration ⫍⃮■̳̻⫎⃯"
+    static var description =
+        IntentDescription(
+            "Arrange 4 screens with 3 in a horizontal layout [left|middle|right] and one in the middle below the other three. Helpful for a MacBook with three external monitors.",
+            categoryName: "Arrangement"
+        )
+
+    static var parameterSummary: some ParameterSummary {
+        Summary("Arrange \(\.$screenLeft) to the left, \(\.$screenMiddle) in the middle, \(\.$screenRight) to the right and \(\.$screenBottom) at the bottom")
+    }
+
+    @Parameter(title: "Left Screen", description: "The screen that will be placed at the left.", optionsProvider: ScreenQuery(single: true, noDefault: true))
+    var screenLeft: Screen
+
+    @Parameter(title: "Middle Screen", description: "The screen that will be placed in the middle.", optionsProvider: ScreenQuery(single: true, noDefault: true))
+    var screenMiddle: Screen
+
+    @Parameter(title: "Right Screen", description: "The screen that will be placed at the right.", optionsProvider: ScreenQuery(single: true, noDefault: true))
+    var screenRight: Screen
+
+    @Parameter(title: "Bottom Screen", description: "The screen that will be placed at the bottom.", optionsProvider: ScreenQuery(single: true, noDefault: true))
+    var screenBottom: Screen
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
+        guard let display1 = screenLeft.display, let display2 = screenMiddle.display,
+              let display3 = screenRight.display, let display4 = screenBottom.display,
+              Set([display1.id, display2.id, display3.id, display4.id]).count == 4
+        else {
+            throw IntentError.message("Four different screens are needed to perform arrangement.")
+        }
+
+        Display.configure { config in
+            let leftScreenBounds = CGDisplayBounds(display1.id)
+            let middleScreenBounds = CGDisplayBounds(display2.id)
+            let rightScreenBounds = CGDisplayBounds(display3.id)
+            let bottomScreenBounds = CGDisplayBounds(display4.id)
+
+            let middleScreenX = bottomScreenBounds.midX - middleScreenBounds.width / 2
+            let middleScreenY = bottomScreenBounds.minY - middleScreenBounds.height
+
+            CGConfigureDisplayOrigin(config, display2.id, Int32(middleScreenX.rounded()), Int32(middleScreenY.rounded()))
+
+            let leftScreenX = middleScreenX - leftScreenBounds.width
+            let leftScreenY = bottomScreenBounds.minY - leftScreenBounds.height
+
+            CGConfigureDisplayOrigin(config, display1.id, Int32(leftScreenX.rounded()), Int32(leftScreenY.rounded()))
+
+            let rightScreenX = middleScreenX + middleScreenBounds.width + rightScreenBounds.width
+            let rightScreenY = bottomScreenBounds.minY - rightScreenBounds.height
+
+            CGConfigureDisplayOrigin(config, display3.id, Int32(rightScreenX.rounded()), Int32(rightScreenY.rounded()))
+            return true
+        }
+
+        notify(
+            identifier: "fyi.lunar.Lunar.Shortcuts",
+            title: "Arranged monitors",
+            body: "A 3-above-1 screen layout was arranged with \(display4.name) at the bottom and, at the top, from left to right: \"\(display1.name)\" -> \"\(display2.name)\" -> \"\(display3.name)\""
+        )
+
+        return .result()
+    }
+}
+
+@available(iOS 16, macOS 13, *)
+struct TwoAboveOneMonitorLayoutIntent: AppIntent {
+    init() {}
+
+    static var title: LocalizedStringResource = "Arrange 3 Screens in a 2-above-1 configuration ⫍‗⫎"
+    static var description =
+        IntentDescription(
+            "Arrange 3 screens with 2 in a horizontal layout [left|right] and one in the middle below the other two. Helpful for a MacBook with two external monitors.",
+            categoryName: "Arrangement"
+        )
+
+    static var parameterSummary: some ParameterSummary {
+        Summary("Arrange \(\.$screenLeft) to the left, \(\.$screenMiddle) at the bottom and \(\.$screenRight) to the right")
+    }
+
+    @Parameter(title: "Left Screen", description: "The screen that will be placed at the left.", optionsProvider: ScreenQuery(single: true, noDefault: true))
+    var screenLeft: Screen
+
+    @Parameter(title: "Middle Screen", description: "The screen that will be placed in the middle at the bottom.", optionsProvider: ScreenQuery(single: true, noDefault: true))
+    var screenMiddle: Screen
+
+    @Parameter(title: "Right Screen", description: "The screen that will be placed at the right.", optionsProvider: ScreenQuery(single: true, noDefault: true))
+    var screenRight: Screen
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
+        guard let display1 = screenLeft.display, let display2 = screenMiddle.display, let display3 = screenRight.display,
+              Set([display1.id, display2.id, display3.id]).count == 3
+        else {
+            throw IntentError.message("Three different screens are needed to perform arrangement.")
+        }
+
+        Display.configure { config in
+            let leftScreenBounds = CGDisplayBounds(display1.id)
+            let middleScreenBounds = CGDisplayBounds(display2.id)
+            let rightScreenBounds = CGDisplayBounds(display3.id)
+
+            let leftScreenX = middleScreenBounds.minX - (leftScreenBounds.width - middleScreenBounds.width / 2)
+            let leftScreenY = middleScreenBounds.minY - leftScreenBounds.height
+
+            CGConfigureDisplayOrigin(config, display1.id, Int32(leftScreenX.rounded()), Int32(leftScreenY.rounded()))
+
+            let rightScreenX = middleScreenBounds.midX
+            let rightScreenY = middleScreenBounds.minY - rightScreenBounds.height
+
+            CGConfigureDisplayOrigin(config, display3.id, Int32(rightScreenX.rounded()), Int32(rightScreenY.rounded()))
+            return true
+        }
+
+        notify(
+            identifier: "fyi.lunar.Lunar.Shortcuts",
+            title: "Arranged monitors",
+            body: "A 2-above-1 screen layout was arranged with \(display2.name) at the bottom and, at the top, from left to right: \"\(display1.name)\" -> \"\(display3.name)\""
+        )
+
+        return .result()
+    }
+}
+
+@available(iOS 16, macOS 13, *)
+struct HorizontalMonitorThreeLayoutIntent: AppIntent {
+    init() {}
+
+    static var title: LocalizedStringResource = "Arrange 3 Screens Horizontally ⫍⃮▬̲⫎⃯"
+    static var description =
+        IntentDescription(
+            "Arrange 3 screens in a horizontal layout, one on the left, one in the middle and one to the right. Helpful for setups with exactly three external monitors.",
+            categoryName: "Arrangement"
+        )
+
+    static var parameterSummary: some ParameterSummary {
+        Summary("Arrange \(\.$screenLeft) to the left, \(\.$screenMiddle) in the middle and \(\.$screenRight) to the right")
+    }
+
+    @Parameter(title: "Left Screen", description: "The screen that will be placed at the left.", optionsProvider: ScreenQuery(single: true, noDefault: true))
+    var screenLeft: Screen
+
+    @Parameter(title: "Middle Screen", description: "The screen that will be placed in the middle.", optionsProvider: ScreenQuery(single: true, noDefault: true))
+    var screenMiddle: Screen
+
+    @Parameter(title: "Right Screen", description: "The screen that will be placed at the right.", optionsProvider: ScreenQuery(single: true, noDefault: true))
+    var screenRight: Screen
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
+        guard let display1 = screenLeft.display, let display2 = screenMiddle.display, let display3 = screenRight.display,
+              Set([display1.id, display2.id, display3.id]).count == 3
+        else {
+            throw IntentError.message("Three different screens are needed to perform arrangement.")
+        }
+
+        Display.configure { config in
+            let leftScreenBounds = CGDisplayBounds(display1.id)
+            let middleScreenBounds = CGDisplayBounds(display2.id)
+            let rightScreenBounds = CGDisplayBounds(display3.id)
+
+            let leftScreenX = middleScreenBounds.minX - leftScreenBounds.width
+            let leftScreenY = middleScreenBounds.midY - leftScreenBounds.height / 2
+
+            CGConfigureDisplayOrigin(config, display1.id, Int32(leftScreenX.rounded()), Int32(leftScreenY.rounded()))
+
+            let rightScreenX = middleScreenBounds.maxX + rightScreenBounds.width
+            let rightScreenY = middleScreenBounds.midY - rightScreenBounds.height / 2
+
+            CGConfigureDisplayOrigin(config, display3.id, Int32(rightScreenX.rounded()), Int32(rightScreenY.rounded()))
+            return true
+        }
+
+        notify(
+            identifier: "fyi.lunar.Lunar.Shortcuts",
+            title: "Arranged monitors",
+            body: "A horizontal screen layout was arranged in the following order, from left to right: \"\(display1.name)\" -> \"\(display2.name)\" -> \"\(display3.name)\""
+        )
 
         return .result()
     }
