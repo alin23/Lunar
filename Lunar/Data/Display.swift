@@ -34,7 +34,7 @@ let DEFAULT_MIN_BRIGHTNESS: UInt16 = 0
 let DEFAULT_MAX_BRIGHTNESS: UInt16 = 100
 let DEFAULT_MIN_CONTRAST: UInt16 = 50
 let DEFAULT_MAX_CONTRAST: UInt16 = 75
-let DEFAULT_COLOR_GAIN: UInt16 = 90
+let DEFAULT_COLOR_GAIN: UInt16 = 50
 
 let DEFAULT_SENSOR_BRIGHTNESS_CURVE_FACTOR = 0.5
 let DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR = 1.0
@@ -3927,6 +3927,27 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         (panel?.isTV ?? false) && edidName.contains("TV")
     }
 
+    static func configure(_ action: (CGDisplayConfigRef) -> Bool) {
+        var configRef: CGDisplayConfigRef?
+        var err = CGBeginDisplayConfiguration(&configRef)
+        guard err == .success, let config = configRef else {
+            log.error("Error with CGBeginDisplayConfiguration: \(err)")
+            return
+        }
+
+        guard action(config) else {
+            _ = CGCancelDisplayConfiguration(config)
+            return
+        }
+
+        err = CGCompleteDisplayConfiguration(config, .permanently)
+        guard err == .success else {
+            log.error("Error with CGCompleteDisplayConfiguration")
+            _ = CGCancelDisplayConfiguration(config)
+            return
+        }
+    }
+
     func setNotchState() {
         mainAsync {
             if #available(macOS 12.0, *), Sysctl.isMacBook {
@@ -4433,7 +4454,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             "\(vendorBytes)\(productBytes)-0000-0000-[\\dA-F]{4}-[\\dA-F]{6}\(horizontalBytes)\(verticalBytes)[\\dA-F]{2}",
         ]
     }
-
     func ensureAudioIdentifier() {
         #if !arch(arm64)
             if (infoDictionary["IODisplayPrefsKey"] as? String) == nil, let dict = displayInfoDictionary(id) {

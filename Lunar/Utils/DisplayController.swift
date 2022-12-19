@@ -542,6 +542,50 @@ class DisplayController: ObservableObject {
         return matches
     }
 
+    func swap(firstDisplay: CGDirectDisplayID, secondDisplay: CGDirectDisplayID, rotation: Bool = true) {
+        Display.configure { config in
+            let firstMonitorBounds = CGDisplayBounds(firstDisplay)
+            let secondMonitorBounds = CGDisplayBounds(secondDisplay)
+
+            CGConfigureDisplayOrigin(
+                config,
+                firstDisplay,
+                Int32(secondMonitorBounds.origin.x.rounded()),
+                Int32(secondMonitorBounds.origin.y.rounded())
+            )
+            CGConfigureDisplayOrigin(
+                config,
+                secondDisplay,
+                Int32(firstMonitorBounds.origin.x.rounded()),
+                Int32(firstMonitorBounds.origin.y.rounded())
+            )
+            return true
+        }
+
+        guard rotation,
+              let panel1 = DisplayController.panel(with: firstDisplay),
+              let panel2 = DisplayController.panel(with: secondDisplay)
+        else { return }
+
+        guard panel1.canChangeOrientation(), panel2.canChangeOrientation()
+        else {
+            print("The monitors don't have the ability to change orientation")
+            return
+        }
+        guard panel1.orientation != panel2.orientation
+        else {
+            print("Orientation is the same for both monitors")
+            return
+        }
+        let rotation1 = panel1.orientation
+        let rotation2 = panel2.orientation
+
+        Display.reconfigure { _ in
+            panel1.orientation = rotation2
+            panel2.orientation = rotation1
+        }
+    }
+
     func reset() {
         menuWindow?.forceClose()
 
