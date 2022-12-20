@@ -860,8 +860,8 @@ extension MPDisplayMode {
         return description.depth
     }
 
-    var tagsString: String {
-        let tags: [String] = [
+    var tagStrings: [String] {
+        [
             isNativeMode ? Tag.native : nil,
             isDefaultMode ? Tag.defaultMode : nil,
             isRetina ? Tag.retina : nil,
@@ -871,6 +871,9 @@ extension MPDisplayMode {
             isSimulscan ? Tag.simulscan : nil,
             isInterlaced ? Tag.interlaced : nil,
         ].compactMap { $0?.rawValue }
+    }
+    var tagsString: String {
+        let tags = tagStrings
         return tags.isEmpty ? "" : "   (\(tags.joined(separator: ", ")))"
     }
 
@@ -904,12 +907,59 @@ extension MPDisplayMode {
             + tagsAttributedString.withFont(.monospacedSystemFont(ofSize: 12, weight: .regular))
     }
 
+    public var title: String {
+        "\(width)×\(height)@\(refreshStringSafe)"
+    }
+
+    @available(iOS 16, macOS 13, *)
+    var panelMode: PanelMode? {
+        guard let screen = display.screen else { return nil }
+
+        return PanelMode(screen: screen, id: (screen.id << 32) + modeNumber.i, title: title, subtitle: subtitle, image: imageSystemName)
+    }
+
+    public var subtitle: String {
+        let tags = tagStrings.without("hidpi")
+        let tagsString = tags.isEmpty ? "" : " (\(tags.joined(separator: ", ")))"
+
+        return "\(dotsPerInch)dpi\(tagsString)"
+    }
+
+    public var image: NSImage? {
+        let symbol = NSImage.SymbolConfiguration(pointSize: 11, weight: .bold)
+        if isTVMode {
+            return NSImage(systemSymbolName: "tv", accessibilityDescription: "TV Mode")?.withSymbolConfiguration(symbol)
+        } else if !isSafeMode {
+            return NSImage(systemSymbolName: "display.trianglebadge.exclamationmark", accessibilityDescription: "Unsafe Mode")?
+                .withSymbolConfiguration(symbol)
+        } else if width > 3800 {
+            return NSImage(systemSymbolName: "4k.tv", accessibilityDescription: "Retina Mode")?.withSymbolConfiguration(symbol)
+        } else if isNativeMode {
+            return NSImage(systemSymbolName: "laptopcomputer", accessibilityDescription: "Native Mode")?
+                .withSymbolConfiguration(symbol)
+        }
+
+        return NSImage(systemSymbolName: "display", accessibilityDescription: "Computer Mode")?.withSymbolConfiguration(symbol)
+    }
+
+    public var imageSystemName: String {
+        if isTVMode {
+            return "tv"
+        } else if !isSafeMode {
+            return "display.trianglebadge.exclamationmark"
+        } else if width > 3800 {
+            return "4k.tv"
+        } else if isNativeMode {
+            return "laptopcomputer"
+        }
+
+        return "display"
+    }
+
     override open var description: String {
-        let res = "\(width) x \(height)"
-        let refresh = "\(refreshRate != 0 ? refreshRate : 60)Hz"
         let dpi = "\(dotsPerInch)DPI"
 
-        return "\(res)@\(refresh) [\(dpi)] [\(depth)bit]\(tagsString)"
+        return "\(resolutionStringSafe)@\(refreshStringSafe) [\(dpi)] [\(depth)bit]\(tagsString)"
     }
 
     var refreshStringSafe: String {
@@ -919,6 +969,38 @@ extension MPDisplayMode {
     var resolutionStringSafe: String {
         "\(width) x \(height)"
     }
+}
+
+extension String {
+    func wordWrap(columns: Int) -> String {
+        var wrappedText = ""
+        let words = components(separatedBy: " ")
+        var currentLine = ""
+
+        for word in words {
+            if currentLine.count + word.count > columns {
+                wrappedText += currentLine + "\n"
+                currentLine = word + " "
+            } else {
+                currentLine += word + " "
+            }
+        }
+
+        wrappedText += currentLine
+
+        return wrappedText
+    }
+}
+
+@available(iOS 16, macOS 13, *)
+extension MPDisplay {
+    var screen: Screen? {
+        displayController.activeDisplays[displayID.u32]?.screen
+    }
+}
+
+public prefix func ! <T>(keyPath: KeyPath<T, Bool>) -> (T) -> Bool {
+    { !$0[keyPath: keyPath] }
 }
 
 // MARK: - ModePopupButton

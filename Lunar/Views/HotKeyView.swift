@@ -106,9 +106,9 @@ class HotkeyView: RecordView, RecordViewDelegate {
         }
 
         if let target = hotkey.target, let action = hotkey.action {
-            hotkey.hotkey = HotKey(identifier: hotkey.identifier, keyCombo: keyCombo, target: target, action: action, actionQueue: .main)
+            hotkey.hotkey = HotKey(identifier: hotkey.identifier, keyCombo: keyCombo, target: target, action: action, actionQueue: .main, detectKeyHold: Hotkey.allowHold(for: hotkey.identifier.hk))
         } else {
-            hotkey.hotkey = HotKey(identifier: hotkey.identifier, keyCombo: keyCombo, actionQueue: .main, handler: hotkey.handler!)
+            hotkey.hotkey = HotKey(identifier: hotkey.identifier, keyCombo: keyCombo, actionQueue: .main, detectKeyHold: Hotkey.allowHold(for: hotkey.identifier.hk), handler: hotkey.handler!)
         }
         hotkey.isEnabled = true
 
@@ -122,9 +122,9 @@ class HotkeyView: RecordView, RecordViewDelegate {
             {
                 hotkey.unregister()
                 if let target = hotkey.target, let action = hotkey.action {
-                    hotkey.hotkey = HotKey(identifier: preciseIdentifier, keyCombo: kc, target: target, action: action, actionQueue: .main)
+                    hotkey.hotkey = HotKey(identifier: preciseIdentifier, keyCombo: kc, target: target, action: action, actionQueue: .main, detectKeyHold: Hotkey.allowHold(for: preciseIdentifier.hk))
                 } else if let handler = hotkey.handler {
-                    hotkey.hotkey = HotKey(identifier: preciseIdentifier, keyCombo: kc, actionQueue: .main, handler: handler)
+                    hotkey.hotkey = HotKey(identifier: preciseIdentifier, keyCombo: kc, actionQueue: .main, detectKeyHold: Hotkey.allowHold(for: preciseIdentifier.hk), handler: handler)
                 }
                 hotkey.isEnabled = true
                 hotkey.register()
@@ -150,9 +150,9 @@ class HotkeyView: RecordView, RecordViewDelegate {
 
                 hotkey.unregister()
                 if let target = hotkey.target, let action = hotkey.action {
-                    hotkey.hotkey = HotKey(identifier: altIdentifier, keyCombo: kc, target: target, action: action, actionQueue: .main)
+                    hotkey.hotkey = HotKey(identifier: altIdentifier, keyCombo: kc, target: target, action: action, actionQueue: .main, detectKeyHold: Hotkey.allowHold(for: altIdentifier.hk))
                 } else if let handler = hotkey.handler {
-                    hotkey.hotkey = HotKey(identifier: altIdentifier, keyCombo: kc, actionQueue: .main, handler: handler)
+                    hotkey.hotkey = HotKey(identifier: altIdentifier, keyCombo: kc, actionQueue: .main, detectKeyHold: Hotkey.allowHold(for: altIdentifier.hk), handler: handler)
                 }
                 hotkey.isEnabled = true
                 hotkey.register()
