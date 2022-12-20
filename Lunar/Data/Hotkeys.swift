@@ -145,13 +145,14 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
                 identifier: identifier,
                 keyCombo: keyCombo,
                 actionQueue: .main,
+                detectKeyHold: allowsHold,
                 handler: handler
             )
             isEnabled = enabled == 1
             if isEnabled {
                 register()
             }
-            hotkey.detectKeyHold = allowsHold
+//            hotkey.detectKeyHold = allowsHold
             // log.debug("Created hotkey with handler \(identifier)")
             return
         }
@@ -162,13 +163,14 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
                 keyCombo: keyCombo,
                 target: appDelegate!,
                 action: Hotkey.handler(identifier: hkIdentifier),
-                actionQueue: .main
+                actionQueue: .main,
+                detectKeyHold: allowsHold
             )
             isEnabled = enabled == 1
             if isEnabled {
                 register()
             }
-            hotkey.detectKeyHold = allowsHold
+//            hotkey.detectKeyHold = allowsHold
             // log.debug("Created hotkey with action/target \(identifier)")
             return
         }
@@ -177,6 +179,7 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
             identifier: identifier,
             keyCombo: keyCombo,
             actionQueue: .main,
+            detectKeyHold: allowsHold,
             handler: { hk in
                 #if DEBUG
                     log.verbose("Pressed hotkey \(hk.identifier)")
@@ -193,7 +196,7 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
             }
         )
         isEnabled = enabled == 1
-        hotkey.detectKeyHold = allowsHold
+        //            hotkey.detectKeyHold = allowsHold
     }
 
     // deinit {
@@ -204,6 +207,7 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
     // }
 
     init(hotkey: HotKey, isEnabled: Bool = true, register: Bool = true) {
+        hotkey.detectKeyHold = Hotkey.allowHold(for: hotkey.identifier.hk)
         self.hotkey = hotkey
         self.isEnabled = isEnabled
         if register {
@@ -221,7 +225,7 @@ class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringCo
         // log.debug("Enabled: \(enabled)")
         let modifiers = try container.decode(Int.self, forKey: .modifiers)
         let keyCode = try container.decode(Int.self, forKey: .keyCode)
-        let allowsHold = (try? container.decodeIfPresent(Bool.self, forKey: .allowsHold)) ?? Hotkey.allowHold(for: identifier.hk)
+        let allowsHold = Hotkey.allowHold(for: identifier.hk)
 
         self.init(identifier, dict: [
             .enabled: enabled ? 1 : 0,
@@ -453,6 +457,21 @@ enum Hotkey {
         HotkeyIdentifier.orientation90.rawValue,
         HotkeyIdentifier.orientation180.rawValue,
         HotkeyIdentifier.orientation270.rawValue,
+    ]
+
+    static let hotkeysAllowingHold: Set<HotkeyIdentifier> = [
+        HotkeyIdentifier.preciseBrightnessUp,
+        HotkeyIdentifier.preciseBrightnessDown,
+        HotkeyIdentifier.preciseContrastUp,
+        HotkeyIdentifier.preciseContrastDown,
+        HotkeyIdentifier.preciseVolumeUp,
+        HotkeyIdentifier.preciseVolumeDown,
+        HotkeyIdentifier.brightnessUp,
+        HotkeyIdentifier.brightnessDown,
+        HotkeyIdentifier.contrastUp,
+        HotkeyIdentifier.contrastDown,
+        HotkeyIdentifier.volumeUp,
+        HotkeyIdentifier.volumeDown,
     ]
 
     static let defaults: Set<PersistentHotkey> = [
@@ -721,7 +740,7 @@ enum Hotkey {
             return false
         }
 
-        return defaults.first(where: { $0.identifier == identifier.rawValue })?.allowsHold ?? false
+        return hotkeysAllowingHold.contains(identifier)
     }
 
     static func toggleOrientationHotkeys(enabled: Bool? = nil) {
