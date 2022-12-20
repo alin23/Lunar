@@ -1438,7 +1438,11 @@ class DisplayController: ObservableObject {
 
     static func panel(with id: CGDirectDisplayID) -> MPDisplay? {
         guard id != kCGNullDirectDisplay else { return nil }
-        return DisplayController.panelManager?.display(withID: id.i32) as? MPDisplay
+        guard let mgr = DisplayController.panelManager, mgr.tryLockAccess() else {
+            return nil
+        }
+        defer { mgr.unlockAccess() }
+        return mgr.display(withID: id.i32) as? MPDisplay
     }
 
     static func autoMode() -> AdaptiveMode {

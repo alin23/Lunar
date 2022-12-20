@@ -66,6 +66,8 @@ final class Screen: NSObject, AppEntity {
         TypeDisplayRepresentation(name: "Screen", numericFormat: "\(placeholder: .int) screens")
     }
 
+    lazy var panelModes: [PanelMode] = display?.panelModes.compactMap(\.panelMode) ?? []
+
     let isDynamicFilter: Bool
     @Property(title: "ID")
     @objc var id: Int
@@ -1009,7 +1011,7 @@ struct ChangeAdaptiveModeIntent: AppIntent {
 struct ApplyPresetIntent: AppIntent {
     init() {}
 
-    static var title: LocalizedStringResource = "Apply Preset"
+    static var title: LocalizedStringResource = "Apply Lunar Preset"
     static var description = IntentDescription("Applies a custom preset from the ones saved through the Lunar UI.", categoryName: "Global")
 
     static var parameterSummary: some ParameterSummary { Summary("Apply Preset \(\.$preset)") }
@@ -1197,7 +1199,7 @@ Note: Not all inputs are supported by all monitors, and some monitors may use no
 struct WriteDDCIntent: AppIntent {
     init() {}
 
-    static var title: LocalizedStringResource = "Write DDC Value to Screen"
+    static var title: LocalizedStringResource = "DDC Write Value to Screen"
     static var description = IntentDescription("Sends a DDC write command to a specific screen.", categoryName: "DDC")
 
     static var parameterSummary: some ParameterSummary { Summary("Write DDC \(\.$vcp) \(\.$value) to \(\.$screen)") }
@@ -1247,7 +1249,7 @@ struct ReadDDCIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
-    static var title: LocalizedStringResource = "Read DDC Value from Screen"
+    static var title: LocalizedStringResource = "DDC Read Value from Screen"
     static var description = IntentDescription(
     """
 Sends a DDC read command to a specific screen and returns the value read.
@@ -1300,7 +1302,7 @@ Note: DDC reads rarely work and can return wrong values.
 struct ControlScreenValueFloatNumeric: AppIntent {
     init() {}
 
-    static var title: LocalizedStringResource = "Control a floating point numeric Screen Value"
+    static var title: LocalizedStringResource = "Control a floating point Screen Value"
     static var description = IntentDescription("Configure any screen property that supports a numeric value with a floating point.", categoryName: "Scripting")
 
     static var parameterSummary: some ParameterSummary { Summary("Set \(\.$property) of \(\.$screen) to \(\.$value)") }
@@ -1328,7 +1330,7 @@ struct ControlScreenValueFloatNumeric: AppIntent {
 struct ControlScreenValueNumeric: AppIntent {
     init() {}
 
-    static var title: LocalizedStringResource = "Control an integer numeric Screen Value"
+    static var title: LocalizedStringResource = "Control an integer Screen Value"
     static var description = IntentDescription("Configure any screen property that supports an integer numeric value.", categoryName: "Scripting")
 
     static var parameterSummary: some ParameterSummary { Summary("Set \(\.$property) of \(\.$screen) to \(\.$value)") }
@@ -1717,6 +1719,247 @@ struct StopMirroringIntent: AppIntent {
         }
 
         return .result()
+    }
+}
+
+@available(iOS 16, macOS 13, *)
+struct SetPanelModeIntent: AppIntent {
+    init() {}
+
+    static var title: LocalizedStringResource = "Change Screen Resolution"
+    static var description =
+        IntentDescription(
+            "Change the current resolution and/or frame rate of a specific screen.",
+            categoryName: "Global"
+        )
+
+    static var parameterSummary: some ParameterSummary {
+//        When(\.$mode, .hasAnyValue, {
+//            Summary("Change resolution of \(\.$mode)")
+//        }, otherwise: {
+        Summary("Change resolution to \(\.$mode)")
+//        })
+
+    }
+
+    @Parameter(title: "Screen Mode")
+    var mode: PanelMode
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
+
+        mode.screen.display?.panel?.setModeNumber((mode.id & ((1 << 32) - 1)).i32)
+
+        return .result()
+    }
+}
+
+@available(iOS 16, macOS 13, *)
+struct SetPanelPresetIntent: AppIntent {
+    init() {}
+
+    static var title: LocalizedStringResource = "Change Screen Preset"
+    static var description =
+        IntentDescription(
+            "Change the current preset of a specific screen.",
+            categoryName: "Global"
+        )
+
+    static var parameterSummary: some ParameterSummary {
+//        When(\.$preset, .hasAnyValue, {
+//            Summary("Change preset of \(\.$preset)")
+//        }, otherwise: {
+        Summary("Change preset to \(\.$preset)")
+//        })
+
+    }
+
+    @Parameter(title: "Screen Preset")
+    var preset: PanelPreset
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
+
+        let presetIndex = (preset.id & ((1 << 32) - 1)).i64
+        guard let display = preset.screen.display,
+              let preset = display.panelPresets.first(where: { $0.presetIndex == presetIndex })
+        else { return .result() }
+        display.panel?.setActivePreset(preset)
+
+        return .result()
+    }
+}
+
+struct SortablePanelMode: Comparable, Equatable, Hashable {
+    let isHiDPI: Bool
+    let refreshRate: Int32
+
+    static func < (lhs: SortablePanelMode, rhs: SortablePanelMode) -> Bool {
+        lhs.refreshRate < rhs.refreshRate
+    }
+}
+
+@available(iOS 16, macOS 13, *)
+extension MPDisplayPreset {
+    var panelPreset: PanelPreset? {
+        guard let screen = displayController.activeDisplays[displayID]?.screen else { return nil }
+
+        return PanelPreset(screen: screen, id: (screen.id << 32) + presetIndex.i, title: presetName, subtitle: presetDescription)
+    }
+
+    static func groupName(_ group: Int64) -> String {
+        switch group {
+        case 1:
+            return "Default"
+        case 2:
+            return "Reference"
+        default:
+            return "Custom"
+        }
+    }
+
+    var groupName: String { Self.groupName(presetGroup) }
+}
+
+@available(iOS 16, macOS 13, *)
+struct PanelPreset: AppEntity {
+    struct PanelPresetQuery: EntityQuery {
+        func entities(for identifiers: [Int]) async throws -> [PanelPreset] {
+            identifiers.compactMap { id -> PanelPreset? in
+                let screenID = CGDirectDisplayID(id >> 32)
+                guard let display = displayController.activeDisplays[screenID],
+                      let panel = display.panel
+                else {
+                    return nil
+                }
+
+                let index = id & ((1 << 32) - 1)
+                guard let preset = (panel.presets as? [MPDisplayPreset])?.first(where: { $0.presetIndex == index }) else {
+                    return nil
+                }
+
+                return preset.panelPreset
+            }
+        }
+        func suggestedEntities() async throws -> ItemCollection<PanelPreset> {
+            try await results()
+        }
+        func results() async throws -> ItemCollection<PanelPreset> {
+            let sections: [(Display, Int64)] = Array(
+                displayController.activeDisplayList
+                    .filter { $0.panel?.hasPresets ?? false }
+                    .map { d in
+                        let modes = Set(d.panelPresets.filter(\.isValid).map(\.presetGroup)).sorted()
+                        return modes.map { p in (d, p) }
+                    }.joined()
+            )
+
+            return ItemCollection(
+                sections: sections
+                    .map { display, group in
+                        ItemSection(
+                            title: "\(display.name) \(MPDisplayPreset.groupName(group)) presets",
+                            items: display.panelPresets
+                                .filter { $0.isValid && $0.presetGroup == group }
+                                .compactMap(\.panelPreset)
+                                .map { preset in
+                                    IntentItem(
+                                        preset,
+                                        title: "\(preset.title)", subtitle: "\(preset.subtitle)"
+                                    )
+                                }
+                        )
+                    }
+            )
+        }
+    }
+    typealias DefaultQuery = PanelPresetQuery
+
+    static var defaultQuery = PanelPresetQuery()
+
+    static var typeDisplayRepresentation: TypeDisplayRepresentation {
+        TypeDisplayRepresentation(name: "Screen Preset")
+    }
+
+    let screen: Screen
+    let id: Int
+    let title: String
+    let subtitle: String
+
+    var displayRepresentation: DisplayRepresentation {
+        DisplayRepresentation(
+            title: "\(title) on \(screen.name)", subtitle: "\(subtitle.wordWrap(columns: 60))\n"
+        )
+    }
+}
+
+@available(iOS 16, macOS 13, *)
+struct PanelMode: AppEntity {
+    struct PanelModeQuery: EntityQuery {
+        func entities(for identifiers: [Int]) async throws -> [PanelMode] {
+            identifiers.compactMap { id -> PanelMode? in
+                let screenID = CGDirectDisplayID(id >> 32)
+                guard let display = displayController.activeDisplays[screenID],
+                      let panel = display.panel
+                else {
+                    return nil
+                }
+
+                let modeID = id & ((1 << 32) - 1)
+                guard let mode = panel.mode(withNumber: modeID.i32) as? MPDisplayMode else {
+                    return nil
+                }
+
+                return mode.panelMode
+            }
+        }
+        func suggestedEntities() async throws -> ItemCollection<PanelMode> {
+            try await results()
+        }
+        func results() async throws -> ItemCollection<PanelMode> {
+            let sections: [(Display, SortablePanelMode)] = Array(displayController.activeDisplayList.map { d in
+                let modes = Set(d.panelModes.map { SortablePanelMode(isHiDPI: $0.isHiDPI, refreshRate: $0.refreshRate) }).sorted().reversed()
+                return modes.filter(\.isHiDPI).map { p in (d, p) } + modes.filter(!\.isHiDPI).map { p in (d, p) }
+            }.joined())
+
+            return ItemCollection(sections: sections.map { display, sortableMode in
+                ItemSection(
+                    title: "\(display.name) \(sortableMode.isHiDPI ? "HiDPI" : "lowDPI") modes @ \(sortableMode.refreshRate)Hz",
+                    items: display.panelModes
+                        .filter { $0.isHiDPI == sortableMode.isHiDPI && $0.refreshRate == sortableMode.refreshRate }
+                        .compactMap(\.panelMode)
+                        .map { mode in
+                            IntentItem(
+                                mode,
+                                title: "\(mode.title)", subtitle: "\(mode.subtitle)",
+                                image: DisplayRepresentation.Image(systemName: mode.image)
+                            )
+                        }
+                )
+            })
+        }
+    }
+    typealias DefaultQuery = PanelModeQuery
+
+    static var defaultQuery = PanelModeQuery()
+
+    static var typeDisplayRepresentation: TypeDisplayRepresentation {
+        TypeDisplayRepresentation(name: "Screen Mode")
+    }
+
+    let screen: Screen
+    let id: Int
+    let title: String
+    let subtitle: String
+    let image: String
+
+    var displayRepresentation: DisplayRepresentation {
+        DisplayRepresentation(
+            title: "\(title) on \(screen.name)", subtitle: "\(subtitle)",
+            image: DisplayRepresentation.Image(systemName: image)
+        )
     }
 }
 

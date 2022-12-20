@@ -127,7 +127,7 @@ ReleaseNotes/release.css: ReleaseNotes/release.styl
 Releases/Lunar-%.html: ReleaseNotes/$(VERSION)*.md
 	@echo Compiling $^ to $@
 ifneq (, $(CHANNEL))
-	pandoc -f gfm -o $@ --standalone --metadata title="Lunar $(FULL_VERSION) - Release Notes" --css https://files.lunar.fyi/ReleaseNotes/release.css $(shell ls -Ut ReleaseNotes/$(VERSION)*.md)
+	pandoc -f gfm -o $@ --standalone --metadata title="Lunar $(FULL_VERSION) - Release Notes" --css https://files.lunar.fyi/ReleaseNotes/release.css $(shell ls -t ReleaseNotes/$(VERSION)*.md)
 else
 	pandoc -f gfm -o $@ --standalone --metadata title="Lunar $(FULL_VERSION) - Release Notes" --css https://files.lunar.fyi/ReleaseNotes/release.css ReleaseNotes/$(VERSION).md
 endif

@@ -1602,6 +1602,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     lazy var usesDDCBrightnessControl: Bool = control is DDCControl || control is NetworkControl
 
+    @available(iOS 16, macOS 13, *)
+    @objc dynamic var panelPresets: [MPDisplayPreset] {
+        (panel?.presets as? [MPDisplayPreset]) ?? []
+    }
+
     @objc dynamic var facelight: Bool {
         get { faceLightEnabled }
         set {
