@@ -1065,6 +1065,8 @@ class DisplayController: ObservableObject {
 
     static var nonZeroBuiltinMinBrightness: NSNumber = -1
 
+    static var serials: [CGDirectDisplayID: String] = [:]
+
     var screencaptureIsRunning: CurrentValueSubject<Bool, Never> = .init(processIsRunning("/usr/sbin/screencapture", nil))
 
     @Atomic var apply = true
@@ -1235,7 +1237,6 @@ class DisplayController: ObservableObject {
             }
         }
     }
-
     var activeDisplays: [CGDirectDisplayID: Display] {
         get { _activeDisplaysLock.around(ignoreMainThread: true) { _activeDisplays } }
         set {
@@ -1249,7 +1250,8 @@ class DisplayController: ObservableObject {
                 }
 
                 mainAsync {
-                    self.activeDisplayList = self._activeDisplays.values.sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }
+                    self.activeDisplayList = self._activeDisplays.values
+                        .sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }
                         .reversed()
                 }
                 #if DEBUG
@@ -1257,6 +1259,10 @@ class DisplayController: ObservableObject {
                         $0.blackOutMirroringAllowed = true
                     }
                 #endif
+            }
+
+            DDC.sync {
+                Self.serials = newValue.mapValues(\.serial)
             }
         }
     }

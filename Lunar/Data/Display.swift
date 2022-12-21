@@ -3352,6 +3352,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var ddcNotWorkingCount: Int {
         get { Self.ddcNotWorkingCount[serial] ?? 0 }
         set {
+            guard !displayController.screensSleeping else { return }
             guard CachedDefaults[.autoRestartOnFailedDDC] else {
                 Self.ddcNotWorkingCount[serial] = newValue
                 return
@@ -4448,10 +4449,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         let weekByte = cap(manufactureWeek, minVal: 0, maxVal: 255).u8.hex.uppercased()
         let vendorBytes = vendorID.u16.str(reversed: true, separator: "").uppercased()
         let productBytes = productID.u16.str(reversed: false, separator: "").uppercased()
-        let serialBytes = serialNumber.u32.str(reversed: false, separator: "").uppercased()
+        // let serialBytes = serialNumber.u32.str(reversed: false, separator: "").uppercased()
         let verticalBytes = (verticalPixels / 10).u8.hex.uppercased()
         let horizontalBytes = (horizontalPixels / 10).u8.hex.uppercased()
-        let transportByte = ((infoDict["kDisplayTransportType"] as? Int64) ?? 0) == 3 ? "03" : "04"
+
+        let transportType = (infoDict["kDisplayTransportType"] as? Int64) ?? 0
+        let transportByte = (transportType == 3 ? "03" : "04")
 
         return [
             "\(vendorBytes)\(productBytes)-0000-0000-\(weekByte)\(yearByte)-01\(transportByte)[\\dA-F]{2}\(horizontalBytes)\(verticalBytes)[\\dA-F]{2}",
@@ -4932,6 +4935,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 "blueMax": self.blueMax,
                 "blueGamma": self.blueGamma,
             ]
+
+            #if arch(arm64)
+                DDC.sync {
+                    dict["ddcid"] = ddcid(self.serial)
+                }
+            #endif
             scope.setExtra(value: dict, key: "display-\(self.serial)")
         }
     }
