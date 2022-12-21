@@ -722,7 +722,10 @@ enum DDC {
         let p = PassthroughSubject<Bool, Never>()
 
         p.debounce(for: .seconds(1), scheduler: queue)
-            .sink { _ in IORegistryTreeChanged() }
+            .sink { _ in
+                guard !displayController.screensSleeping else { return }
+                IORegistryTreeChanged()
+            }
             .store(in: &observers)
 
         return p
@@ -1002,7 +1005,7 @@ enum DDC {
             let writeStartedAt = DispatchTime.now()
 
             #if arch(arm64)
-                let result = DDCWrite(avService: avService, command: &command)
+                let result = DDCWrite(avService: avService, command: &command, displayID: displayID)
             #else
                 let result = DDCWrite(fb: fb, command: &command)
             #endif
@@ -1121,7 +1124,7 @@ enum DDC {
             let readStartedAt = DispatchTime.now()
 
             #if arch(arm64)
-                _ = DDCRead(avService: avService, command: &command)
+                _ = DDCRead(avService: avService, command: &command, displayID: displayID)
             #else
                 _ = DDCRead(fb: fb, command: &command)
             #endif
@@ -1160,7 +1163,7 @@ enum DDC {
     }
 
     static func sendEdidRequest(displayID: CGDirectDisplayID) -> (EDID, Data)? {
-        guard !isTestID(displayID) else { return nil }
+        guard !isTestID(displayID), !displayController.screensSleeping else { return nil }
 
         #if arch(arm64)
             guard let avService = AVService(displayID: displayID) else { return nil }
