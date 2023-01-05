@@ -442,15 +442,16 @@ class ControlChoiceViewController: NSViewController {
         guard wait(1) else { return .allWorked }
 
         guard readWorked.all else {
-            info("Waiting for input", color: peach)
-            var writeWorked = ControlWriteResult.noneWorked
-            waitForAction(
-                "Reading didn't work for some values\nWrite the missing values manually and click the Continue button",
-                buttonColor: lunarYellow, buttonText: "Continue".withTextColor(mauve)
-            ) { [weak self] in
-                guard let self else { return }
-                writeWorked = self.testControlWrite(control, for: display)
-            }
+            info("", color: peach)
+            // var writeWorked = ControlWriteResult.noneWorked
+            // waitForAction(
+            //     "Reading didn't work for some values\nWrite the missing values manually and click the Continue button",
+            //     buttonColor: lunarYellow, buttonText: "Continue".withTextColor(mauve)
+            // ) { [weak self] in
+            //     guard let self else { return }
+            //     writeWorked = self.testControlWrite(control, for: display)
+            // }
+            let writeWorked = testControlWrite(control, for: display)
             return ControlResult(type: control.displayControl, read: readWorked, write: writeWorked)
         }
 
@@ -465,9 +466,9 @@ class ControlChoiceViewController: NSViewController {
         //     return .noneWorked
         // #endif
 
-        let currentBrightness = brightnessField.integerValue.u16
-        let currentContrast = contrastField.integerValue.u16
-        let currentVolume = volume.u16
+        let currentBrightness: UInt16 = brightnessField.integerValue == 0 ? 50 : brightnessField.integerValue.u16
+        let currentContrast: UInt16 = contrastField.integerValue == 0 ? 50 : contrastField.integerValue.u16
+        let currentVolume: UInt16 = volume == 0 ? 50 : volume.u16
         var brightnessWriteWorked = false
         var contrastWriteWorked = false
         var volumeWriteWorked = false
@@ -490,9 +491,10 @@ class ControlChoiceViewController: NSViewController {
             display.enabledControls[control.displayControl] = true
 
             var newBr: UInt16 = currentBrightness != 0 ? (control.isSoftware ? 25 : 0) : 50
+            var oldBr: UInt16 = currentBrightness
             let write1Worked = control.setBrightness(
                 newBr,
-                oldValue: currentBrightness,
+                oldValue: oldBr,
                 force: true, transition: .smooth,
                 onChange: { [weak self] br in self?.setBrightness(br) }
             )
@@ -502,10 +504,11 @@ class ControlChoiceViewController: NSViewController {
             guard wait(4) else { return }
             setWriteProgress(0.15)
 
+            oldBr = newBr
             newBr = 75
             let write2Worked = control.setBrightness(
                 newBr,
-                oldValue: 0,
+                oldValue: oldBr,
                 force: true, transition: .smooth,
                 onChange: { [weak self] br in self?.setBrightness(br) }
             )
@@ -515,10 +518,11 @@ class ControlChoiceViewController: NSViewController {
             guard wait(4) else { return }
             setWriteProgress(0.2)
 
+            oldBr = newBr
             newBr = control.isSoftware ? 100 : 67
             let write3Worked = control.setBrightness(
                 newBr,
-                oldValue: 75,
+                oldValue: oldBr,
                 force: true, transition: .smooth,
                 onChange: { [weak self] br in self?.setBrightness(br) }
             )
@@ -575,26 +579,34 @@ class ControlChoiceViewController: NSViewController {
 
         display.withBrightnessTransition {
             setWriteProgress(0.35)
+
+            var newCr: UInt16 = currentContrast != 0 ? 0 : 50
+            var oldCr: UInt16 = currentContrast
             let write1Worked = control.setContrast(
-                currentContrast != 0 ? 0 : 50,
-                oldValue: currentContrast, transition: .smooth,
+                newCr,
+                oldValue: oldCr,
+                transition: .smooth,
                 onChange: { [weak self] br in self?.setContrast(br) }
             )
             guard wait(4) else { return }
             setWriteProgress(0.4)
 
+            oldCr = newCr
+            newCr = 75
             let write2Worked = control.setContrast(
-                75,
-                oldValue: 0,
+                newCr,
+                oldValue: oldCr,
                 transition: .smooth,
                 onChange: { [weak self] br in self?.setContrast(br) }
             )
             guard wait(4) else { return }
             setWriteProgress(0.45)
 
+            oldCr = newCr
+            newCr = 67
             let write3Worked = control.setContrast(
-                67,
-                oldValue: 75,
+                newCr,
+                oldValue: oldCr,
                 transition: .smooth,
                 onChange: { [weak self] br in self?.setContrast(br) }
             )
@@ -725,7 +737,7 @@ class ControlChoiceViewController: NSViewController {
             guard wait(1.1) else { return .allWorked }
             setReadProgress(0.15)
 
-            setResult(brightnessReadResult, text: "Failed to read", color: red)
+            // setResult(brightnessReadResult, text: "Failed to read", color: red)
             guard wait(1.1) else { return .allWorked }
         }
         setReadProgress(0.33)
@@ -750,7 +762,7 @@ class ControlChoiceViewController: NSViewController {
             guard wait(1.1) else { return .allWorked }
             setReadProgress(0.45)
 
-            setResult(contrastReadResult, text: "Failed to read", color: red)
+            // setResult(contrastReadResult, text: "Failed to read", color: red)
             guard wait(1.1) else { return .allWorked }
         }
         setReadProgress(0.66)
@@ -770,7 +782,7 @@ class ControlChoiceViewController: NSViewController {
             guard wait(1.1) else { return .allWorked }
             setReadProgress(0.8)
 
-            setResult(volumeReadResult, text: "Failed to read", color: peach)
+            // setResult(volumeReadResult, text: "Failed to read", color: peach)
             guard wait(1.1) else { return .allWorked }
         }
         setReadProgress(0.9)
