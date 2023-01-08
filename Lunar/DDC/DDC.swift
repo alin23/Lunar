@@ -695,22 +695,22 @@ enum DDC {
             return AVService(displayID: displayID, ignoreCache: ignoreCache) != nil
         }
 
-        static func DCP(displayID: CGDirectDisplayID, display: Display? = nil) -> DCP? {
-            nil
-        }
-
-        static func AVService(displayID: CGDirectDisplayID, ignoreCache: Bool = false) -> IOAVService? {
+        static func DCP(displayID: CGDirectDisplayID, ignoreCache: Bool = false) -> DCP? {
             guard !isTestID(displayID) else { return nil }
 
             return sync(barrier: true) {
-                if !ignoreCache, let service = dcpMapping[displayID]?.avService {
-                    return service
+                if !ignoreCache, let dcp = dcpMapping[displayID], dcp.avService != nil {
+                    return dcp
                 }
 
                 dcpList = buildDCPList()
 
-                return dcpMapping[displayID]?.avService
+                return dcpMapping[displayID]
             }
+        }
+
+        static func AVService(displayID: CGDirectDisplayID, ignoreCache: Bool = false) -> IOAVService? {
+            DCP(displayID: displayID, ignoreCache: ignoreCache)?.avService
         }
     #endif
 
@@ -986,7 +986,7 @@ enum DDC {
         #endif
 
         #if arch(arm64)
-            guard let avService = AVService(displayID: displayID) else { return false }
+            guard let dcp = DCP(displayID: displayID) else { return false }
         #else
             guard let fb = I2CController(displayID: displayID) else { return false }
         #endif
@@ -1005,7 +1005,7 @@ enum DDC {
             let writeStartedAt = DispatchTime.now()
 
             #if arch(arm64)
-                let result = DDCWrite(avService: avService, command: &command, displayID: displayID)
+                let result = DDCWrite(avService: dcp.avService, command: &command, displayID: displayID, isMCDP: dcp.isMCDP)
             #else
                 let result = DDCWrite(fb: fb, command: &command)
             #endif
@@ -1103,7 +1103,7 @@ enum DDC {
         guard !isTestID(displayID), !shouldWait, !displayController.screensSleeping else { return nil }
 
         #if arch(arm64)
-            guard let avService = AVService(displayID: displayID) else { return nil }
+            guard let dcp = DCP(displayID: displayID) else { return nil }
         #else
             guard let fb = I2CController(displayID: displayID) else { return nil }
         #endif
@@ -1124,7 +1124,7 @@ enum DDC {
             let readStartedAt = DispatchTime.now()
 
             #if arch(arm64)
-                _ = DDCRead(avService: avService, command: &command, displayID: displayID)
+                _ = DDCRead(avService: dcp.avService, command: &command, displayID: displayID, isMCDP: dcp.isMCDP)
             #else
                 _ = DDCRead(fb: fb, command: &command)
             #endif

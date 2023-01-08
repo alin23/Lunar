@@ -4907,7 +4907,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             #if arch(arm64)
-                let dcp = DDC.DCP(displayID: self.id, display: self)
+                let dcp = DDC.DCP(displayID: self.id)
                 if let dcp {
                     dict["avService"] = "YES"
                     dict["dcp"] = dcp.description
