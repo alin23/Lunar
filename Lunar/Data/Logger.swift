@@ -16,61 +16,61 @@ import SwiftyBeaver
 class Logger: SwiftyBeaver {
     override open class func verbose(
         _ message: @autoclosure () -> Any,
-        _ file: String = #file,
+        file: String = #file,
 
-        _ function: String = #function,
+        function: String = #function,
         line: Int = #line,
         context: Any? = nil
     ) {
         guard initialized else { return }
-        super.verbose(message(), file, function, line: line, context: context)
+        super.verbose(message(), file: file, function: function, line: line, context: context)
     }
 
     override open class func debug(
         _ message: @autoclosure () -> Any,
-        _ file: String = #file,
+        file: String = #file,
 
-        _ function: String = #function,
+        function: String = #function,
         line: Int = #line,
         context: Any? = nil
     ) {
-        super.debug(message(), file, function, line: line, context: context)
+        super.debug(message(), file: file, function: function, line: line, context: context)
     }
 
     override open class func info(
         _ message: @autoclosure () -> Any,
-        _ file: String = #file,
+        file: String = #file,
 
-        _ function: String = #function,
+        function: String = #function,
         line: Int = #line,
         context: Any? = nil
     ) {
         guard initialized else { return }
-        super.info(message(), file, function, line: line, context: context)
+        super.info(message(), file: file, function: function, line: line, context: context)
     }
 
     override open class func warning(
         _ message: @autoclosure () -> Any,
-        _ file: String = #file,
+        file: String = #file,
 
-        _ function: String = #function,
+        function: String = #function,
         line: Int = #line,
         context: Any? = nil
     ) {
         guard initialized else { return }
-        super.warning(message(), file, function, line: line, context: context)
+        super.warning(message(), file: file, function: function, line: line, context: context)
     }
 
     override open class func error(
         _ message: @autoclosure () -> Any,
-        _ file: String = #file,
+        file: String = #file,
 
-        _ function: String = #function,
+        function: String = #function,
         line: Int = #line,
         context: Any? = nil
     ) {
         guard initialized else { return }
-        super.error(message(), file, function, line: line, context: context)
+        super.error(message(), file: file, function: function, line: line, context: context)
     }
 
     static var observers: Set<AnyCancellable> = []
@@ -114,7 +114,9 @@ class Logger: SwiftyBeaver {
         }
 
         #if !DEBUG
-            Logger.addDestination(file)
+            if debug || verbose {
+                Logger.addDestination(file)
+            }
             if !cli, AppSettings.beta {
                 cloud.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M \n\t$X"
                 Logger.addDestination(cloud)
@@ -135,11 +137,17 @@ class Logger: SwiftyBeaver {
             console.minLevel = .verbose
             file.minLevel = .verbose
             if cloud { self.cloud.minLevel = .verbose }
+
+            Logger.addDestination(file)
         } else if debug {
             console.minLevel = .debug
             file.minLevel = .debug
             if cloud { self.cloud.minLevel = .debug }
+
+            Logger.addDestination(file)
         } else {
+            Logger.removeDestination(file)
+
             console.minLevel = cli ? .warning : .info
             file.minLevel = cli ? .warning : .info
             if cloud { self.cloud.minLevel = cli ? .warning : .info }
