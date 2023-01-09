@@ -270,11 +270,6 @@ import SwiftyJSON
         func matchingScore(for display: Display, in displayIDs: [CGDirectDisplayID]? = nil) -> Int {
             var score = 0
 
-//            let displayIDs = displayIDs ?? displayController.externalHardwareActiveDisplays.map(\.id).sorted()
-//            if let displayIndex = displayIDs.firstIndex(of: display.id) {
-//                score -= abs(index - displayIndex)
-//            }
-
             if let edidUUID {
                 let uuids = display.possibleEDIDUUIDs()
                 if uuids.isEmpty {
@@ -456,7 +451,7 @@ class DisplayController: ObservableObject {
             score += display.edidName.lowercased() == name.lowercased() ? 1 : -1
         }
 
-        let infoDict = display.infoDictionary
+        let infoDict = (displayInfoDictionary(display.id) ?? display.infoDictionary)
 
         if let manufactureYear, let displayYearManufacture = infoDict[kDisplayYearOfManufacture] as? Int64, displayYearManufacture != 0 {
             score += (displayYearManufacture == manufactureYear).i
@@ -513,7 +508,7 @@ class DisplayController: ObservableObject {
         width: Int? = nil,
         height: Int? = nil
     ) -> Bool {
-        let infoDict = display.infoDictionary
+        let infoDict = (displayInfoDictionary(display.id) ?? display.infoDictionary)
         guard let displayYearManufacture = infoDict[kDisplayYearOfManufacture] as? Int64,
               let displaySerialNumber = infoDict[kDisplaySerialNumber] as? Int64,
               let displayProductID = infoDict[kDisplayProductID] as? Int64,
@@ -1645,13 +1640,8 @@ class DisplayController: ObservableObject {
 
     static func printMirrors(_ displays: [Display]) {
         for d in displays {
-            d.primaryMirrorScreen = d.getPrimaryMirrorScreen()
-//            d.secondaryMirrorScreenID = d.getSecondaryMirrorScreenID()
-            let primary = d.primaryMirrorScreen
-            let secondary = d.secondaryMirrorScreenID
-
-            log.debug("Primary mirror for \(d): \(String(describing: primary))")
-            log.debug("Secondary mirror for \(d): \(String(describing: secondary))")
+            log.debug("Primary mirror for \(d): \(String(describing: d.primaryMirrorScreen))")
+            log.debug("Secondary mirror for \(d): \(String(describing: d.secondaryMirrorScreenID))")
         }
     }
 

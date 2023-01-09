@@ -778,7 +778,6 @@ enum DDC {
 
             displayController.activeDisplays.values.forEach { display in
                 display.nsScreen = display.getScreen()
-                display.primaryMirrorScreen = display.getPrimaryMirrorScreen()
                 display.detectI2C()
                 display.startI2CDetection()
             }
