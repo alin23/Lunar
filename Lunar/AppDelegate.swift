@@ -45,8 +45,8 @@ let kAppleInterfaceThemeChangedNotification = "AppleInterfaceThemeChangedNotific
 let kAppleInterfaceStyle = "AppleInterfaceStyle"
 let kAppleInterfaceStyleSwitchesAutomatically = "AppleInterfaceStyleSwitchesAutomatically"
 
-let serviceBrowserQueue = RunloopQueue(named: "fyi.lunar.serviceBrowser.queue")
-let sensorHostnameQueue = RunloopQueue(named: "fyi.lunar.sensor.hostname.queue")
+let serviceBrowserQueue = DispatchQueue(label: "fyi.lunar.serviceBrowser.queue", qos: .userInteractive)
+let sensorHostnameQueue = DispatchQueue(label: "fyi.lunar.sensor.hostname.queue", qos: .userInteractive)
 let windowControllerQueue = DispatchQueue(label: "fyi.lunar.windowControllerQueue.queue", qos: .userInitiated)
 let concurrentQueue = DispatchQueue(label: "fyi.lunar.concurrent.queue", qos: .userInitiated, attributes: .concurrent)
 let smoothDDCQueue = DispatchQueue(label: "fyi.lunar.smooth.ddc.queue", qos: .userInitiated, attributes: .concurrent)
@@ -56,8 +56,7 @@ let smoothDisplayServicesQueue = DispatchQueue(
     attributes: .concurrent
 )
 
-let timerQueue = RunloopQueue(named: "fyi.lunar.timer.queue")
-let taskManagerQueue = RunloopQueue(named: "fyi.lunar.taskManager.queue")
+let taskManagerQueue = DispatchQueue(label: "fyi.lunar.taskManager.queue", qos: .userInteractive)
 let serialQueue = DispatchQueue(label: "fyi.lunar.serial.queue", qos: .userInitiated)
 let gammaQueue = DispatchQueue(label: "fyi.lunar.gamma.queue", qos: .userInteractive)
 let appName = (Bundle.main.infoDictionary?["CFBundleName"] as? String) ?? "Lunar"

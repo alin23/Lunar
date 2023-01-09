@@ -326,7 +326,7 @@ class NetworkControl: Control {
     }
 
     static func resetState(serial: String? = nil) {
-        asyncNow(runLoopQueue: serviceBrowserQueue) {
+        serviceBrowserQueue.async {
             if browserSemaphore.wait(for: 5) == .timedOut {
                 return
             }

@@ -187,7 +187,6 @@
 		C7ECB6722750C75C00DA212D /* LDSwiftEventSourceStatic in Frameworks */ = {isa = PBXBuildFile; productRef = C7ECB6712750C75C00DA212D /* LDSwiftEventSourceStatic */; };
 		C7EF9535243F4E2200839A62 /* Sysctl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7EF9534243F4E2200839A62 /* Sysctl.swift */; };
 		C7F48C4A2657A258000715A8 /* DataCompression in Frameworks */ = {isa = PBXBuildFile; productRef = C7F48C492657A258000715A8 /* DataCompression */; };
-		C7F862402608A34400704300 /* RunloopQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F8623F2608A34300704300 /* RunloopQueue.swift */; };
 		C7F99AC727175E0C00FBF192 /* SwiftyMarkdown in Frameworks */ = {isa = PBXBuildFile; productRef = C7F99AC627175E0C00FBF192 /* SwiftyMarkdown */; };
 		C7FE724F238EDFB100EBA6DA /* CoreDisplay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */; };
 /* End PBXBuildFile section */
@@ -372,7 +371,6 @@
 		C7E896D92652C0F60079A328 /* ExceptionCatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExceptionCatcher.h; sourceTree = "<group>"; };
 		C7E896DC2652C37E0079A328 /* CoreBrightness.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBrightness.framework; path = ../../../../../System/Library/PrivateFrameworks/CoreBrightness.framework; sourceTree = "<group>"; };
 		C7EF9534243F4E2200839A62 /* Sysctl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sysctl.swift; sourceTree = "<group>"; };
-		C7F8623F2608A34300704300 /* RunloopQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RunloopQueue.swift; sourceTree = "<group>"; };
 		FR_234235089941 /* Secrets.generated.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Secrets.generated.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -579,7 +577,6 @@
 		C790D4BC259B9DC100868689 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				C7F8623F2608A34300704300 /* RunloopQueue.swift */,
 				C7520C071FD20CC200756F82 /* DisplayController.swift */,
 				C78BD04D259B369A00FC823F /* Popovers.swift */,
 				C78BD04B259B365500FC823F /* Extensions.swift */,
@@ -1056,7 +1053,6 @@
 				C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */,
 				C7E80E342637060F004718A4 /* SFTP.swift in Sources */,
 				C784143827DDFBC400E14941 /* OSDWindow.swift in Sources */,
-				C7F862402608A34400704300 /* RunloopQueue.swift in Sources */,
 				C7E80E2C2637060F004718A4 /* FilePermissions.swift in Sources */,
 				C7A82DB7261B779E004146A8 /* SettingsPopoverController.swift in Sources */,
 				C7CBEFFD238E81FF00031E93 /* Util.swift in Sources */,

@@ -693,7 +693,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         if let dict = displayInfoDictionary(id) {
             infoDictionary = dict
-            setAudioIdentifier(from: infoDictionary)
         }
     }
 
@@ -770,7 +769,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         guard active else { return }
         if let dict = displayInfoDictionary(id) {
             infoDictionary = dict
-            setAudioIdentifier(from: infoDictionary)
         }
 
         startControls()
@@ -1312,23 +1310,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     var primaryMirrorScreenFetcher: Repeater?
 
-    lazy var primaryMirrorScreen: NSScreen? = {
-        NotificationCenter.default
-            .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
-            .debounce(for: .seconds(2), scheduler: RunLoop.main)
-            .sink { [weak self] _ in
-                guard let self else { return }
-                self.primaryMirrorScreen = self.getPrimaryMirrorScreen()
-                self.primaryMirrorScreenFetcher = Repeater(every: 2, times: 5, name: "primaryMirrorScreen-\(self.serial)") { [weak self] in
-                    guard let self else { return }
-                    self.primaryMirrorScreen = self.getPrimaryMirrorScreen()
-                }
-            }
-            .store(in: &observers)
-
-        return getPrimaryMirrorScreen()
-    }()
-
     lazy var armProps = DisplayController.armDisplayProperties(display: self)
     @Atomic var force = false
 
@@ -1601,6 +1582,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     lazy var isMacBook: Bool = isBuiltin && Sysctl.isMacBook
 
     lazy var usesDDCBrightnessControl: Bool = control is DDCControl || control is NetworkControl
+
+    var primaryMirrorScreen: NSScreen? {
+        getPrimaryMirrorScreen()
+    }
 
     @available(iOS 16, macOS 13, *)
     @objc dynamic var panelPresets: [MPDisplayPreset] {
@@ -3425,6 +3410,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .debounce(for: .seconds(2), scheduler: RunLoop.main)
             .sink { [weak self] _ in
                 guard let self else { return }
+                if let infoDict = displayInfoDictionary(self.id) {
+                    self.infoDictionary = infoDict
+                }
                 self.nsScreen = self.getScreen()
                 self.screenFetcher = Repeater(every: 2, times: 5, name: "screen-\(self.serial)") { [weak self] in
                     guard let self else { return }
@@ -3592,13 +3580,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             return name
         }
 
-//        if var name = DDC.getDisplayName(for: id) {
-//            name = name.stripped
-//            let minChars = floor(name.count.d * 0.8)
-//            if name.utf8.map({ c in (0x21 ... 0x7E).contains(c) ? 1 : 0 }).reduce(0, { $0 + $1 }) >= minChars {
-//                return name
-//            }
-//        }
         return "Unknown"
     }
 
@@ -3719,7 +3700,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func refetchScreens() {
-        primaryMirrorScreen = getPrimaryMirrorScreen()
         nsScreen = getScreen()
     }
 
@@ -4427,7 +4407,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     func possibleEDIDUUIDs() -> [String] {
         guard !isSidecar, !isAirplay, !isVirtual, !isDummy, !isProjector, !isForTesting else { return [] }
 
-        let infoDict = infoDictionary.dictionaryWithValues(forKeys: [
+        let infoDict = (displayInfoDictionary(id) ?? infoDictionary).dictionaryWithValues(forKeys: [
             kDisplaySerialNumber,
             kDisplayProductID,
             kDisplayWeekOfManufacture,
@@ -4436,8 +4416,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             kDisplayVerticalImageSize,
             kDisplayVendorID,
         ])
-        guard let serialNumber = infoDict[kDisplaySerialNumber] as? Int64,
-              let productID = infoDict[kDisplayProductID] as? Int64,
+        guard let productID = infoDict[kDisplayProductID] as? Int64,
               let vendorID = infoDict[kDisplayVendorID] as? Int64,
               let verticalPixels = infoDict[kDisplayVerticalImageSize] as? Int64,
               let horizontalPixels = infoDict[kDisplayHorizontalImageSize] as? Int64
@@ -4447,8 +4426,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         let manufactureWeek = (infoDict[kDisplayWeekOfManufacture] as? Int64) ?? 0
         let yearByte = cap(manufactureYear >= 1990 ? manufactureYear - 1990 : manufactureYear, minVal: 0, maxVal: 255).u8.hex.uppercased()
         let weekByte = cap(manufactureWeek, minVal: 0, maxVal: 255).u8.hex.uppercased()
-        let vendorBytes = vendorID.u16.str(reversed: true, separator: "").uppercased()
-        let productBytes = productID.u16.str(reversed: false, separator: "").uppercased()
+        let vendorBytes = (vendorID & UINT16_MAX.i64).u16.str(reversed: true, separator: "").uppercased()
+        let productBytes = (productID & UINT16_MAX.i64).u16.str(reversed: false, separator: "").uppercased()
         // let serialBytes = serialNumber.u32.str(reversed: false, separator: "").uppercased()
         let verticalBytes = (verticalPixels / 10).u8.hex.uppercased()
         let horizontalBytes = (horizontalPixels / 10).u8.hex.uppercased()
@@ -4466,7 +4445,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         #if !arch(arm64)
             if (infoDictionary["IODisplayPrefsKey"] as? String) == nil, let dict = displayInfoDictionary(id) {
                 infoDictionary = dict
-                setAudioIdentifier(from: infoDictionary)
             }
         #endif
     }

@@ -58,6 +58,8 @@ class ALSInstallViewController: NSViewController {
         self?.startFirmwareInstallation()
     }
 
+    var installFinishChecker: Repeater?
+
     @objc dynamic var board: String = SELECT_BOARD_ITEM {
         didSet {
             setInstallButtonEnabled()
@@ -220,9 +222,9 @@ class ALSInstallViewController: NSViewController {
             self?.cancelFirmwareInstallation()
         }
 
-        asyncEvery(1.seconds) { [weak self] (timer: Timer) in
+        installFinishChecker = Repeater(every: 1) { [weak self] in
             guard let self, !self.stopped else {
-                timer.invalidate()
+                self?.installFinishChecker = nil
                 return
             }
 
@@ -236,7 +238,6 @@ class ALSInstallViewController: NSViewController {
             self.operationDescription = Data(lastLines).str().attributedString
         }
     }
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
