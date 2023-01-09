@@ -714,8 +714,6 @@ func serialAsyncAfter(ms: Int, _ action: DispatchWorkItem) {
 
     let task: DispatchWorkItem
     if let key = uniqueTaskKey {
-//        let queue = mainThread ? mainQueue : timerQueue
-//        taskQueueLock.around { taskQueue[key] = queue }
         task = DispatchWorkItem(name: "Unique Task \(key) asyncAfter(\(ms) ms)") {
             guard !isCancelled(key) else {
                 taskManager(key, nil)
@@ -752,129 +750,6 @@ func taskIsRunning(_ key: String) -> Bool {
     return false
 }
 
-func asyncEvery(
-    _ interval: DateComponents,
-    leeway: DateComponents = 0.seconds,
-    uniqueTaskKey: String? = nil,
-    runs: Int? = nil,
-    skipIfExists: Bool = false,
-    eager: Bool = false,
-    queue: DispatchQueue? = nil,
-    onSuccess: (() -> Void)? = nil,
-    onCancelled: (() -> Void)? = nil,
-    _ action: @escaping () -> Void
-) {
-    let queue = queue ?? concurrentQueue
-    taskManagerQueue.async {
-        if skipIfExists, let key = uniqueTaskKey, let timer = taskManager(key) as? DispatchSourceTimer, !timer.isCancelled {
-            return
-        }
-
-        let timer = DispatchSource.makeTimerSource(flags: [], queue: queue)
-        timer.schedule(
-            deadline: DispatchTime.now() + (eager ? 0 : interval.timeInterval),
-            repeating: interval.timeInterval,
-            leeway: .milliseconds((leeway.timeInterval * 1000).intround)
-        )
-        timer.setEventHandler {
-            action()
-            taskManagerQueue.async {
-                guard let key = uniqueTaskKey,
-                      let runs = taskManager("\(key)-runs") as? Int,
-                      let maxRuns = taskManager("\(key)-maxRuns") as? Int
-                else {
-                    return
-                }
-
-                if runs >= maxRuns || isCancelled(key) {
-                    cancelTask(key)
-                } else {
-                    taskManager("\(key)-runs", runs + 1)
-                }
-            }
-        }
-        timer.setCancelHandler {
-            taskManagerQueue.async {
-                guard let key = uniqueTaskKey,
-                      let runs = taskManager("\(key)-runs") as? Int,
-                      let maxRuns = taskManager("\(key)-maxRuns") as? Int
-                else {
-                    return
-                }
-
-                if runs >= maxRuns {
-                    queue.async { onSuccess?() }
-                } else {
-                    queue.async { onCancelled?() }
-                }
-            }
-        }
-
-        if let key = uniqueTaskKey {
-            taskManagerQueue.async {
-                (taskManager(key) as? DispatchSourceTimer)?.cancel()
-                taskManager(key, timer)
-
-                if let runs {
-                    taskManager("\(key)-maxRuns", runs)
-                    taskManager("\(key)-runs", 0)
-                }
-            }
-        }
-        timer.activate()
-    }
-}
-
-func asyncEvery(
-    _ interval: DateComponents,
-    uniqueTaskKey: String? = nil,
-    runs: Int? = nil,
-    skipIfExists: Bool = false,
-    eager: Bool = false,
-    queue: RunloopQueue? = nil,
-    onSuccess: (() -> Void)? = nil,
-    onCancelled: (() -> Void)? = nil,
-    _ action: @escaping (Timer) -> Void
-) {
-    let queue = queue ?? timerQueue
-    queue.async {
-        if skipIfExists, let key = uniqueTaskKey, let timer = taskManager(key) as? Timer, timer.isValid {
-            return
-        }
-
-        let timer = Timer.scheduledTimer(withTimeInterval: interval.timeInterval, repeats: true) { timer in
-            action(timer)
-            guard let key = uniqueTaskKey,
-                  let runs = taskManager("\(key)-runs") as? Int,
-                  let maxRuns = taskManager("\(key)-maxRuns") as? Int
-            else {
-                return
-            }
-
-            if runs >= maxRuns || isCancelled(key) {
-                timer.invalidate()
-                taskManager(key, nil)
-                if runs >= maxRuns { onSuccess?() } else { onCancelled?() }
-            } else {
-                taskManager("\(key)-runs", runs + 1)
-            }
-        }
-
-        if eager { action(timer) }
-
-        if let key = uniqueTaskKey {
-//            taskQueueLock.around { taskQueue[key] = queue }
-            (taskManager(key) as? Timer)?.invalidate()
-            taskManager(key, timer)
-
-            if let runs {
-                taskManager("\(key)-maxRuns", runs)
-                taskManager("\(key)-runs", 0)
-            }
-        }
-    }
-}
-
 func cancelScreenWakeAdapterTask() {
     appDelegate!.screenWakeAdapterTask = nil
 }
@@ -900,7 +775,6 @@ func cancelTask(_ key: String, subscriberKey: String? = nil) {
 @discardableResult func asyncNow(
     timeout: DateComponents? = nil,
     queue: DispatchQueue? = nil,
-    runLoopQueue: RunloopQueue? = nil,
     threaded: Bool = false,
     barrier: Bool = false,
     _ action: @escaping () -> Void
@@ -928,24 +802,6 @@ func cancelTask(_ key: String, subscriberKey: String? = nil) {
         return result
     }
 
-    if let queue = runLoopQueue {
-        guard let timeout else {
-            queue.async { action() }
-            return .success
-        }
-
-        let semaphore = DispatchSemaphore(value: 0, name: "Async RunLoopQueue Timeout")
-
-        queue.async {
-            action()
-            semaphore.signal()
-        }
-
-        let result = semaphore.wait(for: timeout)
-
-        return result
-    }
-
     let queue = queue ?? concurrentQueue
     guard let timeout else {
         if barrier {
@@ -969,10 +825,6 @@ func cancelTask(_ key: String, subscriberKey: String? = nil) {
     return result
 }
 
-func asyncEvery(_ interval: DateComponents, queue: RunloopQueue, _ action: @escaping (CFRunLoopTimer?) -> Void) -> CFRunLoopTimer? {
-    queue.async(every: interval, action)
-}
-
 func asyncEvery(_ interval: DateComponents, qos: QualityOfService? = nil, _ action: @escaping (inout TimeInterval) -> Void) -> Thread {
     let thread = Thread {
         var pollingInterval = interval.timeInterval
@@ -993,19 +845,19 @@ func asyncEvery(_ interval: DateComponents, qos: QualityOfService? = nil, _ acti
 }
 
 var globalObservers: [String: AnyCancellable] = Dictionary(minimumCapacity: 100)
-// var taskQueue: [String: RunloopQueue] = Dictionary(minimumCapacity: 100)
-// let taskQueueLock = NSRecursiveLock()
 
-func sync<T>(queue: RunloopQueue, _ action: @escaping () -> T) -> T {
-    if let q = DispatchQueue.current, queue == q {
-        return action()
-    } else {
-        return queue.sync { action() }
+extension DispatchQueue {
+    func syncSafe<T>(_ action: @escaping () -> T) -> T {
+        if let q = DispatchQueue.current, self == q {
+            return action()
+        } else {
+            return sync { action() }
+        }
     }
 }
 
 func isCancelled(_ key: String) -> Bool {
-    sync(queue: taskManagerQueue) {
+    taskManagerQueue.syncSafe {
         Thread.current.threadDictionary[key] == nil || (Thread.current.threadDictionary["\(key)-cancelled"] as? Bool) ?? false
     }
 }
@@ -1015,7 +867,7 @@ func taskManager(_ key: String, _ value: Any?) {
 }
 
 func taskManager(_ key: String) -> Any? {
-    sync(queue: taskManagerQueue) {
+    taskManagerQueue.syncSafe {
         Thread.current.threadDictionary[key]
     }
 }

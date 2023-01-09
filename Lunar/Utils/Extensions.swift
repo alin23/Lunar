@@ -61,6 +61,13 @@ extension DispatchQueue {
             serialQueue,
             DDC.queue,
             CachedDefaults.cache.accessQueue,
+            serviceBrowserQueue,
+            sensorHostnameQueue,
+            windowControllerQueue,
+            smoothDDCQueue,
+            smoothDisplayServicesQueue,
+            taskManagerQueue,
+            gammaQueue,
         ]
         _registerDetection(of: queues, key: key)
     }
