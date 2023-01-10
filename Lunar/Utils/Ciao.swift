@@ -25,7 +25,7 @@ public class CiaoBrowser {
         netServiceBrowser.delegate = delegate
         delegate.browser = self
         netServiceBrowser.remove(from: RunLoop.current, forMode: .default)
-        serviceBrowserQueue.sync {
+        serviceBrowserQueue.syncSafe {
             self.netServiceBrowser.schedule(in: RunLoop.current, forMode: .default)
         }
     }
@@ -78,7 +78,7 @@ public class CiaoBrowser {
             service.stopMonitoring()
         }
 
-        serviceBrowserQueue.sync {
+        serviceBrowserQueue.syncSafe {
             self.netServiceBrowser.stop()
         }
     }
@@ -87,7 +87,7 @@ public class CiaoBrowser {
     var delegate: CiaoBrowserDelegate
 
     fileprivate func serviceFound(_ service: NetService) {
-        serviceBrowserQueue.sync {
+        serviceBrowserQueue.syncSafe {
             service.schedule(in: RunLoop.current, forMode: .default)
         }
         service.startMonitoring()
