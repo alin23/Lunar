@@ -4605,7 +4605,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func resetDDC() {
-        DDC.sync(barrier: true) { DDC.dcpList = buildDCPList() }
+        #if arch(arm64)
+            DDC.sync(barrier: true) { DDC.dcpList = buildDCPList() }
+        #endif
         detectI2C()
 
         ddcResetPublisher.send(true)

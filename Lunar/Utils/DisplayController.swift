@@ -107,6 +107,7 @@ import SwiftyJSON
             IOObjectRelease(dcpAvServiceProxy)
             IOObjectRelease(clcd2Service)
         }
+
         init?(dispService: io_service_t, txIOIterator: io_iterator_t, index: Int) {
             guard let dispName = IOServiceName(dispService), DISP_NAMES.contains(dispName) else {
                 return nil
@@ -148,7 +149,7 @@ import SwiftyJSON
                 log.debug("No display props for service \(dispName)")
             }
 
-            guard let edidUUID = (displayProps["EDID UUID"] as? String) ?? (displayProps["IOMFBUUID"] as? String)
+            guard let edidUUID = (displayProps["EDID UUID"] as? String) ?? (displayProps["IOMFBUUID"] as? String), !edidUUID.isEmpty
             else {
                 log.debug("No EDID UUID for service \(dispName)")
                 return nil
