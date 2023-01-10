@@ -148,6 +148,12 @@ import SwiftyJSON
                 log.debug("No display props for service \(dispName)")
             }
 
+            guard let edidUUID = (displayProps["EDID UUID"] as? String) ?? (displayProps["IOMFBUUID"] as? String)
+            else {
+                log.debug("No EDID UUID for service \(dispName)")
+                return nil
+            }
+
             var transport: Transport?
             if let transportDict = displayProps["Transport"] as? [String: String] {
                 transport = Transport(
@@ -170,7 +176,7 @@ import SwiftyJSON
             self.dispName = dispName
             self.dcpName = dcpName
             self.avService = avService
-            edidUUID = (displayProps["EDID UUID"] as? String) ?? (displayProps["IOMFBUUID"] as? String)
+            self.edidUUID = edidUUID
             isMCDP = isMCDP29XX(dcpAvServiceProxy: dcpAvServiceProxy)
             self.displayProps = displayAttributes
             self.transport = transport
@@ -404,7 +410,7 @@ class DisplayController: ObservableObject {
     @Published var activeDisplayList: [Display] = [] {
         didSet {
             #if arch(arm64)
-                DDC.dcpList = buildDCPList()
+                DDC.rebuildDCPList()
             #endif
         }
     }
@@ -2193,7 +2199,6 @@ class DisplayController: ObservableObject {
                 if let id = self?.builtinDisplay?.id {
                     DisplayServicesGetLinearBrightness(id, &br)
                     computedProps["DisplayServicesGetLinearBrightness"] = br.str(decimals: 4)
-                    computedProps["CoreDisplay_Display_GetUserBrightness"] = CoreDisplay_Display_GetUserBrightness(id).str(decimals: 4)
                 }
                 armProps["ComputedProps"] = computedProps
 

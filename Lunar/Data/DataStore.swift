@@ -842,7 +842,7 @@ enum AppSettings {
 let adaptiveBrightnessModePublisher = Defaults.publisher(.adaptiveBrightnessMode)
 
 let colorSchemePublisher = Defaults.publisher(.colorScheme).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
-let startAtLoginPublisher = Defaults.publisher(.startAtLogin).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let startAtLoginPublisher = Defaults.publisher(.startAtLogin).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let showBrightnessMenuBarPublisher = Defaults.publisher(.showBrightnessMenuBar).removeDuplicates().dropFirst()
     .filter { $0.oldValue != $0.newValue }
 let showOnlyExternalBrightnessMenuBarPublisher = Defaults.publisher(.showOnlyExternalBrightnessMenuBar).removeDuplicates().dropFirst()

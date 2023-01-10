@@ -13,7 +13,7 @@ import SwiftUI
 
 // MARK: - Preset
 
-struct Preset: Codable, Defaults.Serializable, Hashable, Equatable, Identifiable, Sendable {
+struct Preset: Codable, Defaults.Serializable, Hashable, Equatable, Identifiable {
     init(id: String, key: Int, configs: [PresetConfig]) {
         self.id = id
         self.key = key

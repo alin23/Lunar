@@ -33,6 +33,8 @@ import AVFoundation
 import Path
 import SwiftUI
 
+import ServiceManagement
+
 let fm = FileManager()
 let simplyCA = SimplyCoreAudio()
 var brightnessTransition = BrightnessTransition.instant
@@ -286,6 +288,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     var signalHandlers: [DispatchSourceSignal] = []
 
     var env = EnvState()
+
+    let APP_DIR = ((try? p("/Applications")?.realpath()) ?? p("/Applications"))?.components ?? ["Applications"]
+    let SVAPP_DIR = ((try? p("/System/Volumes/Data/Applications")?.realpath()) ?? p("/System/Volumes/Data/Applications"))?.components ?? ["System", "Volumes", "Data", "Applications"]
 
     var currentPage: Int = Page.display.rawValue {
         didSet {
@@ -742,13 +747,22 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             )
         }
     }
-
     func handleDaemon() {
         let handler = { (shouldStartAtLogin: Bool) in
-            guard let appPath = p(Bundle.main.bundlePath),
-                  appPath.parent == p("/Applications")
-            else { return }
-            LaunchAtLoginController().setLaunchAtLogin(shouldStartAtLogin, for: appPath.url)
+            guard let appPath = p(Bundle.main.bundlePath) else { return }
+
+            let appDir = (try? appPath.parent.realpath()) ?? appPath.parent
+            guard appDir.components.starts(with: self.APP_DIR) || appDir.components.starts(with: self.SVAPP_DIR) else { return }
+
+            if #available(macOS 13.0, *) {
+                if shouldStartAtLogin {
+                    try? SMAppService.mainApp.register()
+                } else {
+                    try? SMAppService.mainApp.unregister()
+                }
+            } else {
+                LaunchAtLoginController().setLaunchAtLogin(shouldStartAtLogin, for: appPath.url)
+            }
         }
 
         handler(CachedDefaults[.startAtLogin])
@@ -1169,6 +1183,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             }
             displayController.panelRefreshPublisher.send(displayID)
             displayController.retryAutoBlackoutLater()
+
+            #if arch(arm64)
+                DDC.rebuildDCPList()
+            #endif
         }, nil)
 
         DistributedNotificationCenter
@@ -1240,6 +1258,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
             .sink { notification in
                 log.info("\(notification.name)")
+
+                #if arch(arm64)
+                    DDC.rebuildDCPList()
+                #endif
+
                 displayController.activeDisplays.values.filter { !$0.isForTesting }.forEach { d in
                     let maxEDR = d.computeMaxEDR()
 

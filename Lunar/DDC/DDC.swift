@@ -699,7 +699,7 @@ enum DDC {
             guard !isTestID(displayID) else { return nil }
 
             return sync(barrier: true) {
-                if !ignoreCache, let dcp = dcpMapping[displayID], dcp.avService != nil {
+                if !ignoreCache, let dcp = dcpMapping[displayID] {
                     return dcp
                 }
 
@@ -711,6 +711,17 @@ enum DDC {
 
         static func AVService(displayID: CGDirectDisplayID, ignoreCache: Bool = false) -> IOAVService? {
             DCP(displayID: displayID, ignoreCache: ignoreCache)?.avService
+        }
+
+        static var rebuildDCPTask: DispatchWorkItem? {
+            didSet {
+                oldValue?.cancel()
+            }
+        }
+        static func rebuildDCPList() {
+            rebuildDCPTask = DDC.asyncAfter(ms: 200) {
+                DDC.dcpList = buildDCPList()
+            }
         }
     #endif
 
@@ -745,6 +756,18 @@ enum DDC {
         delayDDCAfterWake && waitAfterWakeSeconds > 0 && wakeTime != startTime && timeSince(wakeTime) > waitAfterWakeSeconds.d
     }
 
+    @discardableResult
+    static func asyncAfter(ms: Int, _ action: @escaping () -> Void) -> DispatchWorkItem {
+        let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
+
+        let workItem = DispatchWorkItem(name: "DDC Async After") {
+            action()
+        }
+        queue.asyncAfter(deadline: deadline, execute: workItem.workItem)
+
+        return workItem
+    }
+
     #if arch(arm64)
         static var dcpList: [DCP] = buildDCPList() {
             didSet {
@@ -762,8 +785,8 @@ enum DDC {
     static func IORegistryTreeChanged() {
         #if DEBUG
             print("IORegistryTreeChanged")
-            print("secondPhase", Defaults[.secondPhase] as Any)
         #endif
+
         DDC.sync(barrier: true) {
             #if !DEBUG
                 if Defaults[.secondPhase] == nil || Defaults[.secondPhase] == true {
