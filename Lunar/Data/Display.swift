@@ -3284,7 +3284,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             if active {
                 #if arch(arm64)
                     if !oldValue {
-                        DDC.dcpList = buildDCPList()
+                        DDC.rebuildDCPList()
                     }
                 #endif
 
@@ -4493,6 +4493,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 mainAsync { self?.hasI2C = false }
                 return
             }
+            #if arch(arm64)
+                DDC.rebuildDCPList()
+            #endif
             self.updateCornerWindow()
             self.detectI2C()
             if self.hasI2C {
@@ -4602,6 +4605,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func resetDDC() {
+        DDC.sync(barrier: true) { DDC.dcpList = buildDCPList() }
         detectI2C()
 
         ddcResetPublisher.send(true)
@@ -4914,11 +4918,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 "blueGamma": self.blueGamma,
             ]
 
-            #if arch(arm64)
-                DDC.sync {
-                    dict["ddcid"] = ddcid(self.serial)
-                }
-            #endif
             scope.setExtra(value: dict, key: "display-\(self.serial)")
         }
     }
