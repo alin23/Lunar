@@ -48,7 +48,7 @@ let kAppleInterfaceStyle = "AppleInterfaceStyle"
 let kAppleInterfaceStyleSwitchesAutomatically = "AppleInterfaceStyleSwitchesAutomatically"
 
 let serviceBrowserQueue = DispatchQueue(label: "fyi.lunar.serviceBrowser.queue", qos: .userInteractive)
-let sensorHostnameQueue = DispatchQueue(label: "fyi.lunar.sensor.hostname.queue", qos: .userInteractive)
+let sensorHostnameQueue = DispatchQueue(label: "fyi.lunar.sensor.hostname.queue", qos: .background)
 let windowControllerQueue = DispatchQueue(label: "fyi.lunar.windowControllerQueue.queue", qos: .userInitiated)
 let concurrentQueue = DispatchQueue(label: "fyi.lunar.concurrent.queue", qos: .userInitiated, attributes: .concurrent)
 let smoothDDCQueue = DispatchQueue(label: "fyi.lunar.smooth.ddc.queue", qos: .userInitiated, attributes: .concurrent)
