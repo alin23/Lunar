@@ -24,7 +24,7 @@ assignees: alin23
     *Sync, Location, Sensor or Manual*
 
 - Tried Lunar Diagnostics?
-> 1. Click on **Open Lunar Diagnostics** in the Lunar menu
+> 1. Click on **Open external monitor diagnostics** in the Lunar menu
 > 2. Follow through the steps when asked
 
 ![Lunar Diagnostics menu item](https://files.lunar.fyi/diagnostics-menu-item.png)

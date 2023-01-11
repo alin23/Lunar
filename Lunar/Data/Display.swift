@@ -606,9 +606,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             showVolumeSlider = canChangeVolume && CachedDefaults[.showVolumeSlider]
             noDDCOrMergedBrightnessContrast = !hasDDC || CachedDefaults[.mergeBrightnessContrast]
             showOrientation = canRotate && CachedDefaults[.showOrientationInQuickActions]
-            withoutApply {
-                rotation = CGDisplayRotation(id).intround
-                enhanced = Self.getWindowController(id, type: "hdr") != nil
+            withoutModeChangeAsk {
+                withoutApply {
+                    rotation = CGDisplayRotation(id).intround
+                    enhanced = Self.getWindowController(id, type: "hdr") != nil
+                }
             }
         }
 
@@ -749,9 +751,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             showVolumeSlider = canChangeVolume && CachedDefaults[.showVolumeSlider]
             noDDCOrMergedBrightnessContrast = !hasDDC || CachedDefaults[.mergeBrightnessContrast]
             showOrientation = canRotate && CachedDefaults[.showOrientationInQuickActions]
-            withoutApply {
-                rotation = CGDisplayRotation(id).intround
-                enhanced = Self.getWindowController(id, type: "hdr") != nil
+            withoutModeChangeAsk {
+                withoutApply {
+                    rotation = CGDisplayRotation(id).intround
+                    enhanced = Self.getWindowController(id, type: "hdr") != nil
+                }
             }
             blackOutMirroringAllowed = supportsGammaByDefault || isFakeDummy
         }
@@ -764,7 +768,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         useOverlay = !supportsGammaByDefault
-        enabledControls[.ddc] = !isTV
+        enabledControls[.ddc] = !isTV && !isStudioDisplay()
         enabledControls[.gamma] = !isSmartBuiltin
         guard active else { return }
         if let dict = displayInfoDictionary(id) {
@@ -1424,7 +1428,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @objc dynamic lazy var hasNotch: Bool = {
         if #available(macOS 12.0, *), isMacBook {
-            return (self.nsScreen?.safeAreaInsets.top ?? 0) > 0 || self.panelMode?.withNotch(modes: self.panelModes) != nil
+            return self.isBuiltin && ((self.nsScreen?.safeAreaInsets.top ?? 0) > 0 || self.panelMode?.withNotch(modes: self.panelModes) != nil)
         } else {
             return false
         }
@@ -1568,8 +1572,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     var screenFetcher: Repeater?
 
-    var builtinBrightnessRefresher: Repeater?
-    var builtinContrastRefresher: Repeater?
+    var nativeBrightnessRefresher: Repeater?
+    var nativeContrastRefresher: Repeater?
 
     @Published @objc dynamic var brightnessU16: UInt16 = 50
 
@@ -2212,6 +2216,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             hasSoftwareControl = control.isSoftware
             isNative = control is AppleNativeControl
 
+            if isNative {
+                mainAsync { [weak self] in
+                    self?.startBrightnessContrastRefreshers()
+                }
+            }
+
             log.debug(
                 "Display got \(control.str)",
                 context: context
@@ -2227,7 +2237,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 }
                 setGamma()
             }
-            if control is AppleNativeControl {
+            if isNative {
                 alternativeControlForAppleNative = getBestAlternativeControlForAppleNative()
             }
             onControlChange?(control)
@@ -2308,7 +2318,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     var supportsVolumeControl: Bool {
         guard let control, !hasSoftwareControl else { return false }
-        if control is AppleNativeControl, let alternativeControl = alternativeControlForAppleNative {
+        if isNative, let alternativeControl = alternativeControlForAppleNative {
             return alternativeControl is DDCControl || alternativeControl is NetworkControl
         }
         return control is DDCControl || control is NetworkControl
@@ -2825,7 +2835,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 return
             }
 
-            guard !(control is AppleNativeControl) else {
+            guard !isNative else {
                 withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
                     mainThread {
                         self.brightness = brightness.ns
@@ -4079,14 +4089,16 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func refreshPanel() {
-        withoutDDC {
-            rotation = CGDisplayRotation(id).intround
+        withoutModeChangeAsk {
+            withoutDDC {
+                rotation = CGDisplayRotation(id).intround
 
-            guard let mgr = DisplayController.panelManager else { return }
-            panel = mgr.display(withID: id.i32) as? MPDisplay
+                guard let mgr = DisplayController.panelManager else { return }
+                panel = mgr.display(withID: id.i32) as? MPDisplay
 
-            panelMode = panel?.currentMode
-            modeNumber = panel?.currentMode?.modeNumber ?? -1
+                panelMode = panel?.currentMode
+                modeNumber = panel?.currentMode?.modeNumber ?? -1
+            }
         }
     }
 
@@ -4367,17 +4379,22 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
         }
 
-        guard isSmartBuiltin else { return }
+        startBrightnessContrastRefreshers()
+    }
+
+    func startBrightnessContrastRefreshers() {
+        guard isNative else { return }
+
         let listensForBrightnessChange = observeBrightnessChangeDS() && hasBrightnessChangeObserver
         let refreshSeconds = listensForBrightnessChange ? 5.0 : 2.0
-        builtinBrightnessRefresher = Repeater(every: refreshSeconds, name: "Builtin Brightness Refresher") { [weak self] in
-            guard let self, !displayController.screensSleeping, !self.hasSoftwareControl else {
+        nativeBrightnessRefresher = nativeBrightnessRefresher ?? Repeater(every: refreshSeconds, name: "\(name) Brightness Refresher") { [weak self] in
+            guard let self, !displayController.screensSleeping, self.isNative else {
                 return
             }
             self.refreshBrightness()
         }
-        builtinContrastRefresher = Repeater(every: 15, name: "Builtin Contrast Refresher") { [weak self] in
-            guard let self, !displayController.screensSleeping, !self.hasSoftwareControl else {
+        nativeContrastRefresher = nativeContrastRefresher ?? Repeater(every: 15, name: "\(name) Contrast Refresher") { [weak self] in
+            guard let self, !displayController.screensSleeping, self.isNative else {
                 return
             }
 
@@ -4925,27 +4942,27 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func isStudioDisplay() -> Bool {
-        name.contains(STUDIO_DISPLAY_NAME) || edidName.contains(STUDIO_DISPLAY_NAME)
+        edidName.contains(STUDIO_DISPLAY_NAME)
     }
 
     func isUltraFine() -> Bool {
-        name.contains(ULTRAFINE_NAME) || edidName.contains(ULTRAFINE_NAME)
+        edidName.contains(ULTRAFINE_NAME)
     }
 
     func isThunderbolt() -> Bool {
-        name.contains(THUNDERBOLT_NAME) || edidName.contains(THUNDERBOLT_NAME)
+        edidName.contains(THUNDERBOLT_NAME)
     }
 
     func isLEDCinema() -> Bool {
-        name.contains(LED_CINEMA_NAME) || edidName.contains(LED_CINEMA_NAME)
+        edidName.contains(LED_CINEMA_NAME)
     }
 
     func isCinema() -> Bool {
-        name == CINEMA_NAME || edidName == CINEMA_NAME || name == CINEMA_HD_NAME || edidName == CINEMA_HD_NAME
+        edidName == CINEMA_NAME || edidName == CINEMA_HD_NAME
     }
 
     func isColorLCD() -> Bool {
-        name.contains(COLOR_LCD_NAME) || edidName.contains(COLOR_LCD_NAME)
+        edidName.contains(COLOR_LCD_NAME)
     }
 
     func isAppleDisplay() -> Bool {
@@ -5562,7 +5579,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         enabledControls = [
             .network: true,
             .appleNative: true,
-            .ddc: !isTV,
+            .ddc: !isTV && !isStudioDisplay(),
             .gamma: !DDC.isSmartBuiltinDisplay(id),
         ]
         brightnessCurveFactors = [
@@ -5633,7 +5650,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     @inline(__always) func withoutDisplayServices(_ block: () -> Void) {
-        guard control is AppleNativeControl else {
+        guard isNative else {
             block()
             return
         }

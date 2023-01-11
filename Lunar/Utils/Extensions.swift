@@ -62,7 +62,6 @@ extension DispatchQueue {
             DDC.queue,
             CachedDefaults.cache.accessQueue,
             serviceBrowserQueue,
-            sensorHostnameQueue,
             windowControllerQueue,
             smoothDDCQueue,
             smoothDisplayServicesQueue,
