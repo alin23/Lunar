@@ -20,8 +20,8 @@ var downHotkey: Magnet.HotKey?
 var leftHotkey: Magnet.HotKey?
 var rightHotkey: Magnet.HotKey?
 
-var mediaKeyTapBrightness: MediaKeyTap?
-var mediaKeyTapAudio: MediaKeyTap?
+var mediaKeyTapBrightness = MediaKeyTap(delegate: appDelegate!, for: [.brightnessUp, .brightnessDown], observeBuiltIn: true)
+var mediaKeyTapAudio = MediaKeyTap(delegate: appDelegate!, for: [.mute, .volumeUp, .volumeDown], observeBuiltIn: true)
 let fineAdjustmentDisabledBecauseOfOptionKey = "Fine adjustment can't be enabled when the hotkey uses the Option key"
 
 // MARK: - HotkeyIdentifier
@@ -930,46 +930,27 @@ extension AppDelegate: MediaKeyTapDelegate {
             if !self.mediaKeyTapBrightnessStarting {
                 self.mediaKeyTapBrightnessStarting = true
 
-                mediaKeyTapBrightness?.stop()
-                mediaKeyTapBrightness = nil
-
                 if brightnessKeysEnabled ?? CachedDefaults[.brightnessKeysEnabled] {
-                    mediaKeyTapBrightness = MediaKeyTap(delegate: self, for: [.brightnessUp, .brightnessDown], observeBuiltIn: true)
-                    self.startAsync(mediaKeyTap: mediaKeyTapBrightness!) { self.mediaKeyTapBrightnessStarting = false }
+                    mediaKeyTapBrightness.restart()
                 } else {
-                    self.mediaKeyTapBrightnessStarting = false
+                    mediaKeyTapBrightness.stop()
                 }
+
+                self.mediaKeyTapBrightnessStarting = false
             }
 
             if !self.mediaKeyTapAudioStarting {
                 self.mediaKeyTapAudioStarting = true
 
-                mediaKeyTapAudio?.stop()
-                mediaKeyTapAudio = nil
-
-                if volumeKeysEnabled ?? CachedDefaults[.volumeKeysEnabled], let audioDevice = simplyCA.defaultOutputDevice,
-                   !audioDevice.canSetVirtualMainVolume(scope: .output)
-                {
-                    mediaKeyTapAudio = MediaKeyTap(delegate: self, for: [.mute, .volumeUp, .volumeDown], observeBuiltIn: true)
-                    self.startAsync(mediaKeyTap: mediaKeyTapAudio!) { self.mediaKeyTapAudioStarting = false }
+                if volumeKeysEnabled ?? CachedDefaults[.volumeKeysEnabled], let audioDevice = simplyCA.defaultOutputDevice, !audioDevice.canSetVirtualMainVolume(scope: .output) {
+                    mediaKeyTapAudio.restart()
                 } else {
-                    self.mediaKeyTapAudioStarting = false
+                    mediaKeyTapAudio.stop()
                 }
+
+                self.mediaKeyTapAudioStarting = false
             }
         }
-    }
-
-    func startAsync(mediaKeyTap: MediaKeyTap, onEnd: () -> Void) {
-        let task = DispatchWorkItem(name: "Start MediaKeyTap") {
-            mediaKeyTap.start(tries: 0)
-        }
-        DispatchQueue.global().async(execute: task.workItem)
-
-        let result = task.wait(for: 5)
-        if result == .timedOut {
-            task.cancel()
-        }
-        onEnd()
     }
 
     func openPreferences(_ mediaKey: MediaKey, event: CGEvent) -> CGEvent? {

@@ -26,6 +26,9 @@ let gray = #colorLiteral(red: 0.9254902005, green: 0.9294117689, blue: 0.9450980
 let white = NSColor(deviceWhite: 1.0, alpha: 1.0)
 let faceLightColor = white.blended(withFraction: 0.15, of: orange) ?? white
 
+let xdrColor = NSColor(hue: 0.61, saturation: 0.26, brightness: 0.78, alpha: 1)
+let subzeroColor = NSColor(hue: 0.98, saturation: 0.56, brightness: 1.00, alpha: 1)
+
 let bgColor = white
 var hotkeysBgColor: NSColor { darkMode ? blackMauve : darkMauve }
 var settingsBgColor: NSColor { darkMode ? peach : lunarYellow }

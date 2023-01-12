@@ -1864,25 +1864,65 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var sendingBrightness = false {
         didSet {
             manageSendingValue(.sendingBrightness, oldValue: oldValue)
+            guard sendingBrightness else {
+                sendingBrightnessResetter = nil
+                return
+            }
+            sendingBrightnessResetter = mainAsyncAfter(ms: 3000) { [weak self] in
+                self?.sendingBrightness = false
+            }
         }
+    }
+    var sendingBrightnessResetter: DispatchWorkItem? = nil {
+        didSet { oldValue?.cancel() }
     }
 
     @Published @objc dynamic var sendingContrast = false {
         didSet {
             manageSendingValue(.sendingContrast, oldValue: oldValue)
+            guard sendingContrast else {
+                sendingContrastResetter = nil
+                return
+            }
+            sendingContrastResetter = mainAsyncAfter(ms: 3000) { [weak self] in
+                self?.sendingContrast = false
+            }
         }
+    }
+    var sendingContrastResetter: DispatchWorkItem? = nil {
+        didSet { oldValue?.cancel() }
     }
 
     @Published @objc dynamic var sendingInput = false {
         didSet {
             manageSendingValue(.sendingInput, oldValue: oldValue)
+            guard sendingInput else {
+                sendingInputResetter = nil
+                return
+            }
+            sendingInputResetter = mainAsyncAfter(ms: 3000) { [weak self] in
+                self?.sendingInput = false
+            }
         }
+    }
+    var sendingInputResetter: DispatchWorkItem? = nil {
+        didSet { oldValue?.cancel() }
     }
 
     @Published @objc dynamic var sendingVolume = false {
         didSet {
             manageSendingValue(.sendingVolume, oldValue: oldValue)
+            guard sendingVolume else {
+                sendingVolumeResetter = nil
+                return
+            }
+            sendingVolumeResetter = mainAsyncAfter(ms: 3000) { [weak self] in
+                self?.sendingVolume = false
+            }
         }
+    }
+    var sendingVolumeResetter: DispatchWorkItem? = nil {
+        didSet { oldValue?.cancel() }
     }
 
     var readableID: String {
@@ -2203,6 +2243,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             if ddcNotWorking, !displayController.displays.isEmpty, isOnline {
                 ddcNotWorkingCount = ddcNotWorkingCount + 1
+            }
+
+            if !(control is NetworkControl) {
+                resetSendingValues()
             }
 
             guard let control else {
@@ -3707,6 +3751,15 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         action(panel)
         manager.notifyReconfigure()
         manager.unlockAccess()
+    }
+
+    func resetSendingValues() {
+        mainAsync { [weak self] in
+            self?.sendingBrightness = false
+            self?.sendingContrast = false
+            self?.sendingInput = false
+            self?.sendingVolume = false
+        }
     }
 
     func refetchScreens() {

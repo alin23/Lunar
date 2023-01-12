@@ -919,7 +919,7 @@ extension MPDisplayMode {
 
     @available(iOS 16, macOS 13, *)
     var panelMode: PanelMode? {
-        guard let screen = display.screen else { return nil }
+        guard let screen = display?.screen else { return nil }
 
         return PanelMode(screen: screen, id: (screen.id << 32) + modeNumber.i, title: title, subtitle: subtitle, image: imageSystemName)
     }
