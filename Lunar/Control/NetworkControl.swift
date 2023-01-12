@@ -28,26 +28,41 @@ class Service {
 
     lazy var urls: [URL] = {
         guard let addresses = service.addresses else { return [] }
-        return addresses.compactMap { data in
-            guard let addr = data.withUnsafeBytes(address) else { return nil }
-            return buildURL(addr)
-        }
+        return addresses
+            .compactMap { data in
+                guard let addr = data.withUnsafeBytes(address) else { return nil }
+                return buildURL(addr)
+            }
+            .sorted { u1, u2 in
+                guard let h1 = u1.host, let h2 = u2.host else { return false }
+                return !h1.contains(":") && h2.contains(":")
+            }
     }()
 
     lazy var maxValueUrls: [URL] = {
         guard let addresses = service.addresses else { return [] }
-        return addresses.compactMap { data in
-            guard let addr = data.withUnsafeBytes(address) else { return nil }
-            return buildURL(addr, path: "/max\(path)")
-        }
+        return addresses
+            .compactMap { data in
+                guard let addr = data.withUnsafeBytes(address) else { return nil }
+                return buildURL(addr, path: "/max\(path)")
+            }
+            .sorted { u1, u2 in
+                guard let h1 = u1.host, let h2 = u2.host else { return false }
+                return !h1.contains(":") && h2.contains(":")
+            }
     }()
 
     lazy var smoothTransitionUrls: [URL] = {
         guard let addresses = service.addresses else { return [] }
-        return addresses.compactMap { data in
-            guard let addr = data.withUnsafeBytes(address) else { return nil }
-            return buildURL(addr, path: "/smooth\(path)")
-        }
+        return addresses
+            .compactMap { data in
+                guard let addr = data.withUnsafeBytes(address) else { return nil }
+                return buildURL(addr, path: "/smooth\(path)")
+            }
+            .sorted { u1, u2 in
+                guard let h1 = u1.host, let h2 = u2.host else { return false }
+                return !h1.contains(":") && h2.contains(":")
+            }
     }()
 
     var urlInitialized = false
@@ -142,7 +157,9 @@ class NetworkControl: Control {
     var setterTasks = [ControlID: DispatchWorkItem]()
     let getterTasksSemaphore = DispatchSemaphore(value: 1, name: "getterTasksSemaphore")
 
-    var requestsPublisher = PassthroughSubject<Request, Never>()
+    var requestsPublishers: [ControlID: PassthroughSubject<Request, Never>] = ControlID.allCases.dict {
+        ($0, PassthroughSubject<Request, Never>())
+    }
     var responsiveCheckPublisher = PassthroughSubject<Bool, Never>()
 
     var observers = Set<AnyCancellable>()
@@ -186,16 +203,16 @@ class NetworkControl: Control {
             )
         let semaphore = DispatchSemaphore(value: 0, name: "Network Control found prompt")
         let completionHandler = { (useNetwork: NSApplication.ModalResponse) in
-            if useNetwork == .alertFirstButtonReturn {
-                controllersForDisplay[display.serial] = service
+            mainAsync {
+                if useNetwork == .alertFirstButtonReturn {
+                    controllersForDisplay[display.serial] = service
 
-                asyncNow(threaded: true) {
                     display.control = display.getBestControl()
                 }
-            }
-            if useNetwork == .alertThirdButtonReturn {
-                display.neverUseNetworkControl = true
-                display.save()
+                if useNetwork == .alertThirdButtonReturn {
+                    display.neverUseNetworkControl = true
+                    display.save()
+                }
             }
             semaphore.signal()
         }
@@ -350,52 +367,62 @@ class NetworkControl: Control {
     func manageSendingState(for controlID: ControlID, sending: Bool) {
         guard let display else { return }
 
-        switch controlID {
-        case .BRIGHTNESS:
-            display.sendingBrightness = sending
-        case .CONTRAST:
-            display.sendingContrast = sending
-        case .INPUT_SOURCE:
-            display.sendingInput = sending
-        case .AUDIO_SPEAKER_VOLUME:
-            display.sendingVolume = sending
-        default:
-            if sending {
-                log.verbose("Sending \(controlID)")
-            } else {
-                log.verbose("Sent \(controlID)")
+        mainAsync {
+            switch controlID {
+            case .BRIGHTNESS:
+                display.sendingBrightness = sending
+            case .CONTRAST:
+                display.sendingContrast = sending
+            case .INPUT_SOURCE:
+                display.sendingInput = sending
+            case .AUDIO_SPEAKER_VOLUME:
+                display.sendingVolume = sending
+            default:
+                if sending {
+                    log.verbose("Sending \(controlID)")
+                } else {
+                    log.verbose("Sent \(controlID)")
+                }
             }
         }
     }
 
     func listenForRequests() {
-        serviceBrowserQueue.async { [weak self] in
-            guard let self else { return }
-            self.requestsPublisher
-                .removeDuplicates()
-                .throttle(for: .milliseconds(500), scheduler: RunLoop.current, latest: true)
+        requestsPublishers.values.forEach {
+            $0.removeDuplicates()
+                .throttle(for: .milliseconds(500), scheduler: RunLoop.main, latest: true)
                 .sink { [weak self] request in
                     guard let self, !displayController.screensSleeping else { return }
 
-                    defer {
-                        self.manageSendingState(for: request.controlID, sending: false)
-                    }
+                    serviceBrowserQueue.async { [weak self] in
+                        guard let self else { return }
+                        defer {
+                            self.manageSendingState(for: request.controlID, sending: false)
+                        }
 
-                    guard let resp = waitForResponse(from: request.url, timeoutPerTry: request.timeout) else {
+                        guard let resp = waitForResponse(from: request.url, timeoutPerTry: request.timeout) else {
+                            guard let display = self.display else { return }
+                            log.error(
+                                "Error sending \(request.controlID)=\(request.value) to \(request.url) for display \(display)"
+                            )
+                            return
+                        }
                         guard let display = self.display else { return }
-                        log.error(
-                            "Error sending \(request.controlID)=\(request.value) to \(request.url) for display \(display)"
-                        )
-                        return
+                        log.debug("Sent \(request.controlID)=\(request.value), received response `\(resp)` for display \(display)")
                     }
-                    guard let display = self.display else { return }
-                    log.debug("Sent \(request.controlID)=\(request.value), received response `\(resp)` for display \(display)")
-                }.store(in: &self.observers)
+                }.store(in: &observers)
+        }
 
-            self.responsiveCheckPublisher
-                .debounce(for: .milliseconds(500), scheduler: RunLoop.current)
-                .sink { [weak self] _ in
-                    guard let self, let display = self.display else { return }
+        responsiveCheckPublisher
+            .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
+            .sink { [weak self] _ in
+                #if DEBUG
+                    print("network responsiveCheckPublisher")
+                #endif
+
+                guard let self, let display = self.display else { return }
+                serviceBrowserQueue.async { [weak self] in
+                    guard let self else { return }
                     guard let service = NetworkControl.controllersForDisplay[display.serial],
                           let url = service.url, let newURL = service.getFirstRespondingURL(
                               urls: service.urls,
@@ -403,10 +430,12 @@ class NetworkControl: Control {
                               retries: 1
                           )
                     else {
-                        self.responsiveTryCount += 1
-                        if self.responsiveTryCount > 10 {
-                            self.responsiveTryCount = 0
-                            self.resetState()
+                        mainAsync {
+                            self.responsiveTryCount += 1
+                            if self.responsiveTryCount > 10 {
+                                self.responsiveTryCount = 0
+                                self.resetState()
+                            }
                         }
                         return
                     }
@@ -418,8 +447,8 @@ class NetworkControl: Control {
                             retries: 1
                         )
                     }
-                }.store(in: &self.observers)
-        }
+                }
+            }.store(in: &observers)
     }
 
     func set(_ value: UInt16, for controlID: ControlID, smooth: Bool = false, oldValue: UInt16? = nil) -> Bool {
@@ -447,7 +476,7 @@ class NetworkControl: Control {
             fullUrl = url / controlID / value
         }
 
-        requestsPublisher.send(Request(url: fullUrl, controlID: controlID, timeout: smooth ? 60.seconds : 15.seconds, value: value))
+        requestsPublishers[controlID]?.send(Request(url: fullUrl, controlID: controlID, timeout: smooth ? 60.seconds : 15.seconds, value: value))
 
         return true
     }
@@ -605,12 +634,15 @@ class NetworkControl: Control {
         guard let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay,
               let service = NetworkControl.controllersForDisplay[display.serial] else { return false }
 
-        if service.url == nil {
+        if service._url == nil {
             serialQueue.async {
                 guard let newURL = service.getFirstRespondingURL(urls: service.urls) else { return }
-                if newURL != service.url {
-                    service.url = newURL
-                    service.smoothTransitionUrl = service.getFirstRespondingURL(urls: service.smoothTransitionUrls)
+                if newURL != service._url {
+                    service._url = newURL
+                    service._smoothTransitionUrl = service.getFirstRespondingURL(urls: service.smoothTransitionUrls)
+                    mainAsync {
+                        display.control = display.getBestControl()
+                    }
                 }
             }
             return false
@@ -635,7 +667,7 @@ class NetworkControl: Control {
             return false
         }
 
-        guard service.url != nil else {
+        guard service._url != nil else {
             return false
         }
 
@@ -654,6 +686,6 @@ class NetworkControl: Control {
         guard let display else { return false }
 
         guard let service = NetworkControl.controllersForDisplay[display.serial] else { return false }
-        return service.smoothTransitionUrl != nil
+        return service._smoothTransitionUrl != nil
     }
 }

@@ -165,18 +165,20 @@ struct ScreenQuery: EntityPropertyQuery {
             EqualToComparator { NSPredicate(format: "name = %@", $0) }
             NotEqualToComparator { NSPredicate(format: "name != %@", $0) }
             ContainsComparator { NSPredicate(format: "name CONTAINS %@", $0) }
+            HasPrefixComparator { NSPredicate(format: "name BEGINSWITH[cd] %@", $0) }
+            HasSuffixComparator { NSPredicate(format: "name ENDSWITH[cd] %@", $0) }
         }
         Property(\.$serial) {
             EqualToComparator { NSPredicate(format: "serial = %@", $0) }
             NotEqualToComparator { NSPredicate(format: "serial != %@", $0) }
         }
         Property(\.$id) {
-            EqualToComparator { NSPredicate(format: "id = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "id != %@", $0) }
-            GreaterThanOrEqualToComparator { NSPredicate(format: "id >= %@", $0) }
-            LessThanOrEqualToComparator { NSPredicate(format: "id <= %@", $0) }
-            GreaterThanComparator { NSPredicate(format: "id > %@", $0) }
-            LessThanComparator { NSPredicate(format: "id < %@", $0) }
+            EqualToComparator { NSPredicate(format: "id = %d", $0) }
+            NotEqualToComparator { NSPredicate(format: "id != %d", $0) }
+            GreaterThanOrEqualToComparator { NSPredicate(format: "id >= %d", $0) }
+            LessThanOrEqualToComparator { NSPredicate(format: "id <= %d", $0) }
+            GreaterThanComparator { NSPredicate(format: "id > %d", $0) }
+            LessThanComparator { NSPredicate(format: "id < %d", $0) }
         }
         Property(\.$isExternal) {
             EqualToComparator { _ in NSPredicate(format: "isExternal = YES") }
@@ -203,82 +205,82 @@ struct ScreenQuery: EntityPropertyQuery {
             NotEqualToComparator { _ in NSPredicate(format: "isProjector = NO") }
         }
         Property(\.$rotation) {
-            EqualToComparator { NSPredicate(format: "rotation = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "rotation != %@", $0) }
+            EqualToComparator { NSPredicate(format: "rotation = %d", $0) }
+            NotEqualToComparator { NSPredicate(format: "rotation != %d", $0) }
         }
 
         Property(\.$supportsHDR) {
-            EqualToComparator { NSPredicate(format: "supportsHDR = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "supportsHDR != %@", $0) }
+            EqualToComparator { _ in NSPredicate(format: "supportsHDR = YES") }
+            NotEqualToComparator { _ in NSPredicate(format: "supportsHDR = NO") }
         }
         Property(\.$supportsXDR) {
-            EqualToComparator { NSPredicate(format: "supportsXDR = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "supportsXDR != %@", $0) }
+            EqualToComparator { _ in NSPredicate(format: "supportsXDR = YES") }
+            NotEqualToComparator { _ in NSPredicate(format: "supportsXDR = NO") }
         }
         Property(\.$hdr) {
-            EqualToComparator { NSPredicate(format: "hdr = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "hdr != %@", $0) }
+            EqualToComparator { _ in NSPredicate(format: "hdr = YES") }
+            NotEqualToComparator { _ in NSPredicate(format: "hdr = NO") }
         }
         Property(\.$xdr) {
-            EqualToComparator { NSPredicate(format: "xdr = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "xdr != %@", $0) }
+            EqualToComparator { _ in NSPredicate(format: "xdr = YES") }
+            NotEqualToComparator { _ in NSPredicate(format: "xdr = NO") }
         }
         Property(\.$subzero) {
-            EqualToComparator { NSPredicate(format: "subzero = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "subzero != %@", $0) }
+            EqualToComparator { _ in NSPredicate(format: "subzero = YES") }
+            NotEqualToComparator { _ in NSPredicate(format: "subzero = NO") }
         }
         Property(\.$blackout) {
-            EqualToComparator { NSPredicate(format: "blackout = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "blackout != %@", $0) }
+            EqualToComparator { _ in NSPredicate(format: "blackout = YES") }
+            NotEqualToComparator { _ in NSPredicate(format: "blackout = NO") }
         }
         Property(\.$facelight) {
-            EqualToComparator { NSPredicate(format: "facelight = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "facelight != %@", $0) }
+            EqualToComparator { _ in NSPredicate(format: "facelight = YES") }
+            NotEqualToComparator { _ in NSPredicate(format: "facelight = NO") }
         }
         Property(\.$adaptive) {
-            EqualToComparator { NSPredicate(format: "adaptive = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "adaptive != %@", $0) }
+            EqualToComparator { _ in NSPredicate(format: "adaptive = YES") }
+            NotEqualToComparator { _ in NSPredicate(format: "adaptive = NO") }
         }
 
         Property(\.$brightness) {
-            EqualToComparator { NSPredicate(format: "brightness = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "brightness != %@", $0) }
-            GreaterThanOrEqualToComparator { NSPredicate(format: "brightness >= %@", $0) }
-            LessThanOrEqualToComparator { NSPredicate(format: "brightness <= %@", $0) }
-            GreaterThanComparator { NSPredicate(format: "brightness > %@", $0) }
-            LessThanComparator { NSPredicate(format: "brightness < %@", $0) }
+            EqualToComparator { NSPredicate(format: "brightness = %f", $0 / 100.0) }
+            NotEqualToComparator { NSPredicate(format: "brightness != %f", $0 / 100.0) }
+            GreaterThanOrEqualToComparator { NSPredicate(format: "brightness >= %f", $0 / 100.0) }
+            LessThanOrEqualToComparator { NSPredicate(format: "brightness <= %f", $0 / 100.0) }
+            GreaterThanComparator { NSPredicate(format: "brightness > %f", $0 / 100.0) }
+            LessThanComparator { NSPredicate(format: "brightness < %f", $0 / 100.0) }
         }
         Property(\.$contrast) {
-            EqualToComparator { NSPredicate(format: "contrast = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "contrast != %@", $0) }
-            GreaterThanOrEqualToComparator { NSPredicate(format: "contrast >= %@", $0) }
-            LessThanOrEqualToComparator { NSPredicate(format: "contrast <= %@", $0) }
-            GreaterThanComparator { NSPredicate(format: "contrast > %@", $0) }
-            LessThanComparator { NSPredicate(format: "contrast < %@", $0) }
+            EqualToComparator { NSPredicate(format: "contrast = %f", $0 / 100.0) }
+            NotEqualToComparator { NSPredicate(format: "contrast != %f", $0 / 100.0) }
+            GreaterThanOrEqualToComparator { NSPredicate(format: "contrast >= %f", $0 / 100.0) }
+            LessThanOrEqualToComparator { NSPredicate(format: "contrast <= %f", $0 / 100.0) }
+            GreaterThanComparator { NSPredicate(format: "contrast > %f", $0 / 100.0) }
+            LessThanComparator { NSPredicate(format: "contrast < %f", $0 / 100.0) }
         }
         Property(\.$brightnessContrast) {
-            EqualToComparator { NSPredicate(format: "brightnessContrast = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "brightnessContrast != %@", $0) }
-            GreaterThanOrEqualToComparator { NSPredicate(format: "brightnessContrast >= %@", $0) }
-            LessThanOrEqualToComparator { NSPredicate(format: "brightnessContrast <= %@", $0) }
-            GreaterThanComparator { NSPredicate(format: "brightnessContrast > %@", $0) }
-            LessThanComparator { NSPredicate(format: "brightnessContrast < %@", $0) }
+            EqualToComparator { NSPredicate(format: "brightnessContrast = %f", $0 / 100.0) }
+            NotEqualToComparator { NSPredicate(format: "brightnessContrast != %f", $0 / 100.0) }
+            GreaterThanOrEqualToComparator { NSPredicate(format: "brightnessContrast >= %f", $0 / 100.0) }
+            LessThanOrEqualToComparator { NSPredicate(format: "brightnessContrast <= %f", $0 / 100.0) }
+            GreaterThanComparator { NSPredicate(format: "brightnessContrast > %f", $0 / 100.0) }
+            LessThanComparator { NSPredicate(format: "brightnessContrast < %f", $0 / 100.0) }
         }
         Property(\.$subzeroDimming) {
-            EqualToComparator { NSPredicate(format: "subzeroDimming = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "subzeroDimming != %@", $0) }
-            GreaterThanOrEqualToComparator { NSPredicate(format: "subzeroDimming >= %@", $0) }
-            LessThanOrEqualToComparator { NSPredicate(format: "subzeroDimming <= %@", $0) }
-            GreaterThanComparator { NSPredicate(format: "subzeroDimming > %@", $0) }
-            LessThanComparator { NSPredicate(format: "subzeroDimming < %@", $0) }
+            EqualToComparator { NSPredicate(format: "subzeroDimming = %f", $0 / 100.0) }
+            NotEqualToComparator { NSPredicate(format: "subzeroDimming != %f", $0 / 100.0) }
+            GreaterThanOrEqualToComparator { NSPredicate(format: "subzeroDimming >= %f", $0 / 100.0) }
+            LessThanOrEqualToComparator { NSPredicate(format: "subzeroDimming <= %f", $0 / 100.0) }
+            GreaterThanComparator { NSPredicate(format: "subzeroDimming > %f", $0 / 100.0) }
+            LessThanComparator { NSPredicate(format: "subzeroDimming < %f", $0 / 100.0) }
         }
         Property(\.$xdrBrightness) {
-            EqualToComparator { NSPredicate(format: "xdrBrightness = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "xdrBrightness != %@", $0) }
-            GreaterThanOrEqualToComparator { NSPredicate(format: "xdrBrightness >= %@", $0) }
-            LessThanOrEqualToComparator { NSPredicate(format: "xdrBrightness <= %@", $0) }
-            GreaterThanComparator { NSPredicate(format: "xdrBrightness > %@", $0) }
-            LessThanComparator { NSPredicate(format: "xdrBrightness < %@", $0) }
+            EqualToComparator { NSPredicate(format: "xdrBrightness = %f", $0 / 100.0) }
+            NotEqualToComparator { NSPredicate(format: "xdrBrightness != %f", $0 / 100.0) }
+            GreaterThanOrEqualToComparator { NSPredicate(format: "xdrBrightness >= %f", $0 / 100.0) }
+            LessThanOrEqualToComparator { NSPredicate(format: "xdrBrightness <= %f", $0 / 100.0) }
+            GreaterThanComparator { NSPredicate(format: "xdrBrightness > %f", $0 / 100.0) }
+            LessThanComparator { NSPredicate(format: "xdrBrightness < %f", $0 / 100.0) }
         }
 
     }

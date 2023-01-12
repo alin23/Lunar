@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -2567,6 +2568,48 @@ CORNERS</string>
                                     </binding>
                                 </connections>
                             </button>
+                            <slider verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="gzj-ZC-v6B" customClass="Slider" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="360" y="346" width="230" height="38"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.33356720266990292" tickMarkPosition="above" sliderType="linear" id="Rpm-Sy-Hb9" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                            <real key="value" value="20"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                            <real key="value" value="10"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                            <color key="value" red="1" green="0.7843137255" blue="0.58431372550000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="knobColor">
+                                            <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </userDefinedRuntimeAttribute>
+                                    </userDefinedRuntimeAttributes>
+                                </sliderCell>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.subzero" previousBinding="B26-Ge-slo" id="Ph3-uF-cd2">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden3" keyPath="self.display.active" previousBinding="Ph3-uF-cd2" id="O2g-Vb-cCe">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.blackOutEnabled" id="B26-Ge-slo"/>
+                                    <binding destination="1Bn-Ca-ETm" name="value" keyPath="self.display.softwareBrightness" id="xJV-bG-lb5"/>
+                                </connections>
+                            </slider>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ycx-jo-u8n" customClass="BrightnessContrastChartView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="-26" y="-10" width="1001" height="190"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -2937,10 +2980,10 @@ CORNERS</string>
                                 </connections>
                             </popUpButton>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0dW-qZ-glS" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="410" y="400" width="130" height="18"/>
+                                <rect key="frame" x="410" y="410" width="130" height="18"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <shadow key="shadow" blurRadius="6">
-                                    <size key="offset" width="0.0" height="-2"/>
+                                <shadow key="shadow" blurRadius="7">
+                                    <size key="offset" width="0.0" height="-3"/>
                                     <color key="color" red="0.17814691534381044" green="0.13160808944013672" blue="0.18593218537414966" alpha="0.70431498344370858" colorSpace="calibratedRGB"/>
                                 </shadow>
                                 <buttonCell key="cell" type="inline" title="Software Dimming" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="28G-xN-agv">
@@ -2961,11 +3004,11 @@ CORNERS</string>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HuJ-7T-Fgg" customClass="HelpButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="410" y="414" width="130" height="18"/>
+                                <rect key="frame" x="410" y="424" width="130" height="18"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <shadow key="shadow" blurRadius="6">
-                                    <size key="offset" width="0.0" height="2"/>
-                                    <color key="color" red="0.17814691534381044" green="0.13160808944013672" blue="0.18593218537414966" alpha="0.703125" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                <shadow key="shadow" blurRadius="10">
+                                    <size key="offset" width="0.0" height="7"/>
+                                    <color key="color" red="0.10033971607402557" green="0.074127123121849187" blue="0.10472470238095238" alpha="0.74950848509933776" colorSpace="calibratedRGB"/>
                                 </shadow>
                                 <buttonCell key="cell" type="inline" title="Hardware Control" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="ie5-OW-ycd">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3123,7 +3166,7 @@ disabled</string>
                                 </connections>
                             </textField>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lXg-hV-GHy" customClass="DisplayName" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="343" y="434" width="264" height="35"/>
+                                <rect key="frame" x="343" y="444" width="264" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="No display" id="Sh6-El-3lf" customClass="PlainTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" size="28" name="Menlo-Bold"/>
@@ -3139,7 +3182,7 @@ disabled</string>
                                 </connections>
                             </textField>
                             <slider verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="ghR-M9-kyP" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="360" y="360" width="230" height="38"/>
+                                <rect key="frame" x="360" y="370" width="230" height="38"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.65914163961038963" tickMarkPosition="above" sliderType="linear" id="p6G-tD-oMg" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
                                     <userDefinedRuntimeAttributes>
@@ -3222,7 +3265,7 @@ disabled</string>
                                 </connections>
                             </textField>
                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="4eI-Ef-5sC" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="366" y="375" width="12" height="12"/>
+                                <rect key="frame" x="366" y="385" width="12" height="12"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <contentFilters>
                                     <ciFilter name="CIFalseColor">
@@ -3249,9 +3292,9 @@ disabled</string>
                                 </connections>
                             </imageView>
                             <slider verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="owU-od-4JA" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="360" y="360" width="230" height="38"/>
+                                <rect key="frame" x="360" y="370" width="230" height="38"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.65914163961038963" tickMarkPosition="above" sliderType="linear" id="9iD-U5-06y" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="1" tickMarkPosition="above" sliderType="linear" id="9iD-U5-06y" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
                                     <userDefinedRuntimeAttributes>
                                         <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
                                             <real key="value" value="20"/>
@@ -3286,7 +3329,7 @@ disabled</string>
                                 </connections>
                             </slider>
                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="UGS-Ey-cgx" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="366" y="375" width="12" height="12"/>
+                                <rect key="frame" x="366" y="385" width="12" height="12"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <contentFilters>
                                     <ciFilter name="CIFalseColor">
@@ -3834,6 +3877,44 @@ enabled</string>
                                     <binding destination="1Bn-Ca-ETm" name="value" keyPath="self.display.notchEnabled" id="w8v-ct-GZd"/>
                                 </connections>
                             </button>
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="nhk-vB-Fhq" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="363" y="357" width="18" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <contentFilters>
+                                    <ciFilter name="CIFalseColor">
+                                        <configuration>
+                                            <ciColor key="inputColor0" red="0.30000001192092896" green="0.0" blue="0.0" alpha="1"/>
+                                            <ciColor key="inputColor1" red="1" green="0.89999997615814209" blue="0.80000001192092896" alpha="1"/>
+                                            <null key="inputImage"/>
+                                        </configuration>
+                                    </ciFilter>
+                                </contentFilters>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="uud-8Y-qJC">
+                                    <imageReference key="image" image="moon.circle.fill" catalog="system" symbolScale="default" renderingMode="template"/>
+                                </imageCell>
+                                <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.subzero" previousBinding="PKi-Wg-ioc" id="6jh-Tf-Lci">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden3" keyPath="self.display.active" previousBinding="6jh-Tf-Lci" id="pBO-oL-FQw">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.blackOutEnabled" id="PKi-Wg-ioc"/>
+                                </connections>
+                            </imageView>
                         </subviews>
                     </view>
                     <connections>
@@ -3875,6 +3956,7 @@ enabled</string>
                         <outlet property="scheduleBox" destination="mcs-8U-Dl2" id="Xhi-p7-Bsk"/>
                         <outlet property="scrollableBrightness" destination="ASQ-wq-GuY" id="mnE-IL-5Cd"/>
                         <outlet property="scrollableContrast" destination="XVS-nO-2Mf" id="iNa-OT-mum"/>
+                        <outlet property="softwareBrightnessSlider" destination="gzj-ZC-v6B" id="TXH-FO-kMW"/>
                         <outlet property="syncSourceButton" destination="lgI-7B-gyu" id="3VJ-hz-Y6o"/>
                     </connections>
                 </viewController>
@@ -10171,6 +10253,7 @@ settings for this monitor.</string>
         <image name="input" width="14" height="14"/>
         <image name="locationmode" width="14" height="14"/>
         <image name="manualmode" width="14" height="14"/>
+        <image name="moon.circle.fill" catalog="system" width="15" height="15"/>
         <image name="power" width="96" height="96"/>
         <image name="reset" width="24" height="24"/>
         <image name="sensormode" width="14" height="14"/>

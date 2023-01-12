@@ -162,6 +162,7 @@ class ModernWindow: WAYWindow {
         }
 
         endEditing(for: nil)
+
         super.mouseDown(with: event)
     }
 

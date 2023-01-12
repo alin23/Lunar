@@ -47,6 +47,7 @@ let kAppleInterfaceThemeChangedNotification = "AppleInterfaceThemeChangedNotific
 let kAppleInterfaceStyle = "AppleInterfaceStyle"
 let kAppleInterfaceStyleSwitchesAutomatically = "AppleInterfaceStyleSwitchesAutomatically"
 
+let mediaKeyTapQueue = DispatchQueue(label: "fyi.lunar.serviceBrowser.queue", qos: .userInteractive)
 let serviceBrowserQueue = DispatchQueue(label: "fyi.lunar.serviceBrowser.queue", qos: .userInteractive)
 let sensorHostnameQueue = DispatchQueue(label: "fyi.lunar.sensor.hostname.queue", qos: .background)
 let windowControllerQueue = DispatchQueue(label: "fyi.lunar.windowControllerQueue.queue", qos: .userInitiated)
@@ -305,7 +306,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var externalLux: String {
         guard SensorMode.wirelessSensorURL != nil else { return "" }
-        return "External light sensor: **\(SensorMode.specific.lastAmbientLight.str(decimals: 2)) lux**\n"
+        return "External light sensor: **\(SensorMode.specific.lastExternalAmbientLight.str(decimals: 2)) lux**\n"
     }
 
     var internalLux: String {

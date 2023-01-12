@@ -125,10 +125,6 @@ struct DisplayRowView: View {
                 )
             }
         }
-        .onAppear(perform: handleSubzeroXDRSliders)
-        .onChange(of: display.subzero, perform: handleSubzeroXDRSliders)
-        .onChange(of: display.enhanced, perform: handleSubzeroXDRSliders)
-        .onChange(of: display.blackOutEnabled, perform: handleSubzeroXDRSliders)
     }
 
     var sdrXdrSelector: some View {
@@ -330,17 +326,6 @@ struct DisplayRowView: View {
                 )
                 .padding(.vertical, 3)
             }
-        }
-    }
-
-    func handleSubzeroXDRSliders(_: Bool) {
-        handleSubzeroXDRSliders()
-    }
-
-    func handleSubzeroXDRSliders() {
-        withAnimation(.fastSpring) {
-            showSubzero = display.subzero && !display.blackOutEnabled
-            showXDR = display.enhanced && !display.blackOutEnabled
         }
     }
 
