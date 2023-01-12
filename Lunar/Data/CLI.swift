@@ -425,6 +425,23 @@ struct Lunar: ParsableCommand {
         }
     }
 
+    struct RefreshDisplays: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Refreshes display list from the system and restarts DDC detection"
+        )
+
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
+
+        func run() throws {
+            Lunar.configureLogging(options: globals)
+
+            displayController.resetDisplayList()
+            appDelegate!.startOrRestartMediaKeyTap()
+
+            return cliExit(0)
+        }
+    }
+
     struct Lux: ParsableCommand {
         static let configuration = CommandConfiguration(
             abstract: "Prints ambient light in lux (or -1 if the sensor can't be read)."
@@ -1519,6 +1536,7 @@ struct Lunar: ParsableCommand {
             DisplayServices.self,
             Hotkeys.self,
             DisplayUuid.self,
+            RefreshDisplays.self,
         ]
     )
 

@@ -162,7 +162,8 @@ public struct BigSurSlider: View {
         acceptsMouseEvents: Binding<Bool>? = nil,
         disabled: Binding<Bool>? = nil,
         enableText: String? = nil,
-        mark: Binding<Float>? = nil
+        mark: Binding<Float>? = nil,
+        onSettingPercentage: ((Float) -> Void)? = nil
     ) {
         _knobColor = .constant(knobColor)
         _knobTextColor = .constant(knobTextColor)
@@ -181,6 +182,7 @@ public struct BigSurSlider: View {
 
         _knobColor = knobColorBinding ?? colorBinding ?? .constant(knobColor ?? colors.accent)
         _knobTextColor = knobTextColorBinding ?? .constant(knobTextColor ?? ((color ?? Colors.peach).textColor))
+        self.onSettingPercentage = onSettingPercentage
     }
 
     public var body: some View {
@@ -267,11 +269,13 @@ public struct BigSurSlider: View {
                         }
 
                         self.percentage = cap(Float(value.location.x / geometry.size.width), minVal: 0, maxVal: 1)
+                        self.onSettingPercentage?(self.percentage)
                     }
                     .onEnded { value in
                         guard acceptsMouseEvents, !disabled else { return }
                         draggingSliderSetter = nil
                         self.percentage = cap(Float(value.location.x / geometry.size.width), minVal: 0, maxVal: 1)
+                        self.onSettingPercentage?(self.percentage)
                         env.draggingSlider = false
                     }
             )
@@ -330,6 +334,8 @@ public struct BigSurSlider: View {
     @Binding var disabled: Bool
     @Binding var mark: Float
 
+    var onSettingPercentage: ((Float) -> Void)?
+
     #if os(macOS)
         func trackScrollWheel() {
             guard scrollWheelListener == nil else { return }
@@ -364,6 +370,7 @@ public struct BigSurSlider: View {
                         }
                     }
                     self.percentage = cap(self.percentage - (delta / 100), minVal: 0, maxVal: 1)
+                    self.onSettingPercentage?(self.percentage)
                 }
         }
     #endif
