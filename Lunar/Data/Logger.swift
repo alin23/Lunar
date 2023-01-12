@@ -138,15 +138,21 @@ class Logger: SwiftyBeaver {
             file.minLevel = .verbose
             if cloud { self.cloud.minLevel = .verbose }
 
-            Logger.addDestination(file)
+            #if !DEBUG
+                Logger.addDestination(file)
+            #endif
         } else if debug {
             console.minLevel = .debug
             file.minLevel = .debug
             if cloud { self.cloud.minLevel = .debug }
 
-            Logger.addDestination(file)
+            #if !DEBUG
+                Logger.addDestination(file)
+            #endif
         } else {
-            Logger.removeDestination(file)
+            #if !DEBUG
+                Logger.removeDestination(file)
+            #endif
 
             console.minLevel = cli ? .warning : .info
             file.minLevel = cli ? .warning : .info

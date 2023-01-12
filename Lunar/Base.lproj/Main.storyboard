@@ -2568,48 +2568,6 @@ CORNERS</string>
                                     </binding>
                                 </connections>
                             </button>
-                            <slider verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="gzj-ZC-v6B" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="360" y="346" width="230" height="38"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.33356720266990292" tickMarkPosition="above" sliderType="linear" id="Rpm-Sy-Hb9" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
-                                    <userDefinedRuntimeAttributes>
-                                        <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
-                                            <real key="value" value="20"/>
-                                        </userDefinedRuntimeAttribute>
-                                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                            <real key="value" value="10"/>
-                                        </userDefinedRuntimeAttribute>
-                                        <userDefinedRuntimeAttribute type="color" keyPath="color">
-                                            <color key="value" red="1" green="0.7843137255" blue="0.58431372550000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        </userDefinedRuntimeAttribute>
-                                        <userDefinedRuntimeAttribute type="color" keyPath="knobColor">
-                                            <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        </userDefinedRuntimeAttribute>
-                                    </userDefinedRuntimeAttributes>
-                                </sliderCell>
-                                <connections>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.subzero" previousBinding="B26-Ge-slo" id="Ph3-uF-cd2">
-                                        <dictionary key="options">
-                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                            <integer key="NSNullPlaceholder" value="-1"/>
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden3" keyPath="self.display.active" previousBinding="Ph3-uF-cd2" id="O2g-Vb-cCe">
-                                        <dictionary key="options">
-                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                            <integer key="NSNullPlaceholder" value="-1"/>
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.blackOutEnabled" id="B26-Ge-slo"/>
-                                    <binding destination="1Bn-Ca-ETm" name="value" keyPath="self.display.softwareBrightness" id="xJV-bG-lb5"/>
-                                </connections>
-                            </slider>
                             <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ycx-jo-u8n" customClass="BrightnessContrastChartView" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="-26" y="-10" width="1001" height="190"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -3000,6 +2958,15 @@ CORNERS</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.active" previousBinding="zNX-mv-Pc0" id="1b5-WY-E0w">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.noDisplay" id="zNX-mv-Pc0"/>
                                 </connections>
                             </button>
@@ -3024,6 +2991,15 @@ CORNERS</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.active" previousBinding="eik-cf-0eC" id="Mvc-sC-9lB">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.noDisplay" id="eik-cf-0eC"/>
                                 </connections>
                             </button>
@@ -3181,39 +3157,6 @@ disabled</string>
                                     </binding>
                                 </connections>
                             </textField>
-                            <slider verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="ghR-M9-kyP" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="360" y="370" width="230" height="38"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.65914163961038963" tickMarkPosition="above" sliderType="linear" id="p6G-tD-oMg" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
-                                    <userDefinedRuntimeAttributes>
-                                        <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
-                                            <real key="value" value="20"/>
-                                        </userDefinedRuntimeAttribute>
-                                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                            <real key="value" value="10"/>
-                                        </userDefinedRuntimeAttribute>
-                                        <userDefinedRuntimeAttribute type="color" keyPath="color">
-                                            <color key="value" red="1" green="0.78431372549019607" blue="0.58431372549019611" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        </userDefinedRuntimeAttribute>
-                                        <userDefinedRuntimeAttribute type="color" keyPath="knobColor">
-                                            <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        </userDefinedRuntimeAttribute>
-                                    </userDefinedRuntimeAttributes>
-                                </sliderCell>
-                                <connections>
-                                    <binding destination="1Bn-Ca-ETm" name="value" keyPath="display.preciseBrightness" id="0fV-5Z-i6q"/>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.active" previousBinding="Q6k-PI-Tpb" id="jRi-Og-cRN">
-                                        <dictionary key="options">
-                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                            <integer key="NSNullPlaceholder" value="-1"/>
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.hasDDC" id="Q6k-PI-Tpb"/>
-                                </connections>
-                            </slider>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="E9U-Wb-J8C" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="720" y="404" width="120" height="54"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -3264,101 +3207,6 @@ disabled</string>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.hasDDC" id="o6M-hx-XyZ"/>
                                 </connections>
                             </textField>
-                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="4eI-Ef-5sC" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="366" y="385" width="12" height="12"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <contentFilters>
-                                    <ciFilter name="CIFalseColor">
-                                        <configuration>
-                                            <ciColor key="inputColor0" red="0.30000001192092896" green="0.0" blue="0.0" alpha="1"/>
-                                            <ciColor key="inputColor1" red="1" green="0.89999997615814209" blue="0.80000001192092896" alpha="1"/>
-                                            <null key="inputImage"/>
-                                        </configuration>
-                                    </ciFilter>
-                                </contentFilters>
-                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="brightness" id="nPb-1k-iIs"/>
-                                <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                                <connections>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.active" previousBinding="SQB-jc-jPC" id="RWr-3D-yXS">
-                                        <dictionary key="options">
-                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                            <integer key="NSNullPlaceholder" value="-1"/>
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.hasDDC" id="SQB-jc-jPC"/>
-                                </connections>
-                            </imageView>
-                            <slider verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="owU-od-4JA" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="360" y="370" width="230" height="38"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="1" tickMarkPosition="above" sliderType="linear" id="9iD-U5-06y" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
-                                    <userDefinedRuntimeAttributes>
-                                        <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
-                                            <real key="value" value="20"/>
-                                        </userDefinedRuntimeAttribute>
-                                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                            <real key="value" value="10"/>
-                                        </userDefinedRuntimeAttribute>
-                                        <userDefinedRuntimeAttribute type="color" keyPath="color">
-                                            <color key="value" red="1" green="0.7843137255" blue="0.58431372550000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        </userDefinedRuntimeAttribute>
-                                        <userDefinedRuntimeAttribute type="color" keyPath="knobColor">
-                                            <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        </userDefinedRuntimeAttribute>
-                                    </userDefinedRuntimeAttributes>
-                                </sliderCell>
-                                <connections>
-                                    <binding destination="1Bn-Ca-ETm" name="value" keyPath="display.preciseBrightnessContrast" id="My3-Qj-UUK"/>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.active" previousBinding="YVM-xf-QRw" id="jVn-mN-oMj">
-                                        <dictionary key="options">
-                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                            <integer key="NSNullPlaceholder" value="-1"/>
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.hasDDC" id="YVM-xf-QRw">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
-                                </connections>
-                            </slider>
-                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="UGS-Ey-cgx" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="366" y="385" width="12" height="12"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <contentFilters>
-                                    <ciFilter name="CIFalseColor">
-                                        <configuration>
-                                            <ciColor key="inputColor0" red="0.30000001192092896" green="0.0" blue="0.0" alpha="1"/>
-                                            <ciColor key="inputColor1" red="1" green="0.89999997615814209" blue="0.80000001192092896" alpha="1"/>
-                                            <null key="inputImage"/>
-                                        </configuration>
-                                    </ciFilter>
-                                </contentFilters>
-                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="brightness" id="keH-Rs-IoE"/>
-                                <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                                <connections>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.active" previousBinding="hrz-uz-h72" id="7bR-7i-Avo">
-                                        <dictionary key="options">
-                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                            <integer key="NSNullPlaceholder" value="-1"/>
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.hasDDC" id="hrz-uz-h72">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
-                                </connections>
-                            </imageView>
                             <box fixedFrame="YES" title="Schedule" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mcs-8U-Dl2">
                                 <rect key="frame" x="-3" y="46" width="956" height="182"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -3454,7 +3302,7 @@ disabled</string>
                                             </connections>
                                         </button>
                                         <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jzB-lh-fCv" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="735" y="158" width="200" height="16"/>
+                                            <rect key="frame" x="734" y="158" width="200" height="16"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="inline" title="Show fewer schedules" alternateTitle="Less" bezelStyle="inline" image="arrow.left.circle.fill" imagePosition="leading" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="h1u-Bi-fDD">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3877,8 +3725,178 @@ enabled</string>
                                     <binding destination="1Bn-Ca-ETm" name="value" keyPath="self.display.notchEnabled" id="w8v-ct-GZd"/>
                                 </connections>
                             </button>
+                            <slider verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="ghR-M9-kyP" customClass="Slider" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="360" y="375" width="230" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.65914163961038963" tickMarkPosition="above" sliderType="linear" id="p6G-tD-oMg" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                            <real key="value" value="20"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                            <real key="value" value="10"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                            <color key="value" red="1" green="0.78431372549019607" blue="0.58431372549019611" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="knobColor">
+                                            <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </userDefinedRuntimeAttribute>
+                                    </userDefinedRuntimeAttributes>
+                                </sliderCell>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="value" keyPath="display.preciseBrightness" id="0fV-5Z-i6q"/>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.active" previousBinding="Q6k-PI-Tpb" id="jRi-Og-cRN">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.hasDDC" id="Q6k-PI-Tpb"/>
+                                </connections>
+                            </slider>
+                            <slider verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="owU-od-4JA" customClass="Slider" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="360" y="375" width="230" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="1" tickMarkPosition="above" sliderType="linear" id="9iD-U5-06y" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                            <real key="value" value="20"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                            <real key="value" value="10"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                            <color key="value" red="1" green="0.7843137255" blue="0.58431372550000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="knobColor">
+                                            <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </userDefinedRuntimeAttribute>
+                                    </userDefinedRuntimeAttributes>
+                                </sliderCell>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="value" keyPath="display.preciseBrightnessContrast" id="My3-Qj-UUK"/>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.active" previousBinding="YVM-xf-QRw" id="jVn-mN-oMj">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.hasDDC" id="YVM-xf-QRw">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </slider>
+                            <slider verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="gzj-ZC-v6B" customClass="Slider" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="360" y="353" width="230" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.33356720266990292" tickMarkPosition="above" sliderType="linear" id="Rpm-Sy-Hb9" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
+                                            <real key="value" value="20"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                            <real key="value" value="10"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                            <color key="value" red="1" green="0.7843137255" blue="0.58431372550000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="color" keyPath="knobColor">
+                                            <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </userDefinedRuntimeAttribute>
+                                    </userDefinedRuntimeAttributes>
+                                </sliderCell>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden3" keyPath="self.display.active" previousBinding="Ph3-uF-cd2" id="O2g-Vb-cCe">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.blackOutEnabled" id="B26-Ge-slo"/>
+                                    <binding destination="1Bn-Ca-ETm" name="value" keyPath="self.display.softwareBrightness" id="xJV-bG-lb5"/>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.subzero" previousBinding="B26-Ge-slo" id="Ph3-uF-cd2">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </slider>
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="4eI-Ef-5sC" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="366" y="386" width="12" height="12"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <contentFilters>
+                                    <ciFilter name="CIFalseColor">
+                                        <configuration>
+                                            <ciColor key="inputColor0" red="0.30000001192092896" green="0.0" blue="0.0" alpha="1"/>
+                                            <ciColor key="inputColor1" red="1" green="0.89999997615814209" blue="0.80000001192092896" alpha="1"/>
+                                            <null key="inputImage"/>
+                                        </configuration>
+                                    </ciFilter>
+                                </contentFilters>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="brightness" id="nPb-1k-iIs"/>
+                                <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.active" previousBinding="SQB-jc-jPC" id="RWr-3D-yXS">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.hasDDC" id="SQB-jc-jPC"/>
+                                </connections>
+                            </imageView>
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="UGS-Ey-cgx" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="366" y="386" width="12" height="12"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <contentFilters>
+                                    <ciFilter name="CIFalseColor">
+                                        <configuration>
+                                            <ciColor key="inputColor0" red="0.30000001192092896" green="0.0" blue="0.0" alpha="1"/>
+                                            <ciColor key="inputColor1" red="1" green="0.89999997615814209" blue="0.80000001192092896" alpha="1"/>
+                                            <null key="inputImage"/>
+                                        </configuration>
+                                    </ciFilter>
+                                </contentFilters>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="brightness" id="keH-Rs-IoE"/>
+                                <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.active" previousBinding="hrz-uz-h72" id="7bR-7i-Avo">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.hasDDC" id="hrz-uz-h72">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </imageView>
                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="nhk-vB-Fhq" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="363" y="357" width="18" height="18"/>
+                                <rect key="frame" x="366" y="363" width="14" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <contentFilters>
                                     <ciFilter name="CIFalseColor">
@@ -3894,15 +3912,6 @@ enabled</string>
                                 </imageCell>
                                 <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                 <connections>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.subzero" previousBinding="PKi-Wg-ioc" id="6jh-Tf-Lci">
-                                        <dictionary key="options">
-                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                            <integer key="NSNullPlaceholder" value="-1"/>
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
                                     <binding destination="1Bn-Ca-ETm" name="hidden3" keyPath="self.display.active" previousBinding="6jh-Tf-Lci" id="pBO-oL-FQw">
                                         <dictionary key="options">
                                             <integer key="NSMultipleValuesPlaceholder" value="-1"/>
@@ -3913,6 +3922,15 @@ enabled</string>
                                         </dictionary>
                                     </binding>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.blackOutEnabled" id="PKi-Wg-ioc"/>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.subzero" previousBinding="PKi-Wg-ioc" id="6jh-Tf-Lci">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
                                 </connections>
                             </imageView>
                         </subviews>

@@ -1049,6 +1049,13 @@ class DisplayViewController: NSViewController {
             displayName?.display = self.display
         }
 
+        softwareBrightnessSlider?.onSettingPercentage = { [weak self] _ in
+            guard let display = self?.display else { return }
+
+            let lastDataPoint = datapointLock.around { displayController.adaptiveMode.brightnessDataPoint.last }
+            display.insertBrightnessUserDataPoint(lastDataPoint, display.brightness.doubleValue, modeKey: displayController.adaptiveModeKey)
+        }
+
         initHotkeys()
         refreshView()
 
@@ -1143,8 +1150,8 @@ class DisplayViewController: NSViewController {
                 softwareDimmingButton.attributedTitle = "Software Dimming".withAttribute(.textColor(.white))
                 softwareDimmingButton.alpha = 0.4
                 softwareDimmingButton.shadowAlpha = 0.0
-                softwareDimmingButton.isHidden = false
-                softwareDimmingButton.isEnabled = true
+                softwareDimmingButton.isHidden = !display.active
+                softwareDimmingButton.isEnabled = display.active
                 softwareDimmingButton.showPopover = false
                 softwareDimmingButton.layer?.setAffineTransform(.init(scaleX: 0.9, y: 0.9).translatedBy(x: softwareDimmingButton.frame.width * 0.05, y: 0))
                 softwareDimmingButton.onClick = { [weak self] in
@@ -1182,8 +1189,8 @@ class DisplayViewController: NSViewController {
                     softwareDimmingButton.attributedTitle = "Software Dimming".withAttribute(.textColor(darkMauve))
                     softwareDimmingButton.alpha = 1.0
                     softwareDimmingButton.shadowAlpha = 1.0
-                    softwareDimmingButton.isHidden = false
-                    softwareDimmingButton.isEnabled = true
+                    softwareDimmingButton.isHidden = !display.active
+                    softwareDimmingButton.isEnabled = display.active
                     softwareDimmingButton.showPopover = true
                     softwareDimmingButton.layer?.setAffineTransform(.init(scaleX: 1.0, y: 1.0))
                     softwareDimmingButton.helpText = display
