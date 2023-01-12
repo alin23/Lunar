@@ -404,7 +404,7 @@ extension AdaptiveMode {
             newValue,
             fromLow: MIN_BRIGHTNESS.d - (applySubzero ? 100 : 0),
             fromHigh: MAX_BRIGHTNESS.d,
-            toLow: minValue - (applySubzero ? 90 : 0),
+            toLow: minValue - (applySubzero ? (newValue < 0 ? 90 : 100) : 0),
             toHigh: maxValue
         )
     }

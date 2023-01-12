@@ -3682,7 +3682,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         let featureValue = featureValue.rounded(to: 4)
         for (x, y) in values.dictionary {
-            if (x < featureValue && y > targetValue) || (x > featureValue && y < targetValue) {
+            if (x < featureValue && y >= targetValue) || (x > featureValue && y <= targetValue) {
                 if logValue {
                     log.debug("Removing data point \(x) => \(y)")
                 }

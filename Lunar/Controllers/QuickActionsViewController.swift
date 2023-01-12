@@ -122,7 +122,10 @@ struct DisplayRowView: View {
                     backgroundColor: Colors.subzero.opacity(colorScheme == .dark ? 0.1 : 0.2),
                     knobColor: Colors.subzero,
                     showValue: $showSliderValues
-                )
+                ) { br in
+                    let lastDataPoint = datapointLock.around { displayController.adaptiveMode.brightnessDataPoint.last }
+                    display.insertBrightnessUserDataPoint(lastDataPoint, display.brightness.doubleValue, modeKey: displayController.adaptiveModeKey)
+                }
             }
         }
     }

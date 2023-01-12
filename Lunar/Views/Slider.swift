@@ -209,6 +209,8 @@ class Slider: NSSlider {
 
     @IBInspectable dynamic var scrollPrecision: CGFloat = 1
 
+    var onSettingPercentage: ((Float) -> Void)?
+
     var color: NSColor {
         get { (cell as! SliderCell).color }
         set { (cell as! SliderCell).color = newValue }
@@ -278,6 +280,7 @@ class Slider: NSSlider {
         let increment = range * (delta / (150 * Float(scrollPrecision)))
         floatValue = floatValue + increment
         sendAction(action, to: target)
+        onSettingPercentage?(floatValue)
     }
 }
 
