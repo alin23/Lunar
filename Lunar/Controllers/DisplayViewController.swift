@@ -368,6 +368,7 @@ class DisplayViewController: NSViewController {
     @IBOutlet var scrollableContrast: ScrollableContrast?
     @IBOutlet var brightnessSlider: Slider?
     @IBOutlet var brightnessContrastSlider: Slider?
+    @IBOutlet var softwareBrightnessSlider: Slider?
     @IBOutlet var resolutionsDropdown: ModePopupButton?
     @IBOutlet var inputDropdown: NSPopUpButton?
 
@@ -1064,6 +1065,7 @@ class DisplayViewController: NSViewController {
         if let resolutionsDropdown {
             resolutionsDropdown.setItemStyles()
         }
+        updateControlsButton()
     }
 
     func setDisconnected() {
@@ -1076,7 +1078,8 @@ class DisplayViewController: NSViewController {
     func updateControlsButton(control: Control? = nil) {
         mainAsync { [weak self] in
             guard let self else { return }
-            guard let button = self.controlsButton, let softwareDimmingButton = self.softwareDimmingButton,
+            guard let button = self.controlsButton,
+                  let softwareDimmingButton = self.softwareDimmingButton,
                   let display = self.display
             else {
                 return
@@ -1106,6 +1109,7 @@ class DisplayViewController: NSViewController {
             softwareDimmingButton.attributedTitle = "".attributedString
             softwareDimmingButton.isHidden = true
             softwareDimmingButton.isEnabled = false
+
             if let brightnessSliderImage = self.brightnessSliderImage {
                 brightnessSliderImage.contentFilters = brightnessSliderImage.contentFilters.filter { $0.name != "CIColorInvert" }
             }
@@ -1125,22 +1129,27 @@ class DisplayViewController: NSViewController {
                 }
                 button.showPopover = true
             case is DDCControl:
+                button.transition(0.2)
                 button.bg = darkMode ? peach : lunarYellow
                 button.attributedTitle = "Hardware DDC".withAttribute(.textColor(darkMauve))
                 button.helpText = HARDWARE_CONTROLS_HELP_TEXT
                 button.alpha = 1.0
                 button.shadowAlpha = 1.0
                 button.showPopover = true
+                button.layer?.setAffineTransform(.init(scaleX: 1.0, y: 1.0))
 
-                softwareDimmingButton.bg = darkMode ? peach.blended(withFraction: 0.7, of: red) : red.withAlphaComponent(0.9)
-                softwareDimmingButton.attributedTitle = "Software Dimming".withAttribute(.textColor(.white.withAlphaComponent(0.5)))
-                softwareDimmingButton.alpha = 0.7
+                softwareDimmingButton.transition(0.2)
+                softwareDimmingButton.bg = darkMode ? peach.blended(withFraction: 0.7, of: red) : red
+                softwareDimmingButton.attributedTitle = "Software Dimming".withAttribute(.textColor(.white))
+                softwareDimmingButton.alpha = 0.4
                 softwareDimmingButton.shadowAlpha = 0.0
                 softwareDimmingButton.isHidden = false
                 softwareDimmingButton.isEnabled = true
                 softwareDimmingButton.showPopover = false
+                softwareDimmingButton.layer?.setAffineTransform(.init(scaleX: 0.9, y: 0.9).translatedBy(x: softwareDimmingButton.frame.width * 0.05, y: 0))
                 softwareDimmingButton.onClick = { [weak self] in
                     guard let display = self?.display else { return }
+                    display.networkEnabled = false
                     display.ddcEnabled = false
                     display.gammaEnabled = true
                     display.control = display.getBestControl(reapply: true)
@@ -1154,25 +1163,29 @@ class DisplayViewController: NSViewController {
                 #endif
 
                 if hasI2C || display.isForTesting {
-                    button.bg = darkMode ? peach : lunarYellow
+                    button.transition(0.2)
+                    button.bg = (darkMode ? peach : lunarYellow)
                     button.attributedTitle = "Hardware DDC".withAttribute(.textColor(darkMauve))
                     button.helpText = HARDWARE_CONTROLS_HELP_TEXT
                     button.shadowAlpha = 0.0
-                    button.alpha = 0.6
+                    button.alpha = 0.4
                     button.showPopover = false
+                    button.layer?.setAffineTransform(.init(scaleX: 0.9, y: 0.9).translatedBy(x: button.frame.width * 0.05, y: 0))
                     button.onClick = { [weak self] in
                         guard let display = self?.display else { return }
                         display.ddcEnabled = true
                         display.control = display.getBestControl(reapply: true)
                     }
 
-                    softwareDimmingButton.bg = darkMode ? peach.blended(withFraction: 0.7, of: red) : red
+                    softwareDimmingButton.transition(0.2)
+                    softwareDimmingButton.bg = (darkMode ? peach.blended(withFraction: 0.7, of: red) : red)
                     softwareDimmingButton.attributedTitle = "Software Dimming".withAttribute(.textColor(darkMauve))
                     softwareDimmingButton.alpha = 1.0
                     softwareDimmingButton.shadowAlpha = 1.0
                     softwareDimmingButton.isHidden = false
                     softwareDimmingButton.isEnabled = true
                     softwareDimmingButton.showPopover = true
+                    softwareDimmingButton.layer?.setAffineTransform(.init(scaleX: 1.0, y: 1.0))
                     softwareDimmingButton.helpText = display
                         .supportsGamma ? SOFTWARE_CONTROLS_FORCED_HELP_TEXT : SOFTWARE_OVERLAY_FORCED_HELP_TEXT
                     self.view.bringSubviewToFront(softwareDimmingButton)
@@ -1203,9 +1216,11 @@ class DisplayViewController: NSViewController {
             if control is GammaControl, display.enabledControls[.gamma] ?? false {
                 self.brightnessSlider?.color = darkMode ? peach.blended(withFraction: 0.7, of: red) ?? peach : red
                 self.brightnessContrastSlider?.color = darkMode ? peach.blended(withFraction: 0.7, of: red) ?? peach : red
+                self.softwareBrightnessSlider?.color = subzeroColor
             } else {
                 self.brightnessSlider?.color = button.bg!
                 self.brightnessContrastSlider?.color = button.bg!
+                self.softwareBrightnessSlider?.color = subzeroColor
             }
         }
     }
