@@ -1736,12 +1736,7 @@ struct SetPanelModeIntent: AppIntent {
         )
 
     static var parameterSummary: some ParameterSummary {
-//        When(\.$mode, .hasAnyValue, {
-//            Summary("Change resolution of \(\.$mode)")
-//        }, otherwise: {
         Summary("Change resolution to \(\.$mode)")
-//        })
-
     }
 
     @Parameter(title: "Screen Mode")
@@ -1751,7 +1746,9 @@ struct SetPanelModeIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
 
-        mode.screen.display?.panel?.setModeNumber((mode.id & ((1 << 32) - 1)).i32)
+        mode.screen.display?.reconfigure { panel in
+            panel.setModeNumber((mode.id & ((1 << 32) - 1)).i32)
+        }
 
         return .result()
     }
@@ -1769,12 +1766,7 @@ struct SetPanelPresetIntent: AppIntent {
         )
 
     static var parameterSummary: some ParameterSummary {
-//        When(\.$preset, .hasAnyValue, {
-//            Summary("Change preset of \(\.$preset)")
-//        }, otherwise: {
         Summary("Change preset to \(\.$preset)")
-//        })
-
     }
 
     @Parameter(title: "Screen Preset")
@@ -1788,8 +1780,9 @@ struct SetPanelPresetIntent: AppIntent {
         guard let display = preset.screen.display,
               let preset = display.panelPresets.first(where: { $0.presetIndex == presetIndex })
         else { return .result() }
-        display.panel?.setActivePreset(preset)
-
+        display.reconfigure { panel in
+            panel.setActivePreset(preset)
+        }
         return .result()
     }
 }
@@ -1829,52 +1822,56 @@ extension MPDisplayPreset {
 struct PanelPreset: AppEntity {
     struct PanelPresetQuery: EntityQuery {
         func entities(for identifiers: [Int]) async throws -> [PanelPreset] {
-            identifiers.compactMap { id -> PanelPreset? in
-                let screenID = CGDirectDisplayID(id >> 32)
-                guard let display = displayController.activeDisplays[screenID],
-                      let panel = display.panel
-                else {
-                    return nil
-                }
+            await DisplayController.panelManager?.withLock { _ in
+                identifiers.compactMap { id -> PanelPreset? in
+                    let screenID = CGDirectDisplayID(id >> 32)
+                    guard let display = displayController.activeDisplays[screenID],
+                          let panel = display.panel
+                    else {
+                        return nil
+                    }
 
-                let index = id & ((1 << 32) - 1)
-                guard let preset = (panel.presets as? [MPDisplayPreset])?.first(where: { $0.presetIndex == index }) else {
-                    return nil
-                }
+                    let index = id & ((1 << 32) - 1)
+                    guard let preset = (panel.presets as? [MPDisplayPreset])?.first(where: { $0.presetIndex == index }) else {
+                        return nil
+                    }
 
-                return preset.panelPreset
-            }
+                    return preset.panelPreset
+                }
+            } ?? []
         }
         func suggestedEntities() async throws -> ItemCollection<PanelPreset> {
             try await results()
         }
         func results() async throws -> ItemCollection<PanelPreset> {
-            let sections: [(Display, Int64)] = Array(
-                displayController.activeDisplayList
-                    .filter { $0.panel?.hasPresets ?? false }
-                    .map { d in
-                        let modes = Set(d.panelPresets.filter(\.isValid).map(\.presetGroup)).sorted()
-                        return modes.map { p in (d, p) }
-                    }.joined()
-            )
+            await DisplayController.panelManager?.withLock { _ in
+                let sections: [(Display, Int64)] = Array(
+                    displayController.activeDisplayList
+                        .filter { $0.panel?.hasPresets ?? false }
+                        .map { d in
+                            let modes = Set(d.panelPresets.filter(\.isValid).map(\.presetGroup)).sorted()
+                            return modes.map { p in (d, p) }
+                        }.joined()
+                )
 
-            return ItemCollection(
-                sections: sections
-                    .map { display, group in
-                        ItemSection(
-                            title: "\(display.name) \(MPDisplayPreset.groupName(group)) presets",
-                            items: display.panelPresets
-                                .filter { $0.isValid && $0.presetGroup == group }
-                                .compactMap(\.panelPreset)
-                                .map { preset in
-                                    IntentItem(
-                                        preset,
-                                        title: "\(preset.title)", subtitle: "\(preset.subtitle)"
-                                    )
-                                }
-                        )
-                    }
-            )
+                return ItemCollection(
+                    sections: sections
+                        .map { display, group in
+                            ItemSection(
+                                title: "\(display.name) \(MPDisplayPreset.groupName(group)) presets",
+                                items: display.panelPresets
+                                    .filter { $0.isValid && $0.presetGroup == group }
+                                    .compactMap(\.panelPreset)
+                                    .map { preset in
+                                        IntentItem(
+                                            preset,
+                                            title: "\(preset.title)", subtitle: "\(preset.subtitle)"
+                                        )
+                                    }
+                            )
+                        }
+                )
+            } ?? ItemCollection(items: [])
         }
     }
     typealias DefaultQuery = PanelPresetQuery
@@ -1898,49 +1895,70 @@ struct PanelPreset: AppEntity {
 }
 
 @available(iOS 16, macOS 13, *)
+extension MPDisplayMgr {
+    func withLock<T>(refreshBefore: Bool = true, _ action: (MPDisplayMgr) -> T) async -> T? {
+        while !tryLockAccess() {
+            do {
+                try await Task.sleep(nanoseconds: 10)
+            } catch {
+                return nil
+            }
+        }
+        let result = action(self)
+        unlockAccess()
+
+        return result
+    }
+}
+
+@available(iOS 16, macOS 13, *)
 struct PanelMode: AppEntity {
     struct PanelModeQuery: EntityQuery {
         func entities(for identifiers: [Int]) async throws -> [PanelMode] {
-            identifiers.compactMap { id -> PanelMode? in
-                let screenID = CGDirectDisplayID(id >> 32)
-                guard let display = displayController.activeDisplays[screenID],
-                      let panel = display.panel
-                else {
-                    return nil
-                }
+            await DisplayController.panelManager?.withLock { _ in
+                identifiers.compactMap { id -> PanelMode? in
+                    let screenID = CGDirectDisplayID(id >> 32)
+                    guard let display = displayController.activeDisplays[screenID],
+                          let panel = display.panel
+                    else {
+                        return nil
+                    }
 
-                let modeID = id & ((1 << 32) - 1)
-                guard let mode = panel.mode(withNumber: modeID.i32) as? MPDisplayMode else {
-                    return nil
-                }
+                    let modeID = id & ((1 << 32) - 1)
+                    guard let mode = panel.mode(withNumber: modeID.i32) as? MPDisplayMode else {
+                        return nil
+                    }
 
-                return mode.panelMode
-            }
+                    return mode.panelMode
+                }
+            } ?? []
         }
         func suggestedEntities() async throws -> ItemCollection<PanelMode> {
             try await results()
         }
         func results() async throws -> ItemCollection<PanelMode> {
-            let sections: [(Display, SortablePanelMode)] = Array(displayController.activeDisplayList.map { d in
-                let modes = Set(d.panelModes.map { SortablePanelMode(isHiDPI: $0.isHiDPI, refreshRate: $0.refreshRate) }).sorted().reversed()
-                return modes.filter(\.isHiDPI).map { p in (d, p) } + modes.filter(!\.isHiDPI).map { p in (d, p) }
-            }.joined())
+            await DisplayController.panelManager?.withLock { _ in
+                let sections: [(Display, SortablePanelMode)] = Array(displayController.activeDisplayList.map { d in
+                    let modes = Set(d.panelModes.map { SortablePanelMode(isHiDPI: $0.isHiDPI, refreshRate: $0.refreshRate) }).sorted().reversed()
+                    return modes.filter(\.isHiDPI).map { p in (d, p) } + modes.filter(!\.isHiDPI).map { p in (d, p) }
+                }.joined())
 
-            return ItemCollection(sections: sections.map { display, sortableMode in
-                ItemSection(
-                    title: "\(display.name) \(sortableMode.isHiDPI ? "HiDPI" : "lowDPI") modes @ \(sortableMode.refreshRate)Hz",
-                    items: display.panelModes
-                        .filter { $0.isHiDPI == sortableMode.isHiDPI && $0.refreshRate == sortableMode.refreshRate }
-                        .compactMap(\.panelMode)
-                        .map { mode in
-                            IntentItem(
-                                mode,
-                                title: "\(mode.title)", subtitle: "\(mode.subtitle)",
-                                image: DisplayRepresentation.Image(systemName: mode.image)
-                            )
-                        }
-                )
-            })
+                return ItemCollection(sections: sections.map { display, sortableMode in
+                    ItemSection(
+                        title: "\(display.name) \(sortableMode.isHiDPI ? "HiDPI" : "lowDPI") modes @ \(sortableMode.refreshRate)Hz",
+                        items: display.panelModes
+                            .filter { $0.isHiDPI == sortableMode.isHiDPI && $0.refreshRate == sortableMode.refreshRate }
+                            .compactMap(\.panelMode)
+                            .map { mode in
+                                IntentItem(
+                                    mode,
+                                    title: "\(mode.title)", subtitle: "\(mode.subtitle)",
+                                    image: DisplayRepresentation.Image(systemName: mode.image)
+                                )
+                            }
+                    )
+                })
+            } ?? ItemCollection(items: [])
         }
     }
     typealias DefaultQuery = PanelModeQuery

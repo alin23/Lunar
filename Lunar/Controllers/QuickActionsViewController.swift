@@ -255,7 +255,7 @@ struct DisplayRowView: View {
                 )
             }
 
-            if display.hasDDC, display.showVolumeSlider, display.ddcEnabled {
+            if display.hasDDC, display.showVolumeSlider, display.ddcEnabled || display.networkEnabled {
                 ZStack {
                     BigSurSlider(
                         percentage: $display.preciseVolume.f,
