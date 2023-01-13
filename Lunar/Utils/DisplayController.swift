@@ -2484,7 +2484,7 @@ class DisplayController: ObservableObject {
                     minVal: 0.0,
                     maxVal: 1.0
                 )
-                if adaptiveModeKey != .manual {
+                if display.adaptiveSubzero, adaptiveModeKey != .manual {
                     display.insertBrightnessUserDataPoint(
                         adaptiveMode.brightnessDataPoint.last,
                         value.d,
