@@ -1942,16 +1942,14 @@ private func handleDisplays(
                     )
                 case .softwareBrightness:
                     display.softwareBrightness = value.floatValue
-                    display.insertBrightnessUserDataPoint(
-                        displayController.adaptiveMode.brightnessDataPoint.last,
-                        display.brightness.doubleValue, modeKey: displayController.adaptiveModeKey
-                    )
+                    if display.adaptiveSubzero {
+                        display.insertBrightnessUserDataPoint(
+                            displayController.adaptiveMode.brightnessDataPoint.last,
+                            display.brightness.doubleValue, modeKey: displayController.adaptiveModeKey
+                        )
+                    }
                 case .xdrBrightness:
                     display.xdrBrightness = value.floatValue
-                    display.insertBrightnessUserDataPoint(
-                        displayController.adaptiveMode.brightnessDataPoint.last,
-                        display.brightness.doubleValue, modeKey: displayController.adaptiveModeKey
-                    )
                 default:
                     display.setValue(value, forKey: property.rawValue)
                     if Display.CodingKeys.settableWithControl.contains(property) {

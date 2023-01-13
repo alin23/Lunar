@@ -345,7 +345,7 @@ extension AdaptiveMode {
         case .brightness, .nsBrightness, .preciseBrightness:
             dataPoint = datapointLock.around { brightnessDataPoint }
             curveFactor = factor ?? display.brightnessCurveFactor
-            applySubzero = true
+            applySubzero = display.adaptiveSubzero
         default:
             dataPoint = datapointLock.around { contrastDataPoint }
             curveFactor = factor ?? display.contrastCurveFactor
