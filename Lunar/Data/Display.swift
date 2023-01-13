@@ -478,6 +478,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         applyGamma = try container.decodeIfPresent(Bool.self, forKey: .applyGamma) ?? false
         input = (try container.decodeIfPresent(UInt16.self, forKey: .input))?.ns ?? VideoInputSource.unknown.rawValue.ns
         forceDDC = (try container.decodeIfPresent(Bool.self, forKey: .forceDDC)) ?? false
+        adaptiveSubzero = try container.decodeIfPresent(Bool.self, forKey: .adaptiveSubzero) ?? true
 
         hotkeyInput1 = try (
             (try container.decodeIfPresent(UInt16.self, forKey: .hotkeyInput1))?
@@ -850,6 +851,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case facelight
         case blackout
         case systemAdaptiveBrightness
+        case adaptiveSubzero
 
         case faceLightEnabled
         case brightnessBeforeFacelight
@@ -1007,6 +1009,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .applyVolumeValueOnMute,
             .applyMuteValueOnMute,
             .systemAdaptiveBrightness,
+            .adaptiveSubzero,
         ]
 
         static var hidden: Set<CodingKeys> = [
@@ -1586,6 +1589,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     lazy var isMacBook: Bool = isBuiltin && Sysctl.isMacBook
 
     lazy var usesDDCBrightnessControl: Bool = control is DDCControl || control is NetworkControl
+
+    @Atomic @objc dynamic var adaptiveSubzero = true
 
     var primaryMirrorScreen: NSScreen? {
         getPrimaryMirrorScreen()
@@ -4905,6 +4910,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try container.encode(facelight, forKey: .facelight)
             try container.encode(blackout, forKey: .blackout)
             try container.encode(systemAdaptiveBrightness, forKey: .systemAdaptiveBrightness)
+            try container.encode(adaptiveSubzero, forKey: .adaptiveSubzero)
         }
     }
 
@@ -5819,7 +5825,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             toLow: MIN_BRIGHTNESS.d,
             toHigh: MAX_BRIGHTNESS.d
         )
-        if softwareBrightness < 1 {
+        if adaptiveSubzero, softwareBrightness < 1 {
             targetValue -= mapNumber(
                 softwareBrightness.d,
                 fromLow: 0.0,

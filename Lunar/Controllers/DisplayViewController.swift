@@ -1050,7 +1050,7 @@ class DisplayViewController: NSViewController {
         }
 
         softwareBrightnessSlider?.onSettingPercentage = { [weak self] _ in
-            guard let display = self?.display else { return }
+            guard let display = self?.display, display.adaptiveSubzero else { return }
 
             let lastDataPoint = datapointLock.around { displayController.adaptiveMode.brightnessDataPoint.last }
             display.insertBrightnessUserDataPoint(lastDataPoint, display.brightness.doubleValue, modeKey: displayController.adaptiveModeKey)
