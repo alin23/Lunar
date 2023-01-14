@@ -1590,7 +1590,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     lazy var usesDDCBrightnessControl: Bool = control is DDCControl || control is NetworkControl
 
-    @Atomic @objc dynamic var adaptiveSubzero = true
+    @Atomic @objc dynamic var adaptiveSubzero = true {
+        didSet {
+            readapt(newValue: adaptiveSubzero, oldValue: oldValue)
+            if !adaptiveSubzero, displayController.adaptiveModeKey != .manual, softwareBrightness < 1 {
+                softwareBrightness = 1
+            }
+        }
+    }
 
     var primaryMirrorScreen: NSScreen? {
         getPrimaryMirrorScreen()
