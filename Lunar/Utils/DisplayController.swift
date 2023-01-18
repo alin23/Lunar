@@ -102,10 +102,12 @@ import SwiftyJSON
 
     class DCP: CustomStringConvertible, Hashable, Equatable {
         deinit {
-            IOObjectRelease(dispService)
-            IOObjectRelease(dcpService)
-            IOObjectRelease(dcpAvServiceProxy)
-            IOObjectRelease(clcd2Service)
+            #if !DEBUG
+                IOObjectRelease(dispService)
+                IOObjectRelease(dcpService)
+                IOObjectRelease(dcpAvServiceProxy)
+                IOObjectRelease(clcd2Service)
+            #endif
         }
 
         init?(dispService: io_service_t, txIOIterator: io_iterator_t, index: Int) {
