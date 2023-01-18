@@ -1,3 +1,158 @@
+# 5.9.4
+## Improvements
+
+* Add `adaptiveSubzero` display property that allows disabling using Sub-zero Dimming range automatically in adaptive algorithms
+* Add UI checkbox for the `adaptiveSubzero` setting
+
+![adaptive subzero setting](https://files.lunar.fyi/adaptive-subzero-setting.png)
+
+## Fixes
+
+* Volume slider was not showing for network controlled monitors
+* Lock the panel manager when using resolution/preset Shortcuts
+# 5.9.3
+Sorry for the fast paced updates. 
+
+Here's a reminder of how you can switch to checking for updates less often:
+
+![weekly updates](https://files.lunar.fyi/weekly-updates.png)
+
+## Fixes
+
+* Fix wireless sensor detection
+* Fix manual adjustments not being reset
+* Fix Sync Mode polling interval 0 not working on Apple external displays
+* Fix Apple displays brightness value not getting updated inside Lunar
+* Fix Network Control not working
+* Fix "Find Screen" Shortcut comparators 
+* Fix "Set Resolution" Shortcut
+* Fix dragging Sub-zero Brightness slider not triggering the auto learning algorithm in adaptive modes
+# 5.9.2
+## Improvements
+
+* Use new *"Launch at Login"* API on macOS Ventura and later
+
+## Fixes
+
+* Skip `nil` EDID UUID in DCP service *(fixes "Non-responsive DDC" on some setups)*
+* Disable logging to file in non-verbose mode
+    * This should avoid some crashes and decrease load on disk
+* Fix crash caused by using CFRunLoop unnecessarily
+* Fix BlackOut not disabling mirroring when turning back on the display
+* Fix DDC services not being assigned correctly to slower monitors
+* Fix crash in network control code
+# 5.9.1
+## Hotfix
+
+* Fix non-responsive DDC for some specific monitor models
+
+## Features
+
+### Adaptive Sub-zero Dimming
+
+Full support for using Sub-zero dimming automatically inside adaptive modes like Sync/Sensor/Location.
+
+The **Auto-learning** algorithm can now learn Sub-zero brightness values and apply them in the future based on the current ambient light or sun position.
+
+
+### Native OSD
+for Sub-zero dimming, XDR Brightness and Contrast adjustments
+
+![new subzero XDR OSD](https://files.lunar.fyi/new-sub-xdr-osd.png)
+
+
+### macOS **Shortcuts**
+
+* Control brightness, volume etc. of a screen
+* Change Lunar adaptive modes and apply global presets
+* Plus actions that can be done exclusively in Shortcuts:
+    * Swap monitors
+    * Mirror any combination of screens
+    * Arrange screens in various layouts
+    * Change resolution and frame rate with a hotkey
+    * Change presets with a hotkey (easily access reference presets like *Design & Print* or *Photography*)
+
+![movie time shortcut example](https://img.panaitiu.com/_/1620/plain/https://files.lunar.fyi/shortcuts-movie-time.png)
+
+### New DDC algorithm
+
+* Adds compatibility for the **built-in HDMI** port of the newer Apple Silicon Mac devices
+    * *Remember to enable DDC from the [Controls menu](https://app.lunar.fyi/display/controls) of the HDMI display if it was previously disabled*
+* Improves writing speed with an algorithm that adapts to each monitor's I²C max speed
+* Improves DDC Read reliability
+
+## Improvements
+
+* Allow changing the ambient light sensor hostname from the command line
+    * `defaults write fyi.lunar.Lunar sensorHostname mysensor.local`
+* Make BlackOut without mirroring a bit faster
+* Better detection for MCDP29XX chips
+* Better detection for projectors and virtual displays
+* Deactivate license on oldest device automatically when activation fails
+
+## Fixes
+
+* Fix custom hotkeys not allowing *hold to change continuously*
+* Fix possible crash when `MPDisplayMgr` can't lock access to displays
+
+#### Full list of macOS Shortcuts
+
+![shortcuts list](https://img.panaitiu.com/_/576/plain/https://files.lunar.fyi/shortcuts-list.png)
+
+# 5.9.0
+## Features
+
+### Adaptive Sub-zero Dimming
+
+Full support for using Sub-zero dimming automatically inside adaptive modes like Sync/Sensor/Location.
+
+The **Auto-learning** algorithm can now learn Sub-zero brightness values and apply them in the future based on the current ambient light or sun position.
+
+
+### Native OSD
+for Sub-zero dimming, XDR Brightness and Contrast adjustments
+
+![new subzero XDR OSD](https://files.lunar.fyi/new-sub-xdr-osd.png)
+
+
+### macOS **Shortcuts**
+
+* Control brightness, volume etc. of a screen
+* Change Lunar adaptive modes and apply global presets
+* Plus actions that can be done exclusively in Shortcuts:
+    * Swap monitors
+    * Mirror any combination of screens
+    * Arrange screens in various layouts
+    * Change resolution and frame rate with a hotkey
+    * Change presets with a hotkey (easily access reference presets like *Design & Print* or *Photography*)
+
+![movie time shortcut example](https://img.panaitiu.com/_/1620/plain/https://files.lunar.fyi/shortcuts-movie-time.png)
+
+### New DDC algorithm
+
+* Adds compatibility for the **built-in HDMI** port of the newer Apple Silicon Mac devices
+    * *Remember to enable DDC from the [Controls menu](https://app.lunar.fyi/display/controls) of the HDMI display if it was previously disabled*
+* Improves writing speed with an algorithm that adapts to each monitor's I²C max speed
+* Improves DDC Read reliability
+
+## Improvements
+
+* Allow changing the ambient light sensor hostname from the command line
+    * `defaults write fyi.lunar.Lunar sensorHostname mysensor.local`
+* Make BlackOut without mirroring a bit faster
+* Better detection for MCDP29XX chips
+* Better detection for projectors and virtual displays
+* Deactivate license on oldest device automatically when activation fails
+
+## Fixes
+
+* Fix custom hotkeys not allowing *hold to change continuously*
+* Fix possible crash when `MPDisplayMgr` can't lock access to displays
+
+#### Full list of macOS Shortcuts
+
+![shortcuts list](https://img.panaitiu.com/_/576/plain/https://files.lunar.fyi/shortcuts-list.png)
+
 # 5.8.0
 ## Fixes
 
