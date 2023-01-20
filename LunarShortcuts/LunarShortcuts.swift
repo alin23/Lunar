@@ -2022,6 +2022,44 @@ struct SwapMonitorsIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
+struct MakeMonitorMainIntent: AppIntent {
+    init() {}
+
+    static var title: LocalizedStringResource = "Set Screen as Main"
+    static var description =
+        IntentDescription(
+            "Set a screen as Main Display instead of Extended Display.",
+            categoryName: "Arrangement"
+        )
+
+    static var parameterSummary: some ParameterSummary {
+        Summary("Set main screen to \(\.$screen)")
+    }
+
+    @Parameter(title: "Screen", optionsProvider: ScreenQuery(single: true, noDefault: true))
+    var screen: Screen
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        guard let mainDisplay = displayController.mainDisplay, mainDisplay.id != screen.id else {
+            return .result()
+        }
+
+        try checkShortcutsLimit()
+
+        Display.configure { config in
+            if let mainDisplay = displayController.mainDisplay, let mainDisplayBounds = mainDisplay.nsScreen?.bounds,
+               mainDisplayBounds.origin == .zero, let display = screen.display, let displayBounds = display.nsScreen?.bounds
+            {
+                CGConfigureDisplayOrigin(config, mainDisplay.id, -displayBounds.origin.x.intround.i32, -displayBounds.origin.y.intround.i32)
+            }
+            return CGConfigureDisplayOrigin(config, screen.id.u32, 0, 0) == .success
+        }
+        return .result()
+    }
+}
+
+@available(iOS 16, macOS 13, *)
 struct VerticalMonitorLayoutIntent: AppIntent {
     init() {}
 
