@@ -35,7 +35,6 @@
 		C731260F22B3A9CD001ED199 /* HelpPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C731260E22B3A9CD001ED199 /* HelpPopoverController.swift */; };
 		C731E85E27E1E5090016B36D /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = C731E85D27E1E5090016B36D /* Sentry */; };
 		C73716A526DE1F22008EEE53 /* CBTrueToneClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C737169E26DE1F22008EEE53 /* CBTrueToneClient.h */; };
-		C73716A626DE1F22008EEE53 /* BrightnessSystemClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C73716A326DE1F22008EEE53 /* BrightnessSystemClient.h */; };
 		C73716A726DE1F22008EEE53 /* CBAdaptationClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C73716A426DE1F22008EEE53 /* CBAdaptationClient.h */; };
 		C73AAC4B22241B690063AD2A /* Hotkeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = C73AAC4A22241B690063AD2A /* Hotkeys.swift */; };
 		C73B41EC263BE02E006F6783 /* LetsMove.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C73B41EA263BE01F006F6783 /* LetsMove.framework */; };
@@ -231,7 +230,6 @@
 		C731260E22B3A9CD001ED199 /* HelpPopoverController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpPopoverController.swift; sourceTree = "<group>"; };
 		C735DD791FD5C04D00FBD16F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		C737169E26DE1F22008EEE53 /* CBTrueToneClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBTrueToneClient.h; sourceTree = "<group>"; };
-		C73716A326DE1F22008EEE53 /* BrightnessSystemClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrightnessSystemClient.h; sourceTree = "<group>"; };
 		C73716A426DE1F22008EEE53 /* CBAdaptationClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBAdaptationClient.h; sourceTree = "<group>"; };
 		C73AAC4A22241B690063AD2A /* Hotkeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hotkeys.swift; sourceTree = "<group>"; };
 		C73B41EA263BE01F006F6783 /* LetsMove.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = LetsMove.framework; sourceTree = "<group>"; };
@@ -743,7 +741,6 @@
 			children = (
 				C72BB4B32727E03400941708 /* Extensions.h */,
 				C72BB4B52727E03400941708 /* Extensions.m */,
-				C73716A326DE1F22008EEE53 /* BrightnessSystemClient.h */,
 				C73716A426DE1F22008EEE53 /* CBAdaptationClient.h */,
 				C737169E26DE1F22008EEE53 /* CBTrueToneClient.h */,
 				C7E896D82652C0F60079A328 /* CBBlueLightClient.h */,
@@ -773,7 +770,6 @@
 				C7E896DA2652C0F60079A328 /* CBBlueLightClient.h in Headers */,
 				C73716A526DE1F22008EEE53 /* CBTrueToneClient.h in Headers */,
 				C7CC5D1629437E2C00DEA106 /* DDC2.h in Headers */,
-				C73716A626DE1F22008EEE53 /* BrightnessSystemClient.h in Headers */,
 				C72BB4B62727E03500941708 /* Extensions.h in Headers */,
 				C73716A726DE1F22008EEE53 /* CBAdaptationClient.h in Headers */,
 				C7E80E362637060F004718A4 /* libssh2_sftp.h in Headers */,
