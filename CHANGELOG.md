@@ -1,3 +1,30 @@
+# 5.9.5
+## Features
+
+#### Support for **M2 Pro/Max**
+
+Both Thunderbolt/DP and HDMI connections on M2 Pro/Max should support DDC in this version.
+
+### Disconnect screens
+
+You'll notice two new actions in macOS Shortcuts: **Disconnect screen** and **Reconnect screen**. 
+
+![disconnect screen shortcuts](https://files.lunar.fyi/disconnect-screen-shortcuts.png)
+
+This new method can really disconnect and power off the screen just like closing the MacBook lid or disconnecting a cable would do, freeing up the GPU resources.
+
+You retain the ability to use the MacBook keyboard/trackpad/webcam as usual, and disconnected external monitors *usually* keep the ability to charge the laptop.
+
+These are the effort of reverse engineering the MacBook's clamshell mode which you can read about [in this article](https://alinpanaitiu.com/blog/turn-off-macbook-display-clamshell/)
+
+I'm planning to integrate them into BlackOut eventually but there's a lot more testing I have to do first.
+
+## Improvements
+
+* Make the arrangements/layouts in Shortcuts work when the main display is not the built-in display
+* Add **"Set screen as main"** Shortcut
+* Add a way to disable sensor checking on the network
+    * ![disable sensor checker](https://files.lunar.fyi/disable-light-sensor-checker.png)
 # 5.9.4
 ## Improvements
 
