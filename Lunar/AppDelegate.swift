@@ -1168,7 +1168,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
         }
 
-        CGDisplayRegisterReconfigurationCallback({ displayID, _, _ in
+        CGDisplayRegisterReconfigurationCallback({ displayID, flags, _ in
+            log.debug("CGDisplayRegisterReconfigurationCallback \(flags) \(displayID)")
+
             for windowType in ["corner", "gamma", "shade", "faceLight"] {
                 if !NSScreen.onlineDisplayIDs.contains(displayID), let wc = Display.getWindowController(displayID, type: windowType) {
                     wc.close()
