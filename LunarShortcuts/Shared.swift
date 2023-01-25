@@ -107,6 +107,7 @@ extension Defaults.Keys {
 
     static let hdrWorkaround = Key<Bool>("hdrWorkaround", default: true)
     static let oldBlackOutMirroring = Key<Bool>("oldBlackOutMirroring", default: false)
+    static let blackOutDisablerType = Key<BlackOutDisablerType>("blackOutDisablerType", default: .disconnect)
     static let disableNightShiftXDR = Key<Bool>("disableNightShiftXDR", default: false)
     static let enableDarkModeXDR = Key<Bool>("enableDarkModeXDR", default: false)
     static let screenBlankingIssueWarningShown = Key<Bool>("screenBlankingIssueWarningShown", default: false)

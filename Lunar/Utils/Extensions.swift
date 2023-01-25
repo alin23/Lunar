@@ -1240,6 +1240,25 @@ extension NSScreen {
     }
 }
 
+extension CGDisplayChangeSummaryFlags: CustomStringConvertible {
+    public var description: String {
+        var result: [String] = []
+        if contains(.addFlag) { result.append("added") }
+        if contains(.enabledFlag) { result.append("enabled") }
+        if contains(.beginConfigurationFlag) { result.append("beganConfiguration") }
+        if contains(.desktopShapeChangedFlag) { result.append("desktopShapeChanged") }
+        if contains(.mirrorFlag) { result.append("mirrored") }
+        if contains(.unMirrorFlag) { result.append("unmirrored") }
+        if contains(.disabledFlag) { result.append("disabled") }
+        if contains(.removeFlag) { result.append("removed") }
+        if contains(.movedFlag) { result.append("moved") }
+        if contains(.setMainFlag) { result.append("setMain") }
+        if contains(.setModeFlag) { result.append("setMode") }
+
+        return result.joined(separator: " ")
+    }
+}
+
 extension AnyBidirectionalCollection where Element: BinaryInteger {
     var commaSeparatedString: String {
         map(\.s).joined(separator: ", ")
