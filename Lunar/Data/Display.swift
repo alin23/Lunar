@@ -3989,25 +3989,28 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         (panel?.isTV ?? false) && edidName.contains("TV")
     }
 
-    static func configure(_ action: (CGDisplayConfigRef) -> Bool) {
+    @discardableResult
+    static func configure(_ action: (CGDisplayConfigRef) -> Bool) -> Bool {
         var configRef: CGDisplayConfigRef?
         var err = CGBeginDisplayConfiguration(&configRef)
         guard err == .success, let config = configRef else {
             log.error("Error with CGBeginDisplayConfiguration: \(err)")
-            return
+            return false
         }
 
         guard action(config) else {
             _ = CGCancelDisplayConfiguration(config)
-            return
+            return false
         }
 
         err = CGCompleteDisplayConfiguration(config, .permanently)
         guard err == .success else {
             log.error("Error with CGCompleteDisplayConfiguration")
             _ = CGCancelDisplayConfiguration(config)
-            return
+            return false
         }
+
+        return true
     }
 
     func setNotchState() {

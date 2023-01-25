@@ -151,11 +151,12 @@ final class Screen: NSObject, AppEntity {
 @available(iOS 16, macOS 13, *)
 struct ScreenQuery: EntityPropertyQuery {
     init() {}
-    init(filter: ((Display) -> Bool)? = nil, single: Bool = false, additionalScreens: [Screen]? = nil, noDefault: Bool = false) {
+    init(filter: ((Display) -> Bool)? = nil, single: Bool = false, additionalScreens: [Screen]? = nil, noDefault: Bool = false, includeDisconnected: Bool = false) {
         self.filter = filter
         self.single = single
         self.additionalScreens = additionalScreens
         self.noDefault = noDefault
+        self.includeDisconnected = includeDisconnected
     }
 
     typealias Entity = Screen
@@ -301,6 +302,11 @@ struct ScreenQuery: EntityPropertyQuery {
     var single = false
     var additionalScreens: [Screen]?
     var noDefault = false
+    var includeDisconnected = false
+
+    var displays: [Display] {
+        includeDisconnected ? displayController.displayList : displayController.activeDisplayList
+    }
 
     func entities(
         matching comparators: [NSPredicate],
@@ -309,7 +315,7 @@ struct ScreenQuery: EntityPropertyQuery {
         limit: Int?
     ) async throws -> [Screen] {
         let predicate = NSCompoundPredicate(type: mode == .and ? .and : .or, subpredicates: comparators)
-        return displayController.activeDisplayList
+        return displays
             .map(\.screen)
             .filter { predicate.evaluate(with: $0) }
             .sorted(by: { this, other in
@@ -340,9 +346,9 @@ struct ScreenQuery: EntityPropertyQuery {
 
         let screens: [Screen]
         if let filter {
-            screens = displayController.activeDisplayList.filter(filter).map(\.screen)
+            screens = displays.filter(filter).map(\.screen)
         } else {
-            screens = displayController.activeDisplayList.map(\.screen)
+            screens = displays.map(\.screen)
         }
 
         return screens.first
@@ -355,9 +361,9 @@ struct ScreenQuery: EntityPropertyQuery {
     func results() async throws -> [Screen] {
         let screens: [Screen]
         if let filter {
-            screens = displayController.activeDisplayList.filter(filter).map(\.screen)
+            screens = displays.filter(filter).map(\.screen)
         } else {
-            screens = displayController.activeDisplayList.map(\.screen)
+            screens = displays.map(\.screen)
         }
 
         guard !single else {
@@ -368,7 +374,7 @@ struct ScreenQuery: EntityPropertyQuery {
     }
 
     func entities(matching query: String) async throws -> [Screen] {
-        let matches = displayController.activeDisplayList.filter {
+        let matches = displays.filter {
             $0.name == query || $0.serial == query
         }.map(\.screen)
 
@@ -381,13 +387,14 @@ struct ScreenQuery: EntityPropertyQuery {
 
     func entities(for identifiers: [Int]) async throws -> [Screen] {
         guard !identifiers.isEmpty else {
-            return displayController.activeDisplayList.map(\.screen)
+            return displays.map(\.screen)
         }
 
         return identifiers.compactMap { id in
             displayController.activeDisplays[id.u32]?.screen ??
                 Self.dynamicFilterScreenMapping[id] ??
-                (additionalScreens ?? []).first(where: { $0.id == id })
+                (additionalScreens ?? []).first(where: { $0.id == id }) ??
+                displayController.possiblyDisconnectedDisplays[id.u32]?.screen
         }
     }
 }
@@ -863,6 +870,130 @@ struct PowerOnSoftwareIntent: AppIntent {
             }
         }
         try await Task.sleep(for: .milliseconds(ms))
+
+        return .result()
+    }
+}
+
+@available(iOS 16, macOS 13, *)
+struct DisconnectScreenIntent: AppIntent {
+    init() {}
+
+    // swiftformat:disable all
+    static var title: LocalizedStringResource = "Disconnect screen"
+    static var description = IntentDescription(
+    """
+Disconnects a screen and removes it from the list of screens that can be drawn on, effectively powering them off or moving them to a Standby state.
+
+For MacBook screens, this is the same as closing the laptop lid, but without actually closing it.
+
+To bring back the screen try any one of the following:
+
+• Use the "Reconnect Screen" action
+• Close and open the MacBook lid (for the internal screen)
+• Disconnect and reconnect the cable (for external screens)
+""", categoryName: "Connection")
+
+    // swiftformat:enable all
+
+    static var parameterSummary: some ParameterSummary {
+        Summary("Disconnect \(\.$screen)")
+    }
+
+    @Parameter(title: "Screen", optionsProvider: ScreenQuery())
+    var screen: Screen
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        guard lunarProActive else {
+            throw IntentError.message("A Lunar Pro license is needed for this feature.")
+        }
+
+        displayController.dis(screen.id.u32)
+
+        return .result()
+    }
+}
+
+@available(iOS 16, macOS 13, *)
+struct ReconnectScreenIntent: AppIntent {
+    init() {}
+
+    // swiftformat:disable all
+    static var title: LocalizedStringResource = "Reconnect screen"
+    static var description = IntentDescription(
+    """
+Reconnects a screen that was previously disconnected using Lunar's "Disconnect screen" action.
+
+If the action fails, try any one of the following to bring back the screen:
+
+• Close and open the MacBook lid (for the internal screen)
+• Disconnect and reconnect the cable (for external screens)
+""", categoryName: "Connection")
+
+    // swiftformat:enable all
+
+    static var parameterSummary: some ParameterSummary {
+        Summary("Reconnect \(\.$screen)")
+    }
+
+    @Parameter(title: "Screen", optionsProvider: ScreenQuery(single: true, additionalScreens: [DisplayFilter.all.screen] + displayController.possiblyDisconnectedDisplays.values.map(\.screen)))
+    var screen: Screen
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        if let displayFilter = DisplayFilter(argument: screen.serial), displayFilter == .all || displayFilter == .cursor {
+            displayController.en()
+            return .result()
+        }
+
+        if let display = displayController.possiblyDisconnectedDisplays.values.first(where: { $0.serial == screen.serial }) {
+            displayController.en(display.id)
+        } else {
+            displayController.en(screen.id.u32)
+        }
+
+        return .result()
+    }
+}
+
+@available(iOS 16, macOS 13, *)
+struct ToggleScreenConnectionIntent: AppIntent {
+    init() {}
+
+    // swiftformat:disable all
+    static var title: LocalizedStringResource = "Toggle screen connection"
+    static var description = IntentDescription(
+    """
+Disconnects a connected screen, or reconnects it if it was previously disconnected using Lunar.
+
+If the reconnect action fails, try any one of the following to bring back the screen:
+
+• Close and open the MacBook lid (for the internal screen)
+• Disconnect and reconnect the cable (for external screens)
+""", categoryName: "Connection")
+
+    // swiftformat:enable all
+
+    static var parameterSummary: some ParameterSummary {
+        Summary("Toggle connected state for \(\.$screen)")
+    }
+
+    @Parameter(title: "Screen", optionsProvider: ScreenQuery(single: true, additionalScreens: displayController.possiblyDisconnectedDisplays.values.map(\.screen)))
+    var screen: Screen
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        if let display = screen.display, display.active {
+            guard lunarProActive else {
+                throw IntentError.message("A Lunar Pro license is needed for this feature.")
+            }
+            displayController.dis(display.id)
+        } else if let display = displayController.possiblyDisconnectedDisplays.values.first(where: { $0.serial == screen.serial }) {
+            displayController.en(display.id)
+        } else {
+            displayController.en(screen.id.u32)
+        }
 
         return .result()
     }
@@ -2281,16 +2412,6 @@ struct TwoAboveOneMonitorLayoutIntent: AppIntent {
                 let rightScreenY = leftScreenBounds.maxY - rightScreenBounds.height
 
                 CGConfigureDisplayOrigin(config, display3.id, Int32(rightScreenX.rounded()), Int32(rightScreenY.rounded()))
-            } else if CGDisplayIsMain(display2.id) != 0 {
-                let leftScreenX = middleScreenBounds.minX - (leftScreenBounds.width - middleScreenBounds.width / 2)
-                let leftScreenY = middleScreenBounds.minY - leftScreenBounds.height
-
-                CGConfigureDisplayOrigin(config, display1.id, Int32(leftScreenX.rounded()), Int32(leftScreenY.rounded()))
-
-                let rightScreenX = middleScreenBounds.midX
-                let rightScreenY = middleScreenBounds.minY - rightScreenBounds.height
-
-                CGConfigureDisplayOrigin(config, display3.id, Int32(rightScreenX.rounded()), Int32(rightScreenY.rounded()))
             } else if CGDisplayIsMain(display3.id) != 0 {
                 let leftScreenX = rightScreenBounds.minX - leftScreenBounds.width
                 let leftScreenY = rightScreenBounds.maxY - leftScreenBounds.height
@@ -2301,6 +2422,16 @@ struct TwoAboveOneMonitorLayoutIntent: AppIntent {
                 let middleScreenY = rightScreenBounds.maxY
 
                 CGConfigureDisplayOrigin(config, display2.id, Int32(middleScreenX.rounded()), Int32(middleScreenY.rounded()))
+            } else {
+                let leftScreenX = middleScreenBounds.minX - (leftScreenBounds.width - middleScreenBounds.width / 2)
+                let leftScreenY = middleScreenBounds.minY - leftScreenBounds.height
+
+                CGConfigureDisplayOrigin(config, display1.id, Int32(leftScreenX.rounded()), Int32(leftScreenY.rounded()))
+
+                let rightScreenX = middleScreenBounds.midX
+                let rightScreenY = middleScreenBounds.minY - rightScreenBounds.height
+
+                CGConfigureDisplayOrigin(config, display3.id, Int32(rightScreenX.rounded()), Int32(rightScreenY.rounded()))
             }
 
             return true
@@ -2364,16 +2495,6 @@ struct HorizontalMonitorThreeLayoutIntent: AppIntent {
                 let rightScreenY = leftScreenBounds.midY - rightScreenBounds.height / 2
 
                 CGConfigureDisplayOrigin(config, display3.id, Int32(rightScreenX.rounded()), Int32(rightScreenY.rounded()))
-            } else if CGDisplayIsMain(display2.id) != 0 {
-                let leftScreenX = middleScreenBounds.minX - leftScreenBounds.width
-                let leftScreenY = middleScreenBounds.midY - leftScreenBounds.height / 2
-
-                CGConfigureDisplayOrigin(config, display1.id, Int32(leftScreenX.rounded()), Int32(leftScreenY.rounded()))
-
-                let rightScreenX = middleScreenBounds.maxX + rightScreenBounds.width
-                let rightScreenY = middleScreenBounds.midY - rightScreenBounds.height / 2
-
-                CGConfigureDisplayOrigin(config, display3.id, Int32(rightScreenX.rounded()), Int32(rightScreenY.rounded()))
             } else if CGDisplayIsMain(display3.id) != 0 {
                 let leftScreenX = rightScreenBounds.minX - middleScreenBounds.width - leftScreenBounds.width
                 let leftScreenY = rightScreenBounds.midY - leftScreenBounds.height / 2
@@ -2384,7 +2505,18 @@ struct HorizontalMonitorThreeLayoutIntent: AppIntent {
                 let middleScreenY = rightScreenBounds.midY - middleScreenBounds.height / 2
 
                 CGConfigureDisplayOrigin(config, display2.id, Int32(middleScreenX.rounded()), Int32(middleScreenY.rounded()))
+            } else {
+                let leftScreenX = middleScreenBounds.minX - leftScreenBounds.width
+                let leftScreenY = middleScreenBounds.midY - leftScreenBounds.height / 2
+
+                CGConfigureDisplayOrigin(config, display1.id, Int32(leftScreenX.rounded()), Int32(leftScreenY.rounded()))
+
+                let rightScreenX = middleScreenBounds.maxX + rightScreenBounds.width
+                let rightScreenY = middleScreenBounds.midY - rightScreenBounds.height / 2
+
+                CGConfigureDisplayOrigin(config, display3.id, Int32(rightScreenX.rounded()), Int32(rightScreenY.rounded()))
             }
+
             return true
         }
 

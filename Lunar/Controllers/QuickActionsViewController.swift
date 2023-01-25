@@ -621,6 +621,8 @@ struct AdvancedSettingsView: View {
     @Default(.autoRestartOnFailedDDC) var autoRestartOnFailedDDC
     @Default(.autoRestartOnFailedDDCSooner) var autoRestartOnFailedDDCSooner
 
+    @State var sensorCheckerEnabled = !Defaults[.sensorHostname].isEmpty
+
     var body: some View {
         ZStack {
             Color.clear.frame(maxWidth: .infinity, alignment: .leading)
@@ -725,6 +727,14 @@ struct AdvancedSettingsView: View {
                         help: """
                         When using "Network Control" with a Raspberry Pi, it might be
                         helpful to disable the Pi desktop if you don't need it.
+                        """
+                    )
+                    SettingsToggle(
+                        text: "Check for network light sensors periodically", setting: $sensorCheckerEnabled,
+                        help: """
+                        To enable "Sensor Mode", Lunar periodically checks if a wireless light
+                        sensor is available using local DNS requests. You can disable this if
+                        you never intend to use a wireless ambient light sensor.
                         """
                     )
                     Divider()
@@ -844,6 +854,9 @@ struct AdvancedSettingsView: View {
                 Spacer()
                 Color.clear
             }.frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .onChange(of: sensorCheckerEnabled) { enabled in
+            Defaults[.sensorHostname] = enabled ? "lunarsensor.local" : ""
         }
     }
 }
