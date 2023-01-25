@@ -949,6 +949,8 @@ class DisplayController: ObservableObject {
 
     var lastTimeBrightnessKeyPressed = Date.distantPast
 
+    var possiblyDisconnectedDisplays: [CGDirectDisplayID: Display] = [:]
+
     @Atomic var autoBlackoutPending = false {
         didSet {
             log.info("autoBlackoutPending=\(autoBlackoutPending)")
@@ -1043,6 +1045,14 @@ class DisplayController: ObservableObject {
     var activeDisplays: [CGDirectDisplayID: Display] {
         get { _activeDisplaysLock.around(ignoreMainThread: true) { _activeDisplays } }
         set {
+            mainAsync { [self] in
+                for id in possiblyDisconnectedDisplays.keys {
+                    if newValue[id] != nil {
+                        possiblyDisconnectedDisplays.removeValue(forKey: id)
+                    }
+                }
+            }
+
             _activeDisplaysLock.around {
                 _activeDisplays = newValue
                 CachedDefaults[.hasActiveDisplays] = !_activeDisplays.isEmpty
