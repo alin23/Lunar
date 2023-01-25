@@ -2091,10 +2091,17 @@ struct VerticalMonitorLayoutIntent: AppIntent {
             let topScreenBounds = CGDisplayBounds(display1.id)
             let bottomScreenBounds = CGDisplayBounds(display2.id)
 
-            let topScreenX = bottomScreenBounds.midX - topScreenBounds.width / 2
-            let topScreenY = bottomScreenBounds.minY - topScreenBounds.height
+            if CGDisplayIsMain(display2.id) != 0 {
+                let topScreenX = bottomScreenBounds.midX - topScreenBounds.width / 2
+                let topScreenY = bottomScreenBounds.minY - topScreenBounds.height
 
-            CGConfigureDisplayOrigin(config, display1.id, Int32(topScreenX.rounded()), Int32(topScreenY.rounded()))
+                CGConfigureDisplayOrigin(config, display1.id, Int32(topScreenX.rounded()), Int32(topScreenY.rounded()))
+            } else {
+                let bottomScreenX = topScreenBounds.midX - bottomScreenBounds.width / 2
+                let bottomScreenY = topScreenBounds.maxY
+
+                CGConfigureDisplayOrigin(config, display2.id, Int32(bottomScreenX.rounded()), Int32(bottomScreenY.rounded()))
+            }
             return true
         }
 
@@ -2136,10 +2143,17 @@ struct HorizontalMonitorLayoutIntent: AppIntent {
             let leftScreenBounds = CGDisplayBounds(display1.id)
             let rightScreenBounds = CGDisplayBounds(display2.id)
 
-            let leftScreenX = rightScreenBounds.minX - leftScreenBounds.width
-            let leftScreenY = rightScreenBounds.midY - leftScreenBounds.height / 2
+            if CGDisplayIsMain(display2.id) != 0 {
+                let leftScreenX = rightScreenBounds.minX - leftScreenBounds.width
+                let leftScreenY = rightScreenBounds.midY - leftScreenBounds.height / 2
 
-            CGConfigureDisplayOrigin(config, display1.id, Int32(leftScreenX.rounded()), Int32(leftScreenY.rounded()))
+                CGConfigureDisplayOrigin(config, display1.id, Int32(leftScreenX.rounded()), Int32(leftScreenY.rounded()))
+            } else {
+                let rightScreenX = leftScreenBounds.maxX
+                let rightScreenY = leftScreenBounds.midY - rightScreenBounds.height / 2
+
+                CGConfigureDisplayOrigin(config, display2.id, Int32(rightScreenX.rounded()), Int32(rightScreenY.rounded()))
+            }
             return true
         }
 
@@ -2257,15 +2271,38 @@ struct TwoAboveOneMonitorLayoutIntent: AppIntent {
             let middleScreenBounds = CGDisplayBounds(display2.id)
             let rightScreenBounds = CGDisplayBounds(display3.id)
 
-            let leftScreenX = middleScreenBounds.minX - (leftScreenBounds.width - middleScreenBounds.width / 2)
-            let leftScreenY = middleScreenBounds.minY - leftScreenBounds.height
+            if CGDisplayIsMain(display1.id) != 0 {
+                let middleScreenX = leftScreenBounds.maxX - middleScreenBounds.width / 2
+                let middleScreenY = leftScreenBounds.maxY
 
-            CGConfigureDisplayOrigin(config, display1.id, Int32(leftScreenX.rounded()), Int32(leftScreenY.rounded()))
+                CGConfigureDisplayOrigin(config, display2.id, Int32(middleScreenX.rounded()), Int32(middleScreenY.rounded()))
 
-            let rightScreenX = middleScreenBounds.midX
-            let rightScreenY = middleScreenBounds.minY - rightScreenBounds.height
+                let rightScreenX = leftScreenBounds.maxX
+                let rightScreenY = leftScreenBounds.maxY - rightScreenBounds.height
 
-            CGConfigureDisplayOrigin(config, display3.id, Int32(rightScreenX.rounded()), Int32(rightScreenY.rounded()))
+                CGConfigureDisplayOrigin(config, display3.id, Int32(rightScreenX.rounded()), Int32(rightScreenY.rounded()))
+            } else if CGDisplayIsMain(display2.id) != 0 {
+                let leftScreenX = middleScreenBounds.minX - (leftScreenBounds.width - middleScreenBounds.width / 2)
+                let leftScreenY = middleScreenBounds.minY - leftScreenBounds.height
+
+                CGConfigureDisplayOrigin(config, display1.id, Int32(leftScreenX.rounded()), Int32(leftScreenY.rounded()))
+
+                let rightScreenX = middleScreenBounds.midX
+                let rightScreenY = middleScreenBounds.minY - rightScreenBounds.height
+
+                CGConfigureDisplayOrigin(config, display3.id, Int32(rightScreenX.rounded()), Int32(rightScreenY.rounded()))
+            } else if CGDisplayIsMain(display3.id) != 0 {
+                let leftScreenX = rightScreenBounds.minX - leftScreenBounds.width
+                let leftScreenY = rightScreenBounds.maxY - leftScreenBounds.height
+
+                CGConfigureDisplayOrigin(config, display1.id, Int32(leftScreenX.rounded()), Int32(leftScreenY.rounded()))
+
+                let middleScreenX = rightScreenBounds.minY - middleScreenBounds.width / 2
+                let middleScreenY = rightScreenBounds.maxY
+
+                CGConfigureDisplayOrigin(config, display2.id, Int32(middleScreenX.rounded()), Int32(middleScreenY.rounded()))
+            }
+
             return true
         }
 
@@ -2317,15 +2354,37 @@ struct HorizontalMonitorThreeLayoutIntent: AppIntent {
             let middleScreenBounds = CGDisplayBounds(display2.id)
             let rightScreenBounds = CGDisplayBounds(display3.id)
 
-            let leftScreenX = middleScreenBounds.minX - leftScreenBounds.width
-            let leftScreenY = middleScreenBounds.midY - leftScreenBounds.height / 2
+            if CGDisplayIsMain(display1.id) != 0 {
+                let middleScreenX = leftScreenBounds.maxX
+                let middleScreenY = leftScreenBounds.midY - middleScreenBounds.height / 2
 
-            CGConfigureDisplayOrigin(config, display1.id, Int32(leftScreenX.rounded()), Int32(leftScreenY.rounded()))
+                CGConfigureDisplayOrigin(config, display2.id, Int32(middleScreenX.rounded()), Int32(middleScreenY.rounded()))
 
-            let rightScreenX = middleScreenBounds.maxX + rightScreenBounds.width
-            let rightScreenY = middleScreenBounds.midY - rightScreenBounds.height / 2
+                let rightScreenX = middleScreenX + middleScreenBounds.width
+                let rightScreenY = leftScreenBounds.midY - rightScreenBounds.height / 2
 
-            CGConfigureDisplayOrigin(config, display3.id, Int32(rightScreenX.rounded()), Int32(rightScreenY.rounded()))
+                CGConfigureDisplayOrigin(config, display3.id, Int32(rightScreenX.rounded()), Int32(rightScreenY.rounded()))
+            } else if CGDisplayIsMain(display2.id) != 0 {
+                let leftScreenX = middleScreenBounds.minX - leftScreenBounds.width
+                let leftScreenY = middleScreenBounds.midY - leftScreenBounds.height / 2
+
+                CGConfigureDisplayOrigin(config, display1.id, Int32(leftScreenX.rounded()), Int32(leftScreenY.rounded()))
+
+                let rightScreenX = middleScreenBounds.maxX + rightScreenBounds.width
+                let rightScreenY = middleScreenBounds.midY - rightScreenBounds.height / 2
+
+                CGConfigureDisplayOrigin(config, display3.id, Int32(rightScreenX.rounded()), Int32(rightScreenY.rounded()))
+            } else if CGDisplayIsMain(display3.id) != 0 {
+                let leftScreenX = rightScreenBounds.minX - middleScreenBounds.width - leftScreenBounds.width
+                let leftScreenY = rightScreenBounds.midY - leftScreenBounds.height / 2
+
+                CGConfigureDisplayOrigin(config, display1.id, Int32(leftScreenX.rounded()), Int32(leftScreenY.rounded()))
+
+                let middleScreenX = rightScreenBounds.minX - middleScreenBounds.width
+                let middleScreenY = rightScreenBounds.midY - middleScreenBounds.height / 2
+
+                CGConfigureDisplayOrigin(config, display2.id, Int32(middleScreenX.rounded()), Int32(middleScreenY.rounded()))
+            }
             return true
         }
 

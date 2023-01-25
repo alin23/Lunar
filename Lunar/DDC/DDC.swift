@@ -812,7 +812,7 @@ enum DDC {
 
         #if arch(arm64)
             log.debug("Adding IOKit notification for dispext")
-            serviceDetectors += (["AppleCLCD2", "DCPAVServiceProxy"] + DISP_NAMES + DCP_NAMES)
+            serviceDetectors += (["AppleCLCD2", "IOMobileFramebufferShim", "DCPAVServiceProxy"] + DISP_NAMES + DCP_NAMES)
                 .compactMap { IOServiceDetector(serviceName: $0, callback: { _, _, _ in ioRegistryTreeChanged.send(true) }) }
         #else
             log.debug("Adding IOKit notification for IOFRAMEBUFFER_CONFORMSTO")

@@ -50,6 +50,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .gammaDisabledCompletely,
     .hdrWorkaround,
     .oldBlackOutMirroring,
+    .blackOutDisablerType,
     .disableNightShiftXDR,
     .enableDarkModeXDR,
     .screenBlankingIssueWarningShown,
@@ -698,6 +699,7 @@ func initCache() {
 
     cacheKey(.hdrWorkaround)
     cacheKey(.oldBlackOutMirroring)
+    cacheKey(.blackOutDisablerType)
     cacheKey(.disableNightShiftXDR)
     cacheKey(.enableDarkModeXDR)
     cacheKey(.screenBlankingIssueWarningShown)
@@ -866,6 +868,8 @@ let gammaDisabledCompletelyPublisher = Defaults.publisher(.gammaDisabledComplete
     .filter { $0.oldValue != $0.newValue }
 let hdrWorkaroundPublisher = Defaults.publisher(.hdrWorkaround).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let oldBlackOutMirroringPublisher = Defaults.publisher(.oldBlackOutMirroring).removeDuplicates().dropFirst()
+    .filter { $0.oldValue != $0.newValue }
+let blackOutDisablerTypePublisher = Defaults.publisher(.blackOutDisablerType).removeDuplicates().dropFirst()
     .filter { $0.oldValue != $0.newValue }
 let xdrContrastPublisher = Defaults.publisher(.xdrContrast).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let xdrContrastFactorPublisher = Defaults.publisher(.xdrContrastFactor).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
