@@ -534,6 +534,7 @@ class IOServiceDetector {
     init? (
         serviceName: String? = nil,
         serviceClass: String? = nil,
+        events: [String] = [kIOFirstMatchNotification, kIOTerminatedNotification],
         callbackQueue: DispatchQueue = .main,
         callback: IOServiceCallback? = nil
     ) {
@@ -542,6 +543,7 @@ class IOServiceDetector {
         self.serviceClass = serviceClass
         self.callbackQueue = callbackQueue
         self.callback = callback
+        self.events = events
 
         guard let notifyPort = IONotificationPortCreate(kIOMasterPortDefault) else {
             return nil
@@ -557,89 +559,64 @@ class IOServiceDetector {
 
     typealias IOServiceCallback = (
         _ detector: IOServiceDetector,
-        _ event: Event,
+        _ event: String,
         _ service: io_service_t
     ) -> Void
-
-    enum Event {
-        case Matched
-        case Terminated
-    }
 
     let serviceName: String?
     let serviceClass: String?
 
     var callbackQueue: DispatchQueue?
     var callback: IOServiceCallback?
+    var events: [String] = []
+    var iterators: [io_iterator_t: String] = [:]
 
     func startDetection() -> Bool {
-        guard matchedIterator == 0 else { return true }
+        guard iterators.isEmpty else { return true }
 
         let matchingDict =
             (serviceName != nil ? IOServiceNameMatching(serviceName!) : IOServiceMatching(serviceClass!)) as NSMutableDictionary
 
-        let matchCallback: IOServiceMatchingCallback = {
-            userData, iterator in
-            let detector = Unmanaged<IOServiceDetector>
-                .fromOpaque(userData!).takeUnretainedValue()
-            detector.dispatchEvent(
-                event: .Matched, iterator: iterator
-            )
-        }
-        let termCallback: IOServiceMatchingCallback = {
-            userData, iterator in
-            let detector = Unmanaged<IOServiceDetector>
-                .fromOpaque(userData!).takeUnretainedValue()
-            detector.dispatchEvent(
-                event: .Terminated, iterator: iterator
-            )
-        }
-
         let selfPtr = Unmanaged.passUnretained(self).toOpaque()
-
-        let addMatchError = IOServiceAddMatchingNotification(
-            notifyPort, kIOFirstMatchNotification,
-            matchingDict, matchCallback, selfPtr, &matchedIterator
-        )
-        let addTermError = IOServiceAddMatchingNotification(
-            notifyPort, kIOTerminatedNotification,
-            matchingDict, termCallback, selfPtr, &terminatedIterator
-        )
-
-        guard addMatchError == 0, addTermError == 0 else {
-            if matchedIterator != 0 {
-                IOObjectRelease(matchedIterator)
-                matchedIterator = 0
+        iterators = events.dict { event in
+            let callback: IOServiceMatchingCallback = { userData, iterator in
+                let detector = Unmanaged<IOServiceDetector>.fromOpaque(userData!).takeUnretainedValue()
+                guard let event = detector.iterators[iterator] else {
+                    return
+                }
+                detector.dispatchEvent(event: event, iterator: iterator)
             }
-            if terminatedIterator != 0 {
-                IOObjectRelease(terminatedIterator)
-                terminatedIterator = 0
+
+            var iterator: io_iterator_t = 0
+            let addMatchError = IOServiceAddMatchingNotification(
+                notifyPort, event,
+                matchingDict, callback, selfPtr, &iterator
+            )
+
+            guard addMatchError == KERN_SUCCESS else {
+                return nil
             }
-            return false
+
+            dispatchEvent(event: event, iterator: iterator)
+            return (iterator, event)
         }
 
-        dispatchEvent(event: .Matched, iterator: matchedIterator)
-        dispatchEvent(event: .Terminated, iterator: terminatedIterator)
-
-        return true
+        return !iterators.isEmpty
     }
 
     func stopDetection() {
-        guard matchedIterator != 0 else { return }
-        IOObjectRelease(matchedIterator)
-        IOObjectRelease(terminatedIterator)
-        matchedIterator = 0
-        terminatedIterator = 0
+        guard !iterators.isEmpty else { return }
+
+        iterators.keys.forEach {
+            IOObjectRelease($0)
+        }
+        iterators = [:]
     }
 
     private let notifyPort: IONotificationPortRef
 
-    private var matchedIterator: io_iterator_t = 0
-
-    private var terminatedIterator: io_iterator_t = 0
-
     private func dispatchEvent(
-        event: Event, iterator: io_iterator_t
+        event: String, iterator: io_iterator_t
     ) {
         repeat {
             let nextService = IOIteratorNext(iterator)
@@ -735,6 +712,7 @@ enum DDC {
         p.debounce(for: .seconds(1), scheduler: queue)
             .sink { _ in
                 guard !displayController.screensSleeping else { return }
+                log.debug("ioRegistryTreeChanged")
                 IORegistryTreeChanged()
             }
             .store(in: &observers)
@@ -782,6 +760,9 @@ enum DDC {
         static var dcpMapping: [CGDirectDisplayID: DCP] = matchDisplayToDCP(dcpScores: dcpScores)
     #endif
 
+    static var lidClosedNotifyPort: IONotificationPortRef?
+    static var lidClosedNotificationHandle: io_object_t = 0
+
     static func IORegistryTreeChanged() {
         #if DEBUG
             print("IORegistryTreeChanged")
@@ -804,6 +785,15 @@ enum DDC {
                 display.detectI2C()
                 display.startI2CDetection()
             }
+
+            #if arch(arm64)
+                mainAsync {
+                    displayController.possiblyDisconnectedDisplays = displayController.possiblyDisconnectedDisplayList.dict { d in
+                        guard DDC.dcpList.contains(where: { $0.dcpName == d.dcpName }) else { return nil }
+                        return (d.id, d)
+                    }
+                }
+            #endif
         }
     }
 
@@ -813,12 +803,28 @@ enum DDC {
         #if arch(arm64)
             log.debug("Adding IOKit notification for dispext")
             serviceDetectors += (["AppleCLCD2", "IOMobileFramebufferShim", "DCPAVServiceProxy"] + DISP_NAMES + DCP_NAMES)
-                .compactMap { IOServiceDetector(serviceName: $0, callback: { _, _, _ in ioRegistryTreeChanged.send(true) }) }
+                .compactMap { IOServiceDetector(serviceName: $0, callback: { _, _, _ in
+                    ioRegistryTreeChanged.send(true)
+                }) }
         #else
             log.debug("Adding IOKit notification for IOFRAMEBUFFER_CONFORMSTO")
             serviceDetectors += [IOFRAMEBUFFER_CONFORMSTO]
-                .compactMap { IOServiceDetector(serviceClass: $0, callback: { _, _, _ in ioRegistryTreeChanged.send(true) }) }
+                .compactMap { IOServiceDetector(serviceClass: $0, callback: { _, _, _ in
+                    ioRegistryTreeChanged.send(true)
+                }) }
         #endif
+
+        let rootDomain = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceNameMatching("IOPMrootDomain"))
+        if rootDomain != 0, let notifyPort = IONotificationPortCreate(kIOMasterPortDefault) {
+            let callback: IOServiceInterestCallback = { refcon, service, type, argument in
+                displayController.lidClosed = isLidClosed()
+            }
+
+            lidClosedNotifyPort = notifyPort
+            IONotificationPortSetDispatchQueue(notifyPort, .main)
+            IOServiceAddInterestNotification(notifyPort, rootDomain, kIOGeneralInterest, callback, nil, &lidClosedNotificationHandle)
+        }
+
         serviceDetectors.forEach { _ = $0.startDetection() }
         addObservers()
         #if arch(arm64)
@@ -826,7 +832,6 @@ enum DDC {
         #endif
 
     }
-
     static func reset() {
         sync(barrier: true) {
             DDC.displayPortByUUID.removeAll()
@@ -859,7 +864,7 @@ enum DDC {
         }
 
         #if DEBUG
-//            return displayIDs
+            return displayIDs
             if !displayIDs.isEmpty {
                 // displayIDs.append(TEST_DISPLAY_PERSISTENT_ID)
                 return displayIDs

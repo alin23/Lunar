@@ -626,8 +626,8 @@ struct AutoOSDView: View {
         .padding(.vertical, 30)
         .colors(colorScheme == .dark ? .dark : .light)
         .onAppear {
-            let step = 0.1 / (AUTO_OSD_DEBOUNCE_SECONDS - 0.5).f
-            timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { t in
+            let step = 0.01 / (AUTO_OSD_DEBOUNCE_SECONDS - 0.5).f
+            timer = Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) { t in
                 guard progress < 1, !done else {
                     t.invalidate()
                     withAnimation(.easeOut(duration: 0.25)) { opacity = 0.0 }
@@ -636,6 +636,7 @@ struct AutoOSDView: View {
                 }
                 progress += step
             }
+            timer?.tolerance = 0
         }
         .onDisappear {
             timer?.invalidate()

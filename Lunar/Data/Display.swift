@@ -1789,6 +1789,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
+    #if arch(arm64)
+        var dcpName = ""
+    #endif
+
     @Published @objc dynamic var isSource: Bool {
         didSet {
             context = getContext()
@@ -1800,7 +1804,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             if isSource {
                 let normalizedName = Self.numberNamePattern.replaceAll(in: edidName, with: "").trimmed
-                displayController.displays.values.filter { $0.id != id }.forEach { d in
+                displayController.activeDisplayList.filter { $0.id != id }.forEach { d in
                     d.isSource = false
                     if Self.numberNamePattern.replaceAll(in: d.edidName, with: "").trimmed == normalizedName {
                         d.brightnessCurveFactors[.sync] = 1
@@ -3835,6 +3839,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     func powerOff() {
         guard displayController.activeDisplays.count > 1 || CachedDefaults[.allowBlackOutOnSingleScreen] else { return }
 
+        #if arch(arm64)
+            if AppDelegate.commandKeyPressed {
+                displayController.dis(id)
+                return
+            }
+        #endif
+
         if hasDDC, AppDelegate.optionKeyPressed, !AppDelegate.shiftKeyPressed {
             _ = control?.setPower(.off)
             return
@@ -3909,6 +3920,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case dvi
         case hdmi
         case vga
+        case mipi
         case unknown
 
         static func fromTransport(_ transport: Transport?) -> ConnectionType? {
@@ -3925,6 +3937,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 return .displayport
             case "VGA":
                 return .vga
+            case "MIPI":
+                return .mipi
             default:
                 return nil
             }
@@ -3940,6 +3954,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 return .dvi
             case 3:
                 return .hdmi
+            case 4:
+                return .mipi
             case 5:
                 return .vga
             default:
@@ -4141,6 +4157,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             create(&cornerWindowControllerBottomRight, .bottomRight)
         }
     }
+
+    #if arch(arm64)
+        var disconnected: Bool { displayController.possiblyDisconnectedDisplays[id]?.serial == serial }
+    #endif
 
     func getScreen() -> NSScreen? {
         guard !isForTesting else { return nil }

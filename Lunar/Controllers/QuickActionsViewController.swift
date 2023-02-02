@@ -75,6 +75,51 @@ struct PowerOffButtonView: View {
     }
 }
 
+#if arch(arm64)
+    struct ReconnectButtonView: View {
+        @State var display: CGDirectDisplayID
+        @State var hoveringPowerButton = false
+        @State var off = true
+
+        var body: some View {
+            SwiftUI.Button(action: {
+                off = false
+                displayController.autoBlackoutPause = true
+                displayController.en(display)
+            }) {
+                Image(systemName: "power").font(.system(size: 10, weight: .heavy))
+            }
+            .buttonStyle(FlatButton(
+                color: off ? Color.gray : Colors.red,
+                circle: true,
+                horizontalPadding: 3,
+                verticalPadding: 3
+            ))
+        }
+    }
+    struct DisconnectedDisplayView: View {
+        @Environment(\.colors) var colors
+
+        @State var id: CGDirectDisplayID
+        @State var name: String
+
+        var body: some View {
+            VStack(spacing: 1) {
+                ZStack(alignment: .topTrailing) {
+                    Text(name)
+                        .font(.system(size: 22, weight: .black))
+                        .padding(6)
+                        .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(colors.bg.primary.opacity(0.5)))
+
+                    ReconnectButtonView(display: id).offset(x: 10, y: -8)
+                }
+                Text("Disconnected").font(.system(size: 10, weight: .semibold, design: .rounded))
+            }
+        }
+    }
+
+#endif
+
 // MARK: - DisplayRowView
 
 struct DisplayRowView: View {
@@ -612,6 +657,7 @@ struct AdvancedSettingsView: View {
     @Default(.allowBlackOutOnSingleScreen) var allowBlackOutOnSingleScreen
     @Default(.reapplyValuesAfterWake) var reapplyValuesAfterWake
     @Default(.oldBlackOutMirroring) var oldBlackOutMirroring
+    @Default(.newBlackOutDisconnect) var newBlackOutDisconnect
 
     @Default(.refreshValues) var refreshValues
     @Default(.gammaDisabledCompletely) var gammaDisabledCompletely
@@ -678,6 +724,7 @@ struct AdvancedSettingsView: View {
                         The best covered cases are "BlackOut built-in display" and "BlackOut only external displays".
                         """
                     )
+
                     SettingsToggle(
                         text: "Toggle Manual/Sync when the lid is closed/opened",
                         setting: $clamshellModeDetection
@@ -745,6 +792,20 @@ struct AdvancedSettingsView: View {
                         Text("Don't use unless really needed or asked by the developer")
                             .foregroundColor(Colors.red)
                             .font(.caption)
+                        #if arch(arm64)
+                            SettingsToggle(
+                                text: "Disconnect built-in display in Auto BlackOut", setting: $newBlackOutDisconnect,
+                                help: """
+                                Instead of mirroring the display to disable it, Lunar can also
+                                disconnect the built-in display entirely, freeing up GPU resources.
+
+                                This uses a hidden macOS API that's not guaranteed to work all the time.
+
+                                In case the built-in display doesn't reconnect itself when it should,
+                                close the laptop lid and reopen it to bring the display back.
+                                """
+                            )
+                        #endif
                         SettingsToggle(
                             text: "Refresh values from monitor settings", setting: $refreshValues,
                             help: """
@@ -1053,6 +1114,17 @@ struct BlackoutPopoverView: View {
                     actionInfo: "(without mirroring)"
                 )
 
+                #if arch(arm64)
+                    Divider().background(Color.white.opacity(0.2))
+                    BlackoutPopoverRowView(
+                        modifiers: ["Command"],
+                        action: "Disconnect screen",
+                        hotkeyText: "",
+                        actionInfo: "(free up GPU)"
+                    )
+                    .colorMultiply(Color.orange)
+                #endif
+
                 if hasDDC {
                     BlackoutPopoverRowView(
                         modifiers: ["Option"],
@@ -1188,8 +1260,11 @@ struct QuickActionsMenuView: View {
     @Default(.showAdditionalInfo) var showAdditionalInfo
     @Default(.startAtLogin) var startAtLogin
 
-    @State var displays: [Display] = displayController.activeDisplayList
+    @State var displays: [Display] = displayController.nonCursorDisplays
     @State var cursorDisplay: Display? = displayController.cursorDisplay
+    #if arch(arm64)
+        @State var disconnectedDisplays: [Display] = displayController.possiblyDisconnectedDisplayList
+    #endif
     @State var adaptiveModes: [AdaptiveModeKey] = [.sensor, .sync, .location, .clock, .manual, .auto]
 
     @State var headerOpacity: CGFloat = 1.0
@@ -1198,7 +1273,7 @@ struct QuickActionsMenuView: View {
     @State var headerIndicatorOpacity: CGFloat = 0.0
     @State var footerIndicatorOpacity: CGFloat = 0
 
-    @State var displayCount = displayController.activeDisplayList.count
+    @State var displayCount = displayController.activeDisplayCount
 
     @ObservedObject var menuBarIcon: StatusItemButtonController
 
@@ -1464,6 +1539,16 @@ struct QuickActionsMenuView: View {
                 DisplayRowView(display: d).padding(.bottom)
             }
 
+            #if arch(arm64)
+                ForEach(disconnectedDisplays) { d in
+                    DisconnectedDisplayView(id: d.id, name: d.name).padding(.vertical, 7)
+                }
+
+                if Sysctl.isMacBook, cursorDisplay?.id != 1, !displays.contains(where: { $0.id == 1 }), !disconnectedDisplays.contains(where: { $0.id == 1 }) {
+                    DisconnectedDisplayView(id: 1, name: "Built-in").padding(.vertical, 7)
+                }
+            #endif
+
             if showStandardPresets || showCustomPresets {
                 VStack {
                     if showStandardPresets { standardPresets }
@@ -1656,6 +1741,9 @@ struct QuickActionsMenuView: View {
                 cursorDisplay = nil
                 displays = []
                 displayCount = 0
+                #if arch(arm64)
+                    disconnectedDisplays = []
+                #endif
             }
             return
         }
@@ -1663,7 +1751,10 @@ struct QuickActionsMenuView: View {
         displayHideTask = nil
         cursorDisplay = dc.cursorDisplay
         displays = dc.nonCursorDisplays
-        displayCount = dc.activeDisplayList.count
+        displayCount = dc.activeDisplayCount
+        #if arch(arm64)
+            disconnectedDisplays = dc.possiblyDisconnectedDisplayList
+        #endif
 
         if showHeaderOnHover { headerOpacity = 0.0 }
         if showFooterOnHover { footerOpacity = 0.0 }

@@ -171,7 +171,7 @@ func crumb(_ msg: String, level: SentryLevel = .info, category: String) {
     guard AppDelegate.enableSentry else { return }
     let crumb = Breadcrumb(level: level, category: category)
     crumb.message = msg
-    SentrySDK.addBreadcrumb(crumb: crumb)
+    SentrySDK.addBreadcrumb(crumb)
 }
 
 func adaptiveCrumb(_ msg: String) {
