@@ -391,10 +391,15 @@ struct ScreenQuery: EntityPropertyQuery {
         }
 
         return identifiers.compactMap { id in
-            displayController.activeDisplays[id.u32]?.screen ??
-                Self.dynamicFilterScreenMapping[id] ??
-                (additionalScreens ?? []).first(where: { $0.id == id }) ??
-                displayController.possiblyDisconnectedDisplays[id.u32]?.screen
+            let screen = displayController.activeDisplays[id.u32]?.screen
+                ?? Self.dynamicFilterScreenMapping[id]
+                ?? (additionalScreens ?? []).first(where: { $0.id == id })
+
+            #if arch(arm64)
+                return screen ?? displayController.possiblyDisconnectedDisplays[id.u32]?.screen
+            #else
+                return screen
+            #endif
         }
     }
 }
@@ -883,6 +888,8 @@ struct DisconnectScreenIntent: AppIntent {
     static var title: LocalizedStringResource = "Disconnect screen"
     static var description = IntentDescription(
     """
+(only available on Apple Silicon)
+
 Disconnects a screen and removes it from the list of screens that can be drawn on, effectively powering them off or moving them to a Standby state.
 
 For MacBook screens, this is the same as closing the laptop lid, but without actually closing it.
@@ -905,12 +912,15 @@ To bring back the screen try any one of the following:
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        guard lunarProActive else {
-            throw IntentError.message("A Lunar Pro license is needed for this feature.")
-        }
+        #if !arch(arm64)
+            throw IntentError.message("This action is only available on Apple Silicon")
+        #else
+            guard lunarProActive else {
+                throw IntentError.message("A Lunar Pro license is needed for this feature.")
+            }
 
-        displayController.dis(screen.id.u32)
-
+            displayController.dis(screen.id.u32)
+        #endif
         return .result()
     }
 }
@@ -923,6 +933,8 @@ struct ReconnectScreenIntent: AppIntent {
     static var title: LocalizedStringResource = "Reconnect screen"
     static var description = IntentDescription(
     """
+(only available on Apple Silicon)
+
 Reconnects a screen that was previously disconnected using Lunar's "Disconnect screen" action.
 
 If the action fails, try any one of the following to bring back the screen:
@@ -937,22 +949,32 @@ If the action fails, try any one of the following to bring back the screen:
         Summary("Reconnect \(\.$screen)")
     }
 
-    @Parameter(title: "Screen", optionsProvider: ScreenQuery(single: true, additionalScreens: [DisplayFilter.all.screen] + displayController.possiblyDisconnectedDisplays.values.map(\.screen)))
+    @Parameter(
+        title: "Screen",
+        optionsProvider: ScreenQuery(
+            single: true,
+            additionalScreens: [DisplayFilter.all.screen] + displayController.possiblyDisconnectedDisplays.values.map(\.screen)
+        )
+    )
     var screen: Screen
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        if let displayFilter = DisplayFilter(argument: screen.serial), displayFilter == .all || displayFilter == .cursor {
-            displayController.en()
-            return .result()
-        }
+        #if !arch(arm64)
+            throw IntentError.message("This action is only available on Apple Silicon")
+        #else
+            if let displayFilter = DisplayFilter(argument: screen.serial), displayFilter == .all || displayFilter == .cursor {
+                displayController.en()
+                return .result()
+            }
 
-        if let display = displayController.possiblyDisconnectedDisplays.values.first(where: { $0.serial == screen.serial }) {
-            displayController.en(display.id)
-        } else {
-            displayController.en(screen.id.u32)
-        }
+            if let display = displayController.possiblyDisconnectedDisplays.values.first(where: { $0.serial == screen.serial }) {
+                displayController.en(display.id)
+            } else {
+                displayController.en(screen.id.u32)
+            }
 
+        #endif
         return .result()
     }
 }
@@ -965,6 +987,8 @@ struct ToggleScreenConnectionIntent: AppIntent {
     static var title: LocalizedStringResource = "Toggle screen connection"
     static var description = IntentDescription(
     """
+(only available on Apple Silicon)
+
 Disconnects a connected screen, or reconnects it if it was previously disconnected using Lunar.
 
 If the reconnect action fails, try any one of the following to bring back the screen:
@@ -984,17 +1008,21 @@ If the reconnect action fails, try any one of the following to bring back the sc
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        if let display = screen.display, display.active {
-            guard lunarProActive else {
-                throw IntentError.message("A Lunar Pro license is needed for this feature.")
+        #if !arch(arm64)
+            throw IntentError.message("This action is only available on Apple Silicon")
+        #else
+            if let display = screen.display, display.active {
+                guard lunarProActive else {
+                    throw IntentError.message("A Lunar Pro license is needed for this feature.")
+                }
+                displayController.dis(display.id)
+            } else if let display = displayController.possiblyDisconnectedDisplays.values.first(where: { $0.serial == screen.serial }) {
+                displayController.en(display.id)
+            } else {
+                displayController.en(screen.id.u32)
             }
-            displayController.dis(display.id)
-        } else if let display = displayController.possiblyDisconnectedDisplays.values.first(where: { $0.serial == screen.serial }) {
-            displayController.en(display.id)
-        } else {
-            displayController.en(screen.id.u32)
-        }
 
+        #endif
         return .result()
     }
 }

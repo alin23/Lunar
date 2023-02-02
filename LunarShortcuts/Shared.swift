@@ -107,7 +107,8 @@ extension Defaults.Keys {
 
     static let hdrWorkaround = Key<Bool>("hdrWorkaround", default: true)
     static let oldBlackOutMirroring = Key<Bool>("oldBlackOutMirroring", default: false)
-    static let blackOutDisablerType = Key<BlackOutDisablerType>("blackOutDisablerType", default: .disconnect)
+    static let newBlackOutDisconnect = Key<Bool>("newBlackOutDisconnect", default: false)
+    // static let blackOutDisablerType = Key<BlackOutDisablerType>("blackOutDisablerType", default: .disconnect)
     static let disableNightShiftXDR = Key<Bool>("disableNightShiftXDR", default: false)
     static let enableDarkModeXDR = Key<Bool>("enableDarkModeXDR", default: false)
     static let screenBlankingIssueWarningShown = Key<Bool>("screenBlankingIssueWarningShown", default: false)
@@ -237,8 +238,12 @@ extension Defaults.Keys {
     static let listenForRemoteCommands = Key<Bool>("listenForRemoteCommands", default: false)
     static let neverAskAboutXDR = Key<Bool>("neverAskAboutXDR", default: false)
 
-    static let autoRestartOnFailedDDC = Key<Bool>("autoRestartOnFailedDDC", default: true)
+    static let autoRestartOnFailedDDC = Key<Bool>("autoRestartOnFailedDDC", default: false)
     static let autoRestartOnFailedDDCSooner = Key<Bool>("autoRestartOnFailedDDCSooner", default: false)
 
     static let sensorHostname = Key<String>("sensorHostname", default: "lunarsensor.local")
+
+    #if arch(arm64)
+        static let possiblyDisconnectedDisplays = Key<[Display]>("possiblyDisconnectedDisplays", default: [])
+    #endif
 }

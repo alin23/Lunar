@@ -1513,6 +1513,164 @@ struct Lunar: ParsableCommand {
         }
     }
 
+    #if arch(arm64)
+        struct Disconnect: ParsableCommand {
+            static let configuration = CommandConfiguration(
+                abstract: "Disconnects screens without cutting power or closing the lid.",
+                discussion: "\("EXAMPLE".bold()): \("lunar disconnect builtin".yellow().bold())"
+            )
+
+            @OptionGroup(visibility: .hidden) var globals: GlobalOptions
+
+            @Argument(
+                help: "Display serial, ID or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
+            )
+            var display = DisplayFilter.builtin
+
+            func run() throws {
+                Lunar.configureLogging(options: globals)
+
+                cliGetDisplays(
+                    includeVirtual: CachedDefaults[.showVirtualDisplays],
+                    includeAirplay: CachedDefaults[.showAirplayDisplays],
+                    includeProjector: CachedDefaults[.showProjectorDisplays],
+                    includeDummy: CachedDefaults[.showDummyDisplays]
+                )
+
+                let displays = getFilteredDisplays(displays: displayController.activeDisplayList, filter: display)
+                guard !displays.isEmpty else {
+                    throw LunarCommandError.displayNotFound(display.s)
+                }
+
+                displayController.dis(displays.map(\.id))
+                cliExit(0)
+            }
+        }
+
+        struct Connect: ParsableCommand {
+            static let configuration = CommandConfiguration(
+                abstract: "Reconnects screens that were previously disconnected using Lunar.",
+                discussion: "\("EXAMPLE".bold()): \("lunar connect builtin".yellow().bold())"
+            )
+
+            @OptionGroup(visibility: .hidden) var globals: GlobalOptions
+
+            @Argument(
+                help: "Display serial, ID or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
+            )
+            var display = DisplayFilter.builtin
+
+            func run() throws {
+                Lunar.configureLogging(options: globals)
+                guard display != .all else {
+                    displayController.en()
+                    cliExit(0)
+                    return
+                }
+
+                guard display != .builtin else {
+                    displayController.en(1)
+                    cliExit(0)
+                    return
+                }
+
+                cliGetDisplays(
+                    includeVirtual: CachedDefaults[.showVirtualDisplays],
+                    includeAirplay: CachedDefaults[.showAirplayDisplays],
+                    includeProjector: CachedDefaults[.showProjectorDisplays],
+                    includeDummy: CachedDefaults[.showDummyDisplays]
+                )
+
+                let displays = getFilteredDisplays(displays: Array(displayController.possiblyDisconnectedDisplays.values), filter: display)
+                guard !displays.isEmpty else {
+                    displayController.en()
+                    throw LunarCommandError.displayNotFound(display.s)
+                }
+
+                for (i, display) in displays.enumerated() {
+                    mainAsyncAfter(ms: i * 1000) {
+                        log.info("Reconnecting \(display)")
+                        displayController.en(display.id)
+                    }
+                }
+                cliExit(0)
+            }
+        }
+        struct ToggleConnection: ParsableCommand {
+            static let configuration = CommandConfiguration(
+                abstract: "Disconnects screens without cutting power or closing the lid, or reconnects screens that were previously disconnected using Lunar.",
+                discussion: "\("EXAMPLE".bold()): \("lunar toggle-connection builtin".yellow().bold())"
+            )
+
+            @OptionGroup(visibility: .hidden) var globals: GlobalOptions
+
+            @Argument(
+                help: "Display serial, ID or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
+            )
+            var display = DisplayFilter.builtin
+
+            func run() throws {
+                Lunar.configureLogging(options: globals)
+
+                cliGetDisplays(
+                    includeVirtual: CachedDefaults[.showVirtualDisplays],
+                    includeAirplay: CachedDefaults[.showAirplayDisplays],
+                    includeProjector: CachedDefaults[.showProjectorDisplays],
+                    includeDummy: CachedDefaults[.showDummyDisplays]
+                )
+
+                guard display != .all else {
+                    if displayController.activeDisplayCount == 0 {
+                        displayController.en()
+                    } else {
+                        for id in displayController.activeDisplays.keys {
+                            displayController.dis(id)
+                        }
+                    }
+                    cliExit(0)
+                    return
+                }
+
+                guard display != .builtin else {
+                    if DCPAVServiceExists(location: .embedded) {
+                        displayController.dis(1)
+                    } else {
+                        displayController.en(1)
+                    }
+                    cliExit(0)
+                    return
+                }
+
+                let connectedDisplays = getFilteredDisplays(displays: displayController.activeDisplayList, filter: display)
+                if !connectedDisplays.isEmpty {
+                    displayController.dis(connectedDisplays.map(\.id))
+                    return
+                }
+
+                let displays = getFilteredDisplays(displays: Array(displayController.possiblyDisconnectedDisplays.values), filter: display)
+                if displays.isEmpty {
+                    displayController.en()
+                } else {
+                    for (i, display) in displays.enumerated() {
+                        mainAsyncAfter(ms: i * 1000) {
+                            log.info("Reconnecting \(display)")
+                            displayController.en(display.id)
+                        }
+                    }
+                }
+
+                cliExit(0)
+            }
+        }
+
+    #endif
+
+    #if arch(arm64)
+        static let ARCH_SPECIFIC_COMMANDS: [ParsableCommand.Type] = [Disconnect.self, Connect.self, ToggleConnection.self]
+    #else
+        static let ARCH_SPECIFIC_COMMANDS: [ParsableCommand.Type] = []
+    #endif
+
     static let configuration = CommandConfiguration(
         abstract: "Lunar CLI.",
         subcommands: [
@@ -1537,7 +1695,7 @@ struct Lunar: ParsableCommand {
             Hotkeys.self,
             DisplayUuid.self,
             RefreshDisplays.self,
-        ]
+        ] + ARCH_SPECIFIC_COMMANDS
     )
 
     @OptionGroup var globals: GlobalOptions
@@ -1618,6 +1776,14 @@ struct Lunar: ParsableCommand {
             return cmd.globals
         case let cmd as DisplayUuid:
             return cmd.globals
+        #if arch(arm64)
+            case let cmd as Disconnect:
+                return cmd.globals
+            case let cmd as Connect:
+                return cmd.globals
+            case let cmd as ToggleConnection:
+                return cmd.globals
+        #endif
         default:
             return nil
         }

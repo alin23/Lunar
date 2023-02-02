@@ -153,6 +153,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     @Atomic static var optionKeyPressed = false
     @Atomic static var shiftKeyPressed = false
     @Atomic static var controlKeyPressed = false
+    @Atomic static var commandKeyPressed = false
 
     static var observers: Set<AnyCancellable> = []
     static var enableSentry = CachedDefaults[.enableSentry]
@@ -1308,7 +1309,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     d.updateCornerWindow()
                 }
                 displayController.screenIDs = Set(NSScreen.onlineDisplayIDs)
-                displayController.lidClosed = isLidClosed()
             }.store(in: &observers)
 
         let wakePublisher = NSWorkspace.shared.notificationCenter
@@ -1705,13 +1705,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         lastCommandModifierPressedTime = Date()
         commandModifierPressedCount += 1
 
-        if commandModifierPressedCount > 8 {
+        if commandModifierPressedCount >= 8 {
             commandModifierPressedCount = 0
             lastCommandModifierPressedTime = nil
 
+            log.warning("Command key pressed 8 times in a row, disabling BlackOut forcefully!")
+            #if arch(arm64)
+                displayController.autoBlackoutPause = true
+                displayController.en()
+            #endif
+
             guard displayController.activeDisplayList.contains(where: \.blackOutEnabled) else { return }
 
-            log.warning("Command key pressed 8 times in a row, disabling BlackOut forcefully!")
             displayController.activeDisplayList.map(\.id).enumerated().forEach { i, id in
                 mainAsyncAfter(ms: i * 1000) {
                     guard let d = displayController.activeDisplays[id] else { return }
@@ -1750,9 +1755,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         AppDelegate.optionKeyPressed = event.modifierFlags.contains(.option)
         AppDelegate.shiftKeyPressed = event.modifierFlags.contains(.shift)
         AppDelegate.controlKeyPressed = event.modifierFlags.contains(.control)
+        AppDelegate.commandKeyPressed = event.modifierFlags.contains(.command)
         log.debug("Option key pressed: \(AppDelegate.optionKeyPressed)")
         log.debug("Shift key pressed: \(AppDelegate.shiftKeyPressed)")
         log.debug("Control key pressed: \(AppDelegate.controlKeyPressed)")
+        log.debug("Command key pressed: \(AppDelegate.commandKeyPressed)")
     }
 
     func addGlobalModifierMonitor() {
@@ -2047,6 +2054,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         if handleCLI() {
             return
         }
+
+        #if arch(arm64)
+            if restarted {
+                displayController.possiblyDisconnectedDisplays = Defaults[.possiblyDisconnectedDisplays].dict { ($0.id, $0) }
+            } else {
+                displayController.en()
+            }
+
+            Defaults[.possiblyDisconnectedDisplays] = []
+        #endif
 
         initCacheTransitionLogging()
         Defaults[.launchCount] += 1
@@ -2679,6 +2696,8 @@ func acquirePrivileges(notificationTitle: String = "Lunar is now listening for m
 }
 
 var axPermissionsChecker: Repeater?
+let restarted = CommandLine.arguments[safe: 1] == "restarted"
+var restarting = false
 
 func isLidClosed() -> Bool {
     guard !Sysctl.isiMac else { return false }
@@ -2687,8 +2706,14 @@ func isLidClosed() -> Bool {
 }
 
 func restart() {
+    restarting = true
+
+    #if arch(arm64)
+        Defaults[.possiblyDisconnectedDisplays] = Array(displayController.possiblyDisconnectedDisplays.values)
+    #endif
+
     _ = shell(
-        command: "while /bin/ps -p \(ProcessInfo.processInfo.processIdentifier) >/dev/null 2>/dev/null; do /bin/sleep 0.1; done; /usr/bin/open '\(Bundle.main.path.string)'",
+        command: "while /bin/ps -p \(ProcessInfo.processInfo.processIdentifier) >/dev/null 2>/dev/null; do /bin/sleep 0.1; done; /bin/sleep 0.5; /usr/bin/open '\(Bundle.main.path.string)' --args restarted",
         wait: false
     )
     exit(0)

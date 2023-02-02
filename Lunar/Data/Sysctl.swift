@@ -62,7 +62,9 @@ public enum Sysctl {
     public static var modelLowercased: String = model.lowercased()
 
     public static let MACBOOK_MODELS = [2, 5, 6, 7, 9, 10].map { "Mac14,\($0)" }
-    public static var isMacMini = modelLowercased.hasPrefix("macmini")
+    public static let MACMINI_MODELS = [3, 12].map { "Mac14,\($0)" }
+
+    public static var isMacMini = modelLowercased.hasPrefix("macmini") || MACMINI_MODELS.contains(model)
     public static var isiMac = modelLowercased.hasPrefix("imac")
     public static var isMacBook = modelLowercased.hasPrefix("macbook") || MACBOOK_MODELS.contains(model)
 
@@ -90,12 +92,12 @@ public enum Sysctl {
             return "MacBook Pro"
         } else if model.hasPrefix("macbookair") {
             return "MacBook Air"
-        } else if model.hasPrefix("macbook") {
-            return "MacBook"
-        } else if model.hasPrefix("macmini") {
-            return "Mac Mini"
         } else if model.hasPrefix("xserve") {
             return "Xserve"
+        } else if isMacBook {
+            return "MacBook"
+        } else if isMacMini {
+            return "Mac Mini"
         }
         return model
     }
