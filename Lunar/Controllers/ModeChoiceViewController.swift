@@ -145,7 +145,6 @@ class ModeChoiceViewController: NSViewController {
 
             CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .sync
             displayController.enable(mode: .sync)
-//            CachedDefaults[.adaptiveBrightnessMode] = .sync
         }
         next()
     }
@@ -153,7 +152,10 @@ class ModeChoiceViewController: NSViewController {
     @objc func syncSourceClick() {
         queueChange {
             let externals = displayController.externalActiveDisplays
-            guard let source = externals.first(where: { $0.hasAmbientLightAdaptiveBrightness && AppleNativeControl.isAvailable(for: $0) })
+            guard let source = externals
+                .filter({ $0.hasAmbientLightAdaptiveBrightness && AppleNativeControl.isAvailable(for: $0) })
+                .sorted(by: \.syncSourcePriority)
+                .first
             else { return }
 
             source.isSource = true
@@ -161,6 +163,8 @@ class ModeChoiceViewController: NSViewController {
                 .filter { $0.serial != source.serial }
                 .forEach { d in
                     d.isSource = false
+                    d.systemAdaptiveBrightness = false
+                    d.adaptive = true
                     d.brightnessCurveFactors[.sync] = 1
                     d.contrastCurveFactors[.sync] = 1
                     d.userContrast[.sync]?.removeAll()
@@ -173,7 +177,6 @@ class ModeChoiceViewController: NSViewController {
 
             CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .sync
             displayController.enable(mode: .sync)
-//            CachedDefaults[.adaptiveBrightnessMode] = .sync
         }
         next()
     }
@@ -183,7 +186,6 @@ class ModeChoiceViewController: NSViewController {
             LocationMode.specific.fetchGeolocation()
             CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .location
             displayController.enable(mode: .location)
-//            CachedDefaults[.adaptiveBrightnessMode] = .location
         }
         next()
     }
@@ -192,7 +194,6 @@ class ModeChoiceViewController: NSViewController {
         queueChange {
             CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .clock
             displayController.enable(mode: .clock)
-//            CachedDefaults[.adaptiveBrightnessMode] = .clock
         }
         next()
     }
@@ -201,7 +202,6 @@ class ModeChoiceViewController: NSViewController {
         queueChange {
             CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .sensor
             displayController.enable(mode: .sensor)
-//            CachedDefaults[.adaptiveBrightnessMode] = .sensor
         }
 
         if let url = URL(string: "https://lunar.fyi/sensor") {
@@ -222,7 +222,6 @@ class ModeChoiceViewController: NSViewController {
     func revert() {
         CachedDefaults[.overrideAdaptiveMode] = originalOverride
         displayController.enable(mode: originalMode)
-//        CachedDefaults[.adaptiveBrightnessMode] = originalMode
     }
 
     override func viewDidLoad() {

@@ -1374,60 +1374,40 @@ struct QuickActionsMenuView: View {
         Group {
             let dynamicFooter = footerOpacity == 0.0 && showFooterOnHover
             ZStack {
-                HStack {
-                    SwiftUI.Button("Preferences") { appDelegate!.showPreferencesWindow(sender: nil) }
-                        .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-                        .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        .fixedSize()
+                VStack(spacing: 5) {
+                    HStack {
+                        Toggle(showAdditionalInfo ? "Hide app info" : "App info", isOn: $showAdditionalInfo.animation(.fastSpring))
+                            .toggleStyle(DetailToggleStyle(style: .circle))
+                            .foregroundColor(Color.secondary)
+                            .font(.system(size: 12, weight: .semibold))
+                            .fixedSize()
 
-                    if !showAdditionalInfo {
-                        SwiftUI.Button("App info") {
-                            withAnimation(.fastSpring) {
-                                showAdditionalInfo = true
-                            }
-                        }
-                        .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-                        .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        .fixedSize()
-                        .matchedGeometryEffect(id: "additional-info-button", in: namespace)
+                        Spacer()
+
+                        SwiftUI.Button("Preferences") { appDelegate!.showPreferencesWindow(sender: nil) }
+                            .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                            .font(.system(size: 12, weight: .medium, design: .rounded))
+                            .fixedSize()
+
+                        let peach = Color.primary.blended(withFraction: colorScheme == .dark ? 0.5 : 0.2, of: Colors.peach)
+                        SwiftUI.Button("Restart") { appDelegate!.restartApp(appDelegate!) }
+                            .buttonStyle(FlatButton(color: peach.opacity(0.1), textColor: peach))
+                            .font(.system(size: 12, weight: .medium, design: .rounded))
+                            .fixedSize()
+
+                        let red = Color.primary.blended(withFraction: colorScheme == .dark ? 0.5 : 0.2, of: Color.red)
+                        SwiftUI.Button("Quit") { NSApplication.shared.terminate(nil) }
+                            .buttonStyle(FlatButton(color: red.opacity(0.1), textColor: red))
+                            .font(.system(size: 12, weight: .medium, design: .rounded))
+                            .fixedSize()
                     }
-                    Spacer()
-
-                    SwiftUI.Button("Restart") { appDelegate!.restartApp(appDelegate!) }
-                        .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-                        .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        .fixedSize()
-
-                    SwiftUI.Button("Quit") { NSApplication.shared.terminate(nil) }
-                        .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-                        .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        .fixedSize()
+                    .padding(.bottom, showAdditionalInfo ? 0 : 7)
                 }
-                .padding(.horizontal, MENU_HORIZONTAL_PADDING)
+                .padding(.horizontal, MENU_HORIZONTAL_PADDING / 2)
                 .opacity(showFooterOnHover ? footerOpacity : 1.0)
                 .contentShape(Rectangle())
                 .onChange(of: showFooterOnHover) { showOnHover in
                     withAnimation(.fastTransition) { footerOpacity = showOnHover ? 0.0 : 1.0 }
-                }
-                .onHover { hovering in
-                    guard showFooterOnHover else {
-                        footerShowHideTask = nil
-                        footerOpacity = 1.0
-                        return
-                    }
-
-                    guard hovering else {
-                        footerShowHideTask = mainAsyncAfter(ms: 500) {
-                            withAnimation(.fastTransition) {
-                                footerOpacity = 0.0
-                                footerIndicatorOpacity = 0.0
-                            }
-                        }
-                        return
-                    }
-                    footerShowHideTask = mainAsyncAfter(ms: 50) {
-                        withAnimation(.fastTransition) { footerOpacity = 1.0 }
-                    }
                 }
                 Rectangle()
                     .fill(Color.primary.opacity(dynamicFooter ? footerIndicatorOpacity : 0.0))
@@ -1443,25 +1423,43 @@ struct QuickActionsMenuView: View {
                             }
                         }
                     }
-            }.frame(maxWidth: .infinity, maxHeight: footerOpacity == 0.0 ? 8 : nil)
+            }
+            .frame(maxWidth: .infinity, maxHeight: footerOpacity == 0.0 ? 8 : nil)
+            .onHover { hovering in
+                guard showFooterOnHover else {
+                    footerShowHideTask = nil
+                    footerOpacity = 1.0
+                    return
+                }
+
+                guard hovering else {
+                    footerShowHideTask = mainAsyncAfter(ms: 500) {
+                        withAnimation(.fastTransition) {
+                            footerOpacity = 0.0
+                            footerIndicatorOpacity = 0.0
+                        }
+                    }
+                    return
+                }
+                footerShowHideTask = mainAsyncAfter(ms: 50) {
+                    withAnimation(.fastTransition) { footerOpacity = 1.0 }
+                }
+            }
 
             if let appDelegate, showAdditionalInfo {
-                Divider()
-                    .padding(.top, 10 * footerOpacity)
-                    .padding(.bottom, 10)
+                Divider().padding(.bottom, 5)
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
-                        Toggle("Hide app info", isOn: $showAdditionalInfo.animation(.fastSpring))
-                            .toggleStyle(DetailToggleStyle(style: .circle))
-                            .foregroundColor(colors.gray)
-                            .font(.system(size: 12, weight: .semibold))
-                            .fixedSize()
-                            .matchedGeometryEffect(id: "additional-info-button", in: namespace)
-                        Spacer()
                         Toggle("Launch at login", isOn: $startAtLogin)
                             .toggleStyle(CheckboxToggleStyle(style: .circle))
                             .foregroundColor(.primary)
                             .font(.system(size: 12, weight: .medium))
+                        Spacer()
+                        SwiftUI.Button("Contact") { NSWorkspace.shared.open("https://lunar.fyi/contact".asURL()!) }
+                            .buttonStyle(OutlineButton(thickness: 1, font: .system(size: 9, weight: .medium, design: .rounded)))
+                        SwiftUI.Button("FAQ") { NSWorkspace.shared.open("https://lunar.fyi/faq".asURL()!) }
+                            .buttonStyle(OutlineButton(thickness: 1, font: .system(size: 9, weight: .medium, design: .rounded)))
+
                     }
                     LicenseView()
                     VersionView(updater: appDelegate.updater)
@@ -1469,6 +1467,7 @@ struct QuickActionsMenuView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 25)
+                .padding(.bottom, 10)
             }
         }
         .frame(maxWidth: .infinity)
@@ -1580,7 +1579,6 @@ struct QuickActionsMenuView: View {
             .scrollOnOverflow()
             .frame(width: env.menuWidth, height: cap(env.menuHeight, minVal: 100, maxVal: env.menuMaxHeight - 50), alignment: .top)
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .padding(.bottom, op < 1 ? 0 : 20)
             .padding(.top, 0)
             .background(bg(optionsMenuOverflow: optionsMenuOverflow), alignment: .top)
             .onAppear { setup() }

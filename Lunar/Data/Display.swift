@@ -157,6 +157,7 @@ let GENERIC_DISPLAY = Display(
 
 let MAX_SMOOTH_STEP_TIME_NS: UInt64 = 90 * 1_000_000 // 90ms
 
+let PRO_DISPLAY_XDR_NAME = "Pro Display XDR"
 let STUDIO_DISPLAY_NAME = "Studio Display"
 let ULTRAFINE_NAME = "LG UltraFine"
 let THUNDERBOLT_NAME = "Thunderbolt"
@@ -479,6 +480,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         input = (try container.decodeIfPresent(UInt16.self, forKey: .input))?.ns ?? VideoInputSource.unknown.rawValue.ns
         forceDDC = (try container.decodeIfPresent(Bool.self, forKey: .forceDDC)) ?? false
         adaptiveSubzero = try container.decodeIfPresent(Bool.self, forKey: .adaptiveSubzero) ?? true
+        maxNits = try container.decodeIfPresent(Int?.self, forKey: .maxNits) ?? nil
 
         hotkeyInput1 = try (
             (try container.decodeIfPresent(UInt16.self, forKey: .hotkeyInput1))?
@@ -852,6 +854,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case blackout
         case systemAdaptiveBrightness
         case adaptiveSubzero
+        case maxNits
 
         case faceLightEnabled
         case brightnessBeforeFacelight
@@ -1317,7 +1320,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     var primaryMirrorScreenFetcher: Repeater?
 
-    lazy var armProps = DisplayController.armDisplayProperties(display: self)
     @Atomic var force = false
 
     @Atomic var faceLightEnabled = false
@@ -1790,8 +1792,19 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     #if arch(arm64)
+        var dispName = ""
         var dcpName = ""
+        var displayProps: [String: Any]? {
+            didSet {
+                if !dispName.isEmpty, let displayProps, let cap = displayProps["property"] as? Int64 {
+                    observeNitsCap(dispName: dispName)
+                }
+            }
+        }
+        var nitsLimitObserver: IOServicePropertyObserver?
     #endif
+
+    var maxNits: Int? = nil
 
     @Published @objc dynamic var isSource: Bool {
         didSet {
@@ -4162,6 +4175,31 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         var disconnected: Bool { displayController.possiblyDisconnectedDisplays[id]?.serial == serial }
     #endif
 
+    lazy var syncSourcePriority: Int = {
+        if isBuiltin {
+            return 1
+        }
+        if panel?.isAppleProDisplay ?? false {
+            return 2
+        }
+        if isProDisplayXDR() {
+            return 3
+        }
+        if isStudioDisplay() {
+            return 4
+        }
+        if isUltraFine() {
+            return 5
+        }
+        if isThunderbolt() {
+            return 6
+        }
+        if isLEDCinema() {
+            return 7
+        }
+        return 100
+    }()
+
     func getScreen() -> NSScreen? {
         guard !isForTesting else { return nil }
         return NSScreen.screens.first(where: { screen in screen.hasDisplayID(id) })
@@ -4489,7 +4527,31 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             self.refreshContrast()
         }
+        #if arch(arm64)
+            if isBuiltin, nitsLimitObserver == nil {
+                observeNitsCap(dispName: "disp0")
+            }
+        #endif
     }
+
+    #if arch(arm64)
+        func observeNitsCap(dispName: String) {
+            guard isNative, let service = DisplayController.armDisplayService(name: dispName) else {
+                return
+            }
+
+            maxNits = DisplayController.getNitsCap(service: service)
+
+            nitsLimitObserver = IOServicePropertyObserver(service: service, property: "property", throttle: .milliseconds(100)) { [weak self] in
+                guard let cap = DisplayController.getNitsCap(service: service), let self else { return }
+
+                if cap != self.maxNits {
+                    self.maxNits = cap
+                    log.debug("New max nits for \(self.description): \(cap)")
+                }
+            }
+        }
+    #endif
 
     func matchesEDIDUUID(_ edidUUID: String) -> Bool {
         let uuids = possibleEDIDUUIDs()
@@ -4942,6 +5004,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try container.encode(blackout, forKey: .blackout)
             try container.encode(systemAdaptiveBrightness, forKey: .systemAdaptiveBrightness)
             try container.encode(adaptiveSubzero, forKey: .adaptiveSubzero)
+            try container.encode(maxNits, forKey: .maxNits)
         }
     }
 
@@ -4971,15 +5034,15 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 dict["infoDictionary"] = compressed
             }
 
-            if var armProps = self.armProps {
-                armProps.removeValue(forKey: "TimingElements")
-                armProps.removeValue(forKey: "ColorElements")
-                if let encoded = try? encoder.encode(ForgivingEncodable(armProps)),
-                   let compressed = encoded.gzip()?.base64EncodedString()
-                {
-                    dict["armProps"] = compressed
+            #if arch(arm64)
+                if let displayProps = self.displayProps {
+                    if let encoded = try? encoder.encode(ForgivingEncodable(displayProps)),
+                       let compressed = encoded.gzip()?.base64EncodedString()
+                    {
+                        dict["armProps"] = compressed
+                    }
                 }
-            }
+            #endif
 
             if let screen = NSScreen.forDisplayID(self.id) {
                 if let encoded = try? encoder.encode(ForgivingEncodable(screen.deviceDescription)),
@@ -5014,6 +5077,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             dict["hasDDC"] = self.hasDDC
             dict["activeAndResponsive"] = self.activeAndResponsive
             dict["responsiveDDC"] = self.responsiveDDC
+            dict["systemAdaptiveBrightness"] = self.systemAdaptiveBrightness
+            dict["hasAmbientLightAdaptiveBrightness"] = self.hasAmbientLightAdaptiveBrightness
             dict["control"] = self.control?.displayControl.str ?? "NONE"
             dict["gamma"] = [
                 "redMin": self.redMin,
@@ -5027,8 +5092,38 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 "blueGamma": self.blueGamma,
             ]
 
+            #if arch(arm64)
+                self.addDDCStats(&dict)
+            #endif
+
             scope.setExtra(value: dict, key: "display-\(self.serial)")
         }
+    }
+
+    func addDDCStats(_ dict: inout [String: Any]) {
+        guard self.hasDDC, self.control is DDCControl else {
+            return
+        }
+
+        guard let maxBR = DDC.getMaxValue(for: self.id, controlID: .BRIGHTNESS) else {
+            return
+        }
+
+        dict["possibleMaxDDCBrightness"] = maxBR
+
+        guard DDC.setBrightness(for: id, brightness: lastWrittenBrightness) else {
+            return
+        }
+
+        guard let maxCR = DDC.getMaxValue(for: self.id, controlID: .CONTRAST) else {
+            return
+        }
+
+        dict["possibleMaxDDCContrast"] = maxCR
+    }
+
+    func isProDisplayXDR() -> Bool {
+        edidName.contains(PRO_DISPLAY_XDR_NAME)
     }
 
     func isStudioDisplay() -> Bool {
