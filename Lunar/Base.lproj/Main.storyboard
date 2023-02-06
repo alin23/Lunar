@@ -3553,7 +3553,7 @@ and contrast to their highest values</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="WK2-eG-vDJ" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="411" y="40" width="123" height="14"/>
+                                <rect key="frame" x="413" y="40" width="124" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="inline" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="DgP-1t-uMe">
                                     <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -3611,7 +3611,7 @@ shown</string>
                                 </connections>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" alphaValue="0.90000000000000002" tag="1" id="S9A-oo-RYX" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="412" y="217" width="121" height="20"/>
+                                <rect key="frame" x="414" y="217" width="122" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <ciFilter key="compositingFilter" name="CISubtractBlendMode">
                                     <configuration>

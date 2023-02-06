@@ -528,6 +528,73 @@ enum ControlID: UInt8, ExpressibleByArgument, CaseIterable {
 let CONTROLS_BY_NAME = [String: ControlID](uniqueKeysWithValues: ControlID.allCases.map { (String(describing: $0), $0) })
 import Defaults
 
+class IOServicePropertyObserver {
+    deinit {
+        if notificationHandle != 0 {
+            IOObjectRelease(notificationHandle)
+        }
+        if service != 0 {
+            IOObjectRelease(service)
+        }
+
+        cancellable = nil
+    }
+
+    init(service: io_service_t, property: String, throttle: RunLoop.SchedulerTimeType.Stride? = nil, debounce: RunLoop.SchedulerTimeType.Stride? = nil, callback: @escaping () -> Void) {
+        self.service = service
+        self.callback = callback
+        self.property = property
+
+        if let debounce {
+            cancellable = callbackSubject
+                .debounce(for: debounce, scheduler: RunLoop.main)
+                .sink { _ in
+//                    log.debug("Change in service observing '\(property)'")
+                    self.callback()
+                }
+        } else if let throttle {
+            cancellable = callbackSubject
+                .throttle(for: throttle, scheduler: RunLoop.main, latest: true)
+                .sink { _ in
+//                    log.debug("Change in service observing '\(property)'")
+                    self.callback()
+                }
+        } else {
+            cancellable = callbackSubject
+                .sink { _ in
+                    self.callback()
+                }
+        }
+
+        guard let notifyPort = IONotificationPortCreate(kIOMasterPortDefault) else {
+            return
+        }
+
+        let observerCallback: IOServiceInterestCallback = { refcon, service, type, argument in
+            guard let ctx = refcon else { return }
+            let observer = Unmanaged<IOServicePropertyObserver>.fromOpaque(ctx).takeUnretainedValue()
+
+            observer.callbackSubject.send(true)
+        }
+
+        self.notifyPort = notifyPort
+        IONotificationPortSetDispatchQueue(notifyPort, .main)
+
+        let ctx = UnsafeMutableRawPointer(Unmanaged.passRetained(self).toOpaque())
+        IOServiceAddInterestNotification(notifyPort, service, kIOGeneralInterest, observerCallback, ctx, &notificationHandle)
+    }
+
+    var notifyPort: IONotificationPortRef?
+    var notificationHandle: io_object_t = 0
+    var service: io_service_t = 0
+    let property: String
+    let callback: () -> Void
+
+    let callbackSubject = PassthroughSubject<Bool, Never>()
+    var cancellable: AnyCancellable?
+
+}
+
 // MARK: - IOServiceDetector
 
 class IOServiceDetector {
@@ -760,8 +827,10 @@ enum DDC {
         static var dcpMapping: [CGDirectDisplayID: DCP] = matchDisplayToDCP(dcpScores: dcpScores)
     #endif
 
-    static var lidClosedNotifyPort: IONotificationPortRef?
-    static var lidClosedNotificationHandle: io_object_t = 0
+    static var lidClosedObserver: IOServicePropertyObserver?
+
+    // static var lidClosedNotifyPort: IONotificationPortRef?
+    // static var lidClosedNotificationHandle: io_object_t = 0
 
     static func IORegistryTreeChanged() {
         #if DEBUG
@@ -815,14 +884,8 @@ enum DDC {
         #endif
 
         let rootDomain = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceNameMatching("IOPMrootDomain"))
-        if rootDomain != 0, let notifyPort = IONotificationPortCreate(kIOMasterPortDefault) {
-            let callback: IOServiceInterestCallback = { refcon, service, type, argument in
-                displayController.lidClosed = isLidClosed()
-            }
-
-            lidClosedNotifyPort = notifyPort
-            IONotificationPortSetDispatchQueue(notifyPort, .main)
-            IOServiceAddInterestNotification(notifyPort, rootDomain, kIOGeneralInterest, callback, nil, &lidClosedNotificationHandle)
+        lidClosedObserver = IOServicePropertyObserver(service: rootDomain, property: "AppleClamshellState", throttle: .milliseconds(100)) {
+            displayController.lidClosed = isLidClosed()
         }
 
         serviceDetectors.forEach { _ = $0.startDetection() }

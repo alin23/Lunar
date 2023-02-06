@@ -93,14 +93,14 @@ import SwiftyJSON
             service, kIOServicePlane, IOOptionBits(kIORegistryIterateRecursively), &iterator
         ) == KERN_SUCCESS
         else {
-            log.info("Can't create iterator for service \(service): (names: \(names))")
+//            log.verbose("Can't create iterator for service \(service): (names: \(names))")
             return nil
         }
 
         defer {
             IOObjectRelease(iterator)
         }
-        log.info("Looking for service (names: \(names)) in iterator \(iterator)")
+//        log.verbose("Looking for service (names: \(names)) in iterator \(iterator)")
         return IOServiceFirstMatchingInIterator(iterator, names: names)
     }
 
@@ -110,7 +110,7 @@ import SwiftyJSON
         while case let txIOChild = IOIteratorNext(iterator), txIOChild != 0 {
             if IOServiceNameMatches(txIOChild, names: names) {
                 service = txIOChild
-                log.info("Found service \(txIOChild) in iterator \(iterator): (names: \(names))")
+//                log.verbose("Found service \(txIOChild) in iterator \(iterator): (names: \(names))")
                 break
             }
             IOObjectRelease(txIOChild)
@@ -381,6 +381,7 @@ class DisplayController: ObservableObject {
         watchScreencaptureProcess()
         initObservers()
         setupXdrTask()
+        // DisplayController.observeBacklightNitsCap()
     }
 
     deinit {
@@ -395,6 +396,13 @@ class DisplayController: ObservableObject {
 
     static var panelManager: MPDisplayMgr? = MPDisplayMgr()
     static var manualModeFromSyncMode = false
+
+    // static var builtinNitsCapObserver: IOServicePropertyObserver?
+    // static var builtinNitsCap: Int? = getBuiltinNitsCap() {
+    //     didSet {
+    //         displayController.builtinDisplay?.maxNits = builtinNitsCap
+    //     }
+    // }
 
     var averageDDCWriteNanoseconds: ThreadSafeDictionary<CGDirectDisplayID, UInt64> = ThreadSafeDictionary()
     var averageDDCReadNanoseconds: ThreadSafeDictionary<CGDirectDisplayID, UInt64> = ThreadSafeDictionary()
@@ -437,6 +445,13 @@ class DisplayController: ObservableObject {
     @Atomic var gammaDisabledCompletely = CachedDefaults[.gammaDisabledCompletely]
 
     lazy var displayList: [Display] = displays.values.sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }.reversed()
+
+    var autoXdrSensor: Bool = Defaults[.autoXdrSensor]
+    var autoXdrSensorShowOSD: Bool = Defaults[.autoXdrSensorShowOSD]
+
+    var lastTimeBrightnessKeyPressed = Date.distantPast
+
+    @Published var possiblyDisconnectedDisplayList: [Display] = []
 
     @Published var activeDisplayList: [Display] = [] {
         didSet {
@@ -742,6 +757,36 @@ class DisplayController: ObservableObject {
         )
     }
 
+    var possiblyDisconnectedDisplays: [CGDirectDisplayID: Display] = [:] {
+        didSet {
+            print("possiblyDisconnectedDisplays", possiblyDisconnectedDisplays)
+            possiblyDisconnectedDisplayList = possiblyDisconnectedDisplays.values.sorted(by: \.id)
+        }
+    }
+    @Atomic var autoBlackoutPending = false {
+        didSet {
+            log.info("autoBlackoutPending=\(autoBlackoutPending)")
+        }
+    }
+
+    @Atomic var autoXdrPendingEnabled = false {
+        didSet {
+            log.info("autoXdrPendingEnabled=\(autoXdrPendingEnabled)")
+            if autoXdrPendingEnabled {
+                autoXdrPendingDisabled = false
+            }
+        }
+    }
+
+    @Atomic var autoXdrPendingDisabled = false {
+        didSet {
+            log.info("autoXdrPendingDisabled=\(autoXdrPendingDisabled)")
+            if autoXdrPendingDisabled {
+                autoXdrPendingEnabled = false
+            }
+        }
+    }
+
     static func tryLockManager(tries: Int = 10) -> Bool {
         for i in 1 ... tries {
             log.info("Trying to lock display manager (try: \(i))")
@@ -886,96 +931,67 @@ class DisplayController: ObservableObject {
         }
     }
 
-    static func allDisplayProperties() -> [[String: Any]] {
-        var propList: [[String: Any]] = []
-        var ioIterator = io_iterator_t()
-
-        var res = IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceNameMatching("AppleCLCD2"), &ioIterator)
-        if res != KERN_SUCCESS {
-            res = IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceNameMatching("IOMobileFramebufferShim"), &ioIterator)
-        }
-        guard res == KERN_SUCCESS else {
-            return propList
+    static func getNitsCap(service: io_service_t) -> Int? {
+        var serviceProperties: Unmanaged<CFMutableDictionary>?
+        guard IORegistryEntryCreateCFProperties(service, &serviceProperties, kCFAllocatorDefault, IOOptionBits()) == KERN_SUCCESS,
+              let cfProps = serviceProperties,
+              let props = cfProps.takeRetainedValue() as? [String: Any],
+              let nitsLimit = props["property"] as? Int64
+        else {
+            return nil
         }
 
-        defer {
-            assert(IOObjectRelease(ioIterator) == KERN_SUCCESS)
+        return nitsLimit.i >> 16
+    }
+
+    // static func observeBacklightNitsCap() {
+    //     guard let builtinDisplayService = DisplayController.armBuiltinDisplayService() else {
+    //         return
+    //     }
+
+    //     builtinNitsCapObserver = IOServicePropertyObserver(service: builtinDisplayService, property: "property", throttle: .milliseconds(100)) {
+    //         guard let cap = DisplayController.getBuiltinNitsCap() else { return }
+
+    //         if cap != DisplayController.builtinNitsCap {
+    //             DisplayController.builtinNitsCap = cap
+    //             log.debug("New builtinNitsCap: \(cap)")
+    //         }
+    //     }
+    // }
+
+    #if arch(arm64)
+        static func armDisplayService(name: String) -> io_service_t? {
+            let dispService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceNameMatching(name))
+            guard dispService != 0,
+                  let clcd2Service = IOServiceFirstChildMatchingRecursively(dispService, names: ["AppleCLCD2", "IOMobileFramebufferShim"])
+            else {
+                return nil
+            }
+
+            IOObjectRelease(dispService)
+            return clcd2Service
         }
-        while case let ioService = IOIteratorNext(ioIterator), ioService != 0 {
+
+        static func armBuiltinDisplayService() -> io_service_t? {
+            armDisplayService(name: "disp0")
+        }
+
+        static func getArmBuiltinDisplayProperties() -> [String: Any]? {
+            guard let service = armBuiltinDisplayService() else {
+                return nil
+            }
+
             var serviceProperties: Unmanaged<CFMutableDictionary>?
-            guard IORegistryEntryCreateCFProperties(ioService, &serviceProperties, kCFAllocatorDefault, IOOptionBits()) == KERN_SUCCESS,
+            guard IORegistryEntryCreateCFProperties(service, &serviceProperties, kCFAllocatorDefault, IOOptionBits()) == KERN_SUCCESS,
                   let cfProps = serviceProperties,
                   let props = cfProps.takeRetainedValue() as? [String: Any]
             else {
-                continue
+                return nil
             }
-            propList.append(props)
-        }
-        return propList
-    }
 
-    static func armDisplayProperties(display: Display) -> [String: Any]? {
-        // "DisplayAttributes" =
-        // {"ProductAttributes"={"ManufacturerID"="GSM","YearOfManufacture"=2017,"SerialNumber"=314041,"ProductName"="LG Ultra
-        // HD","LegacyManufacturerID"=7789,"ProductID"=23305,"WeekOfManufacture"=8}
-
-        let allProps = allDisplayProperties()
-
-        if let props = allProps.first(where: { props in
-            guard let edidUUID = props["EDID UUID"] as? String else { return false }
-            return display.matchesEDIDUUID(edidUUID)
-        }) {
-            log.info("Found ARM properties for display \(display) by EDID UUID")
             return props
         }
-
-        let fullyMatchedProps = allProps.first(where: { props in
-            guard let attrs = props["DisplayAttributes"] as? [String: Any],
-                  let productAttrs = attrs["ProductAttributes"] as? [String: Any],
-                  let manufactureYear = productAttrs["YearOfManufacture"] as? Int64,
-                  let serial = productAttrs["SerialNumber"] as? Int64,
-                  let name = productAttrs["ProductName"] as? String,
-                  let vendorID = productAttrs["LegacyManufacturerID"] as? Int64,
-                  let productID = productAttrs["ProductID"] as? Int64
-            else { return false }
-            return DisplayController.displayInfoDictFullMatch(
-                display: display,
-                name: name,
-                serial: serial.i,
-                productID: productID.i,
-                manufactureYear: manufactureYear.i,
-                vendorID: vendorID.i
-            )
-        })
-
-        if let fullyMatchedProps {
-            return fullyMatchedProps
-        }
-
-        let propScores = allProps.map { props -> ([String: Any], Int) in
-            guard let attrs = props["DisplayAttributes"] as? [String: Any],
-                  let productAttrs = attrs["ProductAttributes"] as? [String: Any],
-                  let manufactureYear = productAttrs["YearOfManufacture"] as? Int64,
-                  let serial = productAttrs["SerialNumber"] as? Int64,
-                  let name = productAttrs["ProductName"] as? String,
-                  let vendorID = productAttrs["LegacyManufacturerID"] as? Int64,
-                  let productID = productAttrs["ProductID"] as? Int64
-            else { return (props, 0) }
-
-            let score = DisplayController.displayInfoDictPartialMatchScore(
-                display: display,
-                name: name,
-                serial: serial.i,
-                productID: productID.i,
-                manufactureYear: manufactureYear.i,
-                vendorID: vendorID.i
-            )
-
-            return (props, score)
-        }
-
-        return propScores.max(count: 1, sortedBy: { first, second in first.1 <= second.1 }).first?.0
-    }
+    #endif
 
     static func getDisplays(
         includeVirtual: Bool = true,
@@ -1461,6 +1477,7 @@ class DisplayController: ObservableObject {
     var xdrContrast: Float = 0.0
 
     var resetDisplayListTask: DispatchWorkItem?
+    var sentryDataTask: DispatchWorkItem?
 
     var xdrSensorTask: Repeater?
     lazy var autoXdrSensorLuxThreshold: Float = {
@@ -1478,43 +1495,6 @@ class DisplayController: ObservableObject {
     @Atomic var autoXdrTipShown = CachedDefaults[.autoXdrTipShown]
     @Atomic var screensSleeping = false
     @Atomic var loggedOut = false
-
-    var autoXdrSensor: Bool = Defaults[.autoXdrSensor]
-    var autoXdrSensorShowOSD: Bool = Defaults[.autoXdrSensorShowOSD]
-
-    var lastTimeBrightnessKeyPressed = Date.distantPast
-
-    @Published var possiblyDisconnectedDisplayList: [Display] = []
-
-    var possiblyDisconnectedDisplays: [CGDirectDisplayID: Display] = [:] {
-        didSet {
-            print("possiblyDisconnectedDisplays", possiblyDisconnectedDisplays)
-            possiblyDisconnectedDisplayList = possiblyDisconnectedDisplays.values.sorted(by: \.id)
-        }
-    }
-    @Atomic var autoBlackoutPending = false {
-        didSet {
-            log.info("autoBlackoutPending=\(autoBlackoutPending)")
-        }
-    }
-
-    @Atomic var autoXdrPendingEnabled = false {
-        didSet {
-            log.info("autoXdrPendingEnabled=\(autoXdrPendingEnabled)")
-            if autoXdrPendingEnabled {
-                autoXdrPendingDisabled = false
-            }
-        }
-    }
-
-    @Atomic var autoXdrPendingDisabled = false {
-        didSet {
-            log.info("autoXdrPendingDisabled=\(autoXdrPendingDisabled)")
-            if autoXdrPendingDisabled {
-                autoXdrPendingEnabled = false
-            }
-        }
-    }
 
     func setupXdrTask() {
         autoXdrSensorShowOSDPublisher
@@ -1799,7 +1779,9 @@ class DisplayController: ObservableObject {
                 }
 
                 SyncMode.refresh()
-                self.addSentryData()
+                self.sentryDataTask = mainAsyncAfter(ms: 5000) {
+                    self.addSentryData()
+                }
 
                 log.debug("Disabling BlackOut where the mirror does not exist anymore")
                 for d in activeNewDisplays {
@@ -2073,32 +2055,6 @@ class DisplayController: ObservableObject {
         SentrySDK.configureScope { [self] scope in
             log.info("Creating Sentry extra context")
             scope.setExtra(value: datastore.settingsDictionary(), key: "settings")
-            if var armProps = SyncMode.getArmBuiltinDisplayProperties() {
-                armProps.removeValue(forKey: "TimingElements")
-                armProps.removeValue(forKey: "ColorElements")
-
-                var computedProps = [String: String]()
-                if let (b, c) = SyncMode.readBrightnessContrast() {
-                    computedProps["Brightness"] = b.str(decimals: 4)
-                    computedProps["Contrast"] = c.str(decimals: 4)
-                }
-
-                var br: Float = cap(Float(armProps["property"] as! Int) / MAX_IOMFB_BRIGHTNESS.f, minVal: 0.0, maxVal: 1.0)
-                computedProps["ComputedFromproperty"] = br.str(decimals: 4)
-                if let id = builtinDisplay?.id {
-                    DisplayServicesGetLinearBrightness(id, &br)
-                    computedProps["DisplayServicesGetLinearBrightness"] = br.str(decimals: 4)
-                }
-                armProps["ComputedProps"] = computedProps
-
-                if let encoded = try? encoder.encode(ForgivingEncodable(armProps)),
-                   let compressed = encoded.gzip()?.base64EncodedString()
-                {
-                    scope.setExtra(value: compressed, key: "armBuiltinProps")
-                }
-            } else {
-                scope.setExtra(value: SyncMode.readBrightnessIOKit(), key: "builtinDisplayBrightnessIOKit")
-            }
             scope.setTag(value: String(describing: lidClosed), key: "lidClosed")
 
             for display in activeDisplayList {

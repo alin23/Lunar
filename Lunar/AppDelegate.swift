@@ -1000,7 +1000,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 includeDummy: CachedDefaults[.showDummyDisplays]
             )
         }
-        displayController.addSentryData()
+        displayController.sentryDataTask = mainAsyncAfter(ms: 5000) {
+            displayController.addSentryData()
+        }
 
         if CachedDefaults[.refreshValues] {
             startValuesReaderThread()
@@ -1931,6 +1933,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             #else
                 options.environment = "production"
             #endif
+            options.appHangTimeoutInterval = 10
         }
 
         let user = User(userId: SERIAL_NUMBER_HASH)
@@ -2159,6 +2162,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                         scope.setTag(value: "null", key: "secondPhase")
                     }
                 }
+                displayController.addSentryData()
                 SentrySDK.capture(message: "Launch New")
             }
         #endif

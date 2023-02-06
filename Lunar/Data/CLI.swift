@@ -821,82 +821,6 @@ struct Lunar: ParsableCommand {
         }
     }
 
-    struct Builtin: ParsableCommand {
-        enum BuiltinDisplayProperty: String, ExpressibleByArgument, CaseIterable {
-            case id
-            case brightness
-            case contrast
-            case all
-        }
-
-        static let configuration = CommandConfiguration(
-            abstract: "Prints information about the built-in display (if it exists)."
-        )
-
-        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
-
-        @Flag(name: .shortAndLong, help: "Print raw values returned by the system.")
-        var raw = false
-
-        @Flag(name: .shortAndLong, help: "Print response as JSON.")
-        var json = false
-
-        @Argument(help: "Property to print. One of (\(BuiltinDisplayProperty.allCases.map(\.rawValue).joined(separator: ", ")))")
-        var property: BuiltinDisplayProperty
-
-        func run() throws {
-            Lunar.configureLogging(options: globals)
-
-            if raw {
-                guard let props = SyncMode.getArmBuiltinDisplayProperties() else {
-                    throw LunarCommandError.displayNotFound("builtin")
-                }
-
-                switch property {
-                case .id:
-                    cliPrint(displayController.builtinDisplay?.id.s ?? "None")
-                case .brightness:
-                    cliPrint(props["property"] ?? "nil")
-                case .contrast:
-                    cliPrint(props["IOMFBContrastEnhancerStrength"] ?? "nil")
-                case .all:
-                    if json {
-                        let encodableProps = ForgivingEncodable(props)
-                        cliPrint((try! prettyEncoder.encode(encodableProps)).str())
-                    } else {
-                        printDictionary(props)
-                    }
-                }
-                return cliExit(0)
-            }
-
-            guard let (brightness, contrast) = SyncMode.getSourceBrightnessContrast() else {
-                throw LunarCommandError.displayNotFound("builtin")
-            }
-            switch property {
-            case .id:
-                cliPrint(displayController.builtinDisplay?.id.s ?? "None")
-            case .brightness:
-                cliPrint(brightness.str(decimals: 2))
-            case .contrast:
-                cliPrint(contrast.str(decimals: 2))
-            case .all:
-                if json {
-                    cliPrint((try! prettyEncoder.encode([
-                        "id": displayController.builtinDisplay?.id.d ?? 0,
-                        "brightness": brightness,
-                        "contrast": contrast,
-                    ])).str())
-                } else {
-                    cliPrint("ID: \(displayController.builtinDisplay?.id.s ?? "None")")
-                    cliPrint("Brightness: \(brightness.str(decimals: 2))")
-                    cliPrint("Contrast: \(contrast.str(decimals: 2))")
-                }
-            }
-            return cliExit(0)
-        }
-    }
-
     struct DisplayUuid: ParsableCommand {
         static let configuration = CommandConfiguration(
             abstract: "Generates UUID for a display ID."
@@ -1681,7 +1605,6 @@ struct Lunar: ParsableCommand {
             Mode.self,
             Blackout.self,
             Facelight.self,
-            Builtin.self,
             Ddc.self,
             Ddcctl.self,
             Lid.self,
@@ -1745,8 +1668,6 @@ struct Lunar: ParsableCommand {
         case let cmd as Preset:
             return cmd.globals
         case let cmd as Mode:
-            return cmd.globals
-        case let cmd as Builtin:
             return cmd.globals
         case let cmd as Ddc:
             return cmd.globals
