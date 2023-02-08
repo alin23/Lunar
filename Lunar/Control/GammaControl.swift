@@ -270,31 +270,35 @@ class GammaControl: Control {
         fluxPromptTime = Date()
         let displayID = display.id
 
-        let completionHandler = { (keepFlux: Bool) in
-            guard !keepFlux else {
+        let completionHandler = { (keepFlux: NSApplication.ModalResponse) in
+            switch keepFlux {
+            case .alertFirstButtonReturn:
                 if let display = displayController.activeDisplays[displayID] {
                     display.useOverlay = true
                 }
-                return
-            }
+            case .alertSecondButtonReturn:
+                if let display = displayController.activeDisplays[displayID] {
+                    display.useOverlay = false
+                }
+                flux.terminate()
+                if NightShift.isSupported {
+                    NightShift.enable(mode: 1, strength: 0.5)
+                }
 
-            if let display = displayController.activeDisplays[displayID] {
-                display.useOverlay = false
-            }
-            flux.terminate()
-            if NightShift.isSupported {
-                NightShift.enable(mode: 1, strength: 0.5)
-            }
+                if let url = URL(string: "https://shifty.natethompson.io") {
+                    NSWorkspace.shared.open(url)
+                }
 
-            if let url = URL(string: "https://shifty.natethompson.io") {
-                NSWorkspace.shared.open(url)
-            }
-
-            guard let script = NSAppleScript(source: NIGHT_SHIFT_TAB_SCRIPT) else { return }
-            var errorInfo: NSDictionary?
-            script.executeAndReturnError(&errorInfo)
-            if let errors = errorInfo as? [String: Any], errors.count > 0 {
-                log.error("Error while executing Night Shift Tab script", context: errors)
+                guard let script = NSAppleScript(source: NIGHT_SHIFT_TAB_SCRIPT) else { return }
+                var errorInfo: NSDictionary?
+                script.executeAndReturnError(&errorInfo)
+                if let errors = errorInfo as? [String: Any], errors.count > 0 {
+                    log.error("Error while executing Night Shift Tab script", context: errors)
+                }
+            case .alertThirdButtonReturn:
+                NSApp.terminate(nil)
+            default:
+                break
             }
         }
 
@@ -306,15 +310,17 @@ class GammaControl: Control {
             info: """
             **F.lux** adjusts the colour temperature of your screen using the same method used by Lunar for *Software Dimming*.
 
-            ### Possible fixes:
+            ### Possible solutions:
 
             1. Set Lunar to dim brightness using a dark overlay
             2. Stop using f.lux, switch to `Night Shift` + `Shifty`
+            3. Quit Lunar
 
             **Note:** `Night Shift` can also get smarter schedules, app exclusion, keyboard temperature control and more using **[Shifty](https://shifty.natethompson.io)**
             """,
             okButton: "Use dark overlay",
             cancelButton: "Quit f.lux and switch to Night Shift",
+            thirdButton: "Quit Lunar",
             screen: display.nsScreen ?? display.primaryMirrorScreen,
             window: window,
             suppressionText: "Never ask again",
