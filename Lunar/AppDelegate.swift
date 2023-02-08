@@ -1333,6 +1333,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     log.info("SESSION: Log in")
                 case NSWorkspace.sessionDidResignActiveNotification:
                     displayController.loggedOut = true
+                    displayController.resetDisplayListTask?.cancel()
                     log.info("SESSION: Log out")
                 default:
                     break
@@ -1346,6 +1347,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 switch notif.name {
                 case NSWorkspace.screensDidSleepNotification:
                     displayController.screensSleeping = true
+                    displayController.resetDisplayListTask?.cancel()
                     log.info("SESSION: Screen sleep warmup")
                 default:
                     break

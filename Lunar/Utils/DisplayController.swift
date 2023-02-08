@@ -1476,9 +1476,6 @@ class DisplayController: ObservableObject {
     var lastXdrContrast: Float = 0.0
     var xdrContrast: Float = 0.0
 
-    var resetDisplayListTask: DispatchWorkItem?
-    var sentryDataTask: DispatchWorkItem?
-
     var xdrSensorTask: Repeater?
     lazy var autoXdrSensorLuxThreshold: Float = {
         autoXdrSensorLuxThresholdPublisher.sink { change in
@@ -1495,6 +1492,19 @@ class DisplayController: ObservableObject {
     @Atomic var autoXdrTipShown = CachedDefaults[.autoXdrTipShown]
     @Atomic var screensSleeping = false
     @Atomic var loggedOut = false
+
+    var autoXDRCancelCount = 0
+
+    var resetDisplayListTask: DispatchWorkItem? {
+        didSet {
+            oldValue?.cancel()
+        }
+    }
+    var sentryDataTask: DispatchWorkItem? {
+        didSet {
+            oldValue?.cancel()
+        }
+    }
 
     func setupXdrTask() {
         autoXdrSensorShowOSDPublisher
@@ -1534,6 +1544,14 @@ class DisplayController: ObservableObject {
 
         lastXDRAbortDate = Date()
         xdrState = autoXdrPendingEnabled ? .disabledManually : .enabledManually
+        autoXDRCancelCount += 1
+
+        if autoXDRCancelCount == 2 {
+            mainAsyncAfter(ms: 3.hours.timeInterval.intround * 1000) {
+                self.autoXDRCancelCount = 0
+                self.autoXdrSensorPausedReason = nil
+            }
+        }
 
         builtinDisplay?.autoOsdWindowController?.close()
         builtinDisplay?.autoOsdWindowController = nil

@@ -480,7 +480,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         input = (try container.decodeIfPresent(UInt16.self, forKey: .input))?.ns ?? VideoInputSource.unknown.rawValue.ns
         forceDDC = (try container.decodeIfPresent(Bool.self, forKey: .forceDDC)) ?? false
         adaptiveSubzero = try container.decodeIfPresent(Bool.self, forKey: .adaptiveSubzero) ?? true
-        maxNits = try container.decodeIfPresent(Int?.self, forKey: .maxNits) ?? nil
+        let nitsLimit = try container.decodeIfPresent(Int?.self, forKey: .maxNits) ?? nil
+        maxNits = (nitsLimit != nil && nitsLimit! > 0) ? nitsLimit : nil
 
         hotkeyInput1 = try (
             (try container.decodeIfPresent(UInt16.self, forKey: .hotkeyInput1))?
@@ -4545,7 +4546,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             nitsLimitObserver = IOServicePropertyObserver(service: service, property: "property", throttle: .milliseconds(100)) { [weak self] in
                 guard let cap = DisplayController.getNitsCap(service: service), let self else { return }
 
-                if cap != self.maxNits {
+                if cap != self.maxNits, cap > 0 {
                     self.maxNits = cap
                     log.debug("New max nits for \(self.description): \(cap)")
                 }
@@ -5004,7 +5005,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try container.encode(blackout, forKey: .blackout)
             try container.encode(systemAdaptiveBrightness, forKey: .systemAdaptiveBrightness)
             try container.encode(adaptiveSubzero, forKey: .adaptiveSubzero)
-            try container.encode(maxNits, forKey: .maxNits)
+            try container.encode(maxNits ?? 0, forKey: .maxNits)
         }
     }
 
