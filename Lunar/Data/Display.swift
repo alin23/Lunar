@@ -764,7 +764,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             blackOutMirroringAllowed = supportsGammaByDefault || isFakeDummy
         }
 
-        if isLEDCinema() || isThunderbolt() {
+        if isLEDCinema() || isThunderbolt() || isCinemaHD() {
             maxDDCBrightness = 255
         }
         if isLEDCinema() {
@@ -2306,12 +2306,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 self.activeAndResponsive = (self.active && self.responsiveDDC) || !(self.control is DDCControl)
                 self.hasNetworkControl = self.control is NetworkControl || self.alternativeControlForAppleNative is NetworkControl
             }
+
+            if let app = NSRunningApplication.runningApplications(withBundleIdentifier: FLUX_IDENTIFIER).first {
+                GammaControl.fluxChecker(flux: app)
+            }
             if let oldValue, !oldValue.isSoftware, control.isSoftware {
-                if let app = NSRunningApplication.runningApplications(withBundleIdentifier: FLUX_IDENTIFIER).first {
-                    (control as! GammaControl).fluxChecker(flux: app)
-                }
                 setGamma()
             }
+
             if isNative {
                 alternativeControlForAppleNative = getBestAlternativeControlForAppleNative()
             }
@@ -3601,6 +3603,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 guard display.brightnessU16 != newBrightness else {
                     return
                 }
+
+                #if DEBUG
+                    if let maxNits = display.maxNits, maxNits > 0 {
+                        print("NITS: \t\((value * maxNits.d).intround)")
+                    }
+                #endif
 
                 log.verbose("newBrightness: \(newBrightness) display.isUserAdjusting: \(display.isUserAdjusting())")
                 display.withoutDisplayServices {
@@ -5145,6 +5153,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func isCinema() -> Bool {
         edidName == CINEMA_NAME || edidName == CINEMA_HD_NAME
+    }
+
+    func isCinemaHD() -> Bool {
+        edidName == CINEMA_HD_NAME
     }
 
     func isColorLCD() -> Bool {

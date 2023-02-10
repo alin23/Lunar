@@ -1735,6 +1735,15 @@ extension FileManager {
 
 extension Set {
     var arr: [Element] { Array(self) }
+
+    func has(someOf otherSet: some Sequence<Element>) -> Bool {
+        !intersection(otherSet).isEmpty
+    }
+}
+extension OptionSet {
+    func has(someOf otherSet: Self) -> Bool {
+        !intersection(otherSet).isEmpty
+    }
 }
 
 extension Array where Element: Equatable & Hashable {
