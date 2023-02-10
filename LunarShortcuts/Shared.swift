@@ -238,7 +238,7 @@ extension Defaults.Keys {
     static let listenForRemoteCommands = Key<Bool>("listenForRemoteCommands", default: false)
     static let neverAskAboutXDR = Key<Bool>("neverAskAboutXDR", default: false)
 
-    static let autoRestartOnFailedDDC = Key<Bool>("autoRestartOnFailedDDC", default: false)
+    static let autoRestartOnFailedDDC = Key<Bool>("autoRestartOnFailedDDC", default: true)
     static let autoRestartOnFailedDDCSooner = Key<Bool>("autoRestartOnFailedDDCSooner", default: false)
 
     static let sensorHostname = Key<String>("sensorHostname", default: "lunarsensor.local")

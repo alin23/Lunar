@@ -105,6 +105,64 @@ extension View {
     }
 }
 
+public struct OutlineButton: ButtonStyle {
+    public init(
+        color: Color = Color.primary.opacity(0.8),
+        hoverColor: Color = Color.primary,
+        multiplyColor: Color = Color.white,
+        scale: CGFloat = 1,
+        thickness: CGFloat = 2,
+        font: Font = .body.bold()
+    ) {
+        _color = State(initialValue: color)
+        _hoverColor = State(initialValue: hoverColor)
+        _multiplyColor = State(initialValue: multiplyColor)
+        _scale = State(initialValue: scale)
+        _thickness = State(initialValue: thickness)
+        _font = State(initialValue: font)
+    }
+
+    @Environment(\.isEnabled) public var isEnabled
+
+    public func makeBody(configuration: Configuration) -> some View {
+        configuration
+            .label
+            .font(font)
+            .foregroundColor(color)
+            .padding(.vertical, 2.0)
+            .padding(.horizontal, 8.0)
+            .background(
+                RoundedRectangle(
+                    cornerRadius: 8,
+                    style: .continuous
+                ).stroke(color, lineWidth: thickness)
+            ).scaleEffect(scale).colorMultiply(multiplyColor)
+            .contentShape(Rectangle())
+            .onHover(perform: { hover in
+                guard isEnabled else { return }
+                withAnimation(.easeOut(duration: 0.2)) {
+                    multiplyColor = hover ? hoverColor : .white
+                    scale = hover ? 1.02 : 1.0
+                }
+            })
+            .onChange(of: isEnabled) { e in
+                if !e {
+                    withAnimation(.easeOut(duration: 0.2)) {
+                        multiplyColor = .white
+                        scale = 1.0
+                    }
+                }
+            }
+    }
+
+    @State var color = Color.primary.opacity(0.8)
+    @State var hoverColor: Color = .primary
+    @State var multiplyColor: Color = .white
+    @State var scale: CGFloat = 1
+    @State var thickness: CGFloat = 2
+    @State var font: Font = .body.bold()
+}
+
 // MARK: - FlatButton
 
 public struct FlatButton: ButtonStyle {
