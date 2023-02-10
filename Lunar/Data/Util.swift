@@ -1118,6 +1118,8 @@ var alertsByMessage = [String: Bool]()
 import Regex
 let WHITESPACE_REGEX = "\\s+".r!
 
+let LEFT_ALIGNED_ALERT_TAG = 18665
+
 func dialog(
     message: String,
     info: String,
@@ -1132,15 +1134,17 @@ func dialog(
     markdown: Bool = false
 ) -> NSAlert {
     mainThread {
+        let nsAlertSwizzled = NSAlert.classMethod
         let alert = NSAlert()
         alert.messageText = message
         alert.informativeText = info
         alert.alertStyle = .warning
 
-        if ultrawide {
-            alert.accessoryView = NSView(frame: NSRect(origin: .zero, size: NSSize(width: 650, height: 0)))
-        } else if wide {
-            alert.accessoryView = NSView(frame: NSRect(origin: .zero, size: NSSize(width: 500, height: 0)))
+        if ultrawide || wide {
+            let tf = NSTextField(frame: NSRect(origin: .zero, size: NSSize(width: ultrawide ? 650 : 500, height: 0)))
+            tf.alignment = .left
+            tf.tag = LEFT_ALIGNED_ALERT_TAG
+            alert.accessoryView = tf
         }
 
         if let okButton {
@@ -1178,9 +1182,42 @@ func dialog(
         }
 
         if markdown, let infoTextField = textField(alert: alert, containing: info) {
-            infoTextField.attributedStringValue = MARKDOWN.attributedString(from: info)
+            infoTextField.attributedStringValue = MARKDOWN.attributedString(from: info).withParagraphStyle(.leftAligned)
+            infoTextField.tag = LEFT_ALIGNED_ALERT_TAG
         }
         return alert
+    }
+}
+
+extension NSAlert {
+    private typealias Layout = @convention(c) (NSAlert) -> Void
+    static let oldLayout = class_getInstanceMethod(NSAlert.self, #selector(NSAlert.layout))!
+    static let oldLayoutIMP = method_getImplementation(oldLayout)
+    static let classMethod: Bool = {
+        let swizzledMethod = class_getInstanceMethod(NSAlert.self, #selector(NSAlert.swizzledLayout))
+        method_exchangeImplementations(oldLayout, swizzledMethod!)
+
+        return true
+    }()
+
+    @objc func swizzledLayout() {
+        swizzledLayout()
+
+        for view in window.contentView!.subviews {
+            if let textField = view as? NSTextField, textField.tag == LEFT_ALIGNED_ALERT_TAG {
+                textField.alignment = .left
+                let attrs = textField.attributedStringValue.attributes(at: 0, effectiveRange: nil)
+                if attrs[.paragraphStyle] == nil {
+                    textField.attributedStringValue = textField.attributedStringValue.withParagraphStyle(.leftAligned)
+                    continue
+                }
+
+                if let paragraphStyle = attrs[.paragraphStyle] as? NSParagraphStyle, paragraphStyle.alignment != .left {
+                    textField.attributedStringValue = textField.attributedStringValue.withParagraphStyle(.leftAligned)
+                    continue
+                }
+            }
+        }
     }
 }
 

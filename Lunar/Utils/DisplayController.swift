@@ -128,14 +128,14 @@ import SwiftyJSON
     }
 
     class DCP: CustomStringConvertible, Hashable, Equatable {
-//        deinit {
-//            #if !DEBUG
-//                IOObjectRelease(dispService)
-//                IOObjectRelease(dcpService)
-//                IOObjectRelease(dcpAvServiceProxy)
-//                IOObjectRelease(clcd2Service)
-//            #endif
-//        }
+        deinit {
+            #if !DEBUG
+                IOObjectRelease(dispService)
+                IOObjectRelease(dcpService)
+                IOObjectRelease(dcpAvServiceProxy)
+                IOObjectRelease(clcd2Service)
+            #endif
+        }
 
         init?(dispService: io_service_t, txIOIterator: io_iterator_t, index: Int) {
             guard let dispName = IOServiceName(dispService), DISP_NAMES.contains(dispName) else {
@@ -1495,6 +1495,18 @@ class DisplayController: ObservableObject {
 
     var autoXDRCancelCount = 0
 
+    var fluxPathURL = fluxApp()?.bundleURL
+    @Atomic var usingFlux = isFluxRunning()
+    @Atomic var xdrPausedBecauseOfFlux = false
+
+    @Atomic var fluxRunning = isFluxRunning() {
+        didSet {
+            if fluxRunning, !usingFlux, let app = fluxApp() {
+                usingFlux = true
+                fluxPathURL = app.bundleURL
+            }
+        }
+    }
     var resetDisplayListTask: DispatchWorkItem? {
         didSet {
             oldValue?.cancel()
@@ -1902,7 +1914,7 @@ class DisplayController: ObservableObject {
                     .filter { $0.starts(with: "window-") }
                     .compactMap { $0.split(separator: "-").last?.u32 }
             )
-            let currentIDs: Set<CGDirectDisplayID> = Set(displays.keys)
+            let currentIDs: Set<CGDirectDisplayID> = Set(NSScreen.onlineDisplayIDs)
 
             let idsToRemove = idsWithWindows.subtracting(currentIDs)
             Thread.current.threadDictionary.allKeys
@@ -1921,7 +1933,6 @@ class DisplayController: ObservableObject {
     }
 
     func shouldPromptAboutFallback(_ display: Display) -> Bool {
-//        guard !display.neverFallbackControl, display.enabledControls[.gamma] ?? false else { return false }
         guard !display.neverFallbackControl, !display.isBuiltin, !AppleNativeControl.isAvailable(for: display),
               !display.isAppleDisplay() else { return false }
 
@@ -2169,21 +2180,30 @@ class DisplayController: ObservableObject {
             .sink { [self] change in
                 let identifiers = change.compactMap(\.bundleIdentifier)
 
-                if identifiers.contains(FLUX_IDENTIFIER),
-                   let app = change.first(where: { app in app.bundleIdentifier == FLUX_IDENTIFIER }),
-                   let display = activeDisplayList.first(where: { d in d.hasSoftwareControl }),
-                   let control = display.control as? GammaControl
-                {
-                    control.fluxChecker(flux: app)
-                }
-
                 runningAppExceptions = datastore.appExceptions(identifiers: Array(identifiers.uniqued())) ?? []
                 log.info("New running applications: \(runningAppExceptions.map(\.name))")
                 adaptBrightness()
             }
             .store(in: &observers)
-    }
 
+        NSWorkspace.shared.publisher(for: \.runningApplications, options: [.new])
+            .sink { [self] change in
+                let identifiers = change.compactMap(\.bundleIdentifier)
+
+                if !fluxRunning, identifiers.contains(FLUX_IDENTIFIER),
+                   let app = change.first(where: { app in app.bundleIdentifier == FLUX_IDENTIFIER })
+                {
+                    fluxRunning = true
+                    GammaControl.fluxChecker(flux: app)
+                }
+
+                if fluxRunning, !identifiers.contains(FLUX_IDENTIFIER) {
+                    fluxRunning = false
+                    xdrPausedBecauseOfFlux = false
+                }
+            }
+            .store(in: &observers)
+    }
     func fetchValues(for displays: [Display]? = nil) {
         for display in displays ?? activeDisplayList.map({ $0 }) {
             display.refreshBrightness()
@@ -2355,32 +2375,34 @@ class DisplayController: ObservableObject {
             }
 
             if autoXdr || display.softwareBrightness > 1.0 || display.enhanced,
-               display.supportsEnhance, !display.isForTesting,
+               display.supportsEnhance, !display.isForTesting, !xdrPausedBecauseOfFlux,
                (value == maxBrightness && value == oldValue && timeSince(lastTimeBrightnessKeyPressed) < 3) ||
                (oldValue == maxBrightness && display.softwareBrightness > Display.MIN_SOFTWARE_BRIGHTNESS),
                lunarProActive || lunarProOnTrial
             {
-                if !display.enhanced {
-                    display.handleEnhance(true, withoutSettingBrightness: true)
+                GammaControl.fluxCheckerXDR(display: display) {
+                    if !display.enhanced {
+                        display.handleEnhance(true, withoutSettingBrightness: true)
+                    }
+
+                    display.maxEDR = display.computeMaxEDR()
+
+                    let range = (display.maxSoftwareBrightness - Display.MIN_SOFTWARE_BRIGHTNESS)
+                    let softOffset = (offset.f / (96 * (1 / range)))
+                    let nextSoftwareBrightness = cap(
+                        self.getFilledChicletValue(
+                            display.softwareBrightness,
+                            offset: softOffset,
+                            thresholds: display.xdrFilledChicletsThresholds,
+                            fillOffset: display.xdrFilledChicletOffset
+                        ),
+                        minVal: Display.MIN_SOFTWARE_BRIGHTNESS,
+                        maxVal: display.maxSoftwareBrightness
+                    )
+
+                    display.forceShowSoftwareOSD = true
+                    display.softwareBrightness = nextSoftwareBrightness
                 }
-
-                display.maxEDR = display.computeMaxEDR()
-
-                let range = (display.maxSoftwareBrightness - Display.MIN_SOFTWARE_BRIGHTNESS)
-                let softOffset = (offset.f / (96 * (1 / range)))
-                let nextSoftwareBrightness = cap(
-                    getFilledChicletValue(
-                        display.softwareBrightness,
-                        offset: softOffset,
-                        thresholds: display.xdrFilledChicletsThresholds,
-                        fillOffset: display.xdrFilledChicletOffset
-                    ),
-                    minVal: Display.MIN_SOFTWARE_BRIGHTNESS,
-                    maxVal: display.maxSoftwareBrightness
-                )
-
-                display.forceShowSoftwareOSD = true
-                display.softwareBrightness = nextSoftwareBrightness
                 return
             }
 
@@ -2416,7 +2438,6 @@ class DisplayController: ObservableObject {
             }
         }
     }
-
     @inline(__always) func withoutSlowTransition(_ block: () -> Void) {
         guard brightnessTransition == .slow else {
             block()

@@ -553,7 +553,7 @@ struct HDRSettingsView: View {
 
     var xdrSettings: some View {
         Group {
-            SettingsToggle(text: "Disable Night Shift when toggling XDR", setting: $disableNightShiftXDR.animation(.fastSpring))
+            SettingsToggle(text: "Disable Night Shift and f.lux when toggling XDR", setting: $disableNightShiftXDR.animation(.fastSpring))
             SettingsToggle(
                 text: "Enable Dark Mode when toggling XDR", setting: $enableDarkModeXDR.animation(.fastSpring),
                 help: """
@@ -1563,7 +1563,6 @@ struct QuickActionsMenuView: View {
     }
 
     var body: some View {
-        let op = (showFooterOnHover && !showAdditionalInfo) ? footerOpacity : 1.0
         let optionsMenuOverflow = showOptionsMenu ? isOptionsMenuOverflowing() : false
         HStack(alignment: .top, spacing: 1) {
             if optionsMenuOverflow {

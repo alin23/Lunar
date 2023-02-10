@@ -211,4 +211,16 @@ extension NSParagraphStyle {
         p.alignment = .center
         return p
     }
+
+    static var leftAligned: NSParagraphStyle {
+        let p = NSMutableParagraphStyle()
+        p.alignment = .left
+        return p
+    }
+
+    static var rightAligned: NSParagraphStyle {
+        let p = NSMutableParagraphStyle()
+        p.alignment = .right
+        return p
+    }
 }

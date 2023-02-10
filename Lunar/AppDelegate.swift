@@ -1172,16 +1172,30 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         CGDisplayRegisterReconfigurationCallback({ displayID, flags, _ in
+            guard !flags.isSubset(of: [.beginConfigurationFlag, .desktopShapeChangedFlag, .movedFlag, .setMainFlag]) else {
+                return
+            }
+
             log.debug("CGDisplayRegisterReconfigurationCallback \(flags) \(displayID)")
 
-            for windowType in ["corner", "gamma", "shade", "faceLight"] {
-                if !NSScreen.onlineDisplayIDs.contains(displayID), let wc = Display.getWindowController(displayID, type: windowType) {
+            let removedDisplay: Bool = flags.has(someOf: [.removeFlag, .disabledFlag])
+            let addedDisplay: Bool = flags.has(someOf: [.addFlag, .enabledFlag])
+
+            if removedDisplay {
+                let wcs: [(String, NSWindowController)] = ["corner", "gamma", "shade", "faceLight"].compactMap { wt in
+                    guard let wc = Display.getWindowController(displayID, type: wt) else {
+                        return nil
+                    }
+                    return (wt, wc)
+                }
+
+                for (windowType, wc) in wcs {
                     wc.close()
                     Display.setWindowController(displayID, type: windowType, windowController: nil)
                 }
             }
 
-            if displayController.screenIDs.count == 1, !displayController.screenIDs.contains(displayID), displayController.xdrContrast > 0 {
+            if addedDisplay, displayController.screenIDs.count == 1, displayController.xdrContrast > 0 {
                 log.info("Disabling XDR Contrast if we have more than 1 screen")
                 lastXDRContrastResetTime = Date()
                 displayController.xdrContrast = 0
@@ -1191,7 +1205,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             displayController.retryAutoBlackoutLater()
 
             #if arch(arm64)
-                DDC.rebuildDCPList()
+                if addedDisplay || removedDisplay {
+                    DDC.rebuildDCPList()
+                }
             #endif
         }, nil)
 
@@ -2168,6 +2184,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 SentrySDK.capture(message: "Launch New")
             }
         #endif
+
+        mainAsyncAfter(ms: 3000) {
+            guard let app = NSRunningApplication.runningApplications(withBundleIdentifier: FLUX_IDENTIFIER).first
+            else {
+                return
+            }
+            GammaControl.fluxChecker(flux: app)
+        }
 
         if CachedDefaults[.reapplyValuesAfterWake] {
             screenWakeAdapterTask = Repeater(every: 2, times: CachedDefaults[.wakeReapplyTries]) {

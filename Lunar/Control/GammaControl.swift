@@ -261,26 +261,39 @@ class GammaControl: Control {
 
     var isSoftware: Bool { true }
 
-    func fluxChecker(flux: NSRunningApplication) {
-        guard let display, display.supportsGamma else { return }
+    static func fluxChecker(flux: NSRunningApplication) {
+        let gammaDisplays = displayController.activeDisplayList.filter {
+            $0.hasSoftwareControl && $0.dimmingMode == .gamma && $0.gammaEnabled
+        }
+        guard let display = gammaDisplays.first else {
+            displayController.activeDisplayList.filter(\.applyGamma).forEach { $0.applyGamma = false }
+            return
+        }
+
         guard !CachedDefaults[.neverAskAboutFlux], !displayController.screensSleeping,
               fluxPromptTime == nil || timeSince(fluxPromptTime!) > 10.minutes.timeInterval
         else { return }
 
         fluxPromptTime = Date()
-        let displayID = display.id
+
+        let gammaNames = gammaDisplays.map(\.name).joined(separator: "\n- ")
+        let gammaIDs = gammaDisplays.map(\.id)
 
         let completionHandler = { (keepFlux: NSApplication.ModalResponse) in
+            let gammaDisplays = gammaIDs.compactMap { displayController.activeDisplays[$0] }
+
             switch keepFlux {
             case .alertFirstButtonReturn:
-                if let display = displayController.activeDisplays[displayID] {
+                gammaDisplays.forEach { display in
                     display.useOverlay = true
+                    display.gammaEnabled = true
                 }
             case .alertSecondButtonReturn:
-                if let display = displayController.activeDisplays[displayID] {
-                    display.useOverlay = false
-                }
                 flux.terminate()
+                gammaDisplays.forEach { display in
+                    display.gammaEnabled = true
+                }
+
                 if NightShift.isSupported {
                     NightShift.enable(mode: 1, strength: 0.5)
                 }
@@ -296,7 +309,7 @@ class GammaControl: Control {
                     log.error("Error while executing Night Shift Tab script", context: errors)
                 }
             case .alertThirdButtonReturn:
-                NSApp.terminate(nil)
+                return
             default:
                 break
             }
@@ -304,23 +317,99 @@ class GammaControl: Control {
 
         let window = mainThread { appDelegate!.windowController?.window }
 
-        display.useOverlay = true
+        gammaDisplays.forEach { display in
+            display.gammaEnabled = false
+        }
+
         let resp = ask(
             message: "Conflict between F.lux and Lunar detected",
             info: """
             **F.lux** adjusts the colour temperature of your screen using the same method used by Lunar for *Software Dimming*.
 
+            The following displays don't support hardware brightness control and are forced to use *Software Dimming*:
+
+            - \(gammaNames)
+
             ### Possible solutions:
 
-            1. Set Lunar to dim brightness using a dark overlay
+            1. Set Lunar to dim brightness using a *dark overlay*
             2. Stop using f.lux, switch to `Night Shift` + `Shifty`
-            3. Quit Lunar
+            3. Disable *Software Dimming* for affected displays
 
             **Note:** `Night Shift` can also get smarter schedules, app exclusion, keyboard temperature control and more using **[Shifty](https://shifty.natethompson.io)**
             """,
-            okButton: "Use dark overlay",
+            okButton: "Dim using an overlay instead of Gamma",
             cancelButton: "Quit f.lux and switch to Night Shift",
-            thirdButton: "Quit Lunar",
+            thirdButton: "Disable Software Dimming",
+            screen: display.nsScreen ?? display.primaryMirrorScreen,
+            window: window,
+            suppressionText: "Never ask again",
+            onSuppression: { shouldStopAsking in
+                CachedDefaults[.neverAskAboutFlux] = shouldStopAsking
+            },
+            onCompletion: completionHandler,
+            unique: true,
+            waitTimeout: 60.seconds,
+            wide: true,
+            markdown: true
+        )
+        if window == nil {
+            completionHandler(resp)
+        }
+    }
+
+    static func fluxCheckerXDR(display: Display, fromAutoXDR: Bool = true, enableXDR: @escaping () -> Void) {
+        guard !CachedDefaults[.neverAskAboutFlux], !displayController.screensSleeping,
+              fluxPromptTime == nil || timeSince(fluxPromptTime!) > 10.minutes.timeInterval,
+              displayController.fluxRunning, let flux = fluxApp()
+        else {
+            enableXDR()
+            return
+        }
+
+        guard !CachedDefaults[.disableNightShiftXDR] else {
+            flux.terminate()
+            enableXDR()
+            return
+        }
+
+        fluxPromptTime = Date()
+
+        let completionHandler = { (keepFlux: NSApplication.ModalResponse) in
+            switch keepFlux {
+            case .alertFirstButtonReturn:
+                flux.terminate()
+                enableXDR()
+            case .alertSecondButtonReturn:
+                displayController.xdrPausedBecauseOfFlux = true
+                displayController.activeDisplayList
+                    .filter(\.enhanced)
+                    .forEach { $0.enhanced = false }
+            case .alertThirdButtonReturn:
+                Defaults[.autoXdr] = false
+                Defaults[.autoXdrSensor] = false
+                Defaults[.showXDRSelector] = false
+            default:
+                break
+            }
+        }
+
+        let window = mainThread { appDelegate!.windowController?.window }
+
+        let disableXDRMessage = !fromAutoXDR
+            ? ""
+            :
+            "\n\nIf you wish to keep using f.lux, you can **Pause XDR** until f.lux is quit *(or until Lunar is relaunched)*.\n\nYou can also disable the XDR feature completely if you don't have a need for it (it can be reenabled later from the **Options** menu)."
+        let resp = ask(
+            message: "Conflict between F.lux and Lunar detected",
+            info: """
+            **F.lux** adjusts the colour temperature of your screen using the same method used by Lunar for **[XDR Brightness](https://lunar.fyi/#xdr)**.
+
+            Because of a system limitation, XDR Brightness and f.lux can't coexist.\(disableXDRMessage)
+            """,
+            okButton: "Quit f.lux",
+            cancelButton: fromAutoXDR ? "Pause XDR" : "Don't enable XDR",
+            thirdButton: fromAutoXDR ? "Disable XDR" : nil,
             screen: display.nsScreen ?? display.primaryMirrorScreen,
             window: window,
             suppressionText: "Never ask again",
