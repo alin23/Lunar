@@ -128,14 +128,14 @@ import SwiftyJSON
     }
 
     class DCP: CustomStringConvertible, Hashable, Equatable {
-        deinit {
-            #if !DEBUG
-                IOObjectRelease(dispService)
-                IOObjectRelease(dcpService)
-                IOObjectRelease(dcpAvServiceProxy)
-                IOObjectRelease(clcd2Service)
-            #endif
-        }
+//        deinit {
+//            #if !DEBUG
+//                IOObjectRelease(dispService)
+//                IOObjectRelease(dcpService)
+//                IOObjectRelease(dcpAvServiceProxy)
+//                IOObjectRelease(clcd2Service)
+//            #endif
+//        }
 
         init?(dispService: io_service_t, txIOIterator: io_iterator_t, index: Int) {
             guard let dispName = IOServiceName(dispService), DISP_NAMES.contains(dispName) else {

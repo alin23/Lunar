@@ -257,7 +257,7 @@
 		C76B775C26445C9B007CAAC5 /* MacToggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacToggle.swift; sourceTree = "<group>"; };
 		C76B775E26447EC6007CAAC5 /* Weather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weather.swift; sourceTree = "<group>"; };
 		C76CB7A725CFD954007624DE /* ResetButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetButton.swift; sourceTree = "<group>"; };
-		C7714AF827E4A3A9002E0B2E /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Components.swift; path = /Users/alin/Projects/Lunar/Lunar/Views/Components.swift; sourceTree = "<absolute>"; };
+		C7714AF827E4A3A9002E0B2E /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		C7714B0527E8F11C002E0B2E /* Presets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Presets.swift; sourceTree = "<group>"; };
 		C77200021FF072CB0078E155 /* ScrollableBrightness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableBrightness.swift; sourceTree = "<group>"; };
 		C772BDD625E7A296006A1684 /* NetworkControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkControl.swift; sourceTree = "<group>"; };
