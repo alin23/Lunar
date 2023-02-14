@@ -60,7 +60,7 @@ bool IsLidClosed(void)
 
     IOReturn ioReturn = IOMasterPort(MACH_PORT_NULL, &masterPort);
     if (ioReturn != 0) {
-        logToFile("Error on getting master port: %d\n", ioReturn);
+        // logToFile("Error on getting master port: %d\n", ioReturn);
         return false;
     }
 

@@ -30,6 +30,10 @@ let MAX_BRIGHTNESS: UInt16 = 100
 let MIN_CONTRAST: UInt16 = 0
 let MAX_CONTRAST: UInt16 = 100
 
+let MIN_BRIGHTNESS_D: Double = 0
+let MAX_BRIGHTNESS_D: Double = 100
+let MAX_NITS: Double = 2000
+
 let DEFAULT_MIN_BRIGHTNESS: UInt16 = 0
 let DEFAULT_MAX_BRIGHTNESS: UInt16 = 100
 let DEFAULT_MIN_CONTRAST: UInt16 = 50
@@ -480,8 +484,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         input = (try container.decodeIfPresent(UInt16.self, forKey: .input))?.ns ?? VideoInputSource.unknown.rawValue.ns
         forceDDC = (try container.decodeIfPresent(Bool.self, forKey: .forceDDC)) ?? false
         adaptiveSubzero = try container.decodeIfPresent(Bool.self, forKey: .adaptiveSubzero) ?? true
-        let nitsLimit = try container.decodeIfPresent(Int?.self, forKey: .maxNits) ?? nil
-        maxNits = (nitsLimit != nil && nitsLimit! > 0) ? nitsLimit : nil
 
         hotkeyInput1 = try (
             (try container.decodeIfPresent(UInt16.self, forKey: .hotkeyInput1))?
@@ -604,6 +606,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         super.init()
+        #if arch(arm64)
+            maxNits = try container.decodeIfPresent(Int.self, forKey: .maxNits) ?! getMaxNits()
+            minNits = try container.decodeIfPresent(Int.self, forKey: .minNits) ?! getMinNits()
+        #endif
+
         defer {
             initialised = true
             supportsEnhance = getSupportsEnhance()
@@ -735,6 +742,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         self.serial = (serial ?? Display.uuid(id: id))
 
         super.init()
+        #if arch(arm64)
+            maxNits = getMaxNits()
+            minNits = getMinNits()
+        #endif
 
         if isSmartBuiltin {
             preciseBrightness = AppleNativeControl.readBrightnessDisplayServices(id: id)
@@ -856,6 +867,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case systemAdaptiveBrightness
         case adaptiveSubzero
         case maxNits
+        case minNits
+        case nits
 
         case faceLightEnabled
         case brightnessBeforeFacelight
@@ -1797,15 +1810,36 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         var dcpName = ""
         var displayProps: [String: Any]? {
             didSet {
-                if !dispName.isEmpty, let displayProps, let cap = displayProps["property"] as? Int64 {
+                if !dispName.isEmpty, let displayProps, displayProps["property"] != nil {
                     observeNitsCap(dispName: dispName)
                 }
             }
         }
         var nitsLimitObserver: IOServicePropertyObserver?
-    #endif
 
-    var maxNits: Int? = nil
+        @Published var minNits = 0
+        @Published var maxNits = 500 {
+            didSet {
+                #if DEBUG
+                    if maxNits == 0 {
+                        maxNits = getMaxNits()
+                    } else {
+                        print("MAX NITS: \t\(maxNits)")
+                    }
+                #endif
+            }
+        }
+
+        @Published var nits: Int? = nil {
+            didSet {
+                #if DEBUG
+                    if let nits, nits > 0 {
+                        print("REAL NITS: \t\(nits)")
+                    }
+                #endif
+            }
+        }
+    #endif
 
     @Published @objc dynamic var isSource: Bool {
         didSet {
@@ -1833,7 +1867,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 smartDisplay.isSource = true
             }
 
-            datastore.storeDisplays(displayController.displays.values.map { $0 })
+            datastore.storeDisplays(displayController.displayList)
             if displayController.adaptiveModeKey == .sync {
                 displayController.adaptiveMode.stopWatching()
                 displayController.adaptiveMode.watch()
@@ -3604,12 +3638,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     return
                 }
 
-                #if DEBUG
-                    if let maxNits = display.maxNits, maxNits > 0 {
-                        print("NITS: \t\((value * maxNits.d).intround)")
-                    }
-                #endif
-
                 log.verbose("newBrightness: \(newBrightness) display.isUserAdjusting: \(display.isUserAdjusting())")
                 display.withoutDisplayServices {
                     display.brightness = newBrightness.ns
@@ -4543,25 +4571,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         #endif
     }
 
-    #if arch(arm64)
-        func observeNitsCap(dispName: String) {
-            guard isNative, let service = DisplayController.armDisplayService(name: dispName) else {
-                return
-            }
-
-            maxNits = DisplayController.getNitsCap(service: service)
-
-            nitsLimitObserver = IOServicePropertyObserver(service: service, property: "property", throttle: .milliseconds(100)) { [weak self] in
-                guard let cap = DisplayController.getNitsCap(service: service), let self else { return }
-
-                if cap != self.maxNits, cap > 0 {
-                    self.maxNits = cap
-                    log.debug("New max nits for \(self.description): \(cap)")
-                }
-            }
-        }
-    #endif
-
     func matchesEDIDUUID(_ edidUUID: String) -> Bool {
         let uuids = possibleEDIDUUIDs()
         guard !uuids.isEmpty else {
@@ -5013,7 +5022,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try container.encode(blackout, forKey: .blackout)
             try container.encode(systemAdaptiveBrightness, forKey: .systemAdaptiveBrightness)
             try container.encode(adaptiveSubzero, forKey: .adaptiveSubzero)
-            try container.encode(maxNits ?? 0, forKey: .maxNits)
+            #if arch(arm64)
+                try container.encode(maxNits, forKey: .maxNits)
+                try container.encode(minNits, forKey: .minNits)
+                try container.encode(nits ?? 0, forKey: .nits)
+            #endif
         }
     }
 
@@ -5952,6 +5965,25 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
               displayController.adaptiveModeKey != .sync || !isSource,
               displayController.adaptiveModeKey != .location || featureValue != 0,
               timeSince(lastConnectionTime) > 5 else { return }
+
+        #if arch(arm64)
+            if displayController.adaptiveModeKey == .sync, let source = SyncMode.sourceDisplay?.nits {
+                if adaptiveSubzero, softwareBrightness < 1 {
+                    displayController.nitsMapping[serial] = NitsMapping(source: source, target: ((1.0 - softwareBrightness) * -100).intround)
+                } else {
+                    displayController.nitsMapping[serial] = NitsMapping(
+                        source: source,
+                        target: mapNumber(
+                            targetValue,
+                            fromLow: minBrightness.doubleValue,
+                            fromHigh: maxBrightness.doubleValue,
+                            toLow: minNits.d,
+                            toHigh: maxNits.d
+                        ).intround
+                    )
+                }
+            }
+        #endif
 
         brightnessDataPointInsertionTask?.cancel()
         if userBrightness[modeKey] == nil {

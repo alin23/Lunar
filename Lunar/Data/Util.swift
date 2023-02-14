@@ -581,34 +581,25 @@ func getSerialNumberHash() -> String? {
         return nil
     }
 
-    if let serialNumberProp = IORegistryEntryCreateCFProperty(
-        platformExpert,
-        kIOPlatformSerialNumberKey as CFString,
-        kCFAllocatorDefault,
-        0
-    ) {
-        guard let serialNumber = (serialNumberProp.takeRetainedValue() as? String)?
-            .trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-        else {
-            serialNumberProp.release()
-            return nil
-        }
+    defer { IOObjectRelease(platformExpert) }
 
-        IOObjectRelease(platformExpert)
-        guard let serialNumberData = serialNumber.data(using: .utf8, allowLossyConversion: true) else {
-            return nil
-        }
-        let hash = sha256(data: serialNumberData).prefix(20).str(base64: true, separator: "").map { (c: Character) -> Character in
-            switch c {
-            case "/": return Character(".")
-            case "+": return Character(".")
-            default: return c
-            }
-        }.str()
-        log.info("SerialNumberHash: \(hash)")
-        return hash
+    guard let serialNumber: String = IOServiceProperty(platformExpert, kIOPlatformSerialNumberKey) else {
+        return nil
     }
-    return nil
+
+    guard let serialNumberData = serialNumber.trimmed.data(using: .utf8, allowLossyConversion: true) else {
+        return nil
+    }
+    let hash = sha256(data: serialNumberData).prefix(20).str(base64: true, separator: "").map { (c: Character) -> Character in
+        switch c {
+        case "/": return Character(".")
+        case "+": return Character(".")
+        default: return c
+        }
+    }.str()
+    log.info("SerialNumberHash: \(hash)")
+
+    return hash
 }
 
 let SERIAL_NUMBER_HASH = getSerialNumberHash() ?? generateAPIKey()

@@ -1389,15 +1389,13 @@ struct QuickActionsMenuView: View {
                             .font(.system(size: 12, weight: .medium, design: .rounded))
                             .fixedSize()
 
-                        let peach = Color.primary.blended(withFraction: colorScheme == .dark ? 0.5 : 0.2, of: Colors.peach)
                         SwiftUI.Button("Restart") { appDelegate!.restartApp(appDelegate!) }
-                            .buttonStyle(FlatButton(color: peach.opacity(0.1), textColor: peach))
+                            .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
                             .font(.system(size: 12, weight: .medium, design: .rounded))
                             .fixedSize()
 
-                        let red = Color.primary.blended(withFraction: colorScheme == .dark ? 0.5 : 0.2, of: Color.red)
                         SwiftUI.Button("Quit") { NSApplication.shared.terminate(nil) }
-                            .buttonStyle(FlatButton(color: red.opacity(0.1), textColor: red))
+                            .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
                             .font(.system(size: 12, weight: .medium, design: .rounded))
                             .fixedSize()
                     }

@@ -44,18 +44,9 @@ import SwiftyJSON
     }
 
     func DCPAVServiceHasLocation(_ dcpAvServiceProxy: io_service_t, location: AVServiceLocation) -> Bool {
-        var dcpAvServiceProperties: Unmanaged<CFMutableDictionary>?
-        let extractionResult = IORegistryEntryCreateCFProperties(
-            dcpAvServiceProxy,
-            &dcpAvServiceProperties,
-            kCFAllocatorDefault,
-            IOOptionBits()
-        )
-
-        guard extractionResult == KERN_SUCCESS,
-              let dcpAvCFProps = dcpAvServiceProperties, let dcpAvProps = dcpAvCFProps.takeRetainedValue() as? [String: Any],
-              let avServiceLocation = dcpAvProps["Location"] as? String
-        else { return false }
+        guard let avServiceLocation: String = IOServiceProperty(dcpAvServiceProxy, "Location") else {
+            return false
+        }
         return avServiceLocation == location.rawValue
     }
 
@@ -359,17 +350,24 @@ func ?! (_ str: String?, _ str2: String) -> String {
     return str
 }
 
-func ?! (_ str: io_service_t?, _ str2: io_service_t?) -> io_service_t? {
-    guard let str, str != 0 else {
-        return str2
+func ?! <T: BinaryInteger>(_ num: T?, _ num2: T) -> T {
+    guard let num, num != 0 else {
+        return num2
     }
-    return str
+    return num
 }
-func ?! (_ str: io_service_t?, _ str2: io_service_t) -> io_service_t {
-    guard let str, str != 0 else {
-        return str2
+
+func ?! (_ svc: io_service_t?, _ svc2: io_service_t?) -> io_service_t? {
+    guard let svc, svc != 0 else {
+        return svc2
     }
-    return str
+    return svc
+}
+func ?! (_ svc: io_service_t?, _ svc2: io_service_t) -> io_service_t {
+    guard let svc, svc != 0 else {
+        return svc2
+    }
+    return svc
 }
 
 // MARK: - DisplayController
@@ -396,13 +394,6 @@ class DisplayController: ObservableObject {
 
     static var panelManager: MPDisplayMgr? = MPDisplayMgr()
     static var manualModeFromSyncMode = false
-
-    // static var builtinNitsCapObserver: IOServicePropertyObserver?
-    // static var builtinNitsCap: Int? = getBuiltinNitsCap() {
-    //     didSet {
-    //         displayController.builtinDisplay?.maxNits = builtinNitsCap
-    //     }
-    // }
 
     var averageDDCWriteNanoseconds: ThreadSafeDictionary<CGDirectDisplayID, UInt64> = ThreadSafeDictionary()
     var averageDDCReadNanoseconds: ThreadSafeDictionary<CGDirectDisplayID, UInt64> = ThreadSafeDictionary()
@@ -590,6 +581,21 @@ class DisplayController: ObservableObject {
             }
         }
     }
+
+    #if arch(arm64)
+        var nitsMappingSaver: DispatchWorkItem? {
+            didSet {
+                oldValue?.cancel()
+            }
+        }
+        var nitsMapping: [String: NitsMapping] = Defaults[.nitsMapping] {
+            didSet {
+                nitsMappingSaver = mainAsyncAfter(ms: 1000) {
+                    Defaults[.nitsMapping] = self.nitsMapping
+                }
+            }
+        }
+    #endif
 
     @Published var adaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode() {
         didSet {
@@ -930,34 +936,6 @@ class DisplayController: ObservableObject {
             return ManualMode.shared
         }
     }
-
-    static func getNitsCap(service: io_service_t) -> Int? {
-        var serviceProperties: Unmanaged<CFMutableDictionary>?
-        guard IORegistryEntryCreateCFProperties(service, &serviceProperties, kCFAllocatorDefault, IOOptionBits()) == KERN_SUCCESS,
-              let cfProps = serviceProperties,
-              let props = cfProps.takeRetainedValue() as? [String: Any],
-              let nitsLimit = props["property"] as? Int64
-        else {
-            return nil
-        }
-
-        return nitsLimit.i >> 16
-    }
-
-    // static func observeBacklightNitsCap() {
-    //     guard let builtinDisplayService = DisplayController.armBuiltinDisplayService() else {
-    //         return
-    //     }
-
-    //     builtinNitsCapObserver = IOServicePropertyObserver(service: builtinDisplayService, property: "property", throttle: .milliseconds(100)) {
-    //         guard let cap = DisplayController.getBuiltinNitsCap() else { return }
-
-    //         if cap != DisplayController.builtinNitsCap {
-    //             DisplayController.builtinNitsCap = cap
-    //             log.debug("New builtinNitsCap: \(cap)")
-    //         }
-    //     }
-    // }
 
     #if arch(arm64)
         static func armDisplayService(name: String) -> io_service_t? {
@@ -1971,12 +1949,12 @@ class DisplayController: ObservableObject {
 
         activeDisplayList.filter(\.faceLightEnabled).forEach { display in
             display.disableFaceLight(smooth: false)
-            display.save(now: true)
         }
         activeDisplayList.filter(\.blackOutEnabled).forEach { display in
             display.disableBlackOut()
-            display.save(now: true)
         }
+
+        datastore.storeDisplays(displayList, now: true)
 
         #if arch(arm64)
             en()
