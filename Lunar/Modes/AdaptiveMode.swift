@@ -217,7 +217,7 @@ extension AdaptiveMode {
         return self
     }
 
-    func adjustCurve(_ value: Double, factor: Double, minVal: Double = MIN_BRIGHTNESS.d, maxVal: Double = MAX_BRIGHTNESS.d) -> Double {
+    func adjustCurve(_ value: Double, factor: Double, minVal: Double = MIN_BRIGHTNESS_D, maxVal: Double = MAX_BRIGHTNESS_D) -> Double {
         guard maxVal != minVal else {
             return value
         }
@@ -239,8 +239,8 @@ extension AdaptiveMode {
     @inline(__always) func adjustCurveSIMD(
         _ value: [Double],
         factor: Double,
-        minVal: Double = MIN_BRIGHTNESS.d,
-        maxVal: Double = MAX_BRIGHTNESS.d
+        minVal: Double = MIN_BRIGHTNESS_D,
+        maxVal: Double = MAX_BRIGHTNESS_D
     ) -> [Double] {
         guard maxVal != minVal else {
             return value
@@ -312,8 +312,8 @@ extension AdaptiveMode {
 
         let values = mapNumberSIMD(
             curve,
-            fromLow: MIN_BRIGHTNESS.d,
-            fromHigh: MAX_BRIGHTNESS.d,
+            fromLow: MIN_BRIGHTNESS_D,
+            fromHigh: MAX_BRIGHTNESS_D,
             toLow: minVal ?? minValue,
             toHigh: maxVal ?? maxValue
         )
@@ -360,11 +360,10 @@ extension AdaptiveMode {
             let sorted = userValues.sorted(by: { pair1, pair2 in pair1.key <= pair2.key })
             let userValueBefore = (
                 sorted.last(where: { dataPoint, _ in dataPoint <= value })
-                    ?? (key: dataPoint.min, value: MIN_BRIGHTNESS.d - 100)
+                    ?? (key: dataPoint.min, value: MIN_BRIGHTNESS_D - 100)
             )
             let userValueAfter = (
-                sorted.first(where: { dataPoint, _ in dataPoint > value })
-                    ?? (key: dataPoint.max, value: MAX_BRIGHTNESS.d)
+                sorted.first(where: { dataPoint, _ in dataPoint > value }) ?? (key: dataPoint.max, value: MAX_BRIGHTNESS_D)
             )
 
             let sourceLow = userValueBefore.key
@@ -386,29 +385,102 @@ extension AdaptiveMode {
                     "NaN value?? Whyy?? WHAT DID I DO??",
                     context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset]
                 )
-                newValue = cap(value, minVal: MIN_BRIGHTNESS.d - 100, maxVal: MAX_BRIGHTNESS.d)
+                newValue = cap(value, minVal: MIN_BRIGHTNESS_D - 100, maxVal: MAX_BRIGHTNESS_D)
             }
         }
 
-        newValue = cap(newValue + offset.d, minVal: MIN_BRIGHTNESS.d - (applySubzero ? 100 : 0), maxVal: MAX_BRIGHTNESS.d)
+        newValue = cap(newValue + offset.d, minVal: MIN_BRIGHTNESS_D - (applySubzero ? 100 : 0), maxVal: MAX_BRIGHTNESS_D)
 
         if newValue.isNaN {
             log.error(
                 "NaN value?? WHAAT?? AGAIN?!",
                 context: ["value": value, "minValue": minValue, "maxValue": maxValue, "monitorValue": monitorValue, "offset": offset]
             )
-            newValue = cap(value, minVal: MIN_BRIGHTNESS.d - (applySubzero ? 100 : 0), maxVal: MAX_BRIGHTNESS.d)
+            newValue = cap(value, minVal: MIN_BRIGHTNESS_D - (applySubzero ? 100 : 0), maxVal: MAX_BRIGHTNESS_D)
         }
 
         return mapNumber(
             newValue,
-            fromLow: MIN_BRIGHTNESS.d - (applySubzero ? 100 : 0),
-            fromHigh: MAX_BRIGHTNESS.d,
+            fromLow: MIN_BRIGHTNESS_D - (applySubzero ? 100 : 0),
+            fromHigh: MAX_BRIGHTNESS_D,
             toLow: minValue - (applySubzero ? (newValue < 0 ? 90 : 100) : 0),
             toHigh: maxValue
         )
     }
 
+    #if arch(arm64)
+        func interpolate(nits: Int, display: Display, nitsLimit: Int) -> Double {
+            let applySubzero = display.adaptiveSubzero
+            let minNits = display.minNits.d
+            let maxNits = display.maxNits.d
+            let nits = nits.d
+            let nitsLimit = nitsLimit.d
+
+            guard let nitsMapping = displayController.nitsMapping[display.serial] else {
+                if applySubzero, nits < minNits {
+                    return mapNumber(nits, fromLow: -100, fromHigh: minNits, toLow: -100, toHigh: 0)
+                }
+
+                return cap(nits, minVal: minNits, maxVal: maxNits)
+            }
+
+            let minTarget = applySubzero ? -100 : minNits
+            let source = cap(nitsMapping.source.d, minVal: -100, maxVal: nitsLimit)
+            let target = cap(nitsMapping.target.d, minVal: minTarget, maxVal: maxNits)
+
+            if source == nits {
+                return target
+            }
+            if applySubzero, nits == -100 {
+                return -100
+            }
+            if nits == nitsLimit {
+                return maxNits
+            }
+
+            if nits < source {
+                if target <= minTarget { return minTarget }
+                return mapNumber(nits, fromLow: -100, fromHigh: source, toLow: minTarget, toHigh: target)
+            }
+
+            if source >= nitsLimit || target >= maxNits {
+                return maxNits
+            }
+            return mapNumber(nits, fromLow: source, fromHigh: nitsLimit, toLow: target, toHigh: maxNits)
+            // if let userValue = display.nitsMap[nits] {
+            //     newValue = userValue
+            // } else {
+            //     let sorted = display.nitsMap.sorted(by: { pair1, pair2 in pair1.key <= pair2.key })
+            //     let userValueBefore = (
+            //         sorted.last(where: { dataPoint, _ in dataPoint <= nits }) ?? (key: -100, value: -100)
+            //     )
+            //     let userValueAfter = (
+            //         sorted.first(where: { dataPoint, _ in dataPoint > nits }) ?? (key: MAX_NITS, value: MAX_NITS)
+            //     )
+
+            //     let sourceLow = userValueBefore.key
+            //     let sourceHigh = userValueAfter.key
+            //     let targetLow = userValueBefore.value
+            //     let targetHigh = userValueAfter.value
+
+            //     if sourceLow == sourceHigh || targetLow == targetHigh {
+            //         newValue = targetLow
+            //     } else {
+            //         newValue = mapNumber(nits, fromLow: sourceLow, fromHigh: sourceHigh, toLow: targetLow, toHigh: targetHigh)
+            //     }
+            //     if newValue.isNaN {
+            //         log.error("NaN value?? Whyy?? WHAT DID I DO??", context: ["nits": nits])
+            //         return cap(nits, minVal: minNits, maxVal: maxNits)
+            //     }
+            // }
+
+            // if applySubzero, nits < minNits {
+            //     return mapNumber(nits, fromLow: -100, fromHigh: minNits, toLow: -100, toHigh: 0)
+            // }
+
+            // return cap(newValue, minVal: minNits, maxVal: maxNits)
+        }
+    #endif
     func interpolate(
         values: inout [Double: Double],
         dataPoint: DataPoint,
@@ -416,7 +488,7 @@ extension AdaptiveMode {
         offset: Float = 0.0
     ) -> [Double] {
         if values[dataPoint.max] == nil, !values.keys.contains(where: { $0 > dataPoint.max }) {
-            values[dataPoint.max] = MAX_BRIGHTNESS.d
+            values[dataPoint.max] = MAX_BRIGHTNESS_D
         }
 
         let sorted = values.sorted(by: { pair1, pair2 in pair1.key <= pair2.key })

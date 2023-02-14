@@ -245,5 +245,13 @@ extension Defaults.Keys {
 
     #if arch(arm64)
         static let possiblyDisconnectedDisplays = Key<[Display]>("possiblyDisconnectedDisplays", default: [])
+        static let nitsMapping = Key<[String: NitsMapping]>("nitsMapping", default: [:])
     #endif
 }
+
+#if arch(arm64)
+    struct NitsMapping: Codable, Defaults.Serializable, Equatable {
+        let source: Int
+        let target: Int
+    }
+#endif

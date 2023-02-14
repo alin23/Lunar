@@ -24,6 +24,12 @@ extension Defaults.Keys {
     static let secure = Key<SecureSettings>("secure", default: SecureSettings())
 }
 
+#if arch(arm64)
+    let ARM_KEYS: [Defaults.Keys] = [.nitsMapping]
+#else
+    let ARM_KEYS: [Defaults.Keys] = []
+#endif
+
 let APP_SETTINGS: [Defaults.Keys] = [
     .oldHdrWorkaround,
     .oldAutoXdr,
@@ -183,7 +189,8 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .ctrlBrightnessKeysControl,
     .shiftBrightnessKeysSyncControl,
     .shiftBrightnessKeysControl,
-]
+
+] + ARM_KEYS
 
 // MARK: - DDCSleepFactor
 
@@ -956,3 +963,8 @@ let ddcSleepFactorPublisher = Defaults.publisher(.ddcSleepFactor).dropFirst().re
     .filter { $0.oldValue != $0.newValue }
 let updateChannelPublisher = Defaults.publisher(.updateChannel).dropFirst().removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
+
+#if arch(arm64)
+    let nitsMappingPublisher = Defaults.publisher(.nitsMapping).dropFirst().removeDuplicates()
+        .filter { $0.oldValue != $0.newValue }
+#endif
