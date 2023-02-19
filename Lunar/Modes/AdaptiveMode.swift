@@ -414,71 +414,32 @@ extension AdaptiveMode {
             let minNits = display.minNits.d
             let maxNits = display.maxNits.d
             let nits = nits.d
-            let nitsLimit = nitsLimit.d
 
-            guard let nitsMapping = displayController.nitsMapping[display.serial] else {
+            guard let spline = displayController.brightnessSplines[display.serial] else {
+                let result: Double
                 if applySubzero, nits < minNits {
-                    return mapNumber(nits, fromLow: -100, fromHigh: minNits, toLow: -100, toHigh: 0)
+                    result = mapNumber(nits, fromLow: -100, fromHigh: minNits, toLow: -100, toHigh: 0)
+                    if result.isNaN {
+                        log.error("NaN value?? Whyy?? WHAT DID I DO??", context: ["nits": nits])
+                        return cap(nits, minVal: minNits, maxVal: maxNits)
+                    }
+
+                    return result
                 }
 
                 return cap(nits, minVal: minNits, maxVal: maxNits)
             }
 
-            let minTarget = applySubzero ? -100 : minNits
-            let source = cap(nitsMapping.source.d, minVal: -100, maxVal: nitsLimit)
-            let target = cap(nitsMapping.target.d, minVal: minTarget, maxVal: maxNits)
-
-            if source == nits {
-                return target
-            }
-            if applySubzero, nits == -100 {
-                return -100
-            }
-            if nits == nitsLimit {
-                return maxNits
+            if nits >= maxNits || nits == -100 {
+                return nits
             }
 
-            if nits < source {
-                if target <= minTarget { return minTarget }
-                return mapNumber(nits, fromLow: -100, fromHigh: source, toLow: minTarget, toHigh: target)
+            let result = spline(nits)
+            if minNits > 0, result < minNits {
+                return mapNumber(result, fromLow: -100, fromHigh: minNits, toLow: -100, toHigh: 0)
             }
 
-            if source >= nitsLimit || target >= maxNits {
-                return maxNits
-            }
-            return mapNumber(nits, fromLow: source, fromHigh: nitsLimit, toLow: target, toHigh: maxNits)
-            // if let userValue = display.nitsMap[nits] {
-            //     newValue = userValue
-            // } else {
-            //     let sorted = display.nitsMap.sorted(by: { pair1, pair2 in pair1.key <= pair2.key })
-            //     let userValueBefore = (
-            //         sorted.last(where: { dataPoint, _ in dataPoint <= nits }) ?? (key: -100, value: -100)
-            //     )
-            //     let userValueAfter = (
-            //         sorted.first(where: { dataPoint, _ in dataPoint > nits }) ?? (key: MAX_NITS, value: MAX_NITS)
-            //     )
-
-            //     let sourceLow = userValueBefore.key
-            //     let sourceHigh = userValueAfter.key
-            //     let targetLow = userValueBefore.value
-            //     let targetHigh = userValueAfter.value
-
-            //     if sourceLow == sourceHigh || targetLow == targetHigh {
-            //         newValue = targetLow
-            //     } else {
-            //         newValue = mapNumber(nits, fromLow: sourceLow, fromHigh: sourceHigh, toLow: targetLow, toHigh: targetHigh)
-            //     }
-            //     if newValue.isNaN {
-            //         log.error("NaN value?? Whyy?? WHAT DID I DO??", context: ["nits": nits])
-            //         return cap(nits, minVal: minNits, maxVal: maxNits)
-            //     }
-            // }
-
-            // if applySubzero, nits < minNits {
-            //     return mapNumber(nits, fromLow: -100, fromHigh: minNits, toLow: -100, toHigh: 0)
-            // }
-
-            // return cap(newValue, minVal: minNits, maxVal: maxNits)
+            return result
         }
     #endif
     func interpolate(

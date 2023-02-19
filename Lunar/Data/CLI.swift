@@ -460,6 +460,34 @@ struct Lunar: ParsableCommand {
         }
     }
 
+    #if arch(arm64)
+        struct Nits: ParsableCommand {
+            static let configuration = CommandConfiguration(
+                abstract: "Prints luminance mapping data for Sync Mode when nits readings are available."
+            )
+
+            @OptionGroup(visibility: .hidden) var globals: GlobalOptions
+
+            func run() throws {
+                Lunar.configureLogging(options: globals)
+
+                displayController.activeDisplayList.forEach { d in
+                    cliPrint("""
+                    \(d.name)
+                      ID:\t\t\(d.id)
+                      UUID:\t\t\(d.serial)
+                      minNits:\t\(d.minNits)
+                      maxNits:\t\(d.maxNits)
+                      nitsMap:\t\(displayController.nitsMapping[d.serial]?.json ?? "None")
+
+                    """)
+                }
+
+                return cliExit(0)
+            }
+        }
+    #endif
+
     struct Ddcctl: ParsableCommand {
         static let configuration = CommandConfiguration(
             abstract: "Control monitors using the ddcctl utility: https://github.com/kfix/ddcctl"
@@ -1438,6 +1466,7 @@ struct Lunar: ParsableCommand {
     }
 
     #if arch(arm64)
+        @available(macOS 13, *)
         struct Disconnect: ParsableCommand {
             static let configuration = CommandConfiguration(
                 abstract: "Disconnects screens without cutting power or closing the lid.",
@@ -1471,6 +1500,7 @@ struct Lunar: ParsableCommand {
             }
         }
 
+        @available(macOS 13, *)
         struct Connect: ParsableCommand {
             static let configuration = CommandConfiguration(
                 abstract: "Reconnects screens that were previously disconnected using Lunar.",
@@ -1520,6 +1550,8 @@ struct Lunar: ParsableCommand {
                 cliExit(0)
             }
         }
+
+        @available(macOS 13, *)
         struct ToggleConnection: ParsableCommand {
             static let configuration = CommandConfiguration(
                 abstract: "Disconnects screens without cutting power or closing the lid, or reconnects screens that were previously disconnected using Lunar.",
@@ -1590,7 +1622,13 @@ struct Lunar: ParsableCommand {
     #endif
 
     #if arch(arm64)
-        static let ARCH_SPECIFIC_COMMANDS: [ParsableCommand.Type] = [Disconnect.self, Connect.self, ToggleConnection.self]
+        static let ARCH_SPECIFIC_COMMANDS: [ParsableCommand.Type] = {
+            if #available(macOS 13, *) {
+                return [Disconnect.self, Connect.self, ToggleConnection.self, Nits.self]
+            } else {
+                return [Nits.self]
+            }
+        }()
     #else
         static let ARCH_SPECIFIC_COMMANDS: [ParsableCommand.Type] = []
     #endif
@@ -1698,14 +1736,25 @@ struct Lunar: ParsableCommand {
         case let cmd as DisplayUuid:
             return cmd.globals
         #if arch(arm64)
-            case let cmd as Disconnect:
-                return cmd.globals
-            case let cmd as Connect:
-                return cmd.globals
-            case let cmd as ToggleConnection:
+            case let cmd as Nits:
                 return cmd.globals
         #endif
         default:
+            #if arch(arm64)
+                if #available(macOS 13, *) {
+                    switch command {
+                    case let cmd as Disconnect:
+                        return cmd.globals
+                    case let cmd as Connect:
+                        return cmd.globals
+                    case let cmd as ToggleConnection:
+                        return cmd.globals
+                    default:
+                        return nil
+                    }
+                }
+            #endif
+
             return nil
         }
     }
@@ -1915,14 +1964,20 @@ private func handleDisplays(
             log.debug("Changing \(property.rawValue) from \(propertyValue) to \(value)")
             switch propertyValue {
             case is String:
-                display.setValue(value, forKey: property.rawValue)
+                display.withForce {
+                    display.setValue(value, forKey: property.rawValue)
+                }
                 display.save(now: true)
             case is NSNumber
                 where property == .input || property == .hotkeyInput1 || property == .hotkeyInput2 || property == .hotkeyInput3:
                 guard let input = VideoInputSource(rawValue: (value.i ?? 0).u16) ?? VideoInputSource(stringValue: value) else {
                     throw LunarCommandError.invalidValue("Unknown input \(value)")
                 }
-                display.setValue(input.rawValue.ns, forKey: property.rawValue)
+
+                display.withForce {
+                    display.setValue(input.rawValue.ns, forKey: property.rawValue)
+                }
+
                 display.save(now: true)
                 display.control?.write(property, input)
             case let currentValue as Bool where Display.CodingKeys.bool.contains(property):
@@ -1937,7 +1992,11 @@ private func handleDisplays(
                 default:
                     throw LunarCommandError.invalidValue("\(value) is not a boolean")
                 }
-                display.setValue(newValue, forKey: property.rawValue)
+
+                display.withForce {
+                    display.setValue(newValue, forKey: property.rawValue)
+                }
+
                 display.save(now: true)
                 if property == .power {
                     display.control?.write(property, newValue ? PowerState.on : PowerState.off)
@@ -2038,7 +2097,10 @@ private func handleDisplays(
                 case .xdrBrightness:
                     display.xdrBrightness = value.floatValue
                 default:
-                    display.setValue(value, forKey: property.rawValue)
+                    display.withForce {
+                        display.setValue(value, forKey: property.rawValue)
+                    }
+
                     if Display.CodingKeys.settableWithControl.contains(property) {
                         display.control?.write(property, value.uint16Value)
                     }

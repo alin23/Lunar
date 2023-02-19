@@ -1566,12 +1566,16 @@ extension AppDelegate: MediaKeyTapDelegate {
         increaseVolume(by: offset, currentDisplay: !allMonitors && !hasAudioDisplay, currentAudioDisplay: !allMonitors && hasAudioDisplay)
 
         if allMonitors {
-            toggleAudioMuted(for: displayController.externalActiveDisplays.filter(\.audioMuted))
+            let muted = displayController.externalActiveDisplays.filter(\.audioMuted)
+            if !muted.isEmpty {
+                toggleAudioMuted(for: muted, currentAudioDisplay: false)
+            }
+
             displayController.externalActiveDisplays.forEach { d in
                 Hotkey.showOsd(osdImage: volumeOsdImage(display: d), value: d.volume.uint32Value, display: d)
             }
         } else if let display = displayController.currentAudioDisplay ?? displayController.cursorDisplay, !display.isBuiltin {
-            if display.audioMuted { toggleAudioMuted(for: [display]) }
+            if display.audioMuted { toggleAudioMuted(for: [display], currentAudioDisplay: false) }
             Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, display: display)
         }
 
@@ -1585,12 +1589,16 @@ extension AppDelegate: MediaKeyTapDelegate {
         decreaseVolume(by: offset, currentDisplay: !allMonitors && !hasAudioDisplay, currentAudioDisplay: !allMonitors && hasAudioDisplay)
 
         if allMonitors {
-            toggleAudioMuted(for: displayController.externalActiveDisplays.filter(\.audioMuted))
+            let muted = displayController.externalActiveDisplays.filter(\.audioMuted)
+            if !muted.isEmpty {
+                toggleAudioMuted(for: muted, currentAudioDisplay: false)
+            }
+
             displayController.externalActiveDisplays.forEach { d in
                 Hotkey.showOsd(osdImage: volumeOsdImage(display: d), value: d.volume.uint32Value, display: d)
             }
         } else if let display = displayController.currentAudioDisplay ?? displayController.cursorDisplay, !display.isBuiltin {
-            if display.audioMuted { toggleAudioMuted(for: [display]) }
+            if display.audioMuted { toggleAudioMuted(for: [display], currentAudioDisplay: false) }
             Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, display: display)
         }
 

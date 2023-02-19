@@ -1035,9 +1035,13 @@ class ControlChoiceViewController: NSViewController {
             ) {}
 
             self.displayProgressStep = 1.0 / displayController.externalActiveDisplays.count.d
-            displayController.externalActiveDisplays.enumerated().forEach { i, d in
-                self.testDisplay(d, index: i)
-            }
+            displayController.externalActiveDisplays
+                .filter { d in
+                    !d.isSidecar && !d.isAirplay
+                }
+                .enumerated().forEach { i, d in
+                    self.testDisplay(d, index: i)
+                }
 
             self.queueChange {
                 displayController.externalActiveDisplays.forEach { d in

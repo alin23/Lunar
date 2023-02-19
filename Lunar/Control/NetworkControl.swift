@@ -268,7 +268,7 @@ class NetworkControl: Control {
                   let serialString = txt["\(displayNum):serial"], let serial = Int(serialString),
                   let yearString = txt["\(displayNum):year"], let year = Int(yearString),
                   let productString = txt["\(displayNum):product"], let productID = Int(productString)
-            else { return }
+            else { continue }
 
             guard let display = displayController.getMatchingDisplay(
                 name: name, serial: serial, productID: productID,
@@ -277,7 +277,7 @@ class NetworkControl: Control {
             ),
                 shouldPromptForNetworkControl(display)
             else {
-                return
+                continue
             }
             asyncNow { promptForNetworkControl(displayNum, netService: netService, display: display) }
         }

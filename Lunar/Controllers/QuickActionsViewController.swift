@@ -12,7 +12,7 @@ import Defaults
 import Surge
 import SwiftUI
 
-var appInfoHiddenAfterLaunch = false
+var appInfoHiddenAfterLaunch = true
 
 prefix func ! (value: Binding<Bool>) -> Binding<Bool> {
     Binding<Bool>(
@@ -50,6 +50,12 @@ struct PowerOffButtonView: View {
                 hoveringPowerButton = true
                 return
             }
+
+            guard neverShowBlackoutPopover else {
+                hoveringPowerButton = true
+                return
+            }
+
             display.powerOff()
         }) {
             Image(systemName: "power").font(.system(size: 10, weight: .heavy))
@@ -60,11 +66,11 @@ struct PowerOffButtonView: View {
             horizontalPadding: 3,
             verticalPadding: 3
         ))
-        .onHover { hovering in
-            if !hoveringPowerButton, hovering {
-                hoveringPowerButton = hovering && !neverShowBlackoutPopover
-            }
-        }
+        // .onHover { hovering in
+        //     if !hoveringPowerButton, hovering {
+        //         hoveringPowerButton = hovering && !neverShowBlackoutPopover
+        //     }
+        // }
         .popover(isPresented: $hoveringPowerButton) {
             BlackoutPopoverView(hasDDC: display.hasDDC).onDisappear {
                 if !neverShowBlackoutPopover {
@@ -76,6 +82,7 @@ struct PowerOffButtonView: View {
 }
 
 #if arch(arm64)
+    @available(macOS 13, *)
     struct ReconnectButtonView: View {
         @State var display: CGDirectDisplayID
         @State var hoveringPowerButton = false
@@ -97,6 +104,7 @@ struct PowerOffButtonView: View {
             ))
         }
     }
+    @available(macOS 13, *)
     struct DisconnectedDisplayView: View {
         @Environment(\.colors) var colors
 
@@ -133,12 +141,18 @@ struct DisplayRowView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.colors) var colors
     @Default(.showSliderValues) var showSliderValues
+    #if arch(arm64)
+        @Default(.showSliderValuesNits) var showSliderValuesNits
+        @Default(.syncNits) var syncNits
+    #endif
     @Default(.showInputInQuickActions) var showInputInQuickActions
     @Default(.showPowerInQuickActions) var showPowerInQuickActions
     @Default(.showXDRSelector) var showXDRSelector
     @Default(.showRawValues) var showRawValues
     @Default(.xdrTipShown) var xdrTipShown
     @Default(.autoXdr) var autoXdr
+    @Default(.syncMode) var syncMode
+    @Default(.syncPollingSeconds) var syncPollingSeconds
 
     @State var showNeedsLunarPro = false
     @State var showXDRTip = false
@@ -242,7 +256,7 @@ struct DisplayRowView: View {
 
     var body: some View {
         VStack(spacing: 4) {
-            let xdrSelectorShown = display.supportsEnhance && showXDRSelector
+            let xdrSelectorShown = display.supportsEnhance && showXDRSelector && !display.blackOutEnabled
             if showPowerInQuickActions, display.getPowerOffEnabled() {
                 ZStack(alignment: .topTrailing) {
                     Text(display.name)
@@ -262,44 +276,53 @@ struct DisplayRowView: View {
 
             if xdrSelectorShown { sdrXdrSelector }
 
-            if display.noDDCOrMergedBrightnessContrast {
-                let mergedLockBinding = Binding<Bool>(
-                    get: { display.lockedBrightness && display.lockedContrast },
-                    set: { locked in
-                        display.lockedBrightness = locked
-                        display.lockedContrast = locked
-                    }
-                )
-                BigSurSlider(
-                    percentage: $display.preciseBrightnessContrast.f,
-                    image: "sun.max.fill",
-                    colorBinding: .constant(colors.accent),
-                    backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
-                    showValue: $showSliderValues,
-                    disabled: mergedLockBinding,
-                    enableText: "Unlock"
-                )
-                softwareSliders
-            } else {
-                BigSurSlider(
-                    percentage: $display.preciseBrightness.f,
-                    image: "sun.max.fill",
-                    colorBinding: .constant(colors.accent),
-                    backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
-                    showValue: $showSliderValues,
-                    disabled: $display.lockedBrightness,
-                    enableText: "Unlock"
-                )
-                softwareSliders
-                BigSurSlider(
-                    percentage: $display.preciseContrast.f,
-                    image: "circle.righthalf.fill",
-                    colorBinding: .constant(colors.accent),
-                    backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
-                    showValue: $showSliderValues,
-                    disabled: $display.lockedContrast,
-                    enableText: "Unlock"
-                )
+            #if arch(arm64)
+                let shownValue = (showSliderValuesNits && syncNits && syncMode && syncPollingSeconds == 0) ? $display.nits : nil
+            #else
+                let shownValue: Binding<Int?>? = nil
+            #endif
+            if !display.blackOutEnabled {
+                if display.noDDCOrMergedBrightnessContrast {
+                    let mergedLockBinding = Binding<Bool>(
+                        get: { display.lockedBrightness && display.lockedContrast },
+                        set: { locked in
+                            display.lockedBrightness = locked
+                            // display.lockedContrast = locked
+                        }
+                    )
+                    BigSurSlider(
+                        percentage: $display.preciseBrightnessContrast.f,
+                        image: "sun.max.fill",
+                        colorBinding: .constant(colors.accent),
+                        backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                        showValue: $showSliderValues,
+                        shownValue: shownValue,
+                        disabled: mergedLockBinding,
+                        enableText: "Unlock"
+                    )
+                    softwareSliders
+                } else {
+                    BigSurSlider(
+                        percentage: $display.preciseBrightness.f,
+                        image: "sun.max.fill",
+                        colorBinding: .constant(colors.accent),
+                        backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                        showValue: $showSliderValues,
+                        shownValue: shownValue,
+                        disabled: $display.lockedBrightness,
+                        enableText: "Unlock"
+                    )
+                    softwareSliders
+                    BigSurSlider(
+                        percentage: $display.preciseContrast.f,
+                        image: "circle.righthalf.fill",
+                        colorBinding: .constant(colors.accent),
+                        backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                        showValue: $showSliderValues,
+                        disabled: $display.lockedContrast,
+                        enableText: "Unlock"
+                    )
+                }
             }
 
             if display.hasDDC, display.showVolumeSlider, display.ddcEnabled || display.networkEnabled {
@@ -694,6 +717,43 @@ struct AdvancedSettingsView: View {
                 }
                 Divider()
                 Group {
+                    #if arch(arm64)
+                        if #available(macOS 13, *) {
+                            SettingsToggle(
+                                text: "Disconnect displays in BlackOut", setting: $newBlackOutDisconnect,
+                                help: """
+                                Instead of mirroring the display to disable it, Lunar can also
+                                disconnect the display entirely, freeing up GPU resources.
+
+                                This uses a hidden macOS API that's not guaranteed to work all the time.
+
+                                In case the built-in MacBook display doesn't reconnect itself when it should,
+                                close the laptop lid and reopen it to bring the display back.
+
+                                For external displays, disconnect and reconnect the cable to fix any issue.
+                                """
+                            )
+                        }
+                    #endif
+
+                    SettingsToggle(
+                        text: "Allow BlackOut on single screen", setting: $allowBlackOutOnSingleScreen,
+                        help: "Allows turning off a screen even if it's the only visible screen left"
+                    )
+
+                    SettingsToggle(
+                        text: "Switch to the old BlackOut mirroring system", setting: $oldBlackOutMirroring,
+                        help: """
+                        Some setups will have trouble enabling mirroring with the new macOS 11+ API.
+
+                        You can try enabling this option if BlackOut is not working properly.
+
+                        Note: the old mirroring system can't handle complex mirror sets with dummies and virtual/wireless displays.
+                        The best covered cases are "BlackOut built-in display" and "BlackOut only external displays".
+                        """
+                    )
+                    Divider()
+
                     SettingsToggle(
                         text: "Use workaround for built-in display", setting: $workaroundBuiltinDisplay,
                         help: """
@@ -709,22 +769,6 @@ struct AdvancedSettingsView: View {
                           • Sub-zero Dimming
                         """
                     )
-                    SettingsToggle(
-                        text: "Allow BlackOut on single screen", setting: $allowBlackOutOnSingleScreen,
-                        help: "Allows turning off a screen even if it's the only visible screen left"
-                    )
-                    SettingsToggle(
-                        text: "Switch to the old BlackOut mirroring system", setting: $oldBlackOutMirroring,
-                        help: """
-                        Some setups will have trouble enabling mirroring with the new macOS 11+ API.
-
-                        You can try enabling this option if BlackOut is not working properly.
-
-                        Note: the old mirroring system can't handle complex mirror sets with dummies and virtual/wireless displays.
-                        The best covered cases are "BlackOut built-in display" and "BlackOut only external displays".
-                        """
-                    )
-
                     SettingsToggle(
                         text: "Toggle Manual/Sync when the lid is closed/opened",
                         setting: $clamshellModeDetection
@@ -792,20 +836,6 @@ struct AdvancedSettingsView: View {
                         Text("Don't use unless really needed or asked by the developer")
                             .foregroundColor(Colors.red)
                             .font(.caption)
-                        #if arch(arm64)
-                            SettingsToggle(
-                                text: "Disconnect built-in display in Auto BlackOut", setting: $newBlackOutDisconnect,
-                                help: """
-                                Instead of mirroring the display to disable it, Lunar can also
-                                disconnect the built-in display entirely, freeing up GPU resources.
-
-                                This uses a hidden macOS API that's not guaranteed to work all the time.
-
-                                In case the built-in display doesn't reconnect itself when it should,
-                                close the laptop lid and reopen it to bring the display back.
-                                """
-                            )
-                        #endif
                         SettingsToggle(
                             text: "Refresh values from monitor settings", setting: $refreshValues,
                             help: """
@@ -928,6 +958,9 @@ struct QuickActionsLayoutView: View {
     @ObservedObject var dc: DisplayController = displayController
 
     @Default(.showSliderValues) var showSliderValues
+    #if arch(arm64)
+        @Default(.showSliderValuesNits) var showSliderValuesNits
+    #endif
     @Default(.mergeBrightnessContrast) var mergeBrightnessContrast
     @Default(.showVolumeSlider) var showVolumeSlider
     @Default(.showRawValues) var showRawValues
@@ -957,6 +990,10 @@ struct QuickActionsLayoutView: View {
                     Divider()
                     Group {
                         SettingsToggle(text: "Show slider values", setting: $showSliderValues.animation(.fastSpring))
+                        #if arch(arm64)
+                            SettingsToggle(text: "Show brightness in nits when possible", setting: $showSliderValuesNits.animation(.fastSpring))
+                                .padding(.leading)
+                        #endif
                         SettingsToggle(text: "Show volume slider", setting: $showVolumeSlider.animation(.fastSpring))
                         SettingsToggle(text: "Show rotation selector", setting: $showOrientationInQuickActions.animation(.fastSpring))
                         SettingsToggle(text: "Show input source selector", setting: $showInputInQuickActions.animation(.fastSpring))
@@ -1094,35 +1131,47 @@ struct PaddedPopoverView<Content>: View where Content: View {
 struct BlackoutPopoverView: View {
     @State var hasDDC: Bool
     @Default(.hotkeys) var hotkeys
+    @Default(.newBlackOutDisconnect) var newBlackOutDisconnect
 
     var body: some View {
         ZStack {
             Color.black.brightness(0.02).scaleEffect(1.5)
             VStack(alignment: .leading, spacing: 10) {
                 BlackoutPopoverHeaderView().padding(.bottom)
-                BlackoutPopoverRowView(action: "Soft power off", hotkeyText: hotkeyText(id: .blackOut), actionInfo: "(with mirroring)")
+                if newBlackOutDisconnect, #available(macOS 13, *) {
+                    BlackoutPopoverRowView(action: "Disconnect screen", hotkeyText: hotkeyText(id: .blackOut), actionInfo: "(free up GPU)")
+                } else {
+                    BlackoutPopoverRowView(action: "Soft power off", hotkeyText: hotkeyText(id: .blackOut), actionInfo: "(disables screen by mirroring)")
+                }
                 BlackoutPopoverRowView(
                     modifiers: ["Shift"],
-                    action: "Soft power off",
+                    action: "Make screen black",
                     hotkeyText: hotkeyText(id: .blackOutNoMirroring),
-                    actionInfo: "(without mirroring)"
+                    actionInfo: "(without disabling it)"
                 )
                 BlackoutPopoverRowView(
                     modifiers: ["Option", "Shift"],
-                    action: "Soft power off other displays",
+                    action: "Make other screens black",
                     hotkeyText: hotkeyText(id: .blackOutOthers),
-                    actionInfo: "(without mirroring)"
+                    actionInfo: "(keep this one visible)"
                 )
 
                 #if arch(arm64)
-                    Divider().background(Color.white.opacity(0.2))
-                    BlackoutPopoverRowView(
-                        modifiers: ["Command"],
-                        action: "Disconnect screen",
-                        hotkeyText: "",
-                        actionInfo: "(free up GPU)"
-                    )
-                    .colorMultiply(Color.orange)
+                    if #available(macOS 13, *) {
+                        Divider().background(Color.white.opacity(0.2))
+                        if newBlackOutDisconnect {
+                            BlackoutPopoverRowView(modifiers: ["Command"], action: "Soft power off", hotkeyText: "", actionInfo: "(disables screen by mirroring)")
+                                .colorMultiply(Color.orange)
+                        } else {
+                            BlackoutPopoverRowView(
+                                modifiers: ["Command"],
+                                action: "Disconnect screen",
+                                hotkeyText: "",
+                                actionInfo: "(free up GPU)"
+                            )
+                            .colorMultiply(Color.orange)
+                        }
+                    }
                 #endif
 
                 if hasDDC {
@@ -1263,6 +1312,8 @@ struct QuickActionsMenuView: View {
     @State var displays: [Display] = displayController.nonCursorDisplays
     @State var cursorDisplay: Display? = displayController.cursorDisplay
     #if arch(arm64)
+        @State var sourceDisplay: Display? = displayController.sourceDisplay
+        @State var nonSourceDisplays: [Display] = displayController.activeDisplayList.filter(!\.isSource)
         @State var disconnectedDisplays: [Display] = displayController.possiblyDisconnectedDisplayList
     #endif
     @State var adaptiveModes: [AdaptiveModeKey] = [.sensor, .sync, .location, .clock, .manual, .auto]
@@ -1376,13 +1427,24 @@ struct QuickActionsMenuView: View {
             ZStack {
                 VStack(spacing: 5) {
                     HStack {
-                        Toggle(showAdditionalInfo ? "Hide app info" : "App info", isOn: $showAdditionalInfo.animation(.fastSpring))
+                        Toggle("App info", isOn: $showAdditionalInfo.animation(.fastSpring))
                             .toggleStyle(DetailToggleStyle(style: .circle))
                             .foregroundColor(Color.secondary)
                             .font(.system(size: 12, weight: .semibold))
                             .fixedSize()
 
                         Spacer()
+
+//                        SwiftUI.Button("Calibrate") {
+//                            if dc.calibrating {
+//                                dc.stopCalibration()
+//                            } else {
+//                                dc.startCalibration()
+//                            }
+//                        }
+//                        .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+//                        .font(.system(size: 12, weight: .medium, design: .rounded))
+//                        .fixedSize()
 
                         SwiftUI.Button("Preferences") { appDelegate!.showPreferencesWindow(sender: nil) }
                             .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
@@ -1537,12 +1599,14 @@ struct QuickActionsMenuView: View {
             }
 
             #if arch(arm64)
-                ForEach(disconnectedDisplays) { d in
-                    DisconnectedDisplayView(id: d.id, name: d.name).padding(.vertical, 7)
-                }
+                if #available(macOS 13, *) {
+                    ForEach(disconnectedDisplays) { d in
+                        DisconnectedDisplayView(id: d.id, name: d.name).padding(.vertical, 7)
+                    }
 
-                if Sysctl.isMacBook, cursorDisplay?.id != 1, !displays.contains(where: { $0.id == 1 }), !disconnectedDisplays.contains(where: { $0.id == 1 }) {
-                    DisconnectedDisplayView(id: 1, name: "Built-in").padding(.vertical, 7)
+                    if Sysctl.isMacBook, cursorDisplay?.id != 1, !displays.contains(where: { $0.id == 1 }), !disconnectedDisplays.contains(where: { $0.id == 1 }) {
+                        DisconnectedDisplayView(id: 1, name: "Built-in").padding(.vertical, 7)
+                    }
                 }
             #endif
 
@@ -1567,11 +1631,23 @@ struct QuickActionsMenuView: View {
                 optionsMenu.padding(.leading, 20)
                     .matchedGeometryEffect(id: "options-menu", in: namespace)
             }
-
+            // ZStack {
             VStack {
+                // if dc.calibrating {
+                //     VStack(spacing: 15) {
+                //         calibrations
+                //         SwiftUI.Button("Finish calibration") { dc.stopCalibration() }
+                //             .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                //             .font(.system(size: 12, weight: .medium, design: .rounded))
+                //             .fixedSize()
+                //     }.padding()
+                // } else {
                 content
                 footer
+                // }
             }
+            // computingNitsProgress
+            // }
             .frame(maxWidth: env.menuWidth, alignment: .center)
             .scrollOnOverflow()
             .frame(width: env.menuWidth, height: cap(env.menuHeight, minVal: 100, maxVal: env.menuMaxHeight - 50), alignment: .top)
@@ -1737,6 +1813,8 @@ struct QuickActionsMenuView: View {
                 displays = []
                 displayCount = 0
                 #if arch(arm64)
+                    sourceDisplay = nil
+                    nonSourceDisplays = []
                     disconnectedDisplays = []
                 #endif
             }
@@ -1748,6 +1826,8 @@ struct QuickActionsMenuView: View {
         displays = dc.nonCursorDisplays
         displayCount = dc.activeDisplayCount
         #if arch(arm64)
+            sourceDisplay = dc.sourceDisplay
+            nonSourceDisplays = dc.activeDisplayList.filter(!\.isSource)
             disconnectedDisplays = dc.possiblyDisconnectedDisplayList
         #endif
 

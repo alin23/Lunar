@@ -57,7 +57,6 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .hdrWorkaround,
     .oldBlackOutMirroring,
     .newBlackOutDisconnect,
-    // .blackOutDisablerType,
     .disableNightShiftXDR,
     .enableDarkModeXDR,
     .screenBlankingIssueWarningShown,
@@ -171,6 +170,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .sunrise,
     .sunset,
     .syncPollingSeconds,
+    .syncNits,
     .volumeKeysEnabled,
     .volumeStep,
     .reapplyValuesAfterWake,
@@ -708,7 +708,6 @@ func initCache() {
     cacheKey(.hdrWorkaround)
     cacheKey(.oldBlackOutMirroring)
     cacheKey(.newBlackOutDisconnect)
-    // cacheKey(.blackOutDisablerType)
     cacheKey(.disableNightShiftXDR)
     cacheKey(.enableDarkModeXDR)
     cacheKey(.screenBlankingIssueWarningShown)
@@ -777,6 +776,7 @@ func initCache() {
     cacheKey(.contrastStep)
     cacheKey(.volumeStep)
     cacheKey(.syncPollingSeconds)
+    cacheKey(.syncNits)
     cacheKey(.ddcSleepFactor)
     cacheKey(.ddcSleepLonger)
     cacheKey(.updateChannel)
@@ -878,8 +878,6 @@ let gammaDisabledCompletelyPublisher = Defaults.publisher(.gammaDisabledComplete
 let hdrWorkaroundPublisher = Defaults.publisher(.hdrWorkaround).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let oldBlackOutMirroringPublisher = Defaults.publisher(.oldBlackOutMirroring).removeDuplicates().dropFirst()
     .filter { $0.oldValue != $0.newValue }
-// let blackOutDisablerTypePublisher = Defaults.publisher(.blackOutDisablerType).removeDuplicates().dropFirst()
-// .filter { $0.oldValue != $0.newValue }
 let xdrContrastPublisher = Defaults.publisher(.xdrContrast).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let xdrContrastFactorPublisher = Defaults.publisher(.xdrContrastFactor).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
 let allowHDREnhanceContrastPublisher = Defaults.publisher(.allowHDREnhanceContrast).removeDuplicates().dropFirst()
@@ -918,6 +916,7 @@ let disableControllerVideoPublisher = Defaults.publisher(.disableControllerVideo
 let locationPublisher = Defaults.publisher(.location).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let brightnessStepPublisher = Defaults.publisher(.brightnessStep).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let syncPollingSecondsPublisher = Defaults.publisher(.syncPollingSeconds).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let syncNitsPublisher = Defaults.publisher(.syncNits).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let sensorPollingSecondsPublisher = Defaults.publisher(.sensorPollingSeconds).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let contrastStepPublisher = Defaults.publisher(.contrastStep).removeDuplicates().filter { $0.oldValue != $0.newValue }
 let volumeStepPublisher = Defaults.publisher(.volumeStep).removeDuplicates().filter { $0.oldValue != $0.newValue }

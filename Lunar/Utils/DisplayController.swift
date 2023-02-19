@@ -395,6 +395,7 @@ class DisplayController: ObservableObject {
     static var panelManager: MPDisplayMgr? = MPDisplayMgr()
     static var manualModeFromSyncMode = false
 
+    static let NAME_NUMBER_REGEX = #" \(\d+\)$"#.r!
     var averageDDCWriteNanoseconds: ThreadSafeDictionary<CGDirectDisplayID, UInt64> = ThreadSafeDictionary()
     var averageDDCReadNanoseconds: ThreadSafeDictionary<CGDirectDisplayID, UInt64> = ThreadSafeDictionary()
 
@@ -412,7 +413,6 @@ class DisplayController: ObservableObject {
     var _activeDisplaysLock = NSRecursiveLock()
     var _activeDisplays: [CGDirectDisplayID: Display] = [:]
     var activeDisplaysByReadableID: [String: Display] = [:]
-    var activeDisplaysBySerial: [String: Display] = [:]
     var lastNonManualAdaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode()
     var lastModeWasAuto: Bool = !CachedDefaults[.overrideAdaptiveMode]
 
@@ -444,6 +444,13 @@ class DisplayController: ObservableObject {
 
     @Published var possiblyDisconnectedDisplayList: [Display] = []
 
+    var activeDisplaysBySerial: [String: Display] = [:] {
+        didSet {
+            #if arch(arm64)
+                brightnessSplines = computeBrightnessSplines()
+            #endif
+        }
+    }
     @Published var activeDisplayList: [Display] = [] {
         didSet {
             #if arch(arm64)
@@ -588,14 +595,25 @@ class DisplayController: ObservableObject {
                 oldValue?.cancel()
             }
         }
-        var nitsMapping: [String: NitsMapping] = Defaults[.nitsMapping] {
+        var nitsMapping: [String: [NitsMapping]] = Defaults[.nitsMapping] {
             didSet {
-                nitsMappingSaver = mainAsyncAfter(ms: 1000) {
-                    Defaults[.nitsMapping] = self.nitsMapping
-                }
+                saveNitsMapping()
             }
         }
+        lazy var brightnessSplines: [String: (Double) -> Double] = computeBrightnessSplines()
+
+        func saveNitsMapping() {
+            nitsMappingSaver = mainAsyncAfter(ms: 500) {
+                Defaults[.nitsMapping] = self.nitsMapping
+                self.brightnessSplines = self.computeBrightnessSplines()
+                self.nitsMappingSaver = nil
+            }
+        }
+        // @Published var computingNitsCurveID: CGDirectDisplayID? = nil
+        // @Published var computingNitsCurveProgress: Float = 0.0
     #endif
+
+    @Published var calibrating = false
 
     @Published var adaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode() {
         didSet {
@@ -816,7 +834,8 @@ class DisplayController: ObservableObject {
         var score = 0
 
         if let name {
-            score += display.edidName.lowercased() == name.lowercased() ? 1 : -1
+            let edidName = NAME_NUMBER_REGEX.replaceAll(in: display.edidName.lowercased(), with: "")
+            score += (edidName == name.lowercased() ? 1 : -1)
         }
 
         let infoDict = (displayInfoDictionary(display.id) ?? display.infoDictionary)
@@ -1338,6 +1357,7 @@ class DisplayController: ObservableObject {
 
         guard partial else { return nil }
 
+//        log.info("Calculating display matching scores:")
         let displayScores = displays.map { display -> (Display, Int) in
             let score = DisplayController.displayInfoDictPartialMatchScore(
                 display: display,
@@ -1349,7 +1369,7 @@ class DisplayController: ObservableObject {
                 width: width,
                 height: height
             )
-
+//            log.info("    \(display.description): \(score)")
             return (display, score)
         }
 
@@ -1413,10 +1433,10 @@ class DisplayController: ObservableObject {
             .debounce(for: .seconds(AUTO_OSD_DEBOUNCE_SECONDS), scheduler: RunLoop.main)
             .sink { shouldBlackout in
                 defer { self.autoBlackoutPending = false }
-                guard shouldBlackout, let d = self.builtinDisplay else { return }
+                guard shouldBlackout, let d = self.builtinDisplay, !self.calibrating else { return }
                 lastBlackOutToggleDate = .distantPast
                 #if arch(arm64)
-                    if CachedDefaults[.newBlackOutDisconnect] {
+                    if CachedDefaults[.newBlackOutDisconnect], #available(macOS 13, *) {
                         self.dis(d.id)
                     } else {
                         self.blackOut(display: d.id, state: .on)
@@ -1439,7 +1459,7 @@ class DisplayController: ObservableObject {
                     self.autoXdrPendingEnabled = false
                     self.autoXdrPendingDisabled = false
                 }
-                guard let xdrEnabled, let d = self.builtinDisplay else { return }
+                guard let xdrEnabled, let d = self.builtinDisplay, !self.calibrating else { return }
 
                 d.enhanced = xdrEnabled
                 self.xdrState = xdrEnabled ? .enabledAutomatically : .disabledAutomatically
@@ -1521,7 +1541,7 @@ class DisplayController: ObservableObject {
     }
 
     func retryAutoBlackoutLater() {
-        if autoBlackoutPending, let d = builtinDisplay, !d.blackOutEnabled {
+        if autoBlackoutPending, let d = builtinDisplay, !d.blackOutEnabled, !calibrating {
             log.info("Retrying Auto Blackout later")
             d.showAutoBlackOutOSD()
             autoBlackoutPublisher.send(true)
@@ -1629,14 +1649,18 @@ class DisplayController: ObservableObject {
         guard lunarProActive, !display.enhanced, let exceptions = runningAppExceptions, !exceptions.isEmpty,
               let screen = display.nsScreen
         else {
-            log.debug("!exceptions: \(runningAppExceptions ?? [])")
-            log.debug("!screen: \(display.nsScreen?.description ?? "")")
-            log.debug("!xdr: \(display.enhanced)")
+            #if DEBUG
+                log.debug("!exceptions: \(runningAppExceptions ?? [])")
+                log.debug("!screen: \(display.nsScreen?.description ?? "")")
+                log.debug("!xdr: \(display.enhanced)")
+            #endif
             mainAsync { display.appPreset = nil }
             return nil
         }
-        log.debug("exceptions: \(exceptions)")
-        log.debug("screen: \(screen)")
+        #if DEBUG
+            log.debug("exceptions: \(exceptions)")
+            log.debug("screen: \(screen)")
+        #endif
 
         if activeDisplays.count == 1, let app = runningAppExceptions.first,
            app.runningApps?.first?.windows(appException: app) == nil
@@ -1820,7 +1844,7 @@ class DisplayController: ObservableObject {
                 }
 
                 #if arch(arm64)
-                    if IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("DCPAVServiceProxy")) == 0 {
+                    if #available(macOS 13, *), IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("DCPAVServiceProxy")) == 0 {
                         log.info("Disabling Auto BlackOut (disconnect) if we're left with only the builtin screen")
                         self.en()
                         self.autoBlackoutPause = false
@@ -1836,7 +1860,7 @@ class DisplayController: ObservableObject {
 
                 let idsCount = NSScreen.onlineDisplayIDs.count
                 if let d = activeOldDisplays.first, activeOldDisplays.count == 1, activeNewDisplays.count > 1,
-                   idsCount > 1, !d.blackOutEnabled
+                   idsCount > 1, !d.blackOutEnabled, !self.calibrating
                 {
                     log.info("Activating Auto Blackout")
                     self.autoBlackoutPending = true
@@ -1957,7 +1981,9 @@ class DisplayController: ObservableObject {
         datastore.storeDisplays(displayList, now: true)
 
         #if arch(arm64)
-            en()
+            if #available(macOS 13, *) {
+                en()
+            }
         #endif
     }
 
