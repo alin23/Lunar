@@ -3,23 +3,6 @@
     <channel>
         <title>Lunar</title>
         <item>
-            <title>5.9.6a4</title>
-            <pubDate>Fri, 17 Feb 2023 19:25:52 +0200</pubDate>
-            <link>https://lunar.fyi/</link>
-            <sparkle:fullReleaseNotesLink>https://lunar.fyi/changelog</sparkle:fullReleaseNotesLink>
-            <sparkle:channel>alpha</sparkle:channel>
-            <sparkle:minimumAutoupdateVersion>4.0.0</sparkle:minimumAutoupdateVersion>
-            <sparkle:version>5.9.6a4</sparkle:version>
-            <sparkle:shortVersionString>5.9.6a4</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
-            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-5.9.6a4.html</sparkle:releaseNotesLink>
-            <enclosure url="https://files.lunar.fyi/releases/Lunar-5.9.6a4.dmg" length="21990761" type="application/octet-stream" sparkle:edSignature="iNc09cFBA4WgSF69Hjxn8SkYGnzKIbV62lbflWzlYPWRbksfCyZtu/YvItulKmvHDWQqK4WWP8GJvzAOWMQXAg=="/>
-            <sparkle:deltas>
-                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.9.6a4-5.9.6a3.delta" sparkle:deltaFrom="5.9.6a3" length="3376426" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="1843312" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,en" sparkle:edSignature="UTaDG8EFfVD5M6VjsDi5RipfBcvOMGEhB3klZv/arcfpav2w6EZ2b4Ni1U9qdNMJw27Xtxs24bS6q0qgymdRCQ=="/>
-                <enclosure url="https://files.lunar.fyi/deltas/Lunar5.9.6a4-5.9.6a2.delta" sparkle:deltaFrom="5.9.6a2" length="3622322" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="1843312" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,en" sparkle:edSignature="yjejajDyaIlsgRxnGxoBvlXO2n3fDChrPuYqTQZaHvRnFelP3b6FAyTMIMyqZuRrJ5/9pQJniZ0Du9lapm4BAw=="/>
-            </sparkle:deltas>
-        </item>
-        <item>
             <title>5.9.6a3</title>
             <pubDate>Fri, 10 Feb 2023 18:06:43 +0200</pubDate>
             <link>https://lunar.fyi/</link>
