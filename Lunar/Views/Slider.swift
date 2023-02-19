@@ -284,6 +284,12 @@ class Slider: NSSlider {
     }
 }
 
+var sliderTracking: Bool {
+    AppleNativeControl.sliderTracking ||
+        GammaControl.sliderTracking ||
+        DDCControl.sliderTracking
+}
+
 // MARK: - VolumeSliderCell
 
 class VolumeSliderCell: NSSliderCell {

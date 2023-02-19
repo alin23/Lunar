@@ -1402,6 +1402,9 @@ class DisplayViewController: NSViewController {
             return
         }
 
+        #if arch(arm64)
+            displayController.nitsMapping = displayController.nitsMapping.copyWithout(key: display.serial)
+        #endif
         display.adaptivePaused = true
         defer {
             display.adaptivePaused = false

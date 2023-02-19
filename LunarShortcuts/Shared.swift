@@ -107,9 +107,12 @@ extension Defaults.Keys {
 
     static let hdrWorkaround = Key<Bool>("hdrWorkaround", default: true)
     static let oldBlackOutMirroring = Key<Bool>("oldBlackOutMirroring", default: false)
-    static let newBlackOutDisconnect = Key<Bool>("newBlackOutDisconnect", default: false)
-    // static let blackOutDisablerType = Key<BlackOutDisablerType>("blackOutDisablerType", default: .disconnect)
-    static let disableNightShiftXDR = Key<Bool>("disableNightShiftXDR", default: false)
+    #if arch(arm64)
+        static let newBlackOutDisconnect = Key<Bool>("newBlackOutDisconnect", default: true)
+    #else
+        static let newBlackOutDisconnect = Key<Bool>("newBlackOutDisconnect", default: false)
+    #endif
+    static let disableNightShiftXDR = Key<Bool>("disableNightShiftXDR", default: true)
     static let enableDarkModeXDR = Key<Bool>("enableDarkModeXDR", default: false)
     static let screenBlankingIssueWarningShown = Key<Bool>("screenBlankingIssueWarningShown", default: false)
     static let xdrContrast = Key<Bool>("xdrContrast", default: true)
@@ -136,6 +139,7 @@ extension Defaults.Keys {
     static let showOptionsMenu = Key<Bool>("showOptionsMenu", default: false)
     static let keepOptionsMenu = Key<Bool>("keepOptionsMenu", default: false)
     static let showSliderValues = Key<Bool>("showSliderValues", default: false)
+    static let showSliderValuesNits = Key<Bool>("showSliderValuesNits", default: false)
     static let showAdvancedDisplaySettings = Key<Bool>("showAdvancedDisplaySettings", default: false)
     static let notificationsPermissionsGranted = Key<Bool>("notificationsPermissionsGranted", default: false)
     static let accessibilityPermissionsGranted = Key<Bool>("accessibilityPermissionsGranted", default: false)
@@ -183,6 +187,11 @@ extension Defaults.Keys {
     static let contrastStep = Key<Int>("contrastStep", default: 6)
     static let volumeStep = Key<Int>("volumeStep", default: 6)
     static let syncPollingSeconds = Key<Int>("syncPollingSeconds", default: 0)
+    #if arch(arm64)
+        static let syncNits = Key<Bool>("syncNits", default: true)
+    #else
+        static let syncNits = Key<Bool>("syncNits", default: false)
+    #endif
 
     static let ddcSleepLonger = Key<Bool>("ddcSleeplonger", default: false)
 
@@ -245,13 +254,17 @@ extension Defaults.Keys {
 
     #if arch(arm64)
         static let possiblyDisconnectedDisplays = Key<[Display]>("possiblyDisconnectedDisplays", default: [])
-        static let nitsMapping = Key<[String: NitsMapping]>("nitsMapping", default: [:])
+        static let nitsMapping = Key<[String: [NitsMapping]]>("nitsMapping", default: [:])
     #endif
 }
 
 #if arch(arm64)
-    struct NitsMapping: Codable, Defaults.Serializable, Equatable {
+    struct NitsMapping: Codable, Defaults.Serializable, Equatable, Comparable {
         let source: Int
         let target: Int
+
+        static func < (lhs: NitsMapping, rhs: NitsMapping) -> Bool {
+            lhs.source < rhs.source
+        }
     }
 #endif

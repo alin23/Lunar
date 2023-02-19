@@ -136,6 +136,7 @@
 		C7C1F7051FD635360039507C /* Moment.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7041FD635360039507C /* Moment.swift */; };
 		C7C1F7071FD6354C0039507C /* Geolocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7061FD6354C0039507C /* Geolocation.swift */; };
 		C7C1F7091FD639970039507C /* DataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7081FD639970039507C /* DataStore.swift */; };
+		C7C1F786299FB50E00F6FFD5 /* Calibration.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F785299FB50E00F6FFD5 /* Calibration.swift */; };
 		C7C4318F269DB81200DCD0F5 /* ALSInstallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C4318E269DB81200DCD0F5 /* ALSInstallViewController.swift */; };
 		C7C43192269DD9AE00DCD0F5 /* install.sh in Resources */ = {isa = PBXBuildFile; fileRef = C7C43190269DD9AE00DCD0F5 /* install.sh */; };
 		C7C43193269DD9AE00DCD0F5 /* lunar.yaml in Resources */ = {isa = PBXBuildFile; fileRef = C7C43191269DD9AE00DCD0F5 /* lunar.yaml */; };
@@ -321,6 +322,7 @@
 		C7C1F7041FD635360039507C /* Moment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Moment.swift; sourceTree = "<group>"; };
 		C7C1F7061FD6354C0039507C /* Geolocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geolocation.swift; sourceTree = "<group>"; };
 		C7C1F7081FD639970039507C /* DataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStore.swift; sourceTree = "<group>"; };
+		C7C1F785299FB50E00F6FFD5 /* Calibration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Calibration.swift; sourceTree = "<group>"; };
 		C7C4318E269DB81200DCD0F5 /* ALSInstallViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ALSInstallViewController.swift; sourceTree = "<group>"; };
 		C7C43190269DD9AE00DCD0F5 /* install.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = install.sh; sourceTree = "<group>"; };
 		C7C43191269DD9AE00DCD0F5 /* lunar.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = lunar.yaml; sourceTree = "<group>"; };
@@ -487,6 +489,7 @@
 		C76545241FD8A10200DBACE9 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				C7C1F785299FB50E00F6FFD5 /* Calibration.swift */,
 				C776416E272139A100C7C308 /* ResetPopoverController.swift */,
 				C7CFF492271FF280002CB549 /* DDCPopoverController.swift */,
 				C762AAE8271F3D6200198EDA /* ColorsPopoverController.swift */,
@@ -792,6 +795,7 @@
 				C7AEC7F31FD0B4350039B562 /* Resources */,
 				C7AEC7F21FD0B4350039B562 /* Frameworks */,
 				C75083582222865F0020270E /* Embed Frameworks */,
+				C750F301299E47AE0004ECEF /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -922,6 +926,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		C750F301299E47AE0004ECEF /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "mkdir \"$CODESIGNING_FOLDER_PATH/Contents/_MASReceipt\"\ntouch \"$CODESIGNING_FOLDER_PATH/Contents/_MASReceipt/receipt\"\n";
+		};
 		C7574F84235469D600358397 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1032,6 +1053,7 @@
 				C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */,
 				C74D07C8265BA68D00291FC2 /* LoginServiceKit.swift in Sources */,
 				C75083642222DC9F0020270E /* HotKeyView.swift in Sources */,
+				C7C1F786299FB50E00F6FFD5 /* Calibration.swift in Sources */,
 				C79975DE25DEEF9200C797FF /* AppleNativeControl.swift in Sources */,
 				C7A7C24A2593B5EA00745637 /* HotkeyButton.swift in Sources */,
 				C78AB66720F0C73900863CB1 /* Logger.swift in Sources */,
@@ -1162,7 +1184,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.9.6a3;
+				CURRENT_PROJECT_VERSION = 5.9.6a4;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -1193,7 +1215,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 5.9.6a3;
+				MARKETING_VERSION = 5.9.6a4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1287,7 +1309,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.9.6a3;
+				CURRENT_PROJECT_VERSION = 5.9.6a4;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1318,7 +1340,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 5.9.6a3;
+				MARKETING_VERSION = 5.9.6a4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
@@ -1474,7 +1496,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.9.6a3;
+				CURRENT_PROJECT_VERSION = 5.9.6a4;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -1505,7 +1527,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 5.9.6a3;
+				MARKETING_VERSION = 5.9.6a4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1543,7 +1565,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.9.6a3;
+				CURRENT_PROJECT_VERSION = 5.9.6a4;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1574,7 +1596,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 5.9.6a3;
+				MARKETING_VERSION = 5.9.6a4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;

@@ -1731,8 +1731,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
             log.warning("Command key pressed 8 times in a row, disabling BlackOut forcefully!")
             #if arch(arm64)
-                displayController.autoBlackoutPause = true
-                displayController.en()
+                if #available(macOS 13, *) {
+                    displayController.autoBlackoutPause = true
+                    displayController.en()
+                }
             #endif
 
             guard displayController.activeDisplayList.contains(where: \.blackOutEnabled) else { return }
@@ -1799,6 +1801,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func handleAutoOSDEvent(_ event: NSEvent) {
         switch event.keyCode.i {
+        case kVK_Escape where displayController.calibrating:
+            displayController.stopCalibration()
         case kVK_Escape where displayController.autoBlackoutPending:
             displayController.cancelAutoBlackout()
         case kVK_Escape where displayController.autoXdrPendingEnabled:
@@ -1824,7 +1828,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func addGlobalMouseDownMonitor() {
         NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]) { _ in
-            guard let menuWindow, menuWindow.isVisible else { return }
+            guard let menuWindow, menuWindow.isVisible, !displayController.calibrating else { return }
             menuWindow.forceClose()
         }
     }
@@ -2077,13 +2081,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         #if arch(arm64)
-            if restarted {
-                displayController.possiblyDisconnectedDisplays = Defaults[.possiblyDisconnectedDisplays].dict { ($0.id, $0) }
-            } else {
-                displayController.en()
-            }
+            if #available(macOS 13, *) {
+                if restarted {
+                    displayController.possiblyDisconnectedDisplays = Defaults[.possiblyDisconnectedDisplays].dict { ($0.id, $0) }
+                } else {
+                    displayController.en()
+                }
 
-            Defaults[.possiblyDisconnectedDisplays] = []
+                Defaults[.possiblyDisconnectedDisplays] = []
+            }
         #endif
 
         initCacheTransitionLogging()

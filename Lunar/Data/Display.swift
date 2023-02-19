@@ -455,7 +455,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         blueGain = (try container.decodeIfPresent(UInt16.self, forKey: .blueGain)?.ns) ?? DEFAULT_COLOR_GAIN.ns
 
         lockedBrightness = (try container.decodeIfPresent(Bool.self, forKey: .lockedBrightness)) ?? false
-        lockedContrast = (try container.decodeIfPresent(Bool.self, forKey: .lockedContrast)) ?? false
+        lockedContrast = (try container.decodeIfPresent(Bool.self, forKey: .lockedContrast)) ?? true
 
         lockedBrightnessCurve = (try container.decodeIfPresent(Bool.self, forKey: .lockedBrightnessCurve)) ?? false
         lockedContrastCurve = (try container.decodeIfPresent(Bool.self, forKey: .lockedContrastCurve)) ?? false
@@ -608,7 +608,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         super.init()
         #if arch(arm64)
             maxNits = try container.decodeIfPresent(Int.self, forKey: .maxNits) ?! getMaxNits()
-            minNits = try container.decodeIfPresent(Int.self, forKey: .minNits) ?! getMinNits()
+            minNits = try container.decodeIfPresent(Int.self, forKey: .minNits) ?? getMinNits()
         #endif
 
         defer {
@@ -1608,6 +1608,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Atomic @objc dynamic var adaptiveSubzero = true {
         didSet {
+            #if arch(arm64)
+                displayController.brightnessSplines = displayController.computeBrightnessSplines()
+            #endif
+
             readapt(newValue: adaptiveSubzero, oldValue: oldValue)
             if !adaptiveSubzero, displayController.adaptiveModeKey != .manual, softwareBrightness < 1 {
                 softwareBrightness = 1
@@ -1694,7 +1698,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         didSet {
             guard apply else { return }
             if subzero, !oldValue {
-                adaptivePaused = true
+                adaptivePaused = !adaptiveSubzero
                 brightnessBeforeBlackout = brightness
                 contrastBeforeBlackout = contrast
                 brightness = minBrightness
@@ -1817,13 +1821,34 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
         var nitsLimitObserver: IOServicePropertyObserver?
 
-        @Published var minNits = 0
-        @Published var maxNits = 500 {
+        @Published @objc var minNits = 0 {
             didSet {
+                guard minNits < maxNits else {
+                    minNits = maxNits - 1
+                    return
+                }
+
+                if minNits != oldValue, !isActiveSyncSource {
+                    displayController.brightnessSplines = displayController.computeBrightnessSplines()
+                }
+                save()
+            }
+        }
+        @Published @objc var maxNits = 500 {
+            didSet {
+                guard maxNits > minNits else {
+                    maxNits = minNits + 1
+                    return
+                }
+
+                if maxNits != oldValue, !isActiveSyncSource {
+                    displayController.brightnessSplines = displayController.computeBrightnessSplines()
+                }
+                save()
                 #if DEBUG
                     if maxNits == 0 {
                         maxNits = getMaxNits()
-                    } else {
+                    } else if maxNits != oldValue {
                         print("MAX NITS: \t\(maxNits)")
                     }
                 #endif
@@ -1833,13 +1858,20 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         @Published var nits: Int? = nil {
             didSet {
                 #if DEBUG
-                    if let nits, nits > 0 {
+                    if let nits, nits > 0, nits != oldValue {
                         print("REAL NITS: \t\(nits)")
                     }
                 #endif
             }
         }
+
+        var nitsMap: [Int: Int] = [:]
+        var nitsSpline: ((Double) -> Double)?
     #endif
+
+    var isActiveSyncSource: Bool {
+        SyncMode.sourceDisplay?.serial == serial
+    }
 
     @Published @objc dynamic var isSource: Bool {
         didSet {
@@ -2005,7 +2037,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             if xdrBrightness > 0, !enhanced {
                 handleEnhance(true, withoutSettingBrightness: true)
             }
-            if xdrBrightness == 0, enhanced {
+            if xdrBrightness == 0, enhanced, !sliderTracking {
                 handleEnhance(false)
             }
 
@@ -2181,6 +2213,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     var xdrSetter: DispatchWorkItem? {
         didSet { oldValue?.cancel() }
+    }
+
+    var calibrationWindowController: NSWindowController? {
+        get { Self.getWindowController(id, type: "calibration") }
+        set { Self.setWindowController(id, type: "calibration", windowController: newValue) }
     }
 
     var osdWindowController: NSWindowController? {
@@ -2763,7 +2800,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-    @Published @objc dynamic var lockedContrast = false {
+    @Published @objc dynamic var lockedContrast = true {
         didSet {
             log.debug("Locked contrast for \(description)")
             save()
@@ -2867,6 +2904,18 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 return
             }
 
+            if subzero, preciseBrightnessContrast > 0 {
+                withoutApply {
+                    subzero = false
+                    adaptivePaused = false
+                    softwareBrightness = 1
+                }
+            } else if !subzero, preciseBrightnessContrast == 0 {
+                withoutApply {
+                    subzero = true
+                }
+            }
+
             let (brightness, contrast) = sliderValueToBrightnessContrast(preciseBrightnessContrast)
 
             var smallDiff = abs(brightness.i - self.brightness.intValue) < 5
@@ -2884,7 +2933,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 }
             }
 
-            if !lockedContrast {
+            if !lockedContrast || displayController.calibrating {
                 smallDiff = abs(contrast.i - self.contrast.intValue) < 5
                 withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
                     mainThread {
@@ -2904,6 +2953,18 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var preciseBrightness = 0.5 {
         didSet {
             guard applyPreciseValue else { return }
+
+            if subzero, preciseBrightnessContrast > 0 {
+                withoutApply {
+                    subzero = false
+                    adaptivePaused = false
+                    softwareBrightness = 1
+                }
+            } else if !subzero, preciseBrightnessContrast == 0 {
+                withoutApply {
+                    subzero = true
+                }
+            }
 
             var smallDiff = abs(preciseBrightness - oldValue) < 0.05
             var oldValue = oldValue
@@ -3137,7 +3198,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             guard !isBuiltin else { return }
-            guard DDC.apply, !lockedContrast, force || contrast != oldValue else {
+            guard DDC.apply, !lockedContrast || displayController.calibrating, force || contrast != oldValue else {
                 log.verbose(
                     "Won't apply contrast to \(description)",
                     context: [
@@ -3762,6 +3823,60 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         values[featureValue] = targetValue
     }
 
+    #if arch(arm64)
+        func insertNitsUserDataPoint(_ featureValue: Double, _ targetValue: Double, modeKey: AdaptiveModeKey) {
+            guard displayController.adaptiveModeKey == .sync, let sourceDisplay = SyncMode.sourceDisplay,
+                  !sourceDisplay.xdr, var sourceNits = sourceDisplay.nits
+            else {
+                return
+            }
+
+            let targetNits = mapNumber(
+                targetValue,
+                fromLow: minBrightness.doubleValue,
+                fromHigh: maxBrightness.doubleValue,
+                toLow: minNits.d,
+                toHigh: maxNits.d
+            ).intround
+
+            if sourceDisplay.softwareBrightness < 1 {
+                sourceNits = mapNumber(
+                    sourceNits < minNits ? sourceNits.f : ((1.0 - sourceDisplay.softwareBrightness) * -100),
+                    fromLow: -100, fromHigh: minNits.f, toLow: -100, toHigh: 0
+                ).intround
+            }
+
+            let map: NitsMapping
+            if adaptiveSubzero, softwareBrightness < 1 {
+                var targetNits = ((1.0 - softwareBrightness) * -100)
+                targetNits = mapNumber(targetNits, fromLow: -100, fromHigh: 0, toLow: -100, toHigh: minNits.f)
+
+                map = NitsMapping(source: sourceNits, target: targetNits.intround)
+            } else {
+                map = NitsMapping(source: sourceNits, target: targetNits)
+            }
+
+            nits = cap(map.target, minVal: 0, maxVal: MAX_NITS.i)
+            displayController.nitsMapping[serial] = Self.insertNitsDataPoint(map, in: displayController.nitsMapping[serial] ?? [])
+            displayController.saveNitsMapping()
+        }
+
+        static func insertNitsDataPoint(_ map: NitsMapping, in values: [NitsMapping]) -> [NitsMapping] {
+            guard displayController.adaptiveModeKey != .manual else {
+                return values
+            }
+
+            let cleanedUpValues = values.filter { m in
+                m.source != map.source &&
+                    !(
+                        (m.source < map.source && m.target >= map.target) ||
+                            (m.source > map.source && m.target <= map.target)
+                    )
+            }
+            return (cleanedUpValues + [map]).uniqued(on: { $0.source }).sorted()
+        }
+    #endif
+
     static func getSecondaryMirrorScreenID(_ id: CGDirectDisplayID) -> CGDirectDisplayID? {
         guard displayIsInMirrorSet(id),
               let secondaryID = NSScreen.onlineDisplayIDs.first(where: { CGDisplayMirrorsDisplay($0) == id })
@@ -3889,13 +4004,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     func powerOff() {
         guard displayController.activeDisplays.count > 1 || CachedDefaults[.allowBlackOutOnSingleScreen] else { return }
 
-        #if arch(arm64)
-            if AppDelegate.commandKeyPressed {
-                displayController.dis(id)
-                return
-            }
-        #endif
-
         if hasDDC, AppDelegate.optionKeyPressed, !AppDelegate.shiftKeyPressed {
             _ = control?.setPower(.off)
             return
@@ -3920,6 +4028,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
             return
         }
+
+        #if arch(arm64)
+            if #available(macOS 13, *), CachedDefaults[.newBlackOutDisconnect], !AppDelegate.commandKeyPressed, !blackOutEnabled {
+                displayController.dis(id)
+                return
+            }
+        #endif
 
         displayController.blackOut(
             display: id,
@@ -4566,6 +4681,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
         #if arch(arm64)
             if isBuiltin, nitsLimitObserver == nil {
+                dispName = "disp0"
                 observeNitsCap(dispName: "disp0")
             }
         #endif
@@ -5153,7 +5269,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func isUltraFine() -> Bool {
-        edidName.contains(ULTRAFINE_NAME)
+        edidName.contains(ULTRAFINE_NAME) && canChangeBrightnessDS
     }
 
     func isThunderbolt() -> Bool {
@@ -5250,7 +5366,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             for newValue in stride(from: currentValue.i, through: value.i, by: step) {
                 adjust(cap(newValue.u16, minVal: minVal, maxVal: maxVal))
                 if let delay {
-                    print("Sleeping for \(delay * 1000)ms")
+                    // print("Sleeping for \(delay * 1000)ms")
                     Thread.sleep(forTimeInterval: delay)
                 }
             }
@@ -5967,22 +6083,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
               timeSince(lastConnectionTime) > 5 else { return }
 
         #if arch(arm64)
-            if displayController.adaptiveModeKey == .sync, let source = SyncMode.sourceDisplay?.nits {
-                if adaptiveSubzero, softwareBrightness < 1 {
-                    displayController.nitsMapping[serial] = NitsMapping(source: source, target: ((1.0 - softwareBrightness) * -100).intround)
-                } else {
-                    displayController.nitsMapping[serial] = NitsMapping(
-                        source: source,
-                        target: mapNumber(
-                            targetValue,
-                            fromLow: minBrightness.doubleValue,
-                            fromHigh: maxBrightness.doubleValue,
-                            toLow: minNits.d,
-                            toHigh: maxNits.d
-                        ).intround
-                    )
-                }
-            }
+            insertNitsUserDataPoint(featureValue, targetValue, modeKey: modeKey)
         #endif
 
         brightnessDataPointInsertionTask?.cancel()

@@ -1283,6 +1283,9 @@ extension Encodable {
         guard let data = try? JSONEncoder().encode(self) else { return nil }
         return (try? JSONSerialization.jsonObject(with: data, options: .allowFragments)).flatMap { $0 as? [String: Any] }
     }
+    var json: String? {
+        (try? JSONEncoder().encode(self))?.s
+    }
 }
 
 extension NSWindow {
@@ -1743,6 +1746,22 @@ extension Set {
 extension OptionSet {
     func has(someOf otherSet: Self) -> Bool {
         !intersection(otherSet).isEmpty
+    }
+}
+
+extension Dictionary {
+    func copyWithout(key: Key) -> Self {
+        var m = self
+
+        m.removeValue(forKey: key)
+        return m
+    }
+
+    func copyWith(key: Key, value: Value) -> Self {
+        var m = self
+
+        m[key] = value
+        return m
     }
 }
 

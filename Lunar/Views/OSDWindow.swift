@@ -6,14 +6,14 @@ import SwiftUI
 // MARK: - OSDWindow
 
 open class OSDWindow: NSWindow, NSWindowDelegate {
-    convenience init(swiftuiView: AnyView, display: Display, releaseWhenClosed: Bool) {
+    convenience init(swiftuiView: AnyView, display: Display, releaseWhenClosed: Bool, level: NSWindow.Level = NSWindow.Level(CGShieldingWindowLevel().i), ignoresMouseEvents: Bool = true) {
         self.init(contentRect: .zero, styleMask: .fullSizeContentView, backing: .buffered, defer: true, screen: display.nsScreen)
         self.display = display
         contentViewController = NSHostingController(rootView: swiftuiView)
 
-        level = NSWindow.Level(CGShieldingWindowLevel().i)
+        self.level = level
         collectionBehavior = [.stationary, .canJoinAllSpaces, .ignoresCycle, .fullScreenDisallowsTiling]
-        ignoresMouseEvents = true
+        self.ignoresMouseEvents = ignoresMouseEvents
         setAccessibilityRole(.popover)
         setAccessibilitySubrole(.unknown)
 
@@ -159,6 +159,7 @@ public struct BigSurSlider: View {
         knobTextColor: Color? = nil,
         knobTextColorBinding: Binding<Color?>? = nil,
         showValue: Binding<Bool>? = nil,
+        shownValue: Binding<Int?>? = nil,
         acceptsMouseEvents: Binding<Bool>? = nil,
         disabled: Binding<Bool>? = nil,
         enableText: String? = nil,
@@ -174,6 +175,7 @@ public struct BigSurSlider: View {
         _image = imageBinding ?? .constant(image)
         _color = colorBinding ?? .constant(color)
         _showValue = showValue ?? .constant(false)
+        _shownValue = shownValue ?? .constant(nil)
         _backgroundColor = backgroundColorBinding ?? .constant(backgroundColor)
         _acceptsMouseEvents = acceptsMouseEvents ?? .constant(true)
         _disabled = disabled ?? .constant(false)
@@ -213,7 +215,7 @@ public struct BigSurSlider: View {
                             .frame(width: sliderHeight, height: sliderHeight, alignment: .trailing)
                             .brightness(env.draggingSlider && hovering ? -0.2 : 0)
                         if showValue {
-                            Text((percentage * 100).str(decimals: 0))
+                            Text(shownValue?.s ?? (percentage * 100).str(decimals: 0))
                                 .foregroundColor(knobTextColor)
                                 .font(.system(size: 8, weight: .medium, design: .monospaced))
                                 .allowsHitTesting(false)
@@ -324,6 +326,7 @@ public struct BigSurSlider: View {
     @Binding var knobColor: Color?
     @Binding var knobTextColor: Color?
     @Binding var showValue: Bool
+    @Binding var shownValue: Int?
 
     @State var scrollWheelListener: Cancellable?
 
@@ -490,7 +493,42 @@ public extension View {
     }
 }
 
-// MARK: - BrightnessOSDView
+struct CheckerView: View {
+    var white: Int
+    var squareSize: CGFloat
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("\(white)")
+                .font(.system(size: squareSize / 2, weight: .semibold, design: .rounded))
+                .foregroundColor(.black)
+
+            row(reversed: true)
+            row()
+            row(reversed: true)
+            row()
+        }
+    }
+
+    func row(reversed: Bool = false) -> some View {
+        let gray = Color(white: white.d / 255)
+        return HStack(spacing: 0) {
+            Rectangle()
+                .fill(reversed ? gray : .clear)
+                .frame(width: squareSize, height: squareSize)
+            Rectangle()
+                .fill(reversed ? .clear : gray)
+                .frame(width: squareSize, height: squareSize)
+            Rectangle()
+                .fill(reversed ? gray : .clear)
+                .frame(width: squareSize, height: squareSize)
+            Rectangle()
+                .fill(reversed ? .clear : gray)
+                .frame(width: squareSize, height: squareSize)
+        }.fixedSize()
+    }
+
+}
 
 struct BrightnessOSDView: View {
     @Environment(\.colorScheme) var colorScheme
@@ -759,10 +797,10 @@ import SwiftUI
 // MARK: - PanelWindow
 
 open class PanelWindow: NSWindow {
-    public convenience init(swiftuiView: AnyView) {
+    public convenience init(swiftuiView: AnyView, level: NSWindow.Level = .floating) {
         self.init(contentViewController: NSHostingController(rootView: swiftuiView))
 
-        level = .floating
+        self.level = level
         setAccessibilityRole(.popover)
         setAccessibilitySubrole(.unknown)
 
