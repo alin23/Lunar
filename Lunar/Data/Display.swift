@@ -1833,8 +1833,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
         @Published @objc var maxNits: Double = 500 {
             didSet {
-                guard maxNits > minNits else {
-                    maxNits = minNits + 1
+                guard maxNits > minNits, maxNits > 0 else {
+                    maxNits = getMaxNits() ?! minNits + 1
                     return
                 }
 
@@ -1842,25 +1842,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     displayController.brightnessSplines = displayController.computeBrightnessSplines()
                 }
                 save()
-                #if DEBUG
-                    if maxNits == 0 {
-                        maxNits = getMaxNits()
-                    } else if maxNits != oldValue {
-                        print("MAX NITS: \t\(maxNits)")
-                    }
-                #endif
             }
         }
 
-        @Published var nits: Double? = nil {
-            didSet {
-                #if DEBUG
-                    if let nits, nits > 0, nits != oldValue {
-                        print("REAL NITS: \t\(nits)")
-                    }
-                #endif
-            }
-        }
+        @Published var nits: Double? = nil
 
         var nitsMap: [Int: Int] = [:]
         var nitsSpline: ((Double) -> Double)?
@@ -3820,61 +3805,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         values[featureValue] = targetValue
     }
 
-    #if arch(arm64)
-        func insertNitsUserDataPoint(_ featureValue: Double, _ targetValue: Double, modeKey: AdaptiveModeKey) {
-            guard displayController.adaptiveModeKey == .sync, let sourceDisplay = SyncMode.sourceDisplay,
-                  !sourceDisplay.xdr, var sourceNits = sourceDisplay.nits
-            else {
-                return
-            }
-
-            if sourceDisplay.softwareBrightness < 1 {
-                sourceNits = mapNumber(
-                    sourceNits < minNits ? sourceNits : ((1.0 - sourceDisplay.softwareBrightness) * -100).d,
-                    fromLow: -100, fromHigh: minNits, toLow: -100, toHigh: 0
-                )
-            }
-
-            let map: NitsMapping
-            if adaptiveSubzero, softwareBrightness < 1 {
-                let targetNits = mapNumber(
-                    ((1.0 - softwareBrightness) * -100).d,
-                    fromLow: -100, fromHigh: 0, toLow: -100, toHigh: minNits
-                )
-
-                map = NitsMapping(source: sourceNits, target: targetNits)
-            } else {
-                let targetNits = mapNumber(
-                    targetValue,
-                    fromLow: minBrightness.doubleValue,
-                    fromHigh: maxBrightness.doubleValue,
-                    toLow: minNits,
-                    toHigh: maxNits
-                )
-                map = NitsMapping(source: sourceNits, target: targetNits)
-            }
-
-            nits = cap(map.target, minVal: 0, maxVal: MAX_NITS)
-            displayController.nitsMapping[serial] = Self.insertNitsDataPoint(map, in: displayController.nitsMapping[serial] ?? [])
-            displayController.saveNitsMapping()
-        }
-
-        static func insertNitsDataPoint(_ map: NitsMapping, in values: [NitsMapping]) -> [NitsMapping] {
-            guard displayController.adaptiveModeKey != .manual else {
-                return values
-            }
-
-            let cleanedUpValues = values.filter { m in
-                m.source != map.source &&
-                    !(
-                        (m.source < map.source && m.target >= map.target) ||
-                            (m.source > map.source && m.target <= map.target)
-                    )
-            }
-            return (cleanedUpValues + [map]).uniqued(on: { $0.source }).sorted()
-        }
-    #endif
-
     static func getSecondaryMirrorScreenID(_ id: CGDirectDisplayID) -> CGDirectDisplayID? {
         guard displayIsInMirrorSet(id),
               let secondaryID = NSScreen.onlineDisplayIDs.first(where: { CGDisplayMirrorsDisplay($0) == id })
@@ -4683,7 +4613,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         #if arch(arm64)
             if isBuiltin, nitsLimitObserver == nil {
                 dispName = "disp0"
-                observeNitsCap(dispName: "disp0")
+                observeNitsLimit(dispName: "disp0")
             }
         #endif
     }

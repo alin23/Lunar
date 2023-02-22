@@ -411,7 +411,7 @@ class DisplayController: ObservableObject {
         watchScreencaptureProcess()
         initObservers()
         setupXdrTask()
-        // DisplayController.observeBacklightNitsCap()
+        // DisplayController.observeBacklightNitsLimit()
     }
 
     deinit {
