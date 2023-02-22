@@ -1984,6 +1984,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         initCache()
+        CachedDefaults[.trace] = false
         CachedDefaults[.debug] = false
         CachedDefaults[.streamLogs] = false
 

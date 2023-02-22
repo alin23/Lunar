@@ -65,7 +65,6 @@
 		C76A129E20D8084E005D4BE3 /* NumberFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */; };
 		C76A12A020D8DDAD005D4BE3 /* BrightnessContrastChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */; };
 		C76B775D26445C9B007CAAC5 /* MacToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76B775C26445C9B007CAAC5 /* MacToggle.swift */; };
-		C76B775F26447EC6007CAAC5 /* Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76B775E26447EC6007CAAC5 /* Weather.swift */; };
 		C76CB7A825CFD954007624DE /* ResetButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76CB7A725CFD954007624DE /* ResetButton.swift */; };
 		C7714AF927E4A3A9002E0B2E /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7714AF827E4A3A9002E0B2E /* Components.swift */; };
 		C7714B0627E8F11C002E0B2E /* Presets.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7714B0527E8F11C002E0B2E /* Presets.swift */; };
@@ -256,7 +255,6 @@
 		C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberFormatter.swift; sourceTree = "<group>"; };
 		C76A129F20D8DDAD005D4BE3 /* BrightnessContrastChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessContrastChartView.swift; sourceTree = "<group>"; };
 		C76B775C26445C9B007CAAC5 /* MacToggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacToggle.swift; sourceTree = "<group>"; };
-		C76B775E26447EC6007CAAC5 /* Weather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weather.swift; sourceTree = "<group>"; };
 		C76CB7A725CFD954007624DE /* ResetButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetButton.swift; sourceTree = "<group>"; };
 		C7714AF827E4A3A9002E0B2E /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		C7714B0527E8F11C002E0B2E /* Presets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Presets.swift; sourceTree = "<group>"; };
@@ -480,7 +478,6 @@
 				C7CBEFFC238E81FF00031E93 /* Util.swift */,
 				C7A82DC2261DF513004146A8 /* Pro.swift */,
 				C740A1F3262490E1004BC1C7 /* CLI.swift */,
-				C76B775E26447EC6007CAAC5 /* Weather.swift */,
 				C7714B0527E8F11C002E0B2E /* Presets.swift */,
 			);
 			path = Data;
@@ -1060,7 +1057,6 @@
 				C7AB59782396C4A90028E573 /* Transformers.swift in Sources */,
 				C722FBA0271AC83200ED4C94 /* Button.swift in Sources */,
 				C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */,
-				C76B775F26447EC6007CAAC5 /* Weather.swift in Sources */,
 				C7E80E322637060F004718A4 /* SSH.swift in Sources */,
 				C76A129E20D8084E005D4BE3 /* NumberFormatter.swift in Sources */,
 				C772BDD725E7A296006A1684 /* NetworkControl.swift in Sources */,

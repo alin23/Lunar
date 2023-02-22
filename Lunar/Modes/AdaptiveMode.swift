@@ -222,18 +222,9 @@ extension AdaptiveMode {
             return value
         }
 
-        let diff = maxVal - minVal
-//        let fact: Double
-//        if value >= 0 {
-//            fact = factor
-//        } else if factor < 1 {
-//            fact = (10 * factor * factor) - factor
-//        } else if factor > 1 {
-//            fact = 0.05 * pow(40 * factor + 1, 0.5) + 0.05
-//        } else {
-//            fact = 1
-//        }
-        return pow((value - minVal) / diff, factor) * diff + minVal
+        let range = maxVal - minVal
+        let value = cap(value, minVal: minVal, maxVal: maxVal)
+        return pow((value - minVal) / range, factor) * range + minVal
     }
 
     @inline(__always) func adjustCurveSIMD(
@@ -408,40 +399,6 @@ extension AdaptiveMode {
         )
     }
 
-    #if arch(arm64)
-        func interpolate(nits: Int, display: Display, nitsLimit: Int) -> Double {
-            let applySubzero = display.adaptiveSubzero
-            let minNits = display.minNits.d
-            let maxNits = display.maxNits.d
-            let nits = nits.d
-
-            guard let spline = displayController.brightnessSplines[display.serial] else {
-                let result: Double
-                if applySubzero, nits < minNits {
-                    result = mapNumber(nits, fromLow: -100, fromHigh: minNits, toLow: -100, toHigh: 0)
-                    if result.isNaN {
-                        log.error("NaN value?? Whyy?? WHAT DID I DO??", context: ["nits": nits])
-                        return cap(nits, minVal: minNits, maxVal: maxNits)
-                    }
-
-                    return result
-                }
-
-                return cap(nits, minVal: minNits, maxVal: maxNits)
-            }
-
-            if nits >= maxNits || nits == -100 {
-                return nits
-            }
-
-            let result = spline(nits)
-            if minNits > 0, result < minNits {
-                return mapNumber(result, fromLow: -100, fromHigh: minNits, toLow: -100, toHigh: 0)
-            }
-
-            return result
-        }
-    #endif
     func interpolate(
         values: inout [Double: Double],
         dataPoint: DataPoint,

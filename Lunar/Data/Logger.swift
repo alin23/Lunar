@@ -75,15 +75,11 @@ class Logger: SwiftyBeaver {
 
     static var observers: Set<AnyCancellable> = []
 
-    @Atomic static var trace: Bool = {
-        tracePublisher.sink { Logger.trace = $0.newValue }.store(in: &observers)
-        return Defaults[.trace]
-    }()
+    @Atomic static var trace: Bool = Defaults[.trace] && Defaults[.debug]
 
     static let console = ConsoleDestination()
     static let file = FileDestination()
     static let cloud = SBPlatformDestination(appID: "WxjbvQ", appSecret: secrets.appSecret, encryptionKey: secrets.encryptionKey)
-    static var debugModeObserver: Cancellable?
     @Atomic static var initialized = false
 
     class func initLogger(cli: Bool = false, debug: Bool = false, verbose: Bool = false) {
@@ -95,31 +91,34 @@ class Logger: SwiftyBeaver {
         Logger.addDestination(console)
 
         let debugMode = { (enabled: Bool) in
-            enabled || TEST_MODE || AppSettings.beta
+            enabled || TEST_MODE
         }
 
         setMinLevel(
             debug: !cli && debugMode(cli ? debug : Defaults[.debug]),
             verbose: !cli && (verbose || TEST_MODE || Defaults[.debug]),
-            cloud: !cli && AppSettings.beta,
+            cloud: false,
             cli: cli
         )
-        debugModeObserver = debugPublisher.sink { change in
+
+        debugPublisher.sink { change in
             guard !cli else { return }
+            Logger.trace = Defaults[.trace] && change.newValue
             self.setMinLevel(
                 debug: debugMode(change.newValue),
                 verbose: verbose || TEST_MODE || change.newValue,
-                cloud: !cli && AppSettings.beta
+                cloud: false
             )
         }
+        .store(in: &observers)
+
+        tracePublisher
+            .sink { Logger.trace = $0.newValue && Defaults[.debug] }
+            .store(in: &observers)
 
         #if !DEBUG
             if debug || verbose {
                 Logger.addDestination(file)
-            }
-            if !cli, AppSettings.beta {
-                cloud.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M \n\t$X"
-                Logger.addDestination(cloud)
             }
         #endif
 

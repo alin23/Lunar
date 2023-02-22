@@ -20,6 +20,24 @@ import Surge
 import SwiftDate
 import SwiftyJSON
 
+func IOServiceFirstMatchingWhere(_ matching: CFDictionary, where predicate: (io_service_t) -> Bool) -> io_service_t? {
+    var ioIterator = io_iterator_t()
+
+    guard IOServiceGetMatchingServices(kIOMasterPortDefault, matching, &ioIterator) == KERN_SUCCESS
+    else {
+        return nil
+    }
+
+    defer { IOObjectRelease(ioIterator) }
+    while case let ioService = IOIteratorNext(ioIterator), ioService != 0 {
+        if predicate(ioService) {
+            return ioService
+        }
+        IOObjectRelease(ioService)
+    }
+    return nil
+}
+
 #if arch(arm64)
     let DCP_NAMES = ["dcp", "dcpext", "dcp0"] + (0 ... 7).map { "dcpext\($0)" }
     let DISP_NAMES = ["disp"] + (0 ... 7).map { "dispext\($0)" } + (0 ... 7).map { "disp\($0)" }
@@ -357,6 +375,20 @@ func ?! <T: BinaryInteger>(_ num: T?, _ num2: T) -> T {
     return num
 }
 
+func ?! (_ num: Double?, _ num2: Double) -> Double {
+    guard let num, num != 0 else {
+        return num2
+    }
+    return num
+}
+
+func ?! (_ num: Float?, _ num2: Float) -> Float {
+    guard let num, num != 0 else {
+        return num2
+    }
+    return num
+}
+
 func ?! (_ svc: io_service_t?, _ svc2: io_service_t?) -> io_service_t? {
     guard let svc, svc != 0 else {
         return svc2
@@ -395,7 +427,6 @@ class DisplayController: ObservableObject {
     static var panelManager: MPDisplayMgr? = MPDisplayMgr()
     static var manualModeFromSyncMode = false
 
-    static let NAME_NUMBER_REGEX = #" \(\d+\)$"#.r!
     var averageDDCWriteNanoseconds: ThreadSafeDictionary<CGDirectDisplayID, UInt64> = ThreadSafeDictionary()
     var averageDDCReadNanoseconds: ThreadSafeDictionary<CGDirectDisplayID, UInt64> = ThreadSafeDictionary()
 
@@ -834,7 +865,7 @@ class DisplayController: ObservableObject {
         var score = 0
 
         if let name {
-            let edidName = NAME_NUMBER_REGEX.replaceAll(in: display.edidName.lowercased(), with: "")
+            let edidName = Display.numberNamePattern.replaceAll(in: display.edidName.lowercased(), with: "")
             score += (edidName == name.lowercased() ? 1 : -1)
         }
 
@@ -1527,7 +1558,7 @@ class DisplayController: ObservableObject {
             .debounce(for: .seconds(1), scheduler: RunLoop.main)
             .sink { [self] change in
                 autoXdrSensor = change.newValue
-                guard let display = builtinDisplay, display.isMacBookXDR, let lux = SensorMode.getInternalSensorLux()?.f else {
+                guard let display = builtinDisplay, display.isMacBookXDR, let lux = SensorMode.getInternalSensorLux() else {
                     xdrSensorTask = nil
                     return
                 }
@@ -1649,18 +1680,18 @@ class DisplayController: ObservableObject {
         guard lunarProActive, !display.enhanced, let exceptions = runningAppExceptions, !exceptions.isEmpty,
               let screen = display.nsScreen
         else {
-            #if DEBUG
-                log.debug("!exceptions: \(runningAppExceptions ?? [])")
-                log.debug("!screen: \(display.nsScreen?.description ?? "")")
-                log.debug("!xdr: \(display.enhanced)")
-            #endif
+//            #if DEBUG
+//                log.debug("!exceptions: \(runningAppExceptions ?? [])")
+//                log.debug("!screen: \(display.nsScreen?.description ?? "")")
+//                log.debug("!xdr: \(display.enhanced)")
+//            #endif
             mainAsync { display.appPreset = nil }
             return nil
         }
-        #if DEBUG
-            log.debug("exceptions: \(exceptions)")
-            log.debug("screen: \(screen)")
-        #endif
+//        #if DEBUG
+//            log.debug("exceptions: \(exceptions)")
+//            log.debug("screen: \(screen)")
+//        #endif
 
         if activeDisplays.count == 1, let app = runningAppExceptions.first,
            app.runningApps?.first?.windows(appException: app) == nil

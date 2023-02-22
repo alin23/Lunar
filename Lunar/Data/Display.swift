@@ -607,8 +607,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         super.init()
         #if arch(arm64)
-            maxNits = try container.decodeIfPresent(Int.self, forKey: .maxNits) ?! getMaxNits()
-            minNits = try container.decodeIfPresent(Int.self, forKey: .minNits) ?? getMinNits()
+            maxNits = try container.decodeIfPresent(Double.self, forKey: .maxNits) ?! getMaxNits()
+            minNits = try container.decodeIfPresent(Double.self, forKey: .minNits) ?? getMinNits()
         #endif
 
         defer {
@@ -1590,9 +1590,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }()
 
     var screenFetcher: Repeater?
-
     var nativeBrightnessRefresher: Repeater?
-    var nativeContrastRefresher: Repeater?
+    // var nativeContrastRefresher: Repeater?
 
     @Published @objc dynamic var brightnessU16: UInt16 = 50
 
@@ -1814,14 +1813,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         var dcpName = ""
         var displayProps: [String: Any]? {
             didSet {
-                if !dispName.isEmpty, let displayProps, displayProps["property"] != nil {
-                    observeNitsCap(dispName: dispName)
-                }
+                checkNitsObserver()
             }
         }
         var nitsLimitObserver: IOServicePropertyObserver?
 
-        @Published @objc var minNits = 0 {
+        @Published @objc var minNits: Double = 0 {
             didSet {
                 guard minNits < maxNits else {
                     minNits = maxNits - 1
@@ -1834,7 +1831,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 save()
             }
         }
-        @Published @objc var maxNits = 500 {
+        @Published @objc var maxNits: Double = 500 {
             didSet {
                 guard maxNits > minNits else {
                     maxNits = minNits + 1
@@ -1855,7 +1852,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
         }
 
-        @Published var nits: Int? = nil {
+        @Published var nits: Double? = nil {
             didSet {
                 #if DEBUG
                     if let nits, nits > 0, nits != oldValue {
@@ -2274,12 +2271,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     @objc dynamic lazy var notchEnabled: Bool = {
-        guard Sysctl.isMacBook, hasNotch, let mode = panelMode else { return false }
+        guard isMacBook, hasNotch, let mode = panelMode else { return false }
 
         return mode.withoutNotch(modes: panelModes) != nil
     }() {
         didSet {
-            guard apply, Sysctl.isMacBook, hasNotch, let mode = panelMode else { return }
+            guard apply, isMacBook, hasNotch, let mode = panelMode else { return }
 
             self.withoutModeChangeAsk {
                 if notchEnabled, !oldValue, let modeWithNotch = mode.withNotch(modes: panelModes) {
@@ -2900,7 +2897,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var preciseBrightnessContrast = 0.5 {
         didSet {
             guard applyPreciseValue else {
-                log.verbose("preciseBrightnessContrast=\(preciseBrightnessContrast) applyPreciseValue=false")
+//                log.verbose("preciseBrightnessContrast=\(preciseBrightnessContrast) applyPreciseValue=false")
                 return
             }
 
@@ -3831,32 +3828,33 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 return
             }
 
-            let targetNits = mapNumber(
-                targetValue,
-                fromLow: minBrightness.doubleValue,
-                fromHigh: maxBrightness.doubleValue,
-                toLow: minNits.d,
-                toHigh: maxNits.d
-            ).intround
-
             if sourceDisplay.softwareBrightness < 1 {
                 sourceNits = mapNumber(
-                    sourceNits < minNits ? sourceNits.f : ((1.0 - sourceDisplay.softwareBrightness) * -100),
-                    fromLow: -100, fromHigh: minNits.f, toLow: -100, toHigh: 0
-                ).intround
+                    sourceNits < minNits ? sourceNits : ((1.0 - sourceDisplay.softwareBrightness) * -100).d,
+                    fromLow: -100, fromHigh: minNits, toLow: -100, toHigh: 0
+                )
             }
 
             let map: NitsMapping
             if adaptiveSubzero, softwareBrightness < 1 {
-                var targetNits = ((1.0 - softwareBrightness) * -100)
-                targetNits = mapNumber(targetNits, fromLow: -100, fromHigh: 0, toLow: -100, toHigh: minNits.f)
+                let targetNits = mapNumber(
+                    ((1.0 - softwareBrightness) * -100).d,
+                    fromLow: -100, fromHigh: 0, toLow: -100, toHigh: minNits
+                )
 
-                map = NitsMapping(source: sourceNits, target: targetNits.intround)
+                map = NitsMapping(source: sourceNits, target: targetNits)
             } else {
+                let targetNits = mapNumber(
+                    targetValue,
+                    fromLow: minBrightness.doubleValue,
+                    fromHigh: maxBrightness.doubleValue,
+                    toLow: minNits,
+                    toHigh: maxNits
+                )
                 map = NitsMapping(source: sourceNits, target: targetNits)
             }
 
-            nits = cap(map.target, minVal: 0, maxVal: MAX_NITS.i)
+            nits = cap(map.target, minVal: 0, maxVal: MAX_NITS)
             displayController.nitsMapping[serial] = Self.insertNitsDataPoint(map, in: displayController.nitsMapping[serial] ?? [])
             displayController.saveNitsMapping()
         }
@@ -4196,13 +4194,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func setNotchState() {
         mainAsync {
-            if #available(macOS 12.0, *), Sysctl.isMacBook {
+            if #available(macOS 12.0, *), self.isMacBook {
                 self.hasNotch = (self.nsScreen?.safeAreaInsets.top ?? 0) > 0 || self.panelMode?.withNotch(modes: self.panelModes) != nil
             } else {
                 self.hasNotch = false
             }
 
-            guard Sysctl.isMacBook, self.hasNotch, let mode = self.panelMode else { return }
+            guard self.isMacBook, self.hasNotch, let mode = self.panelMode else { return }
 
             self.withoutApply {
                 self.notchEnabled = mode.withoutNotch(modes: self.panelModes) != nil
@@ -4665,20 +4663,23 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         guard isNative else { return }
 
         let listensForBrightnessChange = observeBrightnessChangeDS() && hasBrightnessChangeObserver
-        let refreshSeconds = listensForBrightnessChange ? 5.0 : 2.0
-        nativeBrightnessRefresher = nativeBrightnessRefresher ?? Repeater(every: refreshSeconds, name: "\(name) Brightness Refresher") { [weak self] in
-            guard let self, !displayController.screensSleeping, self.isNative else {
-                return
+        if listensForBrightnessChange {
+            nativeBrightnessRefresher = nil
+        } else {
+            nativeBrightnessRefresher = nativeBrightnessRefresher ?? Repeater(every: 2, name: "\(name) Brightness Refresher") { [weak self] in
+                guard let self, !displayController.screensSleeping, self.isNative else {
+                    return
+                }
+                self.refreshBrightness()
             }
-            self.refreshBrightness()
         }
-        nativeContrastRefresher = nativeContrastRefresher ?? Repeater(every: 15, name: "\(name) Contrast Refresher") { [weak self] in
-            guard let self, !displayController.screensSleeping, self.isNative else {
-                return
-            }
+        // nativeContrastRefresher = nativeContrastRefresher ?? Repeater(every: 15, name: "\(name) Contrast Refresher") { [weak self] in
+        //     guard let self, !displayController.screensSleeping, self.isNative else {
+        //         return
+        //     }
 
-            self.refreshContrast()
-        }
+        //     self.refreshContrast()
+        // }
         #if arch(arm64)
             if isBuiltin, nitsLimitObserver == nil {
                 dispName = "disp0"
