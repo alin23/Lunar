@@ -1641,7 +1641,9 @@ Note: not all monitors support color gain control through DDC and value effect c
 
     // swiftformat:enable all
     static var parameterSummary: some ParameterSummary {
-        Summary("Adjust color gain to（\(\.$red) Red｜\(\.$green) Green｜\(\.$blue) Blue）for \(\.$screen)")
+        Summary("Adjust color gain to（\(\.$red) Red｜\(\.$green) Green｜\(\.$blue) Blue）for \(\.$screen)") {
+            \.$delayBetween
+        }
     }
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery(filter: { $0.hasDDC }))
@@ -1674,13 +1676,34 @@ Note: not all monitors support color gain control through DDC and value effect c
     )
     var blue: Int
 
+    @Parameter(title: "Add a small delay between sending each color", default: false)
+    var delayBetween: Bool
+
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
         screen.displays.forEach { display in
             display.redGain = red.ns
-            display.greenGain = green.ns
-            display.blueGain = blue.ns
+            guard delayBetween else {
+                display.greenGain = green.ns
+                display.blueGain = blue.ns
+                return
+            }
+
+            let id = display.id
+            mainAsyncAfter(ms: 500) {
+                guard let display = displayController.activeDisplays[id] else {
+                    return
+                }
+                display.greenGain = green.ns
+
+                mainAsyncAfter(ms: 500) {
+                    guard let display = displayController.activeDisplays[id] else {
+                        return
+                    }
+                    display.blueGain = blue.ns
+                }
+            }
         }
 
         return .result()

@@ -839,7 +839,8 @@ enum InfoPlistKey {
 
 enum AppSettings {
     static let testMode = (infoDict[InfoPlistKey.testMode] as! String) == "YES"
-    static let beta = (infoDict[InfoPlistKey.beta] as! String) == "YES"
+
+//    static let beta = (infoDict[InfoPlistKey.beta] as! String) == "YES"
 
     private static var infoDict: [String: Any] {
         if let dict = Bundle.main.infoDictionary {

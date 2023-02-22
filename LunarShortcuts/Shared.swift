@@ -260,8 +260,8 @@ extension Defaults.Keys {
 
 #if arch(arm64)
     struct NitsMapping: Codable, Defaults.Serializable, Equatable, Comparable {
-        let source: Int
-        let target: Int
+        let source: Double
+        let target: Double
 
         static func < (lhs: NitsMapping, rhs: NitsMapping) -> Bool {
             lhs.source < rhs.source

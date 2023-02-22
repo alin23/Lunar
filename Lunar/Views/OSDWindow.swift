@@ -159,7 +159,7 @@ public struct BigSurSlider: View {
         knobTextColor: Color? = nil,
         knobTextColorBinding: Binding<Color?>? = nil,
         showValue: Binding<Bool>? = nil,
-        shownValue: Binding<Int?>? = nil,
+        shownValue: Binding<Double?>? = nil,
         acceptsMouseEvents: Binding<Bool>? = nil,
         disabled: Binding<Bool>? = nil,
         enableText: String? = nil,
@@ -215,7 +215,7 @@ public struct BigSurSlider: View {
                             .frame(width: sliderHeight, height: sliderHeight, alignment: .trailing)
                             .brightness(env.draggingSlider && hovering ? -0.2 : 0)
                         if showValue {
-                            Text(shownValue?.s ?? (percentage * 100).str(decimals: 0))
+                            Text((shownValue?.f ?? (percentage * 100)).str(decimals: 0))
                                 .foregroundColor(knobTextColor)
                                 .font(.system(size: 8, weight: .medium, design: .monospaced))
                                 .allowsHitTesting(false)
@@ -326,7 +326,7 @@ public struct BigSurSlider: View {
     @Binding var knobColor: Color?
     @Binding var knobTextColor: Color?
     @Binding var showValue: Bool
-    @Binding var shownValue: Int?
+    @Binding var shownValue: Double?
 
     @State var scrollWheelListener: Cancellable?
 

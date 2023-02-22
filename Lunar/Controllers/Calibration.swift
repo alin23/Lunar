@@ -33,22 +33,22 @@ struct DisplayCalibrationView: View {
                         .onChange(of: nitsRange) { nitsRange in
                             guard apply else { return }
                             withoutApply {
-                                let newMinNits = nitsRange.lowerBound.intround
+                                let newMinNits = nitsRange.lowerBound.d
                                 if newMinNits != display.minNits {
                                     display.minNits = newMinNits
                                     display.brightness = display.minBrightness
                                     if let source = displayController.sourceDisplay, source.id != display.id, let spline = source.nitsSpline {
-                                        source.brightness = cap(spline(newMinNits.d), minVal: source.minBrightness.doubleValue, maxVal: source.maxBrightness.doubleValue).ns
+                                        source.brightness = cap(spline(newMinNits), minVal: source.minBrightness.doubleValue, maxVal: source.maxBrightness.doubleValue).ns
                                     }
                                     return
                                 }
 
-                                let newMaxNits = nitsRange.upperBound.intround
+                                let newMaxNits = nitsRange.upperBound.d
                                 if newMaxNits != display.maxNits {
                                     display.maxNits = newMaxNits
                                     display.brightness = display.maxBrightness
                                     if let source = displayController.sourceDisplay, source.id != display.id, let spline = source.nitsSpline {
-                                        source.brightness = cap(spline(newMaxNits.d), minVal: source.minBrightness.doubleValue, maxVal: source.maxBrightness.doubleValue).ns
+                                        source.brightness = cap(spline(newMaxNits), minVal: source.minBrightness.doubleValue, maxVal: source.maxBrightness.doubleValue).ns
                                     }
                                 }
                             }

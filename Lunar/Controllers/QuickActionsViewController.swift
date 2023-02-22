@@ -279,7 +279,7 @@ struct DisplayRowView: View {
             #if arch(arm64)
                 let shownValue = (showSliderValuesNits && syncNits && syncMode && syncPollingSeconds == 0) ? $display.nits : nil
             #else
-                let shownValue: Binding<Int?>? = nil
+                let shownValue: Binding<Double?>? = nil
             #endif
             if !display.blackOutEnabled {
                 if display.noDDCOrMergedBrightnessContrast {
@@ -665,13 +665,10 @@ struct HDRSettingsView: View {
 // MARK: - AdvancedSettingsView
 
 struct AdvancedSettingsView: View {
-    @Default(.hideMenuBarIcon) var hideMenuBarIcon
-    @Default(.showDockIcon) var showDockIcon
-    @Default(.moreGraphData) var moreGraphData
-
     @Default(.silentUpdate) var silentUpdate
     @Default(.workaroundBuiltinDisplay) var workaroundBuiltinDisplay
     @Default(.debug) var debug
+    @Default(.trace) var trace
     @Default(.ddcSleepLonger) var ddcSleepLonger
     @Default(.clamshellModeDetection) var clamshellModeDetection
     @Default(.enableOrientationHotkeys) var enableOrientationHotkeys
@@ -697,13 +694,6 @@ struct AdvancedSettingsView: View {
             Color.clear.frame(maxWidth: .infinity, alignment: .leading)
             VStack(alignment: .leading) {
                 Group {
-                    SettingsToggle(text: "Hide menubar icon", setting: $hideMenuBarIcon)
-                    SettingsToggle(text: "Show dock icon", setting: $showDockIcon)
-                    SettingsToggle(
-                        text: "Show more graph data",
-                        setting: $moreGraphData,
-                        help: "Renders values and data lines on the bottom graph of the preferences window"
-                    )
                     SettingsToggle(text: "Install updates silently in the background", setting: $silentUpdate)
                     SettingsToggle(
                         text: "Enable verbose logging", setting: $debug,
@@ -714,6 +704,9 @@ struct AdvancedSettingsView: View {
                         to avoid filling up disk space with unnecessary logs.
                         """
                     )
+                    SettingsToggle(text: "Trace brightness changes", setting: $trace)
+                        .padding(.leading)
+                        .disabled(!debug)
                 }
                 Divider()
                 Group {
@@ -977,6 +970,10 @@ struct QuickActionsLayoutView: View {
     @Default(.allowAnySyncSource) var allowAnySyncSource
     @Default(.keepOptionsMenu) var keepOptionsMenu
 
+    @Default(.hideMenuBarIcon) var hideMenuBarIcon
+    @Default(.showDockIcon) var showDockIcon
+    @Default(.moreGraphData) var moreGraphData
+
     var body: some View {
         ZStack {
             Color.clear.frame(maxWidth: .infinity, alignment: .leading)
@@ -1024,6 +1021,16 @@ struct QuickActionsLayoutView: View {
                     )
                     .padding(.leading)
                     .disabled(!showBrightnessMenuBar)
+                }
+                Divider()
+                Group {
+                    SettingsToggle(text: "Hide menubar icon", setting: $hideMenuBarIcon)
+                    SettingsToggle(text: "Show dock icon", setting: $showDockIcon)
+                    SettingsToggle(
+                        text: "Show more graph data",
+                        setting: $moreGraphData,
+                        help: "Renders values and data lines on the bottom graph of the preferences window"
+                    )
                 }
                 Spacer()
                 Color.clear
@@ -1690,7 +1697,7 @@ struct QuickActionsMenuView: View {
     @ViewBuilder var optionsMenu: some View {
         VStack(spacing: 10) {
             HStack {
-                SwiftUI.Button("Menu layout") {
+                SwiftUI.Button("Layout") {
                     withAnimation(.fastSpring) { env.optionsTab = .layout }
                 }
                 .buttonStyle(PickerButton(
@@ -1703,7 +1710,7 @@ struct QuickActionsMenuView: View {
                 ))
                 .font(.system(size: 12, weight: env.optionsTab == .layout ? .bold : .medium, design: .rounded))
 
-                SwiftUI.Button("Advanced settings") {
+                SwiftUI.Button("Advanced") {
                     withAnimation(.fastSpring) { env.optionsTab = .advanced }
                 }
                 .buttonStyle(PickerButton(
