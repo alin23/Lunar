@@ -80,6 +80,7 @@ It works well along Night Shift and True Tone (and f.lux if Gamma dimming is not
 ## Tested and known to work with the following types of connections
 - HDMI (1.0 - 2.1)
 - DisplayPort (1.0 - 2.0)
+- Thunderbolt 4 (USB Type-C)
 - Thunderbolt 3 (USB Type-C)
 - Thunderbolt 2 (mini DisplayPort)
 - VGA
@@ -90,4 +91,4 @@ It works well along Night Shift and True Tone (and f.lux if Gamma dimming is not
 I'm pausing contributions for the moment as Lunar has paid features and isn't compilable because of missing parts of the source code *(Pro features code is encrypted)*.
 
 ### Building
-Lunar can't be built from this repo yet as the source code for the paid features is hidden. I will try to post stubs for those paid features to at least make it compilable in an only-free-features form.
+Lunar can't be built from this repo as the source code for the paid features is hidden.
