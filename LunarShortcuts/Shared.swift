@@ -183,6 +183,7 @@ extension Defaults.Keys {
     static let showPowerInQuickActions = Key<Bool>("showPowerInQuickActions", default: true)
     static let neverShowBlackoutPopover = Key<Bool>("neverShowBlackoutPopover", default: false)
     static let clamshellModeDetection = Key<Bool>("clamshellModeDetection", default: true)
+    static let disableBrightnessObservers = Key<Bool>("disableBrightnessObservers", default: false)
     static let brightnessStep = Key<Int>("brightnessStep", default: 6)
     static let contrastStep = Key<Int>("contrastStep", default: 6)
     static let volumeStep = Key<Int>("volumeStep", default: 6)
@@ -195,7 +196,7 @@ extension Defaults.Keys {
 
     static let ddcSleepLonger = Key<Bool>("ddcSleeplonger", default: false)
 
-    static let sensorPollingSeconds = Key<Int>("sensorPollingSeconds", default: 2)
+    static let sensorPollingSeconds = Key<Int>("sensorPollingSeconds", default: 1)
     static let adaptiveBrightnessMode = Key<AdaptiveModeKey>("adaptiveBrightnessMode", default: .sync)
 
     static let nonManualMode = Key<Bool>("nonManualMode", default: true)

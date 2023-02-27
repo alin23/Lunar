@@ -32,6 +32,12 @@ class OnboardingDisplayCellView: NSTableCellView {
 
             syncButton.isHidden = CachedDefaults[.adaptiveBrightnessMode] != .sync
 
+            if !display.supportsGammaByDefault {
+                button.attributedTitle = "Supports Overlay Dimming".withTextColor(red)
+                button.helpText = SOFTWARE_OVERLAY_HELP_TEXT
+                return
+            }
+
             button.bg = .clear
             switch display.controlResult.type {
             case .appleNative:

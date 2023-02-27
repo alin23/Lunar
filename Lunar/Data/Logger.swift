@@ -90,23 +90,23 @@ class Logger: SwiftyBeaver {
         file.logFileAmount = 3
         Logger.addDestination(console)
 
-        let debugMode = { (enabled: Bool) in
-            enabled || TEST_MODE
-        }
-
-        setMinLevel(
-            debug: !cli && debugMode(cli ? debug : Defaults[.debug]),
-            verbose: !cli && (verbose || TEST_MODE || Defaults[.debug]),
-            cloud: false,
-            cli: cli
-        )
+        #if DEBUG
+            setMinLevel(debug: !cli, verbose: !cli, cloud: false, cli: cli)
+        #else
+            setMinLevel(
+                debug: !cli && (debug || Defaults[.debug]),
+                verbose: !cli && (verbose || Defaults[.debug]),
+                cloud: false,
+                cli: cli
+            )
+        #endif
 
         debugPublisher.sink { change in
             guard !cli else { return }
             Logger.trace = Defaults[.trace] && change.newValue
             self.setMinLevel(
-                debug: debugMode(change.newValue),
-                verbose: verbose || TEST_MODE || change.newValue,
+                debug: change.newValue,
+                verbose: change.newValue,
                 cloud: false
             )
         }

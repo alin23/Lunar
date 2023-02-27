@@ -64,13 +64,13 @@ class PageController: NSPageController {
             let externalDisplays: [Any] = displayController.externalActiveDisplays
                 .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
             arrangedObjects.append(contentsOf: externalDisplays + builtinDisplays)
-        } else if TEST_MODE {
-            let builtinDisplays: [Any] = displayController.builtinDisplays
-                .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
-            let externalDisplays: [Any] = displayController.externalDisplays
-                .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
-            let displays = externalDisplays + builtinDisplays
-            arrangedObjects.append(contentsOf: displays.isEmpty ? [GENERIC_DISPLAY] : displays.map { $0 })
+            // } else if TEST_MODE {
+            //     let builtinDisplays: [Any] = displayController.builtinDisplays
+            //         .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
+            //     let externalDisplays: [Any] = displayController.externalDisplays
+            //         .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
+            //     let displays = externalDisplays + builtinDisplays
+            //     arrangedObjects.append(contentsOf: displays.isEmpty ? [GENERIC_DISPLAY] : displays.map { $0 })
         } else {
             arrangedObjects.append(GENERIC_DISPLAY)
         }

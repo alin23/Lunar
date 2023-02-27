@@ -933,7 +933,7 @@ class ControlChoiceViewController: NSViewController {
             .debounce(for: .seconds(2), scheduler: RunLoop.main)
             .sink { [weak self] _ in
                 self?.cancelled = true
-                cancelTask(ONBOARDING_TASK_KEY)
+                OnboardPageController.task?.cancel()
 
                 log.debug("Restarting Onboarding after display list change")
 
@@ -956,7 +956,7 @@ class ControlChoiceViewController: NSViewController {
                         }
 
                         self.cancelled = true
-                        cancelTask(ONBOARDING_TASK_KEY)
+                        OnboardPageController.task?.cancel()
                         self.semaphore.signal()
 
                         wc.changes = []
@@ -984,6 +984,7 @@ class ControlChoiceViewController: NSViewController {
         didAppear = true
         uiCrumb("Control Tester")
 
+        cancelled = false
         adaptiveModeDisabledByDiagnostics = false
         if displayController.adaptiveModeKey != .manual {
             displayController.disable()
@@ -1021,8 +1022,12 @@ class ControlChoiceViewController: NSViewController {
             }
         }
 
-        asyncAfter(ms: 10, uniqueTaskKey: ONBOARDING_TASK_KEY) { [weak self] in
-            guard let self, !self.cancelled, let firstDisplay = displayController.externalActiveDisplays.first else { return }
+        OnboardPageController.task = asyncAfter(ms: 10, name: ONBOARDING_TASK_KEY) { [weak self] in
+            let displays = displayController.externalDisplaysForTest
+            guard let self, !self.cancelled, !OnboardPageController.task.isCancelled, let firstDisplay = displays.first else {
+                return
+            }
+
             mainThread {
                 self.displayName.transition(0.5, easing: .easeOutExpo)
                 self.displayName.alphaValue = 1.0
@@ -1034,19 +1039,13 @@ class ControlChoiceViewController: NSViewController {
                 buttonColor: lunarYellow, buttonText: "Continue".withTextColor(mauve)
             ) {}
 
-            self.displayProgressStep = 1.0 / displayController.externalActiveDisplays.count.d
-            displayController.externalActiveDisplays
-                .filter { d in
-                    !d.isSidecar && !d.isAirplay
-                }
-                .enumerated().forEach { i, d in
-                    self.testDisplay(d, index: i)
-                }
+            self.displayProgressStep = 1.0 / displays.count.d
+            displays.enumerated().forEach { i, d in
+                self.testDisplay(d, index: i)
+            }
 
             self.queueChange {
-                displayController.externalActiveDisplays.forEach { d in
-                    d.resetControl()
-                }
+                displayController.externalActiveDisplays.forEach { $0.resetControl() }
             }
 
             mainThread {

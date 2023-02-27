@@ -675,72 +675,8 @@ func serialAsyncAfter(ms: Int, _ action: DispatchWorkItem) {
     serialQueue.asyncAfter(deadline: deadline, execute: action.workItem)
 }
 
-@discardableResult func asyncAfter(
-    ms: Int,
-    uniqueTaskKey: String? = nil,
-    mainThread: Bool = false,
-    _ action: @escaping () -> Void
-) -> DispatchWorkItem {
-    let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
-
-    let task: DispatchWorkItem
-    if let key = uniqueTaskKey {
-        task = DispatchWorkItem(name: "Unique Task \(key) asyncAfter(\(ms) ms)") {
-            guard !isCancelled(key) else {
-                taskManager(key, nil)
-                return
-            }
-            action()
-            taskManager(key, nil)
-        }
-
-        taskManagerQueue.async {
-            (Thread.current.threadDictionary[key] as? DispatchWorkItem)?.cancel()
-            Thread.current.threadDictionary["\(key)-cancelled"] = false
-            Thread.current.threadDictionary[key] = task
-        }
-    } else {
-        task = DispatchWorkItem(name: "asyncAfter(\(ms) ms)") {
-            action()
-        }
-    }
-
-    if mainThread {
-        DispatchQueue.main.asyncAfter(deadline: deadline, execute: task.workItem)
-    } else {
-        concurrentQueue.asyncAfter(deadline: deadline, execute: task.workItem)
-    }
-
-    return task
-}
-
-func taskIsRunning(_ key: String) -> Bool {
-    if let timer = taskManager(key) as? DispatchSourceTimer { return !timer.isCancelled }
-    if let timer = taskManager(key) as? DispatchWorkItem { return !timer.isCancelled }
-    if let timer = taskManager(key) as? Timer { return timer.isValid }
-    return false
-}
-
 func cancelScreenWakeAdapterTask() {
     appDelegate!.screenWakeAdapterTask = nil
-}
-
-func cancelTask(_ key: String, subscriberKey: String? = nil) {
-    guard let task = taskManager(key) else { return }
-
-    taskManager("\(key)-cancelled", true)
-    if let task = task as? DispatchWorkItem {
-        task.cancel()
-    } else if let task = task as? DispatchSourceTimer {
-        task.cancel()
-    } else if let task = task as? Timer {
-        task.invalidate()
-    }
-
-    globalObservers.removeValue(forKey: subscriberKey ?? key)
-    taskManagerQueue.async {
-        Thread.current.threadDictionary.removeObject(forKey: key)
-    }
 }
 
 @discardableResult func asyncNow(
@@ -824,22 +760,6 @@ extension DispatchQueue {
         } else {
             return sync { action() }
         }
-    }
-}
-
-func isCancelled(_ key: String) -> Bool {
-    taskManagerQueue.syncSafe {
-        Thread.current.threadDictionary[key] == nil || (Thread.current.threadDictionary["\(key)-cancelled"] as? Bool) ?? false
-    }
-}
-
-func taskManager(_ key: String, _ value: Any?) {
-    taskManagerQueue.async { Thread.current.threadDictionary[key] = value }
-}
-
-func taskManager(_ key: String) -> Any? {
-    taskManagerQueue.syncSafe {
-        Thread.current.threadDictionary[key]
     }
 }
 

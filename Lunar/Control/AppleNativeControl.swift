@@ -40,7 +40,7 @@ class AppleNativeControl: Control {
     static func isAvailable(for display: Display) -> Bool {
         guard display.active else { return false }
         guard let enabledForDisplay = display.enabledControls[.appleNative], enabledForDisplay else { return false }
-        #if TEST_MODE
+        #if DEBUG
             return display.isForTesting || display.canChangeBrightnessDS
         #else
             return display.canChangeBrightnessDS

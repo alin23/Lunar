@@ -65,7 +65,6 @@ extension DispatchQueue {
             windowControllerQueue,
             smoothDDCQueue,
             smoothDisplayServicesQueue,
-            taskManagerQueue,
             gammaQueue,
         ]
         _registerDetection(of: queues, key: key)

@@ -249,7 +249,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
                 fieldEditor.insertionPointColor = darkMauve
             }
         }
-        asyncAfter(ms: 200, mainThread: true) { self.lightenUp(color: self.editingTextFieldColor) }
+        mainAsyncAfter(ms: 200) { self.lightenUp(color: self.editingTextFieldColor) }
         return success
     }
 

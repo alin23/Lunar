@@ -59,12 +59,10 @@ let smoothDisplayServicesQueue = DispatchQueue(
     attributes: .concurrent
 )
 
-let taskManagerQueue = DispatchQueue(label: "fyi.lunar.taskManager.queue", qos: .userInteractive)
 let serialQueue = DispatchQueue(label: "fyi.lunar.serial.queue", qos: .userInitiated)
 let gammaQueue = DispatchQueue(label: "fyi.lunar.gamma.queue", qos: .userInteractive)
 let appName = (Bundle.main.infoDictionary?["CFBundleName"] as? String) ?? "Lunar"
 
-let TEST_MODE = AppSettings.testMode
 let LOG_URL = fm.urls(for: .cachesDirectory, in: .userDomainMask).first?.appendingPathComponent(appName, isDirectory: true)
     .appendingPathComponent("swiftybeaver.log", isDirectory: false)
 
@@ -306,13 +304,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     var externalLux: String {
-        guard SensorMode.wirelessSensorURL != nil else { return "" }
-        return "External light sensor: **\(SensorMode.specific.lastExternalAmbientLight.str(decimals: 2)) lux**\n"
+        guard SensorMode.wirelessSensorURL != nil, let lux = SensorMode.specific.lastExternalAmbientLight else { return "" }
+        return "External light sensor: **\(lux.str(decimals: 2)) lux**\n"
     }
 
     var internalLux: String {
         guard let lux = SensorMode.getInternalSensorLux() else { return "" }
-        return "Internal light sensor: **\(lux) lux**\n"
+        return "Internal light sensor: **\(lux.str(decimals: 2)) lux**\n"
     }
 
     var sun: String {
@@ -975,7 +973,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     func manageDisplayControllerActivity(mode: AdaptiveModeKey) {
-        log.debug("Started DisplayController in \(mode.str) mode")
+//        log.debug("Started DisplayController in \(mode.str) mode")
         mainAsyncAfter(ms: 1000) {
             displayController.adaptBrightness()
         }
@@ -2081,6 +2079,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             return
         }
 
+        initCacheTransitionLogging()
+        Defaults[.launchCount] += 1
+
+        startTime = Date()
+        lastBlackOutToggleDate = Date()
+        Defaults[.secondPhase] = initFirstPhase()
         #if arch(arm64)
             if #available(macOS 13, *) {
                 if restarted {
@@ -2092,13 +2096,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 Defaults[.possiblyDisconnectedDisplays] = []
             }
         #endif
-
-        initCacheTransitionLogging()
-        Defaults[.launchCount] += 1
-
-        startTime = Date()
-        lastBlackOutToggleDate = Date()
-        Defaults[.secondPhase] = initFirstPhase()
 
         listenForRemoteCommandsPublisher
             .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
@@ -2156,7 +2153,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         startReceivingSignificantLocationChanges()
 
-        #if TEST_MODE
+        #if DEBUG
 //            if !datastore.shouldOnboard {
 //                showWindow()
 //            }
@@ -2226,6 +2223,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     @IBAction func openLunarDiagnostics(_: Any) {
+        guard !displayController.externalDisplaysForTest.isEmpty else {
+            notify(identifier: "diagnostics", title: "No monitors to diagnose", body: "")
+            return
+        }
         useOnboardingForDiagnostics = true
         createAndShowWindow("onboardWindowController", controller: &onboardWindowController)
     }
