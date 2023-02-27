@@ -314,6 +314,7 @@ public struct PickerButton<T: Equatable>: ButtonStyle {
             ).scaleEffect(scale).colorMultiply(hoverColor)
             .contentShape(Rectangle())
             .onHover(perform: { hover in
+                guard isEnabled else { return }
                 guard enumValue != onValue else {
                     hoverColor = .white
                     scale = 1.0
@@ -324,8 +325,10 @@ public struct PickerButton<T: Equatable>: ButtonStyle {
                     scale = hover ? 1.05 : 1.0
                 }
             })
+            .opacity(isEnabled ? 1 : 0.7)
     }
 
+    @Environment(\.isEnabled) var isEnabled
     @Environment(\.colors) var colors
     @Environment(\.colorScheme) var colorScheme
 
