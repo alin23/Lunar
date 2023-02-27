@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>Beta</key>
-	<string>$(BETA)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -88,7 +86,5 @@
 	<string>https://files.lunar.fyi/appcast2.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>lqnO6tg2A9evTIFo2SC9ArZ6NS84gtBshcAWdwh12xQ=</string>
-	<key>TestMode</key>
-	<string>$(TEST_MODE)</string>
 </dict>
 </plist>

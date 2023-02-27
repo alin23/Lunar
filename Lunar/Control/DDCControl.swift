@@ -209,15 +209,16 @@ class DDCControl: Control, ObservableObject {
         guard let display else { return false }
         defer { mainAsync { self.lastBrightness = brightness } }
 
-        let transition = transition ?? brightnessTransition
-        if transition != .instant, !Self.sliderTracking, supportsSmoothTransition(for: .BRIGHTNESS), var oldValue,
-           oldValue != brightness
-        {
-            if display.inSmoothTransition {
-                display.shouldStopBrightnessTransition = true
-                oldValue = display.lastWrittenBrightness
-            }
+        var oldValue = oldValue
+        if display.inSmoothTransition {
+            display.shouldStopBrightnessTransition = true
+            oldValue = display.lastWrittenBrightness
+        }
 
+        let transition = transition ?? brightnessTransition
+        if transition != .instant, !Self.sliderTracking, supportsSmoothTransition(for: .BRIGHTNESS),
+           let oldValue, oldValue != brightness, abs(oldValue.i - brightness.i) > 1
+        {
             var faults = 0
             let delay = transition == .smooth ? nil : 0.01
 
@@ -229,19 +230,22 @@ class DDCControl: Control, ObservableObject {
                 guard let self, faults <= 5 || self.ignoreFaults, let display = self.display,
                       !display.shouldStopBrightnessTransition
                 else {
-                    log.debug(
-                        "Stopping smooth transition to brightness=\(brightness) for \(display)",
-                        context: [
-                            "faults": faults,
-                            "ignoreFaults": self?.ignoreFaults ?? false,
-                            "display.shouldStopBrightnessTransition": display.shouldStopBrightnessTransition,
-                        ]
-                    )
-                    return
+                    #if DEBUG
+                        log.debug(
+                            "Stopping smooth transition to brightness=\(brightness) for \(display)",
+                            context: [
+                                "faults": faults,
+                                "ignoreFaults": self?.ignoreFaults ?? false,
+                                "display.shouldStopBrightnessTransition": display.shouldStopBrightnessTransition,
+                            ]
+                        )
+                    #endif
+                    throw DDCTransitionError.shouldStop
                 }
 
-                log.debug("Writing brightness=\(brightness) using \(self) for \(display)")
-
+                #if DEBUG
+                    log.debug("Writing brightness=\(brightness) using \(self) for \(display)")
+                #endif
                 if DDC.setBrightness(for: display.id, brightness: brightness) {
                     display.lastWrittenBrightness = brightness
                 } else {
@@ -265,15 +269,16 @@ class DDCControl: Control, ObservableObject {
         guard let display else { return false }
         defer { mainAsync { self.lastContrast = contrast } }
 
-        let transition = transition ?? brightnessTransition
-        if transition != .instant, !Self.sliderTracking, supportsSmoothTransition(for: .CONTRAST), var oldValue,
-           oldValue != contrast
-        {
-            if display.inSmoothTransition {
-                display.shouldStopContrastTransition = true
-                oldValue = display.lastWrittenContrast
-            }
+        var oldValue = oldValue
+        if display.inSmoothTransition {
+            display.shouldStopContrastTransition = true
+            oldValue = display.lastWrittenContrast
+        }
 
+        let transition = transition ?? brightnessTransition
+        if transition != .instant, !Self.sliderTracking, supportsSmoothTransition(for: .CONTRAST),
+           let oldValue, oldValue != contrast, abs(oldValue.i - contrast.i) > 1
+        {
             var faults = 0
             let delay = transition == .smooth ? nil : 0.01
 
@@ -285,19 +290,22 @@ class DDCControl: Control, ObservableObject {
                 guard let self, faults <= 5 || self.ignoreFaults, let display = self.display,
                       !display.shouldStopContrastTransition
                 else {
-                    log.debug(
-                        "Stopping smooth transition to contrast=\(contrast) for \(display)",
-                        context: [
-                            "faults": faults,
-                            "ignoreFaults": self?.ignoreFaults ?? false,
-                            "display.shouldStopContrastTransition": display.shouldStopContrastTransition,
-                        ]
-                    )
-                    return
+                    #if DEBUG
+                        log.debug(
+                            "Stopping smooth transition to contrast=\(contrast) for \(display)",
+                            context: [
+                                "faults": faults,
+                                "ignoreFaults": self?.ignoreFaults ?? false,
+                                "display.shouldStopContrastTransition": display.shouldStopContrastTransition,
+                            ]
+                        )
+                    #endif
+                    throw DDCTransitionError.shouldStop
                 }
 
-                log.debug("Writing contrast=\(contrast) using \(self) for \(display)")
-
+                #if DEBUG
+                    log.debug("Writing contrast=\(contrast) using \(self) for \(display)")
+                #endif
                 if DDC.setContrast(for: display.id, contrast: contrast) {
                     display.lastWrittenContrast = contrast
                 } else {
@@ -387,4 +395,9 @@ class DDCControl: Control, ObservableObject {
 
         return !display.slowWrite
     }
+}
+
+enum DDCTransitionError: Error {
+    case shouldStop
+    case tooManyFaults(Int)
 }

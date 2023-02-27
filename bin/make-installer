@@ -35,7 +35,7 @@ function make-installer -a ext
         echo (set_color red)"Deleting $APP_INSTALLER"(set_color normal)
         rm "$APP_INSTALLER"
     end
-    if test -f "$APP_LATEST_INSTALLER" && not string match -rq "$CHANNEL" "beta|alpha"
+    if test -f "$APP_LATEST_INSTALLER" && not string match -rq "$CHANNEL" beta
         echo \n(set_color red)"Deleting $APP_LATEST_INSTALLER"(set_color normal)
         rm "$APP_LATEST_INSTALLER"
     end
@@ -61,7 +61,7 @@ function make-installer -a ext
         spctl --assess -vv --type install "$APP_INSTALLER" || exit 1
     end
 
-    if not string match -rq "$CHANNEL" "beta|alpha"
+    if not string match -rq "$CHANNEL" beta
         echo (set_color yellow)"Copying $APP_INSTALLER to $APP_LATEST_INSTALLER"(set_color normal)
         cp "$APP_INSTALLER" "$APP_LATEST_INSTALLER" || exit 1
     end

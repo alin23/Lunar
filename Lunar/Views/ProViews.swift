@@ -153,14 +153,6 @@ public struct VersionView: View {
                         onValue: .beta
                     ))
                     .font(.system(size: 12, weight: .semibold))
-                SwiftUI.Button("Alpha") { updateChannel = .alpha }
-                    .buttonStyle(PickerButton(
-                        horizontalPadding: 6,
-                        verticalPadding: 3,
-                        enumValue: $updateChannel,
-                        onValue: .alpha
-                    ))
-                    .font(.system(size: 12, weight: .semibold))
             }
         }
         .foregroundColor(.secondary)

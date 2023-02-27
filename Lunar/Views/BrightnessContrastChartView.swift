@@ -72,7 +72,7 @@ class BrightnessContrastChartView: LineChartView {
 
             switch adaptiveMode {
             case let mode as SensorMode:
-                let lux = mode.lastAmbientLight.rounded()
+                guard let lux = mode.lastAmbientLight?.rounded() else { return }
                 var highlights: [Highlight] = []
 
                 let maxBr = datapointLock.around { mode.brightnessDataPoint.max.i }

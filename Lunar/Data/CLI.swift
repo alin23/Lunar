@@ -451,8 +451,8 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             Lunar.configureLogging(options: globals)
-            if SensorMode.specific.externalSensorAvailable {
-                cliPrint(SensorMode.specific.lastAmbientLight)
+            if SensorMode.specific.externalSensorAvailable, let lux = SensorMode.specific.lastAmbientLight {
+                cliPrint(lux)
             } else {
                 cliPrint(SensorMode.getInternalSensorLux() ?? -1)
             }

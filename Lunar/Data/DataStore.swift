@@ -116,6 +116,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .brightnessKeysEnabled,
     .brightnessStep,
     .clamshellModeDetection,
+    .disableBrightnessObservers,
     .contrastStep,
     .debug,
     .trace,
@@ -205,7 +206,6 @@ enum DDCSleepFactor: UInt8, DefaultsSerializable {
 enum UpdateChannel: UInt8, DefaultsSerializable {
     case release = 0
     case beta = 1
-    case alpha = 2
 }
 
 let NON_RESETTABLE_SETTINGS: [Defaults.Keys] = [
@@ -772,6 +772,7 @@ func initCache() {
     cacheKey(.showOrientationInQuickActions)
     cacheKey(.showInputInQuickActions)
     cacheKey(.clamshellModeDetection)
+    cacheKey(.disableBrightnessObservers)
     cacheKey(.brightnessStep)
     cacheKey(.contrastStep)
     cacheKey(.volumeStep)
@@ -962,6 +963,8 @@ let ddcSleepLongerPublisher = Defaults.publisher(.ddcSleepLonger).dropFirst().re
 let ddcSleepFactorPublisher = Defaults.publisher(.ddcSleepFactor).dropFirst().removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
 let updateChannelPublisher = Defaults.publisher(.updateChannel).dropFirst().removeDuplicates()
+    .filter { $0.oldValue != $0.newValue }
+let sensorHostnamePublisher = Defaults.publisher(.sensorHostname).dropFirst().removeDuplicates()
     .filter { $0.oldValue != $0.newValue }
 
 #if arch(arm64)

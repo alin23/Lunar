@@ -47,6 +47,14 @@ func IOServiceFirstMatchingWhere(_ matching: CFDictionary, where predicate: (io_
         return names.contains(name)
     }
 
+    func IOServiceParentName(_ service: io_service_t) -> String? {
+        var serv: io_service_t = 0
+        IORegistryEntryGetParentEntry(service, kIOServicePlane, &serv)
+
+        guard serv != 0 else { return nil }
+        return IOServiceName(serv)
+
+    }
     func IOServiceName(_ service: io_service_t) -> String? {
         let deviceNamePtr = UnsafeMutablePointer<CChar>.allocate(capacity: MemoryLayout<io_name_t>.size)
         defer { deviceNamePtr.deallocate() }
@@ -506,6 +514,13 @@ class DisplayController: ObservableObject {
         }
     }
 
+    var externalDisplaysForTest: [Display] {
+        activeDisplayList
+            .filter { d in
+                !d.isBuiltin && !d.isSidecar && !d.isAirplay && !d.isLunaDisplay()
+            }
+    }
+
     var externalActiveDisplays: [Display] {
         activeDisplayList.filter { !$0.isBuiltin }
     }
@@ -684,7 +699,7 @@ class DisplayController: ObservableObject {
         if !displays.isEmpty {
             return displayList.first(where: { d in d.active }) ?? displayList.first!
         } else {
-            #if TEST_MODE
+            #if DEBUG
                 return TEST_DISPLAY
             #endif
             return GENERIC_DISPLAY
@@ -865,8 +880,7 @@ class DisplayController: ObservableObject {
         var score = 0
 
         if let name {
-            let edidName = Display.numberNamePattern.replaceAll(in: display.edidName.lowercased(), with: "")
-            score += (edidName == name.lowercased() ? 1 : -1)
+            score += (display.normalizedName.lowercased() == name.lowercased() ? 1 : -1)
         }
 
         let infoDict = (displayInfoDictionary(display.id) ?? display.infoDictionary)
@@ -1562,7 +1576,7 @@ class DisplayController: ObservableObject {
                     xdrSensorTask = nil
                     return
                 }
-                internalSensorLux = lux
+                internalSensorLux = lux.f
                 xdrSensorTask = change.newValue ? getSensorTask() : nil
             }.store(in: &observers)
 
@@ -1913,6 +1927,7 @@ class DisplayController: ObservableObject {
                     page: configurationPage ? Page.settings.rawValue : nil
                 )
                 NotificationCenter.default.post(name: displayListChanged, object: nil)
+                SensorMode.internalSensor = SensorMode.getInternalSensor()
             }
         }
     }

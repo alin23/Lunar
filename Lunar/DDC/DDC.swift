@@ -549,14 +549,18 @@ class IOServicePropertyObserver {
             cancellable = callbackSubject
                 .debounce(for: debounce, scheduler: RunLoop.main)
                 .sink { _ in
-//                    log.debug("Change in service observing '\(property)'")
+//                    #if DEBUG
+//                        log.debug("Change in service observing '\(property)'")
+//                    #endif
                     self.callback()
                 }
         } else if let throttle {
             cancellable = callbackSubject
                 .throttle(for: throttle, scheduler: RunLoop.main, latest: true)
                 .sink { _ in
-//                    log.debug("Change in service observing '\(property)'")
+//                    #if DEBUG
+//                        log.debug("Change in service observing '\(property)'")
+//                    #endif
                     self.callback()
                 }
         } else {
@@ -567,6 +571,9 @@ class IOServicePropertyObserver {
         }
 
         guard let notifyPort = IONotificationPortCreate(kIOMasterPortDefault) else {
+            #if DEBUG
+                log.error("No notification port for service \(service): \(property)")
+            #endif
             return
         }
 
@@ -581,7 +588,13 @@ class IOServicePropertyObserver {
         IONotificationPortSetDispatchQueue(notifyPort, .main)
 
         let ctx = UnsafeMutableRawPointer(Unmanaged.passRetained(self).toOpaque())
-        IOServiceAddInterestNotification(notifyPort, service, kIOGeneralInterest, observerCallback, ctx, &notificationHandle)
+        let err = IOServiceAddInterestNotification(notifyPort, service, kIOGeneralInterest, observerCallback, ctx, &notificationHandle)
+
+        #if DEBUG
+            if err != KERN_SUCCESS {
+                log.error("Error adding observer for service \(service): \(property)")
+            }
+        #endif
     }
 
     var notifyPort: IONotificationPortRef?
@@ -927,7 +940,7 @@ enum DDC {
         }
 
         #if DEBUG
-//            return displayIDs
+            return displayIDs
             if !displayIDs.isEmpty {
                 // displayIDs.append(TEST_DISPLAY_PERSISTENT_ID)
                 return displayIDs

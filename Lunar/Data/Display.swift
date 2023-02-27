@@ -163,6 +163,7 @@ let MAX_SMOOTH_STEP_TIME_NS: UInt64 = 90 * 1_000_000 // 90ms
 
 let PRO_DISPLAY_XDR_NAME = "Pro Display XDR"
 let STUDIO_DISPLAY_NAME = "Studio Display"
+let LUNA_DISPLAY_NAME = "Luna Display"
 let ULTRAFINE_NAME = "LG UltraFine"
 let THUNDERBOLT_NAME = "Thunderbolt"
 let LED_CINEMA_NAME = "LED Cinema"
@@ -869,6 +870,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case maxNits
         case minNits
         case nits
+        case lux
 
         case faceLightEnabled
         case brightnessBeforeFacelight
@@ -1271,7 +1273,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var _id: CGDirectDisplayID
 
     var transport: Transport? = nil
-    var edidName: String
+    var normalizedName = ""
     lazy var lastVolume: NSNumber = volume
 
     @Published @objc dynamic var activeAndResponsive = false
@@ -1385,7 +1387,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     lazy var isProjector: Bool = DDC.isProjectorDisplay(id, name: edidName)
 
     @objc dynamic lazy var supportsGamma: Bool = supportsGammaByDefault && !useOverlay
-    @objc dynamic lazy var supportsGammaByDefault: Bool = !isSidecar && !isAirplay && !isVirtual && !isProjector
+    @objc dynamic lazy var supportsGammaByDefault: Bool = !isSidecar && !isAirplay && !isVirtual && !isProjector && !isLunaDisplay()
 
     @objc dynamic lazy var panelModeTitles: [NSAttributedString] = panelModes.map(\.attributedString)
 
@@ -1605,6 +1607,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     lazy var usesDDCBrightnessControl: Bool = control is DDCControl || control is NetworkControl
 
+    var edidName: String {
+        didSet {
+            normalizedName = Self.numberNamePattern.replaceAll(in: edidName, with: "").trimmed
+        }
+    }
     @Atomic @objc dynamic var adaptiveSubzero = true {
         didSet {
             #if arch(arm64)
@@ -1729,7 +1736,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             if apply {
                 withoutApply { dimmingMode = useOverlay ? .overlay : .gamma }
             }
-            supportsGammaByDefault = !isSidecar && !isAirplay && !isVirtual && !isProjector
+            supportsGammaByDefault = !isSidecar && !isAirplay && !isVirtual && !isProjector && !isLunaDisplay()
             supportsGamma = supportsGammaByDefault && !useOverlay
             guard initialised else { return }
 
@@ -1816,10 +1823,15 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 checkNitsObserver()
             }
         }
-        var nitsLimitObserver: IOServicePropertyObserver?
+        var ioObserver: IOServicePropertyObserver?
+
+        @Published var lux: Double? = nil {
+            didSet {}
+        }
 
         @Published @objc var minNits: Double = 0 {
             didSet {
+                guard initialised else { return }
                 guard minNits < maxNits else {
                     minNits = maxNits - 1
                     return
@@ -1833,6 +1845,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
         @Published @objc var maxNits: Double = 500 {
             didSet {
+                guard initialised else { return }
                 guard maxNits > minNits, maxNits > 0 else {
                     maxNits = getMaxNits() ?! minNits + 1
                     return
@@ -1865,10 +1878,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             if isSource {
-                let normalizedName = Self.numberNamePattern.replaceAll(in: edidName, with: "").trimmed
                 displayController.activeDisplayList.filter { $0.id != id }.forEach { d in
                     d.isSource = false
-                    if Self.numberNamePattern.replaceAll(in: d.edidName, with: "").trimmed == normalizedName {
+                    if d.normalizedName == normalizedName {
                         d.brightnessCurveFactors[.sync] = 1
                         d.contrastCurveFactors[.sync] = 1
                     }
@@ -3664,18 +3676,23 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     static func observeBrightnessChangeDS(_ id: CGDirectDisplayID) -> Bool {
-        guard DisplayServicesCanChangeBrightness(id), !isObservingBrightnessChangeDS(id) else { return true }
+        guard DisplayServicesCanChangeBrightness(id), !isObservingBrightnessChangeDS(id), !CachedDefaults[.disableBrightnessObservers] else { return true }
 
         let result = DisplayServicesRegisterForBrightnessChangeNotifications(id, id) { _, observer, _, _, userInfo in
-            guard !displayController.screensSleeping else { return }
+            guard !displayController.screensSleeping, !AppleNativeControl.sliderTracking else {
+                return
+            }
+
             OperationQueue.main.addOperation {
-                guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let observer else { return }
-                let id = CGDirectDisplayID(UInt(bitPattern: observer))
-                guard !AppleNativeControl.sliderTracking, let display = displayController.activeDisplays[id],
-                      !display.inSmoothTransition
-                else {
+                guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let observer else {
                     return
                 }
+
+                let id = CGDirectDisplayID(UInt(bitPattern: observer))
+                guard let display = displayController.activeDisplays[id], !display.inSmoothTransition else {
+                    return
+                }
+
                 let newBrightness = (value * 100).u16
                 guard display.brightnessU16 != newBrightness else {
                     return
@@ -3958,7 +3975,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         #if arch(arm64)
-            if #available(macOS 13, *), CachedDefaults[.newBlackOutDisconnect], !AppDelegate.commandKeyPressed, !blackOutEnabled {
+            if #available(macOS 13, *), CachedDefaults[.newBlackOutDisconnect], !AppDelegate.commandKeyPressed, !AppDelegate.shiftKeyPressed, !blackOutEnabled {
                 displayController.dis(id)
                 return
             }
@@ -4595,7 +4612,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         let listensForBrightnessChange = observeBrightnessChangeDS() && hasBrightnessChangeObserver
         if listensForBrightnessChange {
             nativeBrightnessRefresher = nil
-        } else {
+        } else if !CachedDefaults[.disableBrightnessObservers] {
             nativeBrightnessRefresher = nativeBrightnessRefresher ?? Repeater(every: 2, name: "\(name) Brightness Refresher") { [weak self] in
                 guard let self, !displayController.screensSleeping, self.isNative else {
                     return
@@ -4611,9 +4628,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         //     self.refreshContrast()
         // }
         #if arch(arm64)
-            if isBuiltin, nitsLimitObserver == nil {
+            if isBuiltin, ioObserver == nil {
                 dispName = "disp0"
-                observeNitsLimit(dispName: "disp0")
+                observeIO(dispName: "disp0")
             }
         #endif
     }
@@ -5073,6 +5090,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 try container.encode(maxNits, forKey: .maxNits)
                 try container.encode(minNits, forKey: .minNits)
                 try container.encode(nits ?? 0, forKey: .nits)
+                try container.encode(lux ?? 0, forKey: .lux)
             #endif
         }
     }
@@ -5195,6 +5213,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         edidName.contains(PRO_DISPLAY_XDR_NAME)
     }
 
+    func isLunaDisplay() -> Bool {
+        edidName.contains(LUNA_DISPLAY_NAME)
+    }
+
     func isStudioDisplay() -> Bool {
         edidName.contains(STUDIO_DISPLAY_NAME)
     }
@@ -5246,7 +5268,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         to value: UInt16,
         delay: TimeInterval? = nil,
         onStart: (() -> Void)? = nil,
-        adjust: @escaping ((UInt16) -> Void)
+        adjust: @escaping ((UInt16) throws -> Void)
     ) -> DispatchWorkItem {
         inSmoothTransition = true
 
@@ -5254,7 +5276,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             guard let self else { return }
 
             var steps = abs(value.distance(to: currentValue))
-            log.debug("Smooth transition STEPS=\(steps) for \(self.description) from \(currentValue) to \(value)")
+            #if DEBUG
+                log.debug("Smooth transition STEPS=\(steps) for \(self.description) from \(currentValue) to \(value)")
+            #endif
 
             var step: Int
             let minVal: UInt16
@@ -5272,44 +5296,51 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             let startTime = DispatchTime.now()
 
             onStart?()
-            adjust((currentValue.i + step).u16)
+            var elapsedTimeInterval: DispatchTimeInterval = .never
+            do {
+                try adjust((currentValue.i + step).u16)
 
-            var elapsedTimeInterval = startTime.distance(to: DispatchTime.now())
-            var elapsedSecondsStr = String(format: "%.3f", elapsedTimeInterval.s)
-            log.debug("It took \(elapsedTimeInterval) (\(elapsedSecondsStr)s) to change brightness by \(step)")
+                elapsedTimeInterval = startTime.distance(to: DispatchTime.now())
+                #if DEBUG
+                    log.debug("It took \(elapsedTimeInterval.ns) to change brightness by \(step)")
+                #endif
 
-            self.checkSlowWrite(elapsedNS: elapsedTimeInterval.absNS)
+                self.checkSlowWrite(elapsedNS: elapsedTimeInterval.absNS)
 
-            steps = steps - abs(step)
-            if steps <= 0 {
-                adjust(value)
+                steps = steps - abs(step)
+                if steps <= 0 {
+                    try adjust(value)
+                    return
+                }
+
+                self.smoothStep = cap((elapsedTimeInterval.absNS / MAX_SMOOTH_STEP_TIME_NS).i, minVal: 1, maxVal: 100)
+                #if DEBUG
+                    log.debug("Smooth step \(self.smoothStep) for \(self.description) from \(currentValue) to \(value)")
+                #endif
+                if value < currentValue {
+                    step = cap(-self.smoothStep, minVal: -steps, maxVal: -1)
+                } else {
+                    step = cap(self.smoothStep, minVal: 1, maxVal: steps)
+                }
+
+                for newValue in stride(from: currentValue.i, through: value.i, by: step) {
+                    try adjust(cap(newValue.u16, minVal: minVal, maxVal: maxVal))
+                    if let delay {
+                        Thread.sleep(forTimeInterval: delay)
+                    }
+                }
+                try adjust(value)
+            } catch DDCTransitionError.shouldStop {
+                return
+            } catch {
+                self.inSmoothTransition = false
                 return
             }
 
-            self.smoothStep = cap((elapsedTimeInterval.absNS / MAX_SMOOTH_STEP_TIME_NS).i, minVal: 1, maxVal: 100)
-            log.debug("Smooth step \(self.smoothStep) for \(self.description) from \(currentValue) to \(value)")
-            if value < currentValue {
-                step = cap(-self.smoothStep, minVal: -steps, maxVal: -1)
-            } else {
-                step = cap(self.smoothStep, minVal: 1, maxVal: steps)
-            }
-
-            for newValue in stride(from: currentValue.i, through: value.i, by: step) {
-                adjust(cap(newValue.u16, minVal: minVal, maxVal: maxVal))
-                if let delay {
-                    // print("Sleeping for \(delay * 1000)ms")
-                    Thread.sleep(forTimeInterval: delay)
-                }
-            }
-            adjust(value)
-
             elapsedTimeInterval = startTime.distance(to: DispatchTime.now())
-            elapsedSecondsStr = String(format: "%.3f", elapsedTimeInterval.s)
-            log
-                .debug(
-                    "It took \(elapsedTimeInterval.ns) (\(elapsedSecondsStr)s) to change brightness from \(currentValue) to \(value) by \(step)"
-                )
-
+            #if DEBUG
+                log.debug("It took \(elapsedTimeInterval.ns) to change brightness from \(currentValue) to \(value) by \(step)")
+            #endif
             self.checkSlowWrite(elapsedNS: elapsedTimeInterval.absNS / steps.u64)
 
             self.inSmoothTransition = false

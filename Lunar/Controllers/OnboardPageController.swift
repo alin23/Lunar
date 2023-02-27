@@ -42,7 +42,7 @@ class OnboardWindowController: ModernWindowController, NSWindowDelegate {
             d.testWindowController?.close()
             d.testWindowController = nil
         }
-        cancelTask(ONBOARDING_TASK_KEY)
+        OnboardPageController.task?.cancel()
         applyChanges()
         appDelegate!.onboardWindowController = nil
         appDelegate!.wakeObserver?.cancel()
@@ -104,6 +104,12 @@ var adaptiveModeDisabledByDiagnostics = false
 // MARK: - OnboardPageController
 
 class OnboardPageController: NSPageController {
+    static var task: DispatchWorkItem? {
+        didSet {
+            oldValue?.cancel()
+        }
+    }
+
     @IBOutlet var logo: NSTextField?
 
     let modeChoiceViewControllerIdentifier = NSPageController.ObjectIdentifier("modeChoiceViewController")
@@ -120,7 +126,20 @@ class OnboardPageController: NSPageController {
         view.bg = blackMauve
         logo?.textColor = logoColor
 
-        arrangedObjects = [modeChoiceViewControllerIdentifier, controlChoiceViewControllerIdentifier, hotkeysChoiceViewControllerIdentifier]
+        if displayController.externalDisplaysForTest.isEmpty {
+            arrangedObjects = [hotkeysChoiceViewControllerIdentifier]
+            displayController.builtinDisplay?.isSource = true
+
+            CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .sync
+            displayController.enable(mode: .sync)
+            displayController.externalActiveDisplays.forEach { d in
+                d.resetControl()
+            }
+
+        } else {
+            arrangedObjects = [modeChoiceViewControllerIdentifier, controlChoiceViewControllerIdentifier, hotkeysChoiceViewControllerIdentifier]
+        }
+
         selectedIndex = useOnboardingForDiagnostics ? 1 : 0
         completeTransition()
         view.setNeedsDisplay(view.rectForPage(selectedIndex))
