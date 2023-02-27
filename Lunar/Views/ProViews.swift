@@ -8,6 +8,7 @@ enum UpdateCheckInterval: Int {
     case daily = 86400
     case everyThreeDays = 259_200
     case weekly = 604_800
+    case monthly = 2_592_000
 }
 
 import Paddle
@@ -103,16 +104,12 @@ public struct VersionView: View {
             }
             Divider().padding(.vertical, 2).opacity(0.5)
             HStack(spacing: 3) {
-                Text("Check automatically")
+                Toggle("Check automatically", isOn: $checkForUpdates)
+                    .toggleStyle(CheckboxToggleStyle(style: .circle))
                     .font(.system(size: 12, weight: .medium))
+
                 Spacer()
 
-                SwiftUI.Button("Never") {
-                    checkForUpdates = false
-                    updateCheckInterval = 0
-                }
-                .buttonStyle(PickerButton(horizontalPadding: 6, verticalPadding: 3, enumValue: $updateCheckInterval, onValue: 0))
-                .font(.system(size: 12, weight: .semibold))
                 SwiftUI.Button("Daily") {
                     checkForUpdates = true
                     updateCheckInterval = UpdateCheckInterval.daily.rawValue
@@ -124,6 +121,8 @@ public struct VersionView: View {
                     onValue: UpdateCheckInterval.daily.rawValue
                 ))
                 .font(.system(size: 12, weight: .semibold))
+                .disabled(!checkForUpdates)
+
                 SwiftUI.Button("Weekly") {
                     checkForUpdates = true
                     updateCheckInterval = UpdateCheckInterval.weekly.rawValue
@@ -135,31 +134,36 @@ public struct VersionView: View {
                     onValue: UpdateCheckInterval.weekly.rawValue
                 ))
                 .font(.system(size: 12, weight: .semibold))
+                .disabled(!checkForUpdates)
+
+                SwiftUI.Button("Monthly") {
+                    checkForUpdates = true
+                    updateCheckInterval = UpdateCheckInterval.monthly.rawValue
+                }
+                .buttonStyle(PickerButton(
+                    horizontalPadding: 6,
+                    verticalPadding: 3,
+                    enumValue: $updateCheckInterval,
+                    onValue: UpdateCheckInterval.monthly.rawValue
+                ))
+                .font(.system(size: 12, weight: .semibold))
+                .disabled(!checkForUpdates)
             }
             Divider().padding(.vertical, 2).opacity(0.5)
-            HStack(spacing: 3) {
-                Text("Update channel")
-                    .font(.system(size: 12, weight: .medium))
-                Spacer()
-
-                SwiftUI.Button("Release") { updateChannel = .release }
-                    .buttonStyle(PickerButton(horizontalPadding: 6, verticalPadding: 3, enumValue: $updateChannel, onValue: .release))
-                    .font(.system(size: 12, weight: .semibold))
-                SwiftUI.Button("Beta") { updateChannel = .beta }
-                    .buttonStyle(PickerButton(
-                        horizontalPadding: 6,
-                        verticalPadding: 3,
-                        enumValue: $updateChannel,
-                        onValue: .beta
-                    ))
-                    .font(.system(size: 12, weight: .semibold))
-            }
+            Toggle("Update to beta builds", isOn: beta)
+                .toggleStyle(CheckboxToggleStyle(style: .circle))
+                .font(.system(size: 12, weight: .medium))
         }
         .foregroundColor(.secondary)
         .padding(.horizontal, 8)
         .padding(.vertical, 8)
         .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.05)))
     }
+
+    var beta: Binding<Bool> = Binding(
+        get: { Defaults[.updateChannel] != .release },
+        set: { Defaults[.updateChannel] = $0 ? .beta : .release }
+    )
 
     @Default(.checkForUpdate) var checkForUpdates
     @Default(.updateCheckInterval) var updateCheckInterval
