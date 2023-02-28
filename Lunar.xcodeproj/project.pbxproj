@@ -69,6 +69,7 @@
 		C7714AF927E4A3A9002E0B2E /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7714AF827E4A3A9002E0B2E /* Components.swift */; };
 		C7714B0627E8F11C002E0B2E /* Presets.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7714B0527E8F11C002E0B2E /* Presets.swift */; };
 		C77200031FF072CB0078E155 /* ScrollableBrightness.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77200021FF072CB0078E155 /* ScrollableBrightness.swift */; };
+		C772802629AE09D900401C78 /* edid-decode in Resources */ = {isa = PBXBuildFile; fileRef = C772802529AE09D900401C78 /* edid-decode */; };
 		C772BDD725E7A296006A1684 /* NetworkControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C772BDD625E7A296006A1684 /* NetworkControl.swift */; };
 		C7764170272139A100C7C308 /* ResetPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C776416E272139A100C7C308 /* ResetPopoverController.swift */; };
 		C7789AE01FF9029700D326A8 /* ScrollableContrast.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7789ADF1FF9029700D326A8 /* ScrollableContrast.swift */; };
@@ -259,6 +260,7 @@
 		C7714AF827E4A3A9002E0B2E /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		C7714B0527E8F11C002E0B2E /* Presets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Presets.swift; sourceTree = "<group>"; };
 		C77200021FF072CB0078E155 /* ScrollableBrightness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableBrightness.swift; sourceTree = "<group>"; };
+		C772802529AE09D900401C78 /* edid-decode */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "edid-decode"; path = "bin/edid-decode"; sourceTree = SOURCE_ROOT; };
 		C772BDD625E7A296006A1684 /* NetworkControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkControl.swift; sourceTree = "<group>"; };
 		C776416E272139A100C7C308 /* ResetPopoverController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResetPopoverController.swift; sourceTree = "<group>"; };
 		C7789ADF1FF9029700D326A8 /* ScrollableContrast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableContrast.swift; sourceTree = "<group>"; };
@@ -632,8 +634,9 @@
 		C7AEC7F71FD0B4350039B562 /* Lunar */ = {
 			isa = PBXGroup;
 			children = (
-				C7E896D72652C0F60079A328 /* Headers */,
+				C772802529AE09D900401C78 /* edid-decode */,
 				C73B41F5263E1301006F6783 /* ddcctl */,
+				C7E896D72652C0F60079A328 /* Headers */,
 				C7BAD9CE26386ABC0058974C /* ALS */,
 				C7BAD9B8263869920058974C /* Resources */,
 				C7E80E1F2637060F004718A4 /* CSSH */,
@@ -909,6 +912,7 @@
 			files = (
 				C7A6A08927BF8F5D008E52E0 /* Schedule.xib in Resources */,
 				C7C43192269DD9AE00DCD0F5 /* install.sh in Resources */,
+				C772802629AE09D900401C78 /* edid-decode in Resources */,
 				C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */,
 				C7AEC8001FD0B4350039B562 /* Main.storyboard in Resources */,
 				C780CF98269F241A007FFB58 /* tsl2591.h in Resources */,

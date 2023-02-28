@@ -29,6 +29,7 @@ private var prettyEncoder: JSONEncoder = {
 // MARK: - LunarCommandError
 
 private enum LunarCommandError: Error, CustomStringConvertible {
+    case noDisplay
     case displayNotFound(String)
     case propertyNotValid(String)
     case cantReadProperty(String)
@@ -41,6 +42,8 @@ private enum LunarCommandError: Error, CustomStringConvertible {
 
     var description: String {
         switch self {
+        case .noDisplay:
+            return "No display available"
         case let .displayNotFound(string):
             return "Display Not Found: \(string)"
         case let .propertyNotValid(string):
@@ -456,6 +459,57 @@ struct Lunar: ParsableCommand {
             } else {
                 cliPrint(SensorMode.getInternalSensorLux() ?? -1)
             }
+            return cliExit(0)
+        }
+    }
+
+    struct Edid: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Reads and decodes EDID data structure from monitors."
+        )
+
+        static let edidDecodeBinary = Bundle.main.path(forResource: "edid-decode", ofType: nil)!
+
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
+
+        @Argument(
+            help: "Display serial or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
+        )
+        var display: DisplayFilter = .all
+
+        func run() throws {
+            Lunar.configureLogging(options: globals)
+
+            cliGetDisplays(
+                includeVirtual: false,
+                includeAirplay: false,
+                includeProjector: false,
+                includeDummy: false
+            )
+            let displays = getFilteredDisplays(displays: displayController.activeDisplayList, filter: display)
+                .filter(!\.isBuiltin)
+            guard !displays.isEmpty else {
+                if display == .all || display == .external {
+                    throw LunarCommandError.noDisplay
+                }
+                throw LunarCommandError.displayNotFound(display.s)
+            }
+
+            for display in displays {
+                cliPrint("\(display)")
+                guard let edid = Display.edid(id: display.id) else {
+                    cliPrint("\tError reading EDID")
+                    continue
+                }
+
+                let result = shell(command: "echo \(edid) | \(Self.edidDecodeBinary)")
+                if result.success, let decoded = result.o {
+                    cliPrint("\t\(decoded.replacingOccurrences(of: "\n", with: "\n\t"))")
+                } else {
+                    cliPrint("\t\(result.e ?? "Error decoding EDID")")
+                }
+            }
+
             return cliExit(0)
         }
     }
@@ -1656,6 +1710,7 @@ struct Lunar: ParsableCommand {
             Hotkeys.self,
             DisplayUuid.self,
             RefreshDisplays.self,
+            Edid.self,
         ] + ARCH_SPECIFIC_COMMANDS
     )
 
