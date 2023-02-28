@@ -343,22 +343,22 @@ class DisplayViewController: NSViewController {
         case reset = 99
     }
 
-    let LOCK_BRIGHTNESS_HELP_TEXT = """
-    ## Description
+    // let LOCK_BRIGHTNESS_HELP_TEXT = """
+    // ## Description
 
-    This setting allows the user to **restrict** changes on the brightness of this monitor.
+    // This setting allows the user to **restrict** changes on the brightness of this monitor.
 
-    - `LOCKED` will **stop** the adaptive algorithm or the hotkeys from changing this monitor's brightness
-    - `UNLOCKED` will **allow** this monitor's brightness to be adjusted by the adaptive algorithm or by hotkeys
-    """
-    let LOCK_CONTRAST_HELP_TEXT = """
-    ## Description
+    // - `LOCKED` will **stop** the adaptive algorithm or the hotkeys from changing this monitor's brightness
+    // - `UNLOCKED` will **allow** this monitor's brightness to be adjusted by the adaptive algorithm or by hotkeys
+    // """
+    // let LOCK_CONTRAST_HELP_TEXT = """
+    // ## Description
 
-    This setting allows the user to **restrict** changes on the contrast of this monitor.
+    // This setting allows the user to **restrict** changes on the contrast of this monitor.
 
-    - `LOCKED` will **stop** the adaptive algorithm or the hotkeys from changing this monitor's contrast
-    - `UNLOCKED` will **allow** this monitor's contrast to be adjusted by the adaptive algorithm or by hotkeys
-    """
+    // - `LOCKED` will **stop** the adaptive algorithm or the hotkeys from changing this monitor's contrast
+    // - `UNLOCKED` will **allow** this monitor's contrast to be adjusted by the adaptive algorithm or by hotkeys
+    // """
 
     @IBOutlet var displayImage: DisplayImage?
     @IBOutlet var displayName: DisplayName?
@@ -386,14 +386,14 @@ class DisplayViewController: NSViewController {
     @IBOutlet var _controlsButton: NSButton!
     @IBOutlet var _softwareDimmingButton: NSButton!
     @IBOutlet var _proButton: NSButton!
-    @IBOutlet var _lockContrastHelpButton: NSButton?
-    @IBOutlet var _lockBrightnessHelpButton: NSButton?
+    // @IBOutlet var _lockContrastHelpButton: NSButton?
+    // @IBOutlet var _lockBrightnessHelpButton: NSButton?
     @IBOutlet var _settingsButton: NSButton?
     @IBOutlet var _resetButton: NSButton?
     @IBOutlet var _colorsButton: NSButton?
     @IBOutlet var _ddcButton: NSButton?
-    @IBOutlet var lockContrastCurveButton: LockButton!
-    @IBOutlet var lockBrightnessCurveButton: LockButton!
+    // @IBOutlet var lockContrastCurveButton: LockButton!
+    // @IBOutlet var lockBrightnessCurveButton: LockButton!
     @objc dynamic var noDisplay = false
     @objc dynamic lazy var chartHidden: Bool = display == nil || noDisplay || display!
         .systemAdaptiveBrightness || displayController
@@ -481,13 +481,13 @@ class DisplayViewController: NSViewController {
         _proButton as? Button
     }
 
-    var lockContrastHelpButton: HelpButton? {
-        _lockContrastHelpButton as? HelpButton
-    }
+    // var lockContrastHelpButton: HelpButton? {
+    //     _lockContrastHelpButton as? HelpButton
+    // }
 
-    var lockBrightnessHelpButton: HelpButton? {
-        _lockBrightnessHelpButton as? HelpButton
-    }
+    // var lockBrightnessHelpButton: HelpButton? {
+    //     _lockBrightnessHelpButton as? HelpButton
+    // }
 
     var settingsButton: SettingsButton? {
         _settingsButton as? SettingsButton
@@ -514,19 +514,19 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    @objc dynamic var lockedBrightnessCurve = false {
-        didSet {
-            display?.lockedBrightnessCurve = lockedBrightnessCurve
-            lockBrightnessCurveButton?.state = lockedBrightnessCurve.state
-        }
-    }
+    // @objc dynamic var lockedBrightnessCurve = false {
+    //     didSet {
+    //         display?.lockedBrightnessCurve = lockedBrightnessCurve
+    //         lockBrightnessCurveButton?.state = lockedBrightnessCurve.state
+    //     }
+    // }
 
-    @objc dynamic var lockedContrastCurve = false {
-        didSet {
-            display?.lockedContrastCurve = lockedContrastCurve
-            lockContrastCurveButton?.state = lockedContrastCurve.state
-        }
-    }
+    // @objc dynamic var lockedContrastCurve = false {
+    //     didSet {
+    //         display?.lockedContrastCurve = lockedContrastCurve
+    //         lockContrastCurveButton?.state = lockedContrastCurve.state
+    //     }
+    // }
 
     @IBOutlet var deleteButton: Button! {
         didSet {
@@ -648,16 +648,16 @@ class DisplayViewController: NSViewController {
         placeAddScheduleButton()
     }
 
-    @IBAction func lockCurve(_ sender: LockButton) {
-        switch sender.tag {
-        case 1:
-            lockedContrastCurve = sender.state == .on
-        case 2:
-            lockedBrightnessCurve = sender.state == .on
-        default:
-            break
-        }
-    }
+    // @IBAction func lockCurve(_ sender: LockButton) {
+    //     switch sender.tag {
+    //     case 1:
+    //         lockedContrastCurve = sender.state == .on
+    //     case 2:
+    //         lockedBrightnessCurve = sender.state == .on
+    //     default:
+    //         break
+    //     }
+    // }
 
     override func mouseDown(with ev: NSEvent) {
         if let editor = displayName?.currentEditor() {
@@ -698,11 +698,11 @@ class DisplayViewController: NSViewController {
         initGraph()
     }
 
-    @objc func highlightChartValue(notification _: Notification) {
-        guard CachedDefaults[.moreGraphData], let display, let brightnessContrastChart,
-              display.id != GENERIC_DISPLAY_ID else { return }
-        brightnessContrastChart.highlightCurrentValues(adaptiveMode: displayController.adaptiveMode, for: display)
-    }
+//    @objc func highlightChartValue(notification _: Notification) {
+//        guard CachedDefaults[.moreGraphData], let display, let brightnessContrastChart,
+//              display.id != GENERIC_DISPLAY_ID else { return }
+//        brightnessContrastChart.highlightCurrentValues(adaptiveMode: displayController.adaptiveMode, for: display)
+//    }
 
     @objc func adaptToUserDataPoint(notification: Notification) {
         guard displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
@@ -755,12 +755,12 @@ class DisplayViewController: NSViewController {
             name: contrastDataPointInserted,
             object: display
         )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(highlightChartValue(notification:)),
-            name: currentDataPointChanged,
-            object: nil
-        )
+//        NotificationCenter.default.addObserver(
+//            self,
+//            selector: #selector(highlightChartValue(notification:)),
+//            name: currentDataPointChanged,
+//            object: nil
+//        )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(adaptToDataPointBounds(notification:)),
@@ -937,8 +937,8 @@ class DisplayViewController: NSViewController {
         updateControlsButton()
         updateNotificationObservers(for: display)
 
-        lockedBrightnessCurve = display.lockedBrightnessCurve
-        lockedContrastCurve = display.lockedContrastCurve
+        // lockedBrightnessCurve = display.lockedBrightnessCurve
+        // lockedContrastCurve = display.lockedContrastCurve
 
         schedule1?.display = display
         schedule2?.display = display
@@ -964,6 +964,12 @@ class DisplayViewController: NSViewController {
             guard let self else { return }
             self.updateDataset(contrastFactor: factor)
         }
+        display.$lockedContrast
+            .debounce(for: .milliseconds(50), scheduler: RunLoop.main)
+            .sink { [weak self] locked in
+                self?.brightnessContrastChart?.contrastGraph.visible = !locked
+                self?.brightnessContrastChart?.needsDisplay = true
+            }.store(in: &observers)
 
         minBrightnessField?.integerValue = display.minBrightness.intValue
         minBrightnessField?.lowerLimit = display.allowBrightnessZero ? 0 : 1
@@ -1373,10 +1379,10 @@ class DisplayViewController: NSViewController {
             break
         }
 
-        brightnessContrastChart.highlightCurrentValues(
-            adaptiveMode: displayController.adaptiveMode, for: display,
-            brightness: currentBrightness?.d, contrast: currentContrast?.d
-        )
+//        brightnessContrastChart.highlightCurrentValues(
+//            adaptiveMode: displayController.adaptiveMode, for: display,
+//            brightness: currentBrightness?.d, contrast: currentContrast?.d
+//        )
         mainAsync { [weak self] in
             self?.brightnessContrastChart?.notifyDataSetChanged()
         }
@@ -1803,8 +1809,8 @@ class DisplayViewController: NSViewController {
         super.viewDidLoad()
         viewID = view.accessibilityIdentifier()
 
-        lockBrightnessHelpButton?.helpText = LOCK_BRIGHTNESS_HELP_TEXT
-        lockContrastHelpButton?.helpText = LOCK_CONTRAST_HELP_TEXT
+        // lockBrightnessHelpButton?.helpText = LOCK_BRIGHTNESS_HELP_TEXT
+        // lockContrastHelpButton?.helpText = LOCK_CONTRAST_HELP_TEXT
 
         if let display, display.id != GENERIC_DISPLAY_ID {
             update()

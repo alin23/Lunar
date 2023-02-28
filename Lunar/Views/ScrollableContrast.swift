@@ -95,8 +95,12 @@ class ScrollableContrast: NSView {
             display?.contrast.intValue ?? 50
         }
         set {
+            guard let display else { return }
             cancelScreenWakeAdapterTask()
-            display?.contrast = newValue.ns
+
+            display.withoutLockedContrast {
+                display.contrast = newValue.ns
+            }
         }
     }
 

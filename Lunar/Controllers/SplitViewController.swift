@@ -23,12 +23,12 @@ You can configure how often Lunar reacts to the ambient light changes by changin
 
 ## Algorithm
 
-1. **Every 2 seconds** the sensor will send the lux value of the ambient light to Lunar
+1. **Every second** the sensor will send the lux value of the ambient light to Lunar
 2. Lunar will compare the received lux to the last value
 3. If the new value is different, it is passed through the **Curve Algorithm** to compute the best brightness for each monitor
 4. After computing the monitor values, Lunar will set the brightness for each monitor based on their settings
 
-*The 2 seconds interval is user configurable to any value greater or equal to 1 second.*
+*The 1 second interval is user configurable to any value greater or equal to 1 second.*
 
 ## Settings
 
@@ -64,21 +64,27 @@ If this fails, Lunar will try to find a rough location through a **GeoIP** servi
 let SYNC_HELP_TEXT = """
 # Sync Mode
 
-`Sync` refers to the algorithm that Lunar uses to synchronize the brightness from the built-in display of a Mac device to the external monitors' brightness.
+`Sync` refers to the algorithm that Lunar uses to synchronize the brightness from the source display of a Mac device to the external monitors' brightness.
 
-The built-in display of a Macbook is always adapted to the ambient light using the Ambient Light Sensor near the camera.
+The source display of a Macbook is always adapted to the ambient light using the Ambient Light Sensor near the camera.
 
 Lunar takes advantage of that by periodically reading the display brightness, and sending it to the external monitors.
 
 ## Algorithm
 
-1. **Every 2 seconds** the display brightness is read and compared to the last value
-2. If the brightness has changed, Lunar starts a **fast polling** process where the brightness is read every **100ms**
-3. The built-in brightness is passed through the **Curve Algorithm** to bring it to a better suited value for each monitor
-4. After computing the brightness value, Lunar will set the brightness for each monitor based on their settings
-5. If **no new brightness** change has been detected in the **last 3 seconds**, Lunar switches back to the efficient polling interval of **2 seconds**
+### When `Polling Interval = 0`
 
-*The 2 seconds interval is user configurable to any value greater or equal to 1 second.*
+1. When the source display brightness changes, Lunar gets notified
+2. The source brightness is passed through the **Curve Algorithm** to bring it to a better suited value for each monitor
+3. After computing the brightness value, Lunar will set the brightness for each monitor based on their settings
+
+### When `Polling Interval > 0`
+
+1. **Every x seconds** the display brightness is read and compared to the last value
+2. If the brightness has changed, Lunar starts a **fast polling** process where the brightness is read every **100ms**
+3. The source brightness is passed through the **Curve Algorithm** to bring it to a better suited value for each monitor
+4. After computing the brightness value, Lunar will set the brightness for each monitor based on their settings
+5. If **no new brightness** change has been detected in the **last 3 seconds**, Lunar switches back to the efficient polling interval of **x seconds**
 
 ## Settings
 

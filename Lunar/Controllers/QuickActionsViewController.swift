@@ -313,14 +313,22 @@ struct DisplayRowView: View {
                         enableText: "Unlock"
                     )
                     softwareSliders
+                    let contrastBinding: Binding<Float> = Binding(
+                        get: { display.preciseContrast.f },
+                        set: { val in
+                            display.withoutLockedContrast {
+                                display.preciseContrast = val.d
+                            }
+                        }
+                    )
                     BigSurSlider(
-                        percentage: $display.preciseContrast.f,
+                        percentage: contrastBinding,
                         image: "circle.righthalf.fill",
                         colorBinding: .constant(colors.accent),
                         backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
-                        showValue: $showSliderValues,
-                        disabled: $display.lockedContrast,
-                        enableText: "Unlock"
+                        showValue: $showSliderValues
+                        // disabled: $display.lockedContrast,
+                        // enableText: "Unlock"
                     )
                 }
             }

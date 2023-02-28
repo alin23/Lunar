@@ -150,7 +150,7 @@
       "location" : "https://github.com/alin23/sentry-cocoa.git",
       "state" : {
         "branch" : "master",
-        "revision" : "cc04ad32c9a045a1108dc3d218c01abde8926529"
+        "revision" : "bae2454d1be63d5c91a86a284c39d7e4b081ff7e"
       }
     },
     {
@@ -194,8 +194,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
-        "revision" : "4ad606ba5d7673ea60679a61ff867cc1ff8c8e86",
-        "version" : "1.2.1"
+        "revision" : "fee6933f37fde9a5e12a1e4aeaa93fe60116ff2a",
+        "version" : "1.2.2"
       }
     },
     {
@@ -239,8 +239,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/siteline/SwiftUI-Introspect",
       "state" : {
-        "revision" : "f2616860a41f9d9932da412a8978fec79c06fe24",
-        "version" : "0.1.4"
+        "revision" : "c18951c747ab62af7c15e17a81bd37d4fd5a9979",
+        "version" : "0.2.3"
       }
     },
     {
@@ -258,7 +258,7 @@
       "location" : "https://github.com/SwiftyBeaver/SwiftyBeaver",
       "state" : {
         "branch" : "master",
-        "revision" : "dc3b9adf6c8faeb91a93b60993b5292d66b26c1c"
+        "revision" : "4f2f202eb357620d8c8528f2720ceadf85d013d7"
       }
     },
     {
