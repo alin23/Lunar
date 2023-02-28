@@ -1799,8 +1799,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func handleAutoOSDEvent(_ event: NSEvent) {
         switch event.keyCode.i {
-        case kVK_Escape where displayController.calibrating:
-            displayController.stopCalibration()
+//        case kVK_Escape where displayController.calibrating:
+//            displayController.stopCalibration()
         case kVK_Escape where displayController.autoBlackoutPending:
             displayController.cancelAutoBlackout()
         case kVK_Escape where displayController.autoXdrPendingEnabled:
