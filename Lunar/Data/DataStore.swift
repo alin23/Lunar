@@ -153,6 +153,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .autoRestartOnFailedDDCSooner,
     .sensorHostname,
     .nonManualMode,
+    .curveMode,
     .clockMode,
     .syncMode,
     .overrideAdaptiveMode,
@@ -611,6 +612,7 @@ enum CachedDefaults {
         .nauticalTwilightBegin,
         .nauticalTwilightEnd,
         .nonManualMode,
+        .curveMode,
         .secure,
         .solarNoon,
         .streamLogs,
@@ -786,6 +788,7 @@ func initCache() {
     cacheKey(.adaptiveBrightnessMode)
     cacheKey(.colorScheme)
     cacheKey(.nonManualMode)
+    cacheKey(.curveMode)
     cacheKey(.clockMode)
     cacheKey(.syncMode)
     cacheKey(.overrideAdaptiveMode)

@@ -95,8 +95,11 @@ class ScrollableBrightness: NSView {
             display?.brightness.intValue ?? 50
         }
         set {
+            guard let display else { return }
             cancelScreenWakeAdapterTask()
-            display?.brightness = newValue.ns
+            display.withoutLockedBrightness {
+                display.brightness = newValue.ns
+            }
         }
     }
 

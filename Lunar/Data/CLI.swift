@@ -488,6 +488,7 @@ struct Lunar: ParsableCommand {
             )
             let displays = getFilteredDisplays(displays: displayController.activeDisplayList, filter: display)
                 .filter(!\.isBuiltin)
+
             guard !displays.isEmpty else {
                 if display == .all || display == .external {
                     throw LunarCommandError.noDisplay

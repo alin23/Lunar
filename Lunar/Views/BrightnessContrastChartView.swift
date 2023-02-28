@@ -55,82 +55,82 @@ class BrightnessContrastChartView: LineChartView {
         }
     }
 
-    func highlightCurrentValues(
-        adaptiveMode: AdaptiveMode,
-        for display: Display?,
-        brightness: Double? = nil,
-        contrast: Double? = nil,
-        now: Date? = nil
-    ) {
-        mainAsync { [self] in
-            guard let data, data.dataSetCount >= 2 else { return }
-
-            guard CachedDefaults[.moreGraphData] else {
-                highlightValues(nil)
-                return
-            }
-
-            switch adaptiveMode {
-            case let mode as SensorMode:
-                guard let lux = mode.lastAmbientLight?.rounded() else { return }
-                var highlights: [Highlight] = []
-
-                let maxBr = datapointLock.around { mode.brightnessDataPoint.max.i }
-                let maxCr = datapointLock.around { mode.contrastDataPoint.max.i }
-
-                if (30 ... (maxBr - 30)).contains(lux.i) {
-                    highlights.append(Highlight(x: lux, dataSetIndex: 0, stackIndex: 0))
-                }
-                if (30 ... (maxCr - 30)).contains(lux.i) {
-                    highlights.append(Highlight(x: lux, dataSetIndex: 1, stackIndex: 1))
-                }
-                if highlights.isEmpty {
-                    highlightValues(nil)
-                } else {
-                    highlightValues(highlights)
-                }
-            case is SyncMode:
-                highlightValues([
-                    Highlight(x: SyncMode.lastSourceBrightness.rounded(), dataSetIndex: 0, stackIndex: 0),
-                    Highlight(x: SyncMode.lastSourceContrast.rounded(), dataSetIndex: 1, stackIndex: 1),
-                ])
-            case let mode as LocationMode:
-                guard let moment = mode.moment,
-                      let sunPosition = mode.geolocation?.sun(date: now),
-                      let solarNoonPosition = mode.geolocation?.solar?.solarNoonPosition,
-                      let chartEntry = mode.lastChartEntry
-                else { return }
-
-                let now = now?.in(region: .local) ?? DateInRegion().convertTo(region: .local)
-                let x: Double
-                if now < moment.solarNoon {
-                    x = cap(
-                        sunPosition.elevation.rounded(.down) + chartEntry.sunriseIndex.d,
-                        minVal: chartEntry.sunriseIndex.d,
-                        maxVal: chartEntry.noonIndex.d
-                    )
-                } else {
-                    x = cap(
-                        (solarNoonPosition.elevation.rounded(.down) - sunPosition.elevation.rounded(.down)) + chartEntry.noonIndex.d,
-                        minVal: chartEntry.noonIndex.d,
-                        maxVal: chartEntry.sunsetIndex.d
-                    )
-                }
-                highlightValues([
-                    Highlight(x: x, dataSetIndex: 0, stackIndex: 0),
-                    Highlight(x: x, dataSetIndex: 1, stackIndex: 1),
-                ])
-            case is ManualMode:
-                guard let display else { return }
-                highlightValues([
-                    Highlight(x: brightness ?? display.brightness.doubleValue, dataSetIndex: 0, stackIndex: 0),
-                    Highlight(x: contrast ?? display.contrast.doubleValue, dataSetIndex: 1, stackIndex: 1),
-                ])
-            default:
-                return
-            }
-        }
-    }
+//    func highlightCurrentValues(
+//        adaptiveMode: AdaptiveMode,
+//        for display: Display?,
+//        brightness: Double? = nil,
+//        contrast: Double? = nil,
+//        now: Date? = nil
+//    ) {
+//        mainAsync { [self] in
+//            guard let data, data.dataSetCount >= 2 else { return }
+//
+//            guard CachedDefaults[.moreGraphData] else {
+//                highlightValues(nil)
+//                return
+//            }
+//
+//            switch adaptiveMode {
+//            case let mode as SensorMode:
+//                guard let lux = mode.lastAmbientLight?.rounded() else { return }
+//                var highlights: [Highlight] = []
+//
+//                let maxBr = datapointLock.around { mode.brightnessDataPoint.max.i }
+//                let maxCr = datapointLock.around { mode.contrastDataPoint.max.i }
+//
+//                if (30 ... (maxBr - 30)).contains(lux.i) {
+//                    highlights.append(Highlight(x: lux, dataSetIndex: 0, stackIndex: 0))
+//                }
+//                if (30 ... (maxCr - 30)).contains(lux.i) {
+//                    highlights.append(Highlight(x: lux, dataSetIndex: 1, stackIndex: 1))
+//                }
+//                if highlights.isEmpty {
+//                    highlightValues(nil)
+//                } else {
+//                    highlightValues(highlights)
+//                }
+//            case is SyncMode:
+//                highlightValues([
+//                    Highlight(x: SyncMode.lastSourceBrightness.rounded(), dataSetIndex: 0, stackIndex: 0),
+//                    Highlight(x: SyncMode.lastSourceContrast.rounded(), dataSetIndex: 1, stackIndex: 1),
+//                ])
+//            case let mode as LocationMode:
+//                guard let moment = mode.moment,
+//                      let sunPosition = mode.geolocation?.sun(date: now),
+//                      let solarNoonPosition = mode.geolocation?.solar?.solarNoonPosition,
+//                      let chartEntry = mode.lastChartEntry
+//                else { return }
+//
+//                let now = now?.in(region: .local) ?? DateInRegion().convertTo(region: .local)
+//                let x: Double
+//                if now < moment.solarNoon {
+//                    x = cap(
+//                        sunPosition.elevation.rounded(.down) + chartEntry.sunriseIndex.d,
+//                        minVal: chartEntry.sunriseIndex.d,
+//                        maxVal: chartEntry.noonIndex.d
+//                    )
+//                } else {
+//                    x = cap(
+//                        (solarNoonPosition.elevation.rounded(.down) - sunPosition.elevation.rounded(.down)) + chartEntry.noonIndex.d,
+//                        minVal: chartEntry.noonIndex.d,
+//                        maxVal: chartEntry.sunsetIndex.d
+//                    )
+//                }
+//                highlightValues([
+//                    Highlight(x: x, dataSetIndex: 0, stackIndex: 0),
+//                    Highlight(x: x, dataSetIndex: 1, stackIndex: 1),
+//                ])
+//            case is ManualMode:
+//                guard let display else { return }
+//                highlightValues([
+//                    Highlight(x: brightness ?? display.brightness.doubleValue, dataSetIndex: 0, stackIndex: 0),
+//                    Highlight(x: contrast ?? display.contrast.doubleValue, dataSetIndex: 1, stackIndex: 1),
+//                ])
+//            default:
+//                return
+//            }
+//        }
+//    }
 
     func initGraph(display: Display?, brightnessColor: NSColor, contrastColor: NSColor, labelColor: NSColor, mode: AdaptiveMode? = nil) {
         mainAsync { [self] in
@@ -147,7 +147,7 @@ class BrightnessContrastChartView: LineChartView {
 
         brightnessChartEntry.removeAll(keepingCapacity: false)
         contrastChartEntry.removeAll(keepingCapacity: false)
-        xAxis.removeAllLimitLines()
+//        xAxis.removeAllLimitLines()
 
         if display == nil || display?.id == GENERIC_DISPLAY_ID {
             if adaptiveMode is LocationMode {
@@ -214,7 +214,6 @@ class BrightnessContrastChartView: LineChartView {
                     ).map { ChartDataEntry(x: $0, y: $1) }
                 )
                 mode.maxChartDataPoints = points.brightness.count
-                setupLimitLines(mode, display: display, chartEntry: points)
             case let mode as SyncMode:
                 let xs = stride(from: 0.0, to: (mode.maxChartDataPoints - 1).d, by: 6.0)
                 brightnessChartEntry.reserveCapacity(mode.maxChartDataPoints)
@@ -268,7 +267,7 @@ class BrightnessContrastChartView: LineChartView {
             brightnessGraph.replaceEntries(brightnessChartEntry)
             contrastGraph.replaceEntries(contrastChartEntry)
 
-            highlightValue(nil)
+//            highlightValue(nil)
             for dataset in graphData.dataSets {
                 graphData.removeDataSet(dataset)
             }
@@ -307,6 +306,8 @@ class BrightnessContrastChartView: LineChartView {
         contrastGraph.highlightLineDashLengths = [10, 6]
         contrastGraph.mode = .cubicBezier
 
+        contrastGraph.visible = !(display?.lockedContrast ?? true)
+
         if CachedDefaults[.moreGraphData] {
             xAxis.labelTextColor = labelColor
             leftAxis.labelTextColor = labelColor
@@ -317,63 +318,14 @@ class BrightnessContrastChartView: LineChartView {
             rightAxis.labelTextColor = .clear
         }
 
-        mainThread { setupLegend() }
+//        mainThread {
+//            setupLegend(display: display)
+//        }
 
         data = graphData
 
-        highlightCurrentValues(adaptiveMode: adaptiveMode, for: display)
-        setup(mode: adaptiveMode.key)
-    }
-
-    func setupLimitLines(_: LocationMode? = nil, display _: Display, chartEntry _: LocationModeChartEntry? = nil) {
-        xAxis.removeAllLimitLines()
-        //        let mode = mode ?? LocationMode.specific
-//        guard mode.moment != nil else { return }
-//
-//        let chartEntry = chartEntry ?? mode.lastChartEntry ?? mode.getBrightnessContrastBatch(display: display)
-//        let sunriseLine = ChartLimitLine(
-//            limit: chartEntry.sunriseIndex.d,
-//            label: "Sunrise"
-//        )
-//        let solarNoonLine = ChartLimitLine(
-//            limit: chartEntry.noonIndex.d,
-//            label: "No on"
-//        )
-//        let sunsetLine = ChartLimitLine(
-//            limit: chartEntry.sunsetIndex.d,
-//            label: "Sunset"
-//        )
-//
-//        sunsetLine.labelPosition = .leftTop
-//        solarNoonLine.xOffset = -20
-//
-//        sunriseLine.yOffset = 75
-//        sunsetLine.yOffset = 75
-//        solarNoonLine.yOffset = 75
-//
-//        sunriseLine.lineDashPhase = 3.0
-//        sunriseLine.lineDashLengths = [3.0, 1.0]
-//        solarNoonLine.lineDashPhase = 2.0
-//        solarNoonLine.lineDashLengths = [3.0, 1.0]
-//        sunsetLine.lineDashPhase = 2.0
-//        sunsetLine.lineDashLengths = [3.0, 1.0]
-//
-//        sunriseLine.valueFont = NSFont.systemFont(ofSize: 12, weight: .bold)
-//        solarNoonLine.valueFont = NSFont.systemFont(ofSize: 12, weight: .bold)
-//        sunsetLine.valueFont = NSFont.systemFont(ofSize: 12, weight: .bold)
-//
-//        sunriseLine.valueTextColor = xAxis.labelTextColor.withAlphaComponent(0.4)
-//        solarNoonLine.valueTextColor = xAxis.labelTextColor.withAlphaComponent(0.4)
-//        sunsetLine.valueTextColor = xAxis.labelTextColor.withAlphaComponent(0.4)
-//
-//        sunriseLine.lineColor = contrastGraph.fillColor.withAlphaComponent(0.7)
-//        solarNoonLine.lineColor = (red.blended(withFraction: 0.5, of: lunarYellow) ?? red).withAlphaComponent(0.7)
-//        solarNoonLine.valueTextColor = solarNoonLine.lineColor
-//        sunsetLine.lineColor = brightnessGraph.fillColor.withAlphaComponent(0.7)
-//
-//        xAxis.addLimitLine(sunriseLine)
-//        xAxis.addLimitLine(solarNoonLine)
-//        xAxis.addLimitLine(sunsetLine)
+//        highlightCurrentValues(adaptiveMode: adaptiveMode, for: display)
+        setup(mode: adaptiveMode.key, display: display)
     }
 
     func valueLegend(_ label: String, color: NSColor) -> LegendEntry {
@@ -388,9 +340,11 @@ class BrightnessContrastChartView: LineChartView {
         return valueLegend
     }
 
-    func setupLegend() {
-        legend.enabled = true
-        legend.drawInside = true
+    func setupLegend(display: Display? = nil) {
+        let lockedContrast = display?.lockedContrast ?? true
+
+        legend.enabled = !lockedContrast
+        legend.drawInside = !lockedContrast
         legend.font = NSFont.systemFont(ofSize: 12, weight: .bold)
         legend.textColor = xAxisLabelColor
         legend.yOffset = 68.0
@@ -399,13 +353,17 @@ class BrightnessContrastChartView: LineChartView {
         legend.formSize = 18.0
         legend.orientation = .vertical
 
-        legend.setCustom(entries: [
-            valueLegend("Brightness", color: brightnessGraph.fillColor.withAlphaComponent(0.4)),
-            valueLegend("Contrast", color: contrastGraph.fillColor.withAlphaComponent(0.4)),
-        ])
+        if !lockedContrast {
+            legend.setCustom(entries: [
+                valueLegend("Brightness", color: brightnessGraph.fillColor.withAlphaComponent(0.4)),
+                valueLegend("Contrast", color: contrastGraph.fillColor.withAlphaComponent(0.4)),
+            ])
+        } else {
+            legend.setCustom(entries: [])
+        }
     }
 
-    func setup(mode: AdaptiveModeKey? = nil) {
+    func setup(mode: AdaptiveModeKey? = nil, display: Display? = nil) {
         gridBackgroundColor = NSColor.clear
         drawGridBackgroundEnabled = false
         drawBordersEnabled = false
@@ -465,7 +423,7 @@ class BrightnessContrastChartView: LineChartView {
             chartDescription.text = ""
         }
 
-        setupLegend()
+        setupLegend(display: display)
 
         noDataText = ""
         noDataTextColor = .clear

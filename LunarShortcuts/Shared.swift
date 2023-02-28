@@ -200,6 +200,7 @@ extension Defaults.Keys {
     static let adaptiveBrightnessMode = Key<AdaptiveModeKey>("adaptiveBrightnessMode", default: .sync)
 
     static let nonManualMode = Key<Bool>("nonManualMode", default: true)
+    static let curveMode = Key<Bool>("curveMode", default: true)
     static let clockMode = Key<Bool>("clockMode", default: false)
     static let syncMode = Key<Bool>("syncMode", default: false)
     static let overrideAdaptiveMode = Key<Bool>("overrideAdaptiveMode", default: false)

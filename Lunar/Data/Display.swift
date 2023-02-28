@@ -5954,6 +5954,28 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         self.force = false
     }
 
+    @inline(__always) func withoutLockedBrightness(_ block: () -> Void) {
+        guard lockedBrightness else {
+            block()
+            return
+        }
+
+        lockedBrightness = false
+        block()
+        lockedBrightness = true
+    }
+
+    @inline(__always) func withoutLockedContrast(_ block: () -> Void) {
+        guard lockedContrast else {
+            block()
+            return
+        }
+
+        lockedContrast = false
+        block()
+        lockedContrast = true
+    }
+
     @inline(__always) func withoutSmoothTransition(_ block: () -> Void) {
         withBrightnessTransition(.instant, block)
     }

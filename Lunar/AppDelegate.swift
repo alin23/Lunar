@@ -605,6 +605,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func listenForAdaptiveModeChange() {
         let mode = CachedDefaults[.adaptiveBrightnessMode]
         CachedDefaults[.nonManualMode] = mode != .manual
+        CachedDefaults[.curveMode] = mode == .sync || mode == .location || mode == .sensor
         CachedDefaults[.clockMode] = mode == .clock
         CachedDefaults[.syncMode] = mode == .sync
 
@@ -640,6 +641,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
 
                 CachedDefaults[.nonManualMode] = modeKey != .manual
+                CachedDefaults[.curveMode] = modeKey == .sync || modeKey == .location || modeKey == .sensor
                 CachedDefaults[.clockMode] = modeKey == .clock
                 CachedDefaults[.syncMode] = modeKey == .sync
                 displayController.adaptiveMode = modeKey.mode
