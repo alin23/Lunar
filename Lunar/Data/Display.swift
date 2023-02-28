@@ -1859,9 +1859,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         @Published var nits: Double? = nil
-
-        var nitsMap: [Int: Int] = [:]
-        var nitsSpline: ((Double) -> Double)?
     #endif
 
     var isActiveSyncSource: Bool {
