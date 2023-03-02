@@ -343,23 +343,6 @@ class DisplayViewController: NSViewController {
         case reset = 99
     }
 
-    // let LOCK_BRIGHTNESS_HELP_TEXT = """
-    // ## Description
-
-    // This setting allows the user to **restrict** changes on the brightness of this monitor.
-
-    // - `LOCKED` will **stop** the adaptive algorithm or the hotkeys from changing this monitor's brightness
-    // - `UNLOCKED` will **allow** this monitor's brightness to be adjusted by the adaptive algorithm or by hotkeys
-    // """
-    // let LOCK_CONTRAST_HELP_TEXT = """
-    // ## Description
-
-    // This setting allows the user to **restrict** changes on the contrast of this monitor.
-
-    // - `LOCKED` will **stop** the adaptive algorithm or the hotkeys from changing this monitor's contrast
-    // - `UNLOCKED` will **allow** this monitor's contrast to be adjusted by the adaptive algorithm or by hotkeys
-    // """
-
     @IBOutlet var displayImage: DisplayImage?
     @IBOutlet var displayName: DisplayName?
     @IBOutlet var adaptiveNotice: NSTextField!
@@ -481,14 +464,6 @@ class DisplayViewController: NSViewController {
         _proButton as? Button
     }
 
-    // var lockContrastHelpButton: HelpButton? {
-    //     _lockContrastHelpButton as? HelpButton
-    // }
-
-    // var lockBrightnessHelpButton: HelpButton? {
-    //     _lockBrightnessHelpButton as? HelpButton
-    // }
-
     var settingsButton: SettingsButton? {
         _settingsButton as? SettingsButton
     }
@@ -513,20 +488,6 @@ class DisplayViewController: NSViewController {
             }
         }
     }
-
-    // @objc dynamic var lockedBrightnessCurve = false {
-    //     didSet {
-    //         display?.lockedBrightnessCurve = lockedBrightnessCurve
-    //         lockBrightnessCurveButton?.state = lockedBrightnessCurve.state
-    //     }
-    // }
-
-    // @objc dynamic var lockedContrastCurve = false {
-    //     didSet {
-    //         display?.lockedContrastCurve = lockedContrastCurve
-    //         lockContrastCurveButton?.state = lockedContrastCurve.state
-    //     }
-    // }
 
     @IBOutlet var deleteButton: Button! {
         didSet {
@@ -585,6 +546,12 @@ class DisplayViewController: NSViewController {
                     x: f.origin.x,
                     y: offTextY + ((display.isMacBook || display.isSidecar) ? topButtonsMacBookOffset : 0)
                 ))
+        }
+    }
+
+    var initGraphTask: DispatchWorkItem? {
+        didSet {
+            oldValue?.cancel()
         }
     }
 
@@ -648,17 +615,6 @@ class DisplayViewController: NSViewController {
         placeAddScheduleButton()
     }
 
-    // @IBAction func lockCurve(_ sender: LockButton) {
-    //     switch sender.tag {
-    //     case 1:
-    //         lockedContrastCurve = sender.state == .on
-    //     case 2:
-    //         lockedBrightnessCurve = sender.state == .on
-    //     default:
-    //         break
-    //     }
-    // }
-
     override func mouseDown(with ev: NSEvent) {
         if let editor = displayName?.currentEditor() {
             editor.selectedRange = NSMakeRange(0, 0)
@@ -704,6 +660,15 @@ class DisplayViewController: NSViewController {
 //        brightnessContrastChart.highlightCurrentValues(adaptiveMode: displayController.adaptiveMode, for: display)
 //    }
 
+//    #if arch(arm64)
+//        @objc func adaptToAutoLearnMapping(notification: Notification) {
+//            guard displayController.adaptiveModeKey == .sync, let display,
+//                  let values = notification.userInfo?["values"] as? [AutoLearnMapping]
+//            else { return }
+//
+//            updateDataset(nitsMapping: values, spline: displayController.computeBrightnessSpline(nitsMapping: values, display: display))
+//        }
+//    #endif
     @objc func adaptToUserDataPoint(notification: Notification) {
         guard displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
               let values = notification.userInfo?["values"] as? [Double: Double]
@@ -755,6 +720,14 @@ class DisplayViewController: NSViewController {
             name: contrastDataPointInserted,
             object: display
         )
+//        #if arch(arm64)
+//            NotificationCenter.default.addObserver(
+//                self,
+//                selector: #selector(adaptToAutoLearnMapping(notification:)),
+//                name: nitsMappingModified,
+//                object: display
+//            )
+//        #endif
 //        NotificationCenter.default.addObserver(
 //            self,
 //            selector: #selector(highlightChartValue(notification:)),
@@ -952,23 +925,18 @@ class DisplayViewController: NSViewController {
         schedule5?.isEnabled = CachedDefaults[.showFiveSchedules]
 
         placeAddScheduleButton()
-
         scheduleBox?.isHidden = displayController.adaptiveModeKey != .clock
 
-        display.onBrightnessCurveFactorChange = { [weak self] factor in
-            guard let self else { return }
-            self.updateDataset(brightnessFactor: factor)
-        }
-
-        display.onContrastCurveFactorChange = { [weak self] factor in
-            guard let self else { return }
-            self.updateDataset(contrastFactor: factor)
-        }
         display.$lockedContrast
             .debounce(for: .milliseconds(50), scheduler: RunLoop.main)
             .sink { [weak self] locked in
                 self?.brightnessContrastChart?.contrastGraph.visible = !locked
                 self?.brightnessContrastChart?.needsDisplay = true
+            }.store(in: &observers)
+        display.$adaptiveSubzero
+            .debounce(for: .milliseconds(50), scheduler: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.initGraph()
             }.store(in: &observers)
 
         minBrightnessField?.integerValue = display.minBrightness.intValue
@@ -1060,6 +1028,7 @@ class DisplayViewController: NSViewController {
 
             let lastDataPoint = datapointLock.around { displayController.adaptiveMode.brightnessDataPoint.last }
             display.insertBrightnessUserDataPoint(lastDataPoint, display.brightness.doubleValue, modeKey: displayController.adaptiveModeKey)
+            self?.updateDataset()
         }
 
         initHotkeys()
@@ -1245,111 +1214,94 @@ class DisplayViewController: NSViewController {
         maxContrast: UInt16? = nil,
         currentBrightness: UInt16? = nil,
         currentContrast: UInt16? = nil,
-        brightnessFactor: Double? = nil,
-        contrastFactor: Double? = nil,
         userBrightness: [Double: Double]? = nil,
         userContrast: [Double: Double]? = nil,
+//        nitsMapping: [AutoLearnMapping]? = nil,
+//        spline: ((Double) -> Double)? = nil,
         force: Bool = false
     ) {
-        guard let display, let brightnessContrastChart, display.id != GENERIC_DISPLAY_ID
-        else { return }
+        guard let display, let brightnessContrastChart, display.id != GENERIC_DISPLAY_ID else {
+            return
+        }
 
         let brightnessChartEntry = brightnessContrastChart.brightnessGraph.entries
         let contrastChartEntry = brightnessContrastChart.contrastGraph.entries
 
         switch displayController.adaptiveMode {
         case let mode as LocationMode:
-            let points = mode.getBrightnessContrastBatch(
-                display: display, brightnessFactor: brightnessFactor, contrastFactor: contrastFactor,
-                minBrightness: minBrightness, maxBrightness: maxBrightness,
-                minContrast: minContrast, maxContrast: maxContrast,
-                userBrightness: userBrightness, userContrast: userContrast
-            )
-            let maxValues = min(
-                mode.maxChartDataPoints,
-                points.brightness.count,
-                points.contrast.count,
-                brightnessChartEntry.count,
-                contrastChartEntry.count
-            )
-            let xs = stride(from: 0, to: maxValues, by: 1)
-            for (x, y) in zip(xs, points.brightness.striding(by: 9)) {
-                brightnessChartEntry[x].y = y
+            guard let moment = mode.moment else { return }
+
+            let xs = stride(from: moment.astronomicalSunrise, to: moment.astronomicalSunset, by: 40)
+            let brcrs = xs.map { datetime in
+                mode.getBrightnessContrast(
+                    display: display,
+                    hour: datetime.hour,
+                    minute: datetime.minute,
+                    minBrightness: minBrightness?.u8, minContrast: minContrast?.u8
+                )
             }
-            for (x, y) in zip(xs, points.contrast.striding(by: 9)) {
-                contrastChartEntry[x].y = y
+
+            for (entry, y) in zip(brightnessChartEntry, brcrs.map(\.0)) {
+                entry.y = y
+            }
+            for (entry, y) in zip(contrastChartEntry, brcrs.map(\.1)) {
+                entry.y = y
             }
         case let mode as SyncMode:
-            let maxValues = min(mode.maxChartDataPoints, brightnessChartEntry.count, contrastChartEntry.count)
-            let xs = stride(from: 0, to: maxValues, by: 1)
-
-            if force || minBrightness != nil || maxBrightness != nil || userBrightness != nil || brightnessFactor != nil {
-                let values = mode.interpolateSIMD(
-                    .brightness(0),
+//            if mode.isSyncingNits {
+//                let brcrs = brightnessChartEntry.map { entry in
+//                    mode.computeBrightnessContrast(
+//                        nits: entry.x,
+//                        display: display,
+//                        minBrightness: minBrightness,
+//                        maxBrightness: maxBrightness,
+//                        minContrast: minContrast,
+//                        maxContrast: maxContrast,
+//                        nitsMapping: nitsMapping,
+//                        spline: spline
+//                    )
+//                }
+//                for (entry, y) in zip(brightnessChartEntry, brcrs.map(\.0)) {
+//                    entry.y = y
+//                }
+//                for (entry, y) in zip(contrastChartEntry, brcrs.map(\.1)) {
+//                    entry.y = y
+//                }
+//            } else {
+            let brs = brightnessChartEntry.map { entry in
+                mode.interpolate(
+                    .preciseBrightness(entry.x),
                     display: display,
                     minVal: minBrightness?.d,
-                    maxVal: maxBrightness?.d,
-                    factor: brightnessFactor,
-                    userValues: userBrightness
+                    maxVal: maxBrightness?.d
                 )
-                for (x, b) in zip(xs, values.striding(by: 6)) {
-                    brightnessChartEntry[x].y = b
-                }
             }
-            if force || minContrast != nil || maxContrast != nil || userContrast != nil || contrastFactor != nil {
-                let values = mode.interpolateSIMD(
-                    .contrast(0),
+
+            for (entry, y) in zip(brightnessChartEntry, brs) {
+                entry.y = y
+            }
+
+            let crs = contrastChartEntry.map { entry in
+                mode.interpolate(
+                    .preciseContrast(entry.x),
                     display: display,
                     minVal: minContrast?.d,
-                    maxVal: maxContrast?.d,
-                    factor: contrastFactor,
-                    userValues: userContrast
+                    maxVal: maxContrast?.d
                 )
-                for (x, b) in zip(xs, values.striding(by: 6)) {
-                    contrastChartEntry[x].y = b
-                }
+            }
+            for (entry, y) in zip(contrastChartEntry, crs) {
+                entry.y = y
             }
         case let mode as SensorMode:
-            let maxValues = min(mode.maxChartDataPoints, brightnessChartEntry.count, contrastChartEntry.count)
-            let xs = stride(from: 0, to: maxValues, by: 1)
-
-            if force || minBrightness != nil || maxBrightness != nil || userBrightness != nil || brightnessFactor != nil {
-                let values = mode.interpolateSIMD(
-                    .brightness(0),
-                    display: display,
-                    minVal: minBrightness?.d,
-                    maxVal: maxBrightness?.d,
-                    factor: brightnessFactor,
-                    userValues: userBrightness
-                )
-                let curveAdjustedValues = mode.adjustCurveSIMD(
-                    [Double](values.striding(by: 30)),
-                    factor: mode.visualCurveFactor,
-                    minVal: minBrightness?.d ?? display.minBrightness.doubleValue,
-                    maxVal: maxBrightness?.d ?? display.maxBrightness.doubleValue
-                )
-                for (x, b) in zip(xs, curveAdjustedValues) {
-                    brightnessChartEntry[x].y = b
-                }
+            let brcrs = brightnessChartEntry.map { entry in
+                mode.computeBrightnessContrast(ambientLight: entry.x, display: display)
             }
-            if force || minContrast != nil || maxContrast != nil || userContrast != nil || contrastFactor != nil {
-                let values = mode.interpolateSIMD(
-                    .contrast(0),
-                    display: display,
-                    minVal: minContrast?.d,
-                    maxVal: maxContrast?.d,
-                    factor: contrastFactor,
-                    userValues: userContrast
-                )
-                let curveAdjustedValues = mode.adjustCurveSIMD(
-                    [Double](values.striding(by: 30)),
-                    factor: mode.visualCurveFactor,
-                    minVal: minContrast?.d ?? display.minContrast.doubleValue,
-                    maxVal: maxContrast?.d ?? display.maxContrast.doubleValue
-                )
-                for (x, b) in zip(xs, curveAdjustedValues) {
-                    contrastChartEntry[x].y = b
-                }
+
+            for (entry, y) in zip(brightnessChartEntry, brcrs) {
+                entry.y = y.0
+            }
+            for (entry, y) in zip(contrastChartEntry, brcrs) {
+                entry.y = y.1
             }
         case let mode as ManualMode:
             let maxValues = min(mode.maxChartDataPoints, brightnessChartEntry.count, contrastChartEntry.count)
@@ -1550,50 +1502,19 @@ class DisplayViewController: NSViewController {
             .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] value in
                 guard let self else { return }
-                // self.scrollableBrightness?.maxValue.integerValue = value.intValue
-                // self.scrollableBrightness?.minValue.upperLimit = value.doubleValue - 1
 
                 self.maxBrightnessField?.integerValue = value.intValue
                 self.minBrightnessField?.upperLimit = value.doubleValue - 1
             }.store(in: &displayObservers, for: "maxBrightness")
-        // display?.$maxContrast
-        //     .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
-        //     .sink { [weak self] value in
-        //         guard let self = self else { return }
-        //         self.scrollableContrast?.maxValue.integerValue = value.intValue
-        //         self.scrollableContrast?.minValue.upperLimit = value.doubleValue - 1
-        //     }.store(in: &displayObservers, for: "maxContrast")
 
         display?.$minBrightness
             .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] value in
                 guard let self else { return }
-                // self.scrollableBrightness?.minValue.integerValue = value.intValue
-                // self.scrollableBrightness?.maxValue.lowerLimit = value.doubleValue + 1
 
                 self.minBrightnessField?.integerValue = value.intValue
                 self.maxBrightnessField?.lowerLimit = value.doubleValue + 1
             }.store(in: &displayObservers, for: "minBrightness")
-        // display?.$minContrast
-        //     .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
-        //     .sink { [weak self] value in
-        //         guard let self = self else { return }
-        //         self.scrollableContrast?.minValue.integerValue = value.intValue
-        //         self.scrollableContrast?.maxValue.lowerLimit = value.doubleValue + 1
-        //     }.store(in: &displayObservers, for: "minContrast")
-
-        // display?.$brightness
-        //     .throttle(for: .milliseconds(50), scheduler: DDC.queue, latest: true)
-        //     .sink { [weak self] value in
-        //         guard let self = self else { return }
-        //         mainAsync { self.scrollableBrightness?.currentValue.integerValue = value.intValue }
-        //     }.store(in: &displayObservers, for: "brightness")
-        // display?.$contrast
-        //     .throttle(for: .milliseconds(50), scheduler: DDC.queue, latest: true)
-        //     .sink { [weak self] value in
-        //         guard let self = self else { return }
-        //         mainAsync { self.scrollableContrast?.currentValue.integerValue = value.intValue }
-        //     }.store(in: &displayObservers, for: "contrast")
         display?.$allowBrightnessZero
             .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] value in
@@ -1676,18 +1597,22 @@ class DisplayViewController: NSViewController {
 
     func initGraph(mode: AdaptiveMode? = nil) {
         guard !chartHidden else {
+            initGraphTask = nil
             zeroGraph()
             return
         }
-        brightnessContrastChart?.initGraph(
-            display: display,
-            brightnessColor: brightnessGraphColor,
-            contrastColor: contrastGraphColor,
-            labelColor: xAxisLabelColor,
-            mode: mode
-        )
-        brightnessContrastChart?.rightAxis.gridColor = mauve.withAlphaComponent(0.1)
-        brightnessContrastChart?.xAxis.gridColor = mauve.withAlphaComponent(0.1)
+
+        initGraphTask = mainAsyncAfter(ms: 50) { [weak self] in
+            self?.brightnessContrastChart?.initGraph(
+                display: self?.display,
+                brightnessColor: brightnessGraphColor,
+                contrastColor: contrastGraphColor,
+                labelColor: xAxisLabelColor,
+                mode: mode
+            )
+            self?.brightnessContrastChart?.rightAxis.gridColor = mauve.withAlphaComponent(0.1)
+            self?.brightnessContrastChart?.xAxis.gridColor = mauve.withAlphaComponent(0.1)
+        }
     }
 
     func zeroGraph() {
@@ -1822,8 +1747,7 @@ class DisplayViewController: NSViewController {
             scrollableBrightness?.onMaxValueChanged = { [weak self] (value: Int) in self?.updateDataset(maxBrightness: value.u16) }
             scrollableContrast?.onMinValueChanged = { [weak self] (value: Int) in self?.updateDataset(minContrast: value.u16) }
             scrollableContrast?.onMaxValueChanged = { [weak self] (value: Int) in self?.updateDataset(maxContrast: value.u16) }
-
-            initGraph()
+//            initGraph()
         }
 
         deleteEnabled = getDeleteEnabled()

@@ -246,7 +246,6 @@
 		C7520C071FD20CC200756F82 /* DisplayController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayController.swift; sourceTree = "<group>"; };
 		C7521D32226C762A0062EC81 /* DDC.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = DDC.c; path = Lunar/DDC/DDC.c; sourceTree = SOURCE_ROOT; };
 		C7545E3125B1996300383AFB /* PopUpButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopUpButton.swift; sourceTree = "<group>"; };
-		C7574F772351FF5700358397 /* LunarRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LunarRelease.entitlements; sourceTree = "<group>"; };
 		C7574F802354691700358397 /* gencode.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = gencode.sh; path = bin/gencode.sh; sourceTree = "<group>"; };
 		C7574F812354691700358397 /* buildscript.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = buildscript.sh; path = bin/buildscript.sh; sourceTree = "<group>"; };
 		C762AAE8271F3D6200198EDA /* ColorsPopoverController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorsPopoverController.swift; sourceTree = "<group>"; };
@@ -289,7 +288,6 @@
 		C79975DA25DEEE9300C797FF /* DDCControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDCControl.swift; sourceTree = "<group>"; };
 		C79975DD25DEEF9200C797FF /* AppleNativeControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleNativeControl.swift; sourceTree = "<group>"; };
 		C79975E025DEF2EC00C797FF /* GammaControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GammaControl.swift; sourceTree = "<group>"; };
-		C79B5A252434905900D62E52 /* Lunar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Lunar.entitlements; sourceTree = "<group>"; };
 		C7A22755281C19D1005F2351 /* XDRTipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XDRTipView.swift; sourceTree = "<group>"; };
 		C7A2574120EA249B003B3A84 /* dsa_pub.pem */ = {isa = PBXFileReference; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		C7A517A02593C11C00F6CC83 /* PopoverButon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverButon.swift; sourceTree = "<group>"; };
@@ -642,8 +640,6 @@
 				C7E80E1F2637060F004718A4 /* CSSH */,
 				C7E80E122637060F004718A4 /* Shout */,
 				C7AEC7FC1FD0B4350039B562 /* Assets.xcassets */,
-				C79B5A252434905900D62E52 /* Lunar.entitlements */,
-				C7574F772351FF5700358397 /* LunarRelease.entitlements */,
 				C7AEC8011FD0B4350039B562 /* Info.plist */,
 				C7AEC7FE1FD0B4350039B562 /* Main.storyboard */,
 				C7AF321C26F62F5C00AC14AF /* Schedule.xib */,
@@ -1233,8 +1229,8 @@
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_USE_OPTIMIZATION_PROFILE = NO;
-				CODE_SIGN_ENTITLEMENTS = Lunar/Lunar.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -1301,8 +1297,8 @@
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_USE_OPTIMIZATION_PROFILE = NO;
-				CODE_SIGN_ENTITLEMENTS = Lunar/Lunar.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;

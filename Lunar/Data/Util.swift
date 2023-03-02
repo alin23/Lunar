@@ -1015,7 +1015,7 @@ func createWindow(
                     window.setAccessibilitySubrole(.unknown)
                 }
                 if show {
-                    log.debug("Showing window '\(window.title)'")
+//                    log.debug("Showing window '\(window.title)'")
                     wc.showWindow(nil)
                     window.orderFrontRegardless()
                 }

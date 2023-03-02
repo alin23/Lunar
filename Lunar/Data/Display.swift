@@ -40,16 +40,6 @@ let DEFAULT_MIN_CONTRAST: UInt16 = 50
 let DEFAULT_MAX_CONTRAST: UInt16 = 75
 let DEFAULT_COLOR_GAIN: UInt16 = 50
 
-let DEFAULT_SENSOR_BRIGHTNESS_CURVE_FACTOR = 0.5
-let DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR = 1.0
-let DEFAULT_LOCATION_BRIGHTNESS_CURVE_FACTOR = 1.0
-let DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR = 1.0
-
-let DEFAULT_SENSOR_CONTRAST_CURVE_FACTOR = 0.2
-let DEFAULT_SYNC_CONTRAST_CURVE_FACTOR = 0.26
-let DEFAULT_LOCATION_CONTRAST_CURVE_FACTOR = 0.8
-let DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR = 1.0
-
 let GENERIC_DISPLAY_ID: CGDirectDisplayID = UINT32_MAX
 #if DEBUG
     let TEST_DISPLAY_ID: CGDirectDisplayID = UINT32_MAX / 2
@@ -328,7 +318,7 @@ struct GammaTable: Equatable {
     func apply(to id: CGDirectDisplayID, force: Bool = false) -> Bool {
         guard !displayController.gammaDisabledCompletely else { return true }
 
-        log.debug("Applying gamma table to ID \(id)")
+//        log.debug("Applying gamma table to ID \(id)")
         guard force || !isZero else {
             log.debug("Zero gamma table: samples=\(samples)")
             GammaTable.original.apply(to: id)
@@ -385,8 +375,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         let userBrightnessContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userBrightness)
         let userContrastContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userContrast)
         let enabledControlsContainer = try container.nestedContainer(keyedBy: DisplayControlKeys.self, forKey: .enabledControls)
-        let brightnessCurveFactorsContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .brightnessCurveFactors)
-        let contrastCurveFactorsContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .contrastCurveFactors)
 
         let id = try container.decode(CGDirectDisplayID.self, forKey: .id)
         _id = id
@@ -554,56 +542,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             (try? userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .clock))?.userValues
         {
             userContrast[.clock] = clockUserContrast.threadSafeDictionary
-        }
-
-        for adaptiveModeKey in AdaptiveModeKey.allCases {
-            if userBrightness[adaptiveModeKey] == nil || userBrightness[adaptiveModeKey]!.isEmpty {
-                userBrightness[adaptiveModeKey] = ThreadSafeDictionary(dict: [0: 0])
-            } else if let d = userBrightness[adaptiveModeKey]?.dictionary,
-                      min(Array(d.keys)) > 0, min(Array(d.values)) > 0
-            {
-                userBrightness[adaptiveModeKey]![0] = 0
-            }
-
-            if userContrast[adaptiveModeKey] == nil || userContrast[adaptiveModeKey]!.isEmpty {
-                userContrast[adaptiveModeKey] = ThreadSafeDictionary(dict: [0: 0])
-            } else if let d = userContrast[adaptiveModeKey]?.dictionary,
-                      min(Array(d.keys)) > 0, min(Array(d.values)) > 0
-            {
-                userContrast[adaptiveModeKey]![0] = 0
-            }
-        }
-
-        if let sensorFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .sensor) {
-            brightnessCurveFactors[.sensor] = sensorFactor > 0 ? sensorFactor : DEFAULT_SENSOR_BRIGHTNESS_CURVE_FACTOR
-        }
-        if let syncFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .sync) {
-            brightnessCurveFactors[.sync] = syncFactor > 0 ? syncFactor : DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR
-        }
-        if let locationFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .location) {
-            brightnessCurveFactors[.location] = locationFactor > 0 ? locationFactor : DEFAULT_LOCATION_BRIGHTNESS_CURVE_FACTOR
-        }
-        if let manualFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .manual) {
-            brightnessCurveFactors[.manual] = manualFactor > 0 ? manualFactor : DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR
-        }
-        if let clockFactor = try brightnessCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .clock) {
-            brightnessCurveFactors[.clock] = clockFactor > 0 ? clockFactor : DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR
-        }
-
-        if let sensorFactor = try contrastCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .sensor) {
-            contrastCurveFactors[.sensor] = sensorFactor > 0 ? sensorFactor : DEFAULT_SENSOR_CONTRAST_CURVE_FACTOR
-        }
-        if let syncFactor = try contrastCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .sync) {
-            contrastCurveFactors[.sync] = syncFactor > 0 ? syncFactor : DEFAULT_SYNC_CONTRAST_CURVE_FACTOR
-        }
-        if let locationFactor = try contrastCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .location) {
-            contrastCurveFactors[.location] = locationFactor > 0 ? locationFactor : DEFAULT_LOCATION_CONTRAST_CURVE_FACTOR
-        }
-        if let manualFactor = try contrastCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .manual) {
-            contrastCurveFactors[.manual] = manualFactor > 0 ? manualFactor : DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR
-        }
-        if let clockFactor = try contrastCurveFactorsContainer.decodeIfPresent(Double.self, forKey: .clock) {
-            contrastCurveFactors[.clock] = clockFactor > 0 ? clockFactor : DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR
         }
 
         super.init()
@@ -916,8 +854,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case neverFallbackControl
         case enabledControls
         case schedules
-        case brightnessCurveFactors
-        case contrastCurveFactors
         case activeAndResponsive
         case hasDDC
         case hasI2C
@@ -1286,22 +1222,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         .gamma: true,
     ]
 
-    var brightnessCurveFactors: [AdaptiveModeKey: Double] = [
-        .sensor: DEFAULT_SENSOR_BRIGHTNESS_CURVE_FACTOR,
-        .sync: DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR,
-        .location: DEFAULT_LOCATION_BRIGHTNESS_CURVE_FACTOR,
-        .manual: DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR,
-        .clock: DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR,
-    ]
-
-    var contrastCurveFactors: [AdaptiveModeKey: Double] = [
-        .sensor: DEFAULT_SENSOR_CONTRAST_CURVE_FACTOR,
-        .sync: DEFAULT_SYNC_CONTRAST_CURVE_FACTOR,
-        .location: DEFAULT_LOCATION_CONTRAST_CURVE_FACTOR,
-        .manual: DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR,
-        .clock: DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR,
-    ]
-
     @objc dynamic var sentBrightnessCondition = NSCondition()
     @objc dynamic var sentContrastCondition = NSCondition()
     @objc dynamic var sentInputCondition = NSCondition()
@@ -1361,9 +1281,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         "toggle-last-input2-\(serial)",
         "toggle-last-input3-\(serial)",
     ]
-
-    lazy var gammaLockPath = "/tmp/lunar-gamma-lock-\(serial)"
-    lazy var gammaDistributedLock: NSDistributedLock? = NSDistributedLock(path: gammaLockPath)
 
     @Atomic var gammaChanged = false
 
@@ -1612,7 +1529,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             normalizedName = Self.numberNamePattern.replaceAll(in: edidName, with: "").trimmed
         }
     }
-    @Atomic @objc dynamic var adaptiveSubzero = true {
+    @Published @objc dynamic var adaptiveSubzero = true {
         didSet {
             #if arch(arm64)
                 displayController.brightnessSplines = displayController.computeBrightnessSplines()
@@ -1877,10 +1794,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             if isSource {
                 displayController.activeDisplayList.filter { $0.id != id }.forEach { d in
                     d.isSource = false
-                    if d.normalizedName == normalizedName {
-                        d.brightnessCurveFactors[.sync] = 1
-                        d.contrastCurveFactors[.sync] = 1
-                    }
                 }
             } else if let builtinDisplay = displayController.builtinDisplay, builtinDisplay.serial != serial {
                 builtinDisplay.isSource = true
@@ -1896,56 +1809,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 displayController.adaptiveMode.watch()
             }
             SyncMode.refresh()
-        }
-    }
-
-    @objc dynamic var sliderBrightnessCurveFactor: Double {
-        get {
-            let factor = brightnessCurveFactor
-            return factor <= 1
-                ? mapNumber(factor, fromLow: 0.01, fromHigh: 1, toLow: 1, toHigh: 0.5)
-                : mapNumber(cap(factor, minVal: 1, maxVal: 9), fromLow: 1, fromHigh: 9, toLow: 0.5, toHigh: 0)
-        }
-        set {
-            let factor = newValue <= 0.5
-                ? mapNumber(newValue, fromLow: 0, fromHigh: 0.5, toLow: 9, toHigh: 1)
-                : mapNumber(newValue, fromLow: 0.5, fromHigh: 1, toLow: 1, toHigh: 0.01)
-            brightnessCurveFactor = factor
-        }
-    }
-
-    @objc dynamic var sliderContrastCurveFactor: Double {
-        get {
-            let factor = contrastCurveFactor
-            return factor <= 1
-                ? mapNumber(factor, fromLow: 0.01, fromHigh: 1, toLow: 1, toHigh: 0.5)
-                : mapNumber(cap(factor, minVal: 1, maxVal: 9), fromLow: 1, fromHigh: 9, toLow: 0.5, toHigh: 0)
-        }
-        set {
-            let factor = newValue <= 0.5
-                ? mapNumber(newValue, fromLow: 0, fromHigh: 0.5, toLow: 9, toHigh: 1)
-                : mapNumber(newValue, fromLow: 0.5, fromHigh: 1, toLow: 1, toHigh: 0.01)
-            contrastCurveFactor = factor
-        }
-    }
-
-    @objc dynamic var brightnessCurveFactor: Double {
-        get { brightnessCurveFactors[displayController.adaptiveModeKey] ?? 1.0 }
-        set {
-            let oldValue = brightnessCurveFactors[displayController.adaptiveModeKey]
-            brightnessCurveFactors[displayController.adaptiveModeKey] = newValue
-            readapt(newValue: newValue, oldValue: oldValue)
-            onBrightnessCurveFactorChange?(newValue)
-        }
-    }
-
-    @objc dynamic var contrastCurveFactor: Double {
-        get { contrastCurveFactors[displayController.adaptiveModeKey] ?? 1.0 }
-        set {
-            let oldValue = contrastCurveFactors[displayController.adaptiveModeKey]
-            contrastCurveFactors[displayController.adaptiveModeKey] = newValue
-            readapt(newValue: newValue, oldValue: oldValue)
-            onContrastCurveFactorChange?(newValue)
         }
     }
 
@@ -2047,6 +1910,17 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc dynamic var subzeroDimming: Float {
         get { min(softwareBrightness, 1.0) }
         set { softwareBrightness = cap(newValue, minVal: 0.0, maxVal: 1.0) }
+    }
+    @objc dynamic var softwareBrightnessSlider: Float {
+        get { softwareBrightness }
+        set {
+            softwareBrightness = newValue
+
+            guard adaptiveSubzero else { return }
+
+            let lastDataPoint = datapointLock.around { displayController.adaptiveMode.brightnessDataPoint.last }
+            insertBrightnessUserDataPoint(lastDataPoint, brightness.doubleValue, modeKey: displayController.adaptiveModeKey)
+        }
     }
     @Published @objc dynamic var softwareBrightness: Float = 1.0 {
         didSet {
@@ -2897,14 +2771,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             if subzero, preciseBrightnessContrast > 0 {
                 withoutApply {
-                    subzero = false
-                    adaptivePaused = false
-                    softwareBrightness = 1
+                    if subzero { subzero = false }
+                    if adaptivePaused { adaptivePaused = false }
                 }
+                if softwareBrightness != 1 { softwareBrightness = 1 }
             } else if !subzero, preciseBrightnessContrast == 0 {
-                withoutApply {
-                    subzero = true
-                }
+                withoutApply { subzero = true }
             }
 
             let (brightness, contrast) = sliderValueToBrightnessContrast(preciseBrightnessContrast)
@@ -2943,7 +2815,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var preciseBrightness = 0.5 {
         didSet {
-            guard applyPreciseValue else { return }
+            guard applyPreciseValue, initialised else { return }
 
             if subzero, preciseBrightnessContrast > 0 {
                 withoutApply {
@@ -3144,11 +3016,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             log.info("Set BRIGHTNESS to \(brightness) for \(description) (old: \(oldBrightness))", context: context)
-            if Logger.trace {
-                Thread.callStackSymbols.forEach {
-                    log.info($0)
-                }
-            }
+            if Logger.trace { log.traceCalls() }
 
             if let control = control as? DDCControl {
                 _ = control.setBrightnessDebounced(brightness, oldValue: oldBrightness, transition: brightnessTransition)
@@ -3230,11 +3098,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             log.info("Set CONTRAST to \(contrast) for \(description) (old: \(oldContrast))", context: context)
-            if Logger.trace {
-                Thread.callStackSymbols.forEach {
-                    log.info($0)
-                }
-            }
+            if Logger.trace { log.traceCalls() }
 
             if let control = control as? DDCControl {
                 _ = control.setContrastDebounced(contrast, oldValue: oldContrast, transition: brightnessTransition)
@@ -3562,18 +3426,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             if hasNetworkControl != oldValue {
                 control = getBestControl()
             }
-        }
-    }
-
-    @objc dynamic var copyFromDisplay: Display? = nil {
-        didSet {
-            guard let display = copyFromDisplay else { return }
-            defer { mainAsyncAfter(ms: 200) { self.copyFromDisplay = nil }}
-
-            brightnessCurveFactors = display.brightnessCurveFactors
-            contrastCurveFactors = display.contrastCurveFactors
-            sliderBrightnessCurveFactor = display.sliderBrightnessCurveFactor
-            sliderContrastCurveFactor = display.sliderContrastCurveFactor
         }
     }
 
@@ -4074,15 +3926,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     static var ddcWorkingCount: [String: Int] = [:]
     static var ddcNotWorkingCount: [String: Int] = [:]
 
-    // #if DEBUG
-    //     @objc dynamic lazy var showVolumeSlider: Bool = CachedDefaults[.showVolumeSlider]
-    // #else
     @Published @objc dynamic var showVolumeSlider = false
     lazy var preciseBrightnessKey = "setPreciseBrightness-\(serial)"
     lazy var preciseContrastKey = "setPreciseContrast-\(serial)"
-
-    var onBrightnessCurveFactorChange: ((Double) -> Void)? = nil
-    var onContrastCurveFactorChange: ((Double) -> Void)? = nil
 
     @Atomic var initialised = false
 
@@ -4874,34 +4720,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         lunarGammaTable = nil
     }
 
-    func resetBrightnessCurveFactor(mode: AdaptiveModeKey? = nil) {
-        let mode = mode ?? displayController.adaptiveModeKey
-        switch mode {
-        case .sensor:
-            brightnessCurveFactors[mode] = DEFAULT_SENSOR_BRIGHTNESS_CURVE_FACTOR
-        case .sync:
-            brightnessCurveFactors[mode] = DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR
-        case .location:
-            brightnessCurveFactors[mode] = DEFAULT_LOCATION_BRIGHTNESS_CURVE_FACTOR
-        case .manual, .clock, .auto:
-            brightnessCurveFactors[mode] = DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR
-        }
-    }
-
-    func resetContrastCurveFactor(mode: AdaptiveModeKey? = nil) {
-        let mode = mode ?? displayController.adaptiveModeKey
-        switch mode {
-        case .sensor:
-            contrastCurveFactors[mode] = DEFAULT_SENSOR_CONTRAST_CURVE_FACTOR
-        case .sync:
-            contrastCurveFactors[mode] = DEFAULT_SYNC_CONTRAST_CURVE_FACTOR
-        case .location:
-            contrastCurveFactors[mode] = DEFAULT_LOCATION_CONTRAST_CURVE_FACTOR
-        case .manual, .clock, .auto:
-            contrastCurveFactors[mode] = DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR
-        }
-    }
-
     func save(now: Bool = false, later: Bool = false) {
         if now {
             DataStore.storeDisplay(display: self, now: now)
@@ -4930,8 +4748,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             var userBrightnessContainer = container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userBrightness)
             var userContrastContainer = container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userContrast)
             var enabledControlsContainer = container.nestedContainer(keyedBy: DisplayControlKeys.self, forKey: .enabledControls)
-            var brightnessCurveFactorsContainer = container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .brightnessCurveFactors)
-            var contrastCurveFactorsContainer = container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .contrastCurveFactors)
 
             try container.encode(active, forKey: .active)
             try container.encode(adaptive, forKey: .adaptive)
@@ -5040,18 +4856,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try enabledControlsContainer.encodeIfPresent(enabledControls[.appleNative], forKey: .appleNative)
             try enabledControlsContainer.encodeIfPresent(enabledControls[.ddc], forKey: .ddc)
             try enabledControlsContainer.encodeIfPresent(enabledControls[.gamma], forKey: .gamma)
-
-            try brightnessCurveFactorsContainer.encodeIfPresent(brightnessCurveFactors[.sync], forKey: .sync)
-            try brightnessCurveFactorsContainer.encodeIfPresent(brightnessCurveFactors[.sensor], forKey: .sensor)
-            try brightnessCurveFactorsContainer.encodeIfPresent(brightnessCurveFactors[.location], forKey: .location)
-            try brightnessCurveFactorsContainer.encodeIfPresent(brightnessCurveFactors[.manual], forKey: .manual)
-            try brightnessCurveFactorsContainer.encodeIfPresent(brightnessCurveFactors[.clock], forKey: .clock)
-
-            try contrastCurveFactorsContainer.encodeIfPresent(contrastCurveFactors[.sync], forKey: .sync)
-            try contrastCurveFactorsContainer.encodeIfPresent(contrastCurveFactors[.sensor], forKey: .sensor)
-            try contrastCurveFactorsContainer.encodeIfPresent(contrastCurveFactors[.location], forKey: .location)
-            try contrastCurveFactorsContainer.encodeIfPresent(contrastCurveFactors[.manual], forKey: .manual)
-            try contrastCurveFactorsContainer.encodeIfPresent(contrastCurveFactors[.clock], forKey: .clock)
 
             try container.encode(useOverlay, forKey: .useOverlay)
             try container.encode(alwaysUseNetworkControl, forKey: .alwaysUseNetworkControl)
@@ -5710,16 +5514,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         gammaChanged = false
     }
 
-    @discardableResult func gammaLock() -> Bool {
-        log.verbose("Locking gamma", context: context)
-        return gammaDistributedLock?.try() ?? false
-    }
-
-    func gammaUnlock() {
-        log.verbose("Unlocking gamma", context: context)
-        gammaDistributedLock?.unlock()
-    }
-
     @discardableResult
     func apply(gamma: GammaTable, force: Bool = false) -> Bool {
         let result = gamma.apply(to: id, force: force)
@@ -5741,7 +5535,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         guard force || (enabledControls[.gamma] ?? false && (timeSince(lastConnectionTime) >= 1 || onlySoftwareDimmingEnabled))
         else { return }
-        gammaLock()
+
         if gammaSetterTask != nil {
             gammaSetterTask = nil
         }
@@ -5868,21 +5662,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .ddc: !isTV && !isStudioDisplay(),
             .gamma: !DDC.isSmartBuiltinDisplay(id),
         ]
-        brightnessCurveFactors = [
-            .sensor: DEFAULT_SENSOR_BRIGHTNESS_CURVE_FACTOR,
-            .sync: DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR,
-            .location: DEFAULT_LOCATION_BRIGHTNESS_CURVE_FACTOR,
-            .manual: DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR,
-            .clock: DEFAULT_MANUAL_BRIGHTNESS_CURVE_FACTOR,
-        ]
-
-        contrastCurveFactors = [
-            .sensor: DEFAULT_SENSOR_CONTRAST_CURVE_FACTOR,
-            .sync: DEFAULT_SYNC_CONTRAST_CURVE_FACTOR,
-            .location: DEFAULT_LOCATION_CONTRAST_CURVE_FACTOR,
-            .manual: DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR,
-            .clock: DEFAULT_MANUAL_CONTRAST_CURVE_FACTOR,
-        ]
 
         adaptive = !Self.ambientLightCompensationEnabled(id)
         adaptivePaused = false
@@ -5992,71 +5771,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         brightnessTransition = oldTransition
     }
 
-    func getMinMaxFactor(
-        type: ValueType,
-        factor: Double? = nil,
-        minVal: Double? = nil,
-        maxVal: Double? = nil
-    ) -> (Double, Double, Double) {
-        let minValue: Double
-        let maxValue: Double
-        if type == .brightness {
-            maxValue = maxVal ?? maxBrightness.doubleValue
-            minValue = minVal ?? minBrightness.doubleValue
-        } else {
-            maxValue = maxVal ?? maxContrast.doubleValue
-            minValue = minVal ?? minContrast.doubleValue
-        }
-
-        return (minValue, maxValue, factor ?? 1.0)
-    }
-
-    func computeValue(
-        from percent: Double,
-        type: ValueType,
-        factor: Double? = nil,
-        appOffset: Int = 0,
-        minVal: Double? = nil,
-        maxVal: Double? = nil
-    ) -> Double {
-        let (minValue, maxValue, factor) = getMinMaxFactor(type: type, factor: factor, minVal: minVal, maxVal: maxVal)
-
-        var value: Double
-        if percent == 1.0 {
-            value = maxValue
-        } else if percent == 0.0 {
-            value = minValue
-        } else {
-            value = pow((percent * (maxValue - minValue) + minValue) / 100.0, factor) * 100.0
-            value = cap(value, minVal: minValue, maxVal: maxValue)
-        }
-
-        if appOffset > 0 {
-            value = cap(value + appOffset.d, minVal: minValue, maxVal: maxValue)
-        }
-        return value.rounded()
-    }
-
-    func computeSIMDValue(
-        from percent: [Double],
-        type: ValueType,
-        factor: Double? = nil,
-        appOffset: Int = 0,
-        minVal: Double? = nil,
-        maxVal: Double? = nil
-    ) -> [Double] {
-        let (minValue, maxValue, factor) = getMinMaxFactor(type: type, factor: factor, minVal: minVal, maxVal: maxVal)
-
-        var value = (percent * (maxValue - minValue) + minValue)
-        value /= 100.0
-        value = pow(value, factor)
-
-        value = (value * 100.0 + appOffset.d)
-        return value.map {
-            b in cap(b, minVal: minValue, maxVal: maxValue)
-        }
-    }
-
     func insertBrightnessUserDataPoint(_ featureValue: Double, _ targetValue: Double, modeKey: AdaptiveModeKey) {
         guard !lockedBrightnessCurve, !adaptivePaused,
               displayController.adaptiveModeKey != .sync || !isSource,
@@ -6069,22 +5783,22 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         brightnessDataPointInsertionTask?.cancel()
         if userBrightness[modeKey] == nil {
-            userBrightness[modeKey] = ThreadSafeDictionary(dict: [0: 0])
+            userBrightness[modeKey] = ThreadSafeDictionary()
         }
         var targetValue = mapNumber(
             targetValue,
             fromLow: minBrightness.doubleValue,
             fromHigh: maxBrightness.doubleValue,
-            toLow: MIN_BRIGHTNESS.d,
-            toHigh: MAX_BRIGHTNESS.d
+            toLow: 0.0,
+            toHigh: 100.0
         )
         if adaptiveSubzero, softwareBrightness < 1 {
             targetValue -= mapNumber(
                 softwareBrightness.d,
                 fromLow: 0.0,
                 fromHigh: 1.0,
-                toLow: MAX_BRIGHTNESS.d,
-                toHigh: MIN_BRIGHTNESS.d
+                toLow: 100.0,
+                toHigh: 0.0
             )
         }
 
@@ -6095,6 +5809,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             guard let self, var userValues = self.userBrightness[modeKey] else { return }
             Display.insertDataPoint(values: &userValues, featureValue: featureValue, targetValue: targetValue)
+            if modeKey == .location { self.insertElevationDataPoint(&userValues, featureValue, targetValue) }
+
             self.save()
             self.brightnessDataPointInsertionTask = nil
         }
@@ -6102,7 +5818,27 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         var userValues = userBrightness[modeKey]!
         Display.insertDataPoint(values: &userValues, featureValue: featureValue, targetValue: targetValue, logValue: false)
+        if modeKey == .location { insertElevationDataPoint(&userValues, featureValue, targetValue) }
         NotificationCenter.default.post(name: brightnessDataPointInserted, object: self, userInfo: ["values": userValues.dictionary])
+    }
+
+    func insertElevationDataPoint(_ values: inout ThreadSafeDictionary<Double, Double>, _ featureValue: Double, _ targetValue: Double) {
+        guard let solar = LocationMode.specific.geolocation?.solar,
+              let astroSunrise = solar.astronomicalSunrisePosition?.elevation,
+              let astroSunset = solar.astronomicalSunsetPosition?.elevation,
+              let noon = solar.solarNoonPosition?.elevation,
+              let sunrise = solar.sunrisePosition?.elevation,
+              let sunset = solar.sunsetPosition?.elevation
+        else {
+            return
+        }
+        if featureValue < max(sunrise, sunset) {
+            Display.insertDataPoint(values: &values, featureValue: min(astroSunrise, astroSunset), targetValue: targetValue, logValue: false)
+        }
+
+        if featureValue > noon {
+            Display.insertDataPoint(values: &values, featureValue: noon, targetValue: targetValue, logValue: false)
+        }
     }
 
     func insertContrastUserDataPoint(_ featureValue: Double, _ targetValue: Double, modeKey: AdaptiveModeKey) {
@@ -6130,6 +5866,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             guard let self, var userValues = self.userContrast[modeKey] else { return }
             Display.insertDataPoint(values: &userValues, featureValue: featureValue, targetValue: targetValue)
+            if modeKey == .location { self.insertElevationDataPoint(&userValues, featureValue, targetValue) }
+
             self.save()
             self.contrastDataPointInsertionTask = nil
         }
@@ -6137,6 +5875,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         var userValues = userContrast[modeKey]!
         Display.insertDataPoint(values: &userValues, featureValue: featureValue, targetValue: targetValue, logValue: false)
+        if modeKey == .location { insertElevationDataPoint(&userValues, featureValue, targetValue) }
+
         NotificationCenter.default.post(name: contrastDataPointInserted, object: self, userInfo: ["values": userValues.dictionary])
     }
 

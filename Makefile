@@ -71,12 +71,12 @@ print-%  : ; @echo $* = $($*)
 
 dmg: SHELL=/usr/local/bin/fish
 dmg:
-	env CODESIGNING_FOLDER_PATH=(xcdir -s 'Lunar $(ENV)' -c $(ENV))/Lunar.app ./bin/make-installer dmg
+	env CODESIGNING_FOLDER_PATH=(xcdir -s '$(ENV)' -c $(ENV))/Lunar.app ./bin/make-installer dmg
 
 pack: SHELL=/usr/local/bin/fish
 pack: export SPARKLE_BIN_DIR="$$PWD/Frameworks/Sparkle/bin/"
 pack:
-	env CODESIGNING_FOLDER_PATH=(xcdir -s 'Lunar $(ENV)' -c $(ENV))/Lunar.app PROJECT_DIR=$$PWD ./bin/pack
+	env CODESIGNING_FOLDER_PATH=(xcdir -s '$(ENV)' -c $(ENV))/Lunar.app PROJECT_DIR=$$PWD ./bin/pack
 
 appcast: export SPARKLE_BIN_DIR="$$PWD/Frameworks/Sparkle/bin/"
 appcast: VERSION=$(shell xcodebuild -scheme $(ENV) -configuration $(ENV) -workspace Lunar.xcworkspace -showBuildSettings -json 2>/dev/null | jq -r .[0].buildSettings.MARKETING_VERSION)

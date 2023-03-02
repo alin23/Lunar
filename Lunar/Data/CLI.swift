@@ -1036,8 +1036,8 @@ struct Lunar: ParsableCommand {
         @Flag(name: .shortAndLong, help: "Include both connected and disconnected displays")
         var all = false
 
-        @Flag(help: "Include virtual displays (e.g. DisplayLink)")
-        var virtual = true
+        @Flag(help: "Don't include virtual displays (e.g. DisplayLink)")
+        var noVirtual = false
 
         @Flag(help: "Include Airplay displays (e.g. iPad Sidecar, AirPlay)")
         var airplay = false
@@ -1087,7 +1087,7 @@ struct Lunar: ParsableCommand {
             let property = property == .mute ? .audioMuted : property
 
             cliGetDisplays(
-                includeVirtual: virtual || all,
+                includeVirtual: !noVirtual || all,
                 includeAirplay: airplay || all,
                 includeProjector: projector || all,
                 includeDummy: dummy || all
@@ -1286,7 +1286,7 @@ struct Lunar: ParsableCommand {
         var refreshSeconds: TimeInterval = 1
 
         @Flag(name: .long, help: "Read Gamma values (the default unless `--write` is passed)")
-        var read = true
+        var read = false
 
         @Flag(name: .long, help: "Read the system gamma table instead of Lunar's internal values")
         var readFullTable = false
@@ -1324,13 +1324,13 @@ struct Lunar: ParsableCommand {
                 throw LunarCommandError.displayNotFound(display.s)
             }
 
-            let alreadyLocked = displays.filter { !$0.gammaLock() }
-            if !alreadyLocked.isEmpty, !force {
-                throw LunarCommandError
-                    .gammaError(
-                        "Another instance of Lunar is using the gamma tables. Quit that before using this command (or delete [\(alreadyLocked.map(\.gammaLockPath).joined(by: ","))] if you think this is incorrect)."
-                    )
-            }
+            // let alreadyLocked = displays.filter { !$0.gammaLock() }
+            // if !alreadyLocked.isEmpty, !force {
+            //     throw LunarCommandError
+            //         .gammaError(
+            //             "Another instance of Lunar is using the gamma tables. Quit that before using this command (or delete [\(alreadyLocked.map(\.gammaLockPath).joined(by: ","))] if you think this is incorrect)."
+            //         )
+            // }
         }
 
         func run() throws {
@@ -1389,7 +1389,7 @@ struct Lunar: ParsableCommand {
 
                 display.applyGamma = true
                 guard !isServer else {
-                    display.gammaLock()
+                    // display.gammaLock()
 
                     display.red = red
                     display.green = green
@@ -1400,7 +1400,7 @@ struct Lunar: ParsableCommand {
 
                 var stepsDone = 0
                 gammaRepeater = Repeater(every: refreshSeconds) {
-                    display.gammaLock()
+                    // display.gammaLock()
 
                     display.red = red
                     display.green = green
@@ -1408,7 +1408,6 @@ struct Lunar: ParsableCommand {
 
                     stepsDone += 1
                     if stepsDone == wait {
-                        display.gammaUnlock()
                         gammaRepeater = nil
                         return cliExit(0)
                     }
@@ -2197,8 +2196,6 @@ private func encodedValue(key: Display.CodingKeys, value: Any, prefix: String = 
         return (try! encoder.encode(value as! [String: [[String: Double]]])).str()
     case .enabledControls:
         return (try! encoder.encode(value as! [String: Bool])).str()
-    case .brightnessCurveFactors, .contrastCurveFactors:
-        return (try! encoder.encode(value as! [String: Double])).str()
     case .input, .hotkeyInput1, .hotkeyInput2, .hotkeyInput3:
         return (VideoInputSource(rawValue: value as! UInt16) ?? .unknown).str
     case .power:

@@ -47,6 +47,12 @@ enum AdaptiveModeKey: Int, Defaults.Serializable, CaseIterable, Sendable {
     case sensor = 2
     case clock = 3
     case auto = 99
+
+    var usesCurve: Bool {
+        self == .location || self == .sensor || (
+            self == .sync && !SyncMode.specific.isSyncingNits
+        )
+    }
 }
 
 let XDR_DEFAULT_LUX: Float = 6500
@@ -58,6 +64,7 @@ extension Defaults.Keys {
     static let launchCount = Key<Int>("launchCount", default: 0)
     static let secondPhase = Key<Bool?>("secondPhase", default: nil)
     static let firstRunAfterLunar4Upgrade = Key<Bool?>("firstRunAfterLunar4Upgrade", default: nil)
+    static let firstRunAfterLunar6Upgrade = Key<Bool?>("firstRunAfterLunar6Upgrade", default: nil)
     static let firstRunAfterDefaults5Upgrade = Key<Bool?>("firstRunAfterDefaults5Upgrade", default: nil)
     static let firstRunAfterBuiltinUpgrade = Key<Bool?>("firstRunAfterBuiltinUpgrade", default: nil)
     static let firstRunAfterHotkeysUpgrade = Key<Bool?>("firstRunAfterHotkeysUpgrade", default: nil)
@@ -256,17 +263,6 @@ extension Defaults.Keys {
 
     #if arch(arm64)
         static let possiblyDisconnectedDisplays = Key<[Display]>("possiblyDisconnectedDisplays", default: [])
-        static let nitsMapping = Key<[String: [NitsMapping]]>("nitsMapping", default: [:])
+        static let nitsMapping = Key<[String: [AutoLearnMapping]]>("nitsMapping", default: [:])
     #endif
 }
-
-#if arch(arm64)
-    struct NitsMapping: Codable, Defaults.Serializable, Equatable, Comparable {
-        let source: Double
-        let target: Double
-
-        static func < (lhs: NitsMapping, rhs: NitsMapping) -> Bool {
-            lhs.source < rhs.source
-        }
-    }
-#endif

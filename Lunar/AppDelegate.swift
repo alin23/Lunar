@@ -70,6 +70,7 @@ var activeDisplay: Display?
 
 var thisIsFirstRun = false
 var thisIsFirstRunAfterLunar4Upgrade = false
+var thisIsFirstRunAfterLunar6Upgrade = false
 var thisIsFirstRunAfterDefaults5Upgrade = false
 var thisIsFirstRunAfterM1DDCUpgrade = false
 var thisIsFirstRunAfterBuiltinUpgrade = false
@@ -605,7 +606,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     func listenForAdaptiveModeChange() {
         let mode = CachedDefaults[.adaptiveBrightnessMode]
         CachedDefaults[.nonManualMode] = mode != .manual
-        CachedDefaults[.curveMode] = mode == .sync || mode == .location || mode == .sensor
+        CachedDefaults[.curveMode] = mode.usesCurve
         CachedDefaults[.clockMode] = mode == .clock
         CachedDefaults[.syncMode] = mode == .sync
 
@@ -641,7 +642,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 }
 
                 CachedDefaults[.nonManualMode] = modeKey != .manual
-                CachedDefaults[.curveMode] = modeKey == .sync || modeKey == .location || modeKey == .sensor
+                CachedDefaults[.curveMode] = modeKey.usesCurve
                 CachedDefaults[.clockMode] = modeKey == .clock
                 CachedDefaults[.syncMode] = modeKey == .sync
                 displayController.adaptiveMode = modeKey.mode
@@ -1864,7 +1865,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                     display.resetGamma()
                 }
 
-                display.gammaUnlock()
                 refreshScreen()
             }
 
