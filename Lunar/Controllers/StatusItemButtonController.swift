@@ -92,6 +92,8 @@ class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObject {
     }
 
     func showMenuBar() {
+        displayHideTask = nil
+
         guard let menuWindow = appDelegate?.initMenuWindow(), !menuWindow.isVisible else { return }
 
         Defaults[.menuBarClosed] = false

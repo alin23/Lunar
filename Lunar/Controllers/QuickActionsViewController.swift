@@ -599,8 +599,8 @@ struct HDRSettingsView: View {
                 setting: $autoSubzero.animation(.fastSpring)
             )
 
-            Divider().padding(.horizontal)
             if Sysctl.isMacBook, displayController.builtinDisplay?.supportsEnhance ?? false {
+                Divider().padding(.horizontal)
                 VStack(alignment: .leading, spacing: 2) {
                     SettingsToggle(text: "Toggle XDR Brightness based on ambient light", setting: $autoXdrSensor)
                     Text(
@@ -651,21 +651,21 @@ struct HDRSettingsView: View {
                     .foregroundColor(.black.opacity(0.4))
                     .padding(.leading, 20)
                 }
+                VStack(alignment: .leading, spacing: 2) {
+                    SettingsToggle(text: "Show OSD when toggling XDR automatically", setting: $autoXdrSensorShowOSD.animation(.fastSpring))
+                    (
+                        Text("Notifies you when XDR is activating and\n")
+                            .font(.system(size: 10, weight: .semibold, design: .monospaced).leading(.tight))
+                            + Text("allows aborting AutoXDR by pressing ")
+                            .font(.system(size: 10, weight: .semibold, design: .monospaced).leading(.tight))
+                            + Text("Esc")
+                            .font(.system(size: 10, weight: .heavy, design: .monospaced).leading(.tight))
+                    )
+                    .foregroundColor(.black.opacity(0.4))
+                    .fixedSize()
+                    .padding(.leading, 20)
+                }.padding(.leading)
             }
-            VStack(alignment: .leading, spacing: 2) {
-                SettingsToggle(text: "Show OSD when toggling XDR automatically", setting: $autoXdrSensorShowOSD.animation(.fastSpring))
-                (
-                    Text("Shows a progress bar while XDR is activating and\n")
-                        .font(.system(size: 10, weight: .semibold, design: .monospaced).leading(.tight))
-                        + Text("allows aborting the activation by pressing ")
-                        .font(.system(size: 10, weight: .semibold, design: .monospaced).leading(.tight))
-                        + Text("Esc")
-                        .font(.system(size: 10, weight: .heavy, design: .monospaced).leading(.tight))
-                )
-                .foregroundColor(.black.opacity(0.4))
-                .fixedSize()
-                .padding(.leading, 20)
-            }.padding(.leading)
         }
     }
 }
@@ -673,6 +673,8 @@ struct HDRSettingsView: View {
 // MARK: - AdvancedSettingsView
 
 struct AdvancedSettingsView: View {
+    @ObservedObject var dc: DisplayController = displayController
+
     @Default(.silentUpdate) var silentUpdate
     @Default(.workaroundBuiltinDisplay) var workaroundBuiltinDisplay
     @Default(.debug) var debug
@@ -814,13 +816,15 @@ struct AdvancedSettingsView: View {
                         the choice to switch to Software Dimming.
                         """
                     )
-                    SettingsToggle(
-                        text: "Disable Network Controller video ", setting: $disableControllerVideo,
-                        help: """
-                        When using "Network Control" with a Raspberry Pi, it might be
-                        helpful to disable the Pi desktop if you don't need it.
-                        """
-                    )
+                    if dc.activeDisplayList.contains(where: { $0.control is NetworkControl }) {
+                        SettingsToggle(
+                            text: "Disable Network Controller video ", setting: $disableControllerVideo,
+                            help: """
+                            When using "Network Control" with a Raspberry Pi, it might be
+                            helpful to disable the Pi desktop if you don't need it.
+                            """
+                        )
+                    }
                     SettingsToggle(
                         text: "Check for network light sensors periodically", setting: $sensorCheckerEnabled,
                         help: """
@@ -1669,7 +1673,10 @@ struct QuickActionsMenuView: View {
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .padding(.top, 0)
             .background(bg(optionsMenuOverflow: optionsMenuOverflow), alignment: .top)
-            .onAppear { setup() }
+            .onAppear {
+                displayHideTask = nil
+                setup()
+            }
             .onChange(of: menuBarClosed) { closed in
                 setup(closed)
             }
