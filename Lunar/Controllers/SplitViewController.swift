@@ -34,7 +34,6 @@ You can configure how often Lunar reacts to the ambient light changes by changin
 
 - Adjusting the curve is as simple as changing the brightness of an external monitor to whatever you want it to be
     - Lunar will learn from that and adjust the curve accordingly
-- The `Curve Factor` from the **Display Settings** menu helps to adjust how fast the brightness should rise or fall between thresholds
 
 \(NOTE_TEXT)
 """
@@ -57,7 +56,6 @@ If this fails, Lunar will try to find a rough location through a **GeoIP** servi
 
 - Adjusting the curve is as simple as changing the brightness to whatever you want it to be at that time of the day
     - Lunar will learn from that and adjust the curve accordingly
-- The `Curve Factor` from the **Display Settings** menu helps to adjust how fast the brightness should rise or fall between thresholds
 
 \(NOTE_TEXT)
 """
@@ -90,7 +88,6 @@ Lunar takes advantage of that by periodically reading the display brightness, an
 
 - Adjusting the curve is as simple as changing the brightness of an external monitor to whatever you want it to be
     - Lunar will learn from that and adjust the curve accordingly
-- The `Curve Factor` from the **Display Settings** menu helps to adjust how fast the brightness should rise or fall between thresholds
 
 \(NOTE_TEXT)
 """

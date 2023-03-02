@@ -128,6 +128,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .launchCount,
     .firstRun,
     .firstRunAfterLunar4Upgrade,
+    .firstRunAfterLunar6Upgrade,
     .firstRunAfterM1DDCUpgrade,
     .firstRunAfterDefaults5Upgrade,
     .firstRunAfterBuiltinUpgrade,
@@ -244,6 +245,7 @@ class DataStore: NSObject {
             DataStore.firstRun()
             Defaults[.firstRun] = true
             Defaults[.firstRunAfterLunar4Upgrade] = true
+            Defaults[.firstRunAfterLunar6Upgrade] = true
             Defaults[.firstRunAfterM1DDCUpgrade] = true
             Defaults[.firstRunAfterDefaults5Upgrade] = true
             Defaults[.firstRunAfterBuiltinUpgrade] = true
@@ -266,6 +268,11 @@ class DataStore: NSObject {
             DataStore.firstRunAfterLunar4Upgrade()
             Defaults[.firstRunAfterLunar4Upgrade] = true
             shouldOnboard = true
+        }
+
+        if Defaults[.firstRunAfterLunar6Upgrade] == nil {
+            DataStore.firstRunAfterLunar6Upgrade()
+            Defaults[.firstRunAfterLunar6Upgrade] = true
         }
 
         if Defaults[.firstRunAfterDefaults5Upgrade] == nil {
@@ -352,6 +359,20 @@ class DataStore: NSObject {
     static func firstRunAfterLunar4Upgrade() {
         thisIsFirstRunAfterLunar4Upgrade = true
         DataStore.reset()
+    }
+
+    static func firstRunAfterLunar6Upgrade() {
+        thisIsFirstRunAfterLunar6Upgrade = true
+
+        if CachedDefaults[.adaptiveBrightnessMode] == .sync {
+            guard let displays = CachedDefaults[.displays] else { return }
+
+            displays.forEach { display in
+                display.lockedContrast = true
+            }
+            CachedDefaults[.displays] = displays
+            Defaults[.displays] = displays
+        }
     }
 
     static func firstRunAfterDefaults5Upgrade() {
@@ -855,87 +876,73 @@ enum AppSettings {
     }
 }
 
-let adaptiveBrightnessModePublisher = Defaults.publisher(.adaptiveBrightnessMode)
+func pub<T: Equatable>(_ key: Defaults.Key<T>) -> Publishers.Filter<Publishers.RemoveDuplicates<Publishers.Drop<AnyPublisher<Defaults.KeyChange<T>, Never>>>> {
+    Defaults.publisher(key).dropFirst().removeDuplicates().filter { $0.oldValue != $0.newValue }
+}
 
-let colorSchemePublisher = Defaults.publisher(.colorScheme).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
-let startAtLoginPublisher = Defaults.publisher(.startAtLogin).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
-let showBrightnessMenuBarPublisher = Defaults.publisher(.showBrightnessMenuBar).removeDuplicates().dropFirst()
-    .filter { $0.oldValue != $0.newValue }
-let showOnlyExternalBrightnessMenuBarPublisher = Defaults.publisher(.showOnlyExternalBrightnessMenuBar).removeDuplicates().dropFirst()
-    .filter { $0.oldValue != $0.newValue }
-let showOrientationInQuickActionsPublisher = Defaults.publisher(.showOrientationInQuickActions).dropFirst().removeDuplicates()
-    .filter { $0.oldValue != $0.newValue }
-let autoBlackoutBuiltinPublisher = Defaults.publisher(.autoBlackoutBuiltin).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let autoSubzeroPublisher = Defaults.publisher(.autoSubzero).removeDuplicates().dropFirst()
-    .filter { $0.oldValue != $0.newValue }
-let autoXdrPublisher = Defaults.publisher(.autoXdr).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
-let autoXdrSensorPublisher = Defaults.publisher(.autoXdrSensor).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
-let autoXdrSensorShowOSDPublisher = Defaults.publisher(.autoXdrSensorShowOSD).removeDuplicates().dropFirst()
-    .filter { $0.oldValue != $0.newValue }
-let autoXdrSensorLuxThresholdPublisher = Defaults.publisher(.autoXdrSensorLuxThreshold).removeDuplicates().dropFirst()
-    .filter { $0.oldValue != $0.newValue }
-let customOSDVerticalOffsetPublisher = Defaults.publisher(.customOSDVerticalOffset).removeDuplicates().dropFirst()
-    .filter { $0.oldValue != $0.newValue }
-let allowAnySyncSourcePublisher = Defaults.publisher(.allowAnySyncSource).removeDuplicates().dropFirst()
-    .filter { $0.oldValue != $0.newValue }
-let gammaDisabledCompletelyPublisher = Defaults.publisher(.gammaDisabledCompletely).removeDuplicates().dropFirst()
-    .filter { $0.oldValue != $0.newValue }
-let hdrWorkaroundPublisher = Defaults.publisher(.hdrWorkaround).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
-let oldBlackOutMirroringPublisher = Defaults.publisher(.oldBlackOutMirroring).removeDuplicates().dropFirst()
-    .filter { $0.oldValue != $0.newValue }
-let xdrContrastPublisher = Defaults.publisher(.xdrContrast).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
-let xdrContrastFactorPublisher = Defaults.publisher(.xdrContrastFactor).removeDuplicates().dropFirst().filter { $0.oldValue != $0.newValue }
-let allowHDREnhanceContrastPublisher = Defaults.publisher(.allowHDREnhanceContrast).removeDuplicates().dropFirst()
-    .filter { $0.oldValue != $0.newValue }
-let allowHDREnhanceBrightnessPublisher = Defaults.publisher(.allowHDREnhanceBrightness).removeDuplicates().dropFirst()
-    .filter { $0.oldValue != $0.newValue }
-let workaroundBuiltinDisplayPublisher = Defaults.publisher(.workaroundBuiltinDisplay).removeDuplicates()
-    .filter { $0.oldValue != $0.newValue }
-let streamLogsPublisher = Defaults.publisher(.streamLogs).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let mergeBrightnessContrastPublisher = Defaults.publisher(.mergeBrightnessContrast).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let enableSentryPublisher = Defaults.publisher(.enableSentry).dropFirst().removeDuplicates().filter { $0.oldValue != $0.newValue }
-let waitAfterWakeSecondsPublisher = Defaults.publisher(.waitAfterWakeSeconds).dropFirst().removeDuplicates()
-    .filter { $0.oldValue != $0.newValue }
-let delayDDCAfterWakePublisher = Defaults.publisher(.delayDDCAfterWake).dropFirst().removeDuplicates()
-    .filter { $0.oldValue != $0.newValue }
-let showVolumeSliderPublisher = Defaults.publisher(.showVolumeSlider).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let showSliderValuesPublisher = Defaults.publisher(.showSliderValues).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let showAdvancedDisplaySettingsPublisher = Defaults.publisher(.showAdvancedDisplaySettings).removeDuplicates()
-    .filter { $0.oldValue != $0.newValue }
-let lunarProActivePublisher = Defaults.publisher(.lunarProActive).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let infoMenuShownPublisher = Defaults.publisher(.infoMenuShown).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let showTwoSchedulesPublisher = Defaults.publisher(.showTwoSchedules).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let showThreeSchedulesPublisher = Defaults.publisher(.showThreeSchedules).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let showFourSchedulesPublisher = Defaults.publisher(.showFourSchedules).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let showFiveSchedulesPublisher = Defaults.publisher(.showFiveSchedules).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let allowBlackOutOnSingleScreenPublisher = Defaults.publisher(.allowBlackOutOnSingleScreen).removeDuplicates()
-    .filter { $0.oldValue != $0.newValue }
-let moreGraphDataPublisher = Defaults.publisher(.moreGraphData).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let enableOrientationHotkeysPublisher = Defaults.publisher(.enableOrientationHotkeys).removeDuplicates()
-    .filter { $0.oldValue != $0.newValue }
-let detectKeyHoldPublisher = Defaults.publisher(.detectKeyHold).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let refreshValuesPublisher = Defaults.publisher(.refreshValues).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let hideMenuBarIconPublisher = Defaults.publisher(.hideMenuBarIcon).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let showDockIconPublisher = Defaults.publisher(.showDockIcon).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let disableControllerVideoPublisher = Defaults.publisher(.disableControllerVideo).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let locationPublisher = Defaults.publisher(.location).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let brightnessStepPublisher = Defaults.publisher(.brightnessStep).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let syncPollingSecondsPublisher = Defaults.publisher(.syncPollingSeconds).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let syncNitsPublisher = Defaults.publisher(.syncNits).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let sensorPollingSecondsPublisher = Defaults.publisher(.sensorPollingSeconds).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let contrastStepPublisher = Defaults.publisher(.contrastStep).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let volumeStepPublisher = Defaults.publisher(.volumeStep).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let appExceptionsPublisher = Defaults.publisher(.appExceptions).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let securePublisher = Defaults.publisher(.secure).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let debugPublisher = Defaults.publisher(.debug).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let tracePublisher = Defaults.publisher(.trace).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let overrideAdaptiveModePublisher = Defaults.publisher(.overrideAdaptiveMode).removeDuplicates().filter { $0.oldValue != $0.newValue }
+let adaptiveBrightnessModePublisher = pub(.adaptiveBrightnessMode)
+
+let colorSchemePublisher = pub(.colorScheme)
+let startAtLoginPublisher = pub(.startAtLogin)
+let showBrightnessMenuBarPublisher = pub(.showBrightnessMenuBar)
+let showOnlyExternalBrightnessMenuBarPublisher = pub(.showOnlyExternalBrightnessMenuBar)
+let showOrientationInQuickActionsPublisher = pub(.showOrientationInQuickActions)
+let autoBlackoutBuiltinPublisher = pub(.autoBlackoutBuiltin)
+let autoSubzeroPublisher = pub(.autoSubzero)
+let autoXdrPublisher = pub(.autoXdr)
+let autoXdrSensorPublisher = pub(.autoXdrSensor)
+let autoXdrSensorShowOSDPublisher = pub(.autoXdrSensorShowOSD)
+let autoXdrSensorLuxThresholdPublisher = pub(.autoXdrSensorLuxThreshold)
+let customOSDVerticalOffsetPublisher = pub(.customOSDVerticalOffset)
+let allowAnySyncSourcePublisher = pub(.allowAnySyncSource)
+let gammaDisabledCompletelyPublisher = pub(.gammaDisabledCompletely)
+let hdrWorkaroundPublisher = pub(.hdrWorkaround)
+let oldBlackOutMirroringPublisher = pub(.oldBlackOutMirroring)
+let xdrContrastPublisher = pub(.xdrContrast)
+let xdrContrastFactorPublisher = pub(.xdrContrastFactor)
+let allowHDREnhanceContrastPublisher = pub(.allowHDREnhanceContrast)
+let allowHDREnhanceBrightnessPublisher = pub(.allowHDREnhanceBrightness)
+let workaroundBuiltinDisplayPublisher = pub(.workaroundBuiltinDisplay)
+let streamLogsPublisher = pub(.streamLogs)
+let mergeBrightnessContrastPublisher = pub(.mergeBrightnessContrast)
+let enableSentryPublisher = pub(.enableSentry)
+let waitAfterWakeSecondsPublisher = pub(.waitAfterWakeSeconds)
+let delayDDCAfterWakePublisher = pub(.delayDDCAfterWake)
+let showVolumeSliderPublisher = pub(.showVolumeSlider)
+let showSliderValuesPublisher = pub(.showSliderValues)
+let showAdvancedDisplaySettingsPublisher = pub(.showAdvancedDisplaySettings)
+let lunarProActivePublisher = pub(.lunarProActive)
+let infoMenuShownPublisher = pub(.infoMenuShown)
+let showTwoSchedulesPublisher = pub(.showTwoSchedules)
+let showThreeSchedulesPublisher = pub(.showThreeSchedules)
+let showFourSchedulesPublisher = pub(.showFourSchedules)
+let showFiveSchedulesPublisher = pub(.showFiveSchedules)
+let allowBlackOutOnSingleScreenPublisher = pub(.allowBlackOutOnSingleScreen)
+let moreGraphDataPublisher = pub(.moreGraphData)
+let enableOrientationHotkeysPublisher = pub(.enableOrientationHotkeys)
+let detectKeyHoldPublisher = pub(.detectKeyHold)
+let refreshValuesPublisher = pub(.refreshValues)
+let hideMenuBarIconPublisher = pub(.hideMenuBarIcon)
+let showDockIconPublisher = pub(.showDockIcon)
+let disableControllerVideoPublisher = pub(.disableControllerVideo)
+let locationPublisher = pub(.location)
+let brightnessStepPublisher = pub(.brightnessStep)
+let syncPollingSecondsPublisher = pub(.syncPollingSeconds)
+let syncNitsPublisher = pub(.syncNits)
+let sensorPollingSecondsPublisher = pub(.sensorPollingSeconds)
+let contrastStepPublisher = pub(.contrastStep)
+let volumeStepPublisher = pub(.volumeStep)
+let appExceptionsPublisher = pub(.appExceptions)
+let securePublisher = pub(.secure)
+let debugPublisher = pub(.debug)
+let tracePublisher = pub(.trace)
+let overrideAdaptiveModePublisher = pub(.overrideAdaptiveMode)
 let dayMomentsPublisher = Defaults.publisher(keys: .sunrise, .sunset, .solarNoon)
-let brightnessKeysEnabledPublisher = Defaults.publisher(.brightnessKeysEnabled).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let brightnessTransitionPublisher = Defaults.publisher(.brightnessTransition).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let volumeKeysEnabledPublisher = Defaults.publisher(.volumeKeysEnabled).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let useAlternateBrightnessKeysPublisher = Defaults.publisher(.useAlternateBrightnessKeys).removeDuplicates()
-    .filter { $0.oldValue != $0.newValue }
+let brightnessKeysEnabledPublisher = pub(.brightnessKeysEnabled)
+let brightnessTransitionPublisher = pub(.brightnessTransition)
+let volumeKeysEnabledPublisher = pub(.volumeKeysEnabled)
+let useAlternateBrightnessKeysPublisher = pub(.useAlternateBrightnessKeys)
+
 let mediaKeysPublisher = Defaults.publisher(
     keys: .brightnessKeysEnabled,
     .volumeKeysEnabled,
@@ -943,34 +950,21 @@ let mediaKeysPublisher = Defaults.publisher(
     .brightnessHotkeysControlAllMonitors,
     .contrastHotkeysControlAllMonitors
 )
-let silentUpdatePublisher = Defaults.publisher(.silentUpdate).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let checkForUpdatePublisher = Defaults.publisher(.checkForUpdate).removeDuplicates().filter { $0.oldValue != $0.newValue }
-let showDummyDisplaysPublisher = Defaults.publisher(.showDummyDisplays).dropFirst().removeDuplicates()
-    .filter { $0.oldValue != $0.newValue }
-let showVirtualDisplaysPublisher = Defaults.publisher(.showVirtualDisplays).dropFirst().removeDuplicates()
-    .filter { $0.oldValue != $0.newValue }
-let showAirplayDisplaysPublisher = Defaults.publisher(.showAirplayDisplays).dropFirst().removeDuplicates()
-    .filter { $0.oldValue != $0.newValue }
-let showProjectorDisplaysPublisher = Defaults.publisher(.showProjectorDisplays).dropFirst().removeDuplicates()
-    .filter { $0.oldValue != $0.newValue }
-let showDisconnectedDisplaysPublisher = Defaults.publisher(.showDisconnectedDisplays).dropFirst().removeDuplicates()
-    .filter { $0.oldValue != $0.newValue }
-let detectResponsivenessPublisher = Defaults.publisher(.detectResponsiveness).dropFirst().removeDuplicates()
-    .filter { $0.oldValue != $0.newValue }
-let nonManualModePublisher = Defaults.publisher(.nonManualMode).dropFirst().removeDuplicates()
-    .filter { $0.oldValue != $0.newValue }
-let listenForRemoteCommandsPublisher = Defaults.publisher(.listenForRemoteCommands).dropFirst().removeDuplicates()
-    .filter { $0.oldValue != $0.newValue }
-let ddcSleepLongerPublisher = Defaults.publisher(.ddcSleepLonger).dropFirst().removeDuplicates()
-    .filter { $0.oldValue != $0.newValue }
-let ddcSleepFactorPublisher = Defaults.publisher(.ddcSleepFactor).dropFirst().removeDuplicates()
-    .filter { $0.oldValue != $0.newValue }
-let updateChannelPublisher = Defaults.publisher(.updateChannel).dropFirst().removeDuplicates()
-    .filter { $0.oldValue != $0.newValue }
-let sensorHostnamePublisher = Defaults.publisher(.sensorHostname).dropFirst().removeDuplicates()
-    .filter { $0.oldValue != $0.newValue }
+let silentUpdatePublisher = pub(.silentUpdate)
+let checkForUpdatePublisher = pub(.checkForUpdate)
+let showDummyDisplaysPublisher = pub(.showDummyDisplays)
+let showVirtualDisplaysPublisher = pub(.showVirtualDisplays)
+let showAirplayDisplaysPublisher = pub(.showAirplayDisplays)
+let showProjectorDisplaysPublisher = pub(.showProjectorDisplays)
+let showDisconnectedDisplaysPublisher = pub(.showDisconnectedDisplays)
+let detectResponsivenessPublisher = pub(.detectResponsiveness)
+let nonManualModePublisher = pub(.nonManualMode)
+let listenForRemoteCommandsPublisher = pub(.listenForRemoteCommands)
+let ddcSleepLongerPublisher = pub(.ddcSleepLonger)
+let ddcSleepFactorPublisher = pub(.ddcSleepFactor)
+let updateChannelPublisher = pub(.updateChannel)
+let sensorHostnamePublisher = pub(.sensorHostname)
 
 #if arch(arm64)
-    let nitsMappingPublisher = Defaults.publisher(.nitsMapping).dropFirst().removeDuplicates()
-        .filter { $0.oldValue != $0.newValue }
+    let nitsMappingPublisher = pub(.nitsMapping)
 #endif

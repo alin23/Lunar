@@ -641,14 +641,14 @@ class DisplayController: ObservableObject {
                 oldValue?.cancel()
             }
         }
-        var nitsMapping: [String: [NitsMapping]] = Defaults[.nitsMapping] {
+        var nitsMapping: [String: [AutoLearnMapping]] = Defaults[.nitsMapping] {
             didSet {
-                saveNitsMapping()
+                saveAutoLearnMapping()
             }
         }
         lazy var brightnessSplines: [String: (Double) -> Double] = computeBrightnessSplines()
 
-        func saveNitsMapping() {
+        func saveAutoLearnMapping() {
             nitsMappingSaver = mainAsyncAfter(ms: 500) {
                 Defaults[.nitsMapping] = self.nitsMapping
                 self.brightnessSplines = self.computeBrightnessSplines()
@@ -2602,10 +2602,6 @@ class DisplayController: ObservableObject {
             return chicletValue != value ? chicletValue : thresholds[backupIndex]
         }
         return newValue
-    }
-
-    func gammaUnlock(for displays: [Display]? = nil) {
-        (displays ?? displayList.map { $0 }).forEach { $0.gammaUnlock() }
     }
 }
 

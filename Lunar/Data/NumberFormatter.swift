@@ -29,6 +29,15 @@ class HourValueFormatter: AxisValueFormatter {
     }
 }
 
+class DateValueFormatter: AxisValueFormatter {
+    func stringForValue(_ value: Double, axis _: AxisBase?) -> String {
+        guard let moment = LocationMode.specific.moment else {
+            return ""
+        }
+        return moment.astronomicalSunrise.addingTimeInterval(value).toString(.time(.short))
+    }
+}
+
 // MARK: - ElevationValueFormatter
 
 class ElevationValueFormatter: AxisValueFormatter {
@@ -62,5 +71,17 @@ class LuxValueFormatter: AxisValueFormatter {
             return ""
         }
         return "\(value.i) lux"
+    }
+}
+
+class NitsValueFormatter: AxisValueFormatter {
+    func stringForValue(_ value: Double, axis _: AxisBase?) -> String {
+        if value == 0.0 {
+            return ""
+        }
+        if value < 0.0 {
+            return "\(value.i) subzero"
+        }
+        return "\(value.i) nits"
     }
 }

@@ -82,6 +82,12 @@ class Logger: SwiftyBeaver {
     static let cloud = SBPlatformDestination(appID: "WxjbvQ", appSecret: secrets.appSecret, encryptionKey: secrets.encryptionKey)
     @Atomic static var initialized = false
 
+    @inline(__always)
+    class func traceCalls() {
+        Thread.callStackSymbols.forEach {
+            info($0)
+        }
+    }
     class func initLogger(cli: Bool = false, debug: Bool = false, verbose: Bool = false) {
         defer { initialized = true }
         console.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M \t$X"

@@ -1034,7 +1034,7 @@ the ⌘ Command key more than 8 times in a row</string>
                                 </connections>
                             </containerView>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E8L-4P-FG0">
-                                <rect key="frame" x="387" y="656" width="171" height="29"/>
+                                <rect key="frame" x="389" y="656" width="171" height="29"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="LUNAR" id="imn-dq-JnU">
                                     <font key="font" size="25" name="Menlo-Bold"/>
@@ -2625,7 +2625,7 @@ CORNERS</string>
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Zt1-xU-YsD" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="155" width="250" height="17"/>
+                                        <rect key="frame" x="0.0" y="180" width="250" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CURRENT" id="gb7-Ko-73d">
                                             <font key="font" metaFont="smallSystemBold"/>
@@ -2661,162 +2661,8 @@ CORNERS</string>
                                             </binding>
                                         </connections>
                                     </segmentedControl>
-                                    <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" id="fNV-Hz-dSA" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="51" y="28" width="144" height="24"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="30" id="lTc-HX-5ih"/>
-                                        </constraints>
-                                        <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.65914163961038963" tickMarkPosition="above" sliderType="linear" id="Kwm-ai-kYG" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
-                                                    <real key="value" value="20"/>
-                                                </userDefinedRuntimeAttribute>
-                                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                                    <real key="value" value="10"/>
-                                                </userDefinedRuntimeAttribute>
-                                                <userDefinedRuntimeAttribute type="color" keyPath="color">
-                                                    <color key="value" red="1" green="0.7843137255" blue="0.58431372550000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                </userDefinedRuntimeAttribute>
-                                                <userDefinedRuntimeAttribute type="color" keyPath="knobColor">
-                                                    <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                </userDefinedRuntimeAttribute>
-                                                <userDefinedRuntimeAttribute type="number" keyPath="fillOrigin">
-                                                    <real key="value" value="0.5"/>
-                                                </userDefinedRuntimeAttribute>
-                                                <userDefinedRuntimeAttribute type="boolean" keyPath="drawText" value="NO"/>
-                                            </userDefinedRuntimeAttributes>
-                                        </sliderCell>
-                                        <userDefinedRuntimeAttributes>
-                                            <userDefinedRuntimeAttribute type="number" keyPath="scrollPrecision">
-                                                <real key="value" value="2"/>
-                                            </userDefinedRuntimeAttribute>
-                                        </userDefinedRuntimeAttributes>
-                                        <connections>
-                                            <binding destination="rew-Tm-BHz" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="kTr-Hm-ndc" id="VY8-9S-2uh">
-                                                <dictionary key="options">
-                                                    <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                    <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                    <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                    <integer key="NSNullPlaceholder" value="-1"/>
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                            <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.lockedBrightness" id="Sqd-sJ-c9r">
-                                                <dictionary key="options">
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                            <binding destination="1Bn-Ca-ETm" name="value" keyPath="self.display.sliderBrightnessCurveFactor" id="CmE-7a-eEl"/>
-                                            <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.curveMode" previousBinding="Sqd-sJ-c9r" id="kTr-Hm-ndc">
-                                                <dictionary key="options">
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                        </connections>
-                                    </slider>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" alphaValue="0.5" id="ylk-iA-gM4">
-                                        <rect key="frame" x="58" y="40" width="25" height="11"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="slow" id="m1F-p4-Oe0">
-                                            <font key="font" metaFont="systemMedium" size="9"/>
-                                            <color key="textColor" name="Caption Tertiary"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                        <connections>
-                                            <binding destination="rew-Tm-BHz" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="KKG-Mg-gsD" id="elC-6n-gAU">
-                                                <dictionary key="options">
-                                                    <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                    <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                    <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                    <integer key="NSNullPlaceholder" value="-1"/>
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                            <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.curveMode" id="KKG-Mg-gsD">
-                                                <dictionary key="options">
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                        </connections>
-                                    </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" alphaValue="0.5" id="0lL-ev-G8k">
-                                        <rect key="frame" x="60" y="33" width="21" height="11"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="rise" id="XWG-eo-6NB">
-                                            <font key="font" metaFont="systemMedium" size="9"/>
-                                            <color key="textColor" name="Caption Tertiary"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                        <connections>
-                                            <binding destination="rew-Tm-BHz" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="HyM-wL-50F" id="xrD-sK-4Sb">
-                                                <dictionary key="options">
-                                                    <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                    <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                    <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                    <integer key="NSNullPlaceholder" value="-1"/>
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                            <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.curveMode" id="HyM-wL-50F">
-                                                <dictionary key="options">
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                        </connections>
-                                    </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" alphaValue="0.5" id="sqI-wN-iRz">
-                                        <rect key="frame" x="165" y="40" width="22" height="11"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="fast" id="87G-Ll-5PD">
-                                            <font key="font" metaFont="systemMedium" size="9"/>
-                                            <color key="textColor" name="Caption Tertiary"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                        <connections>
-                                            <binding destination="rew-Tm-BHz" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="FVq-ny-Ejz" id="nnY-c6-Vk1">
-                                                <dictionary key="options">
-                                                    <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                    <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                    <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                    <integer key="NSNullPlaceholder" value="-1"/>
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                            <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.curveMode" id="FVq-ny-Ejz">
-                                                <dictionary key="options">
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                        </connections>
-                                    </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" alphaValue="0.5" id="GC9-IS-wx0">
-                                        <rect key="frame" x="165" y="33" width="21" height="11"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="rise" id="gmT-0V-OUg">
-                                            <font key="font" metaFont="systemMedium" size="9"/>
-                                            <color key="textColor" name="Caption Tertiary"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                        <connections>
-                                            <binding destination="rew-Tm-BHz" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="dFh-bU-fnc" id="o2f-Ln-mfU">
-                                                <dictionary key="options">
-                                                    <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                    <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                    <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                    <integer key="NSNullPlaceholder" value="-1"/>
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                            <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.curveMode" id="dFh-bU-fnc">
-                                                <dictionary key="options">
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                        </connections>
-                                    </textField>
                                     <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ldr-Bz-FBk">
-                                        <rect key="frame" x="57" y="7" width="135" height="23"/>
+                                        <rect key="frame" x="57" y="37" width="135" height="23"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <segmentedCell key="cell" refusesFirstResponder="YES" borderStyle="border" alignment="left" style="capsule" trackingMode="selectOne" id="1j8-hy-Niu">
                                             <font key="font" metaFont="miniSystem"/>
@@ -2831,6 +2677,12 @@ CORNERS</string>
                                                     <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                 </dictionary>
                                             </binding>
+                                            <binding destination="1Bn-Ca-ETm" name="selectedTag" keyPath="self.display.lockedBrightnessCurve" id="svg-hX-d0Z"/>
+                                            <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.curveMode" previousBinding="8ic-oc-DO2" id="zTJ-I7-a0A">
+                                                <dictionary key="options">
+                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                </dictionary>
+                                            </binding>
                                             <binding destination="rew-Tm-BHz" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="zTJ-I7-a0A" id="jZ4-z8-29G">
                                                 <dictionary key="options">
                                                     <integer key="NSMultipleValuesPlaceholder" value="-1"/>
@@ -2840,12 +2692,6 @@ CORNERS</string>
                                                     <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                 </dictionary>
                                             </binding>
-                                            <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.curveMode" previousBinding="8ic-oc-DO2" id="zTJ-I7-a0A">
-                                                <dictionary key="options">
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                            <binding destination="1Bn-Ca-ETm" name="selectedTag" keyPath="self.display.lockedBrightnessCurve" id="svg-hX-d0Z"/>
                                         </connections>
                                     </segmentedControl>
                                 </subviews>
@@ -2914,7 +2760,7 @@ CORNERS</string>
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VM8-Rs-rmy" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="155" width="250" height="17"/>
+                                        <rect key="frame" x="0.0" y="180" width="250" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="CURRENT" id="jPr-Bs-JhR">
                                             <font key="font" metaFont="smallSystemBold"/>
@@ -2950,162 +2796,8 @@ CORNERS</string>
                                             </binding>
                                         </connections>
                                     </segmentedControl>
-                                    <slider verticalHuggingPriority="750" ambiguous="YES" alphaValue="0.90000000000000002" id="iDx-r9-HI5" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                        <rect key="frame" x="53" y="28" width="144" height="24"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="30" id="zPE-yk-Kia"/>
-                                        </constraints>
-                                        <sliderCell key="cell" continuous="YES" alignment="left" maxValue="1" doubleValue="0.65914163961038963" tickMarkPosition="above" sliderType="linear" id="tnD-iv-pOR" customClass="SliderCell" customModule="Lunar" customModuleProvider="target">
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
-                                                    <real key="value" value="20"/>
-                                                </userDefinedRuntimeAttribute>
-                                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                                    <real key="value" value="10"/>
-                                                </userDefinedRuntimeAttribute>
-                                                <userDefinedRuntimeAttribute type="color" keyPath="color">
-                                                    <color key="value" red="1" green="0.7843137255" blue="0.58431372550000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                </userDefinedRuntimeAttribute>
-                                                <userDefinedRuntimeAttribute type="color" keyPath="knobColor">
-                                                    <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                </userDefinedRuntimeAttribute>
-                                                <userDefinedRuntimeAttribute type="number" keyPath="fillOrigin">
-                                                    <real key="value" value="0.5"/>
-                                                </userDefinedRuntimeAttribute>
-                                                <userDefinedRuntimeAttribute type="boolean" keyPath="drawText" value="NO"/>
-                                            </userDefinedRuntimeAttributes>
-                                        </sliderCell>
-                                        <userDefinedRuntimeAttributes>
-                                            <userDefinedRuntimeAttribute type="number" keyPath="scrollPrecision">
-                                                <real key="value" value="2"/>
-                                            </userDefinedRuntimeAttribute>
-                                        </userDefinedRuntimeAttributes>
-                                        <connections>
-                                            <binding destination="rew-Tm-BHz" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="G6a-J4-IIx" id="a8S-83-Mhg">
-                                                <dictionary key="options">
-                                                    <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                    <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                    <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                    <integer key="NSNullPlaceholder" value="-1"/>
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                            <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.lockedContrast" id="oYZ-aT-SWl">
-                                                <dictionary key="options">
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                            <binding destination="1Bn-Ca-ETm" name="value" keyPath="self.display.sliderContrastCurveFactor" id="xUA-iu-wiP"/>
-                                            <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.curveMode" previousBinding="oYZ-aT-SWl" id="G6a-J4-IIx">
-                                                <dictionary key="options">
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                        </connections>
-                                    </slider>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" alphaValue="0.5" id="esM-kL-aB3">
-                                        <rect key="frame" x="58" y="40" width="25" height="11"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="slow" id="0TL-L1-661">
-                                            <font key="font" metaFont="systemMedium" size="9"/>
-                                            <color key="textColor" name="Caption Tertiary"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                        <connections>
-                                            <binding destination="rew-Tm-BHz" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="Dal-jA-q3G" id="rQc-64-ofA">
-                                                <dictionary key="options">
-                                                    <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                    <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                    <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                    <integer key="NSNullPlaceholder" value="-1"/>
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                            <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.curveMode" id="Dal-jA-q3G">
-                                                <dictionary key="options">
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                        </connections>
-                                    </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" alphaValue="0.5" id="DoD-nx-pRy">
-                                        <rect key="frame" x="165" y="33" width="21" height="11"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="rise" id="paz-X8-yxv">
-                                            <font key="font" metaFont="systemMedium" size="9"/>
-                                            <color key="textColor" name="Caption Tertiary"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                        <connections>
-                                            <binding destination="rew-Tm-BHz" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="e5I-O4-Tvv" id="UhO-qe-lIM">
-                                                <dictionary key="options">
-                                                    <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                    <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                    <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                    <integer key="NSNullPlaceholder" value="-1"/>
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                            <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.curveMode" id="e5I-O4-Tvv">
-                                                <dictionary key="options">
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                        </connections>
-                                    </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" alphaValue="0.5" id="eAa-uu-l6j">
-                                        <rect key="frame" x="165" y="40" width="22" height="11"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="fast" id="6TW-ya-7ge">
-                                            <font key="font" metaFont="systemMedium" size="9"/>
-                                            <color key="textColor" name="Caption Tertiary"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                        <connections>
-                                            <binding destination="rew-Tm-BHz" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="W7R-ID-K3s" id="NqP-8T-FBM">
-                                                <dictionary key="options">
-                                                    <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                    <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                    <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                    <integer key="NSNullPlaceholder" value="-1"/>
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                            <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.curveMode" id="W7R-ID-K3s">
-                                                <dictionary key="options">
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                        </connections>
-                                    </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" alphaValue="0.5" id="p0z-zt-jX9">
-                                        <rect key="frame" x="60" y="33" width="21" height="11"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="rise" id="9cR-ii-WVd">
-                                            <font key="font" metaFont="systemMedium" size="9"/>
-                                            <color key="textColor" name="Caption Tertiary"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                        <connections>
-                                            <binding destination="rew-Tm-BHz" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="adH-m5-JC7" id="Nj7-45-xE7">
-                                                <dictionary key="options">
-                                                    <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                    <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                    <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                    <integer key="NSNullPlaceholder" value="-1"/>
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                            <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.curveMode" id="adH-m5-JC7">
-                                                <dictionary key="options">
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                        </connections>
-                                    </textField>
                                     <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Jb0-NQ-rNK">
-                                        <rect key="frame" x="57" y="7" width="135" height="23"/>
+                                        <rect key="frame" x="57" y="37" width="135" height="23"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <segmentedCell key="cell" refusesFirstResponder="YES" borderStyle="border" alignment="left" style="capsule" trackingMode="selectOne" id="OQI-AN-UVh">
                                             <font key="font" metaFont="miniSystem"/>
@@ -3120,6 +2812,12 @@ CORNERS</string>
                                                     <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                 </dictionary>
                                             </binding>
+                                            <binding destination="1Bn-Ca-ETm" name="selectedTag" keyPath="self.display.lockedContrastCurve" id="YBa-jp-CIi"/>
+                                            <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.curveMode" previousBinding="Apr-k7-UHI" id="Qvo-LH-dsF">
+                                                <dictionary key="options">
+                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                </dictionary>
+                                            </binding>
                                             <binding destination="rew-Tm-BHz" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="Qvo-LH-dsF" id="fB3-Db-8eh">
                                                 <dictionary key="options">
                                                     <integer key="NSMultipleValuesPlaceholder" value="-1"/>
@@ -3129,12 +2827,6 @@ CORNERS</string>
                                                     <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                 </dictionary>
                                             </binding>
-                                            <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.curveMode" previousBinding="Apr-k7-UHI" id="Qvo-LH-dsF">
-                                                <dictionary key="options">
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                            <binding destination="1Bn-Ca-ETm" name="selectedTag" keyPath="self.display.lockedContrastCurve" id="YBa-jp-CIi"/>
                                         </connections>
                                     </segmentedControl>
                                 </subviews>
@@ -4125,7 +3817,7 @@ enabled</string>
                                         </dictionary>
                                     </binding>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.blackOutEnabled" id="B26-Ge-slo"/>
-                                    <binding destination="1Bn-Ca-ETm" name="value" keyPath="self.display.softwareBrightness" id="xJV-bG-lb5"/>
+                                    <binding destination="1Bn-Ca-ETm" name="value" keyPath="self.display.softwareBrightnessSlider" id="xJV-bG-lb5"/>
                                     <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.subzero" previousBinding="B26-Ge-slo" id="Ph3-uF-cd2">
                                         <dictionary key="options">
                                             <integer key="NSMultipleValuesPlaceholder" value="-1"/>

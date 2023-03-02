@@ -135,8 +135,6 @@ class ModeChoiceViewController: NSViewController {
                 .filter { $0.serial != builtin.serial }
                 .forEach { d in
                     d.isSource = false
-                    d.brightnessCurveFactors[.sync] = DEFAULT_SYNC_BRIGHTNESS_CURVE_FACTOR
-                    d.contrastCurveFactors[.sync] = DEFAULT_SYNC_CONTRAST_CURVE_FACTOR
                     d.userContrast[.sync]?.removeAll()
                     d.userBrightness[.sync]?.removeAll()
                     d.lockedBrightnessCurve = false
@@ -165,8 +163,6 @@ class ModeChoiceViewController: NSViewController {
                     d.isSource = false
                     d.systemAdaptiveBrightness = false
                     d.adaptive = true
-                    d.brightnessCurveFactors[.sync] = 1
-                    d.contrastCurveFactors[.sync] = 1
                     d.userContrast[.sync]?.removeAll()
                     d.userBrightness[.sync]?.removeAll()
                     if d.name == source.name {

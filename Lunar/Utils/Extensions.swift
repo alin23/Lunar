@@ -1496,6 +1496,7 @@ func address(from bytes: UnsafeRawBufferPointer) -> String? {
 
 let brightnessDataPointInserted = NSNotification.Name("brightnessDataPointInserted")
 let contrastDataPointInserted = NSNotification.Name("contrastDataPointInserted")
+let nitsMappingModified = NSNotification.Name("nitsMappingModified")
 let currentDataPointChanged = NSNotification.Name("currentDataPointChanged")
 let dataPointBoundsChanged = NSNotification.Name("dataPointBoundsChanged")
 let lunarProStateChanged = NSNotification.Name("lunarProStateChanged")

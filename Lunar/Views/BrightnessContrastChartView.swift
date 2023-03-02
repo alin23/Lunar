@@ -162,81 +162,76 @@ class BrightnessContrastChartView: LineChartView {
                 brightnessChartEntry.reserveCapacity(mode.maxChartDataPoints)
                 contrastChartEntry.reserveCapacity(mode.maxChartDataPoints)
 
-                var values = mode.interpolateSIMD(.brightness(0), display: display, factor: display.brightnessCurveFactors[mode.key])
-                if values.count < mode.maxChartDataPoints {
-                    values += [Double](repeating: values.last!, count: mode.maxChartDataPoints - values.count)
+                let brcrs = xs.map { lux in
+                    mode.computeBrightnessContrast(ambientLight: lux, display: display)
                 }
-                let curveAdjustedBrightness = mode.adjustCurveSIMD(
-                    [Double](values.striding(by: 30)),
-                    factor: mode.visualCurveFactor,
-                    minVal: display.minBrightness.doubleValue,
-                    maxVal: display.maxBrightness.doubleValue
-                )
-                brightnessChartEntry.append(
-                    contentsOf: zip(
-                        xs, curveAdjustedBrightness
-                    ).map { ChartDataEntry(x: $0, y: $1) }
-                )
 
-                values = mode.interpolateSIMD(.contrast(0), display: display, factor: display.contrastCurveFactors[mode.key])
-                if values.count < mode.maxChartDataPoints {
-                    values += [Double](repeating: values.last!, count: mode.maxChartDataPoints - values.count)
-                }
-                let curveAdjustedContrast = mode.adjustCurveSIMD(
-                    [Double](values.striding(by: 30)),
-                    factor: mode.visualCurveFactor,
-                    minVal: display.minContrast.doubleValue,
-                    maxVal: display.maxContrast.doubleValue
+                brightnessChartEntry.append(
+                    contentsOf: zip(xs, brcrs.map(\.0)).map { ChartDataEntry(x: $0, y: $1) }
                 )
                 contrastChartEntry.append(
-                    contentsOf: zip(
-                        xs, curveAdjustedContrast
-                    ).map { ChartDataEntry(x: $0, y: $1) }
+                    contentsOf: zip(xs, brcrs.map(\.1)).map { ChartDataEntry(x: $0, y: $1) }
                 )
             case let mode as LocationMode:
                 brightnessChartEntry.reserveCapacity(mode.maxChartDataPoints)
                 contrastChartEntry.reserveCapacity(mode.maxChartDataPoints)
-                let points = mode.getBrightnessContrastBatch(
-                    display: display,
-                    brightnessFactor: display.brightnessCurveFactors[mode.key],
-                    contrastFactor: display.contrastCurveFactors[mode.key]
-                )
 
-                let xs = stride(from: 0.0, to: (points.brightness.count - 1).d, by: 9.0)
-                brightnessChartEntry.append(
-                    contentsOf: zip(
-                        xs, points.brightness.striding(by: 9)
-                    ).map { ChartDataEntry(x: $0, y: $1) }
-                )
-                contrastChartEntry.append(
-                    contentsOf: zip(
-                        xs, points.contrast.striding(by: 9)
-                    ).map { ChartDataEntry(x: $0, y: $1) }
-                )
-                mode.maxChartDataPoints = points.brightness.count
+                if let moment = mode.moment {
+                    let xs = stride(from: moment.astronomicalSunrise, to: moment.astronomicalSunset, by: 40)
+                    let brcrs = xs.map { datetime in
+                        mode.getBrightnessContrast(
+                            display: display,
+                            hour: datetime.hour,
+                            minute: datetime.minute
+                        )
+                    }
+
+                    brightnessChartEntry.append(
+                        contentsOf: zip(xs, brcrs.map(\.0)).map { ChartDataEntry(x: $0.timeIntervalSince(moment.astronomicalSunrise), y: $1) }
+                    )
+                    contrastChartEntry.append(
+                        contentsOf: zip(xs, brcrs.map(\.1)).map { ChartDataEntry(x: $0.timeIntervalSince(moment.astronomicalSunrise), y: $1) }
+                    )
+                }
             case let mode as SyncMode:
-                let xs = stride(from: 0.0, to: (mode.maxChartDataPoints - 1).d, by: 6.0)
+//                if mode.isSyncingNits, let d = SyncMode.sourceDisplay {
+//                    let xs = stride(from: display.adaptiveSubzero ? -100.0 : 0.0, to: d.maxNits, by: 20.0)
+//                    brightnessChartEntry.reserveCapacity(mode.maxChartDataPoints)
+//                    contrastChartEntry.reserveCapacity(mode.maxChartDataPoints)
+//
+//                    let brcrs = xs.map { sourceNits in
+//                        mode.computeBrightnessContrast(nits: sourceNits, display: display)
+//                    }
+//                    brightnessChartEntry.append(
+//                        contentsOf: zip(xs, brcrs.map(\.0)).map { ChartDataEntry(x: $0, y: $1) }
+//                    )
+//                    contrastChartEntry.append(
+//                        contentsOf: zip(xs, brcrs.map(\.1)).map { ChartDataEntry(x: $0, y: $1) }
+//                    )
+//                } else {
+                let xs = stride(from: display.adaptiveSubzero ? -100.0 : 0.0, to: 100.0, by: 12.0)
                 brightnessChartEntry.reserveCapacity(mode.maxChartDataPoints)
                 contrastChartEntry.reserveCapacity(mode.maxChartDataPoints)
 
-                var values = mode.interpolateSIMD(.brightness(0), display: display, factor: display.brightnessCurveFactors[mode.key])
-                if values.count < mode.maxChartDataPoints {
-                    values += [Double](repeating: values.last!, count: mode.maxChartDataPoints - values.count)
+                let brs = xs.map { sourceBrightness in
+                    mode.interpolate(
+                        .preciseBrightness(sourceBrightness),
+                        display: display
+                    )
                 }
+
                 brightnessChartEntry.append(
-                    contentsOf: zip(
-                        xs, values.striding(by: 6)
-                    ).map { ChartDataEntry(x: $0, y: $1) }
+                    contentsOf: zip(xs, brs).map { ChartDataEntry(x: $0, y: $1) }
                 )
 
-                values = mode.interpolateSIMD(.contrast(0), display: display, factor: display.contrastCurveFactors[mode.key])
-                if values.count < mode.maxChartDataPoints {
-                    values += [Double](repeating: values.last!, count: mode.maxChartDataPoints - values.count)
+                let crs = xs.map { sourceContrast in
+                    mode.interpolate(
+                        .preciseContrast(sourceContrast),
+                        display: display
+                    )
                 }
                 contrastChartEntry.append(
-                    contentsOf: zip(
-                        xs, values.striding(by: 6)
-                    ).map { ChartDataEntry(x: $0, y: $1) }
+                    contentsOf: zip(xs, crs).map { ChartDataEntry(x: $0, y: $1) }
                 )
             case let mode as ManualMode:
                 let xs = stride(from: 0.0, to: (mode.maxChartDataPoints - 1).d, by: 1.0)
@@ -284,6 +279,9 @@ class BrightnessContrastChartView: LineChartView {
         brightnessGraph.circleHoleRadius = darkMode ? 2.5 : 1.5
         brightnessGraph.drawCirclesEnabled = CachedDefaults[.moreGraphData] && adaptiveMode.key != .manual
         brightnessGraph.drawFilledEnabled = true
+        brightnessGraph.fillFormatter = DefaultFillFormatter(block: { dataSet, _ in
+            CGFloat(dataSet.yMin - 200)
+        })
         brightnessGraph.drawValuesEnabled = false
         brightnessGraph.highlightColor = brightnessColor.withAlphaComponent(0.3)
         brightnessGraph.highlightLineWidth = 2
@@ -299,6 +297,9 @@ class BrightnessContrastChartView: LineChartView {
         contrastGraph.circleHoleRadius = 1.5
         contrastGraph.drawCirclesEnabled = CachedDefaults[.moreGraphData] && adaptiveMode.key != .manual
         contrastGraph.drawFilledEnabled = true
+        contrastGraph.fillFormatter = DefaultFillFormatter(block: { dataSet, _ in
+            CGFloat(dataSet.yMin - 200)
+        })
         contrastGraph.drawValuesEnabled = false
         contrastGraph.highlightColor = contrastColor.withAlphaComponent(0.9)
         contrastGraph.highlightLineWidth = 2
@@ -369,58 +370,47 @@ class BrightnessContrastChartView: LineChartView {
         drawBordersEnabled = false
         autoScaleMinMaxEnabled = false
 
+        let adaptiveSubzero = (mode == .manual || display == nil) ? false : (display!.adaptiveSubzero)
         leftAxis.axisMaximum = 100
-        leftAxis.axisMinimum = 0
+        leftAxis.axisMinimum = adaptiveSubzero ? -100 : 0
         leftAxis.drawGridLinesEnabled = false
         leftAxis.drawAxisLineEnabled = false
         leftAxis.drawLabelsEnabled = false
 
+        let moreData = CachedDefaults[.moreGraphData]
         rightAxis.axisMaximum = 100
-        rightAxis.axisMinimum = 0
-        rightAxis.drawGridLinesEnabled = CachedDefaults[.moreGraphData]
+        rightAxis.axisMinimum = adaptiveSubzero ? -100 : 0
+        rightAxis.drawGridLinesEnabled = moreData
         rightAxis.drawAxisLineEnabled = false
-        rightAxis.drawLabelsEnabled = CachedDefaults[.moreGraphData]
-        rightAxis.labelFont = NSFont.systemFont(ofSize: 12, weight: .bold)
+        rightAxis.drawLabelsEnabled = moreData
+        rightAxis.labelFont = NSFont.monospacedSystemFont(ofSize: 12, weight: .semibold)
         rightAxis.labelPosition = .insideChart
         rightAxis.xOffset = 22.0
         rightAxis.gridColor = white.withAlphaComponent(0.3)
         rightAxis.drawZeroLineEnabled = false
         rightAxis.drawBottomYLabelEntryEnabled = false
+        rightAxis.setLabelCount(7, force: true)
 
-        xAxis.drawGridLinesEnabled = CachedDefaults[.moreGraphData]
-        xAxis.labelFont = NSFont.systemFont(ofSize: 12, weight: .bold)
+        xAxis.drawGridLinesEnabled = moreData
+        xAxis.labelFont = NSFont.monospacedSystemFont(ofSize: 12, weight: .semibold)
         xAxis.labelPosition = .bottomInside
         xAxis.drawAxisLineEnabled = false
         xAxis.gridColor = white.withAlphaComponent(0.3)
-        xAxis.drawLabelsEnabled = CachedDefaults[.moreGraphData]
+        xAxis.drawLabelsEnabled = moreData
 
         switch mode ?? displayController.adaptiveModeKey {
         case .location:
-            xAxis.valueFormatter = ElevationValueFormatter()
+            xAxis.valueFormatter = DateValueFormatter()
             xAxis.setLabelCount(7, force: true)
         case .sensor:
             xAxis.valueFormatter = LuxValueFormatter()
-            xAxis.setLabelCount(8, force: true)
+            xAxis.setLabelCount(7, force: true)
+//        case .sync where SyncMode.specific.isSyncingNits:
+//            xAxis.valueFormatter = NitsValueFormatter()
+//            xAxis.setLabelCount(7, force: true)
         default:
             xAxis.valueFormatter = PercentValueFormatter()
             xAxis.setLabelCount(5, force: true)
-        }
-
-        chartDescription = Description()
-        chartDescription.font = NSFont.systemFont(ofSize: 11.0, weight: .semibold)
-        chartDescription.textColor = CachedDefaults[.moreGraphData] ? (red.blended(withFraction: 0.5, of: lunarYellow) ?? red)
-            .withAlphaComponent(0.9) : .clear
-        chartDescription.position = CGPoint(x: 920, y: 130)
-
-        switch mode ?? displayController.adaptiveModeKey {
-        case .location:
-            chartDescription.text = "Brightness based on sun elevation"
-        case .sync:
-            chartDescription.text = ""
-        case .sensor:
-            chartDescription.text = ""
-        case .manual, .clock, .auto:
-            chartDescription.text = ""
         }
 
         setupLegend(display: display)
@@ -429,4 +419,15 @@ class BrightnessContrastChartView: LineChartView {
         noDataTextColor = .clear
         animate(yAxisDuration: 1.5, easingOption: ChartEasingOption.easeOutExpo)
     }
+}
+
+extension DateInRegion: Strideable {
+    public func advanced(by n: Int) -> DateInRegion {
+        dateByAdding(n, .minute)
+    }
+
+    public func distance(to other: DateInRegion) -> Int {
+        other.difference(in: .minute, from: self) ?? 0
+    }
+
 }
