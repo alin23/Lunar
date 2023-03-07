@@ -10,7 +10,7 @@ import Cocoa
 import Combine
 import Defaults
 
-class ScrollableContrast: NSView {
+final class ScrollableContrast: NSView {
     deinit {
         #if DEBUG
             log.verbose("START DEINIT")

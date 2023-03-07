@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class ProgressViewController: NSViewController {
+final class ProgressViewController: NSViewController {
     @objc dynamic var operationTitle = ""
     @objc dynamic var operationDescription: NSAttributedString = "".attributedString
     @IBOutlet var progressBar: NSProgressIndicator!

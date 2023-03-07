@@ -4,7 +4,7 @@ import Defaults
 
 // MARK: - StatusItemButtonControllerDelegate
 
-class StatusItemButtonControllerDelegate: NSObject, NSWindowDelegate {
+final class StatusItemButtonControllerDelegate: NSObject, NSWindowDelegate {
     convenience init(statusItemButtonController: StatusItemButtonController) {
         self.init()
         self.statusItemButtonController = statusItemButtonController
@@ -21,7 +21,7 @@ class StatusItemButtonControllerDelegate: NSObject, NSWindowDelegate {
 
 // MARK: - StatusItemButtonController
 
-class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObject {
+final class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObject {
     convenience init(button: NSStatusBarButton) {
         self.init(frame: button.frame)
         statusButton = button

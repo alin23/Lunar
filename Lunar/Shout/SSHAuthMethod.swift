@@ -9,36 +9,37 @@ import Foundation
 
 // MARK: - SSHAuthMethod
 
-public protocol SSHAuthMethod {
+protocol SSHAuthMethod {
     func authenticate(ssh: SSH, username: String) throws
 }
 
 // MARK: - SSHPassword
 
 /// Password-based authentication method
-public struct SSHPassword: SSHAuthMethod {
+struct SSHPassword: SSHAuthMethod {
     /// Creates a new password-based authentication using the given password
     ///
     /// - Parameter password: the password to authenticate with
-    public init(_ password: String) {
+    init(_ password: String) {
         self.password = password
     }
 
-    public func authenticate(ssh: SSH, username: String) throws {
+    let password: String
+
+    func authenticate(ssh: SSH, username: String) throws {
         try ssh.session.authenticate(username: username, password: password)
     }
 
-    let password: String
 }
 
 // MARK: - SSHAgent
 
 /// Agent-based authentication method
-public struct SSHAgent: SSHAuthMethod {
+struct SSHAgent: SSHAuthMethod {
     /// Creates a new agent-based authentication
-    public init() {}
+    init() {}
 
-    public func authenticate(ssh: SSH, username: String) throws {
+    func authenticate(ssh: SSH, username: String) throws {
         let agent = try ssh.session.openAgent()
         try agent.connect()
         try agent.listIdentities()
@@ -61,14 +62,14 @@ public struct SSHAgent: SSHAuthMethod {
 // MARK: - SSHKey
 
 /// Key-based authentication method
-public struct SSHKey: SSHAuthMethod {
+struct SSHKey: SSHAuthMethod {
     /// Creates a new key-based authentication
     ///
     /// - Parameters:
     ///   - privateKey: the path to the private key
-    ///   - publicKey: the path to the public key; defaults to private key path + ".pub"
+    ///   - publicKey: the path to the key; defaults to private key path + ".pub"
     ///   - passphrase: the passphrase encrypting the key; defaults to nil
-    public init(privateKey: String, publicKey: String? = nil, passphrase: String? = nil) {
+    init(privateKey: String, publicKey: String? = nil, passphrase: String? = nil) {
         self.privateKey = NSString(string: privateKey).expandingTildeInPath
         if let publicKey {
             self.publicKey = NSString(string: publicKey).expandingTildeInPath
@@ -78,11 +79,11 @@ public struct SSHKey: SSHAuthMethod {
         self.passphrase = passphrase
     }
 
-    public let privateKey: String
-    public let publicKey: String
-    public let passphrase: String?
+    let privateKey: String
+    let publicKey: String
+    let passphrase: String?
 
-    public func authenticate(ssh: SSH, username: String) throws {
+    func authenticate(ssh: SSH, username: String) throws {
         // If programatically given a passphrase, use it
         if let passphrase {
             try ssh.session.authenticate(

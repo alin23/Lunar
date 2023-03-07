@@ -11,7 +11,7 @@ import Combine
 import Defaults
 import Paddle
 
-class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSource {
+final class ExceptionsViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSource {
     @IBOutlet var tableView: NSTableView!
     @IBOutlet var arrayController: NSArrayController!
     @IBOutlet var addAppButton: NSButton!

@@ -12,7 +12,7 @@ import Defaults
 import Solar
 import SwiftyJSON
 
-class Geolocation: NSObject, Codable, Defaults.Serializable {
+final class Geolocation: NSObject, Codable, Defaults.Serializable {
     init?(location: CLLocation) {
         guard location.coordinate.latitude != 0 || location.coordinate.longitude != 0 else { return nil }
         latitude = location.coordinate.latitude

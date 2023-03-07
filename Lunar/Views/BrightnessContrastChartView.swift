@@ -10,7 +10,7 @@ import Charts
 import Cocoa
 import SwiftDate
 
-class BrightnessContrastChartView: LineChartView {
+final class BrightnessContrastChartView: LineChartView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setup()

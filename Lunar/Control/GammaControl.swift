@@ -247,7 +247,7 @@ enum NightShift {
 
 // MARK: - GammaControl
 
-class GammaControl: Control {
+final class GammaControl: Control {
     init(display: Display) {
         self.display = display
     }

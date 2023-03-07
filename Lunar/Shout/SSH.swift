@@ -9,7 +9,7 @@ import Foundation
 import Socket
 
 /// Manages an SSH session
-public class SSH {
+final class SSH {
     /// Creates a new SSH session
     ///
     /// - Parameters:

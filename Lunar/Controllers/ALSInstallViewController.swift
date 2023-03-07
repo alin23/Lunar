@@ -35,7 +35,7 @@ func getDevices() -> [String] {
 
 // MARK: - ALSInstallViewController
 
-class ALSInstallViewController: NSViewController {
+final class ALSInstallViewController: NSViewController {
     deinit {
         #if DEBUG
             log.debug("DEINIT")

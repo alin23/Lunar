@@ -11,7 +11,7 @@ import Foundation
 
 // MARK: - HourValueFormatter
 
-class HourValueFormatter: AxisValueFormatter {
+final class HourValueFormatter: AxisValueFormatter {
     func stringForValue(_ value: Double, axis _: AxisBase?) -> String {
         let value = value.i
         switch value {
@@ -29,7 +29,7 @@ class HourValueFormatter: AxisValueFormatter {
     }
 }
 
-class DateValueFormatter: AxisValueFormatter {
+final class DateValueFormatter: AxisValueFormatter {
     func stringForValue(_ value: Double, axis _: AxisBase?) -> String {
         guard let moment = LocationMode.specific.moment else {
             return ""
@@ -40,7 +40,7 @@ class DateValueFormatter: AxisValueFormatter {
 
 // MARK: - ElevationValueFormatter
 
-class ElevationValueFormatter: AxisValueFormatter {
+final class ElevationValueFormatter: AxisValueFormatter {
     func stringForValue(_ value: Double, axis _: AxisBase?) -> String {
         guard LocationMode.specific.moment != nil, let chartEntry = LocationMode.specific.lastChartEntry
         else { return "" }
@@ -54,7 +54,7 @@ class ElevationValueFormatter: AxisValueFormatter {
 
 // MARK: - PercentValueFormatter
 
-class PercentValueFormatter: AxisValueFormatter {
+final class PercentValueFormatter: AxisValueFormatter {
     func stringForValue(_ value: Double, axis _: AxisBase?) -> String {
         if value == 100.0 || value == 0.0 {
             return ""
@@ -65,7 +65,7 @@ class PercentValueFormatter: AxisValueFormatter {
 
 // MARK: - LuxValueFormatter
 
-class LuxValueFormatter: AxisValueFormatter {
+final class LuxValueFormatter: AxisValueFormatter {
     func stringForValue(_ value: Double, axis _: AxisBase?) -> String {
         if value == 0.0 {
             return ""
@@ -74,7 +74,7 @@ class LuxValueFormatter: AxisValueFormatter {
     }
 }
 
-class NitsValueFormatter: AxisValueFormatter {
+final class NitsValueFormatter: AxisValueFormatter {
     func stringForValue(_ value: Double, axis _: AxisBase?) -> String {
         if value == 0.0 {
             return ""

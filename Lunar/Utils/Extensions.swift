@@ -1010,7 +1010,7 @@ public prefix func ! <T>(keyPath: KeyPath<T, Bool>) -> (T) -> Bool {
 
 // MARK: - ModePopupButton
 
-class ModePopupButton: NSPopUpButton {
+final class ModePopupButton: NSPopUpButton {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         font = .monospacedSystemFont(ofSize: 12, weight: .semibold)
@@ -1649,7 +1649,7 @@ extension NSView {
 
 // MARK: - AutoRemovingSegmentedControl
 
-class AutoRemovingSegmentedControl: NSSegmentedControl {
+final class AutoRemovingSegmentedControl: NSSegmentedControl {
     override var isHidden: Bool {
         didSet {
             if isHidden {
@@ -1661,7 +1661,7 @@ class AutoRemovingSegmentedControl: NSSegmentedControl {
 
 // MARK: - AutoRemovingTextField
 
-class AutoRemovingTextField: NSTextField {
+final class AutoRemovingTextField: NSTextField {
     override var isHidden: Bool {
         didSet { if isHidden { removeFromSuperview() } }
     }
@@ -1693,7 +1693,7 @@ extension AutoRemovingConstraintsView {
 
 // MARK: - AutoRemovingConstraintsTextField
 
-class AutoRemovingConstraintsTextField: NSTextField, AutoRemovingConstraintsView {
+final class AutoRemovingConstraintsTextField: NSTextField, AutoRemovingConstraintsView {
     var originalConstraints: [NSLayoutConstraint] = []
 
     override var isHidden: Bool {
@@ -1703,7 +1703,7 @@ class AutoRemovingConstraintsTextField: NSTextField, AutoRemovingConstraintsView
 
 // MARK: - AutoRemovingConstraintsLockButton
 
-class AutoRemovingConstraintsLockButton: LockButton, AutoRemovingConstraintsView {
+final class AutoRemovingConstraintsLockButton: LockButton, AutoRemovingConstraintsView {
     var originalConstraints: [NSLayoutConstraint] = []
 
     override var isHidden: Bool {
@@ -1713,7 +1713,7 @@ class AutoRemovingConstraintsLockButton: LockButton, AutoRemovingConstraintsView
 
 // MARK: - AutoRemovingConstraintsSegmentedControl
 
-class AutoRemovingConstraintsSegmentedControl: NSSegmentedControl, AutoRemovingConstraintsView {
+final class AutoRemovingConstraintsSegmentedControl: NSSegmentedControl, AutoRemovingConstraintsView {
     var originalConstraints: [NSLayoutConstraint] = []
 
     override var isHidden: Bool {
@@ -1723,7 +1723,7 @@ class AutoRemovingConstraintsSegmentedControl: NSSegmentedControl, AutoRemovingC
 
 // MARK: - AutoRemovingBox
 
-class AutoRemovingBox: NSBox {
+final class AutoRemovingBox: NSBox {
     override var isHidden: Bool {
         didSet { if isHidden { removeFromSuperview() } }
     }
@@ -1731,7 +1731,7 @@ class AutoRemovingBox: NSBox {
 
 // MARK: - AutoRemovingSlider
 
-class AutoRemovingSlider: Slider {
+final class AutoRemovingSlider: Slider {
     override var isHidden: Bool {
         didSet { if isHidden { removeFromSuperview() } }
     }

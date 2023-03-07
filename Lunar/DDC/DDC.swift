@@ -528,7 +528,7 @@ enum ControlID: UInt8, ExpressibleByArgument, CaseIterable {
 let CONTROLS_BY_NAME = [String: ControlID](uniqueKeysWithValues: ControlID.allCases.map { (String(describing: $0), $0) })
 import Defaults
 
-class IOServicePropertyObserver {
+final class IOServicePropertyObserver {
     deinit {
         if notificationHandle != 0 {
             IOObjectRelease(notificationHandle)
@@ -610,7 +610,7 @@ class IOServicePropertyObserver {
 
 // MARK: - IOServiceDetector
 
-class IOServiceDetector {
+final class IOServiceDetector {
     init? (
         serviceName: String? = nil,
         serviceClass: String? = nil,

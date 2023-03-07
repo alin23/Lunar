@@ -8,7 +8,7 @@
 // import CSSH
 
 /// Direct bindings to libssh2_agent
-class Agent {
+final class Agent {
     init(cSession: OpaquePointer) throws {
         guard let cAgent = libssh2_agent_init(cSession) else {
             throw SSHError.mostRecentError(session: cSession, backupMessage: "libssh2_agent_init failed")
@@ -26,7 +26,7 @@ class Agent {
         libssh2_agent_free(cAgent)
     }
 
-    class PublicKey: CustomStringConvertible {
+    final class PublicKey: CustomStringConvertible {
         init(cIdentity: UnsafeMutablePointer<libssh2_agent_publickey>) {
             self.cIdentity = cIdentity
         }

@@ -72,7 +72,7 @@ var MENU_MARKDOWN: SwiftyMarkdown { darkMode ? MENU_DARK_MD : MENU_MD }
 
 // MARK: - OnboardingHelpButton
 
-class OnboardingHelpButton: HelpButton {
+final class OnboardingHelpButton: HelpButton {
     let md: SwiftyMarkdown = {
         let md = getMD(dark: true)
         md.body.fontSize = 15

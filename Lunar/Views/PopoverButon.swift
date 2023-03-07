@@ -12,6 +12,11 @@ import Foundation
 // MARK: - PopoverButton
 
 class PopoverButton<T: NSViewController>: Button {
+    override open func mouseDown(with event: NSEvent) {
+        guard let popover, isEnabled else { return }
+        handlePopoverClick(popover, with: event)
+    }
+
     @IBInspectable var showPopover = true
 
     var popoverKey: String {
@@ -28,11 +33,6 @@ class PopoverButton<T: NSViewController>: Button {
 
     var popoverController: T? {
         popover?.contentViewController as? T
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        guard let popover, isEnabled else { return }
-        handlePopoverClick(popover, with: event)
     }
 
     func close() {
@@ -78,7 +78,7 @@ extension NSSize: Comparable {
 
 // MARK: - Box
 
-class Box: NSBox {
+final class Box: NSBox {
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()

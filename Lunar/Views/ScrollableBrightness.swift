@@ -10,7 +10,7 @@ import Cocoa
 import Combine
 import Defaults
 
-class ScrollableBrightness: NSView {
+final class ScrollableBrightness: NSView {
     deinit {
         #if DEBUG
             log.verbose("START DEINIT")

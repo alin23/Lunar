@@ -5,13 +5,13 @@ import Defaults
 
 // MARK: - ColorsPopoverController
 
-class ColorsPopoverController: NSViewController {
+final class ColorsPopoverController: NSViewController {
     @objc dynamic weak var display: Display?
 }
 
 // MARK: - ColorsButton
 
-class ColorsButton: PopoverButton<ColorsPopoverController> {
+final class ColorsButton: PopoverButton<ColorsPopoverController> {
     weak var display: Display? {
         didSet {
             popoverController?.display = display

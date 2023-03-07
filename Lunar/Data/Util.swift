@@ -52,7 +52,7 @@ func displayIsInHardwareMirrorSet(_ id: CGDirectDisplayID) -> Bool {
 
 // MARK: - RequestTimeoutError
 
-class RequestTimeoutError: Error {}
+final class RequestTimeoutError: Error {}
 
 // MARK: - ResponseError
 
@@ -197,7 +197,7 @@ func shell(
 
 // MARK: - DispatchWorkItem
 
-class DispatchWorkItem {
+final class DispatchWorkItem {
     init(name: String, flags: DispatchWorkItemFlags = [], block: @escaping @convention(block) () -> Void) {
         workItem = Foundation.DispatchWorkItem(flags: flags, block: block)
         self.name = name
@@ -251,7 +251,7 @@ class DispatchWorkItem {
 
 // MARK: - DispatchSemaphore
 
-class DispatchSemaphore: CustomStringConvertible {
+final class DispatchSemaphore: CustomStringConvertible {
     init(value: Int, name: String) {
         sem = Foundation.DispatchSemaphore(value: value)
         self.name = name
@@ -1582,7 +1582,7 @@ func displayInfoDictionary(_ id: CGDirectDisplayID) -> NSDictionary? {
 
 // MARK: - PlainTextPasteView
 
-class PlainTextPasteView: NSTextView, NSTextViewDelegate {
+final class PlainTextPasteView: NSTextView, NSTextViewDelegate {
     override func paste(_ sender: Any?) {
         super.pasteAsPlainText(sender)
     }
@@ -1848,7 +1848,7 @@ func activeWindow(on screen: NSScreen? = nil) -> AXWindow? {
 
 // MARK: - LineReader
 
-class LineReader {
+final class LineReader {
     init?(path: String) {
         self.path = path
         guard let file = fopen(path, "r") else {
@@ -2119,8 +2119,8 @@ import SystemConfiguration
 
 // MARK: - Reachability
 
-public class Reachability {
-    class func isConnectedToNetwork() -> Bool {
+final class Reachability {
+    final class func isConnectedToNetwork() -> Bool {
         var zeroAddress = sockaddr()
         zeroAddress.sa_len = UInt8(MemoryLayout<sockaddr>.size)
         zeroAddress.sa_family = sa_family_t(AF_INET)

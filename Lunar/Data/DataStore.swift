@@ -234,7 +234,7 @@ let NON_RESETTABLE_SETTINGS: [Defaults.Keys] = [
 
 // MARK: - DataStore
 
-class DataStore: NSObject {
+final class DataStore: NSObject {
     override init() {
         super.init()
 
@@ -512,7 +512,7 @@ extension AnyCodable: Defaults.Serializable {}
 
 // MARK: - ThreadSafeDictionary
 
-class ThreadSafeDictionary<V: Hashable, T>: Collection {
+final class ThreadSafeDictionary<V: Hashable, T>: Collection {
     init(dict: [V: T] = [V: T]()) {
         mutableDictionary = dict
     }

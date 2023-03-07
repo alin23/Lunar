@@ -44,8 +44,8 @@ import SwiftyBeaver
 
 // MARK: - Logger
 
-class SwiftyLogger: SwiftyBeaver {
-    override open class func verbose(
+final class SwiftyLogger: SwiftyBeaver {
+    override class func verbose(
         _ message: @autoclosure () -> Any,
         file: String = #file,
 
@@ -62,7 +62,7 @@ class SwiftyLogger: SwiftyBeaver {
         super.verbose(message(), file: file, function: function, line: line, context: context)
     }
 
-    override open class func debug(
+    override class func debug(
         _ message: @autoclosure () -> Any,
         file: String = #file,
 
@@ -79,7 +79,7 @@ class SwiftyLogger: SwiftyBeaver {
         super.debug(message(), file: file, function: function, line: line, context: context)
     }
 
-    override open class func info(
+    override class func info(
         _ message: @autoclosure () -> Any,
         file: String = #file,
 
@@ -96,7 +96,7 @@ class SwiftyLogger: SwiftyBeaver {
         super.info(message(), file: file, function: function, line: line, context: context)
     }
 
-    override open class func warning(
+    override class func warning(
         _ message: @autoclosure () -> Any,
         file: String = #file,
 
@@ -108,7 +108,7 @@ class SwiftyLogger: SwiftyBeaver {
         super.warning(message(), file: file, function: function, line: line, context: context)
     }
 
-    override open class func error(
+    override class func error(
         _ message: @autoclosure () -> Any,
         file: String = #file,
 

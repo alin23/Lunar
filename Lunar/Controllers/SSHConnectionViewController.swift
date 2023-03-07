@@ -14,7 +14,7 @@ let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
 
 // MARK: - SSHConnectionViewController
 
-@objc class SSHConnectionViewController: NSViewController {
+@objc final class SSHConnectionViewController: NSViewController {
     @IBOutlet var sshKeyCheckbox: NSButton!
     var sshKey: String?
     @objc dynamic var port = "22"

@@ -420,7 +420,7 @@ struct DynamicKey: View {
 // MARK: - KeyEventHandling
 
 struct KeyEventHandling: NSViewRepresentable {
-    class Coordinator: NSObject {
+    final class Coordinator: NSObject {
         init(_ handler: KeyEventHandling) {
             eventHandler = handler
         }
@@ -428,7 +428,7 @@ struct KeyEventHandling: NSViewRepresentable {
         var eventHandler: KeyEventHandling
     }
 
-    class KeyView: NSView {
+    final class KeyView: NSView {
         dynamic var context: Context?
 
         override var acceptsFirstResponder: Bool { true }

@@ -9,7 +9,7 @@
 import Cocoa
 import Foundation
 
-class GammaViewController: NSViewController {
+final class GammaViewController: NSViewController {
     @IBOutlet var dot: NSTextField!
 
     var visible: Bool {

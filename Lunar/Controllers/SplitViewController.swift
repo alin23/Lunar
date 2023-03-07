@@ -165,7 +165,7 @@ var rightHintsShown = false
 
 // MARK: - SplitViewController
 
-class SplitViewController: NSSplitViewController {
+final class SplitViewController: NSSplitViewController {
     deinit {
         #if DEBUG
             log.verbose("START DEINIT")

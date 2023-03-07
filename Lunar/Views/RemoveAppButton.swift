@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class RemoveAppButton: NSButton {
+final class RemoveAppButton: NSButton {
     override func draw(_ dirtyRect: NSRect) {
         wantsLayer = true
 

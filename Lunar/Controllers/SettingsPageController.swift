@@ -55,7 +55,7 @@ extension NSViewController {
 
 // MARK: - SettingsPageController
 
-class SettingsPageController: NSViewController {
+final class SettingsPageController: NSViewController {
     @IBOutlet var settingsContainerView: NSView!
 
     override func viewDidLoad() {

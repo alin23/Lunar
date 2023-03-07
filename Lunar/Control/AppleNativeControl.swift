@@ -19,7 +19,7 @@ enum AppleNativeMethod {
 
 // MARK: - AppleNativeControl
 
-class AppleNativeControl: Control {
+final class AppleNativeControl: Control {
     init(display: Display) {
         self.display = display
     }

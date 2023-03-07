@@ -15,7 +15,7 @@ import UserNotifications
 
 // MARK: - Service
 
-class Service {
+final class Service {
     init(_ service: NetService, scheme: String = "http", path: String = "") {
         self.service = service
         self.scheme = scheme
@@ -132,7 +132,7 @@ class Service {
 
 // MARK: - NetworkControl
 
-class NetworkControl: Control {
+final class NetworkControl: Control {
     init(display: Display) {
         self.display = display
         listenForRequests()

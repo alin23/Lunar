@@ -13,7 +13,7 @@ let NEW_HOSTNAME_PATTERN = try! Regex(pattern: "NEW_HOSTNAME=(\\S+)", groupNames
 
 // MARK: - OutputScrollView
 
-class OutputScrollView: NSScrollView {
+final class OutputScrollView: NSScrollView {
     var onScroll: ((NSEvent) -> Void)?
     var onKeyDown: ((NSEvent) -> Void)?
 
@@ -40,7 +40,7 @@ class OutputScrollView: NSScrollView {
 
 // MARK: - InstallOutputViewController
 
-class InstallOutputViewController: NSViewController {
+final class InstallOutputViewController: NSViewController {
     var commandChannel: Channel?
 
     @IBOutlet var outputScrollView: OutputScrollView!

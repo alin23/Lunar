@@ -17,7 +17,7 @@ let DEFAULT_APP_BRIGHTNESS_CONTRAST = 0.8
 
 // MARK: - AppException
 
-@objc class AppException: NSObject, Codable, Defaults.Serializable {
+@objc final class AppException: NSObject, Codable, Defaults.Serializable {
     init(identifier: String, name: String) {
         self.identifier = identifier
         self.name = name

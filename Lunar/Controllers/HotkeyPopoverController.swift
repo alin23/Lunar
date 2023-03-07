@@ -13,7 +13,7 @@ import Magnet
 
 // MARK: - NoFrameView
 
-class NoFrameView: NSView {
+final class NoFrameView: NSView {
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         removePopoverBackground(view: self)
@@ -23,7 +23,7 @@ class NoFrameView: NSView {
 
 // MARK: - HotkeyPopoverController
 
-class HotkeyPopoverController: NSViewController {
+final class HotkeyPopoverController: NSViewController {
 //
 //    deinit {
 //        #if DEBUG

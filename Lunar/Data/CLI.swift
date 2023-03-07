@@ -2238,7 +2238,7 @@ var cliServerTask: DispatchWorkItem? {
 
 // MARK: - LunarServer
 
-class LunarServer {
+final class LunarServer {
     deinit {
         for socket in connectedSockets.values {
             socket.close()

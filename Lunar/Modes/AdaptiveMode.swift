@@ -225,7 +225,7 @@ extension [Float] {
 
 // MARK: - AdaptiveModeMenuValidator
 
-class AdaptiveModeMenuValidator: NSObject, NSMenuItemValidation {
+final class AdaptiveModeMenuValidator: NSObject, NSMenuItemValidation {
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         guard let mode = AdaptiveModeKey(rawValue: menuItem.tag) else {
             return false

@@ -16,7 +16,7 @@ let MODE_DISABLED_REASON_PATTERN = "\\sMode.*".r!
 
 // MARK: - AdaptiveModeButton
 
-class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
+final class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()

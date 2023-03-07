@@ -9,7 +9,7 @@
 import Cocoa
 import Defaults
 
-class ScrollableTextFieldCaption: NSTextField {
+final class ScrollableTextFieldCaption: NSTextField {
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()

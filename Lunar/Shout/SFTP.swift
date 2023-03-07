@@ -9,7 +9,7 @@ import Foundation
 // import CSSH
 
 /// Manages an SFTP session
-public class SFTP {
+final class SFTP {
     init(session: Session, cSession: OpaquePointer) throws {
         guard let sftpSession = libssh2_sftp_init(cSession) else {
             throw SSHError.mostRecentError(session: cSession, backupMessage: "libssh2_sftp_init failed")
@@ -217,7 +217,7 @@ public class SFTP {
     }
 
     /// Direct bindings to libssh2_sftp
-    private class SFTPHandle {
+    private final class SFTPHandle {
         init(
             cSession: OpaquePointer,
             sftpSession: OpaquePointer,

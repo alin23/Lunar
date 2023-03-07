@@ -50,9 +50,9 @@ import Cocoa
 
 // MARK: - LoginServiceKit
 
-public final class LoginServiceKit: NSObject {}
+final class LoginServiceKit: NSObject {}
 
-public extension LoginServiceKit {
+extension LoginServiceKit {
     static func isExistLoginItems(at path: String = Bundle.main.bundlePath) -> Bool {
         loginItem(at: path) != nil
     }

@@ -15,7 +15,7 @@ let POPOVER_PADDING: CGFloat = 50
 
 // MARK: - PopoverBackgroundView
 
-class PopoverBackgroundView: NSView {
+final class PopoverBackgroundView: NSView {
     override func draw(_ bounds: NSRect) {
         NSColor.clear.set()
         bounds.fill()
@@ -66,7 +66,7 @@ func fixPopoverWindow(_ window: NSWindow) {
 
 // MARK: - PopoverClearView
 
-class PopoverClearView: NSView {
+final class PopoverClearView: NSView {
     override func makeBackingLayer() -> CALayer {
         NoClippingLayer()
     }
@@ -157,7 +157,7 @@ func removePopoverBackground(view: NSView) {
 
 // MARK: - NoClippingLayer
 
-class NoClippingLayer: CALayer {
+final class NoClippingLayer: CALayer {
     override var masksToBounds: Bool {
         set {}
         get {
@@ -170,7 +170,7 @@ import SwiftUI
 
 // MARK: - HostingView
 
-class HostingView: NSHostingView<QuickActionsView> {
+final class HostingView: NSHostingView<QuickActionsView> {
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         removePopoverBackground(view: self)
@@ -234,7 +234,7 @@ extension VisualEffectBlur {
         }
     }
 
-    class Coordinator {
+    final class Coordinator {
         init() {
             visualEffectView.blendingMode = .withinWindow
         }

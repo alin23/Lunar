@@ -4,7 +4,7 @@ import Foundation
 
 // MARK: - UpdateCheckIntervalTransformer
 
-class UpdateCheckIntervalTransformer: ValueTransformer {
+final class UpdateCheckIntervalTransformer: ValueTransformer {
     static let WEEKLY = 604_800
     static let DAILY = 86400
     static let HOURLY = 3600
@@ -40,7 +40,7 @@ class UpdateCheckIntervalTransformer: ValueTransformer {
 
 // MARK: - IntBoolTransformer
 
-class IntBoolTransformer: ValueTransformer {
+final class IntBoolTransformer: ValueTransformer {
     override class func transformedValueClass() -> AnyClass {
         NSNumber.self
     }
@@ -72,7 +72,7 @@ public enum ColorScheme: Int, DefaultsSerializable {
 
 // MARK: - ColorSchemeTransformer
 
-class ColorSchemeTransformer: ValueTransformer {
+final class ColorSchemeTransformer: ValueTransformer {
     override class func transformedValueClass() -> AnyClass {
         NSNumber.self
     }
@@ -100,7 +100,7 @@ class ColorSchemeTransformer: ValueTransformer {
 
 // MARK: - SignedIntTransformer
 
-class SignedIntTransformer: ValueTransformer {
+final class SignedIntTransformer: ValueTransformer {
     override class func transformedValueClass() -> AnyClass {
         NSString.self
     }
@@ -122,7 +122,7 @@ class SignedIntTransformer: ValueTransformer {
 
 // MARK: - StringNumberTransformer
 
-class StringNumberTransformer: ValueTransformer {
+final class StringNumberTransformer: ValueTransformer {
     override class func transformedValueClass() -> AnyClass {
         NSString.self
     }

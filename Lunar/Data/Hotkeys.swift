@@ -127,7 +127,7 @@ extension String {
 
 // MARK: - PersistentHotkey
 
-class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringConvertible {
+final class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomStringConvertible {
     init(_ identifier: String, dict hk: [HotkeyPart: Int], handler: ((HotKey) -> Void)? = nil) {
         let keyCode = hk[.keyCode]!
         let enabled = hk[.enabled]!

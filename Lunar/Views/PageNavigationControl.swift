@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class PageNavigationControl: NSSegmentedControl {
+final class PageNavigationControl: NSSegmentedControl {
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()

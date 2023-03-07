@@ -11,7 +11,7 @@ import Foundation
 import Magnet
 import Regex
 
-class HotkeyButton: PopoverButton<HotkeyPopoverController> {
+final class HotkeyButton: PopoverButton<HotkeyPopoverController> {
     deinit {
         #if DEBUG
             log.verbose("START DEINIT")

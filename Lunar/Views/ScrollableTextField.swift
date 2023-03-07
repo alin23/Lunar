@@ -20,7 +20,7 @@ var scrollDeltaYThreshold: CGFloat = NORMAL_SCROLL_Y_THRESHOLD
 
 // MARK: - ScrollableTextField
 
-class ScrollableTextField: NSTextField, NSTextFieldDelegate {
+final class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()

@@ -9,7 +9,7 @@
 import Cocoa
 import SwiftyMarkdown
 
-class ModeChoiceViewController: NSViewController {
+final class ModeChoiceViewController: NSViewController {
     @IBOutlet var heading: NSTextField!
     @IBOutlet var subheading: NSTextField!
 

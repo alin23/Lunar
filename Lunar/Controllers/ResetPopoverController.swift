@@ -13,7 +13,7 @@ import Defaults
 
 // MARK: - ResetPopoverController
 
-class ResetPopoverController: NSViewController {
+final class ResetPopoverController: NSViewController {
     var displayObservers = [String: AnyCancellable]()
 
     @objc dynamic weak var display: Display?
@@ -26,7 +26,7 @@ class ResetPopoverController: NSViewController {
 
 // MARK: - ResetPopoverButton
 
-class ResetPopoverButton: PopoverButton<ResetPopoverController> {
+final class ResetPopoverButton: PopoverButton<ResetPopoverController> {
     weak var displayViewController: DisplayViewController? {
         didSet {
             popoverController?.displayViewController = displayViewController

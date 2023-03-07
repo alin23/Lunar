@@ -106,7 +106,7 @@ struct BrightnessSchedule: Codable, Defaults.Serializable, Comparable {
 // MARK: - Schedule
 
 // @IBDesignable
-class Schedule: NSView {
+final class Schedule: NSView {
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()

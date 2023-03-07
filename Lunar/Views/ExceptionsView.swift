@@ -9,7 +9,7 @@
 import Cocoa
 import Combine
 
-class ExceptionsView: NSTableView {
+final class ExceptionsView: NSTableView {
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
     }

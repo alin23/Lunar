@@ -10,7 +10,7 @@ import Cocoa
 import Defaults
 import Magnet
 
-class HotkeyViewController: NSViewController {
+final class HotkeyViewController: NSViewController {
     deinit {
         #if DEBUG
             log.verbose("START DEINIT")
