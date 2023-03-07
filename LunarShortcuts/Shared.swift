@@ -263,6 +263,7 @@ extension Defaults.Keys {
 
     #if arch(arm64)
         static let possiblyDisconnectedDisplays = Key<[Display]>("possiblyDisconnectedDisplays", default: [])
-        static let nitsMapping = Key<[String: [AutoLearnMapping]]>("nitsMapping", default: [:])
+        static let nitsBrightnessMapping = Key<[String: [AutoLearnMapping]]>("nitsBrightnessMapping", default: [:])
+        static let nitsContrastMapping = Key<[String: [AutoLearnMapping]]>("nitsContrastMapping", default: [:])
     #endif
 }

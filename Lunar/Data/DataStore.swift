@@ -25,7 +25,7 @@ extension Defaults.Keys {
 }
 
 #if arch(arm64)
-    let ARM_KEYS: [Defaults.Keys] = [.nitsMapping]
+    let ARM_KEYS: [Defaults.Keys] = [.nitsBrightnessMapping, .nitsContrastMapping]
 #else
     let ARM_KEYS: [Defaults.Keys] = []
 #endif
@@ -364,15 +364,15 @@ class DataStore: NSObject {
     static func firstRunAfterLunar6Upgrade() {
         thisIsFirstRunAfterLunar6Upgrade = true
 
-        if CachedDefaults[.adaptiveBrightnessMode] == .sync {
-            guard let displays = CachedDefaults[.displays] else { return }
-
-            displays.forEach { display in
-                display.lockedContrast = true
-            }
-            CachedDefaults[.displays] = displays
-            Defaults[.displays] = displays
-        }
+//        if CachedDefaults[.adaptiveBrightnessMode] == .sync {
+//            guard let displays = CachedDefaults[.displays] else { return }
+//
+//            displays.forEach { display in
+//                display.lockedContrast = true
+//            }
+//            CachedDefaults[.displays] = displays
+//            Defaults[.displays] = displays
+//        }
     }
 
     static func firstRunAfterDefaults5Upgrade() {
@@ -966,5 +966,6 @@ let updateChannelPublisher = pub(.updateChannel)
 let sensorHostnamePublisher = pub(.sensorHostname)
 
 #if arch(arm64)
-    let nitsMappingPublisher = pub(.nitsMapping)
+    let nitsBrightnessMappingPublisher = pub(.nitsBrightnessMapping)
+    let nitsContrastMappingPublisher = pub(.nitsContrastMapping)
 #endif

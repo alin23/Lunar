@@ -1022,7 +1022,7 @@ class ControlChoiceViewController: NSViewController {
             }
         }
 
-        OnboardPageController.task = asyncAfter(ms: 10, name: ONBOARDING_TASK_KEY) { [weak self] in
+        OnboardPageController.task = concurrentQueue.asyncAfter(ms: 10, name: ONBOARDING_TASK_KEY) { [weak self] in
             let displays = displayController.externalDisplaysForTest
             guard let self, !self.cancelled, !OnboardPageController.task.isCancelled, let firstDisplay = displays.first else {
                 return

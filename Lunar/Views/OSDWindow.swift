@@ -164,6 +164,7 @@ public struct BigSurSlider: View {
         disabled: Binding<Bool>? = nil,
         enableText: String? = nil,
         mark: Binding<Float>? = nil,
+        beforeSettingPercentage: ((Float) -> Void)? = nil,
         onSettingPercentage: ((Float) -> Void)? = nil
     ) {
         _knobColor = .constant(knobColor)
@@ -184,6 +185,7 @@ public struct BigSurSlider: View {
 
         _knobColor = knobColorBinding ?? colorBinding ?? .constant(knobColor ?? colors.accent)
         _knobTextColor = knobTextColorBinding ?? .constant(knobTextColor ?? ((color ?? Colors.peach).textColor))
+        self.beforeSettingPercentage = beforeSettingPercentage
         self.onSettingPercentage = onSettingPercentage
     }
 
@@ -270,12 +272,14 @@ public struct BigSurSlider: View {
                             }
                         }
 
+                        self.beforeSettingPercentage?(self.percentage)
                         self.percentage = cap(Float(value.location.x / geometry.size.width), minVal: 0, maxVal: 1)
                         self.onSettingPercentage?(self.percentage)
                     }
                     .onEnded { value in
                         guard acceptsMouseEvents, !disabled else { return }
                         draggingSliderSetter = nil
+                        self.beforeSettingPercentage?(self.percentage)
                         self.percentage = cap(Float(value.location.x / geometry.size.width), minVal: 0, maxVal: 1)
                         self.onSettingPercentage?(self.percentage)
                         env.draggingSlider = false
@@ -337,6 +341,7 @@ public struct BigSurSlider: View {
     @Binding var disabled: Bool
     @Binding var mark: Float
 
+    var beforeSettingPercentage: ((Float) -> Void)?
     var onSettingPercentage: ((Float) -> Void)?
 
     #if os(macOS)
@@ -372,6 +377,7 @@ public struct BigSurSlider: View {
                             env.draggingSlider = false
                         }
                     }
+                    self.beforeSettingPercentage?(self.percentage)
                     self.percentage = cap(self.percentage - (delta / 100), minVal: 0, maxVal: 1)
                     self.onSettingPercentage?(self.percentage)
                 }

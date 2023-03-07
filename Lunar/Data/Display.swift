@@ -1165,13 +1165,41 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     static let FILLED_CHICLET_OFFSET: Float = 1 / 16
     static let SUBZERO_FILLED_CHICLETS_THRESHOLDS: [Float] = (0 ... 16).map { FILLED_CHICLET_OFFSET * $0.f }
 
-    static var DEFAULT_USER_VALUE_DICT: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Double, Double>> {
+    static var DEFAULT_USER_BRIGHTNESS_DICT: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Double, Double>> {
         ThreadSafeDictionary(dict: [
-            .sync: ThreadSafeDictionary(dict: [0: 0]),
-            .location: ThreadSafeDictionary(dict: [0: 0]),
-            .sensor: ThreadSafeDictionary(dict: [0: 0]),
-            .clock: ThreadSafeDictionary(dict: [0: 0]),
-            .manual: ThreadSafeDictionary(dict: [0: 0]),
+            .sync: ThreadSafeDictionary(dict: [:]),
+            .location: ThreadSafeDictionary(dict: [-18: -20, 20: 100]),
+            .sensor: ThreadSafeDictionary(
+                dict: [
+                    0.0: 0.21,
+                    13.0: 0.31,
+                    23.0: 0.34,
+                    39.0: 0.39,
+                    71.0: 0.41,
+                    80.0: 0.44,
+                    100.0: 0.45,
+                    135.0: 0.47,
+                    160.0: 0.49,
+                    190.0: 0.54,
+                    224.0: 0.58,
+                    313.0: 0.69,
+                    565.0: 0.91,
+                    702.0: 0.99,
+                    800.0: 1.00,
+                ]
+
+            ),
+            .clock: ThreadSafeDictionary(dict: [:]),
+            .manual: ThreadSafeDictionary(dict: [:]),
+        ])
+    }
+    static var DEFAULT_USER_CONTRAST_DICT: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Double, Double>> {
+        ThreadSafeDictionary(dict: [
+            .sync: ThreadSafeDictionary(dict: [:]),
+            .location: ThreadSafeDictionary(dict: [-18: 0, 20: 100]),
+            .sensor: ThreadSafeDictionary(dict: [0: 20]),
+            .clock: ThreadSafeDictionary(dict: [:]),
+            .manual: ThreadSafeDictionary(dict: [:]),
         ])
     }
 
@@ -1227,8 +1255,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc dynamic var sentInputCondition = NSCondition()
     @objc dynamic var sentVolumeCondition = NSCondition()
 
-    var userBrightness: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Double, Double>> = DEFAULT_USER_VALUE_DICT
-    var userContrast: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Double, Double>> = DEFAULT_USER_VALUE_DICT
+    var userBrightness: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Double, Double>> = DEFAULT_USER_BRIGHTNESS_DICT
+    var userContrast: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Double, Double>> = DEFAULT_USER_CONTRAST_DICT
 
     var redMin: CGGammaValue = 0.0
     var redMax: CGGammaValue = 1.0
@@ -1742,9 +1770,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
         var ioObserver: IOServicePropertyObserver?
 
-        @Published var lux: Double? = nil {
-            didSet {}
-        }
+        @Published var contrastEnhancer: Double? = nil
+        @Published var lux: Double? = nil
 
         @Published @objc var minNits: Double = 0 {
             didSet {
@@ -1756,8 +1783,21 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
                 if minNits != oldValue, !isActiveSyncSource {
                     displayController.brightnessSplines = displayController.computeBrightnessSplines()
+                    displayController.contrastSplines = displayController.computeContrastSplines()
+                    recomputeNitsMapping()
                 }
                 save()
+            }
+        }
+        func recomputeNitsMapping() {
+            nitsToPercentageMapping = Self.LUX_TO_NITS.sorted(by: { $0.key < $1.key }).dict { k, v in
+                (k, nitsToPercentage(v, minNits: minNits, maxNits: userMaxNits ?? maxNits) * 100)
+            }
+        }
+        lazy var userMaxNits: Double? = getUserMaxNits() {
+            didSet {
+                debug("\(name) Max Nits: \((userMaxNits ?? maxNits).str(decimals: 2))")
+                recomputeNitsMapping()
             }
         }
         @Published @objc var maxNits: Double = 500 {
@@ -1770,13 +1810,690 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
                 if maxNits != oldValue, !isActiveSyncSource {
                     displayController.brightnessSplines = displayController.computeBrightnessSplines()
+                    displayController.contrastSplines = displayController.computeContrastSplines()
+                    recomputeNitsMapping()
                 }
                 save()
             }
         }
 
         @Published var nits: Double? = nil
+        lazy var nitsToPercentageMapping: [Double: Double] = Self.LUX_TO_NITS.sorted(by: { $0.key < $1.key }).dict { k, v in
+            (k, nitsToPercentage(v, minNits: minNits, maxNits: userMaxNits ?? maxNits) * 100)
+        }
     #endif
+
+    lazy var hdrOn: Bool = potentialEDR > 2 && edr > 1 {
+        didSet {
+            log.debug("\(name) HDR: \(hdrOn)")
+        }
+    }
+
+    var brightnessRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+    var contrastRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+    var volumeRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+    var inputRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+    var colorRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+
+    var gammaSetterTask: DispatchWorkItem? {
+        didSet { oldValue?.cancel() }
+    }
+
+    static func ambientLightCompensationEnabled(_ id: CGDirectDisplayID) -> Bool {
+        guard DisplayServicesHasAmbientLightCompensation(id) else { return false }
+
+        var enabled = false
+        DisplayServicesAmbientLightCompensationEnabled(id, &enabled)
+        return enabled
+    }
+
+    static func isObservingBrightnessChangeDS(_ id: CGDirectDisplayID) -> Bool {
+        mainThread { Thread.current.threadDictionary["observingBrightnessChangeDS-\(id)"] as? Bool } ?? false
+    }
+
+    static func observeBrightnessChangeDS(_ id: CGDirectDisplayID) -> Bool {
+        guard DisplayServicesCanChangeBrightness(id), !isObservingBrightnessChangeDS(id), !CachedDefaults[.disableBrightnessObservers] else { return true }
+
+        let result = DisplayServicesRegisterForBrightnessChangeNotifications(id, id) { _, observer, _, _, userInfo in
+            guard !displayController.screensSleeping, !AppleNativeControl.sliderTracking else {
+                return
+            }
+
+            OperationQueue.main.addOperation {
+                guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let observer else {
+                    return
+                }
+
+                let id = CGDirectDisplayID(UInt(bitPattern: observer))
+                guard let display = displayController.activeDisplays[id], !display.inSmoothTransition else {
+                    return
+                }
+
+                let newBrightness = (value * 100).u16
+                guard display.brightnessU16 != newBrightness else {
+                    return
+                }
+
+                log.verbose("newBrightness: \(newBrightness) display.isUserAdjusting: \(display.isUserAdjusting())")
+                display.withoutDisplayServices {
+                    display.brightness = newBrightness.ns
+                }
+                if display.subzero, newBrightness > 0 {
+                    display.withoutApply {
+                        display.subzero = false
+                        if display.adaptivePaused { display.adaptivePaused = false }
+                    }
+                    if display.softwareBrightness != 1 { display.softwareBrightness = 1 }
+                }
+            }
+        }
+        mainThread { Thread.current.threadDictionary["observingBrightnessChangeDS-\(id)"] = (result == KERN_SUCCESS) }
+
+        return result == KERN_SUCCESS
+    }
+
+    static func getThreadDictValue(_ id: CGDirectDisplayID, type: String) -> Any? {
+        windowControllerQueue.sync { Thread.current.threadDictionary["\(type)-\(id)"] }
+    }
+
+    static func setThreadDictValue(_ id: CGDirectDisplayID, type: String, value: Any?) {
+        windowControllerQueue.sync { Thread.current.threadDictionary["\(type)-\(id)"] = value }
+    }
+
+    static func getWindowController(_ id: CGDirectDisplayID, type: String) -> NSWindowController? {
+        windowControllerQueue.sync { Thread.current.threadDictionary["window-\(type)-\(id)"] as? NSWindowController }
+    }
+
+    static func setWindowController(_ id: CGDirectDisplayID, type: String, windowController: NSWindowController?) {
+        windowControllerQueue.sync { Thread.current.threadDictionary["window-\(type)-\(id)"] = windowController }
+    }
+
+    static func printableName(_ id: CGDirectDisplayID) -> String {
+        #if DEBUG
+            switch id {
+            case TEST_DISPLAY_ID:
+                return "LG Ultra HD"
+            case TEST_DISPLAY_PERSISTENT_ID:
+                return "DELL U3419W"
+            case TEST_DISPLAY_PERSISTENT2_ID:
+                return "LG Ultrafine"
+            case TEST_DISPLAY_PERSISTENT3_ID:
+                return "Pro Display XDR"
+            case TEST_DISPLAY_PERSISTENT4_ID:
+                return "Thunderbolt"
+            default:
+                break
+            }
+        #endif
+
+        if DDC.isBuiltinDisplay(id, checkName: false) {
+            return "Built-in"
+        }
+
+        if DDC.isSidecarDisplay(id, checkName: false) {
+            return "Sidecar"
+        }
+
+        if let screen = NSScreen.forDisplayID(id) {
+            return screen.localizedName
+        }
+
+        if let infoDict = displayInfoDictionary(id), let names = infoDict["DisplayProductName"] as? [String: String],
+           let name = names[Locale.current.identifier] ?? names["en_US"] ?? names.first?.value
+        {
+            return name
+        }
+
+        return "Unknown"
+    }
+
+    static func uuid(id: CGDirectDisplayID) -> String {
+        #if DEBUG
+            switch id {
+            case TEST_DISPLAY_ID:
+                return "TEST_DISPLAY_SERIAL"
+            case TEST_DISPLAY_PERSISTENT_ID:
+                return "TEST_DISPLAY_PERSISTENT_SERIAL"
+            case TEST_DISPLAY_PERSISTENT2_ID:
+                return "TEST_DISPLAY_PERSISTENT2_SERIAL"
+            case TEST_DISPLAY_PERSISTENT3_ID:
+                return "TEST_DISPLAY_PERSISTENT3_SERIAL"
+            case TEST_DISPLAY_PERSISTENT4_ID:
+                return "TEST_DISPLAY_PERSISTENT4_SERIAL"
+            default:
+                break
+            }
+        #endif
+
+        if let uuid = CGDisplayCreateUUIDFromDisplayID(id) {
+            let uuidValue = uuid.takeRetainedValue()
+            let uuidString = CFUUIDCreateString(kCFAllocatorDefault, uuidValue) as String
+            return uuidString
+        }
+        if let edid = Display.edid(id: id) {
+            return edid
+        }
+        return String(describing: id)
+    }
+
+    static func edid(id: CGDirectDisplayID) -> String? {
+        DDC.getEdidData(displayID: id)?.map { $0 }.str(hex: true)
+    }
+
+    static func insertDataPoint(
+        values: inout ThreadSafeDictionary<Double, Double>,
+        featureValue: Double,
+        targetValue: Double,
+        logValue: Bool = true
+    ) {
+        guard displayController.adaptiveModeKey != .manual else {
+            return
+        }
+
+        let featureValue = featureValue.rounded(to: 4)
+        for (x, y) in values.dictionary {
+            if (x < featureValue && y >= targetValue) || (x > featureValue && y <= targetValue) {
+                if logValue {
+                    log.debug("Removing data point \(x) => \(y)")
+                }
+                values.removeValue(forKey: x)
+            }
+        }
+        if logValue {
+            log.debug("Adding data point \(featureValue) => \(targetValue)")
+        }
+        values[featureValue] = targetValue
+    }
+
+    static func getSecondaryMirrorScreenID(_ id: CGDirectDisplayID) -> CGDirectDisplayID? {
+        guard displayIsInMirrorSet(id),
+              let secondaryID = NSScreen.onlineDisplayIDs.first(where: { CGDisplayMirrorsDisplay($0) == id })
+        else { return nil }
+        return secondaryID
+    }
+
+    static func getPrimaryMirrorScreen(_ id: CGDirectDisplayID) -> NSScreen? {
+        guard displayIsInMirrorSet(id),
+              let primaryID = NSScreen.onlineDisplayIDs.first(where: { CGDisplayMirrorsDisplay(id) == $0 })
+        else { return nil }
+        return NSScreen.screens.first(where: { screen in screen.hasDisplayID(primaryID) })
+    }
+
+    static func sliderValueToGammaValue(_ value: Double) -> Double {
+        if value == 0.5 {
+            return 1.0
+        }
+        if value > 0.5 {
+            return mapNumber(value, fromLow: 0.5, fromHigh: 1.0, toLow: 1.0, toHigh: 0.0)
+        }
+
+        return mapNumber(value, fromLow: 0.0, fromHigh: 0.5, toLow: 3.0, toHigh: 1.0)
+    }
+
+    static func gammaValueToSliderValue(_ value: Double) -> Double {
+        if value == 1.0 {
+            return 0.5
+        }
+        if value < 1.0 {
+            return mapNumber(value, fromLow: 0.0, fromHigh: 1.0, toLow: 1.0, toHigh: 0.5)
+        }
+
+        return mapNumber(value, fromLow: 1.0, fromHigh: 3.0, toLow: 0.5, toHigh: 0.0)
+    }
+
+    static func reconfigure(tries: Int = 20, _ action: (MPDisplayMgr) -> Void) {
+        guard let manager = DisplayController.panelManager, DisplayController.tryLockManager(tries: tries) else {
+            return
+        }
+
+        manager.notifyWillReconfigure()
+        action(manager)
+        manager.notifyReconfigure()
+        manager.unlockAccess()
+    }
+
+    static func reconfigure(panel: MPDisplay, tries: Int = 20, _ action: (MPDisplay) -> Void) {
+        guard let manager = DisplayController.panelManager, DisplayController.tryLockManager(tries: tries) else {
+            return
+        }
+
+        manager.notifyWillReconfigure()
+        action(panel)
+        manager.notifyReconfigure()
+        manager.unlockAccess()
+    }
+
+    func resetSendingValues() {
+        mainAsync { [weak self] in
+            self?.sendingBrightness = false
+            self?.sendingContrast = false
+            self?.sendingInput = false
+            self?.sendingVolume = false
+        }
+    }
+
+    func refetchScreens() {
+        nsScreen = getScreen()
+    }
+
+    func getPowerOffEnabled(hasDDC: Bool? = nil) -> Bool {
+        guard active else { return false }
+        if blackOutEnabled { return true }
+
+        return (
+            displayController.activeDisplays.count > 1 ||
+                CachedDefaults[.allowBlackOutOnSingleScreen] ||
+                (hasDDC ?? self.hasDDC)
+        ) && !isDummy
+    }
+
+    func getPowerOffTooltip(hasDDC: Bool? = nil) -> String {
+        guard !(hasDDC ?? self.hasDDC) else {
+            return """
+            BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0.
+
+            Can also be toggled with the keyboard using Ctrl-Cmd-6.
+
+            Hold the following keys while clicking the button (or while pressing the hotkey) to change BlackOut behaviour:
+            - Shift: make the screen black without mirroring
+            - Option: turn off monitor completely using DDC
+            - Option and Shift: BlackOut other monitors and keep this one visible
+
+            Caveats for DDC power off:
+              • works only if the monitor can be controlled through DDC
+              • can't be used to power on the monitor
+              • when a monitor is turned off or in standby, it does not accept commands from a connected device
+              • remember to keep holding the Option key for 2 seconds after you pressed the button to account for possible DDC delays
+
+            Emergency Kill Switch: press the ⌘ Command key more than 8 times in a row to force disable BlackOut.
+            """
+        }
+        guard displayController.activeDisplays.count > 1 || CachedDefaults[.allowBlackOutOnSingleScreen] else {
+            return """
+            At least 2 screens need to be visible for this to work.
+
+            The option can also be enabled for a single screen in Advanced settings.
+            """
+        }
+
+        return """
+        BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0.
+
+        Can also be toggled with the keyboard using Ctrl-Cmd-6.
+
+        Hold the following keys while clicking the button (or while pressing the hotkey) to change BlackOut behaviour:
+        - Shift: make the screen black without mirroring
+        - Option and Shift: BlackOut other monitors and keep this one visible
+
+        Emergency Kill Switch: press the ⌘ Command key more than 8 times in a row to force disable BlackOut.
+        """
+    }
+
+    func powerOff() {
+        guard displayController.activeDisplays.count > 1 || CachedDefaults[.allowBlackOutOnSingleScreen] else { return }
+
+        if hasDDC, AppDelegate.optionKeyPressed, !AppDelegate.shiftKeyPressed {
+            _ = control?.setPower(.off)
+            return
+        }
+
+        guard lunarProOnTrial || lunarProActive else {
+            if let url = URL(string: "https://lunar.fyi/#blackout") {
+                NSWorkspace.shared.open(url)
+            }
+            return
+        }
+
+        if AppDelegate.optionKeyPressed, AppDelegate.shiftKeyPressed {
+            let blackOutEnabled = otherDisplays.contains(where: \.blackOutEnabled)
+            otherDisplays.forEach {
+                lastBlackOutToggleDate = .distantPast
+                displayController.blackOut(
+                    display: $0.id,
+                    state: blackOutEnabled ? .off : .on,
+                    mirroringAllowed: false
+                )
+            }
+            return
+        }
+
+        #if arch(arm64)
+            if #available(macOS 13, *), CachedDefaults[.newBlackOutDisconnect], !AppDelegate.commandKeyPressed, !AppDelegate.shiftKeyPressed, !blackOutEnabled {
+                displayController.dis(id)
+                return
+            }
+        #endif
+
+        displayController.blackOut(
+            display: id,
+            state: blackOutEnabled ? .off : .on,
+            mirroringAllowed: !AppDelegate.shiftKeyPressed && blackOutMirroringAllowed
+        )
+    }
+
+    func setAudioIdentifier(from dict: NSDictionary) {
+        #if !arch(arm64)
+            guard let prefsKey = dict["IODisplayPrefsKey"] as? String,
+                  let match = AUDIO_IDENTIFIER_UUID_PATTERN.findFirst(in: prefsKey),
+                  let g1 = match.group(at: 1), let g2 = match.group(at: 2), let g3 = match.group(at: 3)
+            else { return }
+            audioIdentifier = "\(g2)\(g1)-\(g3)".uppercased()
+        #endif
+    }
+
+    func initHotkeyPopoverController() -> HotkeyPopoverController? {
+        mainThread {
+            guard let popover = _hotkeyPopover else {
+                _hotkeyPopover = NSPopover()
+                if let popover = _hotkeyPopover, popover.contentViewController == nil, let stb = NSStoryboard.main,
+                   let controller = stb.instantiateController(
+                       withIdentifier: NSStoryboard.SceneIdentifier("HotkeyPopoverController")
+                   ) as? HotkeyPopoverController
+                {
+                    INPUT_HOTKEY_POPOVERS[serial] = _hotkeyPopover
+                    popover.contentViewController = controller
+                    popover.contentViewController!.loadView()
+                }
+
+                return _hotkeyPopover?.contentViewController as? HotkeyPopoverController
+            }
+            return popover.contentViewController as? HotkeyPopoverController
+        }
+    }
+
+    #if DEBUG
+        @Published @objc dynamic var showOrientation = false
+    #else
+        @Published @objc dynamic var showOrientation = false
+    #endif
+
+    enum ConnectionType: String, DefaultsSerializable, Codable {
+        case displayport
+        case usbc
+        case dvi
+        case hdmi
+        case vga
+        case mipi
+        case unknown
+
+        static func fromTransport(_ transport: Transport?) -> ConnectionType? {
+            guard let transport else {
+                return nil
+            }
+
+            switch transport.downstream {
+            case "HDMI":
+                return .hdmi
+            case "DVI":
+                return .dvi
+            case "DP":
+                return .displayport
+            case "VGA":
+                return .vga
+            case "MIPI":
+                return .mipi
+            default:
+                return nil
+            }
+        }
+
+        static func fromTransportType(_ transportType: Int) -> ConnectionType? {
+            switch transportType {
+            case 0:
+                return .displayport
+            case 1:
+                return .usbc
+            case 2:
+                return .dvi
+            case 3:
+                return .hdmi
+            case 4:
+                return .mipi
+            case 5:
+                return .vga
+            default:
+                return nil
+            }
+        }
+    }
+
+    static var ddcWorkingCount: [String: Int] = [:]
+    static var ddcNotWorkingCount: [String: Int] = [:]
+
+    @Published @objc dynamic var showVolumeSlider = false
+    lazy var preciseBrightnessKey = "setPreciseBrightness-\(serial)"
+    lazy var preciseContrastKey = "setPreciseContrast-\(serial)"
+
+    @Atomic var initialised = false
+
+    var preciseContrastBeforeAppPreset = 0.5
+
+    @objc dynamic lazy var isDummy: Bool = (
+        (Self.dummyNamePattern.matches(name) || vendor == .dummy)
+            && vendor != .samsung
+            && !Self.notDummyNamePattern.matches(name)
+    )
+    @objc dynamic lazy var isFakeDummy: Bool = (Self.notDummyNamePattern.matches(name) && vendor == .dummy)
+
+    @objc dynamic lazy var otherDisplays: [Display] = displayController.activeDisplayList.filter { $0.serial != serial }
+
+    @Atomic var userAdjusting = false {
+        didSet {
+            mainAsync { [weak self] in
+                if let self, !self.isUserAdjusting(), let onFinishedUserAdjusting = Self.onFinishedUserAdjusting {
+                    Self.onFinishedUserAdjusting = nil
+                    onFinishedUserAdjusting()
+                }
+            }
+        }
+    }
+
+    @objc dynamic var isTV: Bool {
+        (panel?.isTV ?? false) && edidName.contains("TV")
+    }
+
+    @discardableResult
+    static func configure(_ action: (CGDisplayConfigRef) -> Bool) -> Bool {
+        var configRef: CGDisplayConfigRef?
+        var err = CGBeginDisplayConfiguration(&configRef)
+        guard err == .success, let config = configRef else {
+            log.error("Error with CGBeginDisplayConfiguration: \(err)")
+            return false
+        }
+
+        guard action(config) else {
+            _ = CGCancelDisplayConfiguration(config)
+            return false
+        }
+
+        err = CGCompleteDisplayConfiguration(config, .permanently)
+        guard err == .success else {
+            log.error("Error with CGCompleteDisplayConfiguration")
+            _ = CGCancelDisplayConfiguration(config)
+            return false
+        }
+
+        return true
+    }
+
+    func setNotchState() {
+        mainAsync {
+            if #available(macOS 12.0, *), self.isMacBook {
+                self.hasNotch = (self.nsScreen?.safeAreaInsets.top ?? 0) > 0 || self.panelMode?.withNotch(modes: self.panelModes) != nil
+            } else {
+                self.hasNotch = false
+            }
+
+            guard self.isMacBook, self.hasNotch, let mode = self.panelMode else { return }
+
+            self.withoutApply {
+                self.notchEnabled = mode.withoutNotch(modes: self.panelModes) != nil
+            }
+        }
+    }
+
+    func observeBrightnessChangeDS() -> Bool {
+        Self.observeBrightnessChangeDS(id)
+    }
+
+    func sliderValueToBrightness(_ brightness: PreciseBrightness) -> NSNumber {
+        (mapNumber(
+            cap(brightness, minVal: 0.0, maxVal: 1.0),
+            fromLow: 0.0,
+            fromHigh: 1.0,
+            toLow: minBrightness.doubleValue / 100.0,
+            toHigh: maxBrightness.doubleValue / 100.0
+        ) * 100).intround.ns
+    }
+
+    func sliderValueToContrast(_ contrast: PreciseContrast) -> NSNumber {
+        (mapNumber(
+            cap(contrast, minVal: 0.0, maxVal: 1.0),
+            fromLow: 0.0,
+            fromHigh: 1.0,
+            toLow: minContrast.doubleValue / 100.0,
+            toHigh: maxContrast.doubleValue / 100.0
+        ) * 100).intround.ns
+    }
+
+    func brightnessToSliderValue(_ brightness: NSNumber) -> PreciseBrightness {
+        mapNumber(
+            cap(brightness.doubleValue, minVal: 0, maxVal: 100),
+            fromLow: minBrightness.doubleValue,
+            fromHigh: maxBrightness.doubleValue,
+            toLow: 0,
+            toHigh: 100
+        ) / 100.0
+    }
+
+    func contrastToSliderValue(_ contrast: NSNumber, merged: Bool = true) -> PreciseContrast {
+        let c = mapNumber(
+            cap(contrast.doubleValue, minVal: 0, maxVal: 100),
+            fromLow: minContrast.doubleValue,
+            fromHigh: maxContrast.doubleValue,
+            toLow: 0,
+            toHigh: 100
+        ) / 100.0
+
+        return merged ? pow(c, 2) : c
+    }
+
+    func sliderValueToBrightnessContrast(_ value: Double) -> (Brightness, Contrast) {
+        var brightness = brightness.uint16Value
+        var contrast = contrast.uint16Value
+
+        if !lockedBrightness || hasSoftwareControl {
+            brightness = (mapNumber(
+                cap(value, minVal: 0.0, maxVal: 1.0),
+                fromLow: 0.0,
+                fromHigh: 1.0,
+                toLow: minBrightness.doubleValue / 100.0,
+                toHigh: maxBrightness.doubleValue / 100.0
+            ) * 100).intround.u16
+        }
+        if !lockedContrast {
+            contrast = (mapNumber(
+                pow(cap(value, minVal: 0.0, maxVal: 1.0), 0.5),
+                fromLow: 0.0,
+                fromHigh: 1.0,
+                toLow: minContrast.doubleValue / 100.0,
+                toHigh: maxContrast.doubleValue / 100.0
+            ) * 100).intround.u16
+        }
+
+        return (brightness, contrast)
+    }
+
+    func updateCornerWindow() {
+        mainThread {
+            guard cornerRadius.intValue > 0, active, !isInHardwareMirrorSet,
+                  !isIndependentDummy, let screen = nsScreen ?? primaryMirrorScreen
+            else {
+                cornerWindowControllerTopLeft?.close()
+                cornerWindowControllerTopRight?.close()
+                cornerWindowControllerBottomLeft?.close()
+                cornerWindowControllerBottomRight?.close()
+                cornerWindowControllerTopLeft = nil
+                cornerWindowControllerTopRight = nil
+                cornerWindowControllerBottomLeft = nil
+                cornerWindowControllerBottomRight = nil
+                return
+            }
+
+            let create: (inout NSWindowController?, ScreenCorner) -> Void = { wc, corner in
+                createWindow(
+                    "cornerWindowController",
+                    controller: &wc,
+                    screen: screen,
+                    show: true,
+                    backgroundColor: .clear,
+                    level: .hud,
+                    stationary: true,
+                    corner: corner,
+                    size: NSSize(width: 50, height: 50)
+                )
+                if let wc = wc as? CornerWindowController {
+                    wc.corner = corner
+                    wc.display = self
+                }
+            }
+
+            create(&cornerWindowControllerTopLeft, .topLeft)
+            create(&cornerWindowControllerTopRight, .topRight)
+            create(&cornerWindowControllerBottomLeft, .bottomLeft)
+            create(&cornerWindowControllerBottomRight, .bottomRight)
+        }
+    }
+
+    #if arch(arm64)
+        var disconnected: Bool { displayController.possiblyDisconnectedDisplays[id]?.serial == serial }
+    #endif
+
+    static let LUX_TO_NITS: [Double: Double] = [
+        0: 40,
+        13: 54,
+        23: 61,
+        39: 76,
+        71: 87,
+        80: 100,
+        100: 105,
+        135: 120,
+        160: 134,
+        190: 147,
+        224: 160,
+        313: 193,
+        565: 289,
+        702: 340,
+        800: 400,
+        1000: 500,
+    ]
+
+    lazy var syncSourcePriority: Int = {
+        if isBuiltin {
+            return 1
+        }
+        if panel?.isAppleProDisplay ?? false {
+            return 2
+        }
+        if isProDisplayXDR() {
+            return 3
+        }
+        if isStudioDisplay() {
+            return 4
+        }
+        if isUltraFine() {
+            return 5
+        }
+        if isThunderbolt() {
+            return 6
+        }
+        if isLEDCinema() {
+            return 7
+        }
+        return 100
+    }()
+
+    @Published var percentage: Double? = 0.5
 
     var isActiveSyncSource: Bool {
         SyncMode.sourceDisplay?.serial == serial
@@ -1911,10 +2628,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         get { min(softwareBrightness, 1.0) }
         set { softwareBrightness = cap(newValue, minVal: 0.0, maxVal: 1.0) }
     }
-    @objc dynamic var softwareBrightnessSlider: Float {
-        get { softwareBrightness }
-        set {
-            softwareBrightness = newValue
+    @objc dynamic lazy var softwareBrightnessSlider: Float = softwareBrightness {
+        didSet {
+            guard apply else { return }
+            forceHideSoftwareOSD = true
+            softwareBrightness = softwareBrightnessSlider
 
             guard adaptiveSubzero else { return }
 
@@ -1926,14 +2644,17 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         didSet {
             lastSoftwareBrightness = oldValue
             guard apply else { return }
-            log.info("Software brightness for \(self) (old: \(lastSoftwareBrightness): \(softwareBrightness))")
+            // log.info("\(name) OLD SOFT BRIGHTNESS: \(oldValue)")
+            log.info("\(name) SOFT BRIGHTNESS: \(softwareBrightness.str(decimals: 2))")
 
             let br = softwareBrightness
             mainAsync {
                 self.withoutApply {
-                    self
-                        .subzero = br < 1.0 ||
-                        (br == 1.0 && !self.hasSoftwareControl && self.brightness.uint16Value == self.minBrightness.uint16Value)
+                    self.softwareBrightnessSlider = br
+                    self.subzero = br < 1.0 || (
+                        br == 1.0 && !self.hasSoftwareControl &&
+                            self.brightness.uint16Value == self.minBrightness.uint16Value
+                    )
                     guard br > 1 else {
                         self.xdrBrightness = 0.0
                         return
@@ -1989,7 +2710,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
             if !newValue, isBuiltin {
                 log.warning("Disabling system adaptive brightness")
-                if Logger.trace {
+                if SwiftyLogger.trace {
                     Thread.callStackSymbols.forEach {
                         log.info($0)
                     }
@@ -2114,6 +2835,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             withoutApply {
                 useOverlay = dimmingMode == .overlay
+            }
+            if softwareBrightness < 1 {
+                setIndependentSoftwareBrightness(softwareBrightness)
             }
         }
     }
@@ -2815,6 +3539,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var preciseBrightness = 0.5 {
         didSet {
+            percentage = preciseBrightness
             guard applyPreciseValue, initialised else { return }
 
             if subzero, preciseBrightnessContrast > 0 {
@@ -3015,8 +3740,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 ).rounded().u16
             }
 
-            log.info("Set BRIGHTNESS to \(brightness) for \(description) (old: \(oldBrightness))", context: context)
-            if Logger.trace { log.traceCalls() }
+            // log.info("\(name) OLD BRIGHTNESS: \(oldBrightness)")
+            log.info("\(name) BRIGHTNESS: \(brightness)")
+            if SwiftyLogger.trace { log.traceCalls() }
 
             if let control = control as? DDCControl {
                 _ = control.setBrightnessDebounced(brightness, oldValue: oldBrightness, transition: brightnessTransition)
@@ -3097,8 +3823,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 ).rounded().u16
             }
 
-            log.info("Set CONTRAST to \(contrast) for \(description) (old: \(oldContrast))", context: context)
-            if Logger.trace { log.traceCalls() }
+            // log.info("\(name) OLD CONTRAST: \(oldContrast)")
+            log.info("\(name) CONTRAST: \(contrast)")
+            if SwiftyLogger.trace { log.traceCalls() }
 
             if let control = control as? DDCControl {
                 _ = control.setContrastDebounced(contrast, oldValue: oldContrast, transition: brightnessTransition)
@@ -3502,644 +4229,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var potentialEDR: CGFloat { nsScreen?.maximumPotentialExtendedDynamicRangeColorComponentValue ?? 1.0 }
     var edr: CGFloat { NSScreen.forDisplayID(id)?.maximumExtendedDynamicRangeColorComponentValue ?? 1.0 }
 
-    var brightnessRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
-    var contrastRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
-    var volumeRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
-    var inputRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
-    var colorRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
-
-    var gammaSetterTask: DispatchWorkItem? {
-        didSet { oldValue?.cancel() }
-    }
-
-    static func ambientLightCompensationEnabled(_ id: CGDirectDisplayID) -> Bool {
-        guard DisplayServicesHasAmbientLightCompensation(id) else { return false }
-
-        var enabled = false
-        DisplayServicesAmbientLightCompensationEnabled(id, &enabled)
-        return enabled
-    }
-
-    static func isObservingBrightnessChangeDS(_ id: CGDirectDisplayID) -> Bool {
-        mainThread { Thread.current.threadDictionary["observingBrightnessChangeDS-\(id)"] as? Bool } ?? false
-    }
-
-    static func observeBrightnessChangeDS(_ id: CGDirectDisplayID) -> Bool {
-        guard DisplayServicesCanChangeBrightness(id), !isObservingBrightnessChangeDS(id), !CachedDefaults[.disableBrightnessObservers] else { return true }
-
-        let result = DisplayServicesRegisterForBrightnessChangeNotifications(id, id) { _, observer, _, _, userInfo in
-            guard !displayController.screensSleeping, !AppleNativeControl.sliderTracking else {
-                return
-            }
-
-            OperationQueue.main.addOperation {
-                guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let observer else {
-                    return
-                }
-
-                let id = CGDirectDisplayID(UInt(bitPattern: observer))
-                guard let display = displayController.activeDisplays[id], !display.inSmoothTransition else {
-                    return
-                }
-
-                let newBrightness = (value * 100).u16
-                guard display.brightnessU16 != newBrightness else {
-                    return
-                }
-
-                log.verbose("newBrightness: \(newBrightness) display.isUserAdjusting: \(display.isUserAdjusting())")
-                display.withoutDisplayServices {
-                    display.brightness = newBrightness.ns
-                }
-            }
-        }
-        mainThread { Thread.current.threadDictionary["observingBrightnessChangeDS-\(id)"] = (result == KERN_SUCCESS) }
-
-        return result == KERN_SUCCESS
-    }
-
-    static func getThreadDictValue(_ id: CGDirectDisplayID, type: String) -> Any? {
-        windowControllerQueue.sync { Thread.current.threadDictionary["\(type)-\(id)"] }
-    }
-
-    static func setThreadDictValue(_ id: CGDirectDisplayID, type: String, value: Any?) {
-        windowControllerQueue.sync { Thread.current.threadDictionary["\(type)-\(id)"] = value }
-    }
-
-    static func getWindowController(_ id: CGDirectDisplayID, type: String) -> NSWindowController? {
-        windowControllerQueue.sync { Thread.current.threadDictionary["window-\(type)-\(id)"] as? NSWindowController }
-    }
-
-    static func setWindowController(_ id: CGDirectDisplayID, type: String, windowController: NSWindowController?) {
-        windowControllerQueue.sync { Thread.current.threadDictionary["window-\(type)-\(id)"] = windowController }
-    }
-
-    static func printableName(_ id: CGDirectDisplayID) -> String {
-        #if DEBUG
-            switch id {
-            case TEST_DISPLAY_ID:
-                return "LG Ultra HD"
-            case TEST_DISPLAY_PERSISTENT_ID:
-                return "DELL U3419W"
-            case TEST_DISPLAY_PERSISTENT2_ID:
-                return "LG Ultrafine"
-            case TEST_DISPLAY_PERSISTENT3_ID:
-                return "Pro Display XDR"
-            case TEST_DISPLAY_PERSISTENT4_ID:
-                return "Thunderbolt"
-            default:
-                break
-            }
-        #endif
-
-        if DDC.isBuiltinDisplay(id, checkName: false) {
-            return "Built-in"
-        }
-
-        if DDC.isSidecarDisplay(id, checkName: false) {
-            return "Sidecar"
-        }
-
-        if let screen = NSScreen.forDisplayID(id) {
-            return screen.localizedName
-        }
-
-        if let infoDict = displayInfoDictionary(id), let names = infoDict["DisplayProductName"] as? [String: String],
-           let name = names[Locale.current.identifier] ?? names["en_US"] ?? names.first?.value
-        {
-            return name
-        }
-
-        return "Unknown"
-    }
-
-    static func uuid(id: CGDirectDisplayID) -> String {
-        #if DEBUG
-            switch id {
-            case TEST_DISPLAY_ID:
-                return "TEST_DISPLAY_SERIAL"
-            case TEST_DISPLAY_PERSISTENT_ID:
-                return "TEST_DISPLAY_PERSISTENT_SERIAL"
-            case TEST_DISPLAY_PERSISTENT2_ID:
-                return "TEST_DISPLAY_PERSISTENT2_SERIAL"
-            case TEST_DISPLAY_PERSISTENT3_ID:
-                return "TEST_DISPLAY_PERSISTENT3_SERIAL"
-            case TEST_DISPLAY_PERSISTENT4_ID:
-                return "TEST_DISPLAY_PERSISTENT4_SERIAL"
-            default:
-                break
-            }
-        #endif
-
-        if let uuid = CGDisplayCreateUUIDFromDisplayID(id) {
-            let uuidValue = uuid.takeRetainedValue()
-            let uuidString = CFUUIDCreateString(kCFAllocatorDefault, uuidValue) as String
-            return uuidString
-        }
-        if let edid = Display.edid(id: id) {
-            return edid
-        }
-        return String(describing: id)
-    }
-
-    static func edid(id: CGDirectDisplayID) -> String? {
-        DDC.getEdidData(displayID: id)?.map { $0 }.str(hex: true)
-    }
-
-    static func insertDataPoint(
-        values: inout ThreadSafeDictionary<Double, Double>,
-        featureValue: Double,
-        targetValue: Double,
-        logValue: Bool = true
-    ) {
-        guard displayController.adaptiveModeKey != .manual else {
-            return
-        }
-
-        let featureValue = featureValue.rounded(to: 4)
-        for (x, y) in values.dictionary {
-            if (x < featureValue && y >= targetValue) || (x > featureValue && y <= targetValue) {
-                if logValue {
-                    log.debug("Removing data point \(x) => \(y)")
-                }
-                values.removeValue(forKey: x)
-            }
-        }
-        if logValue {
-            log.debug("Adding data point \(featureValue) => \(targetValue)")
-        }
-        values[featureValue] = targetValue
-    }
-
-    static func getSecondaryMirrorScreenID(_ id: CGDirectDisplayID) -> CGDirectDisplayID? {
-        guard displayIsInMirrorSet(id),
-              let secondaryID = NSScreen.onlineDisplayIDs.first(where: { CGDisplayMirrorsDisplay($0) == id })
-        else { return nil }
-        return secondaryID
-    }
-
-    static func getPrimaryMirrorScreen(_ id: CGDirectDisplayID) -> NSScreen? {
-        guard displayIsInMirrorSet(id),
-              let primaryID = NSScreen.onlineDisplayIDs.first(where: { CGDisplayMirrorsDisplay(id) == $0 })
-        else { return nil }
-        return NSScreen.screens.first(where: { screen in screen.hasDisplayID(primaryID) })
-    }
-
-    static func sliderValueToGammaValue(_ value: Double) -> Double {
-        if value == 0.5 {
-            return 1.0
-        }
-        if value > 0.5 {
-            return mapNumber(value, fromLow: 0.5, fromHigh: 1.0, toLow: 1.0, toHigh: 0.0)
-        }
-
-        return mapNumber(value, fromLow: 0.0, fromHigh: 0.5, toLow: 3.0, toHigh: 1.0)
-    }
-
-    static func gammaValueToSliderValue(_ value: Double) -> Double {
-        if value == 1.0 {
-            return 0.5
-        }
-        if value < 1.0 {
-            return mapNumber(value, fromLow: 0.0, fromHigh: 1.0, toLow: 1.0, toHigh: 0.5)
-        }
-
-        return mapNumber(value, fromLow: 1.0, fromHigh: 3.0, toLow: 0.5, toHigh: 0.0)
-    }
-
-    static func reconfigure(tries: Int = 20, _ action: (MPDisplayMgr) -> Void) {
-        guard let manager = DisplayController.panelManager, DisplayController.tryLockManager(tries: tries) else {
-            return
-        }
-
-        manager.notifyWillReconfigure()
-        action(manager)
-        manager.notifyReconfigure()
-        manager.unlockAccess()
-    }
-
-    static func reconfigure(panel: MPDisplay, tries: Int = 20, _ action: (MPDisplay) -> Void) {
-        guard let manager = DisplayController.panelManager, DisplayController.tryLockManager(tries: tries) else {
-            return
-        }
-
-        manager.notifyWillReconfigure()
-        action(panel)
-        manager.notifyReconfigure()
-        manager.unlockAccess()
-    }
-
-    func resetSendingValues() {
-        mainAsync { [weak self] in
-            self?.sendingBrightness = false
-            self?.sendingContrast = false
-            self?.sendingInput = false
-            self?.sendingVolume = false
-        }
-    }
-
-    func refetchScreens() {
-        nsScreen = getScreen()
-    }
-
-    func getPowerOffEnabled(hasDDC: Bool? = nil) -> Bool {
-        guard active else { return false }
-        if blackOutEnabled { return true }
-
-        return (
-            displayController.activeDisplays.count > 1 ||
-                CachedDefaults[.allowBlackOutOnSingleScreen] ||
-                (hasDDC ?? self.hasDDC)
-        ) && !isDummy
-    }
-
-    func getPowerOffTooltip(hasDDC: Bool? = nil) -> String {
-        guard !(hasDDC ?? self.hasDDC) else {
-            return """
-            BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0.
-
-            Can also be toggled with the keyboard using Ctrl-Cmd-6.
-
-            Hold the following keys while clicking the button (or while pressing the hotkey) to change BlackOut behaviour:
-            - Shift: make the screen black without mirroring
-            - Option: turn off monitor completely using DDC
-            - Option and Shift: BlackOut other monitors and keep this one visible
-
-            Caveats for DDC power off:
-              • works only if the monitor can be controlled through DDC
-              • can't be used to power on the monitor
-              • when a monitor is turned off or in standby, it does not accept commands from a connected device
-              • remember to keep holding the Option key for 2 seconds after you pressed the button to account for possible DDC delays
-
-            Emergency Kill Switch: press the ⌘ Command key more than 8 times in a row to force disable BlackOut.
-            """
-        }
-        guard displayController.activeDisplays.count > 1 || CachedDefaults[.allowBlackOutOnSingleScreen] else {
-            return """
-            At least 2 screens need to be visible for this to work.
-
-            The option can also be enabled for a single screen in Advanced settings.
-            """
-        }
-
-        return """
-        BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0.
-
-        Can also be toggled with the keyboard using Ctrl-Cmd-6.
-
-        Hold the following keys while clicking the button (or while pressing the hotkey) to change BlackOut behaviour:
-        - Shift: make the screen black without mirroring
-        - Option and Shift: BlackOut other monitors and keep this one visible
-
-        Emergency Kill Switch: press the ⌘ Command key more than 8 times in a row to force disable BlackOut.
-        """
-    }
-
-    func powerOff() {
-        guard displayController.activeDisplays.count > 1 || CachedDefaults[.allowBlackOutOnSingleScreen] else { return }
-
-        if hasDDC, AppDelegate.optionKeyPressed, !AppDelegate.shiftKeyPressed {
-            _ = control?.setPower(.off)
-            return
-        }
-
-        guard lunarProOnTrial || lunarProActive else {
-            if let url = URL(string: "https://lunar.fyi/#blackout") {
-                NSWorkspace.shared.open(url)
-            }
-            return
-        }
-
-        if AppDelegate.optionKeyPressed, AppDelegate.shiftKeyPressed {
-            let blackOutEnabled = otherDisplays.contains(where: \.blackOutEnabled)
-            otherDisplays.forEach {
-                lastBlackOutToggleDate = .distantPast
-                displayController.blackOut(
-                    display: $0.id,
-                    state: blackOutEnabled ? .off : .on,
-                    mirroringAllowed: false
-                )
-            }
-            return
-        }
-
-        #if arch(arm64)
-            if #available(macOS 13, *), CachedDefaults[.newBlackOutDisconnect], !AppDelegate.commandKeyPressed, !AppDelegate.shiftKeyPressed, !blackOutEnabled {
-                displayController.dis(id)
-                return
-            }
-        #endif
-
-        displayController.blackOut(
-            display: id,
-            state: blackOutEnabled ? .off : .on,
-            mirroringAllowed: !AppDelegate.shiftKeyPressed && blackOutMirroringAllowed
-        )
-    }
-
-    func setAudioIdentifier(from dict: NSDictionary) {
-        #if !arch(arm64)
-            guard let prefsKey = dict["IODisplayPrefsKey"] as? String,
-                  let match = AUDIO_IDENTIFIER_UUID_PATTERN.findFirst(in: prefsKey),
-                  let g1 = match.group(at: 1), let g2 = match.group(at: 2), let g3 = match.group(at: 3)
-            else { return }
-            audioIdentifier = "\(g2)\(g1)-\(g3)".uppercased()
-        #endif
-    }
-
-    func initHotkeyPopoverController() -> HotkeyPopoverController? {
-        mainThread {
-            guard let popover = _hotkeyPopover else {
-                _hotkeyPopover = NSPopover()
-                if let popover = _hotkeyPopover, popover.contentViewController == nil, let stb = NSStoryboard.main,
-                   let controller = stb.instantiateController(
-                       withIdentifier: NSStoryboard.SceneIdentifier("HotkeyPopoverController")
-                   ) as? HotkeyPopoverController
-                {
-                    INPUT_HOTKEY_POPOVERS[serial] = _hotkeyPopover
-                    popover.contentViewController = controller
-                    popover.contentViewController!.loadView()
-                }
-
-                return _hotkeyPopover?.contentViewController as? HotkeyPopoverController
-            }
-            return popover.contentViewController as? HotkeyPopoverController
-        }
-    }
-
-    #if DEBUG
-        @Published @objc dynamic var showOrientation = false
-    #else
-        @Published @objc dynamic var showOrientation = false
-    #endif
-
-    enum ConnectionType: String, DefaultsSerializable, Codable {
-        case displayport
-        case usbc
-        case dvi
-        case hdmi
-        case vga
-        case mipi
-        case unknown
-
-        static func fromTransport(_ transport: Transport?) -> ConnectionType? {
-            guard let transport else {
-                return nil
-            }
-
-            switch transport.downstream {
-            case "HDMI":
-                return .hdmi
-            case "DVI":
-                return .dvi
-            case "DP":
-                return .displayport
-            case "VGA":
-                return .vga
-            case "MIPI":
-                return .mipi
-            default:
-                return nil
-            }
-        }
-
-        static func fromTransportType(_ transportType: Int) -> ConnectionType? {
-            switch transportType {
-            case 0:
-                return .displayport
-            case 1:
-                return .usbc
-            case 2:
-                return .dvi
-            case 3:
-                return .hdmi
-            case 4:
-                return .mipi
-            case 5:
-                return .vga
-            default:
-                return nil
-            }
-        }
-    }
-
-    static var ddcWorkingCount: [String: Int] = [:]
-    static var ddcNotWorkingCount: [String: Int] = [:]
-
-    @Published @objc dynamic var showVolumeSlider = false
-    lazy var preciseBrightnessKey = "setPreciseBrightness-\(serial)"
-    lazy var preciseContrastKey = "setPreciseContrast-\(serial)"
-
-    @Atomic var initialised = false
-
-    var preciseContrastBeforeAppPreset = 0.5
-
-    @objc dynamic lazy var isDummy: Bool = (
-        (Self.dummyNamePattern.matches(name) || vendor == .dummy)
-            && vendor != .samsung
-            && !Self.notDummyNamePattern.matches(name)
-    )
-    @objc dynamic lazy var isFakeDummy: Bool = (Self.notDummyNamePattern.matches(name) && vendor == .dummy)
-
-    @objc dynamic lazy var otherDisplays: [Display] = displayController.activeDisplayList.filter { $0.serial != serial }
-
-    @Atomic var userAdjusting = false {
-        didSet {
-            mainAsync { [weak self] in
-                if let self, !self.isUserAdjusting(), let onFinishedUserAdjusting = Self.onFinishedUserAdjusting {
-                    Self.onFinishedUserAdjusting = nil
-                    onFinishedUserAdjusting()
-                }
-            }
-        }
-    }
-
-    @objc dynamic var isTV: Bool {
-        (panel?.isTV ?? false) && edidName.contains("TV")
-    }
-
-    @discardableResult
-    static func configure(_ action: (CGDisplayConfigRef) -> Bool) -> Bool {
-        var configRef: CGDisplayConfigRef?
-        var err = CGBeginDisplayConfiguration(&configRef)
-        guard err == .success, let config = configRef else {
-            log.error("Error with CGBeginDisplayConfiguration: \(err)")
-            return false
-        }
-
-        guard action(config) else {
-            _ = CGCancelDisplayConfiguration(config)
-            return false
-        }
-
-        err = CGCompleteDisplayConfiguration(config, .permanently)
-        guard err == .success else {
-            log.error("Error with CGCompleteDisplayConfiguration")
-            _ = CGCancelDisplayConfiguration(config)
-            return false
-        }
-
-        return true
-    }
-
-    func setNotchState() {
-        mainAsync {
-            if #available(macOS 12.0, *), self.isMacBook {
-                self.hasNotch = (self.nsScreen?.safeAreaInsets.top ?? 0) > 0 || self.panelMode?.withNotch(modes: self.panelModes) != nil
-            } else {
-                self.hasNotch = false
-            }
-
-            guard self.isMacBook, self.hasNotch, let mode = self.panelMode else { return }
-
-            self.withoutApply {
-                self.notchEnabled = mode.withoutNotch(modes: self.panelModes) != nil
-            }
-        }
-    }
-
-    func observeBrightnessChangeDS() -> Bool {
-        Self.observeBrightnessChangeDS(id)
-    }
-
-    func sliderValueToBrightness(_ brightness: PreciseBrightness) -> NSNumber {
-        (mapNumber(
-            cap(brightness, minVal: 0.0, maxVal: 1.0),
-            fromLow: 0.0,
-            fromHigh: 1.0,
-            toLow: minBrightness.doubleValue / 100.0,
-            toHigh: maxBrightness.doubleValue / 100.0
-        ) * 100).intround.ns
-    }
-
-    func sliderValueToContrast(_ contrast: PreciseContrast) -> NSNumber {
-        (mapNumber(
-            cap(contrast, minVal: 0.0, maxVal: 1.0),
-            fromLow: 0.0,
-            fromHigh: 1.0,
-            toLow: minContrast.doubleValue / 100.0,
-            toHigh: maxContrast.doubleValue / 100.0
-        ) * 100).intround.ns
-    }
-
-    func brightnessToSliderValue(_ brightness: NSNumber) -> PreciseBrightness {
-        mapNumber(
-            cap(brightness.doubleValue, minVal: 0, maxVal: 100),
-            fromLow: minBrightness.doubleValue,
-            fromHigh: maxBrightness.doubleValue,
-            toLow: 0,
-            toHigh: 100
-        ) / 100.0
-    }
-
-    func contrastToSliderValue(_ contrast: NSNumber, merged: Bool = true) -> PreciseContrast {
-        let c = mapNumber(
-            cap(contrast.doubleValue, minVal: 0, maxVal: 100),
-            fromLow: minContrast.doubleValue,
-            fromHigh: maxContrast.doubleValue,
-            toLow: 0,
-            toHigh: 100
-        ) / 100.0
-
-        return merged ? pow(c, 2) : c
-    }
-
-    func sliderValueToBrightnessContrast(_ value: Double) -> (Brightness, Contrast) {
-        var brightness = brightness.uint16Value
-        var contrast = contrast.uint16Value
-
-        if !lockedBrightness || hasSoftwareControl {
-            brightness = (mapNumber(
-                cap(value, minVal: 0.0, maxVal: 1.0),
-                fromLow: 0.0,
-                fromHigh: 1.0,
-                toLow: minBrightness.doubleValue / 100.0,
-                toHigh: maxBrightness.doubleValue / 100.0
-            ) * 100).intround.u16
-        }
-        if !lockedContrast {
-            contrast = (mapNumber(
-                pow(cap(value, minVal: 0.0, maxVal: 1.0), 0.5),
-                fromLow: 0.0,
-                fromHigh: 1.0,
-                toLow: minContrast.doubleValue / 100.0,
-                toHigh: maxContrast.doubleValue / 100.0
-            ) * 100).intround.u16
-        }
-
-        return (brightness, contrast)
-    }
-
-    func updateCornerWindow() {
-        mainThread {
-            guard cornerRadius.intValue > 0, active, !isInHardwareMirrorSet,
-                  !isIndependentDummy, let screen = nsScreen ?? primaryMirrorScreen
-            else {
-                cornerWindowControllerTopLeft?.close()
-                cornerWindowControllerTopRight?.close()
-                cornerWindowControllerBottomLeft?.close()
-                cornerWindowControllerBottomRight?.close()
-                cornerWindowControllerTopLeft = nil
-                cornerWindowControllerTopRight = nil
-                cornerWindowControllerBottomLeft = nil
-                cornerWindowControllerBottomRight = nil
-                return
-            }
-
-            let create: (inout NSWindowController?, ScreenCorner) -> Void = { wc, corner in
-                createWindow(
-                    "cornerWindowController",
-                    controller: &wc,
-                    screen: screen,
-                    show: true,
-                    backgroundColor: .clear,
-                    level: .hud,
-                    stationary: true,
-                    corner: corner,
-                    size: NSSize(width: 50, height: 50)
-                )
-                if let wc = wc as? CornerWindowController {
-                    wc.corner = corner
-                    wc.display = self
-                }
-            }
-
-            create(&cornerWindowControllerTopLeft, .topLeft)
-            create(&cornerWindowControllerTopRight, .topRight)
-            create(&cornerWindowControllerBottomLeft, .bottomLeft)
-            create(&cornerWindowControllerBottomRight, .bottomRight)
-        }
-    }
-
-    #if arch(arm64)
-        var disconnected: Bool { displayController.possiblyDisconnectedDisplays[id]?.serial == serial }
-    #endif
-
-    lazy var syncSourcePriority: Int = {
-        if isBuiltin {
-            return 1
-        }
-        if panel?.isAppleProDisplay ?? false {
-            return 2
-        }
-        if isProDisplayXDR() {
-            return 3
-        }
-        if isStudioDisplay() {
-            return 4
-        }
-        if isUltraFine() {
-            return 5
-        }
-        if isThunderbolt() {
-            return 6
-        }
-        if isLEDCinema() {
-            return 7
-        }
-        return 100
-    }()
-
     func getScreen() -> NSScreen? {
         guard !isForTesting else { return nil }
         return NSScreen.screens.first(where: { screen in screen.hasDisplayID(id) })
@@ -4378,6 +4467,40 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         return nil
     }
 
+    func defaultUserBrightness(modeKey: AdaptiveModeKey) -> [Double: Double] {
+        switch modeKey {
+        case .location:
+            return [-18: -20, 20: 100]
+        case .manual:
+            return [:]
+        case .sensor:
+            return nitsToPercentageMapping
+        case .clock:
+            return [:]
+        case .auto:
+            return [:]
+        case .sync:
+            return [:]
+        }
+    }
+
+    func defaultUserContrast(modeKey: AdaptiveModeKey) -> [Double: Double] {
+        switch modeKey {
+        case .location:
+            return [-18: 0, 20: 100]
+        case .manual:
+            return [:]
+        case .sensor:
+            return [0: 20]
+        case .clock:
+            return [:]
+        case .auto:
+            return [:]
+        case .sync:
+            return [:]
+        }
+    }
+
     func values(_ monitorValue: MonitorValue, modeKey: AdaptiveModeKey) -> (Double, Double, Double, [Double: Double]) {
         var minValue, maxValue, value: Double
         var userValues: [Double: Double]
@@ -4387,32 +4510,32 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             value = brightness
             minValue = minBrightness.doubleValue
             maxValue = maxBrightness.doubleValue
-            userValues = userBrightness[modeKey]?.dictionary ?? [0: 0]
+            userValues = userBrightness[modeKey]?.dictionary ?! defaultUserBrightness(modeKey: modeKey)
         case let .preciseContrast(contrast):
             value = contrast
             minValue = minContrast.doubleValue
             maxValue = maxContrast.doubleValue
-            userValues = userContrast[modeKey]?.dictionary ?? [0: 0]
+            userValues = userContrast[modeKey]?.dictionary ?! defaultUserContrast(modeKey: modeKey)
         case let .brightness(brightness):
             value = brightness.d
             minValue = minBrightness.doubleValue
             maxValue = maxBrightness.doubleValue
-            userValues = userBrightness[modeKey]?.dictionary ?? [0: 0]
+            userValues = userBrightness[modeKey]?.dictionary ?! defaultUserBrightness(modeKey: modeKey)
         case let .contrast(contrast):
             value = contrast.d
             minValue = minContrast.doubleValue
             maxValue = maxContrast.doubleValue
-            userValues = userContrast[modeKey]?.dictionary ?? [0: 0]
+            userValues = userContrast[modeKey]?.dictionary ?! defaultUserContrast(modeKey: modeKey)
         case let .nsBrightness(brightness):
             value = brightness.doubleValue
             minValue = minBrightness.doubleValue
             maxValue = maxBrightness.doubleValue
-            userValues = userBrightness[modeKey]?.dictionary ?? [0: 0]
+            userValues = userBrightness[modeKey]?.dictionary ?! defaultUserBrightness(modeKey: modeKey)
         case let .nsContrast(contrast):
             value = contrast.doubleValue
             minValue = minContrast.doubleValue
             maxValue = maxContrast.doubleValue
-            userValues = userContrast[modeKey]?.dictionary ?? [0: 0]
+            userValues = userContrast[modeKey]?.dictionary ?! defaultUserContrast(modeKey: modeKey)
         }
 
         return (value, minValue, maxValue, userValues)
@@ -4980,9 +5103,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 "blueGamma": self.blueGamma,
             ]
 
-            #if arch(arm64)
-                self.addDDCStats(&dict)
-            #endif
+            // #if arch(arm64)
+            //     self.addDDCStats(&dict)
+            // #endif
 
             scope.setExtra(value: dict, key: "display-\(self.serial)")
         }
@@ -5285,7 +5408,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         guard !isTestID(id), !isSmartBuiltin,
               !displayController.screensSleeping
         else { return }
-        colorRefresher = asyncAfter(ms: 10) { [weak self] in
+        colorRefresher = concurrentQueue.asyncAfter(ms: 10) { [weak self] in
             guard let self else { return }
             let newRedGain = self.readRedGain()
             let newGreenGain = self.readGreenGain()
@@ -5350,7 +5473,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
               !SyncMode.possibleClamshellModeSoon, !hasSoftwareControl, !displayController.screensSleeping
         else { return }
 
-        brightnessRefresher = asyncAfter(ms: 10) { [weak self] in
+        brightnessRefresher = concurrentQueue.asyncAfter(ms: 10) { [weak self] in
             guard let self else { return }
             guard let newBrightness = self.readBrightness() else {
                 log.warning("Can't read brightness for \(self.name)")
@@ -5386,7 +5509,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
               !displayController.screensSleeping
         else { return }
 
-        contrastRefresher = asyncAfter(ms: 10) { [weak self] in
+        contrastRefresher = concurrentQueue.asyncAfter(ms: 10) { [weak self] in
             guard let self else { return }
             guard let newContrast = self.readContrast() else {
                 log.warning("Can't read contrast for \(self.name)")
@@ -5427,7 +5550,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
               !displayController.screensSleeping
         else { return }
 
-        inputRefresher = asyncAfter(ms: 10) { [weak self] in
+        inputRefresher = concurrentQueue.asyncAfter(ms: 10) { [weak self] in
             guard let self else { return }
             guard let newInput = self.readInput() else {
                 log.warning("Can't read input for \(self.name)")
@@ -5452,7 +5575,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
               !displayController.screensSleeping
         else { return }
 
-        volumeRefresher = asyncAfter(ms: 10) { [weak self] in
+        volumeRefresher = concurrentQueue.asyncAfter(ms: 10) { [weak self] in
             guard let self else { return }
             guard let newVolume = self.readVolume(), let newAudioMuted = self.readAudioMuted() else {
                 log.warning("Can't read volume for \(self.name)")
@@ -5646,8 +5769,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         blackOutMirroringAllowed = supportsGammaByDefault || isFakeDummy
         mirroredBeforeBlackOut = false
 
-        userContrast[displayController.adaptiveModeKey] = ThreadSafeDictionary(dict: [0: 0])
-        userBrightness[displayController.adaptiveModeKey] = ThreadSafeDictionary(dict: [0: 0])
+        userBrightness[displayController.adaptiveModeKey] = ThreadSafeDictionary(dict: defaultUserBrightness(modeKey: displayController.adaptiveModeKey))
+        userContrast[displayController.adaptiveModeKey] = ThreadSafeDictionary(dict: defaultUserContrast(modeKey: displayController.adaptiveModeKey))
 
         resetDefaultGamma()
 
@@ -5773,17 +5896,17 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func insertBrightnessUserDataPoint(_ featureValue: Double, _ targetValue: Double, modeKey: AdaptiveModeKey) {
         guard !lockedBrightnessCurve, !adaptivePaused,
-              displayController.adaptiveModeKey != .sync || !isSource,
-              displayController.adaptiveModeKey != .location || featureValue != 0,
+              modeKey != .sync || !isSource,
+              modeKey != .location || featureValue != 0,
               timeSince(lastConnectionTime) > 5 else { return }
 
         #if arch(arm64)
-            insertNitsUserDataPoint(featureValue, targetValue, modeKey: modeKey)
+            insertNitsBrightnessUserDataPoint(featureValue, targetValue, modeKey: modeKey)
         #endif
 
         brightnessDataPointInsertionTask?.cancel()
-        if userBrightness[modeKey] == nil {
-            userBrightness[modeKey] = ThreadSafeDictionary()
+        if userBrightness[modeKey] == nil || userBrightness[modeKey]!.isEmpty {
+            userBrightness[modeKey] = ThreadSafeDictionary(dict: defaultUserBrightness(modeKey: modeKey))
         }
         var targetValue = mapNumber(
             targetValue,
@@ -5843,13 +5966,17 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func insertContrastUserDataPoint(_ featureValue: Double, _ targetValue: Double, modeKey: AdaptiveModeKey) {
         guard !lockedContrastCurve, !adaptivePaused,
-              displayController.adaptiveModeKey != .sync || !isSource,
-              displayController.adaptiveModeKey != .location || featureValue != 0,
+              modeKey != .sync || !isSource,
+              modeKey != .location || featureValue != 0,
               timeSince(lastConnectionTime) > 5 else { return }
 
+        #if arch(arm64)
+            insertNitsContrastUserDataPoint(featureValue, targetValue, modeKey: modeKey)
+        #endif
+
         contrastDataPointInsertionTask?.cancel()
-        if userContrast[modeKey] == nil {
-            userContrast[modeKey] = ThreadSafeDictionary(dict: [0: 0])
+        if userContrast[modeKey] == nil, userContrast[modeKey]!.isEmpty {
+            userContrast[modeKey] = ThreadSafeDictionary(dict: defaultUserContrast(modeKey: modeKey))
         }
         let targetValue = mapNumber(
             targetValue,

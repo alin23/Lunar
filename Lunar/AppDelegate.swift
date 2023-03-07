@@ -123,7 +123,7 @@ class NonClosingMenuText: NSTextField {
     var onClick: (() -> Void)?
 
     override func mouseDown(with event: NSEvent) {
-        log.info("mouseDown: \(event.locationInWindow)")
+        // log.info("mouseDown: \(event.locationInWindow)")
         onClick?()
     }
 }
@@ -141,13 +141,17 @@ var lastXDRContrastResetTime = Date()
 // MARK: - AppDelegate
 
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate, SPUStandardUserDriverDelegate {
     enum UIElement {
         case displayControls
         case displayDDC
         case displayGamma
         case displayReset
     }
+
+    #if DEBUG
+        var supportsGentleScheduledUpdateReminders: Bool { true }
+    #endif
 
     @Atomic static var optionKeyPressed = false
     @Atomic static var shiftKeyPressed = false
@@ -157,7 +161,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     static var observers: Set<AnyCancellable> = []
     static var enableSentry = CachedDefaults[.enableSentry]
     static var supportsHDR: Bool = {
-        asyncAfter(ms: 1) {
+        concurrentQueue.asyncAfter(ms: 1) {
             NotificationCenter.default
                 .publisher(for: AVPlayer.eligibleForHDRPlaybackDidChangeNotification)
                 .sink { _ in supportsHDR = AVPlayer.eligibleForHDRPlayback }
@@ -227,7 +231,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     lazy var updater = SPUUpdater(
         hostBundle: Bundle.main,
         applicationBundle: Bundle.main,
-        userDriver: SPUStandardUserDriver(hostBundle: Bundle.main, delegate: nil),
+        userDriver: SPUStandardUserDriver(hostBundle: Bundle.main, delegate: self),
         delegate: self
     )
 
@@ -243,7 +247,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     @IBOutlet var infoMenuToggle: NSMenuItem!
 
-    var menuUpdater: Timer?
+    var menuUpdater: Repeater?
 
     var memoryUsageChecker: Foundation.Thread?
 
@@ -295,7 +299,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     var currentPage: Int = Page.display.rawValue {
         didSet {
-            log.verbose("Current Page: \(currentPage)")
+            log.verbose("Current Page \(currentPage)")
         }
     }
 
@@ -310,7 +314,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     var internalLux: String {
-        guard let lux = SensorMode.getInternalSensorLux() else { return "" }
+        guard let lux = SensorMode.specific.lastInternalAmbientLight else { return "" }
         return "Internal light sensor: **\(lux.str(decimals: 2)) lux**\n"
     }
 
@@ -437,19 +441,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
     func menuWillOpen(_: NSMenu) {
         menuShown = true
-        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "4"
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "6"
 
         initLicensingMenuItems(version)
         initMenuItems()
-        menuUpdater = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [self] _ in
+        menuUpdater = Repeater(every: 0.5) { [self] in
             updateInfoMenuItem()
         }
-        RunLoop.main.add(menuUpdater!, forMode: .common)
     }
 
     func menuDidClose(_: NSMenu) {
         menuShown = false
-        menuUpdater?.invalidate()
+        menuUpdater = nil
     }
 
     @IBAction func checkForUpdates(_: Any) {
@@ -611,7 +614,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         CachedDefaults[.syncMode] = mode == .sync
 
         adaptiveBrightnessModePublisher.sink { change in
-            log.info("adaptiveBrightnessModePublisher: \(change)")
+            // log.info("adaptiveBrightnessModePublisher \(change)")
             if AppDelegate.enableSentry {
                 SentrySDK.configureScope { scope in
                     scope.setTag(value: change.newValue.str, key: "adaptiveMode")
@@ -708,10 +711,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         streamLogsPublisher.sink { change in
             if change.newValue {
                 CachedDefaults[.debug] = true
-                Logger.addDestination(Logger.cloud)
+                SwiftyLogger.addDestination(SwiftyLogger.cloud)
             } else {
                 CachedDefaults[.debug] = false
-                Logger.removeDestination(Logger.cloud)
+                SwiftyLogger.removeDestination(SwiftyLogger.cloud)
             }
         }.store(in: &observers)
         detectResponsivenessPublisher.sink { change in
@@ -1238,7 +1241,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
                 case let n as Notification:
                     log.info("\(n.name)")
                 case let a as NSRunningApplication:
-                    log.info("Frontmost application changed: \(a.localizedName ?? "") \(a.bundleIdentifier ?? "") \(a.processIdentifier)")
+                    log.info("Frontmost App: \(a.localizedName ?? "") \(a.bundleIdentifier ?? "") \(a.processIdentifier)")
                 default:
                     log.info("\(notif.debugDescription)")
                 }
@@ -1266,12 +1269,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
             .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
             .sink { _ in
                 lastColorSyncReset = Date()
+                displayController.activeDisplayList.forEach { d in
+                    d.hdrOn = d.potentialEDR > 2 && d.edr > 1
+                }
                 #if DEBUG
                     if let d = NSScreen.main {
-                        print("Max EDR:", d.maximumExtendedDynamicRangeColorComponentValue)
-                        print("Potential EDR:", d.maximumPotentialExtendedDynamicRangeColorComponentValue)
-                        print("Reference EDR:", d.maximumReferenceExtendedDynamicRangeColorComponentValue)
-                        print("")
+                        log.verbose("Max EDR: \(d.maximumExtendedDynamicRangeColorComponentValue.str(decimals: 3))")
+                        log.verbose("Potential EDR: \(d.maximumPotentialExtendedDynamicRangeColorComponentValue.str(decimals: 3))")
+                        log.verbose("Reference EDR: \(d.maximumReferenceExtendedDynamicRangeColorComponentValue.str(decimals: 3))")
                     }
                 #endif
             }.store(in: &observers)
@@ -1295,9 +1300,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
                     let oldMaxSoftwareBrightness = d.maxSoftwareBrightness
                     d.maxEDR = maxEDR
-                    #if DEBUG
-                        log.info("MAX EDR: \(maxEDR)")
-                    #endif
 
                     if d.softwareBrightness > 1.0, timeSince(d.hdrWindowOpenedAt) > 1 {
                         let oldSoftwareBrightness = mapNumber(
@@ -1573,13 +1575,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }.store(in: &observers)
 
         hideMenuBarIconPublisher.sink { change in
-            log.info("Hiding menu bar icon: \(change.newValue)")
+            log.info("Hiding menu bar icon \(change.newValue)")
             self.statusItem.isVisible = !change.newValue
         }.store(in: &observers)
         statusItem.isVisible = !CachedDefaults[.hideMenuBarIcon]
 
         showDockIconPublisher.sink { change in
-            log.info("Showing dock icon: \(change.newValue)")
+            log.info("Showing dock icon \(change.newValue)")
             NSApp.setActivationPolicy(change.newValue ? .regular : .accessory)
             NSRunningApplication.current.activate(options: .activateIgnoringOtherApps)
         }.store(in: &observers)
@@ -1779,10 +1781,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         AppDelegate.shiftKeyPressed = event.modifierFlags.contains(.shift)
         AppDelegate.controlKeyPressed = event.modifierFlags.contains(.control)
         AppDelegate.commandKeyPressed = event.modifierFlags.contains(.command)
-        log.debug("Option key pressed: \(AppDelegate.optionKeyPressed)")
-        log.debug("Shift key pressed: \(AppDelegate.shiftKeyPressed)")
-        log.debug("Control key pressed: \(AppDelegate.controlKeyPressed)")
-        log.debug("Command key pressed: \(AppDelegate.commandKeyPressed)")
+        // log.debug("Option key pressed: \(AppDelegate.optionKeyPressed)")
+        // log.debug("Shift key pressed: \(AppDelegate.shiftKeyPressed)")
+        // log.debug("Control key pressed: \(AppDelegate.controlKeyPressed)")
+        // log.debug("Command key pressed: \(AppDelegate.commandKeyPressed)")
     }
 
     func addGlobalModifierMonitor() {
@@ -2265,7 +2267,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
     }
 
     internal func locationManager(_ lm: CLLocationManager, didFailWithError error: Error) {
-        log.error("Location manager failed with error: \(error)")
+        log.error("Location manager failed with error \(error)")
         guard !CachedDefaults[.manualLocation] else { return }
 
         guard lm.authorizationStatus != .denied, let location = lm.location, let geolocation = Geolocation(location: location)
@@ -2313,7 +2315,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
         }
 
         guard let locationManager, locationManager.authorizationStatus != .denied else {
-            log.debug("Location authStatus: denied")
+            log.debug("Location authStatus denied")
             locationManager?.stopUpdatingLocation()
             return
         }
@@ -2323,17 +2325,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, N
 
         switch locationManager.authorizationStatus {
         case .authorizedAlways:
-            log.debug("Location authStatus: authorizedAlways")
+            log.debug("Location authStatus authorizedAlways")
         case .denied:
-            log.debug("Location authStatus: denied")
+            log.debug("Location authStatus denied")
         case .notDetermined:
-            log.debug("Location authStatus: notDetermined")
+            log.debug("Location authStatus notDetermined")
         case .restricted:
-            log.debug("Location authStatus: restricted")
+            log.debug("Location authStatus restricted")
         case .authorized:
-            log.debug("Location authStatus: authorized")
+            log.debug("Location authStatus authorized")
         @unknown default:
-            log.debug("Location authStatus: unknown??")
+            log.debug("Location authStatus unknown??")
         }
     }
 

@@ -38,7 +38,7 @@ extension AppDelegate: NSWindowDelegate {
         guard let window = n.object as? ModernWindow else {
             return
         }
-        log.debug("Got window while closing: \(window.title)")
+        log.debug("Got window while closing \(window.title)")
         guard let view = window.contentView, !view.subviews.isEmpty, !view.subviews[0].subviews.isEmpty,
               let pageController = view.subviews[0].subviews[0].nextResponder as? PageController,
               let settingsPageController = pageController

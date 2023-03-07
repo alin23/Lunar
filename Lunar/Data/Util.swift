@@ -570,7 +570,7 @@ func generateAPIKey() -> String {
         default: return c
         }
     }.str()
-    log.info("APIKey: \(hash)")
+//    log.info("APIKey: \(hash)")
     return hash
 }
 
@@ -597,7 +597,7 @@ func getSerialNumberHash() -> String? {
         default: return c
         }
     }.str()
-    log.info("SerialNumberHash: \(hash)")
+//    log.info("SerialNumberHash: \(hash)")
 
     return hash
 }
@@ -763,16 +763,18 @@ extension DispatchQueue {
     }
 }
 
-@discardableResult
-func asyncAfter(ms: Int, name: String = "asyncAfter", _ action: @escaping () -> Void) -> DispatchWorkItem {
-    let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
+extension DispatchQueue {
+    @discardableResult
+    func asyncAfter(ms: Int, name: String = "asyncAfter", _ action: @escaping () -> Void) -> DispatchWorkItem {
+        let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
 
-    let workItem = DispatchWorkItem(name: name) {
-        action()
+        let workItem = DispatchWorkItem(name: "\(label) \(name) \(ms)ms") {
+            action()
+        }
+        asyncAfter(deadline: deadline, execute: workItem.workItem)
+
+        return workItem
     }
-    concurrentQueue.asyncAfter(deadline: deadline, execute: workItem.workItem)
-
-    return workItem
 }
 
 func asyncAfter(ms: Int, _ action: DispatchWorkItem) {
@@ -801,7 +803,6 @@ func mainAsyncAfter(ms: Int, _ action: DispatchWorkItem) {
 
 func mapNumber<T: Numeric & Comparable & FloatingPoint>(_ number: T, fromLow: T, fromHigh: T, toLow: T, toHigh: T) -> T {
     if fromLow == fromHigh {
-        log.warning("fromLow and fromHigh are both equal to \(fromLow)")
         return number
     }
 

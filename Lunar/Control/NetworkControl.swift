@@ -459,7 +459,7 @@ class NetworkControl: Control {
               DDC.apply
         else {
             manageSendingState(for: controlID, sending: true)
-            asyncAfter(ms: 1000) { [weak self] in self?.manageSendingState(for: controlID, sending: false) }
+            mainAsyncAfter(ms: 1000) { [weak self] in self?.manageSendingState(for: controlID, sending: false) }
             return false
         }
 

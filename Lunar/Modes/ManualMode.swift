@@ -10,7 +10,7 @@ import Combine
 import Foundation
 import Surge
 
-class ManualMode: AdaptiveMode {
+final class ManualMode: AdaptiveMode {
     static let shared: AdaptiveMode = ManualMode()
     static var specific = shared as! ManualMode
 
