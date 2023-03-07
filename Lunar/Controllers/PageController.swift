@@ -14,7 +14,7 @@ import Magnet
 
 // MARK: - PageController
 
-class PageController: NSPageController {
+final class PageController: NSPageController {
     deinit {
         #if DEBUG
             log.verbose("START DEINIT")

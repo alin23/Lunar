@@ -10,7 +10,7 @@ import Cocoa
 
 // MARK: - RaspberryPageController
 
-class RaspberryPageController: NSPageController {
+final class RaspberryPageController: NSPageController {
     @IBOutlet var logo: NSTextField?
 
     let sshConnectionViewControllerIdentifier = NSPageController.ObjectIdentifier("sshConnectionViewController")

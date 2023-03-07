@@ -12,7 +12,7 @@ import Foundation
 
 // MARK: - GradientView
 
-class GradientView: NSView {
+final class GradientView: NSView {
     override var wantsDefaultClipping: Bool { false }
     @IBInspectable var firstColor: NSColor = .clear {
         didSet {
@@ -41,7 +41,7 @@ class GradientView: NSView {
 
 // MARK: - LunarTestViewController
 
-class LunarTestViewController: NSViewController {
+final class LunarTestViewController: NSViewController {
     @IBOutlet var label: NSTextField!
     @objc dynamic var lunarTestText = "Checking Monitor"
     var taskKey = "lunarTestHighlighter"
@@ -123,7 +123,7 @@ struct ControlResult {
 
 // MARK: - ControlChoiceViewController
 
-class ControlChoiceViewController: NSViewController {
+final class ControlChoiceViewController: NSViewController {
     var cancelled = false
     @IBOutlet var displayImage: DisplayImage?
 

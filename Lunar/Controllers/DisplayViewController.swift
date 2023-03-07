@@ -160,7 +160,7 @@ var macbookScreenColor: NSColor { darkMode ? rouge.blended(withFraction: 0.3, of
 // MARK: - DisplayImage
 
 @IBDesignable
-class DisplayImage: NSView {
+final class DisplayImage: NSView {
     override init(frame: NSRect) {
         super.init(frame: frame)
         setup(frame: frame)
@@ -321,7 +321,7 @@ class DisplayImage: NSView {
 
 // MARK: - DisplayViewController
 
-class DisplayViewController: NSViewController {
+final class DisplayViewController: NSViewController {
     deinit {
         #if DEBUG
             log.verbose("START DEINIT")

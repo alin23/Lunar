@@ -279,7 +279,7 @@ extension View {
 
 // MARK: - BetterScrollView
 
-class BetterScrollView: NSScrollView {
+final class BetterScrollView: NSScrollView {
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
     }

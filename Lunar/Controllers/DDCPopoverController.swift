@@ -5,7 +5,7 @@ import Defaults
 
 // MARK: - DDCPopoverController
 
-class DDCPopoverController: NSViewController {
+final class DDCPopoverController: NSViewController {
     var displayObservers = [String: AnyCancellable]()
 
     @IBOutlet var muteByteValueOnField: ScrollableTextField!
@@ -172,7 +172,7 @@ class DDCPopoverController: NSViewController {
 
 // MARK: - DDCButton
 
-class DDCButton: PopoverButton<DDCPopoverController> {
+final class DDCButton: PopoverButton<DDCPopoverController> {
     weak var display: Display? {
         didSet {
             popoverController?.display = display

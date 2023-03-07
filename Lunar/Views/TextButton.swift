@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class TextButton: NSButton {
+final class TextButton: NSButton {
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()

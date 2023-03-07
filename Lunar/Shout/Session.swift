@@ -9,7 +9,7 @@ import Foundation
 import Socket
 
 /// Direct bindings to libssh2_session
-public class Session {
+final class Session {
     init() throws {
         guard Session.initResult == 0 else {
             throw SSHError.genericError("libssh2_init failed")

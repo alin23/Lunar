@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class DisplayName: NSTextField, NSTextFieldDelegate {
+final class DisplayName: NSTextField, NSTextFieldDelegate {
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()

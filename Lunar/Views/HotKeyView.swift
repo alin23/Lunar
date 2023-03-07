@@ -12,7 +12,7 @@ import KeyHolder
 import Magnet
 import Sauce
 
-class HotkeyView: RecordView, RecordViewDelegate {
+final class HotkeyView: RecordView, RecordViewDelegate {
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()
@@ -23,7 +23,7 @@ class HotkeyView: RecordView, RecordViewDelegate {
         setup()
     }
 
-    override open func mouseDown(with _: NSEvent) {
+    override public func mouseDown(with _: NSEvent) {
         log.debug("Clicked on hotkey view: \(hotkey?.identifier ?? "")")
         beginRecording()
         transition()

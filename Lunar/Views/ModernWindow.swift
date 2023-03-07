@@ -48,7 +48,7 @@ extension NSView {
 
 // MARK: - CornerWindowController
 
-class CornerWindowController: NSWindowController {
+final class CornerWindowController: NSWindowController {
     var corner: ScreenCorner?
 
     weak var display: Display? {
@@ -121,11 +121,11 @@ class CornerWindowController: NSWindowController {
 
 // MARK: - CornerWindow
 
-class CornerWindow: NSWindow {}
+final class CornerWindow: NSWindow {}
 
 // MARK: - ModernWindow
 
-class ModernWindow: WAYWindow {
+final class ModernWindow: WAYWindow {
     override init(
         contentRect: NSRect,
         styleMask style: NSWindow.StyleMask,

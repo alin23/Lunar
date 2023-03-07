@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class DeleteButton: NSButton {
+final class DeleteButton: NSButton {
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()

@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class HelpPopoverController: NSViewController {
+final class HelpPopoverController: NSViewController {
     @IBOutlet var helpTextField: NSTextField!
     var onClick: (() -> Void)?
 

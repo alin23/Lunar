@@ -12,7 +12,7 @@ import Solar
 import SwiftDate
 import SwiftyJSON
 
-class Moment: NSObject {
+final class Moment: NSObject {
     init(_ solar: inout Solar) {
         let (sevenAM, noon, sevenPM) = Moment.defaultMomentsAsDates()
 

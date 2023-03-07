@@ -12,7 +12,7 @@ import UserNotifications
 
 // MARK: - OnboardingDisplayCellView
 
-class OnboardingDisplayCellView: NSTableCellView {
+final class OnboardingDisplayCellView: NSTableCellView {
     @IBOutlet var syncButton: LockButton!
     @IBOutlet var _controlButton: NSButton!
 
@@ -72,7 +72,7 @@ class OnboardingDisplayCellView: NSTableCellView {
 
 // MARK: - HotkeysChoiceViewController
 
-class HotkeysChoiceViewController: NSViewController {
+final class HotkeysChoiceViewController: NSViewController {
     var cancelled = false
 
     @IBOutlet var skipButton: Button!

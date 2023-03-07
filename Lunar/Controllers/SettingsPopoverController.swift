@@ -13,7 +13,7 @@ import Defaults
 
 // MARK: - SettingsPopoverController
 
-class SettingsPopoverController: NSViewController {
+final class SettingsPopoverController: NSViewController {
     var displayObservers = [String: AnyCancellable]()
 
     @objc dynamic var adaptiveBrightnessNotice = ""
@@ -124,7 +124,7 @@ class SettingsPopoverController: NSViewController {
 
 // MARK: - SettingsButton
 
-class SettingsButton: PopoverButton<SettingsPopoverController> {
+final class SettingsButton: PopoverButton<SettingsPopoverController> {
     weak var displayViewController: DisplayViewController? {
         didSet {
             popoverController?.displayViewController = displayViewController

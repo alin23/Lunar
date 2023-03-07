@@ -10,7 +10,7 @@ import Cocoa
 
 // MARK: - PaddedTextField
 
-class PaddedTextField: NSTextField {
+final class PaddedTextField: NSTextField {
     override func draw(_ dirtyRect: NSRect) {
         appearance = appearance ?? NSAppearance(named: .aqua)
         super.draw(dirtyRect)
@@ -25,8 +25,8 @@ class PaddedTextField: NSTextField {
 
 // MARK: - PaddedSecureTextField
 
-class PaddedSecureTextField: NSSecureTextField {
-    override class var cellClass: AnyClass? {
+final class PaddedSecureTextField: NSSecureTextField {
+    override final class var cellClass: AnyClass? {
         get {
             PaddedSecureTextFieldCell.self
         }
@@ -47,7 +47,7 @@ class PaddedSecureTextField: NSSecureTextField {
 
 // MARK: - PaddedTextFieldCell
 
-class PaddedTextFieldCell: PlainTextFieldCell {
+final class PaddedTextFieldCell: PlainTextFieldCell {
     @IBInspectable var padding = CGSize(width: 8.0, height: 4.0)
 
     override func cellSize(forBounds rect: NSRect) -> NSSize {
@@ -85,7 +85,7 @@ class PaddedTextFieldCell: PlainTextFieldCell {
 
 // MARK: - PaddedSecureTextFieldCell
 
-class PaddedSecureTextFieldCell: NSSecureTextFieldCell {
+final class PaddedSecureTextFieldCell: NSSecureTextFieldCell {
     @IBInspectable var padding = CGSize(width: 8.0, height: 4.0)
 
     override func cellSize(forBounds rect: NSRect) -> NSSize {

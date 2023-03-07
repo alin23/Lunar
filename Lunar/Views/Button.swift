@@ -3,7 +3,7 @@ import Foundation
 
 // MARK: - ButtonCell
 
-class ButtonCell: NSButtonCell {
+final class ButtonCell: NSButtonCell {
     override func _shouldDrawTextWithDisabledAppearance() -> Bool {
         (controlView as! Button).grayDisabledText
     }

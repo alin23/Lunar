@@ -144,7 +144,7 @@ func IOServiceFirstMatchingWhere(_ matching: CFDictionary, where predicate: (io_
         case byExclusion
     }
 
-    class DCP: CustomStringConvertible, Hashable, Equatable {
+    final class DCP: CustomStringConvertible, Hashable, Equatable {
         deinit {
             #if !DEBUG
                 IOObjectRelease(dispService)
@@ -348,12 +348,12 @@ func IOServiceFirstMatchingWhere(_ matching: CFDictionary, where predicate: (io_
     }
 #endif
 
-public enum BackportSortOrder {
+enum BackportSortOrder {
     case forward
     case reverse
 }
 
-public extension Collection {
+extension Collection {
     func sorted(by keyPath: KeyPath<Element, some Comparable>, order: BackportSortOrder = .forward) -> [Element] {
         sorted(by: { e1, e2 in
             switch order {
@@ -419,7 +419,7 @@ func ?! (_ svc: io_service_t?, _ svc2: io_service_t) -> io_service_t {
 
 // MARK: - DisplayController
 
-class DisplayController: ObservableObject {
+final class DisplayController: ObservableObject {
     init() {
         watchControlAvailability()
         watchModeAvailability()

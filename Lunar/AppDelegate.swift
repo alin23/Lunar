@@ -119,7 +119,7 @@ func playVolumeChangedSound() {
 
 // MARK: - NonClosingMenuText
 
-class NonClosingMenuText: NSTextField {
+final class NonClosingMenuText: NSTextField {
     var onClick: (() -> Void)?
 
     override func mouseDown(with event: NSEvent) {
@@ -141,7 +141,7 @@ var lastXDRContrastResetTime = Date()
 // MARK: - AppDelegate
 
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate, SPUStandardUserDriverDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate, SPUStandardUserDriverDelegate {
     enum UIElement {
         case displayControls
         case displayDDC

@@ -18,7 +18,7 @@ import Foundation
 //  Copyright © 2017 Tavares. All rights reserved.
 //
 
-public class CiaoBrowser {
+final class CiaoBrowser {
     public init() {
         netServiceBrowser = NetServiceBrowser()
         delegate = CiaoBrowserDelegate()
@@ -117,7 +117,7 @@ public class CiaoBrowser {
 
 // MARK: - CiaoBrowserDelegate
 
-public class CiaoBrowserDelegate: NSObject, NetServiceBrowserDelegate {
+final class CiaoBrowserDelegate: NSObject, NetServiceBrowserDelegate {
     public func netServiceBrowser(_: NetServiceBrowser, didFind service: NetService, moreComing _: Bool) {
         SwiftyLogger.info("Service found \(service)")
         browser?.serviceFound(service)
@@ -162,7 +162,7 @@ public class CiaoBrowserDelegate: NSObject, NetServiceBrowserDelegate {
 //  Created by Alexandre Mantovani Tavares on 14/07/19.
 //
 
-public class CiaoResolver {
+final class CiaoResolver {
     public init(service: NetService) {
         self.service = service
     }
@@ -195,7 +195,7 @@ extension ErrorDictionary: Error {}
 // MARK: - CiaoResolver.CiaoResolverDelegate
 
 extension CiaoResolver {
-    class CiaoResolverDelegate: NSObject, NetServiceDelegate {
+    final class CiaoResolverDelegate: NSObject, NetServiceDelegate {
         var onResolve: ((Result<NetService, ErrorDictionary>) -> Void)?
 
         func netService(_ sender: NetService, didNotResolve errorDict: [String: NSNumber]) {
@@ -224,7 +224,7 @@ extension CiaoResolver {
 //  Copyright © 2017 Tavares. All rights reserved.
 //
 
-public class CiaoServer {
+final class CiaoServer {
     public convenience init(type: ServiceType, domain: String = "", name: String = "", port: Int32 = 0) {
         self.init(type: type.description, domain: domain, name: name, port: port)
     }
@@ -284,7 +284,7 @@ public class CiaoServer {
 
 // MARK: - CiaoServerDelegate
 
-class CiaoServerDelegate: NSObject, NetServiceDelegate {
+final class CiaoServerDelegate: NSObject, NetServiceDelegate {
     weak var server: CiaoServer?
 
     func netServiceDidPublish(_: NetService) {

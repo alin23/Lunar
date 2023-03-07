@@ -17,7 +17,7 @@ let ONBOARDING_TASK_KEY = "onboarding-task"
 
 // MARK: - OnboardWindowController
 
-class OnboardWindowController: ModernWindowController, NSWindowDelegate {
+final class OnboardWindowController: ModernWindowController, NSWindowDelegate {
     var changes: [() -> Void] = []
     weak var pageController: OnboardPageController?
 
@@ -103,7 +103,7 @@ var adaptiveModeDisabledByDiagnostics = false
 
 // MARK: - OnboardPageController
 
-class OnboardPageController: NSPageController {
+final class OnboardPageController: NSPageController {
     static var task: DispatchWorkItem? {
         didSet {
             oldValue?.cancel()

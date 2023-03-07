@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class DisplayView: NSImageView {
+final class DisplayView: NSImageView {
     var deleteButtonTrackingArea: NSTrackingArea?
 
     var deleteButton: DeleteButton! {

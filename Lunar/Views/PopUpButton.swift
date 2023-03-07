@@ -15,7 +15,7 @@ let DOT_PREFIX = "⚫︎  "
 
 // MARK: - PopUpButtonCell
 
-class PopUpButtonCell: NSPopUpButtonCell {
+final class PopUpButtonCell: NSPopUpButtonCell {
     var textColor: NSColor?
     var dotColor: NSColor?
     @IBInspectable dynamic var prefix = ""
@@ -52,7 +52,7 @@ enum Origin: Int {
 
 // MARK: - InputDropdown
 
-class InputDropdown: NSPopUpButton {
+final class InputDropdown: NSPopUpButton {
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()
@@ -80,7 +80,7 @@ class InputDropdown: NSPopUpButton {
 
 // MARK: - PopUpButton
 
-class PopUpButton: NSPopUpButton {
+final class PopUpButton: NSPopUpButton {
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()

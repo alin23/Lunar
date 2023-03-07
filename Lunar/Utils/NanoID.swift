@@ -25,7 +25,7 @@ import Foundation
 /// let idFirst = nanoID.new()
 /// let idSecond = nanoID.new()
 
-class NanoID {
+final class NanoID {
     /// Inits an instance with Shared Parameters
     init(alphabet: NanoIDAlphabet..., size: Int) {
         self.size = size

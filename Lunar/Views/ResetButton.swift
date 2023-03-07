@@ -9,7 +9,7 @@
 import Cocoa
 import Foundation
 
-class ResetButton: ToggleButton {
+final class ResetButton: ToggleButton {
     var resettingText = "Resetting"
 
     override var bgColor: NSColor {

@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class SettingsView: NSSplitView {
+final class SettingsView: NSSplitView {
     override var dividerThickness: CGFloat {
         1.0
     }

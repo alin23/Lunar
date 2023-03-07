@@ -10,7 +10,7 @@ import Combine
 import Defaults
 import Foundation
 
-class DDCControl: Control, ObservableObject {
+final class DDCControl: Control, ObservableObject {
     init(display: Display) {
         self.display = display
     }

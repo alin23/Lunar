@@ -5,7 +5,7 @@ import SwiftUI
 
 // MARK: - OSDWindow
 
-open class OSDWindow: NSWindow, NSWindowDelegate {
+final class OSDWindow: NSWindow, NSWindowDelegate {
     convenience init(swiftuiView: AnyView, display: Display, releaseWhenClosed: Bool, level: NSWindow.Level = NSWindow.Level(CGShieldingWindowLevel().i), ignoresMouseEvents: Bool = true) {
         self.init(contentRect: .zero, styleMask: .fullSizeContentView, backing: .buffered, defer: true, screen: display.nsScreen)
         self.display = display
@@ -27,7 +27,33 @@ open class OSDWindow: NSWindow, NSWindowDelegate {
         delegate = self
     }
 
-    open func show(
+    public func hide() {
+        fader = nil
+        endFader = nil
+        closer = nil
+
+        if let v = contentView?.superview {
+            v.alphaValue = 0.0
+        }
+        close()
+        windowController?.close()
+    }
+
+    public func windowShouldClose(_ sender: NSWindow) -> Bool {
+        guard isReleasedWhenClosed else { return true }
+        windowController?.window = nil
+        windowController = nil
+        return true
+    }
+
+    weak var display: Display?
+    lazy var wc = NSWindowController(window: self)
+
+    var closer: DispatchWorkItem? { didSet { oldValue?.cancel() } }
+    var fader: DispatchWorkItem? { didSet { oldValue?.cancel() } }
+    var endFader: DispatchWorkItem? { didSet { oldValue?.cancel() } }
+
+    func show(
         at point: NSPoint? = nil,
         closeAfter closeMilliseconds: Int = 3050,
         fadeAfter fadeMilliseconds: Int = 2000,
@@ -68,31 +94,6 @@ open class OSDWindow: NSWindow, NSWindowDelegate {
         }
     }
 
-    public func hide() {
-        fader = nil
-        endFader = nil
-        closer = nil
-
-        if let v = contentView?.superview {
-            v.alphaValue = 0.0
-        }
-        close()
-        windowController?.close()
-    }
-
-    public func windowShouldClose(_ sender: NSWindow) -> Bool {
-        guard isReleasedWhenClosed else { return true }
-        windowController?.window = nil
-        windowController = nil
-        return true
-    }
-
-    weak var display: Display?
-    lazy var wc = NSWindowController(window: self)
-
-    var closer: DispatchWorkItem? { didSet { oldValue?.cancel() } }
-    var fader: DispatchWorkItem? { didSet { oldValue?.cancel() } }
-    var endFader: DispatchWorkItem? { didSet { oldValue?.cancel() } }
 }
 
 extension AnyView {
@@ -695,7 +696,7 @@ let OSD_WIDTH: CGFloat = 300
 
 // MARK: - OSDState
 
-class OSDState: ObservableObject {
+final class OSDState: ObservableObject {
     @Published var image = "sun.max"
     @Published var value: Float = 1.0
     @Published var text = ""
@@ -802,7 +803,7 @@ import SwiftUI
 
 // MARK: - PanelWindow
 
-open class PanelWindow: NSWindow {
+final class PanelWindow: NSWindow {
     public convenience init(swiftuiView: AnyView, level: NSWindow.Level = .floating) {
         self.init(contentViewController: NSHostingController(rootView: swiftuiView))
 
@@ -820,9 +821,15 @@ open class PanelWindow: NSWindow {
         isMovableByWindowBackground = false
     }
 
-    override open var canBecomeKey: Bool { true }
+    public func forceClose() {
+        wc.close()
+        wc.window = nil
+        close()
+    }
 
-    open func show(at point: NSPoint? = nil, animate: Bool = false) {
+    override var canBecomeKey: Bool { true }
+
+    func show(at point: NSPoint? = nil, animate: Bool = false) {
         if let point {
             if animate {
                 NSAnimationContext.runAnimationGroup { ctx in
@@ -844,12 +851,6 @@ open class PanelWindow: NSWindow {
         makeKeyAndOrderFront(nil)
         orderFrontRegardless()
         NSApp.activate(ignoringOtherApps: true)
-    }
-
-    public func forceClose() {
-        wc.close()
-        wc.window = nil
-        close()
     }
 
     private lazy var wc = NSWindowController(window: self)

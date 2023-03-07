@@ -3,7 +3,7 @@ import Foundation
 
 // MARK: - SliderCell
 
-class SliderCell: NSSliderCell {
+final class SliderCell: NSSliderCell {
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
@@ -188,7 +188,7 @@ class SliderCell: NSSliderCell {
 
 // MARK: - ClickThroughImageView
 
-class ClickThroughImageView: NSImageView {
+final class ClickThroughImageView: NSImageView {
     override func hitTest(_ point: NSPoint) -> NSView? {
         subviews.first { subview in subview.hitTest(point) != nil }
     }
@@ -292,7 +292,7 @@ var sliderTracking: Bool {
 
 // MARK: - VolumeSliderCell
 
-class VolumeSliderCell: NSSliderCell {
+final class VolumeSliderCell: NSSliderCell {
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
@@ -325,7 +325,7 @@ class VolumeSliderCell: NSSliderCell {
 
 // MARK: - VolumeSlider
 
-class VolumeSlider: NSSlider {
+final class VolumeSlider: NSSlider {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setup()

@@ -10,7 +10,7 @@ import Cocoa
 
 // MARK: - LockButtonCell
 
-class LockButtonCell: NSButtonCell {
+final class LockButtonCell: NSButtonCell {
     override func _shouldDrawTextWithDisabledAppearance() -> Bool {
         (controlView as! LockButton).grayDisabledText
     }
@@ -217,7 +217,7 @@ class LockButton: NSButton {
 
 // MARK: - EnableButton
 
-class EnableButton: LockButton {
+final class EnableButton: LockButton {
     override var bgOn: NSColor { get { enableButtonBgOn }
         set {}
     }

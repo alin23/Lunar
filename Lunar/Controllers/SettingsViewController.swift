@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class SettingsViewController: NSSplitViewController {
+final class SettingsViewController: NSSplitViewController {
     override func splitView(_: NSSplitView, effectiveRect _: NSRect, forDrawnRect _: NSRect, ofDividerAt _: Int) -> NSRect {
         NSRect()
     }

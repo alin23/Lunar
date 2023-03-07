@@ -10,7 +10,7 @@ import struct Foundation.Data
 import struct Foundation.URL
 
 /// Direct bindings to libssh2_channel
-public class Channel {
+final class Channel {
     private init(cSession: OpaquePointer, cChannel: OpaquePointer) {
         self.cSession = cSession
         self.cChannel = cChannel

@@ -391,7 +391,7 @@ protocol Nameable {
 
 // MARK: - SizedPopUpButton
 
-class SizedPopUpButton: NSPopUpButton {
+final class SizedPopUpButton: NSPopUpButton {
     var width: CGFloat?
     var height: CGFloat?
 
@@ -407,7 +407,7 @@ class SizedPopUpButton: NSPopUpButton {
 // MARK: - Dropdown
 
 struct Dropdown<T: Nameable>: NSViewRepresentable {
-    class Coordinator: NSObject {
+    final class Coordinator: NSObject {
         init(_ popUpButton: Dropdown) {
             button = popUpButton
         }
