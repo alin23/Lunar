@@ -371,7 +371,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     }
 
     override func mouseEntered(with _: NSEvent) {
-        log.verbose("mouseEntered: \(caption?.stringValue ?? stringValue)")
+        log.verbose("mouseEntered \(caption?.stringValue ?? stringValue)")
         guard isEnabled else { return }
         stringValue = stringValue
 
@@ -382,7 +382,7 @@ class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     }
 
     override func mouseExited(with _: NSEvent) {
-        log.verbose("mouseExited: \(caption?.stringValue ?? stringValue)")
+        log.verbose("mouseExited \(caption?.stringValue ?? stringValue)")
 
         guard isEnabled else { return }
 

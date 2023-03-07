@@ -51,7 +51,7 @@ public class CiaoBrowser {
 
     public var isSearching = false {
         didSet {
-            Logger.info(isSearching)
+            SwiftyLogger.info(isSearching)
         }
     }
 
@@ -64,7 +64,7 @@ public class CiaoBrowser {
     }
 
     public func reset() {
-        Logger.info("Resetting browser")
+        SwiftyLogger.info("Resetting browser")
         stop()
         services.removeAll()
 
@@ -119,7 +119,7 @@ public class CiaoBrowser {
 
 public class CiaoBrowserDelegate: NSObject, NetServiceBrowserDelegate {
     public func netServiceBrowser(_: NetServiceBrowser, didFind service: NetService, moreComing _: Bool) {
-        Logger.info("Service found \(service)")
+        SwiftyLogger.info("Service found \(service)")
         browser?.serviceFound(service)
     }
 
@@ -172,7 +172,7 @@ public class CiaoResolver {
             log.verbose("START DEINIT")
             defer { log.verbose("END DEINIT") }
         #endif
-        Logger.verbose(self)
+        SwiftyLogger.verbose(self)
         service.stop()
     }
 
@@ -199,17 +199,17 @@ extension CiaoResolver {
         var onResolve: ((Result<NetService, ErrorDictionary>) -> Void)?
 
         func netService(_ sender: NetService, didNotResolve errorDict: [String: NSNumber]) {
-            Logger.error("Service didn't resolve \(sender) \(errorDict)")
+            SwiftyLogger.error("Service didn't resolve \(sender) \(errorDict)")
             onResolve?(Result.failure(errorDict.mapValues { $0.intValue }))
         }
 
         func netServiceDidResolveAddress(_ sender: NetService) {
-            Logger.info("Service resolved \(sender)")
+            SwiftyLogger.info("Service resolved \(sender)")
             onResolve?(Result.success(sender))
         }
 
         func netServiceWillResolve(_ sender: NetService) {
-            Logger.info("Service will resolve \(sender)")
+            SwiftyLogger.info("Service will resolve \(sender)")
         }
     }
 }
@@ -259,7 +259,7 @@ public class CiaoServer {
         }
         set {
             netService.setTXTRecord(dictionary: newValue)
-            Logger.info("TXT Record updated \(newValue ?? [:])")
+            SwiftyLogger.info("TXT Record updated \(newValue ?? [:])")
         }
     }
 
@@ -289,17 +289,17 @@ class CiaoServerDelegate: NSObject, NetServiceDelegate {
 
     func netServiceDidPublish(_: NetService) {
         server?.started = true
-        Logger.info("CiaoServer Started")
+        SwiftyLogger.info("CiaoServer Started")
     }
 
     func netService(_: NetService, didNotPublish errorDict: [String: NSNumber]) {
         server?.started = false
-        Logger.error("CiaoServer did not publish \(errorDict)")
+        SwiftyLogger.error("CiaoServer did not publish \(errorDict)")
     }
 
     func netServiceDidStop(_: NetService) {
         server?.started = false
-        Logger.info("CiaoServer Stopped")
+        SwiftyLogger.info("CiaoServer Stopped")
     }
 }
 

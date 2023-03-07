@@ -53,8 +53,8 @@ func IOServiceFirstMatchingWhere(_ matching: CFDictionary, where predicate: (io_
 
         guard serv != 0 else { return nil }
         return IOServiceName(serv)
-
     }
+
     func IOServiceName(_ service: io_service_t) -> String? {
         let deviceNamePtr = UnsafeMutablePointer<CChar>.allocate(capacity: MemoryLayout<io_name_t>.size)
         defer { deviceNamePtr.deallocate() }
@@ -319,7 +319,7 @@ func IOServiceFirstMatchingWhere(_ matching: CFDictionary, where predicate: (io_
             return matched
         }
 
-        func matchingScore(for display: Display, in displayIDs: [CGDirectDisplayID]? = nil) -> Int {
+        func matchingScore(for display: Display, in _: [CGDirectDisplayID]? = nil) -> Int {
             var score = 0
 
             if let edidUUID {
@@ -345,7 +345,6 @@ func IOServiceFirstMatchingWhere(_ matching: CFDictionary, where predicate: (io_
 
             return score
         }
-
     }
 #endif
 
@@ -365,9 +364,16 @@ public extension Collection {
             }
         })
     }
-
 }
+
 infix operator ?!: NilCoalescingPrecedence
+
+func ?! <K: Hashable, V>(_ dict: [K: V]?, _ dict2: [K: V]) -> [K: V] {
+    guard let dict, !dict.isEmpty else {
+        return dict2
+    }
+    return dict
+}
 
 func ?! (_ str: String?, _ str2: String) -> String {
     guard let str, !str.isEmpty else {
@@ -403,6 +409,7 @@ func ?! (_ svc: io_service_t?, _ svc2: io_service_t?) -> io_service_t? {
     }
     return svc
 }
+
 func ?! (_ svc: io_service_t?, _ svc2: io_service_t) -> io_service_t {
     guard let svc, svc != 0 else {
         return svc2
@@ -487,9 +494,11 @@ class DisplayController: ObservableObject {
         didSet {
             #if arch(arm64)
                 brightnessSplines = computeBrightnessSplines()
+                contrastSplines = computeContrastSplines()
             #endif
         }
     }
+
     @Published var activeDisplayList: [Display] = [] {
         didSet {
             #if arch(arm64)
@@ -577,6 +586,7 @@ class DisplayController: ObservableObject {
     var targetDisplays: [Display] {
         activeDisplayList.filter { !$0.isSource }
     }
+
     @AtomicLock var displays: [CGDirectDisplayID: Display] = [:] {
         didSet {
             activeDisplays = displays.filter { $1.active }
@@ -595,6 +605,7 @@ class DisplayController: ObservableObject {
             }
         }
     }
+
     var activeDisplays: [CGDirectDisplayID: Display] {
         get { _activeDisplaysLock.around(ignoreMainThread: true) { _activeDisplays } }
         set {
@@ -636,23 +647,27 @@ class DisplayController: ObservableObject {
     }
 
     #if arch(arm64)
-        var nitsMappingSaver: DispatchWorkItem? {
-            didSet {
-                oldValue?.cancel()
-            }
-        }
-        var nitsMapping: [String: [AutoLearnMapping]] = Defaults[.nitsMapping] {
-            didSet {
-                saveAutoLearnMapping()
-            }
-        }
-        lazy var brightnessSplines: [String: (Double) -> Double] = computeBrightnessSplines()
+        var nitsBrightnessMappingSaver: DispatchWorkItem? { didSet { oldValue?.cancel() } }
+        var nitsBrightnessMapping: [String: [AutoLearnMapping]] = Defaults[.nitsBrightnessMapping] { didSet { saveAutoLearnBrightnessMapping() } }
 
-        func saveAutoLearnMapping() {
-            nitsMappingSaver = mainAsyncAfter(ms: 500) {
-                Defaults[.nitsMapping] = self.nitsMapping
+        var nitsContrastMappingSaver: DispatchWorkItem? { didSet { oldValue?.cancel() } }
+        var nitsContrastMapping: [String: [AutoLearnMapping]] = Defaults[.nitsContrastMapping] { didSet { saveAutoLearnContrastMapping() } }
+
+        lazy var brightnessSplines: [String: (Double) -> Double] = computeBrightnessSplines()
+        lazy var contrastSplines: [String: (Double) -> Double] = computeContrastSplines()
+
+        func saveAutoLearnBrightnessMapping() {
+            nitsBrightnessMappingSaver = mainAsyncAfter(ms: 500) {
+                Defaults[.nitsBrightnessMapping] = self.nitsBrightnessMapping
                 self.brightnessSplines = self.computeBrightnessSplines()
-                self.nitsMappingSaver = nil
+                self.nitsBrightnessMappingSaver = nil
+            }
+        }
+        func saveAutoLearnContrastMapping() {
+            nitsContrastMappingSaver = mainAsyncAfter(ms: 500) {
+                Defaults[.nitsContrastMapping] = self.nitsContrastMapping
+                self.contrastSplines = self.computeContrastSplines()
+                self.nitsContrastMappingSaver = nil
             }
         }
         // @Published var computingNitsCurveID: CGDirectDisplayID? = nil
@@ -670,7 +685,9 @@ class DisplayController: ObservableObject {
             if adaptiveMode.key != .manual {
                 lastNonManualAdaptiveMode = adaptiveMode
             }
-            oldValue.stopWatching()
+            if oldValue.key != adaptiveMode.key {
+                oldValue.stopWatching()
+            }
             if adaptiveMode.available {
                 adaptiveMode.watch()
             }
@@ -833,6 +850,7 @@ class DisplayController: ObservableObject {
             possiblyDisconnectedDisplayList = possiblyDisconnectedDisplays.values.sorted(by: \.id)
         }
     }
+
     @Atomic var autoBlackoutPending = false {
         didSet {
             log.info("autoBlackoutPending=\(autoBlackoutPending)")
@@ -1550,11 +1568,13 @@ class DisplayController: ObservableObject {
             }
         }
     }
+
     var resetDisplayListTask: DispatchWorkItem? {
         didSet {
             oldValue?.cancel()
         }
     }
+
     var sentryDataTask: DispatchWorkItem? {
         didSet {
             oldValue?.cancel()
@@ -1669,6 +1689,7 @@ class DisplayController: ObservableObject {
 
         let mode = DisplayController.autoMode()
         if mode.key != adaptiveMode.key {
+            log.debug("Adaptive Mode: \(adaptiveMode.str) -> \(mode.str)")
             adaptiveMode = mode
             CachedDefaults[.adaptiveBrightnessMode] = mode.key
         }
@@ -2231,7 +2252,7 @@ class DisplayController: ObservableObject {
                 let identifiers = change.compactMap(\.bundleIdentifier)
 
                 runningAppExceptions = datastore.appExceptions(identifiers: Array(identifiers.uniqued())) ?? []
-                log.info("New running applications: \(runningAppExceptions.map(\.name))")
+                log.info("Running app presets: \(runningAppExceptions.map(\.name))")
                 adaptBrightness()
             }
             .store(in: &observers)
@@ -2254,6 +2275,7 @@ class DisplayController: ObservableObject {
             }
             .store(in: &observers)
     }
+
     func fetchValues(for displays: [Display]? = nil) {
         for display in displays ?? activeDisplayList.map({ $0 }) {
             display.refreshBrightness()
@@ -2488,6 +2510,7 @@ class DisplayController: ObservableObject {
             }
         }
     }
+
     @inline(__always) func withoutSlowTransition(_ block: () -> Void) {
         guard brightnessTransition == .slow else {
             block()

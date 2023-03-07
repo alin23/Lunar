@@ -84,7 +84,7 @@
 		C780CF98269F241A007FFB58 /* tsl2591.h in Resources */ = {isa = PBXBuildFile; fileRef = C780CF96269F2370007FFB58 /* tsl2591.h */; };
 		C784143827DDFBC400E14941 /* OSDWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C784143727DDFBC400E14941 /* OSDWindow.swift */; };
 		C78A1964294E700800B0410A /* DDC2.c in Sources */ = {isa = PBXBuildFile; fileRef = C78A1963294E700800B0410A /* DDC2.c */; };
-		C78AB66720F0C73900863CB1 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78AB66620F0C73900863CB1 /* Logger.swift */; };
+		C78AB66720F0C73900863CB1 /* SwiftyLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78AB66620F0C73900863CB1 /* SwiftyLogger.swift */; };
 		C78BD044259B2FB100FC823F /* SensorMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD043259B2FB100FC823F /* SensorMode.swift */; };
 		C78BD04A259B33D500FC823F /* Path in Frameworks */ = {isa = PBXBuildFile; productRef = C78BD049259B33D500FC823F /* Path */; };
 		C78BD04C259B365500FC823F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD04B259B365500FC823F /* Extensions.swift */; };
@@ -271,7 +271,7 @@
 		C784143727DDFBC400E14941 /* OSDWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSDWindow.swift; sourceTree = "<group>"; };
 		C78A1963294E700800B0410A /* DDC2.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = DDC2.c; sourceTree = "<group>"; };
 		C78A1965294E70D100B0410A /* SharedDDC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SharedDDC.h; sourceTree = "<group>"; };
-		C78AB66620F0C73900863CB1 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		C78AB66620F0C73900863CB1 /* SwiftyLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftyLogger.swift; sourceTree = "<group>"; };
 		C78BD043259B2FB100FC823F /* SensorMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorMode.swift; sourceTree = "<group>"; };
 		C78BD04B259B365500FC823F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		C78BD04D259B369A00FC823F /* Popovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Popovers.swift; sourceTree = "<group>"; };
@@ -469,7 +469,7 @@
 				C7C1F7021FD5FD390039507C /* Display.swift */,
 				C7C1F7061FD6354C0039507C /* Geolocation.swift */,
 				C73AAC4A22241B690063AD2A /* Hotkeys.swift */,
-				C78AB66620F0C73900863CB1 /* Logger.swift */,
+				C78AB66620F0C73900863CB1 /* SwiftyLogger.swift */,
 				C7C1F7041FD635360039507C /* Moment.swift */,
 				C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */,
 				C7EF9534243F4E2200839A62 /* Sysctl.swift */,
@@ -1053,7 +1053,7 @@
 				C7C1F786299FB50E00F6FFD5 /* Calibration.swift in Sources */,
 				C79975DE25DEEF9200C797FF /* AppleNativeControl.swift in Sources */,
 				C7A7C24A2593B5EA00745637 /* HotkeyButton.swift in Sources */,
-				C78AB66720F0C73900863CB1 /* Logger.swift in Sources */,
+				C78AB66720F0C73900863CB1 /* SwiftyLogger.swift in Sources */,
 				C7AB59782396C4A90028E573 /* Transformers.swift in Sources */,
 				C722FBA0271AC83200ED4C94 /* Button.swift in Sources */,
 				C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */,
@@ -1235,7 +1235,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 6.0.0b1;
+				CURRENT_PROJECT_VERSION = 6.0.0b3;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -1266,7 +1266,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 6.0.0b1;
+				MARKETING_VERSION = 6.0.0b3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1303,7 +1303,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 6.0.0b1;
+				CURRENT_PROJECT_VERSION = 6.0.0b3;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = RDDXV84A73;
@@ -1334,7 +1334,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 6.0.0b1;
+				MARKETING_VERSION = 6.0.0b3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;

@@ -131,7 +131,7 @@ class HotkeyPopoverController: NSViewController {
         }
 
         let identifier1 = display.hotkeyIdentifiers[0]
-        log.debug("Setting identifier for \(display): \(identifier1)")
+        // log.debug("Setting identifier for \(display): \(identifier1)")
 
         hotkey1 = CachedDefaults[.hotkeys].first(where: { $0.identifier == identifier1 })?
             .with(handler: { [weak self] _ in self?.handler1() }) ??
@@ -154,7 +154,7 @@ class HotkeyPopoverController: NSViewController {
         }
 
         let identifier2 = display.hotkeyIdentifiers[1]
-        log.debug("Setting identifier for \(display): \(identifier2)")
+        // log.debug("Setting identifier for \(display): \(identifier2)")
 
         hotkey2 = CachedDefaults[.hotkeys].first(where: { $0.identifier == identifier2 })?
             .with(handler: { [weak self] _ in self?.handler2() }) ??
@@ -177,7 +177,7 @@ class HotkeyPopoverController: NSViewController {
             }
         }
         let identifier3 = display.hotkeyIdentifiers[2]
-        log.debug("Setting identifier for \(display): \(identifier3)")
+        // log.debug("Setting identifier for \(display): \(identifier3)")
 
         hotkey3 = CachedDefaults[.hotkeys].first(where: { $0.identifier == identifier3 })?
             .with(handler: { [weak self] _ in self?.handler3() }) ??

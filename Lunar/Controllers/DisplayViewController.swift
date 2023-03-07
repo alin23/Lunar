@@ -427,6 +427,8 @@ class DisplayViewController: NSViewController {
 
     @IBOutlet var brightnessSliderImage: ClickThroughImageView?
 
+    var initGraphSubject = PassthroughSubject<AdaptiveModeKey?, Never>()
+
     @IBOutlet var advancedSettingsButton: LockButton? {
         didSet {
             guard let b = advancedSettingsButton else { return }
@@ -549,12 +551,6 @@ class DisplayViewController: NSViewController {
         }
     }
 
-    var initGraphTask: DispatchWorkItem? {
-        didSet {
-            oldValue?.cancel()
-        }
-    }
-
     func placeAddScheduleButton() {
         guard let addScheduleButton,
               let schedule2,
@@ -651,7 +647,7 @@ class DisplayViewController: NSViewController {
 
     @objc func adaptToDataPointBounds(notification _: Notification) {
         guard let display, brightnessContrastChart != nil, display.id != GENERIC_DISPLAY_ID else { return }
-        initGraph()
+        initGraphSubject.send(nil)
     }
 
 //    @objc func highlightChartValue(notification _: Notification) {
@@ -930,13 +926,13 @@ class DisplayViewController: NSViewController {
         display.$lockedContrast
             .debounce(for: .milliseconds(50), scheduler: RunLoop.main)
             .sink { [weak self] locked in
-                self?.brightnessContrastChart?.contrastGraph.visible = !locked
+                self?.brightnessContrastChart?.contrastGraph.visible = !locked && display.hasDDC
                 self?.brightnessContrastChart?.needsDisplay = true
             }.store(in: &observers)
         display.$adaptiveSubzero
             .debounce(for: .milliseconds(50), scheduler: RunLoop.main)
             .sink { [weak self] _ in
-                self?.initGraph()
+                self?.initGraphSubject.send(nil)
             }.store(in: &observers)
 
         minBrightnessField?.integerValue = display.minBrightness.intValue
@@ -1361,7 +1357,8 @@ class DisplayViewController: NSViewController {
         }
 
         #if arch(arm64)
-            displayController.nitsMapping = displayController.nitsMapping.copyWithout(key: display.serial)
+            displayController.nitsBrightnessMapping = displayController.nitsBrightnessMapping.copyWithout(key: display.serial)
+            displayController.nitsContrastMapping = displayController.nitsContrastMapping.copyWithout(key: display.serial)
         #endif
         display.adaptivePaused = true
         defer {
@@ -1557,18 +1554,24 @@ class DisplayViewController: NSViewController {
 
     func listenForGraphDataChange() {
         graphObserver = moreGraphDataPublisher.sink { [weak self] change in
-            log.debug("More graph data: \(change.newValue)")
+            // log.debug("More graph data: \(change.newValue)")
             guard let self else { return }
             mainAsyncAfter(ms: 1000) { [weak self] in
                 guard let self else { return }
-                self.initGraph()
+                self.initGraphSubject.send(nil)
             }
         }
     }
-
     func listenForAdaptiveModeChange() {
-        adaptiveModeObserver = adaptiveBrightnessModePublisher.sink { [weak self] change in
-            mainAsync {
+        initGraphSubject
+            .throttle(for: .milliseconds(1000), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] modeKey in
+                if self?.brightnessContrastChart != nil {
+                    self?.initGraph(mode: modeKey?.mode)
+                }
+            }.store(in: &observers)
+        adaptiveBrightnessModePublisher
+            .sink { [weak self] change in
                 guard let self, !self.pausedAdaptiveModeObserver else { return }
                 self.pausedAdaptiveModeObserver = true
 
@@ -1577,14 +1580,10 @@ class DisplayViewController: NSViewController {
                 self.scheduleBox?.isHidden = self.display == nil || self.noDisplay || change.newValue != .clock
 
                 Defaults.withoutPropagation {
-                    let adaptiveMode = change.newValue
-                    if self.brightnessContrastChart != nil {
-                        self.initGraph(mode: adaptiveMode.mode)
-                    }
+                    self.initGraphSubject.send(change.newValue)
                     self.pausedAdaptiveModeObserver = false
                 }
-            }
-        }
+            }.store(in: &observers)
         DistributedNotificationCenter.default()
             .publisher(for: NSNotification.Name(rawValue: kAppleInterfaceThemeChangedNotification), object: nil)
             .debounce(for: .seconds(2), scheduler: RunLoop.main)
@@ -1597,22 +1596,19 @@ class DisplayViewController: NSViewController {
 
     func initGraph(mode: AdaptiveMode? = nil) {
         guard !chartHidden else {
-            initGraphTask = nil
             zeroGraph()
             return
         }
 
-        initGraphTask = mainAsyncAfter(ms: 50) { [weak self] in
-            self?.brightnessContrastChart?.initGraph(
-                display: self?.display,
-                brightnessColor: brightnessGraphColor,
-                contrastColor: contrastGraphColor,
-                labelColor: xAxisLabelColor,
-                mode: mode
-            )
-            self?.brightnessContrastChart?.rightAxis.gridColor = mauve.withAlphaComponent(0.1)
-            self?.brightnessContrastChart?.xAxis.gridColor = mauve.withAlphaComponent(0.1)
-        }
+        self.brightnessContrastChart?.initGraph(
+            display: self.display,
+            brightnessColor: brightnessGraphColor,
+            contrastColor: contrastGraphColor,
+            labelColor: xAxisLabelColor,
+            mode: mode
+        )
+        self.brightnessContrastChart?.rightAxis.gridColor = mauve.withAlphaComponent(0.1)
+        self.brightnessContrastChart?.xAxis.gridColor = mauve.withAlphaComponent(0.1)
     }
 
     func zeroGraph() {

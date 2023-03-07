@@ -1444,6 +1444,16 @@ enum MonitorValue {
     case contrast(Contrast)
     case preciseBrightness(PreciseBrightness)
     case preciseContrast(PreciseContrast)
+
+    var isBrightness: Bool { !isContrast }
+    var isContrast: Bool {
+        switch self {
+        case .nsBrightness, .brightness, .preciseBrightness:
+            return false
+        case .nsContrast, .contrast, .preciseContrast:
+            return true
+        }
+    }
 }
 
 extension URL {

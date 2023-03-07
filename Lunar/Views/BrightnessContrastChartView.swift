@@ -307,7 +307,9 @@ class BrightnessContrastChartView: LineChartView {
         contrastGraph.highlightLineDashLengths = [10, 6]
         contrastGraph.mode = .cubicBezier
 
-        contrastGraph.visible = !(display?.lockedContrast ?? true)
+        if let display {
+            contrastGraph.visible = !display.lockedContrast && display.hasDDC
+        }
 
         if CachedDefaults[.moreGraphData] {
             xAxis.labelTextColor = labelColor
@@ -343,6 +345,7 @@ class BrightnessContrastChartView: LineChartView {
 
     func setupLegend(display: Display? = nil) {
         let lockedContrast = display?.lockedContrast ?? true
+        let hasDDC = display?.hasDDC ?? false
 
         legend.enabled = !lockedContrast
         legend.drawInside = !lockedContrast
@@ -354,7 +357,7 @@ class BrightnessContrastChartView: LineChartView {
         legend.formSize = 18.0
         legend.orientation = .vertical
 
-        if !lockedContrast {
+        if !lockedContrast, hasDDC {
             legend.setCustom(entries: [
                 valueLegend("Brightness", color: brightnessGraph.fillColor.withAlphaComponent(0.4)),
                 valueLegend("Contrast", color: contrastGraph.fillColor.withAlphaComponent(0.4)),

@@ -533,7 +533,7 @@ struct Lunar: ParsableCommand {
                       UUID:\t\t\(d.serial)
                       minNits:\t\(d.minNits)
                       maxNits:\t\(d.maxNits)
-                      nitsMap:\t\(displayController.nitsMapping[d.serial]?.json ?? "None")
+                      nitsMap:\t\(displayController.nitsBrightnessMapping[d.serial]?.json ?? "None")
 
                     """)
                 }
@@ -2274,14 +2274,14 @@ class LunarServer {
                     }
 
                     try socket.listen(on: LUNAR_CLI_PORT.i, node: host)
-                    log.info("Listening on port: \(socket.listeningPort)")
+                    log.info("Listening on port \(socket.listeningPort)")
 
                     repeat {
                         let newSocket = try socket.acceptClientConnection()
 
                         #if DEBUG
-                            log.info("Accepted connection from: \(newSocket.remoteHostname) on port \(newSocket.remotePort)")
-                            log.info("Socket Signature: \(String(describing: newSocket.signature?.description))")
+                            log.info("Accepted connection from \(newSocket.remoteHostname) on port \(newSocket.remotePort)")
+                            log.info("Socket Signature \(String(describing: newSocket.signature?.description))")
                         #endif
 
                         self?.addNewConnection(socket: newSocket)
@@ -2289,12 +2289,12 @@ class LunarServer {
                     } while self?.continueRunning ?? false
                 } catch {
                     guard let socketError = error as? Socket.Error else {
-                        log.error("Unexpected error: \(error)")
+                        log.error("Unexpected error \(error)")
                         return
                     }
 
                     if let self, self.continueRunning {
-                        log.error("Error reported:\n \(socketError.description)")
+                        log.error("Error reported\n\t\(socketError.description)")
                     }
                 }
             }
@@ -2397,7 +2397,7 @@ class LunarServer {
                 } while shouldKeepRunning
 
                 #if DEBUG
-                    log.info("Socket: \(socket.remoteHostname):\(socket.remotePort) closed...")
+                    log.info("Socket \(socket.remoteHostname):\(socket.remotePort) closed...")
                 #endif
                 socket.close()
 

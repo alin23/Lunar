@@ -10,10 +10,41 @@ import Combine
 import Defaults
 import Foundation
 import SwiftyBeaver
+#if DEBUG
+    import os
+#endif
+
+#if DEBUG
+    func debug(
+        _ message: @autoclosure () -> Any,
+        file: String = #file,
+        function: String = #function,
+        line: Int = #line,
+        context: Any? = nil
+    ) {
+        if let m = message() as? String {
+            SwiftyLogger.oslog(file).debug("\(m)")
+        }
+        log.debug(message(), file: file, function: function, line: line, context: context)
+    }
+
+    func err(
+        _ message: @autoclosure () -> Any,
+        file: String = #file,
+        function: String = #function,
+        line: Int = #line,
+        context: Any? = nil
+    ) {
+        log.error(message(), file: file, function: function, line: line, context: context)
+    }
+#else
+    @inline(__always) func debug(_: @autoclosure () -> Any) {}
+    @inline(__always) func err(_: @autoclosure () -> Any) {}
+#endif
 
 // MARK: - Logger
 
-class Logger: SwiftyBeaver {
+class SwiftyLogger: SwiftyBeaver {
     override open class func verbose(
         _ message: @autoclosure () -> Any,
         file: String = #file,
@@ -22,7 +53,12 @@ class Logger: SwiftyBeaver {
         line: Int = #line,
         context: Any? = nil
     ) {
-        guard initialized else { return }
+        guard initialized, console.minLevel.rawValue < Level.info.rawValue else { return }
+        #if DEBUG
+            if let m = message() as? String {
+                oslog(file).trace("\(m)")
+            }
+        #endif
         super.verbose(message(), file: file, function: function, line: line, context: context)
     }
 
@@ -34,6 +70,12 @@ class Logger: SwiftyBeaver {
         line: Int = #line,
         context: Any? = nil
     ) {
+        guard initialized, console.minLevel.rawValue < Level.info.rawValue else { return }
+        #if DEBUG
+            if let m = message() as? String {
+                oslog(file).debug("\(m)")
+            }
+        #endif
         super.debug(message(), file: file, function: function, line: line, context: context)
     }
 
@@ -45,7 +87,12 @@ class Logger: SwiftyBeaver {
         line: Int = #line,
         context: Any? = nil
     ) {
-        guard initialized else { return }
+        guard initialized, console.minLevel.rawValue < Level.info.rawValue else { return }
+        #if DEBUG
+            if let m = message() as? String {
+                oslog(file).info("\(m)")
+            }
+        #endif
         super.info(message(), file: file, function: function, line: line, context: context)
     }
 
@@ -73,6 +120,18 @@ class Logger: SwiftyBeaver {
         super.error(message(), file: file, function: function, line: line, context: context)
     }
 
+    #if DEBUG
+        static var osLoggers: [String: Logger] = [:]
+        class func oslog(_ category: String) -> Logger {
+            let category = category.split(separator: "/").last!.split(separator: ".").first!.s
+            guard let logger = osLoggers[category] else {
+                let logger = Logger(subsystem: "fyi.lunar.Lunar", category: category)
+                osLoggers[category] = logger
+                return logger
+            }
+            return logger
+        }
+    #endif
     static var observers: Set<AnyCancellable> = []
 
     @Atomic static var trace: Bool = Defaults[.trace] && Defaults[.debug]
@@ -88,13 +147,14 @@ class Logger: SwiftyBeaver {
             info($0)
         }
     }
+
     class func initLogger(cli: Bool = false, debug: Bool = false, verbose: Bool = false) {
         defer { initialized = true }
         console.format = "$DHH:mm:ss.SSS$d $C$L$c $N.$F:$l - $M \t$X"
         file.format = "$DHH:mm:ss.SSS$d $L $N.$F:$l - $M \t$X"
         file.logFileMaxSize = (15 * 1024 * 1024)
         file.logFileAmount = 3
-        Logger.addDestination(console)
+        SwiftyLogger.addDestination(console)
 
         #if DEBUG
             setMinLevel(debug: !cli, verbose: !cli, cloud: false, cli: cli)
@@ -109,7 +169,7 @@ class Logger: SwiftyBeaver {
 
         debugPublisher.sink { change in
             guard !cli else { return }
-            Logger.trace = Defaults[.trace] && change.newValue
+            SwiftyLogger.trace = Defaults[.trace] && change.newValue
             self.setMinLevel(
                 debug: change.newValue,
                 verbose: change.newValue,
@@ -119,22 +179,22 @@ class Logger: SwiftyBeaver {
         .store(in: &observers)
 
         tracePublisher
-            .sink { Logger.trace = $0.newValue && Defaults[.debug] }
+            .sink { SwiftyLogger.trace = $0.newValue && Defaults[.debug] }
             .store(in: &observers)
 
         #if !DEBUG
             if debug || verbose {
-                Logger.addDestination(file)
+                SwiftyLogger.addDestination(file)
             }
         #endif
 
         if lunarProActive, let email = lunarProProduct?.activationEmail {
-            Logger.cloud.analyticsUserName = email
+            SwiftyLogger.cloud.analyticsUserName = email
         }
     }
 
     class func disable() {
-        Logger.removeAllDestinations()
+        SwiftyLogger.removeAllDestinations()
     }
 
     class func setMinLevel(debug: Bool, verbose: Bool = false, cloud: Bool = false, cli: Bool = false) {
@@ -144,7 +204,7 @@ class Logger: SwiftyBeaver {
             if cloud { self.cloud.minLevel = .verbose }
 
             #if !DEBUG
-                Logger.addDestination(file)
+                SwiftyLogger.addDestination(file)
             #endif
         } else if debug {
             console.minLevel = .debug
@@ -152,11 +212,11 @@ class Logger: SwiftyBeaver {
             if cloud { self.cloud.minLevel = .debug }
 
             #if !DEBUG
-                Logger.addDestination(file)
+                SwiftyLogger.addDestination(file)
             #endif
         } else {
             #if !DEBUG
-                Logger.removeDestination(file)
+                SwiftyLogger.removeDestination(file)
             #endif
 
             console.minLevel = cli ? .warning : .info
@@ -166,12 +226,12 @@ class Logger: SwiftyBeaver {
     }
 }
 
-let log = Logger.self
+let log = SwiftyLogger.self
 
 import Sentry
 
 func crumb(_ msg: String, level: SentryLevel = .info, category: String) {
-    log.info("\(category): \(msg)")
+//    log.info("\(category): \(msg)")
 
     guard AppDelegate.enableSentry else { return }
     let crumb = Breadcrumb(level: level, category: category)

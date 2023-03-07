@@ -104,6 +104,7 @@ struct PowerOffButtonView: View {
             ))
         }
     }
+
     @available(macOS 13, *)
     struct DisconnectedDisplayView: View {
         @Environment(\.colors) var colors
@@ -142,7 +143,7 @@ struct DisplayRowView: View {
     @Environment(\.colors) var colors
     @Default(.showSliderValues) var showSliderValues
     #if arch(arm64)
-        @Default(.showSliderValuesNits) var showSliderValuesNits
+        // @Default(.showSliderValuesNits) var showSliderValuesNits
         @Default(.syncNits) var syncNits
     #endif
     @Default(.showInputInQuickActions) var showInputInQuickActions
@@ -170,7 +171,8 @@ struct DisplayRowView: View {
                     color: Colors.xdr.opacity(0.7),
                     backgroundColor: Colors.xdr.opacity(colorScheme == .dark ? 0.1 : 0.2),
                     knobColor: Colors.xdr,
-                    showValue: $showSliderValues
+                    showValue: $showSliderValues,
+                    beforeSettingPercentage: { _ in display.forceHideSoftwareOSD = true }
                 )
             }
             if display.subzero, !display.blackOutEnabled {
@@ -180,8 +182,9 @@ struct DisplayRowView: View {
                     color: Colors.subzero.opacity(0.7),
                     backgroundColor: Colors.subzero.opacity(colorScheme == .dark ? 0.1 : 0.2),
                     knobColor: Colors.subzero,
-                    showValue: $showSliderValues
-                ) { br in
+                    showValue: $showSliderValues,
+                    beforeSettingPercentage: { _ in display.forceHideSoftwareOSD = true }
+                ) { _ in
                     guard display.adaptiveSubzero else { return }
 
                     let lastDataPoint = datapointLock.around { displayController.adaptiveMode.brightnessDataPoint.last }
@@ -276,11 +279,11 @@ struct DisplayRowView: View {
 
             if xdrSelectorShown { sdrXdrSelector }
 
-            #if arch(arm64)
-                let shownValue = (showSliderValuesNits && syncNits && syncMode && syncPollingSeconds == 0) ? $display.nits : nil
-            #else
-                let shownValue: Binding<Double?>? = nil
-            #endif
+            // #if arch(arm64)
+            //     let shownValue = (showSliderValuesNits && syncNits && syncMode && syncPollingSeconds == 0) ? $display.nits : nil
+            // #else
+            let shownValue: Binding<Double?>? = nil
+            // #endif
             if !display.blackOutEnabled {
                 if display.noDDCOrMergedBrightnessContrast {
                     let mergedLockBinding = Binding<Bool>(
@@ -696,6 +699,7 @@ struct AdvancedSettingsView: View {
 
     @Default(.autoRestartOnFailedDDC) var autoRestartOnFailedDDC
     @Default(.autoRestartOnFailedDDCSooner) var autoRestartOnFailedDDCSooner
+    @Default(.allowAnySyncSource) var allowAnySyncSource
 
     @State var sensorCheckerEnabled = !Defaults[.sensorHostname].isEmpty
 
@@ -777,6 +781,10 @@ struct AdvancedSettingsView: View {
                         setting: $clamshellModeDetection
                     ).disabled(!Sysctl.isMacBook)
                     SettingsToggle(
+                        text: "Allow non-Apple monitors as Sync Mode source",
+                        setting: $allowAnySyncSource.animation(.fastSpring)
+                    )
+                    SettingsToggle(
                         text: "Re-apply brightness on screen wake", setting: $reapplyValuesAfterWake,
                         help: """
                         On each screen wake/reconnection, Lunar will try to
@@ -801,21 +809,23 @@ struct AdvancedSettingsView: View {
                             Ctrl+7: 270°
                         """
                     )
-                    SettingsToggle(
-                        text: "Wait longer between DDC requests", setting: $ddcSleepLonger,
-                        help: """
-                        Some monitors have a slower response time on DDC requests.
+                    if dc.activeDisplayList.contains(where: \.hasDDC) {
+                        SettingsToggle(
+                            text: "Wait longer between DDC requests", setting: $ddcSleepLonger,
+                            help: """
+                            Some monitors have a slower response time on DDC requests.
 
-                        This option might help reduce flicker in those cases.
-                        """
-                    )
-                    SettingsToggle(
-                        text: "Check for DDC responsiveness periodically", setting: $detectResponsiveness,
-                        help: """
-                        Detects when DDC becomes unresponsive and presents
-                        the choice to switch to Software Dimming.
-                        """
-                    )
+                            This option might help reduce flicker in those cases.
+                            """
+                        )
+                        SettingsToggle(
+                            text: "Check for DDC responsiveness periodically", setting: $detectResponsiveness,
+                            help: """
+                            Detects when DDC becomes unresponsive and presents
+                            the choice to switch to Software Dimming.
+                            """
+                        )
+                    }
                     if dc.activeDisplayList.contains(where: { $0.control is NetworkControl }) {
                         SettingsToggle(
                             text: "Disable Network Controller video ", setting: $disableControllerVideo,
@@ -841,18 +851,18 @@ struct AdvancedSettingsView: View {
                         Text("Don't use unless really needed or asked by the developer")
                             .foregroundColor(Colors.red)
                             .font(.caption)
-                        SettingsToggle(
-                            text: "Refresh values from monitor settings", setting: $refreshValues,
-                            help: """
-                            Keep Lunar state in sync by reading monitor settings periodically.
+                        // SettingsToggle(
+                        //     text: "Refresh values from monitor settings", setting: $refreshValues,
+                        //     help: """
+                        //     Keep Lunar state in sync by reading monitor settings periodically.
 
-                            This is only useful if monitor values are changed externally,
-                            from another computer or through special buttons/knobs.
+                        //     This is only useful if monitor values are changed externally,
+                        //     from another computer or through special buttons/knobs.
 
-                            Caution: Most monitors don't support read commands and enabling this setting
-                            can cause many issues with losing signal, system freezes, hanging apps etc.
-                            """
-                        )
+                        //     Caution: Most monitors don't support read commands and enabling this setting
+                        //     can cause many issues with losing signal, system freezes, hanging apps etc.
+                        //     """
+                        // )
                         SettingsToggle(
                             text: "Disable usage of Gamma API completely", setting: $gammaDisabledCompletely,
                             help: """
@@ -869,81 +879,82 @@ struct AdvancedSettingsView: View {
                             • Sub-zero Dimming
                             """
                         )
+                        if dc.activeDisplayList.contains(where: \.hasDDC) {
+                            SettingsToggle(
+                                text: "Auto restart Lunar when DDC fails", setting: $autoRestartOnFailedDDC,
+                                help: """
+                                Experimental: for people running into macOS bugs where a monitor can no longer
+                                be controlled. You might see a lock icon when brightness keys are pressed.
 
-                        SettingsToggle(
-                            text: "Auto restart Lunar when DDC fails", setting: $autoRestartOnFailedDDC,
-                            help: """
-                            Experimental: for people running into macOS bugs where a monitor can no longer
-                            be controlled. You might see a lock icon when brightness keys are pressed.
+                                To avoid jarring brightness changes, this will not restart the app
+                                if any of the following features are in active use:
 
-                            To avoid jarring brightness changes, this will not restart the app
-                            if any of the following features are in active use:
-
-                            • XDR Brightness
-                            • Facelight
-                            • Blackout
-                            • Sub-zero Dimming
-                            """
-                        )
-                        SettingsToggle(
-                            text: "Avoid safety checks", setting: $autoRestartOnFailedDDCSooner,
-                            help: """
-                            Don't wait for the detection of DDC fail to happen more than once, and restart
-                            the app even if it could cause a jarring brightness change.
-                            """
-                        ).padding(.leading)
-
-                        SettingsToggle(
-                            text: "Delay DDC commands after wake", setting: $delayDDCAfterWake,
-                            help: """
-                            Experimental: for people running into monitor bugs like the video signal being
-                            lost or screen not waking up after system sleep, this could be a safe measure
-                            to ensure Lunar doesn't send any DDC command until the monitor connection
-                            is fully established.
-
-                            This will disable or cripple the following features:
-
-                            • Smooth transitions
-                            • DDC responsiveness checker
-                            • Re-applying color gain on wake
-                            • Re-applying brightness/contrast on wake
-                            """
-                        )
-                        HStack {
-                            let secondsBinding = Binding<Float>(
-                                get: { waitAfterWakeSeconds.f / 100 },
-                                set: { waitAfterWakeSeconds = ($0 * 100).i }
+                                • XDR Brightness
+                                • Facelight
+                                • Blackout
+                                • Sub-zero Dimming
+                                """
                             )
-                            BigSurSlider(
-                                percentage: secondsBinding,
-                                image: "clock.circle",
-                                color: Colors.lightGray,
-                                backgroundColor: Colors.grayMauve.opacity(0.1),
-                                knobColor: Colors.lightGray,
-                                showValue: .constant(true),
-                                disabled: !$delayDDCAfterWake
-                            )
-                            .padding(.leading)
+                            SettingsToggle(
+                                text: "Avoid safety checks", setting: $autoRestartOnFailedDDCSooner,
+                                help: """
+                                Don't wait for the detection of DDC fail to happen more than once, and restart
+                                the app even if it could cause a jarring brightness change.
+                                """
+                            ).padding(.leading)
 
-                            SwiftUI.Button("Reset") { waitAfterWakeSeconds = 30 }
-                                .buttonStyle(FlatButton(
+                            SettingsToggle(
+                                text: "Delay DDC commands after wake", setting: $delayDDCAfterWake,
+                                help: """
+                                Experimental: for people running into monitor bugs like the video signal being
+                                lost or screen not waking up after system sleep, this could be a safe measure
+                                to ensure Lunar doesn't send any DDC command until the monitor connection
+                                is fully established.
+
+                                This will disable or cripple the following features:
+
+                                • Smooth transitions
+                                • DDC responsiveness checker
+                                • Re-applying color gain on wake
+                                • Re-applying brightness/contrast on wake
+                                """
+                            )
+                            HStack {
+                                let secondsBinding = Binding<Float>(
+                                    get: { waitAfterWakeSeconds.f / 100 },
+                                    set: { waitAfterWakeSeconds = ($0 * 100).i }
+                                )
+                                BigSurSlider(
+                                    percentage: secondsBinding,
+                                    image: "clock.circle",
                                     color: Colors.lightGray,
-                                    textColor: Colors.darkGray,
-                                    radius: 10,
-                                    verticalPadding: 3,
+                                    backgroundColor: Colors.grayMauve.opacity(0.1),
+                                    knobColor: Colors.lightGray,
+                                    showValue: .constant(true),
                                     disabled: !$delayDDCAfterWake
-                                ))
-                                .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                        }
-                        if delayDDCAfterWake {
-                            Text("Lunar will wait \(waitAfterWakeSeconds) seconds before sending\nthe first DDC command after screen wake")
-                                .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                                .foregroundColor(.black.opacity(0.4))
-                                .frame(height: 28, alignment: .topLeading)
-                                .fixedSize()
-                                .lineLimit(2)
-                                .padding(.leading, 20)
-                                .padding(.top, -5)
+                                )
+                                .padding(.leading)
+
+                                SwiftUI.Button("Reset") { waitAfterWakeSeconds = 30 }
+                                    .buttonStyle(FlatButton(
+                                        color: Colors.lightGray,
+                                        textColor: Colors.darkGray,
+                                        radius: 10,
+                                        verticalPadding: 3,
+                                        disabled: !$delayDDCAfterWake
+                                    ))
+                                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                            }
+                            if delayDDCAfterWake {
+                                Text("Lunar will wait \(waitAfterWakeSeconds) seconds before sending\nthe first DDC command after screen wake")
+                                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                                    .foregroundColor(.black.opacity(0.4))
+                                    .frame(height: 28, alignment: .topLeading)
+                                    .fixedSize()
+                                    .lineLimit(2)
+                                    .padding(.leading, 20)
+                                    .padding(.top, -5)
+                            }
                         }
                     }
                 }
@@ -963,9 +974,9 @@ struct QuickActionsLayoutView: View {
     @ObservedObject var dc: DisplayController = displayController
 
     @Default(.showSliderValues) var showSliderValues
-    #if arch(arm64)
-        @Default(.showSliderValuesNits) var showSliderValuesNits
-    #endif
+    // #if arch(arm64)
+    //     @Default(.showSliderValuesNits) var showSliderValuesNits
+    // #endif
     @Default(.mergeBrightnessContrast) var mergeBrightnessContrast
     @Default(.showVolumeSlider) var showVolumeSlider
     @Default(.showRawValues) var showRawValues
@@ -979,7 +990,6 @@ struct QuickActionsLayoutView: View {
     @Default(.showXDRSelector) var showXDRSelector
     @Default(.showHeaderOnHover) var showHeaderOnHover
     @Default(.showFooterOnHover) var showFooterOnHover
-    @Default(.allowAnySyncSource) var allowAnySyncSource
     @Default(.keepOptionsMenu) var keepOptionsMenu
 
     @Default(.hideMenuBarIcon) var hideMenuBarIcon
@@ -999,33 +1009,34 @@ struct QuickActionsLayoutView: View {
                     Divider()
                     Group {
                         SettingsToggle(text: "Show slider values", setting: $showSliderValues.animation(.fastSpring))
-                        #if arch(arm64)
-                            SettingsToggle(text: "Show brightness in nits when possible", setting: $showSliderValuesNits.animation(.fastSpring))
-                                .padding(.leading)
-                        #endif
-                        SettingsToggle(text: "Show volume slider", setting: $showVolumeSlider.animation(.fastSpring))
+                        // #if arch(arm64)
+                        //     SettingsToggle(text: "Show brightness in nits when possible", setting: $showSliderValuesNits.animation(.fastSpring))
+                        //         .padding(.leading)
+                        // #endif
+                        if dc.activeDisplayList.contains(where: \.hasDDC) {
+                            SettingsToggle(text: "Show volume slider", setting: $showVolumeSlider.animation(.fastSpring))
+                            SettingsToggle(text: "Show input source selector", setting: $showInputInQuickActions.animation(.fastSpring))
+                        }
                         SettingsToggle(text: "Show rotation selector", setting: $showOrientationInQuickActions.animation(.fastSpring))
-                        SettingsToggle(text: "Show input source selector", setting: $showInputInQuickActions.animation(.fastSpring))
                         SettingsToggle(text: "Show power button", setting: $showPowerInQuickActions.animation(.fastSpring))
                     }
                     Divider()
                     Group {
                         SettingsToggle(text: "Show standard presets", setting: $showStandardPresets.animation(.fastSpring))
                         SettingsToggle(text: "Show custom presets", setting: $showCustomPresets.animation(.fastSpring))
-                        SettingsToggle(text: "Show XDR Brightness toggle when available", setting: $showXDRSelector.animation(.fastSpring))
+                        if dc.activeDisplayList.contains(where: \.supportsEnhance) {
+                            SettingsToggle(text: "Show XDR Brightness buttons", setting: $showXDRSelector.animation(.fastSpring))
+                        }
                     }
                 }
-                Divider()
-                Group {
+                if dc.activeDisplayList.contains(where: \.hasDDC) {
                     SettingsToggle(text: "Merge brightness and contrast", setting: $mergeBrightnessContrast.animation(.fastSpring))
-                    SettingsToggle(
-                        text: "Allow non-Apple monitors as Sync Mode source",
-                        setting: $allowAnySyncSource.animation(.fastSpring)
-                    )
                 }
                 Divider()
                 Group {
-                    SettingsToggle(text: "Show last raw values sent to the display", setting: $showRawValues.animation(.fastSpring))
+                    if dc.activeDisplayList.contains(where: \.hasDDC) {
+                        SettingsToggle(text: "Show last raw values sent to the display", setting: $showRawValues.animation(.fastSpring))
+                    }
                     SettingsToggle(text: "Show brightness near menubar icon", setting: $showBrightnessMenuBar.animation(.fastSpring))
                     SettingsToggle(
                         text: "Show only external monitor brightness",
@@ -1538,7 +1549,6 @@ struct QuickActionsMenuView: View {
                             .buttonStyle(OutlineButton(thickness: 1, font: .system(size: 9, weight: .medium, design: .rounded)))
                         SwiftUI.Button("FAQ") { NSWorkspace.shared.open("https://lunar.fyi/faq".asURL()!) }
                             .buttonStyle(OutlineButton(thickness: 1, font: .system(size: 9, weight: .medium, design: .rounded)))
-
                     }
                     LicenseView()
                     VersionView(updater: appDelegate.updater)
@@ -1780,7 +1790,7 @@ struct QuickActionsMenuView: View {
         .foregroundColor(Colors.blackMauve)
     }
 
-    func bg(optionsMenuOverflow: Bool) -> some View {
+    func bg(optionsMenuOverflow _: Bool) -> some View {
         ZStack {
             VisualEffectBlur(material: .hudWindow, blendingMode: .behindWindow, state: .active)
                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))

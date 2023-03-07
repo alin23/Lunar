@@ -75,7 +75,7 @@ struct DDCCTLControl: Control {
                 DDCCTLControl.ddcctlBinary.url,
                 arguments: args,
                 terminationHandler: { process in
-                    log.info("`\(command)` status: \(process.terminationStatus)")
+                    log.info("`\(command)` status \(process.terminationStatus)")
                     ddcctlSemaphore.signal()
                 }
             )
