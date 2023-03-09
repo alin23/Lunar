@@ -81,6 +81,7 @@ final class DDCControl: Control, ObservableObject {
     }
 
     var isSoftware: Bool { false }
+    var isDDC: Bool { true }
 
     static func resetState(display: Display? = nil) {
         if let display {

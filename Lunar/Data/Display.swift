@@ -1559,6 +1559,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     lazy var usesDDCBrightnessControl: Bool = control is DDCControl || control is NetworkControl
 
     @Published @objc dynamic var keepDisconnected = false
+    lazy var canChangeContrast: Bool = usesDDCBrightnessControl || (isNative && (alternativeControlForAppleNative?.isDDC ?? false))
+
     var edidName: String {
         didSet {
             normalizedName = Self.numberNamePattern.replaceAll(in: edidName, with: "").trimmed
@@ -2260,6 +2262,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 mainAsyncAfter(ms: 1) { [weak self] in
                     guard let self else { return }
                     self.hasNetworkControl = control is NetworkControl || self.alternativeControlForAppleNative is NetworkControl
+                    self.canChangeContrast = self.usesDDCBrightnessControl || (self.isNative && (self.alternativeControlForAppleNative?.isDDC ?? false))
                 }
             }
         }
@@ -2291,7 +2294,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             guard let control, !control.isSoftware || gammaEnabled else {
                 usesDDCBrightnessControl = false
                 hasSoftwareControl = false
+                hasNetworkControl = false
                 isNative = false
+                canChangeContrast = false
 
                 return
             }
@@ -2305,10 +2310,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 }
             }
 
-            log.debug(
-                "Display got \(control.str)",
-                context: context
-            )
+            log.debug("Display got \(control.str)", context: context)
             mainAsync { [weak self] in
                 guard let self else { return }
                 self.activeAndResponsive = (self.active && self.responsiveDDC) || !(self.control is DDCControl)
@@ -2325,6 +2327,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             if isNative {
                 alternativeControlForAppleNative = getBestAlternativeControlForAppleNative()
             }
+            canChangeContrast = usesDDCBrightnessControl || (isNative && (alternativeControlForAppleNative?.isDDC ?? false))
             onControlChange?(control)
         }
     }

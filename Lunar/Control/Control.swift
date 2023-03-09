@@ -88,6 +88,7 @@ protocol Control {
     var str: String { get }
     var displayControl: DisplayControl { get }
     var isSoftware: Bool { get }
+    var isDDC: Bool { get }
 
     func setBrightness(
         _ brightness: Brightness,
