@@ -138,6 +138,10 @@ let SWIFTUI_PREVIEW = ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PRE
 
 var lastXDRContrastResetTime = Date()
 
+final class UpdateManager: ObservableObject {
+    @Published var newVersion: String? = nil
+}
+
 final class KeysManager: ObservableObject {
     @Published var noModifiers = true
 
@@ -168,6 +172,7 @@ final class KeysManager: ObservableObject {
 }
 
 let KM = KeysManager()
+let UM = UpdateManager()
 
 // MARK: - AppDelegate
 
@@ -312,7 +317,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     let SVAPP_DIR = ((try? p("/System/Volumes/Data/Applications")?.realpath()) ?? p("/System/Volumes/Data/Applications"))?.components ?? ["System", "Volumes", "Data", "Applications"]
 
     var supportsGentleScheduledUpdateReminders: Bool { true }
-
     var currentPage: Int = Page.display.rawValue {
         didSet {
             log.verbose("Current Page \(currentPage)")
@@ -412,6 +416,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         didSet {
             oldValue.stopAsync()
         }
+    }
+
+    func standardUserDriverShouldHandleShowingScheduledUpdate(_ update: SUAppcastItem, andInImmediateFocus immediateFocus: Bool) -> Bool {
+        // If the standard user driver will show the update in immediate focus (e.g. near app launch),
+        // then let Sparkle take care of showing the update.
+        // Otherwise we will handle showing any other scheduled updates
+        immediateFocus
+    }
+
+    func standardUserDriverWillHandleShowingUpdate(_ handleShowingUpdate: Bool, forUpdate update: SUAppcastItem, state: SPUUserUpdateState) {
+        // We will ignore updates that the user driver will handle showing
+        // This includes user initiated (non-scheduled) updates
+        guard !handleShowingUpdate else {
+            return
+        }
+
+        // Attach a gentle UI indicator on our window
+        UM.newVersion = update.displayVersionString
+    }
+
+    func standardUserDriverWillFinishUpdateSession() {
+        // We will dismiss our gentle UI indicator if the user session for the update finishes
+        UM.newVersion = nil
     }
 
     func resetStates() {
