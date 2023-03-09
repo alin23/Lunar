@@ -167,6 +167,7 @@ final class NetworkControl: Control {
     var responsiveTryCount = 0
 
     var isSoftware: Bool { false }
+    var isDDC: Bool { true }
 
     static func setup() {
         displayController.onActiveDisplaysChange = {

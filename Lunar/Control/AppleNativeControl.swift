@@ -36,6 +36,7 @@ final class AppleNativeControl: Control {
     var smoothTransitionTask: DispatchWorkItem?
 
     var isSoftware: Bool { false }
+    var isDDC: Bool { true }
 
     static func isAvailable(for display: Display) -> Bool {
         guard display.active else { return false }

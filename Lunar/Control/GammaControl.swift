@@ -260,6 +260,7 @@ final class GammaControl: Control {
     let str = "Gamma Control"
 
     var isSoftware: Bool { true }
+    var isDDC: Bool { false }
 
     static func fluxChecker(flux: NSRunningApplication) {
         let gammaDisplays = displayController.activeDisplayList.filter {

@@ -23,6 +23,7 @@ struct DDCCTLControl: Control {
     var displayControl: DisplayControl = .ddcctl
 
     var isSoftware: Bool { false }
+    var isDDC: Bool { true }
 
     var displayIndex: Int? {
         guard let display else { return nil }
