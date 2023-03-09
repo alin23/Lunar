@@ -61,8 +61,14 @@ final class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObje
         return middle
     }
 
+    var willCloseTask: DispatchWorkItem? {
+        didSet {
+            oldValue?.cancel()
+        }
+    }
+
     func windowWillClose(_ notification: Notification) {
-        mainAsyncAfter(ms: 50) {
+        willCloseTask = mainAsyncAfter(ms: 50) {
             Defaults[.menuBarClosed] = true
             if Defaults[.showOptionsMenu], !Defaults[.keepOptionsMenu] {
                 Defaults[.showOptionsMenu] = false
@@ -71,6 +77,9 @@ final class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObje
     }
 
     func windowDidBecomeMain(_ notification: Notification) {
+        willCloseTask = nil
+        displayHideTask?.cancel()
+        displayHideTask = nil
         Defaults[.menuBarClosed] = false
     }
 
@@ -92,6 +101,8 @@ final class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObje
     }
 
     func showMenuBar() {
+        willCloseTask = nil
+        displayHideTask?.cancel()
         displayHideTask = nil
 
         guard let menuWindow = appDelegate?.initMenuWindow(), !menuWindow.isVisible else { return }
@@ -106,6 +117,8 @@ final class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObje
 
     func repositionWindow(animate: Bool = false) {
         guard let menuWindow, let screen = NSScreen.main, let appd = appDelegate else { return }
+        displayHideTask?.cancel()
+        displayHideTask = nil
         guard let position else {
             menuWindow.show()
             return

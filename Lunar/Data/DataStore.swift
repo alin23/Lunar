@@ -153,6 +153,8 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .autoRestartOnFailedDDC,
     .autoRestartOnFailedDDCSooner,
     .sensorHostname,
+    .sensorPort,
+    .sensorPathPrefix,
     .nonManualMode,
     .curveMode,
     .clockMode,
@@ -841,6 +843,8 @@ func initCache() {
     cacheKey(.autoRestartOnFailedDDC)
     cacheKey(.autoRestartOnFailedDDCSooner)
     cacheKey(.sensorHostname)
+    cacheKey(.sensorPort)
+    cacheKey(.sensorPathPrefix)
     cacheKey(.apiKey)
 
     cacheKey(.location)

@@ -60,6 +60,7 @@ final class Screen: NSObject, AppEntity {
         xdrBrightness = display.xdrBrightness.d
     }
 
+    static let sidecar = Screen(id: UInt32.max.u32 - 36, name: "Sidecar (most recent)", serial: "sidecar", display: nil, isDynamicFilter: true)
     static var defaultQuery = ScreenQuery()
 
     static var typeDisplayRepresentation: TypeDisplayRepresentation {
@@ -151,12 +152,13 @@ final class Screen: NSObject, AppEntity {
 @available(iOS 16, macOS 13, *)
 struct ScreenQuery: EntityPropertyQuery {
     init() {}
-    init(filter: ((Display) -> Bool)? = nil, single: Bool = false, additionalScreens: [Screen]? = nil, noDefault: Bool = false, includeDisconnected: Bool = false) {
+    init(filter: ((Display) -> Bool)? = nil, single: Bool = false, additionalScreens: [Screen]? = nil, noDefault: Bool = false, includeDisconnected: Bool = false, sidecar: Bool = false) {
         self.filter = filter
         self.single = single
         self.additionalScreens = additionalScreens
         self.noDefault = noDefault
         self.includeDisconnected = includeDisconnected
+        self.sidecar = sidecar
     }
 
     typealias Entity = Screen
@@ -300,6 +302,7 @@ struct ScreenQuery: EntityPropertyQuery {
 
     var filter: ((Display) -> Bool)?
     var single = false
+    var sidecar = false
     var additionalScreens: [Screen]?
     var noDefault = false
     var includeDisconnected = false
@@ -351,7 +354,7 @@ struct ScreenQuery: EntityPropertyQuery {
             screens = displays.map(\.screen)
         }
 
-        return screens.first
+        return screens.first ?? (sidecar ? .sidecar : nil)
     }
 
     func suggestedEntities() async throws -> Result<[Screen], Error> {
@@ -367,13 +370,17 @@ struct ScreenQuery: EntityPropertyQuery {
         }
 
         guard !single else {
-            return (additionalScreens ?? []) + screens + [DisplayFilter.cursor.screen]
+            return (additionalScreens ?? []) + screens + [DisplayFilter.cursor.screen] + (sidecar ? [.sidecar] : [])
         }
 
-        return (additionalScreens ?? []) + screens + Self.dynamicFilterScreens
+        return (additionalScreens ?? []) + screens + Self.dynamicFilterScreens + (sidecar ? [.sidecar] : [])
     }
 
     func entities(matching query: String) async throws -> [Screen] {
+        if query == "sidecar", sidecar {
+            return [.sidecar]
+        }
+
         let matches = displays.filter {
             $0.name == query || $0.serial == query
         }.map(\.screen)
@@ -387,10 +394,14 @@ struct ScreenQuery: EntityPropertyQuery {
 
     func entities(for identifiers: [Int]) async throws -> [Screen] {
         guard !identifiers.isEmpty else {
-            return displays.map(\.screen)
+            return displays.map(\.screen) + (sidecar ? [.sidecar] : [])
         }
 
         return identifiers.compactMap { id in
+            if id == Screen.sidecar.id {
+                return .sidecar
+            }
+
             let screen = displayController.activeDisplays[id.u32]?.screen
                 ?? Self.dynamicFilterScreenMapping[id]
                 ?? (additionalScreens ?? []).first(where: { $0.id == id })
@@ -907,7 +918,7 @@ To bring back the screen try any one of the following:
         Summary("Disconnect \(\.$screen)")
     }
 
-    @Parameter(title: "Screen", optionsProvider: ScreenQuery())
+    @Parameter(title: "Screen", optionsProvider: ScreenQuery(sidecar: true))
     var screen: Screen
 
     @MainActor
@@ -917,6 +928,11 @@ To bring back the screen try any one of the following:
         #else
             guard lunarProActive else {
                 throw IntentError.message("A Lunar Pro license is needed for this feature.")
+            }
+
+            if screen == Screen.sidecar, let sdm, let device = sdm.connectedDevices?.first {
+                await sdm.disconnect(from: device)
+                return .result()
             }
 
             displayController.dis(screen.id.u32)
@@ -953,7 +969,8 @@ If the action fails, try any one of the following to bring back the screen:
         title: "Screen",
         optionsProvider: ScreenQuery(
             single: true,
-            additionalScreens: [DisplayFilter.all.screen] + displayController.possiblyDisconnectedDisplays.values.map(\.screen)
+            additionalScreens: [DisplayFilter.all.screen] + displayController.possiblyDisconnectedDisplays.values.map(\.screen),
+            sidecar: true
         )
     )
     var screen: Screen
@@ -963,6 +980,13 @@ If the action fails, try any one of the following to bring back the screen:
         #if !arch(arm64)
             throw IntentError.message("This action is only available on Apple Silicon")
         #else
+            if screen == Screen.sidecar, let sdm, let connected = sdm.connectedDevices {
+                if connected.isEmpty, let device = sdm.recentDevices?.first ?? sdm.devices?.first {
+                    await sdm.connect(to: device)
+                }
+                return .result()
+            }
+
             if let displayFilter = DisplayFilter(argument: screen.serial), displayFilter == .all || displayFilter == .cursor {
                 displayController.en()
                 return .result()
@@ -1003,7 +1027,7 @@ If the reconnect action fails, try any one of the following to bring back the sc
         Summary("Toggle connected state for \(\.$screen)")
     }
 
-    @Parameter(title: "Screen", optionsProvider: ScreenQuery(single: true, additionalScreens: displayController.possiblyDisconnectedDisplays.values.map(\.screen)))
+    @Parameter(title: "Screen", optionsProvider: ScreenQuery(single: true, additionalScreens: displayController.possiblyDisconnectedDisplays.values.map(\.screen), sidecar: true))
     var screen: Screen
 
     @MainActor
@@ -1011,6 +1035,15 @@ If the reconnect action fails, try any one of the following to bring back the sc
         #if !arch(arm64)
             throw IntentError.message("This action is only available on Apple Silicon")
         #else
+            if screen == Screen.sidecar, let sdm, let connected = sdm.connectedDevices {
+                if connected.isEmpty, let device = sdm.recentDevices?.first ?? sdm.devices?.first {
+                    await sdm.connect(to: device)
+                } else if let device = connected.first {
+                    await sdm.disconnect(from: device)
+                }
+                return .result()
+            }
+
             if let display = screen.display, display.active {
                 guard lunarProActive else {
                     throw IntentError.message("A Lunar Pro license is needed for this feature.")

@@ -490,6 +490,8 @@ final class DisplayController: ObservableObject {
 
     @Published var possiblyDisconnectedDisplayList: [Display] = []
 
+    var displaysBySerial: [String: Display] = [:]
+    var unmanagedDisplays: [Display] = []
     var activeDisplaysBySerial: [String: Display] = [:] {
         didSet {
             #if arch(arm64)
@@ -569,8 +571,10 @@ final class DisplayController: ObservableObject {
     }
 
     var sourceDisplay: Display? {
-        guard let source = externalActiveDisplays.first(where: { $0.isSource && !$0.blackOutEnabled }) ?? activeDisplayList.first(where: { $0.isSource && !$0.blackOutEnabled })
-        else {
+        guard let source = (
+            externalActiveDisplays.sorted(by: { $0.isNative && !$1.isNative }).first(where: { $0.isSource && !$0.blackOutEnabled })
+                ?? activeDisplayList.first(where: { $0.isSource && !$0.blackOutEnabled })
+        ) else {
             if let builtin = builtinDisplay {
                 if !builtin.isSource {
                     builtinSourceSetter = mainAsyncAfter(ms: 100) { builtin.isSource = true }
@@ -589,17 +593,13 @@ final class DisplayController: ObservableObject {
 
     @AtomicLock var displays: [CGDirectDisplayID: Display] = [:] {
         didSet {
-            activeDisplays = displays.filter { $1.active }
+            activeDisplays = displays.filter { $1.active && !$1.unmanaged }
             displayList = displays.values.sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }.reversed()
+            unmanagedDisplays = displayList.filter { $0.active && $0.unmanaged }
 
-            activeDisplaysByReadableID = [String: Display](
-                activeDisplays.map { _, display in (display.readableID, display) },
-                uniquingKeysWith: first(this:other:)
-            )
-            activeDisplaysBySerial = [String: Display](
-                activeDisplays.map { _, display in (display.serial, display) },
-                uniquingKeysWith: first(this:other:)
-            )
+            activeDisplaysByReadableID = activeDisplayList.dict { display in (display.readableID, display) }
+            activeDisplaysBySerial = activeDisplayList.dict { display in (display.serial, display) }
+            displaysBySerial = displayList.dict { display in (display.serial, display) }
             if CachedDefaults[.autoXdrSensor] {
                 xdrSensorTask = getSensorTask()
             }
@@ -616,6 +616,7 @@ final class DisplayController: ObservableObject {
                             possiblyDisconnectedDisplays.removeValue(forKey: id)
                         }
                     }
+                    possiblyDisconnectedDisplayList = possiblyDisconnectedDisplays.values.sorted(by: \.id)
                 }
             #endif
 
@@ -663,6 +664,7 @@ final class DisplayController: ObservableObject {
                 self.nitsBrightnessMappingSaver = nil
             }
         }
+
         func saveAutoLearnContrastMapping() {
             nitsContrastMappingSaver = mainAsyncAfter(ms: 500) {
                 Defaults[.nitsContrastMapping] = self.nitsContrastMapping
@@ -732,7 +734,7 @@ final class DisplayController: ObservableObject {
     }
 
     var nonCursorDisplays: [Display] {
-        guard let cursorDisplay else { return [] }
+        guard let cursorDisplay else { return activeDisplayList }
         return activeDisplayList.filter { $0.id != cursorDisplay.id }
     }
 
@@ -846,7 +848,6 @@ final class DisplayController: ObservableObject {
 
     var possiblyDisconnectedDisplays: [CGDirectDisplayID: Display] = [:] {
         didSet {
-            print("possiblyDisconnectedDisplays", possiblyDisconnectedDisplays)
             possiblyDisconnectedDisplayList = possiblyDisconnectedDisplays.values.sorted(by: \.id)
         }
     }
@@ -1192,7 +1193,7 @@ final class DisplayController: ObservableObject {
     }
 
     func reset() {
-        menuWindow?.forceClose()
+//        menuWindow?.forceClose()
 
         manageClamshellMode()
         resetDisplayList(autoBlackOut: Defaults[.autoBlackoutBuiltin])
@@ -1852,9 +1853,9 @@ final class DisplayController: ObservableObject {
         adaptBrightness(force: true)
     }
 
-    func resetDisplayList(configurationPage: Bool = false, autoBlackOut: Bool? = nil) {
+    func resetDisplayList(configurationPage: Bool = false, autoBlackOut: Bool? = nil, now: Bool = false) {
         resetDisplayListTask?.cancel()
-        resetDisplayListTask = mainAsyncAfter(ms: 200) {
+        resetDisplayListTask = mainAsyncAfter(ms: now ? 0 : 200) {
             self.resetDisplayListTask = nil
             self.getDisplaysLock.around {
                 Self.panelManager = MPDisplayMgr()
@@ -2403,7 +2404,9 @@ final class DisplayController: ObservableObject {
             mainDisplay: mainDisplay,
             nonMainDisplays: nonMainDisplays
         ) { (display: Display) in
-            guard !display.noControls, !display.blackOutEnabled else { return }
+            guard !display.noControls, !display.blackOutEnabled, !(display.lockedBrightness && display.hasDDC) else {
+                return
+            }
             if display.isBuiltin {
                 guard builtinDisplay || currentDisplay || sourceDisplay || mainDisplay else { return }
             }
@@ -2550,7 +2553,9 @@ final class DisplayController: ObservableObject {
             )
 
             withoutSlowTransition {
-                display.contrast = value.ns
+                display.withoutLockedContrast {
+                    display.contrast = value.ns
+                }
             }
 
             if adaptiveModeKey != .manual {

@@ -35,48 +35,127 @@ struct PresetButtonView: View {
     }
 }
 
+var poweringOffTask: DispatchWorkItem? {
+    didSet { oldValue?.cancel() }
+}
+
 // MARK: - PowerOffButtonView
 
 struct PowerOffButtonView: View {
     @ObservedObject var display: Display
-    @State var hoveringPowerButton = false
+    @ObservedObject var km = KM
+    @State var showPopover = false
+    @Default(.newBlackOutDisconnect) var newBlackOutDisconnect
     @Default(.neverShowBlackoutPopover) var neverShowBlackoutPopover
 
-    var body: some View {
-        SwiftUI.Button(action: {
-            guard !AppDelegate.controlKeyPressed,
-                  lunarProActive || lunarProOnTrial || (AppDelegate.optionKeyPressed && !AppDelegate.shiftKeyPressed)
-            else {
-                hoveringPowerButton = true
-                return
-            }
+    @State var hovering = false
+    @State var poweringOff = false
 
-            guard neverShowBlackoutPopover else {
-                hoveringPowerButton = true
-                return
+    var actionText: String {
+        if km.controlKeyPressed {
+            if km.commandKeyPressed, !display.blackOutEnabled {
+                return "Ignore"
             }
-
-            display.powerOff()
-        }) {
-            Image(systemName: "power").font(.system(size: 10, weight: .heavy))
+            return "Show Help"
         }
-        .buttonStyle(FlatButton(
-            color: display.blackOutEnabled ? Color.gray : Colors.red,
-            circle: true,
-            horizontalPadding: 3,
-            verticalPadding: 3
-        ))
-        // .onHover { hovering in
-        //     if !hoveringPowerButton, hovering {
-        //         hoveringPowerButton = hovering && !neverShowBlackoutPopover
-        //     }
-        // }
-        .popover(isPresented: $hoveringPowerButton) {
-            BlackoutPopoverView(hasDDC: display.hasDDC).onDisappear {
-                if !neverShowBlackoutPopover {
-                    neverShowBlackoutPopover = true
+
+        if display.blackOutEnabled {
+            return "Power On"
+        }
+
+        if km.optionKeyPressed {
+            if km.shiftKeyPressed {
+                return "Focus"
+            }
+            return display.hasDDC ? "Power Off" : "Needs DDC"
+        }
+
+        if km.shiftKeyPressed {
+            return "Darken"
+        }
+
+        #if arch(arm64)
+            if #available(macOS 13, *), km.commandKeyPressed {
+                return newBlackOutDisconnect ? "BlackOut" : "Disconnect"
+            }
+
+            return newBlackOutDisconnect ? "Disconnect" : "BlackOut"
+        #else
+            return "BlackOut"
+        #endif
+    }
+
+    var color: Color {
+        if poweringOff || display.blackOutEnabled {
+            return Color.gray
+        }
+
+        if km.controlKeyPressed {
+            return Color.orange
+        }
+
+        if km.optionKeyPressed, !km.shiftKeyPressed, !display.hasDDC {
+            return Color.gray
+        }
+        return Colors.red
+    }
+
+    var body: some View {
+        HStack(spacing: 2) {
+            SwiftUI.Button(action: {
+                if km.controlKeyPressed, km.commandKeyPressed {
+                    display.unmanaged = true
+                    return
+                }
+
+                guard !KM.controlKeyPressed,
+                      lunarProActive || lunarProOnTrial || (KM.optionKeyPressed && !KM.shiftKeyPressed)
+                else {
+                    showPopover = true
+                    return
+                }
+
+                guard neverShowBlackoutPopover else {
+                    showPopover = true
+                    return
+                }
+
+                poweringOff = true
+                poweringOffTask = mainAsyncAfter(ms: 2000) {
+                    poweringOff = false
+                }
+                if display.blackOutEnabled {
+                    display.powerOn()
+                } else {
+                    display.powerOff()
+                }
+            }) {
+                Image(systemName: "power").font(.system(size: 10, weight: .heavy))
+            }
+
+            .buttonStyle(FlatButton(
+                color: color,
+                circle: true,
+                horizontalPadding: 3,
+                verticalPadding: 3
+            ))
+            .popover(isPresented: $showPopover) {
+                BlackoutPopoverView(hasDDC: display.hasDDC).onDisappear {
+                    if !neverShowBlackoutPopover {
+                        neverShowBlackoutPopover = true
+                    }
                 }
             }
+            .onHover { h in withAnimation { hovering = h } }
+            .disabled((km.optionKeyPressed && !display.hasDDC) || poweringOff)
+
+            Text(actionText)
+                .font(.system(size: 10, weight: .semibold))
+                .opacity(hovering ? 1 : 0)
+        }
+        .frame(width: 100, alignment: .leading)
+        .onDisappear {
+            poweringOffTask = nil
         }
     }
 }
@@ -85,23 +164,30 @@ struct PowerOffButtonView: View {
     @available(macOS 13, *)
     struct ReconnectButtonView: View {
         @State var display: CGDirectDisplayID
-        @State var hoveringPowerButton = false
+        @State var hovering = false
         @State var off = true
 
         var body: some View {
-            SwiftUI.Button(action: {
-                off = false
-                displayController.autoBlackoutPause = true
-                displayController.en(display)
-            }) {
-                Image(systemName: "power").font(.system(size: 10, weight: .heavy))
+            HStack(spacing: 2) {
+                SwiftUI.Button(action: {
+                    off = false
+                    displayController.autoBlackoutPause = true
+                    displayController.en(display)
+                }) {
+                    Image(systemName: "power").font(.system(size: 10, weight: .heavy))
+                }
+                .buttonStyle(FlatButton(
+                    color: off ? Color.gray : Colors.red,
+                    circle: true,
+                    horizontalPadding: 3,
+                    verticalPadding: 3
+                ))
+                .onHover { h in withAnimation { hovering = h } }
+                Text("Connect")
+                    .font(.system(size: 10, weight: .semibold))
+                    .opacity(hovering ? 1 : 0)
             }
-            .buttonStyle(FlatButton(
-                color: off ? Color.gray : Colors.red,
-                circle: true,
-                horizontalPadding: 3,
-                verticalPadding: 3
-            ))
+            .frame(width: 100, alignment: .leading)
         }
     }
 
@@ -112,22 +198,97 @@ struct PowerOffButtonView: View {
         @State var id: CGDirectDisplayID
         @State var name: String
 
+        @ObservedObject var display: Display
+
         var body: some View {
             VStack(spacing: 1) {
-                ZStack(alignment: .topTrailing) {
+                HStack(alignment: .top, spacing: -10) {
                     Text(name)
                         .font(.system(size: 22, weight: .black))
                         .padding(6)
                         .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(colors.bg.primary.opacity(0.5)))
 
-                    ReconnectButtonView(display: id).offset(x: 10, y: -8)
-                }
+                    ReconnectButtonView(display: id)
+                        .offset(y: -8)
+                }.offset(x: 45)
                 Text("Disconnected").font(.system(size: 10, weight: .semibold, design: .rounded))
+
+                if display.id == id, !display.isSidecar, !display.isAirplay {
+                    VStack {
+                        SettingsToggle(
+                            text: "Auto Disconnect",
+                            setting: $display.keepDisconnected,
+                            color: nil,
+                            help: """
+                            The display might come back on by itself after standby/wake or when
+                            reconnecting the monitor cable.
+
+                            This option will automatically disconnect the display whenever that
+                            happens, until you reconnect the display manually using the power button.
+
+                            Note: Press ⌘ Command more than 8 times in a row to force connect all displays.
+                            """
+                        )
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                    }
+                    .padding(8)
+                    .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color.primary.opacity(0.05)))
+                    .padding(.vertical, 3)
+                }
             }
         }
     }
 
 #endif
+
+struct UnmanagedDisplayView: View {
+    @Environment(\.colors) var colors
+
+    @ObservedObject var display: Display
+
+    var body: some View {
+        VStack(spacing: 1) {
+            HStack(alignment: .top, spacing: -10) {
+                Text(display.name)
+                    .font(.system(size: 22, weight: .black))
+                    .padding(6)
+                    .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(colors.bg.primary.opacity(0.5)))
+
+                ManageButtonView(display: display)
+                    .offset(y: -8)
+            }.offset(x: 45)
+            Text("Not managed").font(.system(size: 10, weight: .semibold, design: .rounded))
+        }
+    }
+}
+
+struct ManageButtonView: View {
+    @State var display: Display
+    @State var hovering = false
+    @State var off = true
+
+    var body: some View {
+        HStack(spacing: 2) {
+            SwiftUI.Button(action: {
+                off = false
+                display.unmanaged = false
+            }) {
+                Image(systemName: "power").font(.system(size: 10, weight: .heavy))
+            }
+            .buttonStyle(FlatButton(
+                color: off ? Color.gray : Colors.red,
+                circle: true,
+                horizontalPadding: 3,
+                verticalPadding: 3
+            ))
+            Text("Unignore")
+                .font(.system(size: 10, weight: .semibold))
+                .opacity(hovering ? 1 : 0)
+        }
+        .onHover { h in withAnimation { hovering = h } }
+        .frame(width: 100, alignment: .leading)
+    }
+}
 
 // MARK: - DisplayRowView
 
@@ -257,11 +418,156 @@ struct DisplayRowView: View {
         }
     }
 
+    var disabledReason: String? {
+        if display.noControls {
+            return "No controls available"
+        } else if display.useOverlay {
+            if display.isInHardwareMirrorSet {
+                return "Overlay dimming disabled while mirroring"
+            } else if display.isIndependentDummy {
+                return "Overlay dimming disabled for dummy"
+            }
+        }
+
+        return nil
+    }
+
+    @ViewBuilder var appPresetAdaptivePaused: some View {
+        if (display.hasDDC && showInputInQuickActions)
+            || display.showOrientation
+            || display.appPreset != nil
+            || (display.adaptivePaused && !display.blackOutEnabled)
+            || showRawValues && (display.lastRawBrightness != nil || display.lastRawContrast != nil || display.lastRawVolume != nil)
+            || SWIFTUI_PREVIEW
+        {
+            VStack {
+                if (display.hasDDC && showInputInQuickActions) || SWIFTUI_PREVIEW { inputSelector }
+                if display.showOrientation || SWIFTUI_PREVIEW { rotationSelector }
+                if let app = display.appPreset {
+                    SwiftUI.Button("App Preset: \(app.name)") {
+                        app.runningApps?.first?.activate()
+                    }
+                    .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .secondary.opacity(0.8)))
+                    .font(.system(size: 9, weight: .bold))
+                }
+                if (display.adaptivePaused && !display.blackOutEnabled) || SWIFTUI_PREVIEW {
+                    SwiftUI.Button(action: { display.adaptivePaused.toggle() }) {
+                        VStack {
+                            Text("Adaptive paused")
+                            Text("click to resume").font(.system(size: 9))
+                        }
+                    }
+                    .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .secondary.opacity(0.8)))
+                    .font(.system(size: 9, weight: .bold))
+                }
+
+                if showRawValues {
+                    RawValuesView(display: display).frame(width: 220).padding(.vertical, 3)
+                }
+            }
+            .padding(8)
+            .background(
+                RoundedRectangle(
+                    cornerRadius: 10,
+                    style: .continuous
+                ).fill(Color.primary.opacity(0.05))
+            )
+            .padding(.vertical, 3)
+        }
+    }
+
+    @ViewBuilder var volumeSlider: some View {
+        if display.hasDDC, display.showVolumeSlider, display.ddcEnabled || display.networkEnabled {
+            ZStack {
+                BigSurSlider(
+                    percentage: $display.preciseVolume.f,
+                    imageBinding: .oneway { display.audioMuted ? "speaker.slash.fill" : "speaker.2.fill" },
+                    colorBinding: .constant(colors.accent),
+                    backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                    showValue: $showSliderValues,
+                    disabled: $display.audioMuted,
+                    enableText: "Unmute"
+                )
+                if hoveringVolumeSlider, !display.audioMuted {
+                    SwiftUI.Button("Mute") {
+                        display.audioMuted = true
+                    }
+                    .buttonStyle(FlatButton(
+                        color: Colors.red.opacity(0.7),
+                        textColor: .white,
+                        horizontalPadding: 6,
+                        verticalPadding: 2
+                    ))
+                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .transition(.scale.animation(.fastSpring))
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .offset(x: -120, y: 0)
+                }
+            }.onHover { hovering in
+                Self.hoveringVolumeSliderTask = mainAsyncAfter(ms: 150) {
+                    hoveringVolumeSlider = hovering
+                }
+            }
+        }
+    }
+
+    @ViewBuilder var sliders: some View {
+        if !display.blackOutEnabled {
+            if display.noDDCOrMergedBrightnessContrast {
+                let mergedLockBinding = Binding<Bool>(
+                    get: { display.lockedBrightness && display.lockedContrast },
+                    set: { locked in
+                        display.lockedBrightness = locked
+                        // display.lockedContrast = locked
+                    }
+                )
+                BigSurSlider(
+                    percentage: $display.preciseBrightnessContrast.f,
+                    image: "sun.max.fill",
+                    colorBinding: .constant(colors.accent),
+                    backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                    showValue: $showSliderValues,
+                    disabled: mergedLockBinding,
+                    enableText: "Unlock"
+                )
+                softwareSliders
+            } else {
+                BigSurSlider(
+                    percentage: $display.preciseBrightness.f,
+                    image: "sun.max.fill",
+                    colorBinding: .constant(colors.accent),
+                    backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                    showValue: $showSliderValues,
+                    disabled: $display.lockedBrightness,
+                    enableText: "Unlock"
+                )
+                softwareSliders
+                let contrastBinding: Binding<Float> = Binding(
+                    get: { display.preciseContrast.f },
+                    set: { val in
+                        display.withoutLockedContrast {
+                            display.preciseContrast = val.d
+                        }
+                    }
+                )
+                BigSurSlider(
+                    percentage: contrastBinding,
+                    image: "circle.righthalf.fill",
+                    colorBinding: .constant(colors.accent),
+                    backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                    showValue: $showSliderValues
+                    // disabled: $display.lockedContrast,
+                    // enableText: "Unlock"
+                )
+            }
+        }
+    }
+
     var body: some View {
         VStack(spacing: 4) {
             let xdrSelectorShown = display.supportsEnhance && showXDRSelector && !display.blackOutEnabled
             if showPowerInQuickActions, display.getPowerOffEnabled() {
-                ZStack(alignment: .topTrailing) {
+                HStack(alignment: .top, spacing: -10) {
                     Text(display.name)
                         .font(.system(size: 22, weight: .black))
                         .padding(6)
@@ -269,146 +575,23 @@ struct DisplayRowView: View {
                         .padding(.bottom, xdrSelectorShown ? 0 : 6)
 
                     PowerOffButtonView(display: display)
-                        .offset(x: 10, y: -8)
-                }
+                        .offset(y: -8)
+                }.offset(x: 45)
+
             } else {
                 Text(display.name)
                     .font(.system(size: 22, weight: .black))
                     .padding(.bottom, xdrSelectorShown ? 0 : 6)
             }
 
-            if xdrSelectorShown { sdrXdrSelector }
+            if let disabledReason {
+                Text(disabledReason).font(.system(size: 10, weight: .semibold, design: .rounded))
+            } else {
+                if xdrSelectorShown { sdrXdrSelector }
 
-            // #if arch(arm64)
-            //     let shownValue = (showSliderValuesNits && syncNits && syncMode && syncPollingSeconds == 0) ? $display.nits : nil
-            // #else
-            let shownValue: Binding<Double?>? = nil
-            // #endif
-            if !display.blackOutEnabled {
-                if display.noDDCOrMergedBrightnessContrast {
-                    let mergedLockBinding = Binding<Bool>(
-                        get: { display.lockedBrightness && display.lockedContrast },
-                        set: { locked in
-                            display.lockedBrightness = locked
-                            // display.lockedContrast = locked
-                        }
-                    )
-                    BigSurSlider(
-                        percentage: $display.preciseBrightnessContrast.f,
-                        image: "sun.max.fill",
-                        colorBinding: .constant(colors.accent),
-                        backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
-                        showValue: $showSliderValues,
-                        shownValue: shownValue,
-                        disabled: mergedLockBinding,
-                        enableText: "Unlock"
-                    )
-                    softwareSliders
-                } else {
-                    BigSurSlider(
-                        percentage: $display.preciseBrightness.f,
-                        image: "sun.max.fill",
-                        colorBinding: .constant(colors.accent),
-                        backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
-                        showValue: $showSliderValues,
-                        shownValue: shownValue,
-                        disabled: $display.lockedBrightness,
-                        enableText: "Unlock"
-                    )
-                    softwareSliders
-                    let contrastBinding: Binding<Float> = Binding(
-                        get: { display.preciseContrast.f },
-                        set: { val in
-                            display.withoutLockedContrast {
-                                display.preciseContrast = val.d
-                            }
-                        }
-                    )
-                    BigSurSlider(
-                        percentage: contrastBinding,
-                        image: "circle.righthalf.fill",
-                        colorBinding: .constant(colors.accent),
-                        backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
-                        showValue: $showSliderValues
-                        // disabled: $display.lockedContrast,
-                        // enableText: "Unlock"
-                    )
-                }
-            }
-
-            if display.hasDDC, display.showVolumeSlider, display.ddcEnabled || display.networkEnabled {
-                ZStack {
-                    BigSurSlider(
-                        percentage: $display.preciseVolume.f,
-                        imageBinding: .oneway { display.audioMuted ? "speaker.slash.fill" : "speaker.2.fill" },
-                        colorBinding: .constant(colors.accent),
-                        backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
-                        showValue: $showSliderValues,
-                        disabled: $display.audioMuted,
-                        enableText: "Unmute"
-                    )
-                    if hoveringVolumeSlider, !display.audioMuted {
-                        SwiftUI.Button("Mute") {
-                            display.audioMuted = true
-                        }
-                        .buttonStyle(FlatButton(
-                            color: Colors.red.opacity(0.7),
-                            textColor: .white,
-                            horizontalPadding: 6,
-                            verticalPadding: 2
-                        ))
-                        .font(.system(size: 10, weight: .medium, design: .rounded))
-                        .transition(.scale.animation(.fastSpring))
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .offset(x: -120, y: 0)
-                    }
-                }.onHover { hovering in
-                    Self.hoveringVolumeSliderTask = mainAsyncAfter(ms: 150) {
-                        hoveringVolumeSlider = hovering
-                    }
-                }
-            }
-
-            if (display.hasDDC && showInputInQuickActions)
-                || display.showOrientation
-                || display.appPreset != nil
-                || (display.adaptivePaused && !display.blackOutEnabled)
-                || showRawValues && (display.lastRawBrightness != nil || display.lastRawContrast != nil || display.lastRawVolume != nil)
-                || SWIFTUI_PREVIEW
-            {
-                VStack {
-                    if (display.hasDDC && showInputInQuickActions) || SWIFTUI_PREVIEW { inputSelector }
-                    if display.showOrientation || SWIFTUI_PREVIEW { rotationSelector }
-                    if let app = display.appPreset {
-                        SwiftUI.Button("App Preset: \(app.name)") {
-                            app.runningApps?.first?.activate()
-                        }
-                        .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .secondary.opacity(0.8)))
-                        .font(.system(size: 9, weight: .bold))
-                    }
-                    if (display.adaptivePaused && !display.blackOutEnabled) || SWIFTUI_PREVIEW {
-                        SwiftUI.Button(action: { display.adaptivePaused.toggle() }) {
-                            VStack {
-                                Text("Adaptive paused")
-                                Text("click to resume").font(.system(size: 9))
-                            }
-                        }
-                        .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .secondary.opacity(0.8)))
-                        .font(.system(size: 9, weight: .bold))
-                    }
-
-                    if showRawValues {
-                        RawValuesView(display: display).frame(width: 220).padding(.vertical, 3)
-                    }
-                }
-                .padding(8)
-                .background(
-                    RoundedRectangle(
-                        cornerRadius: 10,
-                        style: .continuous
-                    ).fill(Color.primary.opacity(0.05))
-                )
-                .padding(.vertical, 3)
+                sliders
+                volumeSlider
+                appPresetAdaptivePaused
             }
         }
     }
@@ -542,40 +725,42 @@ struct HDRSettingsView: View {
                         """
                     )
 
-                    SettingsToggle(
-                        text: "Enhance contrast in XDR Brightness", setting: $xdrContrast,
-                        help: """
-                        Improve readability in sunlight by increasing XDR contrast.
-                        This option is especially useful when using apps with dark backgrounds.
+                    if displayController.activeDisplayList.contains(where: \.supportsEnhance) {
+                        SettingsToggle(
+                            text: "Enhance contrast in XDR Brightness", setting: $xdrContrast,
+                            help: """
+                            Improve readability in sunlight by increasing XDR contrast.
+                            This option is especially useful when using apps with dark backgrounds.
 
-                        Note: works only when using a single display
-                        """
-                    )
-                    HStack {
-                        BigSurSlider(
-                            percentage: $xdrContrastFactor,
-                            image: "circle.lefthalf.filled",
-                            color: Colors.lightGray,
-                            backgroundColor: Colors.grayMauve.opacity(0.1),
-                            knobColor: Colors.lightGray,
-                            showValue: .constant(false),
-                            disabled: !$xdrContrast
+                            Note: works only when using a single display
+                            """
                         )
-                        .padding(.leading)
-
-                        SwiftUI.Button("Reset") { xdrContrastFactor = 0.3 }
-                            .buttonStyle(FlatButton(
+                        HStack {
+                            BigSurSlider(
+                                percentage: $xdrContrastFactor,
+                                image: "circle.lefthalf.filled",
                                 color: Colors.lightGray,
-                                textColor: Colors.darkGray,
-                                radius: 10,
-                                verticalPadding: 3,
+                                backgroundColor: Colors.grayMauve.opacity(0.1),
+                                knobColor: Colors.lightGray,
+                                showValue: .constant(false),
                                 disabled: !$xdrContrast
-                            ))
-                            .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                            )
+                            .padding(.leading)
+
+                            SwiftUI.Button("Reset") { xdrContrastFactor = 0.3 }
+                                .buttonStyle(FlatButton(
+                                    color: Colors.lightGray,
+                                    textColor: Colors.darkGray,
+                                    radius: 10,
+                                    verticalPadding: 3
+                                ))
+                                .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                                .disabled(!xdrContrast)
+                        }
+                        SettingsToggle(text: "Allow on non-Apple HDR monitors", setting: $allowHDREnhanceContrast.animation(.fastSpring))
+                            .padding(.leading)
+                            .disabled(!xdrContrast)
                     }
-                    SettingsToggle(text: "Allow on non-Apple HDR monitors", setting: $allowHDREnhanceContrast.animation(.fastSpring))
-                        .padding(.leading)
-                        .disabled(!xdrContrast)
                 }
                 Divider()
                 xdrSettings
@@ -639,10 +824,10 @@ struct HDRSettingsView: View {
                             color: Colors.lightGray,
                             textColor: Colors.darkGray,
                             radius: 10,
-                            verticalPadding: 3,
-                            disabled: !$autoXdrSensor
+                            verticalPadding: 3
                         ))
                         .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                        .disabled(!autoXdrSensor)
                 }
                 if autoXdrSensor {
                     (
@@ -699,7 +884,7 @@ struct AdvancedSettingsView: View {
 
     @Default(.autoRestartOnFailedDDC) var autoRestartOnFailedDDC
     @Default(.autoRestartOnFailedDDCSooner) var autoRestartOnFailedDDCSooner
-    @Default(.allowAnySyncSource) var allowAnySyncSource
+    // @Default(.allowAnySyncSource) var allowAnySyncSource
 
     @State var sensorCheckerEnabled = !Defaults[.sensorHostname].isEmpty
 
@@ -780,10 +965,10 @@ struct AdvancedSettingsView: View {
                         text: "Toggle Manual/Sync when the lid is closed/opened",
                         setting: $clamshellModeDetection
                     ).disabled(!Sysctl.isMacBook)
-                    SettingsToggle(
-                        text: "Allow non-Apple monitors as Sync Mode source",
-                        setting: $allowAnySyncSource.animation(.fastSpring)
-                    )
+                    // SettingsToggle(
+                    //     text: "Allow non-Apple monitors as Sync Mode source",
+                    //     setting: $allowAnySyncSource.animation(.fastSpring)
+                    // )
                     SettingsToggle(
                         text: "Re-apply brightness on screen wake", setting: $reapplyValuesAfterWake,
                         help: """
@@ -940,10 +1125,10 @@ struct AdvancedSettingsView: View {
                                         color: Colors.lightGray,
                                         textColor: Colors.darkGray,
                                         radius: 10,
-                                        verticalPadding: 3,
-                                        disabled: !$delayDDCAfterWake
+                                        verticalPadding: 3
                                     ))
                                     .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                                    .disabled(!delayDDCAfterWake)
                             }
                             if delayDDCAfterWake {
                                 Text("Lunar will wait \(waitAfterWakeSeconds) seconds before sending\nthe first DDC command after screen wake")
@@ -1346,6 +1531,7 @@ struct QuickActionsMenuView: View {
         @State var nonSourceDisplays: [Display] = displayController.activeDisplayList.filter(!\.isSource)
         @State var disconnectedDisplays: [Display] = displayController.possiblyDisconnectedDisplayList
     #endif
+    @State var unmanagedDisplays: [Display] = displayController.unmanagedDisplays
     @State var adaptiveModes: [AdaptiveModeKey] = [.sensor, .sync, .location, .clock, .manual, .auto]
 
     @State var headerOpacity: CGFloat = 1.0
@@ -1357,6 +1543,8 @@ struct QuickActionsMenuView: View {
     @State var displayCount = displayController.activeDisplayCount
 
     @ObservedObject var menuBarIcon: StatusItemButtonController
+
+    @ObservedObject var km = KM
 
     var modeSelector: some View {
         let titleBinding = Binding<String>(
@@ -1630,14 +1818,20 @@ struct QuickActionsMenuView: View {
             #if arch(arm64)
                 if #available(macOS 13, *) {
                     ForEach(disconnectedDisplays) { d in
-                        DisconnectedDisplayView(id: d.id, name: d.name).padding(.vertical, 7)
+                        DisconnectedDisplayView(id: d.id, name: d.name, display: d).padding(.vertical, 7)
                     }
 
-                    if Sysctl.isMacBook, cursorDisplay?.id != 1, !displays.contains(where: { $0.id == 1 }), !disconnectedDisplays.contains(where: { $0.id == 1 }) {
-                        DisconnectedDisplayView(id: 1, name: "Built-in").padding(.vertical, 7)
+                    if Sysctl.isMacBook, cursorDisplay?.id != 1, !displays.contains(where: { $0.id == 1 }), !disconnectedDisplays.contains(where: { $0.id == 1 }),
+                       !(displayController.builtinDisplays.first?.unmanaged ?? false)
+                    {
+                        DisconnectedDisplayView(id: 1, name: "Built-in", display: dc.displays[1] ?? GENERIC_DISPLAY).padding(.vertical, 7)
                     }
                 }
             #endif
+
+            ForEach(unmanagedDisplays) { d in
+                UnmanagedDisplayView(display: d).padding(.vertical, 7)
+            }
 
             if showStandardPresets || showCustomPresets {
                 VStack {
@@ -1690,6 +1884,16 @@ struct QuickActionsMenuView: View {
             .onChange(of: menuBarClosed) { closed in
                 setup(closed)
             }
+            .onChange(of: dc.activeDisplayList) { _ in
+                mainAsyncAfter(ms: 10) { setup() }
+            }
+            .onChange(of: dc.possiblyDisconnectedDisplayList) { disconnected in
+                mainAsyncAfter(ms: 10) {
+                    setup()
+                    let ids = disconnected.map(\.id)
+                    displays = displays.filter { !ids.contains($0.id) }
+                }
+            }
             .frame(maxWidth: .infinity, alignment: .center)
             .onTapGesture { env.recording = false }
 
@@ -1718,7 +1922,6 @@ struct QuickActionsMenuView: View {
         .frame(width: MENU_WIDTH + FULL_OPTIONS_MENU_WIDTH, height: env.menuMaxHeight, alignment: .top)
         .padding(.horizontal, showOptionsMenu ? MENU_HORIZONTAL_PADDING * 2 : 0)
     }
-
     @ViewBuilder var optionsMenu: some View {
         VStack(spacing: 10) {
             HStack {
@@ -1771,8 +1974,20 @@ struct QuickActionsMenuView: View {
                 HDRSettingsView().padding(10).foregroundColor(Colors.blackMauve)
             }
 
-            SwiftUI.Button("Reset all settings") {
-                DataStore.reset()
+            SwiftUI.Button("Reset \(km.optionKeyPressed ? "ALL" : (km.commandKeyPressed ? "display-specific" : "global")) settings") {
+                if km.optionKeyPressed {
+                    resetAllSettings()
+                } else if km.commandKeyPressed {
+                    appDelegate!.resetStates()
+                    Defaults.reset(.displays)
+                    dc.displays = [:]
+                } else {
+                    DataStore.reset()
+                }
+
+                mainAsyncAfter(ms: 300) {
+                    restart()
+                }
             }
             .buttonStyle(FlatButton(color: Color.red.opacity(0.7), textColor: .white))
             .font(.system(size: 12, weight: .medium))
@@ -1806,14 +2021,23 @@ struct QuickActionsMenuView: View {
     }
 
     func setMenuWidth(_: Any) {
-        withAnimation(.fastSpring) {
+        #if arch(arm64)
+            withAnimation(.fastSpring) {
+                env.menuWidth = (
+                    showOptionsMenu || showStandardPresets || showCustomPresets
+                        || !showHeaderOnHover || !showFooterOnHover
+                        || showAdditionalInfo
+                        || headerOpacity > 0 || footerOpacity > 0
+                ) ? MENU_WIDTH : MENU_CLEAN_WIDTH
+            }
+        #else
             env.menuWidth = (
                 showOptionsMenu || showStandardPresets || showCustomPresets
                     || !showHeaderOnHover || !showFooterOnHover
                     || showAdditionalInfo
                     || headerOpacity > 0 || footerOpacity > 0
             ) ? MENU_WIDTH : MENU_CLEAN_WIDTH
-        }
+        #endif
         if let menuWindow, let size = menuWindow.contentView?.frame.size, size != menuWindow.frame.size {
             menuWindow.setContentSize(size)
         }
@@ -1849,6 +2073,7 @@ struct QuickActionsMenuView: View {
                     nonSourceDisplays = []
                     disconnectedDisplays = []
                 #endif
+                unmanagedDisplays = []
             }
             return
         }
@@ -1861,7 +2086,14 @@ struct QuickActionsMenuView: View {
             sourceDisplay = dc.sourceDisplay
             nonSourceDisplays = dc.activeDisplayList.filter(!\.isSource)
             disconnectedDisplays = dc.possiblyDisconnectedDisplayList
+
+            let ids = disconnectedDisplays.map(\.id)
+            displays = displays.filter { !ids.contains($0.id) }
+            if let id = cursorDisplay?.id, ids.contains(id) {
+                cursorDisplay = nil
+            }
         #endif
+        unmanagedDisplays = dc.unmanagedDisplays
 
         if showHeaderOnHover { headerOpacity = 0.0 }
         if showFooterOnHover { footerOpacity = 0.0 }
@@ -1878,7 +2110,9 @@ var additionInfoTask: DispatchWorkItem? {
 }
 
 var displayHideTask: DispatchWorkItem? {
-    didSet { oldValue?.cancel() }
+    didSet {
+        oldValue?.cancel()
+    }
 }
 
 var headerShowHideTask: DispatchWorkItem? {

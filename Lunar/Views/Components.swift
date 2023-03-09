@@ -16,6 +16,7 @@ import SwiftUI
 struct SettingsToggle: View {
     @State var text: String
     @Binding var setting: Bool
+    @State var color: Color? = Colors.blackMauve
     @State var help: String?
     @State var helpShown = false
 
@@ -23,11 +24,11 @@ struct SettingsToggle: View {
         HStack {
             Toggle(text, isOn: $setting)
                 .toggleStyle(CheckboxToggleStyle(style: .circle))
-                .foregroundColor(Colors.blackMauve)
+                .foregroundColor(color)
             if let help {
                 SwiftUI.Button(action: { helpShown = true }) {
                     Image(systemName: "questionmark.circle.fill")
-                        .font(.system(size: 13, weight: .black))
+                        .font(.system(size: 12, weight: .black))
                         .imageScale(.medium)
                 }
                 .buttonStyle(FlatButton(
@@ -180,8 +181,7 @@ public struct FlatButton: ButtonStyle {
         pressedBinding: Binding<Bool>? = nil,
         horizontalPadding: CGFloat = 8,
         verticalPadding: CGFloat = 4,
-        stretch: Bool = false,
-        disabled: Binding<Bool>? = nil
+        stretch: Bool = false
     ) {
         _color = colorBinding ?? .constant(color ?? Colors.lightGold)
         _textColor = textColorBinding ?? .constant(textColor ?? Colors.blackGray)
@@ -194,7 +194,6 @@ public struct FlatButton: ButtonStyle {
         _horizontalPadding = horizontalPadding.state
         _verticalPadding = verticalPadding.state
         _stretch = State(initialValue: stretch)
-        _disabled = disabled ?? .constant(false)
     }
 
     public func makeBody(configuration: Configuration) -> some View {
@@ -239,8 +238,8 @@ public struct FlatButton: ButtonStyle {
                         )
                     )
             )
-            .scaleEffect(configuration.isPressed && !disabled ? 1.02 : scale)
-            .colorMultiply(configuration.isPressed && !disabled ? pressedColor : colorMultiply)
+            .scaleEffect(configuration.isPressed && isEnabled ? 1.02 : scale)
+            .colorMultiply(configuration.isPressed && isEnabled ? pressedColor : colorMultiply)
             .onAppear {
                 pressedColor = hoverColor.blended(withFraction: 0.5, of: .white)
             }
@@ -258,17 +257,17 @@ public struct FlatButton: ButtonStyle {
                 }
             }
             .onHover(perform: { hover in
-                guard !disabled else { return }
+                guard isEnabled else { return }
                 withAnimation(.easeOut(duration: 0.2)) {
                     colorMultiply = hover ? hoverColor : .white
                     scale = hover ? 1.07 : 1
                 }
             })
-            .contrast(disabled ? 0.3 : 1.0)
-            .disabled(disabled)
+            .contrast(!isEnabled ? 0.3 : 1.0)
     }
 
     @Environment(\.colors) var colors
+    @Environment(\.isEnabled) var isEnabled
 
     @Binding var color: Color
     @Binding var textColor: Color
@@ -284,7 +283,6 @@ public struct FlatButton: ButtonStyle {
     @State var horizontalPadding: CGFloat = 8
     @State var verticalPadding: CGFloat = 4
     @State var stretch = false
-    @Binding var disabled: Bool
 }
 
 // MARK: - PickerButton

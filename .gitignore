@@ -24,8 +24,10 @@ DerivedData/
 *.xcscmblueprint
 Carthage
 Releases/.tmp
+Releases/*.tmp
 Releases/*.dmg
 Releases/*.delta
+Releases/*.delta*
 Lunar/Generated/
 .env.sh
 .gitsecret/keys/random_seed
