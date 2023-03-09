@@ -2661,6 +2661,21 @@ CORNERS</string>
                                             </binding>
                                         </connections>
                                     </segmentedControl>
+                                    <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="K6H-bv-Rej">
+                                        <rect key="frame" x="49" y="63" width="150" height="23"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <segmentedCell key="cell" refusesFirstResponder="YES" borderStyle="border" alignment="left" segmentDistribution="fillEqually" style="capsule" trackingMode="selectOne" id="yzy-Fa-m6G">
+                                            <font key="font" metaFont="systemSemibold" size="12"/>
+                                            <segments>
+                                                <segment label="Adjustable" toolTip="Allow brightness to be adjusted using keys or sliders" imageScaling="proportionallyUpOrDown" selected="YES"/>
+                                                <segment label="Locked" toolTip="Keep brightness locked to the last set value" tag="1"/>
+                                            </segments>
+                                        </segmentedCell>
+                                        <connections>
+                                            <binding destination="1Bn-Ca-ETm" name="selectedTag" keyPath="self.display.lockedBrightness" id="hBR-n4-Om9"/>
+                                            <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.nonManualMode" id="skZ-Ew-FdL"/>
+                                        </connections>
+                                    </segmentedControl>
                                     <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ldr-Bz-FBk">
                                         <rect key="frame" x="57" y="37" width="135" height="23"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -2794,6 +2809,21 @@ CORNERS</string>
                                                     <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                 </dictionary>
                                             </binding>
+                                        </connections>
+                                    </segmentedControl>
+                                    <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1gk-AA-Y5x">
+                                        <rect key="frame" x="51" y="63" width="150" height="23"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <segmentedCell key="cell" refusesFirstResponder="YES" borderStyle="border" alignment="left" segmentDistribution="fillEqually" style="capsule" trackingMode="selectOne" id="d5N-Gw-uQF">
+                                            <font key="font" metaFont="systemSemibold" size="12"/>
+                                            <segments>
+                                                <segment label="Adjustable" toolTip="Allow brightness to be adjusted using keys or sliders" imageScaling="proportionallyUpOrDown" selected="YES"/>
+                                                <segment label="Locked" toolTip="Keep contrast locked to the last set value" tag="1"/>
+                                            </segments>
+                                        </segmentedCell>
+                                        <connections>
+                                            <binding destination="1Bn-Ca-ETm" name="selectedTag" keyPath="self.display.lockedContrast" id="WZO-Lx-1GV"/>
+                                            <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.nonManualMode" id="bIX-JD-9Ow"/>
                                         </connections>
                                     </segmentedControl>
                                     <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Jb0-NQ-rNK">
@@ -3544,39 +3574,20 @@ and contrast to their highest values</string>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="WK2-eG-vDJ" customClass="LockButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="413" y="40" width="124" height="14"/>
+                            <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="brE-6o-Vsl">
+                                <rect key="frame" x="405" y="37" width="140" height="23"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="inline" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="DgP-1t-uMe">
-                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                                    <string key="title">Advanced settings
-hidden</string>
-                                    <string key="alternateTitle">Advanced settings
-shown</string>
-                                    <font key="font" metaFont="smallSystem"/>
-                                </buttonCell>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="verticalPadding">
-                                        <real key="value" value="0.69999999999999996"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="labelOn">
-                                        <color key="value" name="Caption Tertiary"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="bgOff">
-                                        <color key="value" name="Field BG"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="bgOn">
-                                        <color key="value" name="Button BG"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                        <real key="value" value="6"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="boolean" keyPath="monospaced" value="YES"/>
-                                </userDefinedRuntimeAttributes>
+                                <segmentedCell key="cell" refusesFirstResponder="YES" borderStyle="border" alignment="left" segmentDistribution="fillEqually" style="capsule" trackingMode="selectOne" id="atp-y4-Gi0">
+                                    <font key="font" metaFont="systemSemibold" size="12"/>
+                                    <segments>
+                                        <segment label="Simple" toolTip="Keep the user interface simple, hiding more advanced settings" imageScaling="proportionallyUpOrDown" selected="YES"/>
+                                        <segment label="Advanced" toolTip="Show advanced settings" tag="1"/>
+                                    </segments>
+                                </segmentedCell>
                                 <connections>
-                                    <binding destination="rew-Tm-BHz" name="value" keyPath="values.showAdvancedDisplaySettings" id="5Ie-4a-I5L"/>
+                                    <binding destination="rew-Tm-BHz" name="selectedTag" keyPath="values.showAdvancedDisplaySettings" id="BNd-CG-Kbk"/>
                                 </connections>
-                            </button>
+                            </segmentedControl>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="BGp-R3-21E">
                                 <rect key="frame" x="591" y="495" width="21" height="10"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
@@ -3938,7 +3949,6 @@ enabled</string>
                         <outlet property="_softwareDimmingButton" destination="0dW-qZ-glS" id="iqi-eZ-JMs"/>
                         <outlet property="adaptiveNotice" destination="ZlW-Lv-Oa8" id="e5o-8i-RIo"/>
                         <outlet property="addScheduleButton" destination="8G3-fq-bS8" id="XHZ-uR-fu4"/>
-                        <outlet property="advancedSettingsButton" destination="WK2-eG-vDJ" id="JFd-Q2-R9M"/>
                         <outlet property="brightnessContrastChart" destination="ycx-jo-u8n" id="9av-L7-GAu"/>
                         <outlet property="brightnessContrastSlider" destination="owU-od-4JA" id="aOH-kD-PjK"/>
                         <outlet property="brightnessSlider" destination="ghR-M9-kyP" id="hpV-oy-1M3"/>
@@ -9589,7 +9599,7 @@ non-standard mute implementation</string>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4ZK-JW-guk">
-                                <rect key="frame" x="13" y="447" width="172" height="25"/>
+                                <rect key="frame" x="13" y="441" width="172" height="25"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Algorithm Curve" id="kXm-Ja-RI2">
                                     <font key="font" metaFont="systemHeavy" size="21"/>
                                     <color key="textColor" name="Caption"/>
@@ -9597,7 +9607,7 @@ non-standard mute implementation</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Q8Y-pU-swj" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="240" y="449" width="66" height="22"/>
+                                <rect key="frame" x="240" y="443" width="66" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="66" id="Lgw-Ce-Z4W"/>
                                     <constraint firstAttribute="height" constant="22" id="rpD-5h-bMD"/>
@@ -9625,7 +9635,7 @@ non-standard mute implementation</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pha-fy-8xu">
-                                <rect key="frame" x="13" y="419" width="286" height="26"/>
+                                <rect key="frame" x="13" y="413" width="286" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="282" id="cIg-Jl-hOW"/>
                                     <constraint firstAttribute="height" constant="26" id="e0z-7e-yXd"/>
@@ -9639,7 +9649,7 @@ and contrast for the current active mode.</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lkA-nB-TbI">
-                                <rect key="frame" x="13" y="386" width="110" height="25"/>
+                                <rect key="frame" x="13" y="380" width="110" height="25"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="DDC State" id="wgO-FF-ux5">
                                     <font key="font" metaFont="systemHeavy" size="21"/>
                                     <color key="textColor" name="Caption"/>
@@ -9647,7 +9657,7 @@ and contrast for the current active mode.</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="e1b-Yq-aG5" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="240" y="388" width="66" height="22"/>
+                                <rect key="frame" x="240" y="382" width="66" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="66" id="ZzJ-dt-7GL"/>
                                     <constraint firstAttribute="height" constant="22" id="jl4-Ii-2cq"/>
@@ -9675,7 +9685,7 @@ and contrast for the current active mode.</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="opg-wR-U4d">
-                                <rect key="frame" x="13" y="358" width="286" height="26"/>
+                                <rect key="frame" x="13" y="352" width="286" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="282" id="Ekh-cI-nPe"/>
                                     <constraint firstAttribute="height" constant="26" id="kXx-vj-F59"/>
@@ -9689,7 +9699,7 @@ and retries remaining DDC commands.</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="WSa-Ff-Y1O">
-                                <rect key="frame" x="13" y="325" width="173" height="25"/>
+                                <rect key="frame" x="13" y="319" width="173" height="25"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Network Control" id="Ykd-uz-HIJ">
                                     <font key="font" metaFont="systemHeavy" size="21"/>
                                     <color key="textColor" name="Caption"/>
@@ -9697,7 +9707,7 @@ and retries remaining DDC commands.</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="h5z-gS-3bR" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="240" y="327" width="66" height="22"/>
+                                <rect key="frame" x="240" y="321" width="66" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="22" id="SZl-a9-Zuo"/>
                                     <constraint firstAttribute="width" constant="66" id="YL2-Me-W8c"/>
@@ -9725,7 +9735,7 @@ and retries remaining DDC commands.</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J7I-IP-OQL">
-                                <rect key="frame" x="13" y="297" width="286" height="26"/>
+                                <rect key="frame" x="13" y="291" width="286" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="26" id="IfF-XH-zwv"/>
                                     <constraint firstAttribute="width" constant="282" id="TGV-bh-PqK"/>
@@ -9739,7 +9749,7 @@ a new search for controllers on the local network.</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hcT-AQ-zqf">
-                                <rect key="frame" x="13" y="264" width="158" height="25"/>
+                                <rect key="frame" x="13" y="258" width="158" height="25"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="BlackOut State" id="Dn2-iI-McG">
                                     <font key="font" metaFont="systemHeavy" size="21"/>
                                     <color key="textColor" name="Caption"/>
@@ -9747,7 +9757,7 @@ a new search for controllers on the local network.</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6Zk-va-CkO" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="240" y="266" width="66" height="22"/>
+                                <rect key="frame" x="240" y="260" width="66" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="66" id="Blv-E1-qtR"/>
                                     <constraint firstAttribute="height" constant="22" id="dXY-lm-hSw"/>
@@ -9775,7 +9785,7 @@ a new search for controllers on the local network.</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ga2-xO-Y0e">
-                                <rect key="frame" x="13" y="236" width="296" height="26"/>
+                                <rect key="frame" x="13" y="230" width="296" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="292" id="Tc7-QF-RYM"/>
                                     <constraint firstAttribute="height" constant="26" id="oPZ-Wu-2rM"/>
@@ -9789,7 +9799,7 @@ Helpful when BlackOut behaves weird.</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HHV-6f-Kdt">
-                                <rect key="frame" x="13" y="203" width="154" height="25"/>
+                                <rect key="frame" x="13" y="197" width="154" height="25"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Lunar Settings" id="9Fh-m3-tLF">
                                     <font key="font" metaFont="systemHeavy" size="21"/>
                                     <color key="textColor" name="Caption"/>
@@ -9797,7 +9807,7 @@ Helpful when BlackOut behaves weird.</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zqI-zY-XVw" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="240" y="205" width="66" height="22"/>
+                                <rect key="frame" x="240" y="199" width="66" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="22" id="RKE-3F-z1z"/>
                                     <constraint firstAttribute="width" constant="66" id="YsW-Ga-72w"/>
@@ -9825,7 +9835,7 @@ Helpful when BlackOut behaves weird.</string>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9Tw-fr-5dI">
-                                <rect key="frame" x="13" y="175" width="296" height="26"/>
+                                <rect key="frame" x="13" y="169" width="296" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="26" id="diE-r8-aKe"/>
                                     <constraint firstAttribute="width" constant="292" id="hIN-Ah-3Fl"/>
@@ -9950,7 +9960,10 @@ settings for this monitor.</string>
                                 </textFieldCell>
                             </textField>
                             <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="7V6-mp-EQS">
-                                <rect key="frame" x="0.0" y="168" width="321" height="5"/>
+                                <rect key="frame" x="0.0" y="162" width="321" height="5"/>
+                            </box>
+                            <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="rj3-mF-K6Z">
+                                <rect key="frame" x="0.0" y="136" width="321" height="5"/>
                             </box>
                         </subviews>
                         <constraints>
@@ -9958,14 +9971,16 @@ settings for this monitor.</string>
                             <constraint firstItem="HHV-6f-Kdt" firstAttribute="leading" secondItem="hcT-AQ-zqf" secondAttribute="leading" id="1vR-TR-cB4"/>
                             <constraint firstItem="A2C-5I-BL3" firstAttribute="leading" secondItem="zqI-zY-XVw" secondAttribute="leading" id="3F9-ED-dWP"/>
                             <constraint firstItem="d7s-It-7HT" firstAttribute="leading" secondItem="zqI-zY-XVw" secondAttribute="leading" id="3z8-qg-xWh"/>
-                            <constraint firstItem="B9T-j5-BWv" firstAttribute="top" secondItem="7V6-mp-EQS" secondAttribute="bottom" constant="10" id="4sX-XW-XVL"/>
+                            <constraint firstItem="B9T-j5-BWv" firstAttribute="top" secondItem="7V6-mp-EQS" secondAttribute="bottom" constant="4" id="4sX-XW-XVL"/>
                             <constraint firstItem="HHV-6f-Kdt" firstAttribute="top" secondItem="ga2-xO-Y0e" secondAttribute="bottom" constant="8" symbolic="YES" id="605-Mj-ehc"/>
                             <constraint firstItem="ga2-xO-Y0e" firstAttribute="top" secondItem="hcT-AQ-zqf" secondAttribute="bottom" constant="2" id="6cq-bK-lF3"/>
                             <constraint firstItem="B9T-j5-BWv" firstAttribute="centerX" secondItem="784-nu-gc5" secondAttribute="centerX" id="7AJ-Ap-hFs"/>
                             <constraint firstItem="9Tw-fr-5dI" firstAttribute="top" secondItem="HHV-6f-Kdt" secondAttribute="bottom" constant="2" id="8Ww-mx-ctw"/>
+                            <constraint firstItem="rj3-mF-K6Z" firstAttribute="centerX" secondItem="784-nu-gc5" secondAttribute="centerX" id="AZy-QO-0Vg"/>
                             <constraint firstItem="BTL-vZ-51v" firstAttribute="top" secondItem="B9T-j5-BWv" secondAttribute="bottom" constant="10" id="BT7-7u-vtz"/>
                             <constraint firstItem="opg-wR-U4d" firstAttribute="leading" secondItem="lkA-nB-TbI" secondAttribute="leading" id="Ect-WM-4hP"/>
                             <constraint firstItem="7V6-mp-EQS" firstAttribute="centerX" secondItem="784-nu-gc5" secondAttribute="centerX" id="Gtx-jF-NOm"/>
+                            <constraint firstItem="rj3-mF-K6Z" firstAttribute="width" secondItem="784-nu-gc5" secondAttribute="width" id="Gy1-Jn-yeQ"/>
                             <constraint firstItem="opg-wR-U4d" firstAttribute="top" secondItem="lkA-nB-TbI" secondAttribute="bottom" constant="2" id="IHD-Pd-9ln"/>
                             <constraint firstItem="6Zk-va-CkO" firstAttribute="centerY" secondItem="hcT-AQ-zqf" secondAttribute="centerY" id="J30-RF-BWz"/>
                             <constraint firstItem="h5z-gS-3bR" firstAttribute="centerY" secondItem="WSa-Ff-Y1O" secondAttribute="centerY" id="KwX-5Z-nlv"/>
@@ -9977,6 +9992,7 @@ settings for this monitor.</string>
                             <constraint firstItem="4ZK-JW-guk" firstAttribute="leading" secondItem="784-nu-gc5" secondAttribute="leading" constant="15" id="WNB-jW-I8W"/>
                             <constraint firstItem="lhQ-ai-FCL" firstAttribute="leading" secondItem="HHV-6f-Kdt" secondAttribute="leading" id="WiS-hL-vhw"/>
                             <constraint firstItem="9Tw-fr-5dI" firstAttribute="leading" secondItem="HHV-6f-Kdt" secondAttribute="leading" id="YsZ-pY-Ufe"/>
+                            <constraint firstItem="rj3-mF-K6Z" firstAttribute="top" secondItem="B9T-j5-BWv" secondAttribute="bottom" constant="4" id="Yub-nO-mPf"/>
                             <constraint firstItem="hcT-AQ-zqf" firstAttribute="top" secondItem="J7I-IP-OQL" secondAttribute="bottom" constant="8" symbolic="YES" id="Yvg-rU-c8m"/>
                             <constraint firstItem="oEJ-RN-BYb" firstAttribute="top" secondItem="lhQ-ai-FCL" secondAttribute="bottom" constant="2" id="ZAU-yQ-NNm"/>
                             <constraint firstItem="A2C-5I-BL3" firstAttribute="centerY" secondItem="lhQ-ai-FCL" secondAttribute="centerY" id="Zys-5d-uxz"/>

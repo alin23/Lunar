@@ -138,6 +138,37 @@ let SWIFTUI_PREVIEW = ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PRE
 
 var lastXDRContrastResetTime = Date()
 
+final class KeysManager: ObservableObject {
+    @Published var noModifiers = true
+
+    @Published var optionKeyPressed = false {
+        didSet {
+            noModifiers = !optionKeyPressed && !shiftKeyPressed && !controlKeyPressed && !commandKeyPressed
+
+        }
+    }
+    @Published var shiftKeyPressed = false {
+        didSet {
+            noModifiers = !optionKeyPressed && !shiftKeyPressed && !controlKeyPressed && !commandKeyPressed
+
+        }
+    }
+    @Published var controlKeyPressed = false {
+        didSet {
+            noModifiers = !optionKeyPressed && !shiftKeyPressed && !controlKeyPressed && !commandKeyPressed
+
+        }
+    }
+    @Published var commandKeyPressed = false {
+        didSet {
+            noModifiers = !optionKeyPressed && !shiftKeyPressed && !controlKeyPressed && !commandKeyPressed
+
+        }
+    }
+}
+
+let KM = KeysManager()
+
 // MARK: - AppDelegate
 
 @NSApplicationMain
@@ -148,15 +179,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         case displayGamma
         case displayReset
     }
-
-    #if DEBUG
-        var supportsGentleScheduledUpdateReminders: Bool { true }
-    #endif
-
-    @Atomic static var optionKeyPressed = false
-    @Atomic static var shiftKeyPressed = false
-    @Atomic static var controlKeyPressed = false
-    @Atomic static var commandKeyPressed = false
 
     static var observers: Set<AnyCancellable> = []
     static var enableSentry = CachedDefaults[.enableSentry]
@@ -267,18 +289,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             .sink { [self] shouldReset in
                 guard shouldReset else { return }
 
-                self.disableFaceLight(smooth: false)
-                NetworkControl.resetState()
-                DDCControl.resetState()
-                self.startOrRestartMediaKeyTap()
-                displayController.activeDisplays.values.forEach { d in
-                    d.updateCornerWindow()
-//                    d.reapplySoftwareControl()
-                }
+                resetStates()
             }.store(in: &observers)
         return p
     }()
-
     var zeroGammaChecker: Repeater?
 
     var enableSentryObserver: Cancellable?
@@ -296,6 +310,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
     let APP_DIR = ((try? p("/Applications")?.realpath()) ?? p("/Applications"))?.components ?? ["Applications"]
     let SVAPP_DIR = ((try? p("/System/Volumes/Data/Applications")?.realpath()) ?? p("/System/Volumes/Data/Applications"))?.components ?? ["System", "Volumes", "Data", "Applications"]
+
+    var supportsGentleScheduledUpdateReminders: Bool { true }
 
     var currentPage: Int = Page.display.rawValue {
         didSet {
@@ -398,6 +414,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         }
     }
 
+    func resetStates() {
+        disableFaceLight(smooth: false)
+        NetworkControl.resetState()
+        DDCControl.resetState()
+        startOrRestartMediaKeyTap()
+        displayController.activeDisplays.values.forEach { d in
+            d.updateCornerWindow()
+        }
+    }
+
     @IBAction func blackOutPowerOff(_: Any) {
         guard let display = displayController.mainExternalDisplay else { return }
         _ = display.control?.setPower(.off)
@@ -457,6 +483,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
     @IBAction func checkForUpdates(_: Any) {
         updater.checkForUpdates()
+    }
+
+    func closeAndOpenMenuWindow(afterMs: Int = 10) {
+        statusItemButtonController?.closeMenuBar()
+        mainAsyncAfter(ms: afterMs) {
+            self.statusItemButtonController?.showMenuBar()
+        }
     }
 
     func application(_: NSApplication, open urls: [URL]) {
@@ -1199,12 +1232,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 }
             }
 
-            if addedDisplay, displayController.screenIDs.count == 1, displayController.xdrContrast > 0 {
-                log.info("Disabling XDR Contrast if we have more than 1 screen")
-                lastXDRContrastResetTime = Date()
-                displayController.xdrContrast = 0
-                displayController.setXDRContrast(0, now: true)
-            }
             displayController.panelRefreshPublisher.send(displayID)
             displayController.retryAutoBlackoutLater()
 
@@ -1213,6 +1240,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                     DDC.rebuildDCPList()
                 }
             #endif
+
+            #if arch(arm64)
+                if #available(macOS 13, *), addedDisplay, let d = displayController.displaysBySerial[Display.uuid(id: displayID)], !d.active, d.keepDisconnected {
+                    mainAsyncAfter(ms: 10) {
+                        displayController.dis(displayID, display: d, force: true)
+                    }
+                    return
+                }
+            #endif
+
+            if addedDisplay, displayController.screenIDs.count == 1, displayController.xdrContrast > 0 {
+                log.info("Disabling XDR Contrast if we have more than 1 screen")
+                lastXDRContrastResetTime = Date()
+                displayController.xdrContrast = 0
+                displayController.setXDRContrast(0, now: true)
+            }
+
         }, nil)
 
         DistributedNotificationCenter
@@ -1611,10 +1655,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                     self.statusItem.button?.imagePosition = .imageOnly
                 }
                 self.updateInfoMenuItem(showBrightnessMenuBar: change.newValue)
-                self.statusItemButtonController?.closeMenuBar()
-                mainAsync {
-                    self.statusItemButtonController?.showMenuBar()
-                }
+                self.closeAndOpenMenuWindow()
 
             }.store(in: &observers)
     }
@@ -1701,7 +1742,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     }
 
     func applicationWillFinishLaunching(_: Notification) {
-        PFMoveToApplicationsFolderIfNecessary()
+        #if !DEBUG
+            PFMoveToApplicationsFolderIfNecessary()
+        #endif
     }
 
     func checkEmergencyBlackoutOff(event: NSEvent) {
@@ -1777,10 +1820,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             scrollDeltaYThreshold = NORMAL_SCROLL_Y_THRESHOLD
         }
 
-        AppDelegate.optionKeyPressed = event.modifierFlags.contains(.option)
-        AppDelegate.shiftKeyPressed = event.modifierFlags.contains(.shift)
-        AppDelegate.controlKeyPressed = event.modifierFlags.contains(.control)
-        AppDelegate.commandKeyPressed = event.modifierFlags.contains(.command)
+        KM.optionKeyPressed = event.modifierFlags.contains(.option)
+        KM.shiftKeyPressed = event.modifierFlags.contains(.shift)
+        KM.controlKeyPressed = event.modifierFlags.contains(.control)
+        KM.commandKeyPressed = event.modifierFlags.contains(.command)
         // log.debug("Option key pressed: \(AppDelegate.optionKeyPressed)")
         // log.debug("Shift key pressed: \(AppDelegate.shiftKeyPressed)")
         // log.debug("Control key pressed: \(AppDelegate.controlKeyPressed)")
@@ -1789,7 +1832,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
     func addGlobalModifierMonitor() {
         NSEvent.addGlobalMonitorForEvents(matching: [.flagsChanged]) { [self] event in
-            guard !event.modifierFlags.intersection([.command, .option, .shift, .control]).isEmpty else { return }
+            guard !event.modifierFlags.intersection([.command, .option, .shift, .control]).isEmpty else {
+                if KM.optionKeyPressed { KM.optionKeyPressed = false }
+                if KM.shiftKeyPressed { KM.shiftKeyPressed = false }
+                if KM.controlKeyPressed { KM.controlKeyPressed = false }
+                if KM.commandKeyPressed { KM.commandKeyPressed = false }
+                return
+            }
             checkEmergencyBlackoutOff(event: event)
         }
         NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [self] event in
@@ -2745,6 +2794,10 @@ func isLidClosed() -> Bool {
     guard !Sysctl.isiMac else { return false }
     guard Sysctl.isMacBook else { return true }
     return IsLidClosed()
+}
+
+func resetAllSettings() {
+    UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
 }
 
 func restart() {

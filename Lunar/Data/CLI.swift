@@ -1770,6 +1770,8 @@ struct Lunar: ParsableCommand {
             return cmd.globals
         case let cmd as Lux:
             return cmd.globals
+        case let cmd as Edid:
+            return cmd.globals
         case let cmd as Signature:
             return cmd.globals
         case is Key:

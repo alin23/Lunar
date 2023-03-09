@@ -20,6 +20,7 @@
 #import <MonitorPanel/MPDisplayMode.h>
 #import <MonitorPanel/MPDisplayPreset.h>
 #import <MonitorPanel/CDStructures.h>
+#import "Bridge.h"
 
 #include "libssh2.h"
 #include "libssh2_sftp.h"

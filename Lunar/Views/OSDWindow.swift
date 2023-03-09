@@ -831,16 +831,20 @@ final class PanelWindow: NSWindow {
 
     func show(at point: NSPoint? = nil, animate: Bool = false) {
         if let point {
-            if animate {
-                NSAnimationContext.runAnimationGroup { ctx in
-                    ctx.duration = 0.15
-                    ctx.timingFunction = .easeOut
-                    ctx.allowsImplicitAnimation = true
-                    setFrame(NSRect(origin: point, size: frame.size), display: true, animate: true)
+            #if arch(arm64)
+                if animate {
+                    NSAnimationContext.runAnimationGroup { ctx in
+                        ctx.duration = 0.15
+                        ctx.timingFunction = .easeOut
+                        ctx.allowsImplicitAnimation = true
+                        setFrame(NSRect(origin: point, size: frame.size), display: true, animate: true)
+                    }
+                } else {
+                    setFrameOrigin(point)
                 }
-            } else {
+            #else
                 setFrameOrigin(point)
-            }
+            #endif
         } else {
             center()
         }

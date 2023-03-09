@@ -157,6 +157,11 @@ final class ModernWindow: WAYWindow {
                 c.onClick = nil
             }
         }
+        for display in displayController.activeDisplayList {
+            if let popover = display._hotkeyPopover, popover.isShown {
+                popover.close()
+            }
+        }
         if let menuWindow, menuWindow.isVisible {
             menuWindow.forceClose()
         }

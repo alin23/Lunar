@@ -96,7 +96,7 @@ extension Defaults.Keys {
     static let autoXdrSensorShowOSD = Key<Bool>("autoXdrSensorShowOSD", default: true)
     static let autoXdrSensorLuxThreshold = Key<Float>("autoXdrSensorLuxThreshold", default: XDR_DEFAULT_LUX)
     static let customOSDVerticalOffset = Key<Float>("customOSDVerticalOffset", default: 0)
-    static let allowAnySyncSource = Key<Bool>("allowAnySyncSource", default: false)
+    static let allowAnySyncSource = Key<Bool>("allowAnySyncSource", default: true)
 
     static let gammaDisabledCompletely = Key<Bool>("gammaDisabledCompletely", default: false)
     static let oldHdrWorkaround = Key<Bool?>("oldHdrWorkaround", default: nil)
@@ -260,6 +260,8 @@ extension Defaults.Keys {
     static let autoRestartOnFailedDDCSooner = Key<Bool>("autoRestartOnFailedDDCSooner", default: false)
 
     static let sensorHostname = Key<String>("sensorHostname", default: "lunarsensor.local")
+    static let sensorPort = Key<Int>("sensorPort", default: 80)
+    static let sensorPathPrefix = Key<String>("sensorPathPrefix", default: "")
 
     #if arch(arm64)
         static let possiblyDisconnectedDisplays = Key<[Display]>("possiblyDisconnectedDisplays", default: [])

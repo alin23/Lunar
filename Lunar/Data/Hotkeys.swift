@@ -859,7 +859,7 @@ enum Hotkey {
         }
     }
 
-    static func showOsd(osdImage: OSDImage, value: UInt32, display: Display, locked _: Bool = false) {
+    static func showOsd(osdImage: OSDImage, value: UInt32, display: Display) {
         guard osdImage != .contrast else {
             display.showSoftwareOSD(
                 image: "circle.lefthalf.filled",
@@ -889,6 +889,7 @@ enum Hotkey {
 
         let locked = (display.control is DDCControl && (DDC.skipWritingPropertyById[display.id]?.contains(controlID) ?? false))
             || display.noControls
+            || (display.lockedBrightness && display.hasDDC)
         let mirroredID = CGDisplayMirrorsDisplay(display.id)
         let osdID = (mirroredID != kCGNullDirectDisplay && mirroredID != UINT32_MAX) ? mirroredID : display.id
 
