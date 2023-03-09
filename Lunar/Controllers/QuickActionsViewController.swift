@@ -1508,6 +1508,7 @@ struct QuickActionsMenuView: View {
     @Environment(\.colors) var colors
     @EnvironmentObject var env: EnvState
     @ObservedObject var dc: DisplayController = displayController
+    @ObservedObject var um = UM
     @Namespace var namespace
 
     @Default(.overrideAdaptiveMode) var overrideAdaptiveMode
@@ -1645,13 +1646,27 @@ struct QuickActionsMenuView: View {
             ZStack {
                 VStack(spacing: 5) {
                     HStack {
-                        Toggle("App info", isOn: $showAdditionalInfo.animation(.fastSpring))
+                        Toggle(um.newVersion != nil ? "" : "App info", isOn: $showAdditionalInfo.animation(.fastSpring))
                             .toggleStyle(DetailToggleStyle(style: .circle))
                             .foregroundColor(Color.secondary)
                             .font(.system(size: 12, weight: .semibold))
                             .fixedSize()
 
                         Spacer()
+
+                        if let version = um.newVersion {
+                            SwiftUI.Button("v\(version) available") { appDelegate!.updater.checkForUpdates() }
+                                .buttonStyle(FlatButton(
+                                    color: Colors.peach,
+                                    textColor: Colors.blackMauve,
+                                    horizontalPadding: 6,
+                                    verticalPadding: 3
+                                ))
+                                .font(.system(size: 12, weight: .semibold))
+                                .lineLimit(1)
+                                .minimumScaleFactor(.leastNonzeroMagnitude)
+                                .scaledToFit()
+                        }
 
 //                        SwiftUI.Button("Calibrate") {
 //                            if dc.calibrating {
