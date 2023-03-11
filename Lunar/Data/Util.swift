@@ -29,7 +29,7 @@ func displayIsInHardwareMirrorSet(_ id: CGDirectDisplayID) -> Bool {
     #if DEBUG
         return id == GENERIC_DISPLAY_ID || id == TEST_DISPLAY_ID
     #else
-        return id == GENERIC_DISPLAY_ID
+        return id == GENERIC_DISPLAY_ID || id == ALL_DISPLAYS_ID
     #endif
 }
 
@@ -37,7 +37,7 @@ func displayIsInHardwareMirrorSet(_ id: CGDirectDisplayID) -> Bool {
     #if DEBUG
         return serial == GENERIC_DISPLAY.serial || serial == TEST_DISPLAY.serial
     #else
-        return serial == GENERIC_DISPLAY.serial
+        return serial == GENERIC_DISPLAY.serial || serial == ALL_DISPLAYS.serial
     #endif
 }
 
@@ -1471,6 +1471,56 @@ extension NSRecursiveLock {
         defer { if locked { unlock() } }
 
         closure()
+    }
+}
+
+class ExpiringBool: ExpressibleByBooleanLiteral, CustomStringConvertible, ObservableObject {
+    required init(booleanLiteral value: BooleanLiteralType) {
+        self.value = value
+    }
+
+    deinit {
+        if let task, !task.isCancelled {
+            task.cancel()
+        }
+    }
+
+    @Published var value: Bool
+    var expiresAt: Date = .distantFuture
+
+    var description: String {
+        if let task, !task.isCancelled {
+            return "\(value) (expires at \(expiresAt))"
+        }
+        return "\(value)"
+    }
+    var task: DispatchWorkItem? {
+        didSet {
+            oldValue?.cancel()
+        }
+    }
+
+    func expire() {
+        if let task, !task.isCancelled {
+            DispatchQueue.main.sync(execute: task.workItem)
+            self.task = nil
+        }
+    }
+
+    func set(_ value: Bool, expireAfter: TimeInterval) {
+        self.value = value
+        expiresAt = .init(timeIntervalSinceNow: expireAfter)
+        task = mainAsyncAfter(ms: (expireAfter * 1000).intround) { [self] in
+            self.value = !value
+        }
+    }
+
+    func toggle(expireAfter: TimeInterval) {
+        value.toggle()
+        expiresAt = .init(timeIntervalSinceNow: expireAfter)
+        task = mainAsyncAfter(ms: (expireAfter * 1000).intround) { [self] in
+            self.value.toggle()
+        }
     }
 }
 

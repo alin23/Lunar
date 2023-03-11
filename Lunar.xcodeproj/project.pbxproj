@@ -138,7 +138,6 @@
 		C7C1F7051FD635360039507C /* Moment.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7041FD635360039507C /* Moment.swift */; };
 		C7C1F7071FD6354C0039507C /* Geolocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7061FD6354C0039507C /* Geolocation.swift */; };
 		C7C1F7091FD639970039507C /* DataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F7081FD639970039507C /* DataStore.swift */; };
-		C7C1F786299FB50E00F6FFD5 /* Calibration.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C1F785299FB50E00F6FFD5 /* Calibration.swift */; };
 		C7C4318F269DB81200DCD0F5 /* ALSInstallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C4318E269DB81200DCD0F5 /* ALSInstallViewController.swift */; };
 		C7C43192269DD9AE00DCD0F5 /* install.sh in Resources */ = {isa = PBXBuildFile; fileRef = C7C43190269DD9AE00DCD0F5 /* install.sh */; };
 		C7C43193269DD9AE00DCD0F5 /* lunar.yaml in Resources */ = {isa = PBXBuildFile; fileRef = C7C43191269DD9AE00DCD0F5 /* lunar.yaml */; };
@@ -324,7 +323,6 @@
 		C7C1F7041FD635360039507C /* Moment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Moment.swift; sourceTree = "<group>"; };
 		C7C1F7061FD6354C0039507C /* Geolocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geolocation.swift; sourceTree = "<group>"; };
 		C7C1F7081FD639970039507C /* DataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStore.swift; sourceTree = "<group>"; };
-		C7C1F785299FB50E00F6FFD5 /* Calibration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Calibration.swift; sourceTree = "<group>"; };
 		C7C4318E269DB81200DCD0F5 /* ALSInstallViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ALSInstallViewController.swift; sourceTree = "<group>"; };
 		C7C43190269DD9AE00DCD0F5 /* install.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = install.sh; sourceTree = "<group>"; };
 		C7C43191269DD9AE00DCD0F5 /* lunar.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = lunar.yaml; sourceTree = "<group>"; };
@@ -491,7 +489,6 @@
 		C76545241FD8A10200DBACE9 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				C7C1F785299FB50E00F6FFD5 /* Calibration.swift */,
 				C776416E272139A100C7C308 /* ResetPopoverController.swift */,
 				C7CFF492271FF280002CB549 /* DDCPopoverController.swift */,
 				C762AAE8271F3D6200198EDA /* ColorsPopoverController.swift */,
@@ -1058,7 +1055,6 @@
 				C7C1F7011FD5D2C10039507C /* ModernWindowController.swift in Sources */,
 				C74D07C8265BA68D00291FC2 /* LoginServiceKit.swift in Sources */,
 				C75083642222DC9F0020270E /* HotKeyView.swift in Sources */,
-				C7C1F786299FB50E00F6FFD5 /* Calibration.swift in Sources */,
 				C79975DE25DEEF9200C797FF /* AppleNativeControl.swift in Sources */,
 				C7A7C24A2593B5EA00745637 /* HotkeyButton.swift in Sources */,
 				C78AB66720F0C73900863CB1 /* SwiftyLogger.swift in Sources */,
@@ -1236,17 +1232,18 @@
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_USE_OPTIMIZATION_PROFILE = NO;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 6.0.0b5;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = RDDXV84A73;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = RDDXV84A73;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1304,16 +1301,17 @@
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_USE_OPTIMIZATION_PROFILE = NO;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 6.0.0b5;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = RDDXV84A73;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = RDDXV84A73;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

@@ -492,20 +492,67 @@ final class DisplayController: ObservableObject {
 
     var displaysBySerial: [String: Display] = [:]
     var unmanagedDisplays: [Display] = []
-    var activeDisplaysBySerial: [String: Display] = [:] {
+    @Published var sourceDisplay: Display = ALL_DISPLAYS
+
+    @Atomic var clamshell: Bool = isLidClosed() && Sysctl.isMacBook
+    var targetDisplays: [Display] {
+        activeDisplayList.filter { !$0.isSource }
+    }
+    @AtomicLock var displays: [CGDirectDisplayID: Display] = [:] {
         didSet {
-            #if arch(arm64)
-                brightnessSplines = computeBrightnessSplines()
-                contrastSplines = computeContrastSplines()
-            #endif
+            activeDisplays = displays.filter { $1.active && !$1.unmanaged }
+            displayList = displays.values.sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }.reversed()
+            unmanagedDisplays = displayList.filter { $0.active && $0.unmanaged }
+
+            activeDisplaysByReadableID = activeDisplayList.dict { display in (display.readableID, display) }
+            activeDisplaysBySerial = activeDisplayList.dict { display in (display.serial, display) }
+            displaysBySerial = displayList.dict { display in (display.serial, display) }
+            if CachedDefaults[.autoXdrSensor] {
+                xdrSensorTask = getSensorTask()
+            }
+            sourceDisplay = getSourceDisplay()
         }
     }
 
-    @Published var activeDisplayList: [Display] = [] {
-        didSet {
+    var activeDisplays: [CGDirectDisplayID: Display] {
+        get { _activeDisplaysLock.around(ignoreMainThread: true) { _activeDisplays } }
+        set {
             #if arch(arm64)
-                DDC.rebuildDCPList()
+                mainAsync { [self] in
+                    let serials = newValue.values.map(\.serial)
+                    for (id, display) in possiblyDisconnectedDisplays {
+                        if serials.contains(display.serial) {
+                            possiblyDisconnectedDisplays.removeValue(forKey: id)
+                        }
+                    }
+                    possiblyDisconnectedDisplayList = possiblyDisconnectedDisplays.values.sorted(by: \.id)
+                }
             #endif
+
+            _activeDisplaysLock.around {
+                _activeDisplays = newValue
+                CachedDefaults[.hasActiveDisplays] = !_activeDisplays.isEmpty
+                CachedDefaults[.hasActiveExternalDisplays] = !_activeDisplays.values.filter(\.isExternal).isEmpty
+                onActiveDisplaysChange?()
+                newValue.values.forEach { d in
+                    d.updateCornerWindow()
+                }
+
+                mainAsync {
+                    self.activeDisplayList = self._activeDisplays.values
+                        .sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }
+                        .reversed()
+                }
+                #if DEBUG
+                    newValue.values.forEach {
+                        $0.blackOutMirroringAllowed = $0.supportsGammaByDefault
+                    }
+                #endif
+            }
+
+            DDC.sync {
+                Self.serials = newValue.mapValues(\.serial)
+            }
         }
     }
 
@@ -513,6 +560,7 @@ final class DisplayController: ObservableObject {
         didSet {
             guard lidClosed != oldValue else { return }
 
+            clamshell = lidClosed && Sysctl.isMacBook
             log.info(
                 "Lid state changed",
                 context: [
@@ -569,114 +617,6 @@ final class DisplayController: ObservableObject {
             oldValue?.cancel()
         }
     }
-
-    var sourceDisplay: Display? {
-        guard let source = (
-            externalActiveDisplays.sorted(by: { $0.isNative && !$1.isNative }).first(where: { $0.isSource && !$0.blackOutEnabled })
-                ?? activeDisplayList.first(where: { $0.isSource && !$0.blackOutEnabled })
-        ) else {
-            if let builtin = builtinDisplay {
-                if !builtin.isSource {
-                    builtinSourceSetter = mainAsyncAfter(ms: 100) { builtin.isSource = true }
-                }
-                return builtin
-            }
-            return nil
-        }
-
-        return source
-    }
-
-    var targetDisplays: [Display] {
-        activeDisplayList.filter { !$0.isSource }
-    }
-
-    @AtomicLock var displays: [CGDirectDisplayID: Display] = [:] {
-        didSet {
-            activeDisplays = displays.filter { $1.active && !$1.unmanaged }
-            displayList = displays.values.sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }.reversed()
-            unmanagedDisplays = displayList.filter { $0.active && $0.unmanaged }
-
-            activeDisplaysByReadableID = activeDisplayList.dict { display in (display.readableID, display) }
-            activeDisplaysBySerial = activeDisplayList.dict { display in (display.serial, display) }
-            displaysBySerial = displayList.dict { display in (display.serial, display) }
-            if CachedDefaults[.autoXdrSensor] {
-                xdrSensorTask = getSensorTask()
-            }
-        }
-    }
-
-    var activeDisplays: [CGDirectDisplayID: Display] {
-        get { _activeDisplaysLock.around(ignoreMainThread: true) { _activeDisplays } }
-        set {
-            #if arch(arm64)
-                mainAsync { [self] in
-                    for id in possiblyDisconnectedDisplays.keys {
-                        if newValue[id] != nil {
-                            possiblyDisconnectedDisplays.removeValue(forKey: id)
-                        }
-                    }
-                    possiblyDisconnectedDisplayList = possiblyDisconnectedDisplays.values.sorted(by: \.id)
-                }
-            #endif
-
-            _activeDisplaysLock.around {
-                _activeDisplays = newValue
-                CachedDefaults[.hasActiveDisplays] = !_activeDisplays.isEmpty
-                CachedDefaults[.hasActiveExternalDisplays] = !_activeDisplays.values.filter(\.isExternal).isEmpty
-                onActiveDisplaysChange?()
-                newValue.values.forEach { d in
-                    d.updateCornerWindow()
-                }
-
-                mainAsync {
-                    self.activeDisplayList = self._activeDisplays.values
-                        .sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }
-                        .reversed()
-                }
-                #if DEBUG
-                    newValue.values.forEach {
-                        $0.blackOutMirroringAllowed = true
-                    }
-                #endif
-            }
-
-            DDC.sync {
-                Self.serials = newValue.mapValues(\.serial)
-            }
-        }
-    }
-
-    #if arch(arm64)
-        var nitsBrightnessMappingSaver: DispatchWorkItem? { didSet { oldValue?.cancel() } }
-        var nitsBrightnessMapping: [String: [AutoLearnMapping]] = Defaults[.nitsBrightnessMapping] { didSet { saveAutoLearnBrightnessMapping() } }
-
-        var nitsContrastMappingSaver: DispatchWorkItem? { didSet { oldValue?.cancel() } }
-        var nitsContrastMapping: [String: [AutoLearnMapping]] = Defaults[.nitsContrastMapping] { didSet { saveAutoLearnContrastMapping() } }
-
-        lazy var brightnessSplines: [String: (Double) -> Double] = computeBrightnessSplines()
-        lazy var contrastSplines: [String: (Double) -> Double] = computeContrastSplines()
-
-        func saveAutoLearnBrightnessMapping() {
-            nitsBrightnessMappingSaver = mainAsyncAfter(ms: 500) {
-                Defaults[.nitsBrightnessMapping] = self.nitsBrightnessMapping
-                self.brightnessSplines = self.computeBrightnessSplines()
-                self.nitsBrightnessMappingSaver = nil
-            }
-        }
-
-        func saveAutoLearnContrastMapping() {
-            nitsContrastMappingSaver = mainAsyncAfter(ms: 500) {
-                Defaults[.nitsContrastMapping] = self.nitsContrastMapping
-                self.contrastSplines = self.computeContrastSplines()
-                self.nitsContrastMappingSaver = nil
-            }
-        }
-        // @Published var computingNitsCurveID: CGDirectDisplayID? = nil
-        // @Published var computingNitsCurveProgress: Float = 0.0
-    #endif
-
-    @Published var calibrating = false
 
     @Published var adaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode() {
         didSet {
@@ -848,6 +788,7 @@ final class DisplayController: ObservableObject {
 
     var possiblyDisconnectedDisplays: [CGDirectDisplayID: Display] = [:] {
         didSet {
+            debug("possiblyDisconnectedDisplays: \(possiblyDisconnectedDisplays.keys.sorted())")
             possiblyDisconnectedDisplayList = possiblyDisconnectedDisplays.values.sorted(by: \.id)
         }
     }
@@ -1020,6 +961,62 @@ final class DisplayController: ObservableObject {
         }
     }
 
+    func getSourceDisplay() -> Display {
+        externalActiveDisplays
+            .sorted(by: { $0.isNative && !$1.isNative })
+            .first(where: { $0.isSource && !$0.blackOutEnabled })
+            ?? activeDisplayList.first(where: { $0.isSource && !$0.blackOutEnabled })
+            ?? ALL_DISPLAYS
+    }
+
+    #if arch(arm64)
+        var nitsBrightnessMappingSaver: DispatchWorkItem? { didSet { oldValue?.cancel() } }
+        var nitsBrightnessMapping: [String: [AutoLearnMapping]] = Defaults[.nitsBrightnessMapping] { didSet { saveAutoLearnBrightnessMapping() } }
+
+        var nitsContrastMappingSaver: DispatchWorkItem? { didSet { oldValue?.cancel() } }
+        var nitsContrastMapping: [String: [AutoLearnMapping]] = Defaults[.nitsContrastMapping] { didSet { saveAutoLearnContrastMapping() } }
+
+        lazy var brightnessSplines: [String: (Double) -> Double] = computeBrightnessSplines()
+        lazy var contrastSplines: [String: (Double) -> Double] = computeContrastSplines()
+
+        func saveAutoLearnBrightnessMapping() {
+            nitsBrightnessMappingSaver = mainAsyncAfter(ms: 500) {
+                Defaults[.nitsBrightnessMapping] = self.nitsBrightnessMapping
+                self.brightnessSplines = self.computeBrightnessSplines()
+                self.nitsBrightnessMappingSaver = nil
+            }
+        }
+
+        func saveAutoLearnContrastMapping() {
+            nitsContrastMappingSaver = mainAsyncAfter(ms: 500) {
+                Defaults[.nitsContrastMapping] = self.nitsContrastMapping
+                self.contrastSplines = self.computeContrastSplines()
+                self.nitsContrastMappingSaver = nil
+            }
+        }
+        // @Published var computingNitsCurveID: CGDirectDisplayID? = nil
+        // @Published var computingNitsCurveProgress: Float = 0.0
+    #endif
+
+    @Published var calibrating = false
+
+    var activeDisplaysBySerial: [String: Display] = [:] {
+        didSet {
+            #if arch(arm64)
+                brightnessSplines = computeBrightnessSplines()
+                contrastSplines = computeContrastSplines()
+            #endif
+        }
+    }
+
+    @Published var activeDisplayList: [Display] = [] {
+        didSet {
+            #if arch(arm64)
+                DDC.rebuildDCPList()
+            #endif
+        }
+    }
+
     #if arch(arm64)
         static func armDisplayService(name: String) -> io_service_t? {
             let dispService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceNameMatching(name))
@@ -1053,6 +1050,147 @@ final class DisplayController: ObservableObject {
             return props
         }
     #endif
+
+    #if arch(arm64)
+        func clcd2Properties(_ dispService: io_service_t) -> [String: Any]? {
+            guard let clcd2Service = IOServiceFirstChildMatchingRecursively(dispService, names: ["AppleCLCD2", "IOMobileFramebufferShim"]) else { return nil }
+
+            var clcd2ServiceProperties: Unmanaged<CFMutableDictionary>?
+            guard IORegistryEntryCreateCFProperties(
+                clcd2Service,
+                &clcd2ServiceProperties,
+                kCFAllocatorDefault,
+                IOOptionBits()
+            ) == KERN_SUCCESS,
+                let cfProps = clcd2ServiceProperties, let displayProps = cfProps.takeRetainedValue() as? [String: Any]
+            else {
+                log.info("No display props for service \(dispService)")
+                return nil
+            }
+            return displayProps
+        }
+    #endif
+
+    enum XDRState {
+        case none
+        case enabledManually
+        case disabledManually
+        case enabledAutomatically
+        case disabledAutomatically
+    }
+
+    static var nonZeroBuiltinMinBrightness: NSNumber = -1
+
+    static var serials: [CGDirectDisplayID: String] = [:]
+
+    var screencaptureIsRunning: CurrentValueSubject<Bool, Never> = .init(processIsRunning("/usr/sbin/screencapture", nil))
+
+    @Atomic var apply = true
+
+    lazy var panelRefreshPublisher: PassthroughSubject<CGDirectDisplayID, Never> = {
+        let p = PassthroughSubject<CGDirectDisplayID, Never>()
+        p.debounce(for: .seconds(2), scheduler: RunLoop.main)
+            .sink { [self] id in
+                DisplayController.panelManager = MPDisplayMgr()
+                if let display = self.activeDisplays[id] {
+                    display.refreshPanel()
+                }
+            }.store(in: &observers)
+        return p
+    }()
+
+    var reconfigureTask: Repeater?
+
+    lazy var autoBlackoutPublisher: PassthroughSubject<Bool, Never> = {
+        let p = PassthroughSubject<Bool, Never>()
+        p
+            .debounce(for: .seconds(AUTO_OSD_DEBOUNCE_SECONDS), scheduler: RunLoop.main)
+            .sink { shouldBlackout in
+                defer { self.autoBlackoutPending = false }
+                guard shouldBlackout, let d = self.builtinDisplay, !self.calibrating else { return }
+                lastBlackOutToggleDate = .distantPast
+                #if arch(arm64)
+                    if CachedDefaults[.newBlackOutDisconnect], #available(macOS 13, *) {
+                        self.dis(d.id)
+                    } else {
+                        self.blackOut(display: d.id, state: .on)
+                    }
+                #else
+                    self.blackOut(display: d.id, state: .on)
+                #endif
+            }.store(in: &observers)
+        return p
+    }()
+
+    var autoBlackoutPause = false
+
+    lazy var autoXdrAmbientLightPublisher: PassthroughSubject<Bool?, Never> = {
+        let p = PassthroughSubject<Bool?, Never>()
+        p
+            .debounce(for: .seconds(AUTO_OSD_DEBOUNCE_SECONDS), scheduler: RunLoop.main)
+            .sink { xdrEnabled in
+                defer {
+                    self.autoXdrPendingEnabled = false
+                    self.autoXdrPendingDisabled = false
+                }
+                guard let xdrEnabled, let d = self.builtinDisplay, !self.calibrating else { return }
+
+                d.enhanced = xdrEnabled
+                self.xdrState = xdrEnabled ? .enabledAutomatically : .disabledAutomatically
+            }.store(in: &observers)
+        return p
+    }()
+
+    var panelModesBeforeMirroring: [CGDirectDisplayID: MPDisplayMode] = [:]
+    var mirrorSetBeforeBlackout: [CGDirectDisplayID: [MPDisplay]] = [:]
+    var enabledHDRBeforeXDR: [CGDirectDisplayID: Bool] = [:]
+
+    var lastXdrContrast: Float = 0.0
+    var xdrContrast: Float = 0.0
+
+    var xdrSensorTask: Repeater?
+    lazy var autoXdrSensorLuxThreshold: Float = {
+        autoXdrSensorLuxThresholdPublisher.sink { change in
+            self.autoXdrSensorLuxThreshold = change.newValue
+        }.store(in: &self.observers)
+        return CachedDefaults[.autoXdrSensorLuxThreshold]
+    }()
+
+    @Published var autoXdrSensorPausedReason: String? = nil
+    @Published var internalSensorLux: Float = 0
+
+    var xdrState: XDRState = .none
+
+    @Atomic var autoXdrTipShown = CachedDefaults[.autoXdrTipShown]
+    @Atomic var screensSleeping = false
+    @Atomic var loggedOut = false
+
+    var autoXDRCancelCount = 0
+
+    var fluxPathURL = fluxApp()?.bundleURL
+    @Atomic var usingFlux = isFluxRunning()
+    @Atomic var xdrPausedBecauseOfFlux = false
+
+    @Atomic var fluxRunning = isFluxRunning() {
+        didSet {
+            if fluxRunning, !usingFlux, let app = fluxApp() {
+                usingFlux = true
+                fluxPathURL = app.bundleURL
+            }
+        }
+    }
+
+    var resetDisplayListTask: DispatchWorkItem? {
+        didSet {
+            oldValue?.cancel()
+        }
+    }
+
+    var sentryDataTask: DispatchWorkItem? {
+        didSet {
+            oldValue?.cancel()
+        }
+    }
 
     static func getDisplays(
         includeVirtual: Bool = true,
@@ -1441,147 +1579,6 @@ final class DisplayController: ObservableObject {
         return displayScores.max(count: 1, sortedBy: { first, second in first.1 <= second.1 }).first?.0
     }
 
-    #if arch(arm64)
-        func clcd2Properties(_ dispService: io_service_t) -> [String: Any]? {
-            guard let clcd2Service = IOServiceFirstChildMatchingRecursively(dispService, names: ["AppleCLCD2", "IOMobileFramebufferShim"]) else { return nil }
-
-            var clcd2ServiceProperties: Unmanaged<CFMutableDictionary>?
-            guard IORegistryEntryCreateCFProperties(
-                clcd2Service,
-                &clcd2ServiceProperties,
-                kCFAllocatorDefault,
-                IOOptionBits()
-            ) == KERN_SUCCESS,
-                let cfProps = clcd2ServiceProperties, let displayProps = cfProps.takeRetainedValue() as? [String: Any]
-            else {
-                log.info("No display props for service \(dispService)")
-                return nil
-            }
-            return displayProps
-        }
-    #endif
-
-    enum XDRState {
-        case none
-        case enabledManually
-        case disabledManually
-        case enabledAutomatically
-        case disabledAutomatically
-    }
-
-    static var nonZeroBuiltinMinBrightness: NSNumber = -1
-
-    static var serials: [CGDirectDisplayID: String] = [:]
-
-    var screencaptureIsRunning: CurrentValueSubject<Bool, Never> = .init(processIsRunning("/usr/sbin/screencapture", nil))
-
-    @Atomic var apply = true
-
-    lazy var panelRefreshPublisher: PassthroughSubject<CGDirectDisplayID, Never> = {
-        let p = PassthroughSubject<CGDirectDisplayID, Never>()
-        p.debounce(for: .seconds(2), scheduler: RunLoop.main)
-            .sink { [self] id in
-                DisplayController.panelManager = MPDisplayMgr()
-                if let display = self.activeDisplays[id] {
-                    display.refreshPanel()
-                }
-            }.store(in: &observers)
-        return p
-    }()
-
-    var reconfigureTask: Repeater?
-
-    lazy var autoBlackoutPublisher: PassthroughSubject<Bool, Never> = {
-        let p = PassthroughSubject<Bool, Never>()
-        p
-            .debounce(for: .seconds(AUTO_OSD_DEBOUNCE_SECONDS), scheduler: RunLoop.main)
-            .sink { shouldBlackout in
-                defer { self.autoBlackoutPending = false }
-                guard shouldBlackout, let d = self.builtinDisplay, !self.calibrating else { return }
-                lastBlackOutToggleDate = .distantPast
-                #if arch(arm64)
-                    if CachedDefaults[.newBlackOutDisconnect], #available(macOS 13, *) {
-                        self.dis(d.id)
-                    } else {
-                        self.blackOut(display: d.id, state: .on)
-                    }
-                #else
-                    self.blackOut(display: d.id, state: .on)
-                #endif
-            }.store(in: &observers)
-        return p
-    }()
-
-    var autoBlackoutPause = false
-
-    lazy var autoXdrAmbientLightPublisher: PassthroughSubject<Bool?, Never> = {
-        let p = PassthroughSubject<Bool?, Never>()
-        p
-            .debounce(for: .seconds(AUTO_OSD_DEBOUNCE_SECONDS), scheduler: RunLoop.main)
-            .sink { xdrEnabled in
-                defer {
-                    self.autoXdrPendingEnabled = false
-                    self.autoXdrPendingDisabled = false
-                }
-                guard let xdrEnabled, let d = self.builtinDisplay, !self.calibrating else { return }
-
-                d.enhanced = xdrEnabled
-                self.xdrState = xdrEnabled ? .enabledAutomatically : .disabledAutomatically
-            }.store(in: &observers)
-        return p
-    }()
-
-    var panelModesBeforeMirroring: [CGDirectDisplayID: MPDisplayMode] = [:]
-    var mirrorSetBeforeBlackout: [CGDirectDisplayID: [MPDisplay]] = [:]
-    var enabledHDRBeforeXDR: [CGDirectDisplayID: Bool] = [:]
-
-    var lastXdrContrast: Float = 0.0
-    var xdrContrast: Float = 0.0
-
-    var xdrSensorTask: Repeater?
-    lazy var autoXdrSensorLuxThreshold: Float = {
-        autoXdrSensorLuxThresholdPublisher.sink { change in
-            self.autoXdrSensorLuxThreshold = change.newValue
-        }.store(in: &self.observers)
-        return CachedDefaults[.autoXdrSensorLuxThreshold]
-    }()
-
-    @Published var autoXdrSensorPausedReason: String? = nil
-    @Published var internalSensorLux: Float = 0
-
-    var xdrState: XDRState = .none
-
-    @Atomic var autoXdrTipShown = CachedDefaults[.autoXdrTipShown]
-    @Atomic var screensSleeping = false
-    @Atomic var loggedOut = false
-
-    var autoXDRCancelCount = 0
-
-    var fluxPathURL = fluxApp()?.bundleURL
-    @Atomic var usingFlux = isFluxRunning()
-    @Atomic var xdrPausedBecauseOfFlux = false
-
-    @Atomic var fluxRunning = isFluxRunning() {
-        didSet {
-            if fluxRunning, !usingFlux, let app = fluxApp() {
-                usingFlux = true
-                fluxPathURL = app.bundleURL
-            }
-        }
-    }
-
-    var resetDisplayListTask: DispatchWorkItem? {
-        didSet {
-            oldValue?.cancel()
-        }
-    }
-
-    var sentryDataTask: DispatchWorkItem? {
-        didSet {
-            oldValue?.cancel()
-        }
-    }
-
     func setupXdrTask() {
         autoXdrSensorShowOSDPublisher
             .debounce(for: .seconds(1), scheduler: RunLoop.main)
@@ -1607,7 +1604,7 @@ final class DisplayController: ObservableObject {
     }
 
     func retryAutoBlackoutLater() {
-        if autoBlackoutPending, let d = builtinDisplay, !d.blackOutEnabled, !calibrating {
+        if autoBlackoutPending, let d = builtinDisplay, !d.blackOutEnabled, possiblyDisconnectedDisplays[d.id] == nil, !calibrating {
             log.info("Retrying Auto Blackout later")
             d.showAutoBlackOutOSD()
             autoBlackoutPublisher.send(true)
@@ -1870,74 +1867,18 @@ final class DisplayController: ObservableObject {
                 )
                 let activeNewDisplays = self.displayList.filter(\.active)
 
-                let d = self.displayList
-                if !d.contains(where: \.isSource),
-                   let possibleSource = (d.first(where: \.isSmartBuiltin) ?? d.first(where: \.canChangeBrightnessDS))
-                {
-                    mainThread { possibleSource.isSource = true }
-                }
+//                let d = self.displayList
+//                if !d.contains(where: \.isSource),
+//                   let possibleSource = (d.first(where: \.isSmartBuiltin) ?? d.first(where: \.canChangeBrightnessDS))
+//                {
+//                    possibleSource.isSource = true
+//                }
 
                 SyncMode.refresh()
                 self.sentryDataTask = mainAsyncAfter(ms: 5000) {
                     self.addSentryData()
                 }
-
-                log.debug("Disabling BlackOut where the mirror does not exist anymore")
-                for d in activeNewDisplays {
-                    log.debug(
-                        "\(d): blackOutEnabled=\(d.blackOutEnabled) blackOutEnabledWithoutMirroring=\(d.blackOutEnabledWithoutMirroring)"
-                    )
-                    guard d.blackOutEnabled, !d.blackOutEnabledWithoutMirroring, let panel = Self.panel(with: d.id),
-                          !panel.isMirrored
-                    else {
-                        d.blackoutDisablerPublisher.send(false)
-                        continue
-                    }
-
-                    log.info(
-                        "Disabling BlackOut for \(d): blackOutEnabled=\(d.blackOutEnabled) isMirrored=\(panel.isMirrored) isMirrorMaster=\(panel.isMirrorMaster) mirrorMasterDisplayID=\(panel.mirrorMasterDisplayID)"
-                    )
-                    d.blackoutDisablerPublisher.send(false)
-                }
-
-                if let d = activeNewDisplays.first, activeNewDisplays.count == 1, d.isBuiltin, d.blackOutEnabled,
-                   activeOldDisplays.count > 1
-                {
-                    log.info("Disabling BlackOut if we're left with only 1 screen")
-                    mainAsync {
-                        lastBlackOutToggleDate = .distantPast
-                        self.blackOut(display: d.id, state: .off)
-                    }
-                }
-
-                #if arch(arm64)
-                    if #available(macOS 13, *), IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("DCPAVServiceProxy")) == 0 {
-                        log.info("Disabling Auto BlackOut (disconnect) if we're left with only the builtin screen")
-                        self.en()
-                        self.autoBlackoutPause = false
-                    }
-                #endif
-
-                guard let autoBlackOut, autoBlackOut, lunarProOnTrial || lunarProActive, !self.autoBlackoutPause else {
-                    if self.autoBlackoutPause {
-                        self.autoBlackoutPause = false
-                    }
-                    return
-                }
-
-                let idsCount = NSScreen.onlineDisplayIDs.count
-                if let d = activeOldDisplays.first, activeOldDisplays.count == 1, activeNewDisplays.count > 1,
-                   idsCount > 1, !d.blackOutEnabled, !self.calibrating
-                {
-                    log.info("Activating Auto Blackout")
-                    self.autoBlackoutPending = true
-                    self.builtinDisplay?.showAutoBlackOutOSD()
-                    self.autoBlackoutPublisher.send(true)
-                } else {
-                    log.info(
-                        "Not activating Auto Blackout: activeOldDisplays.count=\(activeOldDisplays.count) activeNewDisplays.count=\(activeNewDisplays.count) idsCount=\(idsCount)"
-                    )
-                }
+                self.handleAutoBlackOut(activeNewDisplays: activeNewDisplays, activeOldDisplays: activeOldDisplays, autoBlackOut: autoBlackOut)
             }
 
             if CachedDefaults[.autoXdrSensor] {
@@ -1952,6 +1893,66 @@ final class DisplayController: ObservableObject {
                 SensorMode.internalSensor = SensorMode.getInternalSensor()
             }
         }
+    }
+
+    func handleAutoBlackOut(activeNewDisplays: [Display], activeOldDisplays: [Display], autoBlackOut: Bool?) {
+        log.debug("Disabling BlackOut where the mirror does not exist anymore")
+        for d in activeNewDisplays {
+            log.debug("\(d): blackOutEnabled=\(d.blackOutEnabled) blackOutEnabledWithoutMirroring=\(d.blackOutEnabledWithoutMirroring)")
+
+            guard d.blackOutEnabled, !d.blackOutEnabledWithoutMirroring, let panel = Self.panel(with: d.id), !panel.isMirrored else {
+                d.blackoutDisablerPublisher.send(false)
+                continue
+            }
+
+            let stats = "isMirrored=\(panel.isMirrored) isMirrorMaster=\(panel.isMirrorMaster) mirrorMasterDisplayID=\(panel.mirrorMasterDisplayID)"
+            log.info("Disabling BlackOut for \(d): blackOutEnabled=\(d.blackOutEnabled) \(stats)")
+            d.blackoutDisablerPublisher.send(true)
+        }
+
+        if let d = activeNewDisplays.first, activeNewDisplays.count == 1, d.isBuiltin, d.blackOutEnabled, activeOldDisplays.count > 1 {
+            log.info("Disabling BlackOut if we're left with only 1 screen")
+            lastBlackOutToggleDate = .distantPast
+            blackOut(display: d.id, state: .off)
+        }
+
+        #if arch(arm64)
+            log.debug("activeNewDisplays: \(activeNewDisplays.map { "[name:\($0.edidName)] [ID:\($0.id)]" })")
+            log.debug("activeOldDisplays: \(activeOldDisplays.map { "[name:\($0.edidName)] [ID:\($0.id)]" })")
+            log.debug("onlineDisplayIDs: \(NSScreen.onlineDisplayIDs.map { "[name:\(NSScreen.forDisplayID($0)?.localizedName ?? "nil")] [ID:\($0)]" })")
+
+            let onlineIDs = NSScreen.onlineDisplayIDs
+            if #available(macOS 13, *), !clamshell, Sysctl.isMacBook || Sysctl.isiMac,
+               onlineIDs.count == 1, !onlineIDs.contains(1), NSScreen.screens.first?.localizedName.isEmpty ?? true
+            {
+                log.info("Disabling AutoBlackOut (disconnect) if we're left with only the builtin screen")
+                self.en()
+                self.autoBlackoutPause = false
+            }
+        #endif
+
+        guard let autoBlackOut, autoBlackOut, lunarProOnTrial || lunarProActive, !self.autoBlackoutPause else {
+            if autoBlackoutPause {
+                autoBlackoutPause = false
+            }
+            return
+        }
+
+        let idsCount = NSScreen.onlineDisplayIDs.count
+        guard activeOldDisplays.count == 1, activeNewDisplays.count > 1, idsCount > 1,
+              !activeOldDisplays[0].blackOutEnabled,
+              activeNewDisplays.contains(where: { !$0.isBuiltin && !$0.isSidecar && !$0.isAirplay }),
+              !calibrating
+        else {
+            let stats = "activeOldDisplays.count=\(activeOldDisplays.count) activeNewDisplays.count=\(activeNewDisplays.count) idsCount=\(idsCount)"
+            log.info("Not activating AutoBlackout: \(stats)")
+            return
+        }
+
+        log.info("Activating AutoBlackout")
+        autoBlackoutPending = true
+        builtinDisplay?.showAutoBlackOutOSD()
+        autoBlackoutPublisher.send(true)
     }
 
     func reconfigure() {
@@ -2404,7 +2405,7 @@ final class DisplayController: ObservableObject {
             mainDisplay: mainDisplay,
             nonMainDisplays: nonMainDisplays
         ) { (display: Display) in
-            guard !display.noControls, !display.blackOutEnabled, !(display.lockedBrightness && display.hasDDC) else {
+            guard display.isAllDisplays || !display.noControls, !display.blackOutEnabled, !(display.lockedBrightness && display.hasDDC) else {
                 return
             }
             if display.isBuiltin {
@@ -2595,9 +2596,7 @@ final class DisplayController: ObservableObject {
                 setValue(display)
             }
         } else if sourceDisplay {
-            if let display = self.sourceDisplay {
-                setValue(display)
-            }
+            setValue(self.sourceDisplay)
         } else if mainDisplay {
             if let display = self.mainDisplay {
                 setValue(display)

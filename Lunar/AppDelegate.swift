@@ -1260,7 +1260,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             }
 
             displayController.panelRefreshPublisher.send(displayID)
-            displayController.retryAutoBlackoutLater()
+            if addedDisplay {
+                displayController.retryAutoBlackoutLater()
+            }
 
             #if arch(arm64)
                 if addedDisplay || removedDisplay {
@@ -2768,11 +2770,11 @@ func installCLIBinary() throws {
 }
 
 func acquirePrivileges(notificationTitle: String = "Lunar is now listening for media keys", notificationBody: String? = nil) {
-    #if DEBUG
-        if CommandLine.arguments.contains("-NSDocumentRevisionsDebugMode") {
-            return
-        }
-    #endif
+//    #if DEBUG
+//        if CommandLine.arguments.contains("-NSDocumentRevisionsDebugMode") {
+//            return
+//        }
+//    #endif
 
     let onAcquire = {
         mainAsync { Defaults[.accessibilityPermissionsGranted] = true }

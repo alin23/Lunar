@@ -41,6 +41,7 @@ let DEFAULT_MAX_CONTRAST: UInt16 = 75
 let DEFAULT_COLOR_GAIN: UInt16 = 50
 
 let GENERIC_DISPLAY_ID: CGDirectDisplayID = UINT32_MAX
+let ALL_DISPLAYS_ID: CGDirectDisplayID = UINT32_MAX / 7
 #if DEBUG
     let TEST_DISPLAY_ID: CGDirectDisplayID = UINT32_MAX / 2
     let TEST_DISPLAY_PERSISTENT_ID: CGDirectDisplayID = UINT32_MAX / 3
@@ -67,6 +68,29 @@ let GENERIC_DISPLAY = Display(
     minContrast: 0,
     maxContrast: 100
 )
+
+let ALL_DISPLAYS: Display = {
+    let d = Display(
+        id: ALL_DISPLAYS_ID,
+        serial: "a115a115-18bb-4ef3-aa11-555555555555",
+        name: "All Displays",
+        minBrightness: 0,
+        maxBrightness: 100,
+        minContrast: 0,
+        maxContrast: 100
+    )
+    d.active = false
+    d.canChangeContrast = true
+    d.isAllDisplays = true
+    d.enabledControls = [
+        .appleNative: false,
+        .ddc: false,
+        .gamma: false,
+        .network: false,
+    ]
+    return d
+}()
+
 #if DEBUG
     var TEST_DISPLAY: Display = {
         let BWqRBb9WWpPF = Display(
@@ -1561,6 +1585,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var keepDisconnected = false
     lazy var canChangeContrast: Bool = usesDDCBrightnessControl || (isNative && (alternativeControlForAppleNative?.isDDC ?? false))
 
+    var isAllDisplays = false
     var edidName: String {
         didSet {
             normalizedName = Self.numberNamePattern.replaceAll(in: edidName, with: "").trimmed
@@ -2274,6 +2299,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @AtomicLock var control: Control? = nil {
         didSet {
+            guard !isAllDisplays else { return }
+
             context = getContext()
             mainAsync {
                 self.supportsEnhance = self.getSupportsEnhance()
@@ -2839,8 +2866,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var preciseBrightnessContrast = 0.5 {
         didSet {
-            guard applyPreciseValue else {
-//                log.verbose("preciseBrightnessContrast=\(preciseBrightnessContrast) applyPreciseValue=false")
+            guard initialised, applyPreciseValue else {
                 return
             }
 
@@ -2850,13 +2876,22 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     if adaptivePaused { adaptivePaused = false }
                 }
                 if softwareBrightness != 1 { softwareBrightness = 1 }
-            } else if !subzero, preciseBrightnessContrast == 0, !hasSoftwareControl, !noControls {
+            } else if !subzero, preciseBrightnessContrast == 0, isAllDisplays || (!hasSoftwareControl && !noControls) {
                 withoutApply { subzero = true }
             }
 
             let (brightness, contrast) = sliderValueToBrightnessContrast(preciseBrightnessContrast)
+            guard !isAllDisplays else {
+                mainThread {
+                    withoutReapplyPreciseValue {
+                        self.brightness = brightness.ns
+                        self.contrast = contrast.ns
+                    }
+                }
+                return
+            }
 
-            var smallDiff = abs(brightness.i - self.brightness.intValue) < 5
+            var smallDiff = abs(brightness.i - self.brightness.doubleValue.intround) < 5
             if !lockedBrightness || hasSoftwareControl {
                 withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
                     mainThread {
@@ -2872,7 +2907,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             if !lockedContrast || displayController.calibrating {
-                smallDiff = abs(contrast.i - self.contrast.intValue) < 5
+                smallDiff = abs(contrast.i - self.contrast.doubleValue.intround) < 5
                 withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
                     mainThread {
                         withoutReapplyPreciseValue {
@@ -2891,15 +2926,15 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var preciseBrightness = 0.5 {
         didSet {
             percentage = preciseBrightness
-            guard applyPreciseValue, initialised else { return }
+            guard initialised, applyPreciseValue else { return }
 
-            if subzero, preciseBrightnessContrast > 0 {
+            if subzero, preciseBrightness > 0 {
                 withoutApply {
                     subzero = false
                     adaptivePaused = false
                     softwareBrightness = 1
                 }
-            } else if !subzero, preciseBrightnessContrast == 0, !hasSoftwareControl, !noControls {
+            } else if !subzero, preciseBrightness == 0, isAllDisplays || (!hasSoftwareControl && !noControls) {
                 withoutApply { subzero = true }
             }
 
@@ -2914,6 +2949,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 toHigh: maxBrightness.doubleValue / 100.0
             )
             let brightness = (preciseBrightness * 100).intround
+            guard !isAllDisplays else {
+                mainThread {
+                    withoutReapplyPreciseValue {
+                        self.brightness = brightness.ns
+                    }
+                }
+                return
+            }
 
             guard !hasSoftwareControl else {
                 if !smallDiff {
@@ -2957,7 +3000,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 return
             }
 
-            smallDiff = abs(brightness - self.brightness.intValue) < 5
+            smallDiff = abs(brightness - self.brightness.doubleValue.intround) < 5
             withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
                 mainThread {
                     self.brightness = brightness.ns
@@ -2972,7 +3015,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var preciseContrast = 0.5 {
         didSet {
-            guard applyPreciseValue else { return }
+            guard initialised, applyPreciseValue else { return }
 
             let contrast = (mapNumber(
                 cap(preciseContrast, minVal: 0.0, maxVal: 1.0),
@@ -2982,7 +3025,16 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 toHigh: maxContrast.doubleValue / 100.0
             ) * 100).intround
 
-            let smallDiff = abs(contrast - self.contrast.intValue) < 5
+            guard !isAllDisplays else {
+                mainThread {
+                    withoutReapplyPreciseValue {
+                        self.contrast = contrast.ns
+                    }
+                }
+                return
+            }
+
+            let smallDiff = abs(contrast - self.contrast.doubleValue.intround) < 5
             withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
                 mainThread {
                     self.contrast = contrast.ns
@@ -3891,7 +3943,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             return
         }
 
-        if KM.optionKeyPressed, KM.shiftKeyPressed {
+        if KM.optionKeyPressed, KM.shiftKeyPressed, displayController.activeDisplayCount > 1 {
             let blackOutEnabled = otherDisplays.contains(where: \.blackOutEnabled)
             otherDisplays.forEach {
                 lastBlackOutToggleDate = .distantPast
@@ -3905,7 +3957,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         #if arch(arm64)
-            if #available(macOS 13, *), CachedDefaults[.newBlackOutDisconnect], !KM.commandKeyPressed, !KM.shiftKeyPressed, !blackOutEnabled {
+            let shouldDisconnect: Bool
+            if CachedDefaults[.newBlackOutDisconnect] {
+                shouldDisconnect = !KM.commandKeyPressed
+            } else {
+                shouldDisconnect = KM.commandKeyPressed
+            }
+
+            if #available(macOS 13, *), !KM.shiftKeyPressed, !blackOutEnabled, displayController.activeDisplayCount > 1, shouldDisconnect {
                 displayController.dis(id)
                 return
             }
@@ -4249,6 +4308,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var isSource: Bool {
         didSet {
             context = getContext()
+            displayController.sourceDisplay = displayController.getSourceDisplay()
             guard Self.applySource else { return }
             Self.applySource = false
             defer {
@@ -4904,6 +4964,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func save(now: Bool = false, later: Bool = false) {
+        guard !isAllDisplays else { return }
+
         if now {
             DataStore.storeDisplay(display: self, now: now)
             return
