@@ -1060,9 +1060,9 @@ extension AppDelegate: MediaKeyTapDelegate {
             log.info("showOSD(mainDisplay)")
             showOSD(display)
         }
-        if sourceDisplay, let display = displayController.sourceDisplay {
+        if sourceDisplay, !displayController.sourceDisplay.isAllDisplays {
             log.info("showOSD(sourceDisplay)")
-            showOSD(display)
+            showOSD(displayController.sourceDisplay)
         }
         if builtinDisplay, let display = displayController.builtinDisplay, !mainDisplay {
             log.info("showOSD(builtinDisplay)")
@@ -1141,7 +1141,7 @@ extension AppDelegate: MediaKeyTapDelegate {
             }
             adjust(mediaKey, by: offset, contrast: contrast, currentDisplay: lidClosed, builtinDisplay: lidOpened)
         case .source:
-            if CachedDefaults[.workaroundBuiltinDisplay], !contrast, let source = displayController.sourceDisplay, source.isBuiltin {
+            if CachedDefaults[.workaroundBuiltinDisplay], !contrast, displayController.sourceDisplay.isBuiltin {
                 event.flags = event.flags.subtracting([.maskShift, .maskAlternate, .maskCommand, .maskControl])
                 if offset == 1 {
                     event.flags = event.flags.union([.maskShift, .maskAlternate])

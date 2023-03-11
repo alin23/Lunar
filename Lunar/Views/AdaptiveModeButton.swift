@@ -31,7 +31,7 @@ final class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
         if Sysctl.isMacBook, displayController.lidClosed {
             return "lid needs to be opened"
         }
-        if let d = displayController.sourceDisplay, d.blackOutEnabled {
+        if !displayController.sourceDisplay.isAllDisplays, displayController.sourceDisplay.blackOutEnabled {
             return "BlackOut has to be disabled"
         }
 

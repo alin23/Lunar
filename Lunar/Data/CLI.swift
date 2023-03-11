@@ -1534,6 +1534,9 @@ struct Lunar: ParsableCommand {
             )
             var display = DisplayFilter.builtin
 
+            @Flag(name: .shortAndLong, help: "Force disconnect in single screen scenarios.")
+            var force = false
+
             func run() throws {
                 Lunar.configureLogging(options: globals)
 
@@ -1549,7 +1552,11 @@ struct Lunar: ParsableCommand {
                     throw LunarCommandError.displayNotFound(display.s)
                 }
 
-                displayController.dis(displays.map(\.id))
+                if force, displays.count == 1 {
+                    displayController.forcedis(displays[0].id, display: displays[0])
+                } else {
+                    displayController.dis(displays.map(\.id))
+                }
                 cliExit(0)
             }
         }
