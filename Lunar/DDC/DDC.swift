@@ -791,7 +791,7 @@ enum DDC {
 
         p.debounce(for: .seconds(1), scheduler: queue)
             .sink { _ in
-                guard !displayController.screensSleeping else { return }
+                guard !DC.screensSleeping else { return }
                 log.debug("ioRegistryTreeChanged")
                 IORegistryTreeChanged()
             }
@@ -805,13 +805,13 @@ enum DDC {
 //
 //        p.throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
 //            .sink { _ in
-//                guard !displayController.screensSleeping else { return }
+//                guard !DC.screensSleeping else { return }
 //                log.debug("ioRegistryTreeChangedFaster")
 //
 //                if #available(macOS 13, *), IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("DCPAVServiceProxy")) == 0 {
 //                    log.info("Disabling Auto BlackOut (disconnect) if we're left with only the builtin screen")
-//                    displayController.en()
-//                    displayController.autoBlackoutPause = false
+//                    DC.en()
+//                    DC.autoBlackoutPause = false
 //                }
 //            }
 //            .store(in: &observers)
@@ -848,10 +848,10 @@ enum DDC {
     #if arch(arm64)
         static var dcpList: [DCP] = buildDCPList() {
             didSet {
-                dcpScores = buildDCPScoreMapping(dcpList: dcpList, displays: displayController.externalHardwareActiveDisplays)
+                dcpScores = buildDCPScoreMapping(dcpList: dcpList, displays: DC.externalHardwareActiveDisplays)
             }
         }
-        static var dcpScores: [DCP: [CGDirectDisplayID: Int]] = buildDCPScoreMapping(dcpList: dcpList, displays: displayController.externalHardwareActiveDisplays) {
+        static var dcpScores: [DCP: [CGDirectDisplayID: Int]] = buildDCPScoreMapping(dcpList: dcpList, displays: DC.externalHardwareActiveDisplays) {
             didSet {
                 dcpMapping = matchDisplayToDCP(dcpScores: dcpScores)
             }
@@ -881,7 +881,7 @@ enum DDC {
                 DDC.i2cControllerCache.removeAll()
             #endif
 
-            displayController.activeDisplays.values.forEach { display in
+            DC.activeDisplays.values.forEach { display in
                 display.nsScreen = display.getScreen()
                 display.detectI2C()
                 display.startI2CDetection()
@@ -889,7 +889,7 @@ enum DDC {
 
             #if arch(arm64)
                 mainAsync {
-                    displayController.possiblyDisconnectedDisplays = displayController.possiblyDisconnectedDisplayList.dict { d in
+                    DC.possiblyDisconnectedDisplays = DC.possiblyDisconnectedDisplayList.dict { d in
                         if d.isBuiltin, !DCPAVServiceExists(location: .embedded) { return (d.id, d) }
 
                         guard DDC.dcpList.contains(where: { $0.dcpName == d.dcpName }) else { return nil }
@@ -898,8 +898,8 @@ enum DDC {
 
                     if #available(macOS 13, *), IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("DCPAVServiceProxy")) == 0 {
                         log.info("Disabling AutoBlackOut (disconnect) if we're left with only the builtin screen")
-                        displayController.en()
-                        displayController.autoBlackoutPause = false
+                        DC.en()
+                        DC.autoBlackoutPause = false
                     }
                 }
             #endif
@@ -926,7 +926,7 @@ enum DDC {
 
         let rootDomain = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceNameMatching("IOPMrootDomain"))
         lidClosedObserver = IOServicePropertyObserver(service: rootDomain, property: "AppleClamshellState", throttle: .milliseconds(100)) {
-            displayController.lidClosed = isLidClosed()
+            DC.lidClosed = isLidClosed()
         }
 
         serviceDetectors.forEach { _ = $0.startDetection() }
@@ -1111,9 +1111,9 @@ enum DDC {
 
     static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt16) -> Bool {
         #if DEBUG
-            guard apply, !isTestID(displayID), !shouldWait, !displayController.screensSleeping else { return true }
+            guard apply, !isTestID(displayID), !shouldWait, !DC.screensSleeping else { return true }
         #else
-            guard apply, !shouldWait, !displayController.screensSleeping else { return true }
+            guard apply, !shouldWait, !DC.screensSleeping else { return true }
         #endif
 
         #if arch(arm64)
@@ -1155,9 +1155,9 @@ enum DDC {
             }
 
             if writeNs > 0 {
-                displayController.averageDDCWriteNanoseconds(for: displayID, ns: writeNs)
+                DC.averageDDCWriteNanoseconds(for: displayID, ns: writeNs)
             }
-            if let display = displayController.displays[displayID], !display.responsiveDDC {
+            if let display = DC.displays[displayID], !display.responsiveDDC {
                 display.responsiveDDC = true
             }
 
@@ -1222,16 +1222,16 @@ enum DDC {
         if controlID == ControlID.BRIGHTNESS, CachedDefaults[.detectResponsiveness] {
             mainAsyncAfter(ms: 100) {
                 #if DEBUG
-                    displayController.displays[displayID]?.responsiveDDC = TEST_IDS.contains(displayID)
+                    DC.displays[displayID]?.responsiveDDC = TEST_IDS.contains(displayID)
                 #else
-                    displayController.displays[displayID]?.responsiveDDC = false
+                    DC.displays[displayID]?.responsiveDDC = false
                 #endif
             }
         }
     }
 
     static func read(displayID: CGDirectDisplayID, controlID: ControlID) -> DDCReadResult? {
-        guard !isTestID(displayID), !shouldWait, !displayController.screensSleeping else { return nil }
+        guard !isTestID(displayID), !shouldWait, !DC.screensSleeping else { return nil }
 
         #if arch(arm64)
             guard let dcp = DCP(displayID: displayID) else { return nil }
@@ -1275,9 +1275,9 @@ enum DDC {
             }
 
             if readNs > 0 {
-                displayController.averageDDCReadNanoseconds(for: displayID, ns: readNs)
+                DC.averageDDCReadNanoseconds(for: displayID, ns: readNs)
             }
-            if let display = displayController.displays[displayID], !display.responsiveDDC {
+            if let display = DC.displays[displayID], !display.responsiveDDC {
                 display.responsiveDDC = true
             }
 
@@ -1294,7 +1294,7 @@ enum DDC {
     }
 
     static func sendEdidRequest(displayID: CGDirectDisplayID) -> (EDID, Data)? {
-        guard !isTestID(displayID), !displayController.screensSleeping else { return nil }
+        guard !isTestID(displayID), !DC.screensSleeping else { return nil }
 
         #if arch(arm64)
             guard let avService = AVService(displayID: displayID) else { return nil }
@@ -1420,7 +1420,7 @@ enum DDC {
                 CachedDefaults[.reapplyValuesAfterWake] = false
                 CachedDefaults[.brightnessTransition] = .instant
 
-                displayController.displays.values.forEach { d in
+                DC.displays.values.forEach { d in
                     d.reapplyColorGain = false
                 }
             }

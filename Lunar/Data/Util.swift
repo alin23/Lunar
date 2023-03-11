@@ -1884,7 +1884,7 @@ func activeWindow(on screen: NSScreen? = nil) -> AXWindow? {
         return nil
     }
 
-    let appException = displayController.runningAppExceptions.first { $0.identifier == frontMostApp.bundleIdentifier }
+    let appException = DC.runningAppExceptions.first { $0.identifier == frontMostApp.bundleIdentifier }
 
     return frontMostApp.windows(appException: appException)?.first(where: { w in
         !w.minimized && w.size != .zero

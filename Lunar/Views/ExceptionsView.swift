@@ -18,8 +18,8 @@ final class ExceptionsView: NSTableView {
         guard let app = (rowView.view(atColumn: 0) as? NSTableCellView)?.objectValue as? AppException
         else { return }
 
-        displayController.runningAppExceptions.removeAll(where: { $0.identifier == app.identifier })
-        displayController.adaptBrightness(force: true)
+        DC.runningAppExceptions.removeAll(where: { $0.identifier == app.identifier })
+        DC.adaptBrightness(force: true)
     }
 
     override func didAdd(_ rowView: NSTableRowView, forRow _: Int) {
@@ -28,8 +28,8 @@ final class ExceptionsView: NSTableView {
 
         let runningApps = NSRunningApplication.runningApplications(withBundleIdentifier: app.identifier)
         if !runningApps.isEmpty {
-            displayController.runningAppExceptions.append(app)
-            displayController.adaptBrightness(force: true)
+            DC.runningAppExceptions.append(app)
+            DC.adaptBrightness(force: true)
         }
     }
 

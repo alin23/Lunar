@@ -143,7 +143,7 @@ final class BrightnessContrastChartView: LineChartView {
 
         var brightnessChartEntry = brightnessGraph.entries
         var contrastChartEntry = contrastGraph.entries
-        let adaptiveMode = mode ?? displayController.adaptiveMode
+        let adaptiveMode = mode ?? DC.adaptiveMode
 
         brightnessChartEntry.removeAll(keepingCapacity: false)
         contrastChartEntry.removeAll(keepingCapacity: false)
@@ -401,7 +401,7 @@ final class BrightnessContrastChartView: LineChartView {
         xAxis.gridColor = white.withAlphaComponent(0.3)
         xAxis.drawLabelsEnabled = moreData
 
-        switch mode ?? displayController.adaptiveModeKey {
+        switch mode ?? DC.adaptiveModeKey {
         case .location:
             xAxis.valueFormatter = DateValueFormatter()
             xAxis.setLabelCount(7, force: true)

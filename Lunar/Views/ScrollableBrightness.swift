@@ -163,7 +163,7 @@ final class ScrollableBrightness: NSView {
         default:
             return
         }
-        displayController.adaptBrightness()
+        DC.adaptBrightness()
     }
 
     func setup() {

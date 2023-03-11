@@ -379,7 +379,7 @@ final class DisplayViewController: NSViewController {
     // @IBOutlet var lockBrightnessCurveButton: LockButton!
     @objc dynamic var noDisplay = false
     @objc dynamic lazy var chartHidden: Bool = display == nil || noDisplay || display!
-        .systemAdaptiveBrightness || displayController
+        .systemAdaptiveBrightness || DC
         .adaptiveModeKey == .clock
 
     var graphObserver: Cancellable?
@@ -653,20 +653,20 @@ final class DisplayViewController: NSViewController {
 //    @objc func highlightChartValue(notification _: Notification) {
 //        guard CachedDefaults[.moreGraphData], let display, let brightnessContrastChart,
 //              display.id != GENERIC_DISPLAY_ID else { return }
-//        brightnessContrastChart.highlightCurrentValues(adaptiveMode: displayController.adaptiveMode, for: display)
+//        brightnessContrastChart.highlightCurrentValues(adaptiveMode: DC.adaptiveMode, for: display)
 //    }
 
 //    #if arch(arm64)
 //        @objc func adaptToAutoLearnMapping(notification: Notification) {
-//            guard displayController.adaptiveModeKey == .sync, let display,
+//            guard DC.adaptiveModeKey == .sync, let display,
 //                  let values = notification.userInfo?["values"] as? [AutoLearnMapping]
 //            else { return }
 //
-//            updateDataset(nitsMapping: values, spline: displayController.computeBrightnessSpline(nitsMapping: values, display: display))
+//            updateDataset(nitsMapping: values, spline: DC.computeBrightnessSpline(nitsMapping: values, display: display))
 //        }
 //    #endif
     @objc func adaptToUserDataPoint(notification: Notification) {
-        guard displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
+        guard DC.adaptiveModeKey != .manual, DC.adaptiveModeKey != .clock,
               let values = notification.userInfo?["values"] as? [Double: Double]
         else { return }
 
@@ -878,7 +878,7 @@ final class DisplayViewController: NSViewController {
         deleteEnabled = getDeleteEnabled(display: display)
         powerOffEnabled = getPowerOffEnabled(display: display)
         powerOffTooltip = getPowerOffTooltip(display: display)
-        chartHidden = noDisplay || display.systemAdaptiveBrightness || displayController.adaptiveModeKey == .clock
+        chartHidden = noDisplay || display.systemAdaptiveBrightness || DC.adaptiveModeKey == .clock
 
         if let button = colorsButton {
             button.display = display
@@ -921,7 +921,7 @@ final class DisplayViewController: NSViewController {
         schedule5?.isEnabled = CachedDefaults[.showFiveSchedules]
 
         placeAddScheduleButton()
-        scheduleBox?.isHidden = displayController.adaptiveModeKey != .clock
+        scheduleBox?.isHidden = DC.adaptiveModeKey != .clock
 
         display.$lockedContrast
             .debounce(for: .milliseconds(50), scheduler: RunLoop.main)
@@ -969,7 +969,7 @@ final class DisplayViewController: NSViewController {
 
         scrollableBrightness?.onCurrentValueChanged = { [weak self] brightness in
             guard let self, let display = self.display,
-                  displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
+                  DC.adaptiveModeKey != .manual, DC.adaptiveModeKey != .clock,
                   !display.lockedBrightnessCurve
             else {
                 self?.updateDataset(currentBrightness: brightness.u16)
@@ -977,25 +977,25 @@ final class DisplayViewController: NSViewController {
             }
             cancelScreenWakeAdapterTask()
 
-            let lastDataPoint = datapointLock.around { displayController.adaptiveMode.brightnessDataPoint.last }
-            display.insertBrightnessUserDataPoint(lastDataPoint, brightness.d, modeKey: displayController.adaptiveModeKey)
+            let lastDataPoint = datapointLock.around { DC.adaptiveMode.brightnessDataPoint.last }
+            display.insertBrightnessUserDataPoint(lastDataPoint, brightness.d, modeKey: DC.adaptiveModeKey)
 
-            let userValues = display.userBrightness[displayController.adaptiveModeKey] ?? ThreadSafeDictionary()
+            let userValues = display.userBrightness[DC.adaptiveModeKey] ?? ThreadSafeDictionary()
             self.updateDataset(currentBrightness: brightness.u16, userBrightness: userValues.dictionary)
         }
         scrollableContrast?.onCurrentValueChanged = { [weak self] contrast in
             guard let self, let display = self.display,
-                  displayController.adaptiveModeKey != .manual, displayController.adaptiveModeKey != .clock,
+                  DC.adaptiveModeKey != .manual, DC.adaptiveModeKey != .clock,
                   !display.lockedContrastCurve
             else {
                 self?.updateDataset(currentContrast: contrast.u16)
                 return
             }
 
-            let lastDataPoint = displayController.adaptiveMode.contrastDataPoint.last
-            display.insertContrastUserDataPoint(lastDataPoint, contrast.d, modeKey: displayController.adaptiveModeKey)
+            let lastDataPoint = DC.adaptiveMode.contrastDataPoint.last
+            display.insertContrastUserDataPoint(lastDataPoint, contrast.d, modeKey: DC.adaptiveModeKey)
 
-            let userValues = display.userContrast[displayController.adaptiveModeKey] ?? ThreadSafeDictionary()
+            let userValues = display.userContrast[DC.adaptiveModeKey] ?? ThreadSafeDictionary()
             self.updateDataset(currentContrast: contrast.u16, userContrast: userValues.dictionary)
         }
 
@@ -1022,8 +1022,8 @@ final class DisplayViewController: NSViewController {
         softwareBrightnessSlider?.onSettingPercentage = { [weak self] _ in
             guard let display = self?.display, display.adaptiveSubzero else { return }
 
-            let lastDataPoint = datapointLock.around { displayController.adaptiveMode.brightnessDataPoint.last }
-            display.insertBrightnessUserDataPoint(lastDataPoint, display.brightness.doubleValue, modeKey: displayController.adaptiveModeKey)
+            let lastDataPoint = datapointLock.around { DC.adaptiveMode.brightnessDataPoint.last }
+            display.insertBrightnessUserDataPoint(lastDataPoint, display.brightness.doubleValue, modeKey: DC.adaptiveModeKey)
             self?.updateDataset()
         }
 
@@ -1223,7 +1223,7 @@ final class DisplayViewController: NSViewController {
         let brightnessChartEntry = brightnessContrastChart.brightnessGraph.entries
         let contrastChartEntry = brightnessContrastChart.contrastGraph.entries
 
-        switch displayController.adaptiveMode {
+        switch DC.adaptiveMode {
         case let mode as LocationMode:
             guard let moment = mode.moment else { return }
 
@@ -1328,7 +1328,7 @@ final class DisplayViewController: NSViewController {
         }
 
 //        brightnessContrastChart.highlightCurrentValues(
-//            adaptiveMode: displayController.adaptiveMode, for: display,
+//            adaptiveMode: DC.adaptiveMode, for: display,
 //            brightness: currentBrightness?.d, contrast: currentContrast?.d
 //        )
         mainAsync { [weak self] in
@@ -1357,8 +1357,8 @@ final class DisplayViewController: NSViewController {
         }
 
         #if arch(arm64)
-            displayController.nitsBrightnessMapping = displayController.nitsBrightnessMapping.copyWithout(key: display.serial)
-            displayController.nitsContrastMapping = displayController.nitsContrastMapping.copyWithout(key: display.serial)
+            DC.nitsBrightnessMapping = DC.nitsBrightnessMapping.copyWithout(key: display.serial)
+            DC.nitsContrastMapping = DC.nitsContrastMapping.copyWithout(key: display.serial)
         #endif
         display.adaptivePaused = true
         defer {
@@ -1366,8 +1366,8 @@ final class DisplayViewController: NSViewController {
             display.readapt(newValue: false, oldValue: true)
         }
 
-        display.userContrast[displayController.adaptiveModeKey]?.removeAll()
-        display.userBrightness[displayController.adaptiveModeKey]?.removeAll()
+        display.userContrast[DC.adaptiveModeKey]?.removeAll()
+        display.userBrightness[DC.adaptiveModeKey]?.removeAll()
         display.save()
         updateDataset(force: true)
     }
@@ -1541,7 +1541,7 @@ final class DisplayViewController: NSViewController {
                     self.hideAdaptiveNotice()
                     return
                 }
-                self.chartHidden = self.noDisplay || self.display!.systemAdaptiveBrightness || displayController
+                self.chartHidden = self.noDisplay || self.display!.systemAdaptiveBrightness || DC
                     .adaptiveModeKey == .clock
 
                 if !newAdaptive, !display.systemAdaptiveBrightness {
@@ -1642,7 +1642,7 @@ final class DisplayViewController: NSViewController {
     @IBAction func delete(_: Any) {
         guard let serial = display?.serial else { return }
         CachedDefaults[.displays] = CachedDefaults[.displays]?.filter { $0.serial != serial }
-        displayController.resetDisplayList()
+        DC.resetDisplayList()
     }
 
     @IBAction func autoBlackout(_: Any) {

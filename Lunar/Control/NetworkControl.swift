@@ -170,7 +170,7 @@ final class NetworkControl: Control {
     var isDDC: Bool { true }
 
     static func setup() {
-        displayController.onActiveDisplaysChange = {
+        DC.onActiveDisplaysChange = {
             let matchedServices = controllersForDisplay.values.map(\.service)
             for service in Set(browser.services).subtracting(matchedServices) {
                 matchTXTRecord(service)
@@ -185,7 +185,7 @@ final class NetworkControl: Control {
     static func shouldPromptForNetworkControl(_ display: Display) -> Bool {
         guard !display.neverUseNetworkControl else { return false }
 
-        if !displayController.screensSleeping, let screen = display.nsScreen ?? display.primaryMirrorScreen,
+        if !DC.screensSleeping, let screen = display.nsScreen ?? display.primaryMirrorScreen,
            !screen.visibleFrame.isEmpty
         {
             return true
@@ -257,8 +257,8 @@ final class NetworkControl: Control {
         guard let txt = netService.txtRecordDictionary else { return }
 
         let serviceConnectedDisplayCount = Set(txt.compactMap { $0.key.split(separator: ":").first }).count
-        if serviceConnectedDisplayCount == 1, displayController.activeDisplays.count == 1,
-           let display = displayController.activeDisplays.first?.value, shouldPromptForNetworkControl(display)
+        if serviceConnectedDisplayCount == 1, DC.activeDisplays.count == 1,
+           let display = DC.activeDisplays.first?.value, shouldPromptForNetworkControl(display)
         {
             asyncNow { promptForNetworkControl(1, netService: netService, display: display) }
             return
@@ -271,10 +271,10 @@ final class NetworkControl: Control {
                   let productString = txt["\(displayNum):product"], let productID = Int(productString)
             else { continue }
 
-            guard let display = displayController.getMatchingDisplay(
+            guard let display = DC.getMatchingDisplay(
                 name: name, serial: serial, productID: productID,
                 manufactureYear: year, manufacturer: manufacturer,
-                displays: displayController.externalActiveDisplays.filter(\.networkEnabled)
+                displays: DC.externalActiveDisplays.filter(\.networkEnabled)
             ),
                 shouldPromptForNetworkControl(display)
             else {
@@ -309,9 +309,9 @@ final class NetworkControl: Control {
             let displayService = controllersForDisplay.first(where: { _, displayService in
                 service == displayService.service
             })
-            if !displayController.screensSleeping,
+            if !DC.screensSleeping,
                let serial = displayService?.key, let controller = displayService?.value,
-               let display = displayController.displays.values.first(where: { $0.serial == serial })
+               let display = DC.displays.values.first(where: { $0.serial == serial })
             {
                 let serviceName = controller.url?.absoluteString ?? "\(service.hostName ?? service.name):\(service.port)"
                 let body =
@@ -337,7 +337,7 @@ final class NetworkControl: Control {
     }
 
     static func setDisplayPower(_ power: Bool) {
-        guard !displayController.screensSleeping else { return }
+        guard !DC.screensSleeping else { return }
         sendToAllControllers { url in
             _ = waitForResponse(from: url / "display-power" / power.i)
         }
@@ -354,7 +354,7 @@ final class NetworkControl: Control {
             if let serial {
                 _ = controllersForDisplay.removeValue(forKey: serial)
             }
-            for display in displayController.activeDisplays.values {
+            for display in DC.activeDisplays.values {
                 display.lastConnectionTime = Date()
             }
             browser.reset()
@@ -393,7 +393,7 @@ final class NetworkControl: Control {
             $0.removeDuplicates()
                 .throttle(for: .milliseconds(500), scheduler: RunLoop.main, latest: true)
                 .sink { [weak self] request in
-                    guard let self, !displayController.screensSleeping else { return }
+                    guard let self, !DC.screensSleeping else { return }
 
                     serviceBrowserQueue.async { [weak self] in
                         guard let self else { return }
@@ -485,7 +485,7 @@ final class NetworkControl: Control {
     func get(_ controlID: ControlID, max: Bool = false) -> UInt16? {
         guard let display else { return nil }
 
-        guard !displayController.screensSleeping else { return nil }
+        guard !DC.screensSleeping else { return nil }
 
         _ = getterTasksSemaphore.wait(for: 5.seconds)
         defer { getterTasksSemaphore.signal() }

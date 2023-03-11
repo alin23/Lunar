@@ -38,7 +38,7 @@ final class OnboardWindowController: ModernWindowController, NSWindowDelegate {
     }
 
     func windowWillClose(_: Notification) {
-        displayController.displays.values.forEach { d in
+        DC.displays.values.forEach { d in
             d.testWindowController?.close()
             d.testWindowController = nil
         }
@@ -126,13 +126,13 @@ final class OnboardPageController: NSPageController {
         view.bg = blackMauve
         logo?.textColor = logoColor
 
-        if displayController.externalDisplaysForTest.isEmpty {
+        if DC.externalDisplaysForTest.isEmpty {
             arrangedObjects = [hotkeysChoiceViewControllerIdentifier]
-            displayController.builtinDisplay?.isSource = true
+            DC.builtinDisplay?.isSource = true
 
             CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .sync
-            displayController.enable(mode: .sync)
-            displayController.externalActiveDisplays.forEach { d in
+            DC.enable(mode: .sync)
+            DC.externalActiveDisplays.forEach { d in
                 d.resetControl()
             }
 

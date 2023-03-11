@@ -73,7 +73,7 @@ final class SettingsPopoverController: NSViewController {
     }
 
     func lunarAdaptiveTooltip(mode: AdaptiveModeKey? = nil) -> String {
-        switch mode ?? displayController.adaptiveModeKey {
+        switch mode ?? DC.adaptiveModeKey {
         case .sync:
             return "Allow Lunar to automatically sync the brightness of this display with the other monitors"
         case .sensor:
@@ -95,7 +95,7 @@ final class SettingsPopoverController: NSViewController {
                 "When \"System\" is deselected, the system setting\n\"Automatically adjust brightness\" will be disabled"
             return
         }
-        switch mode ?? displayController.adaptiveModeKey {
+        switch mode ?? DC.adaptiveModeKey {
         case .sync:
             adaptiveBrightnessNotice = "When \"None\" is selected, this monitor will not\nsync its brightness with the other monitors"
         case .sensor:

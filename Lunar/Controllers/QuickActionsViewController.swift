@@ -50,7 +50,7 @@ struct PowerOffButtonView: View {
 
     var actionText: String {
         if km.controlKeyPressed {
-            if km.commandKeyPressed, !display.blackOutEnabled, displayController.activeDisplayCount > 1 {
+            if km.commandKeyPressed, !display.blackOutEnabled, DC.activeDisplayCount > 1 {
                 return "Ignore"
             }
             return "Show Help"
@@ -60,7 +60,7 @@ struct PowerOffButtonView: View {
             return "Power On"
         }
 
-        if allowBlackOutOnSingleScreen, displayController.activeDisplayCount == 1 {
+        if allowBlackOutOnSingleScreen, DC.activeDisplayCount == 1 {
             if km.optionKeyPressed {
                 return display.hasDDC ? "Power Off" : "Needs DDC"
             }
@@ -98,7 +98,7 @@ struct PowerOffButtonView: View {
             return Color.orange
         }
 
-        if displayController.activeDisplayCount == 1 {
+        if DC.activeDisplayCount == 1 {
             return Colors.red
         }
 
@@ -111,7 +111,7 @@ struct PowerOffButtonView: View {
     var body: some View {
         HStack(spacing: 2) {
             SwiftUI.Button(action: {
-                if km.controlKeyPressed, km.commandKeyPressed, displayController.activeDisplayCount > 1 {
+                if km.controlKeyPressed, km.commandKeyPressed, DC.activeDisplayCount > 1 {
                     display.unmanaged = true
                     return
                 }
@@ -173,8 +173,8 @@ struct PowerOffButtonView: View {
             HStack(spacing: 2) {
                 SwiftUI.Button(action: {
                     off = false
-                    displayController.autoBlackoutPause = true
-                    displayController.en(display)
+                    DC.autoBlackoutPause = true
+                    DC.en(display)
                 }) {
                     Image(systemName: "power").font(.system(size: 10, weight: .heavy))
                 }
@@ -405,8 +405,8 @@ struct DisplayRowView: View {
                 ) { _ in
                     guard display.adaptiveSubzero else { return }
 
-                    let lastDataPoint = datapointLock.around { displayController.adaptiveMode.brightnessDataPoint.last }
-                    display.insertBrightnessUserDataPoint(lastDataPoint, display.brightness.doubleValue, modeKey: displayController.adaptiveModeKey)
+                    let lastDataPoint = datapointLock.around { DC.adaptiveMode.brightnessDataPoint.last }
+                    display.insertBrightnessUserDataPoint(lastDataPoint, display.brightness.doubleValue, modeKey: DC.adaptiveModeKey)
                 }
             }
         }
@@ -750,7 +750,7 @@ struct RawValuesView: View {
 // MARK: - HDRSettingsView
 
 struct HDRSettingsView: View {
-    @ObservedObject var dc: DisplayController = displayController
+    @ObservedObject var dc: DisplayController = DC
 
     @Default(.hdrWorkaround) var hdrWorkaround
     @Default(.xdrContrast) var xdrContrast
@@ -797,7 +797,7 @@ struct HDRSettingsView: View {
                         """
                     )
 
-                    if displayController.activeDisplayList.contains(where: \.supportsEnhance) {
+                    if DC.activeDisplayList.contains(where: \.supportsEnhance) {
                         SettingsToggle(
                             text: "Enhance contrast in XDR Brightness", setting: $xdrContrast,
                             help: """
@@ -859,7 +859,7 @@ struct HDRSettingsView: View {
                 setting: $autoSubzero.animation(.fastSpring)
             )
 
-            if Sysctl.isMacBook, displayController.builtinDisplay?.supportsEnhance ?? false {
+            if Sysctl.isMacBook, DC.builtinDisplay?.supportsEnhance ?? false {
                 Divider().padding(.horizontal)
                 VStack(alignment: .leading, spacing: 2) {
                     SettingsToggle(text: "Toggle XDR Brightness based on ambient light", setting: $autoXdrSensor)
@@ -933,7 +933,7 @@ struct HDRSettingsView: View {
 // MARK: - AdvancedSettingsView
 
 struct AdvancedSettingsView: View {
-    @ObservedObject var dc: DisplayController = displayController
+    @ObservedObject var dc: DisplayController = DC
 
     @Default(.silentUpdate) var silentUpdate
     @Default(.workaroundBuiltinDisplay) var workaroundBuiltinDisplay
@@ -1228,7 +1228,7 @@ struct AdvancedSettingsView: View {
 // MARK: - QuickActionsLayoutView
 
 struct QuickActionsLayoutView: View {
-    @ObservedObject var dc: DisplayController = displayController
+    @ObservedObject var dc: DisplayController = DC
 
     @Default(.showSliderValues) var showSliderValues
     // #if arch(arm64)
@@ -1425,7 +1425,7 @@ struct BlackoutPopoverView: View {
             Color.black.brightness(0.02).scaleEffect(1.5)
             VStack(alignment: .leading, spacing: 10) {
                 BlackoutPopoverHeaderView().padding(.bottom)
-                if displayController.activeDisplayCount == 1 {
+                if DC.activeDisplayCount == 1 {
                     BlackoutPopoverRowView(action: "Make screen black", hotkeyText: hotkeyText(id: .blackOut), actionInfo: "(without disabling it)")
                 } else {
                     if newBlackOutDisconnect, #available(macOS 13, *) {
@@ -1583,7 +1583,7 @@ struct QuickActionsMenuView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.colors) var colors
     @EnvironmentObject var env: EnvState
-    @ObservedObject var dc: DisplayController = displayController
+    @ObservedObject var dc: DisplayController = DC
     @ObservedObject var um = UM
     @Namespace var namespace
 
@@ -1601,14 +1601,14 @@ struct QuickActionsMenuView: View {
     @Default(.showAdditionalInfo) var showAdditionalInfo
     @Default(.startAtLogin) var startAtLogin
 
-    @State var displays: [Display] = displayController.nonCursorDisplays
-    @State var cursorDisplay: Display? = displayController.cursorDisplay
-    @State var sourceDisplay: Display? = displayController.sourceDisplay
-    @State var nonSourceDisplays: [Display] = displayController.activeDisplayList.filter(!\.isSource)
+    @State var displays: [Display] = DC.nonCursorDisplays
+    @State var cursorDisplay: Display? = DC.cursorDisplay
+    @State var sourceDisplay: Display? = DC.sourceDisplay
+    @State var nonSourceDisplays: [Display] = DC.activeDisplayList.filter(!\.isSource)
     #if arch(arm64)
-        @State var disconnectedDisplays: [Display] = displayController.possiblyDisconnectedDisplayList
+        @State var disconnectedDisplays: [Display] = DC.possiblyDisconnectedDisplayList
     #endif
-    @State var unmanagedDisplays: [Display] = displayController.unmanagedDisplays
+    @State var unmanagedDisplays: [Display] = DC.unmanagedDisplays
     @State var adaptiveModes: [AdaptiveModeKey] = [.sensor, .sync, .location, .clock, .manual, .auto]
 
     @State var headerOpacity: CGFloat = 1.0
@@ -1617,7 +1617,7 @@ struct QuickActionsMenuView: View {
     @State var headerIndicatorOpacity: CGFloat = 0.0
     @State var footerIndicatorOpacity: CGFloat = 0
 
-    @State var displayCount = displayController.activeDisplayCount
+    @State var displayCount = DC.activeDisplayCount
 
     @ObservedObject var menuBarIcon: StatusItemButtonController
 
@@ -1919,7 +1919,7 @@ struct QuickActionsMenuView: View {
                     }
 
                     if Sysctl.isMacBook, !dc.lidClosed, cursorDisplay?.id != 1, !displays.contains(where: { $0.id == 1 }), !disconnectedDisplays.contains(where: { $0.id == 1 }),
-                       !(displayController.builtinDisplays.first?.unmanaged ?? false)
+                       !(DC.builtinDisplays.first?.unmanaged ?? false)
                     {
                         DisconnectedDisplayView(id: 1, name: "Built-in", display: dc.displays[1] ?? GENERIC_DISPLAY).padding(.vertical, 7)
                     }

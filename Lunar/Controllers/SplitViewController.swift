@@ -291,8 +291,8 @@ final class SplitViewController: NSSplitViewController {
         guard let button = activeHelpButton, let modeButton = activeModeButton else { return }
 
         if CachedDefaults[.overrideAdaptiveMode] {
-            button.helpText = (modeKey ?? displayController.adaptiveModeKey).helpText
-            button.link = (modeKey ?? displayController.adaptiveModeKey).helpLink
+            button.helpText = (modeKey ?? DC.adaptiveModeKey).helpText
+            button.link = (modeKey ?? DC.adaptiveModeKey).helpLink
         } else {
             let mode = DisplayController.getAdaptiveMode()
             button.helpText = mode.key.helpText

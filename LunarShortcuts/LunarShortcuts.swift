@@ -28,7 +28,7 @@ final class Screen: NSObject, AppEntity {
         self.id = id.i
         self.name = name
         self.serial = serial
-        let display = display ?? displayController.activeDisplaysBySerial[serial]
+        let display = display ?? DC.activeDisplaysBySerial[serial]
 
         guard let display else {
             self.display = nil
@@ -126,7 +126,7 @@ final class Screen: NSObject, AppEntity {
         guard let displayFilter = DisplayFilter(argument: serial) else {
             return []
         }
-        return getFilteredDisplays(displays: displayController.activeDisplayList, filter: displayFilter)
+        return getFilteredDisplays(displays: DC.activeDisplayList, filter: displayFilter)
     }
     var displayRepresentation: DisplayRepresentation {
         DisplayRepresentation(title: "\(name)", subtitle: isDynamicFilter ? nil : "\(serial)")
@@ -308,7 +308,7 @@ struct ScreenQuery: EntityPropertyQuery {
     var includeDisconnected = false
 
     var displays: [Display] {
-        includeDisconnected ? displayController.displayList : displayController.activeDisplayList
+        includeDisconnected ? DC.displayList : DC.activeDisplayList
     }
 
     func entities(
@@ -402,12 +402,12 @@ struct ScreenQuery: EntityPropertyQuery {
                 return .sidecar
             }
 
-            let screen = displayController.activeDisplays[id.u32]?.screen
+            let screen = DC.activeDisplays[id.u32]?.screen
                 ?? Self.dynamicFilterScreenMapping[id]
                 ?? (additionalScreens ?? []).first(where: { $0.id == id })
 
             #if arch(arm64)
-                return screen ?? displayController.possiblyDisconnectedDisplays[id.u32]?.screen
+                return screen ?? DC.possiblyDisconnectedDisplays[id.u32]?.screen
             #else
                 return screen
             #endif
@@ -808,7 +808,7 @@ Power off a screen by:
                 if master.blackOutEnabled {
                     throw $visibleScreen.needsValueError("Screen to mirror from should not be powered off")
                 }
-            } else if displayController.activeDisplayList.filter(
+            } else if DC.activeDisplayList.filter(
                 { !displayIDs.contains($0.id) && !$0.blackOutEnabled }
             ).first == nil {
                 throw $visibleScreen.needsValueError("No visible screen remaining to mirror from")
@@ -816,7 +816,7 @@ Power off a screen by:
         }
 
         var master: Display?
-        if disableScreen, let masterD = screen.display ?? displayController.activeDisplayList.filter(
+        if disableScreen, let masterD = screen.display ?? DC.activeDisplayList.filter(
             { !displayIDs.contains($0.id) && !$0.blackOutEnabled }
         ).first {
             master = masterD
@@ -827,7 +827,7 @@ Power off a screen by:
             mainAsyncAfter(ms: i * ms) {
                 log.info("Turning off \(display)")
                 lastBlackOutToggleDate = .distantPast
-                displayController.blackOut(
+                DC.blackOut(
                     display: display.id,
                     state: .on,
                     mirroringAllowed: disableScreen,
@@ -878,7 +878,7 @@ struct PowerOnSoftwareIntent: AppIntent {
                 lastBlackOutToggleDate = .distantPast
                 lastDisplayWasMirrored = display.blackOutEnabled && display.isInMirrorSet && !display.mirroredBeforeBlackOut
 
-                displayController.blackOut(
+                DC.blackOut(
                     display: display.id,
                     state: .off,
                     mirroringAllowed: false
@@ -935,7 +935,7 @@ To bring back the screen try any one of the following:
                 return .result()
             }
 
-            displayController.dis(screen.id.u32)
+            DC.dis(screen.id.u32)
         #endif
         return .result()
     }
@@ -969,7 +969,7 @@ If the action fails, try any one of the following to bring back the screen:
         title: "Screen",
         optionsProvider: ScreenQuery(
             single: true,
-            additionalScreens: [DisplayFilter.all.screen] + displayController.possiblyDisconnectedDisplays.values.map(\.screen),
+            additionalScreens: [DisplayFilter.all.screen] + DC.possiblyDisconnectedDisplays.values.map(\.screen),
             sidecar: true
         )
     )
@@ -988,14 +988,14 @@ If the action fails, try any one of the following to bring back the screen:
             }
 
             if let displayFilter = DisplayFilter(argument: screen.serial), displayFilter == .all || displayFilter == .cursor {
-                displayController.en()
+                DC.en()
                 return .result()
             }
 
-            if let display = displayController.possiblyDisconnectedDisplays.values.first(where: { $0.serial == screen.serial }) {
-                displayController.en(display.id)
+            if let display = DC.possiblyDisconnectedDisplays.values.first(where: { $0.serial == screen.serial }) {
+                DC.en(display.id)
             } else {
-                displayController.en(screen.id.u32)
+                DC.en(screen.id.u32)
             }
 
         #endif
@@ -1027,7 +1027,7 @@ If the reconnect action fails, try any one of the following to bring back the sc
         Summary("Toggle connected state for \(\.$screen)")
     }
 
-    @Parameter(title: "Screen", optionsProvider: ScreenQuery(single: true, additionalScreens: displayController.possiblyDisconnectedDisplays.values.map(\.screen), sidecar: true))
+    @Parameter(title: "Screen", optionsProvider: ScreenQuery(single: true, additionalScreens: DC.possiblyDisconnectedDisplays.values.map(\.screen), sidecar: true))
     var screen: Screen
 
     @MainActor
@@ -1048,11 +1048,11 @@ If the reconnect action fails, try any one of the following to bring back the sc
                 guard lunarProActive else {
                     throw IntentError.message("A Lunar Pro license is needed for this feature.")
                 }
-                displayController.dis(display.id)
-            } else if let display = displayController.possiblyDisconnectedDisplays.values.first(where: { $0.serial == screen.serial }) {
-                displayController.en(display.id)
+                DC.dis(display.id)
+            } else if let display = DC.possiblyDisconnectedDisplays.values.first(where: { $0.serial == screen.serial }) {
+                DC.en(display.id)
             } else {
-                displayController.en(screen.id.u32)
+                DC.en(screen.id.u32)
             }
 
         #endif
@@ -1217,8 +1217,8 @@ struct ApplyPresetIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
         if let percent = preset.i8 ?? preset.replacingOccurrences(of: "%", with: "").i8 {
-            displayController.setBrightnessPercent(value: percent, now: true)
-            displayController.setContrastPercent(value: percent, now: true)
+            DC.setBrightnessPercent(value: percent, now: true)
+            DC.setContrastPercent(value: percent, now: true)
             return .result()
         }
 
@@ -1725,13 +1725,13 @@ Note: not all monitors support color gain control through DDC and value effect c
 
             let id = display.id
             mainAsyncAfter(ms: 500) {
-                guard let display = displayController.activeDisplays[id] else {
+                guard let display = DC.activeDisplays[id] else {
                     return
                 }
                 display.greenGain = green.ns
 
                 mainAsyncAfter(ms: 500) {
-                    guard let display = displayController.activeDisplays[id] else {
+                    guard let display = DC.activeDisplays[id] else {
                         return
                     }
                     display.blueGain = blue.ns
@@ -2014,7 +2014,7 @@ struct SortablePanelMode: Comparable, Equatable, Hashable {
 @available(iOS 16, macOS 13, *)
 extension MPDisplayPreset {
     var panelPreset: PanelPreset? {
-        guard let screen = displayController.activeDisplays[displayID]?.screen else { return nil }
+        guard let screen = DC.activeDisplays[displayID]?.screen else { return nil }
 
         return PanelPreset(screen: screen, id: (screen.id << 32) + presetIndex.i, title: presetName, subtitle: presetDescription)
     }
@@ -2040,7 +2040,7 @@ struct PanelPreset: AppEntity {
             await DisplayController.panelManager?.withLock { _ in
                 identifiers.compactMap { id -> PanelPreset? in
                     let screenID = CGDirectDisplayID(id >> 32)
-                    guard let display = displayController.activeDisplays[screenID],
+                    guard let display = DC.activeDisplays[screenID],
                           let panel = display.panel
                     else {
                         return nil
@@ -2061,7 +2061,7 @@ struct PanelPreset: AppEntity {
         func results() async throws -> ItemCollection<PanelPreset> {
             await DisplayController.panelManager?.withLock { _ in
                 let sections: [(Display, Int64)] = Array(
-                    displayController.activeDisplayList
+                    DC.activeDisplayList
                         .filter { $0.panel?.hasPresets ?? false }
                         .map { d in
                             let modes = Set(d.panelPresets.filter(\.isValid).map(\.presetGroup)).sorted()
@@ -2133,7 +2133,7 @@ struct PanelMode: AppEntity {
             await DisplayController.panelManager?.withLock { _ in
                 identifiers.compactMap { id -> PanelMode? in
                     let screenID = CGDirectDisplayID(id >> 32)
-                    guard let display = displayController.activeDisplays[screenID],
+                    guard let display = DC.activeDisplays[screenID],
                           let panel = display.panel
                     else {
                         return nil
@@ -2153,7 +2153,7 @@ struct PanelMode: AppEntity {
         }
         func results() async throws -> ItemCollection<PanelMode> {
             await DisplayController.panelManager?.withLock { _ in
-                let sections: [(Display, SortablePanelMode)] = Array(displayController.activeDisplayList.map { d in
+                let sections: [(Display, SortablePanelMode)] = Array(DC.activeDisplayList.map { d in
                     let modes = Set(d.panelModes.map { SortablePanelMode(isHiDPI: $0.isHiDPI, refreshRate: $0.refreshRate) }).sorted().reversed()
                     return modes.filter(\.isHiDPI).map { p in (d, p) } + modes.filter(!\.isHiDPI).map { p in (d, p) }
                 }.joined())
@@ -2230,7 +2230,7 @@ struct SwapMonitorsIntent: AppIntent {
         guard let display1 = screen1.display, let display2 = screen2.display, display1 != display2 else {
             throw IntentError.message("Two different screens are needed to perform swapping.")
         }
-        displayController.swap(firstDisplay: display1.id, secondDisplay: display2.id, rotation: swapOrientations)
+        DC.swap(firstDisplay: display1.id, secondDisplay: display2.id, rotation: swapOrientations)
         notify(identifier: "fyi.lunar.Lunar.Shortcuts", title: "Swapped monitors", body: "\"\(display1.name)\" swapped positions with \"\(display2.name)\"")
         return .result()
     }
@@ -2256,14 +2256,14 @@ struct MakeMonitorMainIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        guard let mainDisplay = displayController.mainDisplay, mainDisplay.id != screen.id else {
+        guard let mainDisplay = DC.mainDisplay, mainDisplay.id != screen.id else {
             return .result()
         }
 
         try checkShortcutsLimit()
 
         Display.configure { config in
-            if let mainDisplay = displayController.mainDisplay, let mainDisplayBounds = mainDisplay.nsScreen?.bounds,
+            if let mainDisplay = DC.mainDisplay, let mainDisplayBounds = mainDisplay.nsScreen?.bounds,
                mainDisplayBounds.origin == .zero, let display = screen.display, let displayBounds = display.nsScreen?.bounds
             {
                 CGConfigureDisplayOrigin(config, mainDisplay.id, -displayBounds.origin.x.intround.i32, -displayBounds.origin.y.intround.i32)

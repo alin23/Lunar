@@ -909,7 +909,7 @@ enum Hotkey {
 
 extension AppDelegate: MediaKeyTapDelegate {
     func volumeOsdImage(display: Display? = nil) -> OSDImage {
-        guard let display = (display ?? displayController.mainExternalOrCGMainDisplay) else {
+        guard let display = (display ?? DC.mainExternalOrCGMainDisplay) else {
             return .volume
         }
 
@@ -922,7 +922,7 @@ extension AppDelegate: MediaKeyTapDelegate {
 
     func startOrRestartMediaKeyTap(brightnessKeysEnabled: Bool? = nil, volumeKeysEnabled: Bool? = nil, checkPermissions: Bool = false) {
         mediaKeyTapStartingFinishTask = mainAsyncAfter(ms: 300) {
-            displayController.currentAudioDisplay = displayController.getCurrentAudioDisplay()
+            DC.currentAudioDisplay = DC.getCurrentAudioDisplay()
 
             if checkPermissions || brightnessKeysEnabled ?? false || volumeKeysEnabled ?? false {
                 acquirePrivileges()
@@ -977,7 +977,7 @@ extension AppDelegate: MediaKeyTapDelegate {
         nonMainDisplays: Bool = false,
         allDisplays: Bool = false
     ) {
-        let builtinDisplay = builtinDisplay || (mainDisplay && (displayController.mainDisplay?.isBuiltin ?? false))
+        let builtinDisplay = builtinDisplay || (mainDisplay && (DC.mainDisplay?.isBuiltin ?? false))
         if contrast && builtinDisplay && !(allDisplays || nonMainDisplays || currentDisplay || sourceDisplay) {
             return
         }
@@ -1048,37 +1048,37 @@ extension AppDelegate: MediaKeyTapDelegate {
         guard sourceDisplay || builtinDisplay || currentDisplay || allDisplays || mainDisplay || nonMainDisplays else {
             log.info("showOSD()")
             if CachedDefaults[.workaroundBuiltinDisplay] {
-                displayController.externalActiveDisplays.forEach(showOSD)
+                DC.externalActiveDisplays.forEach(showOSD)
             } else {
-                displayController.activeDisplayList.forEach(showOSD)
+                DC.activeDisplayList.forEach(showOSD)
             }
 
             return
         }
 
-        if mainDisplay, let display = displayController.mainDisplay {
+        if mainDisplay, let display = DC.mainDisplay {
             log.info("showOSD(mainDisplay)")
             showOSD(display)
         }
-        if sourceDisplay, !displayController.sourceDisplay.isAllDisplays {
+        if sourceDisplay, !DC.sourceDisplay.isAllDisplays {
             log.info("showOSD(sourceDisplay)")
-            showOSD(displayController.sourceDisplay)
+            showOSD(DC.sourceDisplay)
         }
-        if builtinDisplay, let display = displayController.builtinDisplay, !mainDisplay {
+        if builtinDisplay, let display = DC.builtinDisplay, !mainDisplay {
             log.info("showOSD(builtinDisplay)")
             showOSD(display)
         }
-        if currentDisplay, let display = displayController.cursorDisplay {
+        if currentDisplay, let display = DC.cursorDisplay {
             log.info("showOSD(cursorDisplay)")
             showOSD(display)
         }
         if nonMainDisplays {
             log.info("showOSD(nonMainDisplays)")
-            displayController.nonMainDisplays.forEach(showOSD)
+            DC.nonMainDisplays.forEach(showOSD)
         }
         if allDisplays {
             log.info("showOSD(allDisplays)")
-            displayController.externalActiveDisplays.forEach(showOSD)
+            DC.externalActiveDisplays.forEach(showOSD)
         }
     }
 
@@ -1096,7 +1096,7 @@ extension AppDelegate: MediaKeyTapDelegate {
 
         switch action {
         case .all:
-            if CachedDefaults[.workaroundBuiltinDisplay], lidOpened, let builtin = displayController.builtinDisplay, builtin.active {
+            if CachedDefaults[.workaroundBuiltinDisplay], lidOpened, let builtin = DC.builtinDisplay, builtin.active {
                 log.info("Adjusting external displays and then forwarding media key to system")
                 adjust(mediaKey, by: offset, contrast: contrast, allDisplays: true)
                 if !contrast, !builtin.blackOutEnabled {
@@ -1121,7 +1121,7 @@ extension AppDelegate: MediaKeyTapDelegate {
         case .nonMain:
             adjust(mediaKey, by: offset, contrast: contrast, nonMainDisplays: true)
         case .cursor:
-            if CachedDefaults[.workaroundBuiltinDisplay], !contrast, let cursor = displayController.cursorDisplay, cursor.isBuiltin {
+            if CachedDefaults[.workaroundBuiltinDisplay], !contrast, let cursor = DC.cursorDisplay, cursor.isBuiltin {
                 event.flags = event.flags.subtracting([.maskShift, .maskAlternate, .maskCommand, .maskControl])
                 if offset == 1 {
                     event.flags = event.flags.union([.maskShift, .maskAlternate])
@@ -1141,7 +1141,7 @@ extension AppDelegate: MediaKeyTapDelegate {
             }
             adjust(mediaKey, by: offset, contrast: contrast, currentDisplay: lidClosed, builtinDisplay: lidOpened)
         case .source:
-            if CachedDefaults[.workaroundBuiltinDisplay], !contrast, displayController.sourceDisplay.isBuiltin {
+            if CachedDefaults[.workaroundBuiltinDisplay], !contrast, DC.sourceDisplay.isBuiltin {
                 event.flags = event.flags.subtracting([.maskShift, .maskAlternate, .maskCommand, .maskControl])
                 if offset == 1 {
                     event.flags = event.flags.union([.maskShift, .maskAlternate])
@@ -1164,16 +1164,16 @@ extension AppDelegate: MediaKeyTapDelegate {
 
         let flags = flags.intersection([.command, .option, .control, .shift])
         switch flags {
-        case [] where displayController.adaptiveModeKey == .sync:
-            log.info("\(mediaKey) + [] where displayController.adaptiveModeKey == .sync")
+        case [] where DC.adaptiveModeKey == .sync:
+            log.info("\(mediaKey) + [] where DC.adaptiveModeKey == .sync")
             return handleBrightnessKeyAction(
                 CachedDefaults[.brightnessKeysSyncControl],
                 mediaKey: mediaKey,
                 lidClosed: lidClosed,
                 event: event
             )
-        case [.option, .shift] where displayController.adaptiveModeKey == .sync:
-            log.info("\(mediaKey) + [.option, .shift] where displayController.adaptiveModeKey == .sync")
+        case [.option, .shift] where DC.adaptiveModeKey == .sync:
+            log.info("\(mediaKey) + [.option, .shift] where DC.adaptiveModeKey == .sync")
             return handleBrightnessKeyAction(
                 CachedDefaults[.brightnessKeysSyncControl],
                 mediaKey: mediaKey,
@@ -1195,8 +1195,8 @@ extension AppDelegate: MediaKeyTapDelegate {
                 event: event
             )
 
-        case [.shift] where displayController.adaptiveModeKey == .sync:
-            log.info("\(mediaKey) + [.shift] where displayController.adaptiveModeKey == .sync")
+        case [.shift] where DC.adaptiveModeKey == .sync:
+            log.info("\(mediaKey) + [.shift] where DC.adaptiveModeKey == .sync")
             return handleBrightnessKeyAction(
                 CachedDefaults[.shiftBrightnessKeysSyncControl],
                 mediaKey: mediaKey,
@@ -1212,8 +1212,8 @@ extension AppDelegate: MediaKeyTapDelegate {
                 event: event
             )
 
-        case [.control] where displayController.adaptiveModeKey == .sync:
-            log.info("\(mediaKey) + [.control] where displayController.adaptiveModeKey == .sync")
+        case [.control] where DC.adaptiveModeKey == .sync:
+            log.info("\(mediaKey) + [.control] where DC.adaptiveModeKey == .sync")
             return handleBrightnessKeyAction(
                 CachedDefaults[.ctrlBrightnessKeysSyncControl],
                 mediaKey: mediaKey,
@@ -1229,8 +1229,8 @@ extension AppDelegate: MediaKeyTapDelegate {
                 event: event
             )
 
-        case [.control, .option] where displayController.adaptiveModeKey == .sync:
-            log.info("\(mediaKey) + [.control, .option] where displayController.adaptiveModeKey == .sync")
+        case [.control, .option] where DC.adaptiveModeKey == .sync:
+            log.info("\(mediaKey) + [.control, .option] where DC.adaptiveModeKey == .sync")
             return handleBrightnessKeyAction(
                 CachedDefaults[.ctrlBrightnessKeysSyncControl],
                 mediaKey: mediaKey,
@@ -1292,21 +1292,21 @@ extension AppDelegate: MediaKeyTapDelegate {
             return event
         }
 
-        guard displayController.activeDisplays.count > 0 else {
+        guard DC.activeDisplays.count > 0 else {
             return event
         }
 
         guard isVolumeKey(mediaKey) else {
-            let lidClosed = displayController.lidClosed || displayController.builtinDisplay == nil
+            let lidClosed = DC.lidClosed || DC.builtinDisplay == nil
             let event = handleBrightnessKeys(withLidClosed: lidClosed, mediaKey: mediaKey, modifiers: flags, event: event)
             if event != nil { log.debug("Forwarding brightness key event to the system") }
-            displayController.lastTimeBrightnessKeyPressed = Date()
+            DC.lastTimeBrightnessKeyPressed = Date()
             return event
         }
 
         switch mediaKey {
         case .volumeUp:
-            guard let display = displayController.currentAudioDisplay, display.supportsVolumeControl else {
+            guard let display = DC.currentAudioDisplay, display.supportsVolumeControl else {
                 return event
             }
 
@@ -1325,7 +1325,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                 playVolumeChangedSound()
             }
         case .volumeDown:
-            guard let display = displayController.currentAudioDisplay, display.supportsVolumeControl else {
+            guard let display = DC.currentAudioDisplay, display.supportsVolumeControl else {
                 return event
             }
 
@@ -1344,7 +1344,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                 playVolumeChangedSound()
             }
         case .mute:
-            guard let display = displayController.currentAudioDisplay, display.supportsVolumeControl else {
+            guard let display = DC.currentAudioDisplay, display.supportsVolumeControl else {
                 return event
             }
 
@@ -1363,9 +1363,9 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     @objc func toggleHotkeyHandler() {
-        displayController.toggle()
-        if displayController.adaptiveModeKey != .manual, displayController.activeDisplayList.contains(where: \.adaptivePaused) {
-            displayController.activeDisplayList.filter(\.adaptivePaused).forEach {
+        DC.toggle()
+        if DC.adaptiveModeKey != .manual, DC.activeDisplayList.contains(where: \.adaptivePaused) {
+            DC.activeDisplayList.filter(\.adaptivePaused).forEach {
                 $0.adaptivePaused = false
             }
         }
@@ -1427,7 +1427,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     @objc func blackOutPowerOffHotkeyHandler() {
-        guard let display = displayController.mainExternalDisplay else { return }
+        guard let display = DC.mainExternalDisplay else { return }
         _ = display.control?.setPower(.off)
         log.debug("BlackOut Power Off Hotkey pressed")
     }
@@ -1447,7 +1447,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     @objc func orientation0Handler() {
-        guard let display = displayController.cursorDisplay else {
+        guard let display = DC.cursorDisplay else {
             log.warning("Orientation 0 Hotkey pressed but no display with cursor found")
             return
         }
@@ -1456,7 +1456,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     @objc func orientation90Handler() {
-        guard let display = displayController.cursorDisplay else {
+        guard let display = DC.cursorDisplay else {
             log.warning("Orientation 90 Hotkey pressed but no display with cursor found")
             return
         }
@@ -1465,7 +1465,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     @objc func orientation180Handler() {
-        guard let display = displayController.cursorDisplay else {
+        guard let display = DC.cursorDisplay else {
             log.warning("Orientation 180 Hotkey pressed but no display with cursor found")
             return
         }
@@ -1474,7 +1474,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     @objc func orientation270Handler() {
-        guard let display = displayController.cursorDisplay else {
+        guard let display = DC.cursorDisplay else {
             log.warning("Orientation 270 Hotkey pressed but no display with cursor found")
             return
         }
@@ -1483,7 +1483,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func brightnessUpAction(offset: Int? = nil) {
-        defer { displayController.lastTimeBrightnessKeyPressed = Date() }
+        defer { DC.lastTimeBrightnessKeyPressed = Date() }
 
         let allMonitors = CachedDefaults[.brightnessHotkeysControlAllMonitors]
         cancelScreenWakeAdapterTask()
@@ -1493,11 +1493,11 @@ extension AppDelegate: MediaKeyTapDelegate {
         }
 
         if allMonitors {
-            for (_, display) in displayController.activeDisplays {
+            for (_, display) in DC.activeDisplays {
                 guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin else { continue }
                 Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, display: display)
             }
-        } else if let display = displayController.cursorDisplay {
+        } else if let display = DC.cursorDisplay {
             Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, display: display)
         }
 
@@ -1505,7 +1505,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func brightnessDownAction(offset: Int? = nil) {
-        defer { displayController.lastTimeBrightnessKeyPressed = Date() }
+        defer { DC.lastTimeBrightnessKeyPressed = Date() }
 
         let allMonitors = CachedDefaults[.brightnessHotkeysControlAllMonitors]
         cancelScreenWakeAdapterTask()
@@ -1515,11 +1515,11 @@ extension AppDelegate: MediaKeyTapDelegate {
         }
 
         if allMonitors {
-            for (_, display) in displayController.activeDisplays {
+            for (_, display) in DC.activeDisplays {
                 guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin else { continue }
                 Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, display: display)
             }
-        } else if let display = displayController.cursorDisplay {
+        } else if let display = DC.cursorDisplay {
             Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, display: display)
         }
 
@@ -1532,11 +1532,11 @@ extension AppDelegate: MediaKeyTapDelegate {
         increaseContrast(by: offset, currentDisplay: !allMonitors)
 
         if allMonitors {
-            for (_, display) in displayController.activeDisplays {
+            for (_, display) in DC.activeDisplays {
                 guard !display.isBuiltin else { continue }
                 Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, display: display)
             }
-        } else if let display = displayController.cursorDisplay, !display.isBuiltin {
+        } else if let display = DC.cursorDisplay, !display.isBuiltin {
             Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, display: display)
         }
 
@@ -1549,11 +1549,11 @@ extension AppDelegate: MediaKeyTapDelegate {
         decreaseContrast(by: offset, currentDisplay: !allMonitors)
 
         if allMonitors {
-            for (_, display) in displayController.activeDisplays {
+            for (_, display) in DC.activeDisplays {
                 guard !display.isBuiltin else { continue }
                 Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, display: display)
             }
-        } else if let display = displayController.cursorDisplay, !display.isBuiltin {
+        } else if let display = DC.cursorDisplay, !display.isBuiltin {
             Hotkey.showOsd(osdImage: .contrast, value: display.contrast.uint32Value, display: display)
         }
 
@@ -1563,19 +1563,19 @@ extension AppDelegate: MediaKeyTapDelegate {
     func volumeUpAction(offset: Int? = nil) {
         let allMonitors = CachedDefaults[.volumeHotkeysControlAllMonitors]
 
-        let hasAudioDisplay = displayController.currentAudioDisplay != nil
+        let hasAudioDisplay = DC.currentAudioDisplay != nil
         increaseVolume(by: offset, currentDisplay: !allMonitors && !hasAudioDisplay, currentAudioDisplay: !allMonitors && hasAudioDisplay)
 
         if allMonitors {
-            let muted = displayController.externalActiveDisplays.filter(\.audioMuted)
+            let muted = DC.externalActiveDisplays.filter(\.audioMuted)
             if !muted.isEmpty {
                 toggleAudioMuted(for: muted, currentAudioDisplay: false)
             }
 
-            displayController.externalActiveDisplays.forEach { d in
+            DC.externalActiveDisplays.forEach { d in
                 Hotkey.showOsd(osdImage: volumeOsdImage(display: d), value: d.volume.uint32Value, display: d)
             }
-        } else if let display = displayController.currentAudioDisplay ?? displayController.cursorDisplay, !display.isBuiltin {
+        } else if let display = DC.currentAudioDisplay ?? DC.cursorDisplay, !display.isBuiltin {
             if display.audioMuted { toggleAudioMuted(for: [display], currentAudioDisplay: false) }
             Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, display: display)
         }
@@ -1586,19 +1586,19 @@ extension AppDelegate: MediaKeyTapDelegate {
     func volumeDownAction(offset: Int? = nil) {
         let allMonitors = CachedDefaults[.volumeHotkeysControlAllMonitors]
 
-        let hasAudioDisplay = displayController.currentAudioDisplay != nil
+        let hasAudioDisplay = DC.currentAudioDisplay != nil
         decreaseVolume(by: offset, currentDisplay: !allMonitors && !hasAudioDisplay, currentAudioDisplay: !allMonitors && hasAudioDisplay)
 
         if allMonitors {
-            let muted = displayController.externalActiveDisplays.filter(\.audioMuted)
+            let muted = DC.externalActiveDisplays.filter(\.audioMuted)
             if !muted.isEmpty {
                 toggleAudioMuted(for: muted, currentAudioDisplay: false)
             }
 
-            displayController.externalActiveDisplays.forEach { d in
+            DC.externalActiveDisplays.forEach { d in
                 Hotkey.showOsd(osdImage: volumeOsdImage(display: d), value: d.volume.uint32Value, display: d)
             }
-        } else if let display = displayController.currentAudioDisplay ?? displayController.cursorDisplay, !display.isBuiltin {
+        } else if let display = DC.currentAudioDisplay ?? DC.cursorDisplay, !display.isBuiltin {
             if display.audioMuted { toggleAudioMuted(for: [display], currentAudioDisplay: false) }
             Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, display: display)
         }
@@ -1609,14 +1609,14 @@ extension AppDelegate: MediaKeyTapDelegate {
     @objc func muteAudioHotkeyHandler() {
         let allMonitors = CachedDefaults[.volumeHotkeysControlAllMonitors]
 
-        let hasAudioDisplay = displayController.currentAudioDisplay != nil
+        let hasAudioDisplay = DC.currentAudioDisplay != nil
         toggleAudioMuted(currentDisplay: !allMonitors && !hasAudioDisplay, currentAudioDisplay: !allMonitors && hasAudioDisplay)
 
         if allMonitors {
-            displayController.externalActiveDisplays.forEach { d in
+            DC.externalActiveDisplays.forEach { d in
                 Hotkey.showOsd(osdImage: volumeOsdImage(display: d), value: d.volume.uint32Value, display: d)
             }
-        } else if let display = displayController.currentAudioDisplay ?? displayController.cursorDisplay, !display.isBuiltin {
+        } else if let display = DC.currentAudioDisplay ?? DC.cursorDisplay, !display.isBuiltin {
             Hotkey.showOsd(osdImage: volumeOsdImage(display: display), value: display.volume.uint32Value, display: display)
         }
 

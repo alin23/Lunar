@@ -28,10 +28,10 @@ final class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
     }
 
     static var syncDisabledReason: String {
-        if Sysctl.isMacBook, displayController.lidClosed {
+        if Sysctl.isMacBook, DC.lidClosed {
             return "lid needs to be opened"
         }
-        if !displayController.sourceDisplay.isAllDisplays, displayController.sourceDisplay.blackOutEnabled {
+        if !DC.sourceDisplay.isAllDisplays, DC.sourceDisplay.blackOutEnabled {
             return "BlackOut has to be disabled"
         }
 
@@ -175,7 +175,7 @@ final class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
             if !mode.available {
                 log.warning("Mode \(mode) not available!")
                 button
-                    .selectItem(withTag: CachedDefaults[.overrideAdaptiveMode] ? displayController.adaptiveModeKey.rawValue : AUTO_MODE_TAG)
+                    .selectItem(withTag: CachedDefaults[.overrideAdaptiveMode] ? DC.adaptiveModeKey.rawValue : AUTO_MODE_TAG)
             } else {
                 log.debug("Changed mode to \(mode)")
                 CachedDefaults[.overrideAdaptiveMode] = true
