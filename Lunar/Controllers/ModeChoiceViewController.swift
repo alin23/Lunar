@@ -40,7 +40,7 @@ final class ModeChoiceViewController: NSViewController {
 
     var cancelled = false
     lazy var originalOverride = CachedDefaults[.overrideAdaptiveMode]
-    lazy var originalMode = displayController.adaptiveModeKey
+    lazy var originalMode = DC.adaptiveModeKey
 
     var didAppear = false
 
@@ -120,7 +120,7 @@ final class ModeChoiceViewController: NSViewController {
 
     func next() {
         guard let wc = view.window?.windowController as? OnboardWindowController else { return }
-        guard !displayController.externalActiveDisplays.isEmpty else {
+        guard !DC.externalActiveDisplays.isEmpty else {
             wc.pageController?.select(index: 2)
             return
         }
@@ -129,9 +129,9 @@ final class ModeChoiceViewController: NSViewController {
 
     @objc func syncBuiltinClick() {
         queueChange {
-            guard let builtin = displayController.builtinDisplay else { return }
+            guard let builtin = DC.builtinDisplay else { return }
             builtin.isSource = true
-            displayController.displays.values
+            DC.displays.values
                 .filter { $0.serial != builtin.serial }
                 .forEach { d in
                     d.isSource = false
@@ -142,14 +142,14 @@ final class ModeChoiceViewController: NSViewController {
                 }
 
             CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .sync
-            displayController.enable(mode: .sync)
+            DC.enable(mode: .sync)
         }
         next()
     }
 
     @objc func syncSourceClick() {
         queueChange {
-            let externals = displayController.externalActiveDisplays
+            let externals = DC.externalActiveDisplays
             guard let source = externals
                 .filter({ $0.hasAmbientLightAdaptiveBrightness && AppleNativeControl.isAvailable(for: $0) })
                 .sorted(by: \.syncSourcePriority)
@@ -157,7 +157,7 @@ final class ModeChoiceViewController: NSViewController {
             else { return }
 
             source.isSource = true
-            displayController.displays.values
+            DC.displays.values
                 .filter { $0.serial != source.serial }
                 .forEach { d in
                     d.isSource = false
@@ -172,7 +172,7 @@ final class ModeChoiceViewController: NSViewController {
                 }
 
             CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .sync
-            displayController.enable(mode: .sync)
+            DC.enable(mode: .sync)
         }
         next()
     }
@@ -181,7 +181,7 @@ final class ModeChoiceViewController: NSViewController {
         queueChange {
             LocationMode.specific.fetchGeolocation()
             CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .location
-            displayController.enable(mode: .location)
+            DC.enable(mode: .location)
         }
         next()
     }
@@ -189,7 +189,7 @@ final class ModeChoiceViewController: NSViewController {
     @objc func clockClick() {
         queueChange {
             CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .clock
-            displayController.enable(mode: .clock)
+            DC.enable(mode: .clock)
         }
         next()
     }
@@ -197,7 +197,7 @@ final class ModeChoiceViewController: NSViewController {
     @objc func sensorClick() {
         queueChange {
             CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .sensor
-            displayController.enable(mode: .sensor)
+            DC.enable(mode: .sensor)
         }
 
         if let url = URL(string: "https://lunar.fyi/sensor") {
@@ -217,7 +217,7 @@ final class ModeChoiceViewController: NSViewController {
 
     func revert() {
         CachedDefaults[.overrideAdaptiveMode] = originalOverride
-        displayController.enable(mode: originalMode)
+        DC.enable(mode: originalMode)
     }
 
     override func viewDidLoad() {
@@ -225,15 +225,15 @@ final class ModeChoiceViewController: NSViewController {
         guard !useOnboardingForDiagnostics else { return }
 
         originalOverride = CachedDefaults[.overrideAdaptiveMode]
-        originalMode = displayController.adaptiveModeKey
+        originalMode = DC.adaptiveModeKey
         CachedDefaults[.overrideAdaptiveMode] = true
         CachedDefaults[.adaptiveBrightnessMode] = .manual
 
         heading.alphaValue = 0
         subheading.alphaValue = 0
 
-        let externals = displayController.externalActiveDisplays
-        let externalName = displayController.externalActiveDisplays.count == 1 ? displayController.externalActiveDisplays[0]
+        let externals = DC.externalActiveDisplays
+        let externalName = DC.externalActiveDisplays.count == 1 ? DC.externalActiveDisplays[0]
             .name : "external monitors"
         setupButton(
             syncBuiltin,

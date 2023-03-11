@@ -41,7 +41,7 @@ final class DDCControl: Control, ObservableObject {
         p.throttle(for: .milliseconds(50), scheduler: DDC.queue, latest: true)
             .sink { [weak self] range in
                 guard let self else {
-                    if let display = displayController.activeDisplays[range.displayID], let control = display.control as? DDCControl {
+                    if let display = DC.activeDisplays[range.displayID], let control = display.control as? DDCControl {
                         _ = control.setBrightnessDebounced(range.value, oldValue: range.oldValue, transition: range.transition)
                     }
                     return
@@ -57,7 +57,7 @@ final class DDCControl: Control, ObservableObject {
         p.throttle(for: .milliseconds(50), scheduler: DDC.queue, latest: true)
             .sink { [weak self] range in
                 guard let self else {
-                    if let display = displayController.activeDisplays[range.displayID], let control = display.control as? DDCControl {
+                    if let display = DC.activeDisplays[range.displayID], let control = display.control as? DDCControl {
                         _ = control.setContrastDebounced(range.value, oldValue: range.oldValue, transition: range.transition)
                     }
                     return
@@ -102,7 +102,7 @@ final class DDCControl: Control, ObservableObject {
             DDC.writeFaults.removeAll()
             DDC.readFaults.removeAll()
             mainAsync {
-                for display in displayController.activeDisplays.values {
+                for display in DC.activeDisplays.values {
                     display.responsiveDDC = true
                     display.startI2CDetection()
                     if display.ddcEnabled {

@@ -1000,7 +1000,7 @@ extension String {
 @available(iOS 16, macOS 13, *)
 extension MPDisplay {
     var screen: Screen? {
-        displayController.activeDisplays[displayID.u32]?.screen
+        DC.activeDisplays[displayID.u32]?.screen
     }
 }
 

@@ -446,19 +446,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         NetworkControl.resetState()
         DDCControl.resetState()
         startOrRestartMediaKeyTap()
-        displayController.activeDisplays.values.forEach { d in
+        DC.activeDisplays.values.forEach { d in
             d.updateCornerWindow()
         }
     }
 
     @IBAction func blackOutPowerOff(_: Any) {
-        guard let display = displayController.mainExternalDisplay else { return }
+        guard let display = DC.mainExternalDisplay else { return }
         _ = display.control?.setPower(.off)
     }
 
     func showTestWindow(text: String? = nil) {
         mainThread {
-            for d in displayController.activeDisplayList {
+            for d in DC.activeDisplayList {
                 createWindow(
                     "testWindowController",
                     controller: &d.testWindowController,
@@ -570,7 +570,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 if let firstPath = url.pathComponents.prefix(2).last, !firstPath.isEmpty,
                    let lastPath = url.pathComponents.last, !lastPath.isEmpty
                 {
-                    if let number = firstPath.i, number > 0, number <= displayController.activeDisplays.count {
+                    if let number = firstPath.i, number > 0, number <= DC.activeDisplays.count {
                         currentPage += (number - 1)
                     } else if firstPath == "builtin" || firstPath == "internal" || firstPath == "built-in" {
                         if let w = windowController?.window, let view = w.contentView,
@@ -586,7 +586,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                            !view.subviews.isEmpty, !view.subviews[0].subviews.isEmpty,
                            let pageController = view.subviews[0].subviews[0].nextResponder as? PageController
                         {
-                            if let name = displayController.displays.values.map(\.name).fuzzyFind(firstPath) {
+                            if let name = DC.displays.values.map(\.name).fuzzyFind(firstPath) {
                                 currentPage = pageController.arrangedObjects.firstIndex {
                                     (($0 as? Display)?.name ?? "") == name
                                 } ?? currentPage
@@ -686,7 +686,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             let modeKey = change.newValue
             mainAsync {
                 if change.oldValue == .manual, change.newValue != .manual {
-                    for d in displayController.activeDisplayList {
+                    for d in DC.activeDisplayList {
                         guard d.hasAmbientLightAdaptiveBrightness, let lastAppPreset = d.appPreset
                         else { continue }
 
@@ -708,7 +708,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 CachedDefaults[.curveMode] = modeKey.usesCurve
                 CachedDefaults[.clockMode] = modeKey == .clock
                 CachedDefaults[.syncMode] = modeKey == .sync
-                displayController.adaptiveMode = modeKey.mode
+                DC.adaptiveMode = modeKey.mode
                 self.resetElements()
                 self.windowController?.window?.displayIfNeeded()
                 self.manageDisplayControllerActivity(mode: modeKey)
@@ -754,19 +754,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             self.updater.automaticallyChecksForUpdates = change.newValue
         }.store(in: &observers)
         showDummyDisplaysPublisher.sink { _ in
-            displayController.resetDisplayList(configurationPage: true)
+            DC.resetDisplayList(configurationPage: true)
         }.store(in: &observers)
         showVirtualDisplaysPublisher.sink { _ in
-            displayController.resetDisplayList(configurationPage: true)
+            DC.resetDisplayList(configurationPage: true)
         }.store(in: &observers)
         showAirplayDisplaysPublisher.sink { _ in
-            displayController.resetDisplayList(configurationPage: true)
+            DC.resetDisplayList(configurationPage: true)
         }.store(in: &observers)
         showProjectorDisplaysPublisher.sink { _ in
-            displayController.resetDisplayList(configurationPage: true)
+            DC.resetDisplayList(configurationPage: true)
         }.store(in: &observers)
         showDisconnectedDisplaysPublisher.sink { _ in
-            displayController.resetDisplayList(configurationPage: true)
+            DC.resetDisplayList(configurationPage: true)
         }.store(in: &observers)
         streamLogsPublisher.sink { change in
             if change.newValue {
@@ -780,7 +780,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         detectResponsivenessPublisher.sink { change in
             let shouldDetect = change.newValue
             if !shouldDetect {
-                displayController.activeDisplays.values.forEach { $0.responsiveDDC = true }
+                DC.activeDisplays.values.forEach { $0.responsiveDDC = true }
             }
         }.store(in: &observers)
     }
@@ -1010,8 +1010,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         if showBrightnessMenuBar ?? CachedDefaults[.showBrightnessMenuBar],
            let button = statusItem.button,
            let display = CachedDefaults[.showOnlyExternalBrightnessMenuBar]
-           ? displayController.mainExternalDisplay
-           : displayController.cursorDisplay
+           ? DC.mainExternalDisplay
+           : DC.cursorDisplay
         {
             button.imagePosition = .imageLeading
             let paragraphStyle = NSMutableParagraphStyle()
@@ -1041,22 +1041,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     func manageDisplayControllerActivity(mode: AdaptiveModeKey) {
 //        log.debug("Started DisplayController in \(mode.str) mode")
         mainAsyncAfter(ms: 1000) {
-            displayController.adaptBrightness()
+            DC.adaptBrightness()
         }
     }
 
     func startValuesReaderThread() {
         valuesReaderThread = Repeater(every: 10, tolerance: 5) {
-            guard !displayController.screensSleeping else { return }
+            guard !DC.screensSleeping else { return }
 
             if CachedDefaults[.refreshValues] {
-                displayController.fetchValues()
+                DC.fetchValues()
             }
         }
     }
 
     func initDisplayController() {
-        displayController.displays = displayController.getDisplaysLock.around {
+        DC.displays = DC.getDisplaysLock.around {
             DisplayController.getDisplays(
                 includeVirtual: CachedDefaults[.showVirtualDisplays],
                 includeAirplay: CachedDefaults[.showAirplayDisplays],
@@ -1064,24 +1064,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 includeDummy: CachedDefaults[.showDummyDisplays]
             )
         }
-        displayController.sentryDataTask = mainAsyncAfter(ms: 5000) {
-            displayController.addSentryData()
+        DC.sentryDataTask = mainAsyncAfter(ms: 5000) {
+            DC.addSentryData()
         }
 
         if CachedDefaults[.refreshValues] {
             startValuesReaderThread()
         }
 
-        manageDisplayControllerActivity(mode: displayController.adaptiveModeKey)
-        if displayController.adaptiveMode.available {
-            displayController.adaptiveMode.watch()
+        manageDisplayControllerActivity(mode: DC.adaptiveModeKey)
+        if DC.adaptiveMode.available {
+            DC.adaptiveMode.watch()
         }
 
-        displayController.screencaptureIsRunning.removeDuplicates()
+        DC.screencaptureIsRunning.removeDuplicates()
             .debounce(for: .milliseconds(10), scheduler: RunLoop.main)
             .sink { takingScreenshot in
-                if takingScreenshot, displayController.activeDisplayList.contains(where: { $0.shadeWindowController != nil }) {
-                    displayController.activeDisplayList
+                if takingScreenshot, DC.activeDisplayList.contains(where: { $0.shadeWindowController != nil }) {
+                    DC.activeDisplayList
                         .filter { $0.shadeWindowController != nil }
                         .forEach { d in
                             d.shadeWindowController?.close()
@@ -1090,7 +1090,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 }
 
                 if !takingScreenshot {
-                    displayController.activeDisplayList
+                    DC.activeDisplayList
                         .filter { $0.hasSoftwareControl && !$0.supportsGamma }
                         .forEach { $0.preciseBrightness = $0.preciseBrightness }
                 }
@@ -1187,7 +1187,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
     func listenForScreenConfigurationChanged() {
         zeroGammaChecker = Repeater(every: 3, name: "zeroGammaChecker", tolerance: 10) {
-            displayController.activeDisplayList
+            DC.activeDisplayList
                 .filter { d in
                     !d.isForTesting && !d.settingGamma && !d.blackOutEnabled &&
                         (d.hasSoftwareControl || CachedDefaults[.hdrWorkaround] || d.enhanced || d.subzero || d.applyGamma) &&
@@ -1259,9 +1259,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 }
             }
 
-            displayController.panelRefreshPublisher.send(displayID)
+            DC.panelRefreshPublisher.send(displayID)
             if addedDisplay {
-                displayController.retryAutoBlackoutLater()
+                DC.retryAutoBlackoutLater()
             }
 
             #if arch(arm64)
@@ -1271,19 +1271,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             #endif
 
             #if arch(arm64)
-                if #available(macOS 13, *), addedDisplay, let d = displayController.displaysBySerial[Display.uuid(id: displayID)], !d.active, d.keepDisconnected {
+                if #available(macOS 13, *), addedDisplay, let d = DC.displaysBySerial[Display.uuid(id: displayID)], !d.active, d.keepDisconnected {
                     mainAsyncAfter(ms: 10) {
-                        displayController.dis(displayID, display: d, force: true)
+                        DC.dis(displayID, display: d, force: true)
                     }
                     return
                 }
             #endif
 
-            if addedDisplay, displayController.screenIDs.count == 1, displayController.xdrContrast > 0 {
+            if addedDisplay, DC.screenIDs.count == 1, DC.xdrContrast > 0 {
                 log.info("Disabling XDR Contrast if we have more than 1 screen")
                 lastXDRContrastResetTime = Date()
-                displayController.xdrContrast = 0
-                displayController.setXDRContrast(0, now: true)
+                DC.xdrContrast = 0
+                DC.setXDRContrast(0, now: true)
             }
 
         }, nil)
@@ -1297,7 +1297,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             .sink { n in
                 log.info("\(n.name)")
                 guard let displayUUID = n.userInfo?["DeviceID"] as? String,
-                      let display = displayController.activeDisplays.values.first(where: { $0.serial == displayUUID }) else { return }
+                      let display = DC.activeDisplays.values.first(where: { $0.serial == displayUUID }) else { return }
                 log.info("ColorSync changed for \(display)")
                 display.refreshGamma()
                 display.reapplyGamma()
@@ -1324,7 +1324,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                     return
                 }
 
-                displayController.adaptBrightness(force: true)
+                DC.adaptBrightness(force: true)
                 updateInfoMenuItem()
             }
             .store(in: &observers)
@@ -1334,15 +1334,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
             .sink { notification in
                 log.info("\(notification.name)")
-                displayController.reconfigure()
-                displayController.retryAutoBlackoutLater()
+                DC.reconfigure()
+                DC.retryAutoBlackoutLater()
             }.store(in: &observers)
 
         NotificationCenter.default
             .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
             .sink { _ in
                 lastColorSyncReset = Date()
-                displayController.activeDisplayList.forEach { d in
+                DC.activeDisplayList.forEach { d in
                     d.hdrOn = d.potentialEDR > 2 && d.edr > 1
                 }
                 #if DEBUG
@@ -1364,7 +1364,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                     DDC.rebuildDCPList()
                 #endif
 
-                displayController.activeDisplays.values.filter { !$0.isForTesting }.forEach { d in
+                DC.activeDisplays.values.filter { !$0.isForTesting }.forEach { d in
                     let maxEDR = d.computeMaxEDR()
 
                     guard d.maxEDR != maxEDR else {
@@ -1399,10 +1399,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             .sink { _ in
                 log.info("Screen configuration changed")
 
-                displayController.activeDisplays.values.forEach { d in
+                DC.activeDisplays.values.forEach { d in
                     d.updateCornerWindow()
                 }
-                displayController.screenIDs = Set(NSScreen.onlineDisplayIDs)
+                DC.screenIDs = Set(NSScreen.onlineDisplayIDs)
             }.store(in: &observers)
 
         let wakePublisher = NSWorkspace.shared.notificationCenter
@@ -1421,11 +1421,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 log.info(notif.name)
                 switch notif.name {
                 case NSWorkspace.sessionDidBecomeActiveNotification:
-                    displayController.loggedOut = false
+                    DC.loggedOut = false
                     log.info("SESSION: Log in")
                 case NSWorkspace.sessionDidResignActiveNotification:
-                    displayController.loggedOut = true
-                    displayController.resetDisplayListTask?.cancel()
+                    DC.loggedOut = true
+                    DC.resetDisplayListTask?.cancel()
                     log.info("SESSION: Log out")
                 default:
                     break
@@ -1438,8 +1438,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 log.info(notif.name)
                 switch notif.name {
                 case NSWorkspace.screensDidSleepNotification:
-                    displayController.screensSleeping = true
-                    displayController.resetDisplayListTask?.cancel()
+                    DC.screensSleeping = true
+                    DC.resetDisplayListTask?.cancel()
                     log.info("SESSION: Screen sleep warmup")
                 default:
                     break
@@ -1454,26 +1454,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             .sink { notif in
                 log.info(notif.name)
                 switch notif.name {
-                case NSWorkspace.screensDidWakeNotification where !displayController.loggedOut,
+                case NSWorkspace.screensDidWakeNotification where !DC.loggedOut,
                      NSWorkspace.sessionDidBecomeActiveNotification:
                     log.debug("SESSION: Screen wake")
                     wakeTime = Date()
-                    displayController.screensSleeping = false
-                    displayController.retryAutoBlackoutLater()
+                    DC.screensSleeping = false
+                    DC.retryAutoBlackoutLater()
 
                     if CachedDefaults[.refreshValues] {
                         self.startValuesReaderThread()
                     }
                     SyncMode.refresh()
-                    if displayController.adaptiveMode.available {
-                        displayController.adaptiveMode.watch()
+                    if DC.adaptiveMode.available {
+                        DC.adaptiveMode.watch()
                     }
                     self.resetStatesPublisher.send(true)
 
                     if CachedDefaults[.reapplyValuesAfterWake] {
                         self.screenWakeAdapterTask = Repeater(every: 2, times: CachedDefaults[.wakeReapplyTries]) {
-                            if displayController.adaptiveModeKey == .manual, CachedDefaults[.jitterAfterWake] {
-                                for (num, display) in displayController.activeDisplayList.enumerated() {
+                            if DC.adaptiveModeKey == .manual, CachedDefaults[.jitterAfterWake] {
+                                for (num, display) in DC.activeDisplayList.enumerated() {
                                     let br = display.brightness.uint16Value
                                     mainAsyncAfter(ms: num * 50) {
                                         display.withForce { display.brightness = cap(br - 1, minVal: 0, maxVal: 100).ns }
@@ -1489,10 +1489,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                                     }
                                 }
                             } else {
-                                displayController.adaptBrightness(force: true)
+                                DC.adaptBrightness(force: true)
                             }
 
-                            for display in displayController.activeDisplays.values.filter(\.blackOutEnabled) {
+                            for display in DC.activeDisplays.values.filter(\.blackOutEnabled) {
                                 display.apply(gamma: GammaTable.zero, force: true)
 
                                 if display.isSmartBuiltin, display.readBrightness() != 0 {
@@ -1504,7 +1504,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                                 }
                             }
 
-                            for display in displayController.activeDisplays.values.filter({ !$0.blackOutEnabled && $0.reapplyColorGain }) {
+                            for display in DC.activeDisplays.values.filter({ !$0.blackOutEnabled && $0.reapplyColorGain }) {
                                 _ = display.control?.setRedGain(display.redGain.uint16Value)
                                 _ = display.control?.setGreenGain(display.greenGain.uint16Value)
                                 _ = display.control?.setBlueGain(display.blueGain.uint16Value)
@@ -1515,11 +1515,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
                 case NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification:
                     log.debug("SESSION: Screen sleep")
-                    displayController.screensSleeping = true
-                    displayController.cancelAutoBlackout()
+                    DC.screensSleeping = true
+                    DC.cancelAutoBlackout()
 
                     self.valuesReaderThread = nil
-                    displayController.adaptiveMode.stopWatching()
+                    DC.adaptiveMode.stopWatching()
                     self.server.stopAsync()
                 default:
                     break
@@ -1625,8 +1625,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         }.store(in: &observers)
 
         dayMomentsPublisher.sink {
-            if displayController.adaptiveModeKey == .location {
-                displayController.adaptBrightness()
+            if DC.adaptiveModeKey == .location {
+                DC.adaptBrightness()
             }
         }.store(in: &observers)
 
@@ -1807,20 +1807,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             log.warning("Command key pressed 8 times in a row, disabling BlackOut forcefully!")
             #if arch(arm64)
                 if #available(macOS 13, *) {
-                    displayController.autoBlackoutPause = true
-                    displayController.en()
+                    DC.autoBlackoutPause = true
+                    DC.en()
                 }
             #endif
 
-            guard displayController.activeDisplayList.contains(where: \.blackOutEnabled) else { return }
+            guard DC.activeDisplayList.contains(where: \.blackOutEnabled) else { return }
 
-            displayController.activeDisplayList.map(\.id).enumerated().forEach { i, id in
+            DC.activeDisplayList.map(\.id).enumerated().forEach { i, id in
                 mainAsyncAfter(ms: i * 1000) {
-                    guard let d = displayController.activeDisplays[id] else { return }
+                    guard let d = DC.activeDisplays[id] else { return }
                     log.warning("Disabling BlackOut forcefully for \(d.description)")
                     d.resetSoftwareControl()
                     lastBlackOutToggleDate = .distantPast
-                    displayController.blackOut(display: d.id, state: .off)
+                    DC.blackOut(display: d.id, state: .off)
                     d.blackOutEnabled = false
                     d.mirroredBeforeBlackOut = false
                     if d.brightness.doubleValue <= 10 {
@@ -1882,14 +1882,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
     func handleAutoOSDEvent(_ event: NSEvent) {
         switch event.keyCode.i {
-//        case kVK_Escape where displayController.calibrating:
-//            displayController.stopCalibration()
-        case kVK_Escape where displayController.autoBlackoutPending:
-            displayController.cancelAutoBlackout()
-        case kVK_Escape where displayController.autoXdrPendingEnabled:
-            displayController.cancelAutoXdr()
-        case kVK_Escape where displayController.autoXdrPendingDisabled:
-            displayController.cancelAutoXdr()
+//        case kVK_Escape where DC.calibrating:
+//            DC.stopCalibration()
+        case kVK_Escape where DC.autoBlackoutPending:
+            DC.cancelAutoBlackout()
+        case kVK_Escape where DC.autoXdrPendingEnabled:
+            DC.cancelAutoXdr()
+        case kVK_Escape where DC.autoXdrPendingDisabled:
+            DC.cancelAutoXdr()
         default:
             break
         }
@@ -1909,7 +1909,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
     func addGlobalMouseDownMonitor() {
         NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]) { _ in
-            guard let menuWindow, menuWindow.isVisible, !displayController.calibrating else { return }
+            guard let menuWindow, menuWindow.isVisible, !DC.calibrating else { return }
             menuWindow.forceClose()
         }
     }
@@ -1924,7 +1924,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         let s = DispatchSource.makeSignalSource(signal: signal)
         s.setEventHandler {
             if isServer {
-                displayController.cleanup()
+                DC.cleanup()
             }
         }
         s.activate()
@@ -1938,9 +1938,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
         signal(SIGINT) { _ in
             if isServer {
-                displayController.cleanup()
+                DC.cleanup()
             }
-            for display in displayController.displays.values {
+            for display in DC.displays.values {
                 if display.gammaChanged {
                     display.resetGamma()
                 }
@@ -2047,8 +2047,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         user.username = lunarProProduct?.activationID
         SentrySDK.configureScope { scope in
             scope.setUser(user)
-            scope.setTag(value: displayController.adaptiveModeString(), key: "adaptiveMode")
-            scope.setTag(value: displayController.adaptiveModeString(last: true), key: "lastAdaptiveMode")
+            scope.setTag(value: DC.adaptiveModeString(), key: "adaptiveMode")
+            scope.setTag(value: DC.adaptiveModeString(last: true), key: "lastAdaptiveMode")
             scope.setTag(value: CachedDefaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
             if let secondPhase = Defaults[.secondPhase] {
                 scope.setTag(value: secondPhase ? "true" : "false", key: "secondPhase")
@@ -2140,7 +2140,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
     func applicationDidFinishLaunching(_: Notification) {
         guard !SWIFTUI_PREVIEW else {
-            displayController.displays = displayController.getDisplaysLock.around {
+            DC.displays = DC.getDisplaysLock.around {
                 DisplayController.getDisplays(
                     includeVirtual: CachedDefaults[.showVirtualDisplays],
                     includeAirplay: CachedDefaults[.showAirplayDisplays],
@@ -2170,9 +2170,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         #if arch(arm64)
             if #available(macOS 13, *) {
                 if restarted {
-                    displayController.possiblyDisconnectedDisplays = Defaults[.possiblyDisconnectedDisplays].dict { ($0.id, $0) }
+                    DC.possiblyDisconnectedDisplays = Defaults[.possiblyDisconnectedDisplays].dict { ($0.id, $0) }
                 } else {
-                    displayController.en()
+                    DC.en()
                 }
 
                 Defaults[.possiblyDisconnectedDisplays] = []
@@ -2216,7 +2216,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         listenForSettingsChange()
         checkForHighMemoryUsage()
         listenForScreenConfigurationChanged()
-        displayController.listenForRunningApps()
+        DC.listenForRunningApps()
 
         addObservers()
         initLicensing()
@@ -2257,8 +2257,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 user.username = lunarProProduct?.activationID
                 SentrySDK.configureScope { scope in
                     scope.setUser(user)
-                    scope.setTag(value: displayController.adaptiveModeString(), key: "adaptiveMode")
-                    scope.setTag(value: displayController.adaptiveModeString(last: true), key: "lastAdaptiveMode")
+                    scope.setTag(value: DC.adaptiveModeString(), key: "adaptiveMode")
+                    scope.setTag(value: DC.adaptiveModeString(last: true), key: "lastAdaptiveMode")
                     scope.setTag(value: CachedDefaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
                     if let secondPhase = Defaults[.secondPhase] {
                         scope.setTag(value: secondPhase ? "false" : "true", key: "secondPhase")
@@ -2266,7 +2266,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                         scope.setTag(value: "null", key: "secondPhase")
                     }
                 }
-                displayController.addSentryData()
+                DC.addSentryData()
                 SentrySDK.capture(message: "Launch New")
             }
         #endif
@@ -2281,8 +2281,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
         if CachedDefaults[.reapplyValuesAfterWake] {
             screenWakeAdapterTask = Repeater(every: 2, times: CachedDefaults[.wakeReapplyTries]) {
-                displayController.adaptBrightness(force: true)
-                for display in displayController.activeDisplays.values.filter({ !$0.blackOutEnabled && $0.reapplyColorGain }) {
+                DC.adaptBrightness(force: true)
+                for display in DC.activeDisplays.values.filter({ !$0.blackOutEnabled && $0.reapplyColorGain }) {
                     _ = display.control?.setRedGain(display.redGain.uint16Value)
                     _ = display.control?.setGreenGain(display.greenGain.uint16Value)
                     _ = display.control?.setBlueGain(display.blueGain.uint16Value)
@@ -2296,7 +2296,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     }
 
     @IBAction func forceUpdateDisplayList(_: Any) {
-        displayController.resetDisplayList()
+        DC.resetDisplayList()
         appDelegate!.startOrRestartMediaKeyTap()
     }
 
@@ -2305,7 +2305,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     }
 
     @IBAction func openLunarDiagnostics(_: Any) {
-        guard !displayController.externalDisplaysForTest.isEmpty else {
+        guard !DC.externalDisplaysForTest.isEmpty else {
             notify(identifier: "diagnostics", title: "No monitors to diagnose", body: "")
             return
         }
@@ -2318,7 +2318,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     }
 
     func applicationWillTerminate(_: Notification) {
-        displayController.cleanup()
+        DC.cleanup()
     }
 
     func geolocationFallback() {
@@ -2426,20 +2426,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     }
 
     func adapt() {
-        displayController.adaptBrightness()
+        DC.adaptBrightness()
     }
 
     func setLightPercent(percent: Int8) {
         guard checkRemainingAdjustments() else { return }
 
-        displayController.disable()
-        displayController.setBrightnessPercent(value: percent)
-        displayController.setContrastPercent(value: percent)
+        DC.disable()
+        DC.setBrightnessPercent(value: percent)
+        DC.setContrastPercent(value: percent)
         log.debug("Setting brightness and contrast to \(percent)%")
     }
 
     func toggleAudioMuted(for displays: [Display]? = nil, currentDisplay: Bool = false, currentAudioDisplay: Bool = true) {
-        displayController.toggleAudioMuted(for: displays, currentDisplay: currentDisplay, currentAudioDisplay: currentAudioDisplay)
+        DC.toggleAudioMuted(for: displays, currentDisplay: currentDisplay, currentAudioDisplay: currentAudioDisplay)
     }
 
     func increaseVolume(
@@ -2450,7 +2450,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     ) {
         let amount = amount ?? CachedDefaults[.volumeStep]
         mainAsync {
-            displayController.adjustVolume(
+            DC.adjustVolume(
                 by: amount,
                 for: displays,
                 currentDisplay: currentDisplay,
@@ -2467,7 +2467,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     ) {
         let amount = amount ?? CachedDefaults[.volumeStep]
         mainAsync {
-            displayController.adjustVolume(
+            DC.adjustVolume(
                 by: -amount,
                 for: displays,
                 currentDisplay: currentDisplay,
@@ -2486,7 +2486,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         nonMainDisplays: Bool = false
     ) {
         let amount = amount ?? CachedDefaults[.brightnessStep]
-        displayController.adjustBrightness(
+        DC.adjustBrightness(
             by: amount,
             for: displays,
             currentDisplay: currentDisplay,
@@ -2506,7 +2506,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         nonMainDisplays: Bool = false
     ) {
         let amount = amount ?? CachedDefaults[.contrastStep]
-        displayController.adjustContrast(
+        DC.adjustContrast(
             by: amount,
             for: displays,
             currentDisplay: currentDisplay,
@@ -2526,7 +2526,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         nonMainDisplays: Bool = false
     ) {
         let amount = amount ?? CachedDefaults[.brightnessStep]
-        displayController.adjustBrightness(
+        DC.adjustBrightness(
             by: -amount,
             for: displays,
             currentDisplay: currentDisplay,
@@ -2546,7 +2546,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         nonMainDisplays: Bool = false
     ) {
         let amount = amount ?? CachedDefaults[.contrastStep]
-        displayController.adjustContrast(
+        DC.adjustContrast(
             by: -amount,
             for: displays,
             currentDisplay: currentDisplay,
@@ -2833,7 +2833,7 @@ func restart() {
     restarting = true
 
     #if arch(arm64)
-        Defaults[.possiblyDisconnectedDisplays] = Array(displayController.possiblyDisconnectedDisplays.values)
+        Defaults[.possiblyDisconnectedDisplays] = Array(DC.possiblyDisconnectedDisplays.values)
     #endif
 
     _ = shell(

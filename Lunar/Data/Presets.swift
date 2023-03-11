@@ -76,9 +76,9 @@ struct Preset: Codable, Defaults.Serializable, Hashable, Equatable, Identifiable
     }
 
     func apply() {
-        displayController.disable()
+        DC.disable()
         for config in configs {
-            guard let display = displayController.activeDisplaysBySerial[config.id] else { continue }
+            guard let display = DC.activeDisplaysBySerial[config.id] else { continue }
             display.preciseBrightness = config.brightness
             display.preciseContrast = config.contrast
             if config.brightness <= 0.01 {
@@ -287,7 +287,7 @@ struct CustomPresetsView: View {
         presets.append(Preset(
             id: presetName,
             key: presetKey,
-            configs: displayController.activeDisplayList.map {
+            configs: DC.activeDisplayList.map {
                 PresetConfig(
                     id: $0.serial,
                     brightness: $0.preciseBrightness,

@@ -164,7 +164,7 @@ final class ScrollableContrast: NSView {
         default:
             return
         }
-        displayController.adaptBrightness()
+        DC.adaptBrightness()
     }
 
     func setup() {

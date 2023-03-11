@@ -50,7 +50,7 @@ final class LunarTestViewController: NSViewController {
 
     override func viewDidAppear() {
         let end = {
-            displayController.displays.values.forEach { d in
+            DC.displays.values.forEach { d in
                 d.testWindowController?.close()
                 d.testWindowController = nil
             }
@@ -963,7 +963,7 @@ final class ControlChoiceViewController: NSViewController {
                         w.close()
                         wc.close()
 
-                        displayController.displays.values.forEach { d in
+                        DC.displays.values.forEach { d in
                             d.testWindowController?.close()
                             d.testWindowController = nil
                         }
@@ -986,8 +986,8 @@ final class ControlChoiceViewController: NSViewController {
 
         cancelled = false
         adaptiveModeDisabledByDiagnostics = false
-        if displayController.adaptiveModeKey != .manual {
-            displayController.disable()
+        if DC.adaptiveModeKey != .manual {
+            DC.disable()
             adaptiveModeDisabledByDiagnostics = true
         }
 
@@ -996,7 +996,7 @@ final class ControlChoiceViewController: NSViewController {
         if let wc = view.window?.windowController as? OnboardWindowController {
             wc.setupSkipButton(skipButton, text: useOnboardingForDiagnostics ? "Stop Diagnostics" : nil) { [weak self] in
                 self?.cancelled = true
-                displayController.displays.values.forEach { d in
+                DC.displays.values.forEach { d in
                     d.testWindowController?.close()
                     d.testWindowController = nil
                 }
@@ -1016,14 +1016,14 @@ final class ControlChoiceViewController: NSViewController {
                 mainAsyncAfter(ms: 1500) {
                     self?.view.window?.close()
                     if adaptiveModeDisabledByDiagnostics {
-                        displayController.enable()
+                        DC.enable()
                     }
                 }
             }
         }
 
         OnboardPageController.task = concurrentQueue.asyncAfter(ms: 10, name: ONBOARDING_TASK_KEY) { [weak self] in
-            let displays = displayController.externalDisplaysForTest
+            let displays = DC.externalDisplaysForTest
             guard let self, !self.cancelled, !OnboardPageController.task.isCancelled, let firstDisplay = displays.first else {
                 return
             }
@@ -1045,11 +1045,11 @@ final class ControlChoiceViewController: NSViewController {
             }
 
             self.queueChange {
-                displayController.externalActiveDisplays.forEach { $0.resetControl() }
+                DC.externalActiveDisplays.forEach { $0.resetControl() }
             }
 
             mainThread {
-                displayController.displays.values.forEach { d in
+                DC.displays.values.forEach { d in
                     d.testWindowController?.close()
                     d.testWindowController = nil
                 }
@@ -1060,7 +1060,7 @@ final class ControlChoiceViewController: NSViewController {
     }
 
     func testDisplay(_ d: Display, index: Int) {
-        displayController.displays.values.forEach { d in
+        DC.displays.values.forEach { d in
             d.testWindowController?.close()
             d.testWindowController = nil
         }

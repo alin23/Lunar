@@ -266,7 +266,7 @@ func IOServiceFirstMatchingWhere(_ matching: CFDictionary, where predicate: (io_
 
         var scoreDict: [String: Int] {
             scores.dict { id, score in
-                guard let display = displayController.activeDisplays[id] else { return nil }
+                guard let display = DC.activeDisplays[id] else { return nil }
                 return (display.description, score)
             }
         }
@@ -2632,5 +2632,5 @@ final class DisplayController: ObservableObject {
     }
 }
 
-let displayController = DisplayController()
+let DC = DisplayController()
 let FILLED_CHICLETS_THRESHOLDS: [Float] = [0, 6, 12, 18, 24, 31, 37, 43, 50, 56, 62, 68, 75, 81, 87, 93, 100]

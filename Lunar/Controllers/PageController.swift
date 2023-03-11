@@ -42,15 +42,15 @@ final class PageController: NSPageController {
         delegate = self
 
         arrangedObjects = [hotkeyViewControllerIdentifier, settingsPageControllerIdentifier]
-        if CachedDefaults[.showDisconnectedDisplays], !displayController.displays.isEmpty {
-            let builtinActiveDisplays: [Any] = displayController.builtinActiveDisplays
+        if CachedDefaults[.showDisconnectedDisplays], !DC.displays.isEmpty {
+            let builtinActiveDisplays: [Any] = DC.builtinActiveDisplays
                 .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
-            let externalActiveDisplays: [Any] = displayController.externalActiveDisplays
+            let externalActiveDisplays: [Any] = DC.externalActiveDisplays
                 .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
-            let builtinDisconnectedDisplays: [Any] = displayController.builtinDisplays
+            let builtinDisconnectedDisplays: [Any] = DC.builtinDisplays
                 .filter { !$0.active }
                 .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
-            let externalDisconnectedDisplays: [Any] = displayController.externalDisplays
+            let externalDisconnectedDisplays: [Any] = DC.externalDisplays
                 .filter { !$0.active }
                 .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
             arrangedObjects
@@ -58,16 +58,16 @@ final class PageController: NSPageController {
                     contentsOf: externalActiveDisplays + builtinActiveDisplays + externalDisconnectedDisplays +
                         builtinDisconnectedDisplays
                 )
-        } else if !displayController.activeDisplays.isEmpty {
-            let builtinDisplays: [Any] = displayController.builtinActiveDisplays
+        } else if !DC.activeDisplays.isEmpty {
+            let builtinDisplays: [Any] = DC.builtinActiveDisplays
                 .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
-            let externalDisplays: [Any] = displayController.externalActiveDisplays
+            let externalDisplays: [Any] = DC.externalActiveDisplays
                 .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
             arrangedObjects.append(contentsOf: externalDisplays + builtinDisplays)
             // } else if TEST_MODE {
-            //     let builtinDisplays: [Any] = displayController.builtinDisplays
+            //     let builtinDisplays: [Any] = DC.builtinDisplays
             //         .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
-            //     let externalDisplays: [Any] = displayController.externalDisplays
+            //     let externalDisplays: [Any] = DC.externalDisplays
             //         .sorted(by: { d1, d2 -> Bool in d1.serial < d2.serial })
             //     let displays = externalDisplays + builtinDisplays
             //     arrangedObjects.append(contentsOf: displays.isEmpty ? [GENERIC_DISPLAY] : displays.map { $0 })
@@ -197,11 +197,11 @@ extension PageController: NSPageControllerDelegate {
                     case GENERIC_DISPLAY.serial:
                         displayViewController.display = GENERIC_DISPLAY
                     default:
-                        displayViewController.display = displayController.displays.values.first(where: { $0.serial == identifier })
+                        displayViewController.display = DC.displays.values.first(where: { $0.serial == identifier })
                     }
                 #else
                     if !isGeneric(serial: identifier) {
-                        displayViewController.display = displayController.displays.values.first(where: { $0.serial == identifier })
+                        displayViewController.display = DC.displays.values.first(where: { $0.serial == identifier })
                     } else {
                         displayViewController.display = GENERIC_DISPLAY
                     }

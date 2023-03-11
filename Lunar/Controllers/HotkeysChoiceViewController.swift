@@ -85,7 +85,7 @@ final class HotkeysChoiceViewController: NSViewController {
         didAppear = true
 
         uiCrumb("\(useOnboardingForDiagnostics ? "Diagnostics" : "Onboarding") Summary")
-        displays = displayController.activeDisplays.values.map { $0 }
+        displays = DC.activeDisplays.values.map { $0 }
         if let wc = view.window?.windowController as? OnboardWindowController {
             wc.setupSkipButton(skipButton, color: peach, text: useOnboardingForDiagnostics ? "Complete Diagnostics" : nil) {
                 guard useOnboardingForDiagnostics else { return }
@@ -93,7 +93,7 @@ final class HotkeysChoiceViewController: NSViewController {
                 mainAsync {
                     self.view.window?.close()
                     if adaptiveModeDisabledByDiagnostics {
-                        displayController.enable()
+                        DC.enable()
                     }
                 }
             }

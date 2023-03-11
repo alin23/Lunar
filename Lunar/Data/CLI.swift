@@ -305,25 +305,25 @@ func getFilteredDisplays(displays: [Display], filter: DisplayFilter) -> [Display
         guard let first = displays.first else { return [] }
         return [first]
     case .mainExternal:
-        guard let mainDisplayId = displayController.mainExternalDisplay?.id else { return [] }
+        guard let mainDisplayId = DC.mainExternalDisplay?.id else { return [] }
         return displays.filter { $0.id == mainDisplayId }
     case .main:
-        guard let mainDisplayId = displayController.mainDisplay?.id else { return [] }
+        guard let mainDisplayId = DC.mainDisplay?.id else { return [] }
         return displays.filter { $0.id == mainDisplayId }
     case .nonMain:
-        guard let mainDisplayId = displayController.mainDisplay?.id else { return [] }
+        guard let mainDisplayId = DC.mainDisplay?.id else { return [] }
         return displays.filter { $0.id != mainDisplayId }
     case .cursor:
-        guard let cursorDisplayId = displayController.cursorDisplay?.id else { return [] }
+        guard let cursorDisplayId = DC.cursorDisplay?.id else { return [] }
         return displays.filter { $0.id == cursorDisplayId }
     case .withoutCursor:
-        guard let cursorDisplayId = displayController.cursorDisplay?.id else { return [] }
+        guard let cursorDisplayId = DC.cursorDisplay?.id else { return [] }
         return displays.filter { $0.id != cursorDisplayId }
     case .bestGuess:
-        guard let currentDisplayId = displayController.mainExternalOrCGMainDisplay?.id else { return [] }
+        guard let currentDisplayId = DC.mainExternalOrCGMainDisplay?.id else { return [] }
         return displays.filter { $0.id == currentDisplayId }
     case .builtin:
-        return displayController.activeDisplayList.filter(\.isBuiltin)
+        return DC.activeDisplayList.filter(\.isBuiltin)
     case .syncSource:
         return displays.filter(\.isSource)
     case .syncTargets:
@@ -438,7 +438,7 @@ struct Lunar: ParsableCommand {
         func run() throws {
             Lunar.configureLogging(options: globals)
 
-            displayController.resetDisplayList()
+            DC.resetDisplayList()
             appDelegate!.startOrRestartMediaKeyTap()
 
             return cliExit(0)
@@ -486,7 +486,7 @@ struct Lunar: ParsableCommand {
                 includeProjector: false,
                 includeDummy: false
             )
-            let displays = getFilteredDisplays(displays: displayController.activeDisplayList, filter: display)
+            let displays = getFilteredDisplays(displays: DC.activeDisplayList, filter: display)
                 .filter(!\.isBuiltin)
 
             guard !displays.isEmpty else {
@@ -526,14 +526,14 @@ struct Lunar: ParsableCommand {
             func run() throws {
                 Lunar.configureLogging(options: globals)
 
-                displayController.activeDisplayList.forEach { d in
+                DC.activeDisplayList.forEach { d in
                     cliPrint("""
                     \(d.name)
                       ID:\t\t\(d.id)
                       UUID:\t\t\(d.serial)
                       minNits:\t\(d.minNits)
                       maxNits:\t\(d.maxNits)
-                      nitsMap:\t\(displayController.nitsBrightnessMapping[d.serial]?.json ?? "None")
+                      nitsMap:\t\(DC.nitsBrightnessMapping[d.serial]?.json ?? "None")
 
                     """)
                 }
@@ -604,7 +604,7 @@ struct Lunar: ParsableCommand {
                 includeProjector: false,
                 includeDummy: false
             )
-            let displays = getFilteredDisplays(displays: displayController.activeDisplayList, filter: display)
+            let displays = getFilteredDisplays(displays: DC.activeDisplayList, filter: display)
             guard !displays.isEmpty else {
                 throw LunarCommandError.displayNotFound(display.s)
             }
@@ -694,7 +694,7 @@ struct Lunar: ParsableCommand {
                 includeProjector: false,
                 includeDummy: false
             )
-            let displays = getFilteredDisplays(displays: displayController.activeDisplayList, filter: display)
+            let displays = getFilteredDisplays(displays: DC.activeDisplayList, filter: display)
             guard !displays.isEmpty else {
                 throw LunarCommandError.displayNotFound(display.s)
             }
@@ -767,7 +767,7 @@ struct Lunar: ParsableCommand {
                         guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let id = observer else { return }
                         let displayID = CGDirectDisplayID(UInt(bitPattern: id))
 
-                        if let display = displayController.activeDisplays[displayID] {
+                        if let display = DC.activeDisplays[displayID] {
                             cliPrint("\(display) => \(value)")
                         } else {
                             cliPrint("\(displayID) => \(value)")
@@ -779,7 +779,7 @@ struct Lunar: ParsableCommand {
                         guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let id = observer else { return }
                         let displayID = CGDirectDisplayID(UInt(bitPattern: id))
 
-                        if let display = displayController.activeDisplays[displayID] {
+                        if let display = DC.activeDisplays[displayID] {
                             cliPrint("\(display) => \(value)")
                         } else {
                             cliPrint("\(displayID) => \(value)")
@@ -835,7 +835,7 @@ struct Lunar: ParsableCommand {
                 includeDummy: false
             )
 
-            let displays = getFilteredDisplays(displays: displayController.activeDisplayList, filter: display)
+            let displays = getFilteredDisplays(displays: DC.activeDisplayList, filter: display)
             guard !displays.isEmpty else {
                 throw LunarCommandError.displayNotFound(display.s)
             }
@@ -970,15 +970,15 @@ struct Lunar: ParsableCommand {
             Lunar.configureLogging(options: globals)
 
             cliGetDisplays()
-            displayController.disable()
+            DC.disable()
             if !isServer {
                 brightnessTransition = .instant
             }
 
             if let preset = preset.i8 ?? preset.replacingOccurrences(of: "%", with: "").i8 {
-                displayController.setBrightnessPercent(value: preset, now: true)
+                DC.setBrightnessPercent(value: preset, now: true)
                 cliSleep(1.0)
-                displayController.setContrastPercent(value: preset, now: true)
+                DC.setContrastPercent(value: preset, now: true)
                 cliSleep(1.0)
             }
 
@@ -987,7 +987,7 @@ struct Lunar: ParsableCommand {
                 preset.apply()
             }
 
-            for display in displayController.activeDisplays.values {
+            for display in DC.activeDisplays.values {
                 cliPrint(display.name)
                 cliPrint("\tBrightness: \(display.brightness)")
                 cliPrint("\tContrast: \(display.contrast)\n")
@@ -1093,7 +1093,7 @@ struct Lunar: ParsableCommand {
                 includeDummy: dummy || all
             )
 
-            let displays = (all ? displayController.displayList : displayController.activeDisplayList)
+            let displays = (all ? DC.displayList : DC.activeDisplayList)
 
             if let displayFilter = display {
                 do {
@@ -1190,7 +1190,7 @@ struct Lunar: ParsableCommand {
 
             try handleDisplays(
                 .bestGuess,
-                displays: displayController.activeDisplayList,
+                displays: DC.activeDisplayList,
                 property: property,
                 controls: controls,
                 read: read
@@ -1245,12 +1245,12 @@ struct Lunar: ParsableCommand {
             )
 
             if !isServer, controls.contains(.network) {
-                setupNetworkControls(displays: displayController.activeDisplayList, waitms: waitms)
+                setupNetworkControls(displays: DC.activeDisplayList, waitms: waitms)
             }
 
             try handleDisplays(
                 .bestGuess,
-                displays: displayController.activeDisplayList,
+                displays: DC.activeDisplayList,
                 property: property,
                 value: value,
                 controls: controls,
@@ -1319,7 +1319,7 @@ struct Lunar: ParsableCommand {
 
             guard !isServer else { return }
 
-            let displays = getFilteredDisplays(displays: displayController.activeDisplayList, filter: display)
+            let displays = getFilteredDisplays(displays: DC.activeDisplayList, filter: display)
             guard !displays.isEmpty else {
                 throw LunarCommandError.displayNotFound(display.s)
             }
@@ -1336,7 +1336,7 @@ struct Lunar: ParsableCommand {
         func run() throws {
             Lunar.configureLogging(options: globals)
 
-            let displays = getFilteredDisplays(displays: displayController.activeDisplayList, filter: display)
+            let displays = getFilteredDisplays(displays: DC.activeDisplayList, filter: display)
             guard !displays.isEmpty else {
                 throw LunarCommandError.displayNotFound(display.s)
             }
@@ -1442,7 +1442,7 @@ struct Lunar: ParsableCommand {
                 includeDummy: CachedDefaults[.showDummyDisplays]
             )
 
-            let displays = getFilteredDisplays(displays: displayController.activeDisplayList, filter: display)
+            let displays = getFilteredDisplays(displays: DC.activeDisplayList, filter: display)
             guard !displays.isEmpty else {
                 throw LunarCommandError.displayNotFound(display.s)
             }
@@ -1493,13 +1493,13 @@ struct Lunar: ParsableCommand {
                 includeDummy: CachedDefaults[.showDummyDisplays]
             )
 
-            let displays = getFilteredDisplays(displays: displayController.activeDisplayList, filter: display)
+            let displays = getFilteredDisplays(displays: DC.activeDisplayList, filter: display)
             guard !displays.isEmpty else {
                 throw LunarCommandError.displayNotFound(display.s)
             }
 
             let master: CGDirectDisplayID? = master == .none ? nil : getFilteredDisplays(
-                displays: displayController.activeDisplayList,
+                displays: DC.activeDisplayList,
                 filter: master
             ).first?.id
 
@@ -1507,7 +1507,7 @@ struct Lunar: ParsableCommand {
                 mainAsyncAfter(ms: i * 3000) {
                     log.info("Turning \(state == .enable ? "off" : "on") \(display)")
                     lastBlackOutToggleDate = .distantPast
-                    displayController.blackOut(
+                    DC.blackOut(
                         display: display.id,
                         state: state == .enable ? .on : .off,
                         mirroringAllowed: !noMirror,
@@ -1547,15 +1547,15 @@ struct Lunar: ParsableCommand {
                     includeDummy: CachedDefaults[.showDummyDisplays]
                 )
 
-                let displays = getFilteredDisplays(displays: displayController.activeDisplayList, filter: display)
+                let displays = getFilteredDisplays(displays: DC.activeDisplayList, filter: display)
                 guard !displays.isEmpty else {
                     throw LunarCommandError.displayNotFound(display.s)
                 }
 
                 if force, displays.count == 1 {
-                    displayController.forcedis(displays[0].id, display: displays[0])
+                    DC.forcedis(displays[0].id, display: displays[0])
                 } else {
-                    displayController.dis(displays.map(\.id))
+                    DC.dis(displays.map(\.id))
                 }
                 cliExit(0)
             }
@@ -1578,13 +1578,13 @@ struct Lunar: ParsableCommand {
             func run() throws {
                 Lunar.configureLogging(options: globals)
                 guard display != .all else {
-                    displayController.en()
+                    DC.en()
                     cliExit(0)
                     return
                 }
 
                 guard display != .builtin else {
-                    displayController.en(1)
+                    DC.en(1)
                     cliExit(0)
                     return
                 }
@@ -1596,16 +1596,16 @@ struct Lunar: ParsableCommand {
                     includeDummy: CachedDefaults[.showDummyDisplays]
                 )
 
-                let displays = getFilteredDisplays(displays: Array(displayController.possiblyDisconnectedDisplays.values), filter: display)
+                let displays = getFilteredDisplays(displays: Array(DC.possiblyDisconnectedDisplays.values), filter: display)
                 guard !displays.isEmpty else {
-                    displayController.en()
+                    DC.en()
                     throw LunarCommandError.displayNotFound(display.s)
                 }
 
                 for (i, display) in displays.enumerated() {
                     mainAsyncAfter(ms: i * 1000) {
                         log.info("Reconnecting \(display)")
-                        displayController.en(display.id)
+                        DC.en(display.id)
                     }
                 }
                 cliExit(0)
@@ -1637,11 +1637,11 @@ struct Lunar: ParsableCommand {
                 )
 
                 guard display != .all else {
-                    if displayController.activeDisplayCount == 0 {
-                        displayController.en()
+                    if DC.activeDisplayCount == 0 {
+                        DC.en()
                     } else {
-                        for id in displayController.activeDisplays.keys {
-                            displayController.dis(id)
+                        for id in DC.activeDisplays.keys {
+                            DC.dis(id)
                         }
                     }
                     cliExit(0)
@@ -1650,28 +1650,28 @@ struct Lunar: ParsableCommand {
 
                 guard display != .builtin else {
                     if DCPAVServiceExists(location: .embedded) {
-                        displayController.dis(1)
+                        DC.dis(1)
                     } else {
-                        displayController.en(1)
+                        DC.en(1)
                     }
                     cliExit(0)
                     return
                 }
 
-                let connectedDisplays = getFilteredDisplays(displays: displayController.activeDisplayList, filter: display)
+                let connectedDisplays = getFilteredDisplays(displays: DC.activeDisplayList, filter: display)
                 if !connectedDisplays.isEmpty {
-                    displayController.dis(connectedDisplays.map(\.id))
+                    DC.dis(connectedDisplays.map(\.id))
                     return
                 }
 
-                let displays = getFilteredDisplays(displays: Array(displayController.possiblyDisconnectedDisplays.values), filter: display)
+                let displays = getFilteredDisplays(displays: Array(DC.possiblyDisconnectedDisplays.values), filter: display)
                 if displays.isEmpty {
-                    displayController.en()
+                    DC.en()
                 } else {
                     for (i, display) in displays.enumerated() {
                         mainAsyncAfter(ms: i * 1000) {
                             log.info("Reconnecting \(display)")
-                            displayController.en(display.id)
+                            DC.en(display.id)
                         }
                     }
                 }
@@ -2104,16 +2104,16 @@ private func handleDisplays(
                     display.brightness = value
                     display.control?.write(property, display.limitedBrightness, old)
                     display.insertBrightnessUserDataPoint(
-                        displayController.adaptiveMode.brightnessDataPoint.last,
-                        display.brightness.doubleValue, modeKey: displayController.adaptiveModeKey
+                        DC.adaptiveMode.brightnessDataPoint.last,
+                        display.brightness.doubleValue, modeKey: DC.adaptiveModeKey
                     )
                 case .contrast:
                     let old = display.contrast
                     display.contrast = value
                     display.control?.write(property, display.limitedContrast, old)
                     display.insertContrastUserDataPoint(
-                        displayController.adaptiveMode.contrastDataPoint.last,
-                        display.contrast.doubleValue, modeKey: displayController.adaptiveModeKey
+                        DC.adaptiveMode.contrastDataPoint.last,
+                        display.contrast.doubleValue, modeKey: DC.adaptiveModeKey
                     )
                 case .volume:
                     display.volume = value
@@ -2124,8 +2124,8 @@ private func handleDisplays(
                     display.preciseBrightness = value
                     display.control?.write(property, display.limitedBrightness)
                     display.insertBrightnessUserDataPoint(
-                        displayController.adaptiveMode.brightnessDataPoint.last,
-                        display.brightness.doubleValue, modeKey: displayController.adaptiveModeKey
+                        DC.adaptiveMode.brightnessDataPoint.last,
+                        display.brightness.doubleValue, modeKey: DC.adaptiveModeKey
                     )
                 case .normalizedContrast:
                     let value = value.doubleValue
@@ -2133,8 +2133,8 @@ private func handleDisplays(
                     display.preciseContrast = value
                     display.control?.write(property, display.limitedContrast)
                     display.insertContrastUserDataPoint(
-                        displayController.adaptiveMode.contrastDataPoint.last,
-                        display.contrast.doubleValue, modeKey: displayController.adaptiveModeKey
+                        DC.adaptiveMode.contrastDataPoint.last,
+                        display.contrast.doubleValue, modeKey: DC.adaptiveModeKey
                     )
                 case .normalizedBrightnessContrast:
                     let value = value.doubleValue
@@ -2143,19 +2143,19 @@ private func handleDisplays(
                     display.control?.write(property, display.limitedBrightness)
                     display.control?.write(property, display.limitedContrast)
                     display.insertBrightnessUserDataPoint(
-                        displayController.adaptiveMode.brightnessDataPoint.last,
-                        display.brightness.doubleValue, modeKey: displayController.adaptiveModeKey
+                        DC.adaptiveMode.brightnessDataPoint.last,
+                        display.brightness.doubleValue, modeKey: DC.adaptiveModeKey
                     )
                     display.insertContrastUserDataPoint(
-                        displayController.adaptiveMode.contrastDataPoint.last,
-                        display.contrast.doubleValue, modeKey: displayController.adaptiveModeKey
+                        DC.adaptiveMode.contrastDataPoint.last,
+                        display.contrast.doubleValue, modeKey: DC.adaptiveModeKey
                     )
                 case .softwareBrightness:
                     display.softwareBrightness = value.floatValue
                     if display.adaptiveSubzero {
                         display.insertBrightnessUserDataPoint(
-                            displayController.adaptiveMode.brightnessDataPoint.last,
-                            display.brightness.doubleValue, modeKey: displayController.adaptiveModeKey
+                            DC.adaptiveMode.brightnessDataPoint.last,
+                            display.brightness.doubleValue, modeKey: DC.adaptiveModeKey
                         )
                     }
                 case .xdrBrightness:
@@ -2499,7 +2499,7 @@ func cliGetDisplays(
     guard !isServer else {
         return
     }
-    displayController.displays = DisplayController.getDisplays(
+    DC.displays = DisplayController.getDisplays(
         includeVirtual: includeVirtual,
         includeAirplay: includeAirplay,
         includeProjector: includeProjector,

@@ -263,15 +263,15 @@ final class GammaControl: Control {
     var isDDC: Bool { false }
 
     static func fluxChecker(flux: NSRunningApplication) {
-        let gammaDisplays = displayController.activeDisplayList.filter {
+        let gammaDisplays = DC.activeDisplayList.filter {
             $0.hasSoftwareControl && $0.dimmingMode == .gamma && $0.gammaEnabled
         }
         guard let display = gammaDisplays.first else {
-            displayController.activeDisplayList.filter(\.applyGamma).forEach { $0.applyGamma = false }
+            DC.activeDisplayList.filter(\.applyGamma).forEach { $0.applyGamma = false }
             return
         }
 
-        guard !CachedDefaults[.neverAskAboutFlux], !displayController.screensSleeping,
+        guard !CachedDefaults[.neverAskAboutFlux], !DC.screensSleeping,
               fluxPromptTime == nil || timeSince(fluxPromptTime!) > 10.minutes.timeInterval
         else { return }
 
@@ -281,7 +281,7 @@ final class GammaControl: Control {
         let gammaIDs = gammaDisplays.map(\.id)
 
         let completionHandler = { (keepFlux: NSApplication.ModalResponse) in
-            let gammaDisplays = gammaIDs.compactMap { displayController.activeDisplays[$0] }
+            let gammaDisplays = gammaIDs.compactMap { DC.activeDisplays[$0] }
 
             switch keepFlux {
             case .alertFirstButtonReturn:
@@ -360,9 +360,9 @@ final class GammaControl: Control {
     }
 
     static func fluxCheckerXDR(display: Display, fromAutoXDR: Bool = true, enableXDR: @escaping () -> Void) {
-        guard !CachedDefaults[.neverAskAboutFlux], !displayController.screensSleeping,
+        guard !CachedDefaults[.neverAskAboutFlux], !DC.screensSleeping,
               fluxPromptTime == nil || timeSince(fluxPromptTime!) > 10.minutes.timeInterval,
-              displayController.fluxRunning, let flux = fluxApp()
+              DC.fluxRunning, let flux = fluxApp()
         else {
             enableXDR()
             return
@@ -382,8 +382,8 @@ final class GammaControl: Control {
                 flux.terminate()
                 enableXDR()
             case .alertSecondButtonReturn:
-                displayController.xdrPausedBecauseOfFlux = true
-                displayController.activeDisplayList
+                DC.xdrPausedBecauseOfFlux = true
+                DC.activeDisplayList
                     .filter(\.enhanced)
                     .forEach { $0.enhanced = false }
             case .alertThirdButtonReturn:
