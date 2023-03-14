@@ -28,6 +28,7 @@ let faceLightColor = white.blended(withFraction: 0.15, of: orange) ?? white
 
 let xdrColor = NSColor(hue: 0.61, saturation: 0.26, brightness: 0.78, alpha: 1)
 let subzeroColor = NSColor(hue: 0.98, saturation: 0.56, brightness: 1.00, alpha: 1)
+let subzeroColorDarker = NSColor(hue: 0.98, saturation: 0.95, brightness: 0.50, alpha: 1.00)
 
 let bgColor = white
 var hotkeysBgColor: NSColor { darkMode ? blackMauve : darkMauve }
@@ -101,13 +102,13 @@ let hotkeyColorDarkMode: [HoverState: [String: NSColor]] = [
     .hover: [
         "background": white.withAlphaComponent(0.4),
         "tint": lunarYellow,
-        "tintDisabled": white.withAlphaComponent(0.4),
+        "tintDisabled": white.withAlphaComponent(0.2),
         "tintRecording": red.highlight(withLevel: 0.4) ?? red,
     ],
     .noHover: [
         "background": white.withAlphaComponent(0.15),
         "tint": lunarYellow.withAlphaComponent(0.9),
-        "tintDisabled": white.withAlphaComponent(0.4),
+        "tintDisabled": white.withAlphaComponent(0.2),
         "tintRecording": red.highlight(withLevel: 0.4) ?? red,
     ],
 ]

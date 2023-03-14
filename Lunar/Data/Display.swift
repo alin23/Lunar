@@ -4254,6 +4254,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
+    var softwareAdjustedBrightness: Int {
+        if !hasSoftwareControl, softwareBrightness < 1 {
+            return softwareBrightness.map(from: (0, 1), to: (-100, 0)).intround
+        }
+        return (preciseBrightnessContrast * 100).intround
+    }
+
     static func insertElevationDataPoint(_ mapping: AutoLearnMapping, in values: [AutoLearnMapping]) -> [AutoLearnMapping]? {
         guard let solar = LocationMode.specific.geolocation?.solar,
               let astroSunrise = solar.astronomicalSunrisePosition?.elevation,
@@ -4267,8 +4274,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         var values = values
-        if mapping.source < max(sunrise, sunset) {
-            values = Display.insertDataPoint([min(astroSunrise, astroSunset): mapping.target], in: values)
+        if mapping.source < max(sunrise, sunset), mapping.target > -100 {
+            values = Display.insertDataPoint([min(astroSunrise, astroSunset): mapping.target - 0.01], in: values)
         }
 
         if mapping.source > noon {
@@ -5378,6 +5385,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         control?.getInput()?.rawValue
     }
 
+    func softwareAdjusted(brightness: UInt16) -> Int {
+        guard !hasSoftwareControl, softwareBrightness < 1 else {
+            return brightness.i
+        }
+        return brightness.i - softwareBrightness.map(from: (0, 1), to: (100, 0)).intround
+    }
+
     func readBrightness() -> UInt16? {
         control?.getBrightness()
     }
@@ -5914,7 +5928,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             } else {
                 syncBrightnessMapping[DC.sourceDisplay.serial] = [[featureValue: targetValue]]
             }
-            NotificationCenter.default.post(name: brightnessDataPointInserted, object: self, userInfo: ["values": syncBrightnessMapping])
+            NotificationCenter.default.post(name: brightnessDataPointInserted, object: self, userInfo: ["values": syncBrightnessMapping[DC.sourceDisplay.serial]!])
             saveSyncMapping()
         case .sensor:
             sensorBrightnessMapping = Self.insertDataPoint([featureValue: targetValue], in: sensorBrightnessMapping)
@@ -5954,7 +5968,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             } else {
                 syncContrastMapping[DC.sourceDisplay.serial] = [[featureValue: targetValue]]
             }
-            NotificationCenter.default.post(name: contrastDataPointInserted, object: self, userInfo: ["values": syncContrastMapping])
+            NotificationCenter.default.post(name: contrastDataPointInserted, object: self, userInfo: ["values": syncContrastMapping[DC.sourceDisplay.serial]!])
             saveSyncMapping()
         case .sensor:
             sensorContrastMapping = Self.insertDataPoint([featureValue: targetValue], in: sensorContrastMapping)

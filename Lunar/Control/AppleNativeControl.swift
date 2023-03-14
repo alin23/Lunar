@@ -330,6 +330,8 @@ final class AppleNativeControl: Control {
 
     func getBrightness() -> Brightness? {
         guard let display else { return nil }
+        guard !display.isForTesting else { return display.brightness.uint16Value }
+
         switch method {
         case .coreDisplay:
             return (CoreDisplay_Display_GetUserBrightness(display.id) * 100.0).u16

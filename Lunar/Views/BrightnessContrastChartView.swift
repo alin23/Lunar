@@ -24,6 +24,49 @@ final class BrightnessContrastChartView: LineChartView {
     let contrastGraph = LineChartDataSet(entries: [ChartDataEntry](), label: "Contrast")
     let graphData = LineChartData()
 
+    static func brightnessGradient(values: [Double], mode: AdaptiveModeKey) -> CGGradient? {
+        let brColor = (darkMode ? white.withAlphaComponent(0.5) : violet).cgColor
+        let subColor = (darkMode ? subzeroColor : subzeroColorDarker).cgColor
+
+        let allSubZero = values.allSatisfy { $0 <= 0 }
+        var locations: [CGFloat] = [0]
+        var colors: [CGColor] = [allSubZero ? subColor : brColor]
+
+        if !allSubZero {
+            switch mode {
+            case .sync:
+                if let subzero = values.lastIndex(where: { $0 < 0 }) {
+                    let loc = subzero.f / values.count.f
+                    locations = [0, pow(loc, 2).cg, 1]
+                    colors = [subColor, subColor, brColor]
+                }
+            case .sensor:
+                if let subzero = values.lastIndex(where: { $0 < 0 }) {
+                    let loc = (subzero.f + 1) / values.count.f
+                    locations = [0, loc.cg]
+                    colors = [subColor, brColor]
+                }
+            case .location:
+                if let subzeroStart = values.firstIndex(where: { $0 >= 0 }), subzeroStart > 0,
+                   let subzeroEnd = values.suffix(from: subzeroStart).firstIndex(where: { $0 < 0 })
+                {
+                    let start = (subzeroStart.f + 1) / values.count.f
+                    let end = (subzeroEnd.f - 1) / values.count.f
+                    locations = [0, start.cg, end.cg, 1]
+                    colors = [subColor, brColor, brColor, subColor]
+                }
+            default:
+                break
+            }
+        }
+
+        guard let g = CGGradient(colorsSpace: .init(name: CGColorSpace.sRGB), colors: colors as CFArray, locations: &locations) else {
+            return nil
+        }
+
+        return g
+    }
+
     func zero() {
         for (brightnessEntry, contrastEntry) in zip(brightnessGraph.entries, contrastGraph.entries) {
             brightnessEntry.y = 0
@@ -132,7 +175,7 @@ final class BrightnessContrastChartView: LineChartView {
 //        }
 //    }
 
-    func initGraph(display: Display?, brightnessColor: NSColor, contrastColor: NSColor, labelColor: NSColor, mode: AdaptiveMode? = nil) {
+    func initGraph(display: Display?, mode: AdaptiveMode? = nil) {
         mainAsync { [self] in
             if display == nil || display?.id == GENERIC_DISPLAY_ID {
                 isHidden = true
@@ -148,6 +191,9 @@ final class BrightnessContrastChartView: LineChartView {
         brightnessChartEntry.removeAll(keepingCapacity: false)
         contrastChartEntry.removeAll(keepingCapacity: false)
 //        xAxis.removeAllLimitLines()
+
+        let brColor = darkMode ? white.withAlphaComponent(0.5) : violet
+        var gradient: CGGradient?
 
         if display == nil || display?.id == GENERIC_DISPLAY_ID {
             if adaptiveMode is LocationMode {
@@ -172,6 +218,7 @@ final class BrightnessContrastChartView: LineChartView {
                 contrastChartEntry.append(
                     contentsOf: zip(xs, brcrs.map(\.1)).map { ChartDataEntry(x: $0, y: $1) }
                 )
+                gradient = BrightnessContrastChartView.brightnessGradient(values: brcrs.map(\.0), mode: .sensor)
             case let mode as LocationMode:
                 brightnessChartEntry.reserveCapacity(mode.maxChartDataPoints)
                 contrastChartEntry.reserveCapacity(mode.maxChartDataPoints)
@@ -192,6 +239,7 @@ final class BrightnessContrastChartView: LineChartView {
                     contrastChartEntry.append(
                         contentsOf: zip(xs, brcrs.map(\.1)).map { ChartDataEntry(x: $0.timeIntervalSince(moment.astronomicalSunrise), y: $1) }
                     )
+                    gradient = BrightnessContrastChartView.brightnessGradient(values: brcrs.map(\.0), mode: .location)
                 }
             case let mode as SyncMode:
 //                if mode.isSyncingNits, let d = SyncMode.sourceDisplay {
@@ -227,29 +275,10 @@ final class BrightnessContrastChartView: LineChartView {
                 contrastChartEntry.append(
                     contentsOf: zip(xs, crs).map { ChartDataEntry(x: $0, y: $1) }
                 )
-            case let mode as ManualMode:
-                let xs = stride(from: 0.0, to: (mode.maxChartDataPoints - 1).d, by: 1.0)
-                let percents = Array(stride(from: 0.0, to: (mode.maxChartDataPoints - 1).d / 100.0, by: 0.01))
-                brightnessChartEntry.reserveCapacity(mode.maxChartDataPoints)
-                contrastChartEntry.reserveCapacity(mode.maxChartDataPoints)
-                brightnessChartEntry.append(
-                    contentsOf: zip(
-                        xs, mode.computeSIMD(
-                            from: percents,
-                            minVal: display.minBrightness.doubleValue,
-                            maxVal: display.maxBrightness.doubleValue
-                        )
-                    ).map { ChartDataEntry(x: $0, y: $1) }
-                )
-                contrastChartEntry.append(
-                    contentsOf: zip(
-                        xs, mode.computeSIMD(
-                            from: percents,
-                            minVal: display.minContrast.doubleValue,
-                            maxVal: display.maxContrast.doubleValue
-                        )
-                    ).map { ChartDataEntry(x: $0, y: $1) }
-                )
+                gradient = BrightnessContrastChartView.brightnessGradient(values: brs, mode: .sync)
+            case is ManualMode:
+                brightnessChartEntry = [ChartDataEntry(x: 0, y: display.minBrightness.doubleValue), ChartDataEntry(x: 100, y: display.maxBrightness.doubleValue)]
+                contrastChartEntry = [ChartDataEntry(x: 0, y: display.minContrast.doubleValue), ChartDataEntry(x: 100, y: display.maxContrast.doubleValue)]
             default:
                 log.error("Unknown mode")
             }
@@ -265,7 +294,12 @@ final class BrightnessContrastChartView: LineChartView {
         }
 
         brightnessGraph.colors = [NSColor.clear]
-        brightnessGraph.fillColor = darkMode ? white.withAlphaComponent(0.5) : brightnessColor
+        if let gradient {
+            brightnessGraph.fill = LinearGradientFill(gradient: gradient)
+        } else {
+            brightnessGraph.fill = nil
+            brightnessGraph.fillColor = brColor
+        }
         brightnessGraph.cubicIntensity = 0.15
         brightnessGraph.circleColors = darkMode ? [white] : [darkMauve.withAlphaComponent(0.6)]
         brightnessGraph.circleHoleColor = darkMode ? lunarYellow : white
@@ -277,14 +311,14 @@ final class BrightnessContrastChartView: LineChartView {
             CGFloat(dataSet.yMin - 200)
         })
         brightnessGraph.drawValuesEnabled = false
-        brightnessGraph.highlightColor = brightnessColor.withAlphaComponent(0.3)
+        brightnessGraph.highlightColor = violet.withAlphaComponent(0.3)
         brightnessGraph.highlightLineWidth = 2
         brightnessGraph.highlightLineDashPhase = 3
         brightnessGraph.highlightLineDashLengths = [10, 6]
         brightnessGraph.mode = .cubicBezier
 
         contrastGraph.colors = [NSColor.clear]
-        contrastGraph.fillColor = contrastColor
+        contrastGraph.fillColor = lunarYellow
         contrastGraph.cubicIntensity = 0.15
         contrastGraph.circleColors = [lunarYellow.withAlphaComponent(0.9)]
         contrastGraph.circleRadius = 4.0
@@ -295,7 +329,7 @@ final class BrightnessContrastChartView: LineChartView {
             CGFloat(dataSet.yMin - 200)
         })
         contrastGraph.drawValuesEnabled = false
-        contrastGraph.highlightColor = contrastColor.withAlphaComponent(0.9)
+        contrastGraph.highlightColor = lunarYellow.withAlphaComponent(0.9)
         contrastGraph.highlightLineWidth = 2
         contrastGraph.highlightLineDashPhase = 10
         contrastGraph.highlightLineDashLengths = [10, 6]
@@ -306,9 +340,9 @@ final class BrightnessContrastChartView: LineChartView {
         }
 
         if CachedDefaults[.moreGraphData] {
-            xAxis.labelTextColor = labelColor
-            leftAxis.labelTextColor = labelColor
-            rightAxis.labelTextColor = labelColor
+            xAxis.labelTextColor = xAxisLabelColor
+            leftAxis.labelTextColor = xAxisLabelColor
+            rightAxis.labelTextColor = xAxisLabelColor
         } else {
             xAxis.labelTextColor = .clear
             leftAxis.labelTextColor = .clear
@@ -353,14 +387,13 @@ final class BrightnessContrastChartView: LineChartView {
 
         if !lockedContrast, hasDDC {
             legend.setCustom(entries: [
-                valueLegend("Brightness", color: brightnessGraph.fillColor.withAlphaComponent(0.4)),
+                valueLegend("Brightness", color: (darkMode ? white : violet).withAlphaComponent(0.4)),
                 valueLegend("Contrast", color: contrastGraph.fillColor.withAlphaComponent(0.4)),
             ])
         } else {
             legend.setCustom(entries: [])
         }
     }
-
     func setup(mode: AdaptiveModeKey? = nil, display: Display? = nil) {
         gridBackgroundColor = NSColor.clear
         drawGridBackgroundEnabled = false

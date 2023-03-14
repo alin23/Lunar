@@ -601,8 +601,14 @@ final class DisplayController: ObservableObject {
             if oldValue.key != adaptiveMode.key {
                 oldValue.stopWatching()
             }
+            if adaptiveMode.key == .sync {
+                recomputeAllDisplaysBrightness(activeDisplays: activeDisplayList)
+            }
             if adaptiveMode.available {
                 adaptiveMode.watch()
+                activeDisplayList.forEach { d in
+                    adaptiveMode.adapt(d)
+                }
             }
         }
     }
@@ -974,6 +980,7 @@ final class DisplayController: ObservableObject {
 
         let recomputeAndAssign: (Display, Double) -> Void = { [self] display, brightness in
             let (brightnessOffset, _) = DC.appBrightnessContrastOffset(for: display) ?? (0, 0)
+
             let sourceBrightness: Double? = (-100 ... 100)
                 .map { br -> (Double, Int) in
                     let newBr = SyncMode.specific.interpolate(br.d, display: display, offset: brightnessOffset.f, gamma22: false)
@@ -984,22 +991,30 @@ final class DisplayController: ObservableObject {
             guard let sourceBrightness else { return }
             if sourceBrightness < 0 {
                 sourceDisplay.preciseBrightnessContrast = 0
-                sourceDisplay.softwareBrightness = sourceBrightness.f
+                sourceDisplay.softwareBrightness = sourceBrightness.f.map(from: (-100, 0), to: (0, 1))
             } else {
                 sourceDisplay.preciseBrightnessContrast = (sourceBrightness / 100)
             }
         }
 
         if let d = activeDisplays.first(where: \.isBuiltin), !lidClosed, !d.systemAdaptiveBrightness, d.adaptive, let brightness = d.readBrightness() {
-            recomputeAndAssign(d, brightness.d)
+            recomputeAndAssign(d, d.softwareAdjusted(brightness: brightness).d)
+        } else if let d = activeDisplays.first(where: { $0.isNative && $0.adaptive }), !d.systemAdaptiveBrightness, let brightness = d.readBrightness() {
+            recomputeAndAssign(d, d.softwareAdjusted(brightness: brightness).d)
+        } else if let d = activeDisplays.first(where: { $0.hasDDC && $0.adaptive && !$0.noControls }) ?? activeDisplays.first(where: { $0.adaptive && !$0.noControls }) {
+            recomputeAndAssign(d, d.softwareAdjustedBrightness.d)
+        } else {
             return
         }
-        if let d = activeDisplays.first(where: { $0.isNative && $0.adaptive }), !d.systemAdaptiveBrightness, let brightness = d.readBrightness() {
-            recomputeAndAssign(d, brightness.d)
-            return
-        }
-        if let d = activeDisplays.first(where: { $0.hasDDC && $0.adaptive }) {
-            recomputeAndAssign(d, d.brightness.doubleValue)
+
+        for display in activeDisplays {
+            if !display.lockedBrightnessCurve {
+                display.insertBrightnessUserDataPoint(sourceDisplay.softwareAdjustedBrightness.d, display.preciseBrightnessContrast * 100, modeKey: .sync)
+            }
+
+            if !display.lockedContrastCurve, !display.lockedContrast {
+                display.insertContrastUserDataPoint(sourceDisplay.preciseContrast * 100, display.preciseContrast * 100, modeKey: .sync)
+            }
         }
     }
 

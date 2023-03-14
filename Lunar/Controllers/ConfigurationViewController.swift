@@ -23,24 +23,6 @@ final class ConfigurationViewController: NSViewController {
     - Click to edit text, press enter to set the value
     	- Press the up/down arrow keys on your keyboard to increment/decrement the value
     """
-    lazy var SYNC_POLLING_INTERVAL_TOOLTIP = """
-    ## Description
-    Value that describes how often Lunar should check for changes in the built-in display brightness.
-
-    ## Effect
-    The adaptive algorithm synchronizes the monitors with the built-in display brightness using the following steps:
-        - Read built-in display brightness
-        - Compute each monitor's brightness by taking into account the configured offsets
-        - Apply the brightness for each monitor
-        - *Sleep for `x` seconds*
-
-    The last step uses this value to know how much to sleep.
-    If you experience lags and system freeze in Sync mode, your monitor might have slow DDC response time.
-
-    In this case, you might benefit from a larger polling interval like 10 seconds.
-
-    \(ADJUSTING_VALUES_INFO)
-    """
     lazy var SENSOR_POLLING_INTERVAL_TOOLTIP = """
     ## Description
     Value that describes how often the Ambient Light Sensor should send lux values to Lunar.
@@ -108,8 +90,6 @@ final class ConfigurationViewController: NSViewController {
     @IBOutlet var volumeStepCaption: ScrollableTextFieldCaption!
     @IBOutlet var hotkeyStepLabel: NSTextField!
     @IBOutlet var pollingIntervalLabel: NSTextField!
-    @IBOutlet var syncPollingIntervalField: ScrollableTextField!
-    @IBOutlet var syncPollingIntervalCaption: ScrollableTextFieldCaption!
     @IBOutlet var sensorPollingIntervalField: ScrollableTextField!
     @IBOutlet var sensorPollingIntervalCaption: ScrollableTextFieldCaption!
     @IBOutlet var locationLatField: ScrollableTextField!
@@ -125,7 +105,6 @@ final class ConfigurationViewController: NSViewController {
     var dayMomentsObserver: Cancellable?
     var locationObserver: Cancellable?
     var brightnessStepObserver: Cancellable?
-    var syncPollingSecondsObserver: Cancellable?
     var sensorPollingSecondsObserver: Cancellable?
     var contrastStepObserver: Cancellable?
     var volumeStepObserver: Cancellable?
@@ -155,19 +134,11 @@ final class ConfigurationViewController: NSViewController {
         }
     }
 
-    var syncPollingIntervalVisible = false {
-        didSet {
-            syncPollingIntervalField?.isHidden = !syncPollingIntervalVisible
-            syncPollingIntervalCaption?.isHidden = !syncPollingIntervalVisible
-            pollingIntervalLabel?.isHidden = !syncPollingIntervalVisible && !sensorPollingIntervalVisible
-        }
-    }
-
     var sensorPollingIntervalVisible = false {
         didSet {
             sensorPollingIntervalField?.isHidden = !sensorPollingIntervalVisible
             sensorPollingIntervalCaption?.isHidden = !sensorPollingIntervalVisible
-            pollingIntervalLabel?.isHidden = !syncPollingIntervalVisible && !sensorPollingIntervalVisible
+            pollingIntervalLabel?.isHidden = !sensorPollingIntervalVisible
         }
     }
 
@@ -197,7 +168,6 @@ final class ConfigurationViewController: NSViewController {
         // let manualMode = adaptiveMode == .manual
 
         locationVisible = locationMode
-        syncPollingIntervalVisible = syncMode
         sensorPollingIntervalVisible = sensorMode
         scheduleTransitionVisible = clockMode
         hotkeyStepVisible = true
@@ -209,7 +179,7 @@ final class ConfigurationViewController: NSViewController {
         case .location:
             helpButton3?.helpText = LOCATION_TOOLTIP
         case .sync:
-            helpButton3?.helpText = SYNC_POLLING_INTERVAL_TOOLTIP
+            helpButton3?.helpText = ""
         case .sensor:
             helpButton3?.helpText = SENSOR_POLLING_INTERVAL_TOOLTIP
         case .clock:
@@ -218,7 +188,7 @@ final class ConfigurationViewController: NSViewController {
             break
         }
 
-        helpButton3?.isHidden = adaptiveMode == .manual
+        helpButton3?.isHidden = adaptiveMode == .manual || adaptiveMode == .sync
     }
 
     func listenForLocationChange() {
@@ -234,14 +204,6 @@ final class ConfigurationViewController: NSViewController {
         brightnessStepObserver = brightnessStepObserver ?? brightnessStepPublisher.sink { [weak self] change in
             mainAsync {
                 self?.brightnessStepField?.stringValue = String(change.newValue)
-            }
-        }
-    }
-
-    func listenForSyncPollingIntervalChange() {
-        syncPollingSecondsObserver = syncPollingSecondsObserver ?? syncPollingSecondsPublisher.sink { [weak self] change in
-            mainAsync {
-                self?.syncPollingIntervalField?.stringValue = String(change.newValue)
             }
         }
     }
@@ -285,17 +247,6 @@ final class ConfigurationViewController: NSViewController {
             field, caption: caption,
             settingKeyInt: Defaults.Keys.brightnessStep,
             lowerLimit: 1, upperLimit: 99,
-            onMouseEnter: nil
-        )
-    }
-
-    func setupSyncPollingInterval() {
-        guard let field = syncPollingIntervalField, let caption = syncPollingIntervalCaption else { return }
-
-        setupScrollableTextField(
-            field, caption: caption,
-            settingKeyInt: Defaults.Keys.syncPollingSeconds,
-            lowerLimit: 0, upperLimit: 300,
             onMouseEnter: nil
         )
     }
@@ -452,7 +403,6 @@ final class ConfigurationViewController: NSViewController {
 
     func setup() {
         setupBrightnessStep()
-        setupSyncPollingInterval()
         setupSensorPollingInterval()
         setupContrastStep()
         setupVolumeStep()
@@ -462,7 +412,6 @@ final class ConfigurationViewController: NSViewController {
 
         listenForLocationChange()
         listenForBrightnessStepChange()
-        listenForSyncPollingIntervalChange()
         listenForSensorPollingIntervalChange()
         listenForContrastStepChange()
         listenForVolumeStepChange()

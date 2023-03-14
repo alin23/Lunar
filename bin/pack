@@ -1,4 +1,5 @@
 #!/usr/bin/env fish
+set DIR (cd (dirname (status -f)); and pwd)
 if not set -q PROJECT_DIR
     set PROJECT_DIR (dirname $DIR)
 end
