@@ -346,7 +346,6 @@ final class DisplayViewController: NSViewController {
     @IBOutlet var displayImage: DisplayImage?
     @IBOutlet var displayName: DisplayName?
     @IBOutlet var adaptiveNotice: NSTextField!
-    @IBOutlet var gammaNotice: NSTextField!
     @IBOutlet var scrollableBrightness: ScrollableBrightness?
     @IBOutlet var scrollableContrast: ScrollableContrast?
     @IBOutlet var brightnessSlider: Slider?
@@ -410,8 +409,6 @@ final class DisplayViewController: NSViewController {
 
     var openedBlackoutPage = false
     var openedXDRPage = false
-
-    var gammaNoticeHighlighterTask: Repeater?
 
     var buttonY: CGFloat?
     var resolutionsY: CGFloat?
@@ -1001,11 +998,6 @@ final class DisplayViewController: NSViewController {
             mainAsyncAfter(ms: 10) { [weak self] in
                 guard let self else { return }
                 self.updateControlsButton(control: control)
-                if control.isSoftware, display.enabledControls[.gamma] ?? false {
-                    self.showGammaNotice()
-                } else {
-                    self.hideGammaNotice()
-                }
             }
         }
 
@@ -1221,6 +1213,9 @@ final class DisplayViewController: NSViewController {
         let brightnessChartEntry = brightnessContrastChart.brightnessGraph.entries
         let contrastChartEntry = brightnessContrastChart.contrastGraph.entries
 
+        let brColor = darkMode ? white.withAlphaComponent(0.5) : violet
+        var gradient: CGGradient?
+
         switch DC.adaptiveMode {
         case let mode as LocationMode:
             guard let moment = mode.moment else { return }
@@ -1241,6 +1236,7 @@ final class DisplayViewController: NSViewController {
             for (entry, y) in zip(contrastChartEntry, brcrs.map(\.1)) {
                 entry.y = y
             }
+            gradient = BrightnessContrastChartView.brightnessGradient(values: brcrs.map(\.0), mode: .location)
         case let mode as SyncMode:
 //            if mode.isSyncingNits {
 //                let brcrs = brightnessChartEntry.map { entry in
@@ -1287,6 +1283,7 @@ final class DisplayViewController: NSViewController {
             for (entry, y) in zip(contrastChartEntry, crs) {
                 entry.y = y
             }
+            gradient = BrightnessContrastChartView.brightnessGradient(values: brs, mode: .sync)
         case let mode as SensorMode:
             let brcrs = brightnessChartEntry.map { entry in
                 mode.computeBrightnessContrast(ambientLight: entry.x, display: display)
@@ -1298,30 +1295,12 @@ final class DisplayViewController: NSViewController {
             for (entry, y) in zip(contrastChartEntry, brcrs) {
                 entry.y = y.1
             }
-        case let mode as ManualMode:
-            let maxValues = min(mode.maxChartDataPoints, brightnessChartEntry.count, contrastChartEntry.count)
-            let xs = stride(from: 0, to: maxValues, by: 1)
-            let percents = Array(stride(from: 0.0, to: maxValues.d / 100.0, by: 0.01))
-            for (x, b) in zip(
-                xs,
-                mode.computeSIMD(
-                    from: percents,
-                    minVal: minBrightness?.d ?? display.minBrightness.doubleValue,
-                    maxVal: maxBrightness?.d ?? display.maxBrightness.doubleValue
-                )
-            ) {
-                brightnessChartEntry[x].y = b
-            }
-            for (x, b) in zip(
-                xs,
-                mode.computeSIMD(
-                    from: percents,
-                    minVal: minContrast?.d ?? display.minContrast.doubleValue,
-                    maxVal: maxContrast?.d ?? display.maxContrast.doubleValue
-                )
-            ) {
-                contrastChartEntry[x].y = b
-            }
+            gradient = BrightnessContrastChartView.brightnessGradient(values: brcrs.map(\.0), mode: .sensor)
+        case is ManualMode:
+            brightnessChartEntry[0].y = minBrightness?.d ?? display.minBrightness.doubleValue
+            brightnessChartEntry[1].y = maxBrightness?.d ?? display.maxBrightness.doubleValue
+            contrastChartEntry[0].y = minContrast?.d ?? display.minContrast.doubleValue
+            contrastChartEntry[1].y = maxContrast?.d ?? display.maxContrast.doubleValue
         default:
             break
         }
@@ -1331,6 +1310,12 @@ final class DisplayViewController: NSViewController {
 //            brightness: currentBrightness?.d, contrast: currentContrast?.d
 //        )
         mainAsync { [weak self] in
+            if let gradient {
+                self?.brightnessContrastChart?.brightnessGraph.fill = LinearGradientFill(gradient: gradient)
+            } else {
+                self?.brightnessContrastChart?.brightnessGraph.fill = nil
+                self?.brightnessContrastChart?.brightnessGraph.fillColor = brColor
+            }
             self?.brightnessContrastChart?.notifyDataSetChanged()
         }
     }
@@ -1548,7 +1533,6 @@ final class DisplayViewController: NSViewController {
 
     func listenForGraphDataChange() {
         graphObserver = moreGraphDataPublisher.sink { [weak self] change in
-            // log.debug("More graph data: \(change.newValue)")
             guard let self else { return }
             mainAsyncAfter(ms: 1000) { [weak self] in
                 guard let self else { return }
@@ -1594,24 +1578,13 @@ final class DisplayViewController: NSViewController {
             return
         }
 
-        self.brightnessContrastChart?.initGraph(
-            display: self.display,
-            brightnessColor: brightnessGraphColor,
-            contrastColor: contrastGraphColor,
-            labelColor: xAxisLabelColor,
-            mode: mode
-        )
+        self.brightnessContrastChart?.initGraph(display: self.display, mode: mode)
         self.brightnessContrastChart?.rightAxis.gridColor = mauve.withAlphaComponent(0.1)
         self.brightnessContrastChart?.xAxis.gridColor = mauve.withAlphaComponent(0.1)
     }
 
     func zeroGraph() {
-        brightnessContrastChart?.initGraph(
-            display: nil,
-            brightnessColor: brightnessGraphColor,
-            contrastColor: contrastGraphColor,
-            labelColor: xAxisLabelColor
-        )
+        brightnessContrastChart?.initGraph(display: nil)
         brightnessContrastChart?.rightAxis.gridColor = mauve.withAlphaComponent(0.0)
         brightnessContrastChart?.xAxis.gridColor = mauve.withAlphaComponent(0.0)
     }
@@ -1664,49 +1637,6 @@ final class DisplayViewController: NSViewController {
         display.powerOff()
     }
 
-    func showGammaNotice() {
-        mainAsync { [weak self] in
-            guard let self, self.display?.active ?? false, self.view.window?.isVisible ?? false,
-                  self.gammaNoticeHighlighterTask == nil
-            else { return }
-
-            self.gammaNoticeHighlighterTask = Repeater(
-                every: 5,
-                name: "gammaNoticeHighlighter-\(self.display?.serial ?? "display")"
-            ) { [weak self] in
-                guard let self else { return }
-
-                guard self.view.window?.isVisible ?? false, let gammaNotice = self.gammaNotice
-                else {
-                    self.gammaNoticeHighlighterTask = nil
-                    return
-                }
-
-                if gammaNotice.alphaValue <= 0.1 {
-                    gammaNotice.transition(2)
-                    gammaNotice.alphaValue = 0.9
-                    gammaNotice.needsDisplay = true
-                } else {
-                    gammaNotice.transition(3)
-                    gammaNotice.alphaValue = 0.01
-                    gammaNotice.needsDisplay = true
-                }
-            }
-        }
-    }
-
-    func hideGammaNotice() {
-        mainAsync { [weak self] in
-            guard let self else { return }
-            self.gammaNoticeHighlighterTask = nil
-
-            guard let gammaNotice = self.gammaNotice else { return }
-            gammaNotice.transition(0.3)
-            gammaNotice.alphaValue = 0.0
-            gammaNotice.needsDisplay = true
-        }
-    }
-
     func showAdaptiveNotice() {
         guard let d = display, !d.isBuiltin, let button = settingsButton else {
             hideAdaptiveNotice()
@@ -1724,9 +1654,6 @@ final class DisplayViewController: NSViewController {
         super.viewDidLoad()
         viewID = view.accessibilityIdentifier()
 
-        // lockBrightnessHelpButton?.helpText = LOCK_BRIGHTNESS_HELP_TEXT
-        // lockContrastHelpButton?.helpText = LOCK_CONTRAST_HELP_TEXT
-
         if let display, display.id != GENERIC_DISPLAY_ID {
             update()
 
@@ -1737,7 +1664,6 @@ final class DisplayViewController: NSViewController {
             scrollableBrightness?.onMaxValueChanged = { [weak self] (value: Int) in self?.updateDataset(maxBrightness: value.u16) }
             scrollableContrast?.onMinValueChanged = { [weak self] (value: Int) in self?.updateDataset(minContrast: value.u16) }
             scrollableContrast?.onMaxValueChanged = { [weak self] (value: Int) in self?.updateDataset(maxContrast: value.u16) }
-//            initGraph()
         }
 
         deleteEnabled = getDeleteEnabled()

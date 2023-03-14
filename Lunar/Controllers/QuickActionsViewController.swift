@@ -201,6 +201,7 @@ struct PowerOffButtonView: View {
         @State var name: String
 
         @ObservedObject var display: Display
+        @Default(.autoBlackoutBuiltin) var autoBlackoutBuiltin
 
         var body: some View {
             VStack(spacing: 1) {
@@ -217,20 +218,37 @@ struct PowerOffButtonView: View {
                 Text("Disconnected").font(.system(size: 10, weight: .semibold, design: .rounded))
 
                 if display.id == id, !display.isSidecar, !display.isAirplay {
+                    let binding = !display.isMacBook ? $display.keepDisconnected : Binding<Bool>(
+                        get: { autoBlackoutBuiltin },
+                        set: {
+                            autoBlackoutBuiltin = $0
+                            display.keepDisconnected = $0
+                        }
+                    )
                     VStack {
                         SettingsToggle(
                             text: "Auto Disconnect",
-                            setting: $display.keepDisconnected,
+                            setting: binding,
                             color: nil,
-                            help: """
-                            The display might come back on by itself after standby/wake or when
-                            reconnecting the monitor cable.
+                            help: !display.isMacBook
+                                ? """
+                                The display might come back on by itself after standby/wake or when
+                                reconnecting the monitor cable.
 
-                            This option will automatically disconnect the display whenever that
-                            happens, until you reconnect the display manually using the power button.
+                                This option will automatically disconnect the display whenever that
+                                happens, until you reconnect the display manually using the power button.
 
-                            Note: Press ⌘ Command more than 8 times in a row to force connect all displays.
-                            """
+                                Note: Press ⌘ Command more than 8 times in a row to force connect all displays.
+                                """
+                                : """
+                                Turns off the built-in screen automatically when a monitor is connected.
+
+                                Turns the screen back on when the last monitor is disconnected.
+
+                                Keeps the screen disconnected between standby/wake or lid open/close states.
+
+                                Note: Press ⌘ Command more than 8 times in a row to force connect all displays.
+                                """
                         )
                         .font(.system(size: 12, weight: .medium, design: .rounded))
                     }
