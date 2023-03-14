@@ -25,7 +25,7 @@ extension Defaults.Keys {
 }
 
 #if arch(arm64)
-    let ARM_KEYS: [Defaults.Keys] = [.nitsBrightnessMapping, .nitsContrastMapping]
+    let ARM_KEYS: [Defaults.Keys] = []
 #else
     let ARM_KEYS: [Defaults.Keys] = []
 #endif
@@ -67,7 +67,6 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .autoXdrTipShown,
     .workaroundBuiltinDisplay,
     .autoBlackoutBuiltin,
-    .streamLogs,
     .mergeBrightnessContrast,
     .enableBlackOutKillSwitch,
     .enableSentry,
@@ -118,8 +117,6 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .clamshellModeDetection,
     .disableBrightnessObservers,
     .contrastStep,
-    .debug,
-    .trace,
     .didScrollTextField,
     .didSwipeLeft,
     .didSwipeRight,
@@ -366,15 +363,14 @@ final class DataStore: NSObject {
     static func firstRunAfterLunar6Upgrade() {
         thisIsFirstRunAfterLunar6Upgrade = true
 
-//        if CachedDefaults[.adaptiveBrightnessMode] == .sync {
-//            guard let displays = CachedDefaults[.displays] else { return }
+//        guard let displays = CachedDefaults[.displays] else { return }
 //
-//            displays.forEach { display in
-//                display.lockedContrast = true
-//            }
-//            CachedDefaults[.displays] = displays
-//            Defaults[.displays] = displays
+//        displays.forEach { display in
+//            display.userBrightness = Display.DEFAULT_USER_BRIGHTNESS_DICT
+//            display.userContrast = Display.DEFAULT_USER_CONTRAST_DICT
 //        }
+//        CachedDefaults[.displays] = displays
+//        Defaults[.displays] = displays
     }
 
     static func firstRunAfterDefaults5Upgrade() {
@@ -628,7 +624,6 @@ enum CachedDefaults {
         .civilTwilightEnd,
         .clockMode,
         .dayLength,
-        .debug,
         .hasActiveDisplays,
         .hasActiveExternalDisplays,
         .location,
@@ -638,7 +633,6 @@ enum CachedDefaults {
         .curveMode,
         .secure,
         .solarNoon,
-        .streamLogs,
         .sunrise,
         .sunset,
         .syncMode,
@@ -743,7 +737,6 @@ func initCache() {
     cacheKey(.autoXdrTipShown)
     cacheKey(.autoBlackoutBuiltin)
     cacheKey(.workaroundBuiltinDisplay)
-    cacheKey(.streamLogs)
     cacheKey(.mergeBrightnessContrast)
     cacheKey(.enableBlackOutKillSwitch)
     cacheKey(.enableSentry)
@@ -787,8 +780,6 @@ func initCache() {
     cacheKey(.brightnessTransition)
     cacheKey(.scheduleTransition)
     cacheKey(.refreshValues)
-    cacheKey(.debug)
-    cacheKey(.trace)
     cacheKey(.showQuickActions)
     cacheKey(.manualLocation)
     cacheKey(.startAtLogin)
@@ -907,7 +898,6 @@ let xdrContrastFactorPublisher = pub(.xdrContrastFactor)
 let allowHDREnhanceContrastPublisher = pub(.allowHDREnhanceContrast)
 let allowHDREnhanceBrightnessPublisher = pub(.allowHDREnhanceBrightness)
 let workaroundBuiltinDisplayPublisher = pub(.workaroundBuiltinDisplay)
-let streamLogsPublisher = pub(.streamLogs)
 let mergeBrightnessContrastPublisher = pub(.mergeBrightnessContrast)
 let enableSentryPublisher = pub(.enableSentry)
 let waitAfterWakeSecondsPublisher = pub(.waitAfterWakeSeconds)
@@ -938,8 +928,6 @@ let contrastStepPublisher = pub(.contrastStep)
 let volumeStepPublisher = pub(.volumeStep)
 let appExceptionsPublisher = pub(.appExceptions)
 let securePublisher = pub(.secure)
-let debugPublisher = pub(.debug)
-let tracePublisher = pub(.trace)
 let overrideAdaptiveModePublisher = pub(.overrideAdaptiveMode)
 let dayMomentsPublisher = Defaults.publisher(keys: .sunrise, .sunset, .solarNoon)
 let brightnessKeysEnabledPublisher = pub(.brightnessKeysEnabled)
@@ -968,8 +956,3 @@ let ddcSleepLongerPublisher = pub(.ddcSleepLonger)
 let ddcSleepFactorPublisher = pub(.ddcSleepFactor)
 let updateChannelPublisher = pub(.updateChannel)
 let sensorHostnamePublisher = pub(.sensorHostname)
-
-#if arch(arm64)
-    let nitsBrightnessMappingPublisher = pub(.nitsBrightnessMapping)
-    let nitsContrastMappingPublisher = pub(.nitsContrastMapping)
-#endif

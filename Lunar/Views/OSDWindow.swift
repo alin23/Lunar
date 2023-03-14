@@ -566,7 +566,7 @@ struct BrightnessOSDView: View {
                     .foregroundColor(.primary.opacity(0.75))
             }
 
-            let value = mapNumber(osd.value, fromLow: 0, fromHigh: 1, toLow: 0, toHigh: 160).cg
+            let value = osd.value.map(from: (0, 1), to: (0, 160)).cg
 
             ZStack {
                 Path { path in
@@ -716,6 +716,7 @@ extension Display {
     }
 
     func showSoftwareOSD(image: String, value: Float, text: String, color: Color, glowRadius: CGFloat = 5) {
+        guard !isAllDisplays, !isForTesting else { return }
         mainAsync { [weak self] in
             guard let self else { return }
 

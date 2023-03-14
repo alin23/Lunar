@@ -362,7 +362,7 @@ struct GammaTable: Equatable {
     func adjust(brightness: UInt16, preciseBrightness: Double? = nil, maxValue: Float) -> GammaTable {
         let br: Float = preciseBrightness?.f ?? (brightness.f / 100)
         let max: Float = br <= 1.0 ? 1.0 : maxValue
-        let gammaBrightness: Float = mapNumber(br, fromLow: 0.00, fromHigh: max, toLow: 0.08, toHigh: max)
+        let gammaBrightness: Float = br.map(from: (0.00, max), to: (0.08, max))
 
         return GammaTable(
             red: red * gammaBrightness,
@@ -396,8 +396,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 @objc final class Display: NSObject, Codable, Defaults.Serializable, ObservableObject, Identifiable {
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let userBrightnessContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userBrightness)
-        let userContrastContainer = try container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userContrast)
         let enabledControlsContainer = try container.nestedContainer(keyedBy: DisplayControlKeys.self, forKey: .enabledControls)
 
         let id = try container.decode(CGDirectDisplayID.self, forKey: .id)
@@ -412,8 +410,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         edidName = try container.decode(String.self, forKey: .edidName)
         active = try container.decode(Bool.self, forKey: .active)
 
-        let brightness = isNative ? (AppleNativeControl.readBrightnessDisplayServices(id: id) * 100)
-            .ns : (try container.decode(UInt16.self, forKey: .brightness)).ns
+        let brightness = isNative
+            ? (AppleNativeControl.readBrightnessDisplayServices(id: id) * 100).ns
+            : (try container.decode(UInt16.self, forKey: .brightness)).ns
         self.brightness = brightness
         let contrast = (try container.decode(UInt16.self, forKey: .contrast)).ns
         self.contrast = contrast
@@ -518,63 +517,33 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         applyBrightnessOnInputChange2 = (try container.decodeIfPresent(Bool.self, forKey: .applyBrightnessOnInputChange2)) ?? true
         applyBrightnessOnInputChange3 = (try container.decodeIfPresent(Bool.self, forKey: .applyBrightnessOnInputChange3)) ?? false
 
-        if let syncUserBrightness = (try? userBrightnessContainer.decodeIfPresent([UserValue].self, forKey: .sync)) ??
-            (try? userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .sync))?.userValues
-        {
-            userBrightness[.sync] = syncUserBrightness.threadSafeDictionary
-        }
-        if let sensorUserBrightness = (try? userBrightnessContainer.decodeIfPresent([UserValue].self, forKey: .sensor)) ??
-            (try? userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .sensor))?.userValues
-        {
-            userBrightness[.sensor] = sensorUserBrightness.threadSafeDictionary
-        }
-        if let locationUserBrightness = (try? userBrightnessContainer.decodeIfPresent([UserValue].self, forKey: .location)) ??
-            (try? userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .location))?.userValues
-        {
-            userBrightness[.location] = locationUserBrightness.threadSafeDictionary
-        }
-        if let manualUserBrightness = (try? userBrightnessContainer.decodeIfPresent([UserValue].self, forKey: .manual)) ??
-            (try? userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .manual))?.userValues
-        {
-            userBrightness[.manual] = manualUserBrightness.threadSafeDictionary
-        }
-        if let clockUserBrightness = (try? userBrightnessContainer.decodeIfPresent([UserValue].self, forKey: .clock)) ??
-            (try? userBrightnessContainer.decodeIfPresent([Int: Int].self, forKey: .clock))?.userValues
-        {
-            userBrightness[.clock] = clockUserBrightness.threadSafeDictionary
-        }
+        syncBrightnessMapping = (try container.decodeIfPresent([DisplayUUID: [AutoLearnMapping]].self, forKey: .syncBrightnessMapping)) ?? [:]
+        syncContrastMapping = (try container.decodeIfPresent([DisplayUUID: [AutoLearnMapping]].self, forKey: .syncContrastMapping)) ?? [:]
 
-        if let syncUserContrast = (try? userContrastContainer.decodeIfPresent([UserValue].self, forKey: .sync)) ??
-            (try? userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .sync))?.userValues
-        {
-            userContrast[.sync] = syncUserContrast.threadSafeDictionary
-        }
-        if let sensorUserContrast = (try? userContrastContainer.decodeIfPresent([UserValue].self, forKey: .sensor)) ??
-            (try? userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .sensor))?.userValues
-        {
-            userContrast[.sensor] = sensorUserContrast.threadSafeDictionary
-        }
-        if let locationUserContrast = (try? userContrastContainer.decodeIfPresent([UserValue].self, forKey: .location)) ??
-            (try? userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .location))?.userValues
-        {
-            userContrast[.location] = locationUserContrast.threadSafeDictionary
-        }
-        if let manualUserContrast = (try? userContrastContainer.decodeIfPresent([UserValue].self, forKey: .manual)) ??
-            (try? userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .manual))?.userValues
-        {
-            userContrast[.manual] = manualUserContrast.threadSafeDictionary
-        }
-        if let clockUserContrast = (try? userContrastContainer.decodeIfPresent([UserValue].self, forKey: .clock)) ??
-            (try? userContrastContainer.decodeIfPresent([Int: Int].self, forKey: .clock))?.userValues
-        {
-            userContrast[.clock] = clockUserContrast.threadSafeDictionary
-        }
+        sensorBrightnessMapping = (try container.decodeIfPresent([AutoLearnMapping].self, forKey: .sensorBrightnessMapping)) ?? []
+        sensorContrastMapping = (try container.decodeIfPresent([AutoLearnMapping].self, forKey: .sensorContrastMapping)) ?? SensorMode.DEFAULT_CONTRAST_MAPPING
+
+        locationBrightnessMapping = (try container.decodeIfPresent([AutoLearnMapping].self, forKey: .locationBrightnessMapping)) ?? LocationMode.DEFAULT_BRIGHTNESS_MAPPING
+        locationContrastMapping = (try container.decodeIfPresent([AutoLearnMapping].self, forKey: .locationContrastMapping)) ?? LocationMode.DEFAULT_CONTRAST_MAPPING
+
+        #if arch(arm64)
+            nitsBrightnessMapping = (try container.decodeIfPresent([AutoLearnMapping].self, forKey: .nitsBrightnessMapping)) ?? []
+            nitsContrastMapping = (try container.decodeIfPresent([AutoLearnMapping].self, forKey: .nitsContrastMapping)) ?? []
+        #endif
 
         super.init()
         #if arch(arm64)
             maxNits = try container.decodeIfPresent(Double.self, forKey: .maxNits) ?! getMaxNits()
             minNits = try container.decodeIfPresent(Double.self, forKey: .minNits) ?? getMinNits()
         #endif
+
+        if sensorBrightnessMapping.isEmpty {
+            #if arch(arm64)
+                sensorBrightnessMapping = nitsToPercentageMapping
+            #else
+                sensorBrightnessMapping = SensorMode.DEFAULT_BRIGHTNESS_MAPPING
+            #endif
+        }
 
         defer {
             initialised = true
@@ -716,13 +685,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             preciseBrightness = AppleNativeControl.readBrightnessDisplayServices(id: id)
             brightness = (preciseBrightness * 100).ns
         } else {
-            preciseBrightnessContrast = mapNumber(
-                50,
-                fromLow: minBrightness.d,
-                fromHigh: maxBrightness.d,
-                toLow: 0,
-                toHigh: 100
-            ) / 100.0
+            preciseBrightnessContrast = 50.map(from: (minBrightness.d, maxBrightness.d), to: (0, 100)) / 100.0
         }
 
         defer {
@@ -873,8 +836,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case hotkeyInput1
         case hotkeyInput2
         case hotkeyInput3
-        case userBrightness
-        case userContrast
         case useOverlay
         case alwaysUseNetworkControl
         case neverUseNetworkControl
@@ -910,6 +871,16 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case applyBrightnessOnInputChange1
         case applyBrightnessOnInputChange2
         case applyBrightnessOnInputChange3
+
+        case syncBrightnessMapping
+        case syncContrastMapping
+        case sensorBrightnessMapping
+        case sensorContrastMapping
+        case locationBrightnessMapping
+        case locationContrastMapping
+        case nitsBrightnessMapping
+        case nitsContrastMapping
+
         case rotation
         case adaptiveController
         case subzero
@@ -1195,49 +1166,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     static let FILLED_CHICLET_OFFSET: Float = 1 / 16
     static let SUBZERO_FILLED_CHICLETS_THRESHOLDS: [Float] = (0 ... 16).map { FILLED_CHICLET_OFFSET * $0.f }
 
-    static var DEFAULT_USER_BRIGHTNESS_DICT: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Double, Double>> {
-        ThreadSafeDictionary(dict: [
-            .sync: ThreadSafeDictionary(dict: [:]),
-            .location: ThreadSafeDictionary(dict: [-18: -20, 20: 100]),
-            .sensor: ThreadSafeDictionary(
-                dict: [
-                    0.0: 0.21,
-                    13.0: 0.31,
-                    23.0: 0.34,
-                    39.0: 0.39,
-                    71.0: 0.41,
-                    80.0: 0.44,
-                    100.0: 0.45,
-                    135.0: 0.47,
-                    160.0: 0.49,
-                    190.0: 0.54,
-                    224.0: 0.58,
-                    313.0: 0.69,
-                    565.0: 0.91,
-                    702.0: 0.99,
-                    800.0: 1.00,
-                ]
-
-            ),
-            .clock: ThreadSafeDictionary(dict: [:]),
-            .manual: ThreadSafeDictionary(dict: [:]),
-        ])
-    }
-    static var DEFAULT_USER_CONTRAST_DICT: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Double, Double>> {
-        ThreadSafeDictionary(dict: [
-            .sync: ThreadSafeDictionary(dict: [:]),
-            .location: ThreadSafeDictionary(dict: [-18: 0, 20: 100]),
-            .sensor: ThreadSafeDictionary(dict: [0: 20]),
-            .clock: ThreadSafeDictionary(dict: [:]),
-            .manual: ThreadSafeDictionary(dict: [:]),
-        ])
-    }
-
     lazy var xdrFilledChicletOffset = 6 / (96 * (1 / (maxSoftwareBrightness - Self.MIN_SOFTWARE_BRIGHTNESS)))
     lazy var xdrFilledChicletsThresholds: [Float] = (0 ... 16).map { 1.0 + xdrFilledChicletOffset * $0.f }
     @Published @objc dynamic var appPreset: AppException? = nil
 
-    @objc dynamic lazy var hasAmbientLightAdaptiveBrightness: Bool = DisplayServicesHasAmbientLightCompensation(id)
+    @objc dynamic lazy var hasAmbientLightAdaptiveBrightness: Bool = isAllDisplays ? false : DisplayServicesHasAmbientLightCompensation(id)
     @objc dynamic lazy var canBeSource: Bool = {
         allowAnySyncSourcePublisher.sink { [weak self] change in
             guard let self else { return }
@@ -1258,7 +1191,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc dynamic lazy var isBuiltin: Bool = DDC.isBuiltinDisplay(id)
     @objc dynamic lazy var isExternal: Bool = !isBuiltin
     lazy var isSmartBuiltin: Bool = isBuiltin && isSmartDisplay
-    lazy var canChangeBrightnessDS: Bool = DisplayServicesCanChangeBrightness(id)
+    lazy var canChangeBrightnessDS: Bool = isAllDisplays ? false : DisplayServicesCanChangeBrightness(id)
 
     lazy var _hotkeyPopover: NSPopover? = INPUT_HOTKEY_POPOVERS[serial] ?? nil
     lazy var hotkeyPopoverController: HotkeyPopoverController? = initHotkeyPopoverController()
@@ -1284,9 +1217,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc dynamic var sentContrastCondition = NSCondition()
     @objc dynamic var sentInputCondition = NSCondition()
     @objc dynamic var sentVolumeCondition = NSCondition()
-
-    var userBrightness: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Double, Double>> = DEFAULT_USER_BRIGHTNESS_DICT
-    var userContrast: ThreadSafeDictionary<AdaptiveModeKey, ThreadSafeDictionary<Double, Double>> = DEFAULT_USER_CONTRAST_DICT
 
     var redMin: CGGammaValue = 0.0
     var redMax: CGGammaValue = 1.0
@@ -1378,7 +1308,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Atomic var modeChangeAsk = true
 
-    @objc dynamic lazy var isSmartDisplay = panel?.isSmartDisplay ?? DisplayServicesIsSmartDisplay(id)
+    @objc dynamic lazy var isSmartDisplay = isAllDisplays ? false : (panel?.isSmartDisplay ?? DisplayServicesIsSmartDisplay(id))
 
     @Atomic var shouldStopBrightnessTransition = true
     @Atomic var shouldStopContrastTransition = true
@@ -1461,7 +1391,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc dynamic lazy var maxColorGain = extendedColorGain ? 255 : 100
 
     @Atomic var applyDisplayServices = true
-
     @Atomic var apply = true
 
     lazy var saving: PassthroughSubject<Bool, Never> = {
@@ -1586,11 +1515,82 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     lazy var canChangeContrast: Bool = usesDDCBrightnessControl || (isNative && (alternativeControlForAppleNative?.isDDC ?? false))
 
     var isAllDisplays = false
+
+    var syncBrightnessMapping: [DisplayUUID: [AutoLearnMapping]] = [:]
+    var syncContrastMapping: [DisplayUUID: [AutoLearnMapping]] = [:]
+    var sensorBrightnessMapping: [AutoLearnMapping] = SensorMode.DEFAULT_BRIGHTNESS_MAPPING
+    var sensorContrastMapping: [AutoLearnMapping] = SensorMode.DEFAULT_CONTRAST_MAPPING
+    var locationBrightnessMapping: [AutoLearnMapping] = LocationMode.DEFAULT_BRIGHTNESS_MAPPING
+    var locationContrastMapping: [AutoLearnMapping] = LocationMode.DEFAULT_CONTRAST_MAPPING
+    var syncMappingSaver: DispatchWorkItem? { didSet { oldValue?.cancel() } }
+
+    var sensorMappingSaver: DispatchWorkItem? { didSet { oldValue?.cancel() } }
+
+    var locationMappingSaver: DispatchWorkItem? { didSet { oldValue?.cancel() } }
+
+    func brightnessCurveMapping(_ modeKey: AdaptiveModeKey? = nil) -> [AutoLearnMapping] {
+        switch modeKey ?? DC.adaptiveModeKey {
+        case .sync:
+            return syncBrightnessMapping[DC.sourceDisplay.serial] ?? []
+        case .sensor:
+            return sensorBrightnessMapping
+        case .location:
+            return locationBrightnessMapping
+        default:
+            return []
+        }
+    }
+
+    func contrastCurveMapping(_ modeKey: AdaptiveModeKey? = nil) -> [AutoLearnMapping] {
+        switch modeKey ?? DC.adaptiveModeKey {
+        case .sync:
+            return syncContrastMapping[DC.sourceDisplay.serial] ?? []
+        case .sensor:
+            return sensorContrastMapping
+        case .location:
+            return locationContrastMapping
+        default:
+            return []
+        }
+    }
+
+    #if arch(arm64)
+        var nitsBrightnessMapping: [AutoLearnMapping] = []
+        var nitsBrightnessMappingSaver: DispatchWorkItem? { didSet { oldValue?.cancel() } }
+
+        var nitsContrastMapping: [AutoLearnMapping] = []
+        var nitsContrastMappingSaver: DispatchWorkItem? { didSet { oldValue?.cancel() } }
+
+        lazy var brightnessSpline: ((Double) -> Double)? = computeBrightnessSpline(nitsMapping: nitsBrightnessMapping)
+        lazy var contrastSpline: ((Double) -> Double)? = computeContrastSpline(nitsMapping: nitsContrastMapping)
+
+        func saveNitsBrightnessMapping() {
+            nitsBrightnessMappingSaver = mainAsyncAfter(ms: 200) { [weak self] in
+                guard let self else { return }
+
+                self.save()
+                self.brightnessSpline = self.computeBrightnessSpline(nitsMapping: self.nitsBrightnessMapping)
+                self.nitsBrightnessMappingSaver = nil
+            }
+        }
+
+        func saveNitsContrastMapping() {
+            nitsContrastMappingSaver = mainAsyncAfter(ms: 200) { [weak self] in
+                guard let self else { return }
+
+                self.save()
+                self.contrastSpline = self.computeContrastSpline(nitsMapping: self.nitsContrastMapping)
+                self.nitsContrastMappingSaver = nil
+            }
+        }
+    #endif
+
     var edidName: String {
         didSet {
             normalizedName = Self.numberNamePattern.replaceAll(in: edidName, with: "").trimmed
         }
     }
+
     @Published @objc dynamic var unmanaged = false {
         didSet {
             guard unmanaged else {
@@ -1623,7 +1623,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var adaptiveSubzero = true {
         didSet {
             #if arch(arm64)
-                DC.brightnessSplines = DC.computeBrightnessSplines()
+                DC.computeBrightnessSplines()
             #endif
 
             readapt(newValue: adaptiveSubzero, oldValue: oldValue)
@@ -1655,6 +1655,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             faceLightEnabled = newValue
         }
     }
+
     @objc dynamic var blackout: Bool {
         get { blackOutEnabled }
         set {
@@ -1665,6 +1666,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             blackOutEnabled = newValue
         }
     }
+
     var isOnline: Bool { NSScreen.isOnline(id) }
 
     lazy var maxEDR = computeMaxEDR() {
@@ -1821,335 +1823,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             context = getContext()
             save()
         }
-    }
-
-    #if arch(arm64)
-        var dispName = ""
-        var dcpName = ""
-        var displayProps: [String: Any]? {
-            didSet {
-                checkNitsObserver()
-            }
-        }
-        var ioObserver: IOServicePropertyObserver?
-
-        @Published var contrastEnhancer: Double? = nil
-        @Published var lux: Double? = nil
-
-        @Published @objc var minNits: Double = 0 {
-            didSet {
-                guard initialised else { return }
-                guard minNits < maxNits else {
-                    minNits = maxNits - 1
-                    return
-                }
-
-                if minNits != oldValue, !isActiveSyncSource {
-                    DC.brightnessSplines = DC.computeBrightnessSplines()
-                    DC.contrastSplines = DC.computeContrastSplines()
-                    recomputeNitsMapping()
-                }
-                save()
-            }
-        }
-        func recomputeNitsMapping() {
-            nitsToPercentageMapping = Self.LUX_TO_NITS.sorted(by: { $0.key < $1.key }).dict { k, v in
-                (k, nitsToPercentage(v, minNits: minNits, maxNits: userMaxNits ?? maxNits) * 100)
-            }
-        }
-        lazy var userMaxNits: Double? = getUserMaxNits() {
-            didSet {
-                debug("\(name) Max Nits: \((userMaxNits ?? maxNits).str(decimals: 2))")
-                recomputeNitsMapping()
-            }
-        }
-        @Published @objc var maxNits: Double = 500 {
-            didSet {
-                guard initialised else { return }
-                guard maxNits > minNits, maxNits > 0 else {
-                    maxNits = getMaxNits() ?! minNits + 1
-                    return
-                }
-
-                if maxNits != oldValue, !isActiveSyncSource {
-                    DC.brightnessSplines = DC.computeBrightnessSplines()
-                    DC.contrastSplines = DC.computeContrastSplines()
-                    recomputeNitsMapping()
-                }
-                save()
-            }
-        }
-
-        @Published var nits: Double? = nil
-        lazy var nitsToPercentageMapping: [Double: Double] = Self.LUX_TO_NITS.sorted(by: { $0.key < $1.key }).dict { k, v in
-            (k, nitsToPercentage(v, minNits: minNits, maxNits: userMaxNits ?? maxNits) * 100)
-        }
-    #endif
-
-    lazy var hdrOn: Bool = potentialEDR > 2 && edr > 1 {
-        didSet {
-            log.debug("\(name) HDR: \(hdrOn)")
-        }
-    }
-
-    var brightnessRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
-    var contrastRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
-    var volumeRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
-    var inputRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
-    var colorRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
-
-    var gammaSetterTask: DispatchWorkItem? {
-        didSet { oldValue?.cancel() }
-    }
-
-    @Published @objc dynamic var sendingBrightness = false {
-        didSet {
-            manageSendingValue(.sendingBrightness, oldValue: oldValue)
-            guard sendingBrightness else {
-                sendingBrightnessResetter = nil
-                return
-            }
-            sendingBrightnessResetter = mainAsyncAfter(ms: 3000) { [weak self] in
-                self?.sendingBrightness = false
-            }
-        }
-    }
-    var sendingBrightnessResetter: DispatchWorkItem? = nil {
-        didSet { oldValue?.cancel() }
-    }
-
-    @Published @objc dynamic var sendingContrast = false {
-        didSet {
-            manageSendingValue(.sendingContrast, oldValue: oldValue)
-            guard sendingContrast else {
-                sendingContrastResetter = nil
-                return
-            }
-            sendingContrastResetter = mainAsyncAfter(ms: 3000) { [weak self] in
-                self?.sendingContrast = false
-            }
-        }
-    }
-    var sendingContrastResetter: DispatchWorkItem? = nil {
-        didSet { oldValue?.cancel() }
-    }
-
-    @Published @objc dynamic var sendingInput = false {
-        didSet {
-            manageSendingValue(.sendingInput, oldValue: oldValue)
-            guard sendingInput else {
-                sendingInputResetter = nil
-                return
-            }
-            sendingInputResetter = mainAsyncAfter(ms: 3000) { [weak self] in
-                self?.sendingInput = false
-            }
-        }
-    }
-    var sendingInputResetter: DispatchWorkItem? = nil {
-        didSet { oldValue?.cancel() }
-    }
-
-    @Published @objc dynamic var sendingVolume = false {
-        didSet {
-            manageSendingValue(.sendingVolume, oldValue: oldValue)
-            guard sendingVolume else {
-                sendingVolumeResetter = nil
-                return
-            }
-            sendingVolumeResetter = mainAsyncAfter(ms: 3000) { [weak self] in
-                self?.sendingVolume = false
-            }
-        }
-    }
-    var sendingVolumeResetter: DispatchWorkItem? = nil {
-        didSet { oldValue?.cancel() }
-    }
-
-    var readableID: String {
-        if name.isEmpty || name == "Unknown" {
-            return shortHash(string: serial)
-        }
-        let safeName = "[^\\w\\d]+".r!.replaceAll(in: name.lowercased(), with: "")
-        return "\(safeName)-\(shortHash(string: serial))"
-    }
-
-    @Published @objc dynamic var xdrBrightness: Float = 0.0 {
-        didSet {
-            guard apply else { return }
-
-            if xdrBrightness > 0, !enhanced {
-                handleEnhance(true, withoutSettingBrightness: true)
-            }
-            if xdrBrightness == 0, enhanced, !sliderTracking {
-                handleEnhance(false)
-            }
-
-            maxEDR = computeMaxEDR()
-
-            softwareBrightness = mapNumber(
-                xdrBrightness,
-                fromLow: 0.0,
-                fromHigh: 1.0,
-                toLow: Self.MIN_SOFTWARE_BRIGHTNESS,
-                toHigh: maxSoftwareBrightness
-            )
-        }
-    }
-
-    @objc dynamic var subzeroDimming: Float {
-        get { min(softwareBrightness, 1.0) }
-        set { softwareBrightness = cap(newValue, minVal: 0.0, maxVal: 1.0) }
-    }
-    @objc dynamic lazy var softwareBrightnessSlider: Float = softwareBrightness {
-        didSet {
-            guard apply else { return }
-            forceHideSoftwareOSD = true
-            softwareBrightness = softwareBrightnessSlider
-
-            guard adaptiveSubzero else { return }
-
-            let lastDataPoint = datapointLock.around { DC.adaptiveMode.brightnessDataPoint.last }
-            insertBrightnessUserDataPoint(lastDataPoint, brightness.doubleValue, modeKey: DC.adaptiveModeKey)
-        }
-    }
-    @Published @objc dynamic var softwareBrightness: Float = 1.0 {
-        didSet {
-            guard supportsGammaByDefault else { return }
-
-            lastSoftwareBrightness = oldValue
-            guard apply else { return }
-            // log.info("\(name) OLD SOFT BRIGHTNESS: \(oldValue)")
-            log.info("\(name) SOFT BRIGHTNESS: \(softwareBrightness.str(decimals: 2))")
-
-            let br = softwareBrightness
-            mainAsync {
-                self.withoutApply {
-                    self.softwareBrightnessSlider = br
-                    self.subzero = br < 1.0 || (
-                        br == 1.0 && !self.hasSoftwareControl &&
-                            self.brightness.uint16Value == self.minBrightness.uint16Value
-                    )
-                    guard br > 1 else {
-                        self.xdrBrightness = 0.0
-                        return
-                    }
-                    self.xdrBrightness = mapNumber(
-                        br,
-                        fromLow: Self.MIN_SOFTWARE_BRIGHTNESS,
-                        fromHigh: self.maxSoftwareBrightness,
-                        toLow: 0.0,
-                        toHigh: 1.0
-                    )
-                }
-            }
-
-            setIndependentSoftwareBrightness(softwareBrightness, oldValue: oldValue)
-        }
-    }
-
-    var preciseBrightnessContrastBeforeAppPreset = 0.5 {
-        didSet {
-            guard CachedDefaults[.mergeBrightnessContrast] else { return }
-            preciseBrightnessBeforeAppPreset = preciseBrightnessContrastBeforeAppPreset
-            preciseContrastBeforeAppPreset = preciseBrightnessContrastBeforeAppPreset
-        }
-    }
-
-    var preciseBrightnessBeforeAppPreset = 0.5 {
-        didSet {
-            guard !CachedDefaults[.mergeBrightnessContrast] else { return }
-            preciseBrightnessContrastBeforeAppPreset = preciseBrightnessBeforeAppPreset
-        }
-    }
-
-    // #endif
-
-    @Published @objc dynamic var canChangeVolume = true {
-        didSet {
-            showVolumeSlider = canChangeVolume && CachedDefaults[.showVolumeSlider]
-            save()
-        }
-    }
-
-    var noControls: Bool {
-        guard let control else { return true }
-        return control.isSoftware && !gammaEnabled
-    }
-
-    @objc dynamic var systemAdaptiveBrightness: Bool {
-        get { Self.ambientLightCompensationEnabled(id) }
-        set {
-            guard ambientLightCompensationEnabledByUser || force else {
-                return
-            }
-            if !newValue, isBuiltin {
-                log.warning("Disabling system adaptive brightness")
-                if SwiftyLogger.trace {
-                    Thread.callStackSymbols.forEach {
-                        log.info($0)
-                    }
-                }
-            }
-            DisplayServicesEnableAmbientLightCompensation(id, newValue)
-        }
-    }
-
-    var ambientLightCompensationEnabledByUser: Bool {
-        guard let enabled = Self.getThreadDictValue(id, type: "ambientLightCompensationEnabledByUser") as? Bool
-        else {
-            // First time checking out this flag, set it manually
-            let value = systemAdaptiveBrightness
-            Self.setThreadDictValue(id, type: "ambientLightCompensationEnabledByUser", value: value)
-            return value
-        }
-        if enabled { return true }
-        if systemAdaptiveBrightness {
-            // User must have enabled this manually in the meantime, set it to true manually
-            Self.setThreadDictValue(id, type: "ambientLightCompensationEnabledByUser", value: true)
-            return true
-        }
-        return false
-    }
-
-    var zeroGammaTask: Repeater? {
-        get { Self.getThreadDictValue(id, type: "zero-gamma") as? Repeater }
-        set { Self.setThreadDictValue(id, type: "zero-gamma", value: newValue) }
-    }
-
-    var zeroGammaWarmupTask: Repeater? {
-        get { Self.getThreadDictValue(id, type: "zero-gamma-warmup") as? Repeater }
-        set { Self.setThreadDictValue(id, type: "zero-gamma-warmup", value: newValue) }
-    }
-
-    var blackOutEnforceTask: Repeater? {
-        get { Self.getThreadDictValue(id, type: "blackout-enforce") as? Repeater }
-        set { Self.setThreadDictValue(id, type: "blackout-enforce", value: newValue) }
-    }
-
-    var resolutionBlackoutResetterTask: Repeater? {
-        get { Self.getThreadDictValue(id, type: "resolution-blackout-resetter") as? Repeater }
-        set { Self.setThreadDictValue(id, type: "resolution-blackout-resetter", value: newValue) }
-    }
-
-    var testWindowController: NSWindowController? {
-        get { Self.getWindowController(id, type: "test") }
-        set { Self.setWindowController(id, type: "test", windowController: newValue) }
-    }
-
-    var cornerWindowControllerTopLeft: NSWindowController? {
-        get { Self.getWindowController(id, type: "corner-topLeft") }
-        set { Self.setWindowController(id, type: "corner-topLeft", windowController: newValue) }
-    }
-
-    var cornerWindowControllerTopRight: NSWindowController? {
-        get { Self.getWindowController(id, type: "corner-topRight") }
-        set { Self.setWindowController(id, type: "corner-topRight", windowController: newValue) }
-    }
-
-    var cornerWindowControllerBottomLeft: NSWindowController? {
-        get { Self.getWindowController(id, type: "corner-bottomLeft") }
-        set { Self.setWindowController(id, type: "corner-bottomLeft", windowController: newValue) }
     }
 
     var cornerWindowControllerBottomRight: NSWindowController? {
@@ -2822,39 +2495,21 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         guard maxDDCBrightness.uint16Value != 100 || minDDCBrightness.uint16Value != 0 else {
             return brightness.uint16Value
         }
-        return mapNumber(
-            brightness.doubleValue,
-            fromLow: 0,
-            fromHigh: 100,
-            toLow: minDDCBrightness.doubleValue,
-            toHigh: maxDDCBrightness.doubleValue
-        ).rounded().u16
+        return brightness.doubleValue.map(from: (0, 100), to: (minDDCBrightness.doubleValue, maxDDCBrightness.doubleValue)).rounded().u16
     }
 
     var limitedContrast: UInt16 {
         guard maxDDCContrast.uint16Value != 100 || minDDCContrast.uint16Value != 0 else {
             return contrast.uint16Value
         }
-        return mapNumber(
-            contrast.doubleValue,
-            fromLow: 0,
-            fromHigh: 100,
-            toLow: minDDCContrast.doubleValue,
-            toHigh: maxDDCContrast.doubleValue
-        ).rounded().u16
+        return contrast.doubleValue.map(from: (0, 100), to: (minDDCContrast.doubleValue, maxDDCContrast.doubleValue)).rounded().u16
     }
 
     var limitedVolume: UInt16 {
         guard maxDDCVolume.uint16Value != 100 || minDDCVolume.uint16Value != 0 else {
             return volume.uint16Value
         }
-        return mapNumber(
-            volume.doubleValue,
-            fromLow: 0,
-            fromHigh: 100,
-            toLow: minDDCVolume.doubleValue,
-            toHigh: maxDDCVolume.doubleValue
-        ).rounded().u16
+        return volume.doubleValue.map(from: (0, 100), to: (minDDCVolume.doubleValue, maxDDCVolume.doubleValue)).rounded().u16
     }
 
     @Published @objc dynamic var allowBrightnessZero = false {
@@ -2866,6 +2521,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var preciseBrightnessContrast = 0.5 {
         didSet {
+            checkNaN(preciseBrightnessContrast)
+
             guard initialised, applyPreciseValue else {
                 return
             }
@@ -2925,6 +2582,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var preciseBrightness = 0.5 {
         didSet {
+            checkNaN(preciseBrightness)
+
             percentage = preciseBrightness
             guard initialised, applyPreciseValue else { return }
 
@@ -2941,13 +2600,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             var smallDiff = abs(preciseBrightness - oldValue) < 0.05
             var oldValue = oldValue
 
-            let preciseBrightness = mapNumber(
-                cap(preciseBrightness, minVal: 0.0, maxVal: 1.0),
-                fromLow: 0.0,
-                fromHigh: 1.0,
-                toLow: minBrightness.doubleValue / 100.0,
-                toHigh: maxBrightness.doubleValue / 100.0
-            )
+            let preciseBrightness = cap(preciseBrightness, minVal: 0.0, maxVal: 1.0).map(from: (0.0, 1.0), to: (minBrightness.doubleValue / 100.0, maxBrightness.doubleValue / 100.0))
             let brightness = (preciseBrightness * 100).intround
             guard !isAllDisplays else {
                 mainThread {
@@ -2960,13 +2613,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             guard !hasSoftwareControl else {
                 if !smallDiff {
-                    oldValue = mapNumber(
-                        cap(oldValue, minVal: 0.0, maxVal: 1.0),
-                        fromLow: 0.0,
-                        fromHigh: 1.0,
-                        toLow: minBrightness.doubleValue / 100.0,
-                        toHigh: maxBrightness.doubleValue / 100.0
-                    )
+                    oldValue = cap(oldValue, minVal: 0.0, maxVal: 1.0).map(from: (0.0, 1.0), to: (minBrightness.doubleValue / 100.0, maxBrightness.doubleValue / 100.0))
                 }
                 if supportsGamma {
                     setGamma(
@@ -3015,15 +2662,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var preciseContrast = 0.5 {
         didSet {
+            checkNaN(preciseContrast)
+
             guard initialised, applyPreciseValue else { return }
 
-            let contrast = (mapNumber(
-                cap(preciseContrast, minVal: 0.0, maxVal: 1.0),
-                fromLow: 0.0,
-                fromHigh: 1.0,
-                toLow: minContrast.doubleValue / 100.0,
-                toHigh: maxContrast.doubleValue / 100.0
-            ) * 100).intround
+            let contrast = (cap(preciseContrast, minVal: 0.0, maxVal: 1.0).map(from: (0.0, 1.0), to: (minContrast.doubleValue / 100.0, maxContrast.doubleValue / 100.0)) * 100).intround
 
             guard !isAllDisplays else {
                 mainThread {
@@ -3064,6 +2707,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var brightness: NSNumber = 50 {
         didSet {
+            checkNaN(brightness.doubleValue)
+
             brightnessU16 = brightness.uint16Value
             save(later: true)
             guard timeSince(lastConnectionTime) > 1 else { return }
@@ -3125,25 +2770,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             if DDC.applyLimits, maxDDCBrightness.uint16Value != 100 || minDDCBrightness.uint16Value != 0, !hasSoftwareControl {
-                oldBrightness = mapNumber(
-                    oldBrightness.d,
-                    fromLow: 0,
-                    fromHigh: 100,
-                    toLow: minDDCBrightness.doubleValue,
-                    toHigh: maxDDCBrightness.doubleValue
-                ).rounded().u16
-                brightness = mapNumber(
-                    brightness.d,
-                    fromLow: 0,
-                    fromHigh: 100,
-                    toLow: minDDCBrightness.doubleValue,
-                    toHigh: maxDDCBrightness.doubleValue
-                ).rounded().u16
+                oldBrightness = oldBrightness.d.map(from: (0, 100), to: (minDDCBrightness.doubleValue, maxDDCBrightness.doubleValue)).rounded().u16
+                brightness = brightness.d.map(from: (0, 100), to: (minDDCBrightness.doubleValue, maxDDCBrightness.doubleValue)).rounded().u16
             }
 
             // log.info("\(name) OLD BRIGHTNESS: \(oldBrightness)")
             log.info("\(name) BRIGHTNESS: \(brightness)")
-            if SwiftyLogger.trace { log.traceCalls() }
+            log.traceCalls()
 
             if let control = control as? DDCControl {
                 _ = control.setBrightnessDebounced(brightness, oldValue: oldBrightness, transition: brightnessTransition)
@@ -3166,6 +2799,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var contrast: NSNumber = 50 {
         didSet {
+            checkNaN(contrast.doubleValue)
+
             save(later: true)
             guard timeSince(lastConnectionTime) > 1 else { return }
 
@@ -3208,25 +2843,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             var oldContrast = cap(oldValue.uint16Value, minVal: minContrast.uint16Value, maxVal: maxContrast.uint16Value)
 
             if DDC.applyLimits, maxDDCContrast.uint16Value != 100 || minDDCContrast.uint16Value != 0, !hasSoftwareControl {
-                oldContrast = mapNumber(
-                    oldContrast.d,
-                    fromLow: 0,
-                    fromHigh: 100,
-                    toLow: minDDCContrast.doubleValue,
-                    toHigh: maxDDCContrast.doubleValue
-                ).rounded().u16
-                contrast = mapNumber(
-                    contrast.d,
-                    fromLow: 0,
-                    fromHigh: 100,
-                    toLow: minDDCContrast.doubleValue,
-                    toHigh: maxDDCContrast.doubleValue
-                ).rounded().u16
+                oldContrast = oldContrast.d.map(from: (0, 100), to: (minDDCContrast.doubleValue, maxDDCContrast.doubleValue)).rounded().u16
+                contrast = contrast.d.map(from: (0, 100), to: (minDDCContrast.doubleValue, maxDDCContrast.doubleValue)).rounded().u16
             }
 
             // log.info("\(name) OLD CONTRAST: \(oldContrast)")
             log.info("\(name) CONTRAST: \(contrast)")
-            if SwiftyLogger.trace { log.traceCalls() }
+            log.traceCalls()
 
             if let control = control as? DDCControl {
                 _ = control.setContrastDebounced(contrast, oldValue: oldContrast, transition: brightnessTransition)
@@ -3257,7 +2880,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             var volume = volume.uint16Value
             if DDC.applyLimits, maxDDCVolume.uint16Value != 100 || minDDCVolume.uint16Value != 0, !hasSoftwareControl {
-                volume = mapNumber(volume.d, fromLow: 0, fromHigh: 100, toLow: minDDCVolume.doubleValue, toHigh: maxDDCVolume.doubleValue)
+                volume = volume.d.map(from: (0, 100), to: (minDDCVolume.doubleValue, maxDDCVolume.doubleValue))
                     .rounded().u16
             }
 
@@ -3608,30 +3231,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     var shadeTask: DispatchWorkItem? { didSet { oldValue?.cancel() }}
-
-    var userBrightnessCodable: [AdaptiveModeKey: [UserValue]] {
-        Dictionary(
-            userBrightness.map { key, value in
-                (key, value.userValues)
-            }, uniquingKeysWith: first(this:other:)
-        )
-    }
-
-    var userContrastCodable: [AdaptiveModeKey: [UserValue]] {
-        Dictionary(
-            userContrast.map { key, value in
-                (key, value.userValues)
-            }, uniquingKeysWith: first(this:other:)
-        )
-    }
-
     var shouldDetectI2C: Bool { ddcEnabled && !isBuiltin && !isDummy && (forceDDC || supportsGammaByDefault) }
 
     var potentialEDR: CGFloat { nsScreen?.maximumPotentialExtendedDynamicRangeColorComponentValue ?? 1.0 }
     var edr: CGFloat { NSScreen.forDisplayID(id)?.maximumExtendedDynamicRangeColorComponentValue ?? 1.0 }
 
     static func ambientLightCompensationEnabled(_ id: CGDirectDisplayID) -> Bool {
-        guard DisplayServicesHasAmbientLightCompensation(id) else { return false }
+        guard !isGeneric(id), DisplayServicesHasAmbientLightCompensation(id) else { return false }
 
         var enabled = false
         DisplayServicesAmbientLightCompensationEnabled(id, &enabled)
@@ -3643,7 +3249,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     static func observeBrightnessChangeDS(_ id: CGDirectDisplayID) -> Bool {
-        guard DisplayServicesCanChangeBrightness(id), !isObservingBrightnessChangeDS(id), !CachedDefaults[.disableBrightnessObservers] else { return true }
+        guard !isGeneric(id), DisplayServicesCanChangeBrightness(id), !isObservingBrightnessChangeDS(id), !CachedDefaults[.disableBrightnessObservers] else {
+            return true
+        }
 
         let result = DisplayServicesRegisterForBrightnessChangeNotifications(id, id) { _, observer, _, _, userInfo in
             guard !DC.screensSleeping, !AppleNativeControl.sliderTracking else {
@@ -3815,10 +3423,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             return 1.0
         }
         if value > 0.5 {
-            return mapNumber(value, fromLow: 0.5, fromHigh: 1.0, toLow: 1.0, toHigh: 0.0)
+            return value.map(from: (0.5, 1.0), to: (1.0, 0.0))
         }
 
-        return mapNumber(value, fromLow: 0.0, fromHigh: 0.5, toLow: 3.0, toHigh: 1.0)
+        return value.map(from: (0.0, 0.5), to: (3.0, 1.0))
     }
 
     static func gammaValueToSliderValue(_ value: Double) -> Double {
@@ -3826,10 +3434,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             return 0.5
         }
         if value < 1.0 {
-            return mapNumber(value, fromLow: 0.0, fromHigh: 1.0, toLow: 1.0, toHigh: 0.5)
+            return value.map(from: (0.0, 1.0), to: (1.0, 0.5))
         }
 
-        return mapNumber(value, fromLow: 1.0, fromHigh: 3.0, toLow: 0.5, toHigh: 0.0)
+        return value.map(from: (1.0, 3.0), to: (0.5, 0.0))
     }
 
     static func reconfigure(tries: Int = 20, _ action: (MPDisplayMgr) -> Void) {
@@ -3852,6 +3460,354 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         action(panel)
         manager.notifyReconfigure()
         manager.unlockAccess()
+    }
+
+    func saveSyncMapping() {
+        syncMappingSaver = mainAsyncAfter(ms: 200) { [weak self] in
+            self?.save()
+            self?.syncMappingSaver = nil
+        }
+    }
+
+    func saveSensorMapping() {
+        sensorMappingSaver = mainAsyncAfter(ms: 1000) { [weak self] in
+            self?.save()
+            self?.sensorMappingSaver = nil
+        }
+    }
+
+    func saveLocationMapping() {
+        locationMappingSaver = mainAsyncAfter(ms: 2000) { [weak self] in
+            self?.save()
+            self?.locationMappingSaver = nil
+        }
+    }
+
+    #if arch(arm64)
+        var dispName = ""
+        var dcpName = ""
+        var displayProps: [String: Any]? {
+            didSet {
+                checkNitsObserver()
+            }
+        }
+
+        var ioObserver: IOServicePropertyObserver?
+
+        @Published var contrastEnhancer: Double? = nil
+        @Published var lux: Double? = nil
+
+        @Published @objc var minNits: Double = 0 {
+            didSet {
+                guard initialised else { return }
+                guard minNits < maxNits else {
+                    minNits = maxNits - 1
+                    return
+                }
+
+                if minNits != oldValue, !isActiveSyncSource {
+                    nitsRecomputePublisher.send(true)
+                }
+                save()
+            }
+        }
+
+        var isActiveSyncSource: Bool { DC.sourceDisplay.serial == serial }
+        func recomputeNitsMapping() {
+            nitsToPercentageMapping = Self.LUX_TO_NITS.sorted(by: { $0.key < $1.key }).map { k, v in
+                AutoLearnMapping(source: k, target: nitsToPercentage(v, minNits: minNits, maxNits: userMaxNits ?? maxNits) * 100)
+            }
+        }
+
+        lazy var userMaxNits: Double? = getUserMaxNits() {
+            didSet {
+                debug("\(name) Max Nits: \((userMaxNits ?? maxNits).str(decimals: 2))")
+                recomputeNitsMapping()
+            }
+        }
+
+        @Published @objc var maxNits: Double = 500 {
+            didSet {
+                guard initialised else { return }
+                guard maxNits > minNits, maxNits > 0 else {
+                    maxNits = getMaxNits() ?! minNits + 1
+                    return
+                }
+
+                if maxNits != oldValue, !isActiveSyncSource {
+                    nitsRecomputePublisher.send(true)
+                }
+                save()
+            }
+        }
+
+        lazy var nitsRecomputePublisher: PassthroughSubject<Bool, Never> = listener(in: &observers, throttle: .milliseconds(500)) { [weak self] _ in
+            DC.computeBrightnessSplines()
+            DC.computeContrastSplines()
+            self?.recomputeNitsMapping()
+        }
+
+        @Published var nits: Double? = nil
+        lazy var nitsToPercentageMapping: [AutoLearnMapping] = Self.LUX_TO_NITS.sorted(by: { $0.key < $1.key }).map { k, v in
+            AutoLearnMapping(source: k, target: nitsToPercentage(v, minNits: minNits, maxNits: userMaxNits ?? maxNits) * 100)
+        }
+    #endif
+
+    lazy var hdrOn: Bool = potentialEDR > 2 && edr > 1 {
+        didSet {
+            log.debug("\(name) HDR: \(hdrOn)")
+        }
+    }
+
+    var brightnessRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+    var contrastRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+    var volumeRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+    var inputRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+    var colorRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+
+    var gammaSetterTask: DispatchWorkItem? {
+        didSet { oldValue?.cancel() }
+    }
+
+    @Published @objc dynamic var sendingBrightness = false {
+        didSet {
+            manageSendingValue(.sendingBrightness, oldValue: oldValue)
+            guard sendingBrightness else {
+                sendingBrightnessResetter = nil
+                return
+            }
+            sendingBrightnessResetter = mainAsyncAfter(ms: 3000) { [weak self] in
+                self?.sendingBrightness = false
+            }
+        }
+    }
+
+    var sendingBrightnessResetter: DispatchWorkItem? = nil {
+        didSet { oldValue?.cancel() }
+    }
+
+    @Published @objc dynamic var sendingContrast = false {
+        didSet {
+            manageSendingValue(.sendingContrast, oldValue: oldValue)
+            guard sendingContrast else {
+                sendingContrastResetter = nil
+                return
+            }
+            sendingContrastResetter = mainAsyncAfter(ms: 3000) { [weak self] in
+                self?.sendingContrast = false
+            }
+        }
+    }
+
+    var sendingContrastResetter: DispatchWorkItem? = nil {
+        didSet { oldValue?.cancel() }
+    }
+
+    @Published @objc dynamic var sendingInput = false {
+        didSet {
+            manageSendingValue(.sendingInput, oldValue: oldValue)
+            guard sendingInput else {
+                sendingInputResetter = nil
+                return
+            }
+            sendingInputResetter = mainAsyncAfter(ms: 3000) { [weak self] in
+                self?.sendingInput = false
+            }
+        }
+    }
+
+    var sendingInputResetter: DispatchWorkItem? = nil {
+        didSet { oldValue?.cancel() }
+    }
+
+    @Published @objc dynamic var sendingVolume = false {
+        didSet {
+            manageSendingValue(.sendingVolume, oldValue: oldValue)
+            guard sendingVolume else {
+                sendingVolumeResetter = nil
+                return
+            }
+            sendingVolumeResetter = mainAsyncAfter(ms: 3000) { [weak self] in
+                self?.sendingVolume = false
+            }
+        }
+    }
+
+    var sendingVolumeResetter: DispatchWorkItem? = nil {
+        didSet { oldValue?.cancel() }
+    }
+
+    var readableID: String {
+        if name.isEmpty || name == "Unknown" {
+            return shortHash(string: serial)
+        }
+        let safeName = "[^\\w\\d]+".r!.replaceAll(in: name.lowercased(), with: "")
+        return "\(safeName)-\(shortHash(string: serial))"
+    }
+
+    @Published @objc dynamic var xdrBrightness: Float = 0.0 {
+        didSet {
+            guard apply else { return }
+
+            if xdrBrightness > 0, !enhanced {
+                handleEnhance(true, withoutSettingBrightness: true)
+            }
+            if xdrBrightness == 0, enhanced, !sliderTracking {
+                handleEnhance(false)
+            }
+
+            maxEDR = computeMaxEDR()
+
+            softwareBrightness = xdrBrightness.map(from: (0.0, 1.0), to: (Self.MIN_SOFTWARE_BRIGHTNESS, maxSoftwareBrightness))
+        }
+    }
+
+    @objc dynamic var subzeroDimming: Float {
+        get { min(softwareBrightness, 1.0) }
+        set { softwareBrightness = cap(newValue, minVal: 0.0, maxVal: 1.0) }
+    }
+
+    @objc dynamic lazy var softwareBrightnessSlider: Float = softwareBrightness {
+        didSet {
+            guard apply else { return }
+            forceHideSoftwareOSD = true
+            softwareBrightness = softwareBrightnessSlider
+
+            guard adaptiveSubzero else { return }
+
+            let lastDataPoint = datapointLock.around { DC.adaptiveMode.brightnessDataPoint.last }
+            insertBrightnessUserDataPoint(lastDataPoint, brightness.doubleValue, modeKey: DC.adaptiveModeKey)
+        }
+    }
+
+    @Published @objc dynamic var softwareBrightness: Float = 1.0 {
+        didSet {
+            checkNaN(softwareBrightness)
+            guard supportsGammaByDefault else { return }
+
+            lastSoftwareBrightness = oldValue
+            guard apply else { return }
+            // log.info("\(name) OLD SOFT BRIGHTNESS: \(oldValue)")
+            log.info("\(name) SOFT BRIGHTNESS: \(softwareBrightness.str(decimals: 2))")
+
+            let br = softwareBrightness
+            mainAsync {
+                self.withoutApply {
+                    self.softwareBrightnessSlider = br
+                    self.subzero = br < 1.0 || (
+                        br == 1.0 && !self.hasSoftwareControl &&
+                            self.brightness.uint16Value == self.minBrightness.uint16Value
+                    )
+                    guard br > 1 else {
+                        self.xdrBrightness = 0.0
+                        return
+                    }
+                    self.xdrBrightness = br.map(from: (Self.MIN_SOFTWARE_BRIGHTNESS, self.maxSoftwareBrightness), to: (0.0, 1.0))
+                }
+            }
+
+            setIndependentSoftwareBrightness(softwareBrightness, oldValue: oldValue)
+        }
+    }
+
+    var preciseBrightnessContrastBeforeAppPreset = 0.5 {
+        didSet {
+            guard CachedDefaults[.mergeBrightnessContrast] else { return }
+            preciseBrightnessBeforeAppPreset = preciseBrightnessContrastBeforeAppPreset
+            preciseContrastBeforeAppPreset = preciseBrightnessContrastBeforeAppPreset
+        }
+    }
+
+    var preciseBrightnessBeforeAppPreset = 0.5 {
+        didSet {
+            guard !CachedDefaults[.mergeBrightnessContrast] else { return }
+            preciseBrightnessContrastBeforeAppPreset = preciseBrightnessBeforeAppPreset
+        }
+    }
+
+    // #endif
+
+    @Published @objc dynamic var canChangeVolume = true {
+        didSet {
+            showVolumeSlider = canChangeVolume && CachedDefaults[.showVolumeSlider]
+            save()
+        }
+    }
+
+    var noControls: Bool {
+        guard let control else { return true }
+        return control.isSoftware && !gammaEnabled
+    }
+
+    @objc dynamic var systemAdaptiveBrightness: Bool {
+        get { Self.ambientLightCompensationEnabled(id) }
+        set {
+            guard ambientLightCompensationEnabledByUser || force else {
+                return
+            }
+            if !newValue, isBuiltin {
+                log.warning("Disabling system adaptive brightness")
+                log.traceCalls()
+            }
+            DisplayServicesEnableAmbientLightCompensation(id, newValue)
+        }
+    }
+
+    var ambientLightCompensationEnabledByUser: Bool {
+        guard let enabled = Self.getThreadDictValue(id, type: "ambientLightCompensationEnabledByUser") as? Bool
+        else {
+            // First time checking out this flag, set it manually
+            let value = systemAdaptiveBrightness
+            Self.setThreadDictValue(id, type: "ambientLightCompensationEnabledByUser", value: value)
+            return value
+        }
+        if enabled { return true }
+        if systemAdaptiveBrightness {
+            // User must have enabled this manually in the meantime, set it to true manually
+            Self.setThreadDictValue(id, type: "ambientLightCompensationEnabledByUser", value: true)
+            return true
+        }
+        return false
+    }
+
+    var zeroGammaTask: Repeater? {
+        get { Self.getThreadDictValue(id, type: "zero-gamma") as? Repeater }
+        set { Self.setThreadDictValue(id, type: "zero-gamma", value: newValue) }
+    }
+
+    var zeroGammaWarmupTask: Repeater? {
+        get { Self.getThreadDictValue(id, type: "zero-gamma-warmup") as? Repeater }
+        set { Self.setThreadDictValue(id, type: "zero-gamma-warmup", value: newValue) }
+    }
+
+    var blackOutEnforceTask: Repeater? {
+        get { Self.getThreadDictValue(id, type: "blackout-enforce") as? Repeater }
+        set { Self.setThreadDictValue(id, type: "blackout-enforce", value: newValue) }
+    }
+
+    var resolutionBlackoutResetterTask: Repeater? {
+        get { Self.getThreadDictValue(id, type: "resolution-blackout-resetter") as? Repeater }
+        set { Self.setThreadDictValue(id, type: "resolution-blackout-resetter", value: newValue) }
+    }
+
+    var testWindowController: NSWindowController? {
+        get { Self.getWindowController(id, type: "test") }
+        set { Self.setWindowController(id, type: "test", windowController: newValue) }
+    }
+
+    var cornerWindowControllerTopLeft: NSWindowController? {
+        get { Self.getWindowController(id, type: "corner-topLeft") }
+        set { Self.setWindowController(id, type: "corner-topLeft", windowController: newValue) }
+    }
+
+    var cornerWindowControllerTopRight: NSWindowController? {
+        get { Self.getWindowController(id, type: "corner-topRight") }
+        set { Self.setWindowController(id, type: "corner-topRight", windowController: newValue) }
+    }
+
+    var cornerWindowControllerBottomLeft: NSWindowController? {
+        get { Self.getWindowController(id, type: "corner-bottomLeft") }
+        set { Self.setWindowController(id, type: "corner-bottomLeft", windowController: newValue) }
     }
 
     func resetSendingValues() {
@@ -3957,23 +3913,25 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         #if arch(arm64)
-            let shouldDisconnect: Bool
-            if CachedDefaults[.newBlackOutDisconnect] {
-                shouldDisconnect = !KM.commandKeyPressed
-            } else {
-                shouldDisconnect = KM.commandKeyPressed
-            }
+            if DC.activeDisplayCount > 1 {
+                let shouldDisconnect: Bool
+                if CachedDefaults[.newBlackOutDisconnect] {
+                    shouldDisconnect = !KM.commandKeyPressed
+                } else {
+                    shouldDisconnect = KM.commandKeyPressed
+                }
 
-            if #available(macOS 13, *), !KM.shiftKeyPressed, !blackOutEnabled, DC.activeDisplayCount > 1, shouldDisconnect {
-                DC.dis(id)
-                return
+                if #available(macOS 13, *), !KM.shiftKeyPressed, !blackOutEnabled, DC.activeDisplayCount > 1, shouldDisconnect {
+                    DC.dis(id)
+                    return
+                }
             }
         #endif
 
         DC.blackOut(
             display: id,
             state: blackOutEnabled ? .off : .on,
-            mirroringAllowed: !KM.shiftKeyPressed && blackOutMirroringAllowed
+            mirroringAllowed: !KM.shiftKeyPressed && blackOutMirroringAllowed && DC.activeDisplayCount > 1
         )
     }
 
@@ -4143,43 +4101,19 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func sliderValueToBrightness(_ brightness: PreciseBrightness) -> NSNumber {
-        (mapNumber(
-            cap(brightness, minVal: 0.0, maxVal: 1.0),
-            fromLow: 0.0,
-            fromHigh: 1.0,
-            toLow: minBrightness.doubleValue / 100.0,
-            toHigh: maxBrightness.doubleValue / 100.0
-        ) * 100).intround.ns
+        (cap(brightness, minVal: 0.0, maxVal: 1.0).map(from: (0.0, 1.0), to: (minBrightness.doubleValue / 100.0, maxBrightness.doubleValue / 100.0)) * 100).intround.ns
     }
 
     func sliderValueToContrast(_ contrast: PreciseContrast) -> NSNumber {
-        (mapNumber(
-            cap(contrast, minVal: 0.0, maxVal: 1.0),
-            fromLow: 0.0,
-            fromHigh: 1.0,
-            toLow: minContrast.doubleValue / 100.0,
-            toHigh: maxContrast.doubleValue / 100.0
-        ) * 100).intround.ns
+        (cap(contrast, minVal: 0.0, maxVal: 1.0).map(from: (0.0, 1.0), to: (minContrast.doubleValue / 100.0, maxContrast.doubleValue / 100.0)) * 100).intround.ns
     }
 
     func brightnessToSliderValue(_ brightness: NSNumber) -> PreciseBrightness {
-        mapNumber(
-            cap(brightness.doubleValue, minVal: 0, maxVal: 100),
-            fromLow: minBrightness.doubleValue,
-            fromHigh: maxBrightness.doubleValue,
-            toLow: 0,
-            toHigh: 100
-        ) / 100.0
+        cap(brightness.doubleValue, minVal: 0, maxVal: 100).map(from: (minBrightness.doubleValue, maxBrightness.doubleValue), to: (0, 100)) / 100.0
     }
 
     func contrastToSliderValue(_ contrast: NSNumber, merged: Bool = true) -> PreciseContrast {
-        let c = mapNumber(
-            cap(contrast.doubleValue, minVal: 0, maxVal: 100),
-            fromLow: minContrast.doubleValue,
-            fromHigh: maxContrast.doubleValue,
-            toLow: 0,
-            toHigh: 100
-        ) / 100.0
+        let c = cap(contrast.doubleValue, minVal: 0, maxVal: 100).map(from: (minContrast.doubleValue, maxContrast.doubleValue), to: (0, 100)) / 100.0
 
         return merged ? pow(c, 2) : c
     }
@@ -4189,22 +4123,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         var contrast = contrast.uint16Value
 
         if !lockedBrightness || hasSoftwareControl {
-            brightness = (mapNumber(
-                cap(value, minVal: 0.0, maxVal: 1.0),
-                fromLow: 0.0,
-                fromHigh: 1.0,
-                toLow: minBrightness.doubleValue / 100.0,
-                toHigh: maxBrightness.doubleValue / 100.0
-            ) * 100).intround.u16
+            brightness = (cap(value, minVal: 0.0, maxVal: 1.0).map(from: (0.0, 1.0), to: (minBrightness.doubleValue / 100.0, maxBrightness.doubleValue / 100.0)) * 100).intround.u16
         }
         if !lockedContrast {
-            contrast = (mapNumber(
-                pow(cap(value, minVal: 0.0, maxVal: 1.0), 0.5),
-                fromLow: 0.0,
-                fromHigh: 1.0,
-                toLow: minContrast.doubleValue / 100.0,
-                toHigh: maxContrast.doubleValue / 100.0
-            ) * 100).intround.u16
+            contrast = (pow(cap(value, minVal: 0.0, maxVal: 1.0), 0.5).map(from: (0.0, 1.0), to: (minContrast.doubleValue / 100.0, maxContrast.doubleValue / 100.0)) * 100).intround.u16
         }
 
         return (brightness, contrast)
@@ -4301,10 +4223,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published var percentage: Double? = 0.5
 
-    var isActiveSyncSource: Bool {
-        SyncMode.sourceDisplay?.serial == serial
-    }
-
     @Published @objc dynamic var isSource: Bool {
         didSet {
             context = getContext()
@@ -4334,6 +4252,30 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 DC.adaptiveMode.watch()
             }
         }
+    }
+
+    static func insertElevationDataPoint(_ mapping: AutoLearnMapping, in values: [AutoLearnMapping]) -> [AutoLearnMapping]? {
+        guard let solar = LocationMode.specific.geolocation?.solar,
+              let astroSunrise = solar.astronomicalSunrisePosition?.elevation,
+              let astroSunset = solar.astronomicalSunsetPosition?.elevation,
+              let noon = solar.solarNoonPosition?.elevation,
+              let sunrise = solar.sunrisePosition?.elevation,
+              let sunset = solar.sunsetPosition?.elevation,
+              mapping.source < max(sunrise, sunset) || mapping.source > noon
+        else {
+            return nil
+        }
+
+        var values = values
+        if mapping.source < max(sunrise, sunset) {
+            values = Display.insertDataPoint([min(astroSunrise, astroSunset): mapping.target], in: values)
+        }
+
+        if mapping.source > noon {
+            values = Display.insertDataPoint([noon: mapping.target], in: values)
+        }
+
+        return values
     }
 
     func resetSubZero() {
@@ -4431,13 +4373,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             if amount == 2 {
                 w.contentView?.alphaValue = 1
             } else {
-                w.contentView?.alphaValue = mapNumber(
-                    cap(amount, minVal: 0.0, maxVal: 1.0),
-                    fromLow: 0.0,
-                    fromHigh: 1.0,
-                    toLow: 0.01,
-                    toHigh: 0.85
-                )
+                w.contentView?.alphaValue = cap(amount, minVal: 0.0, maxVal: 1.0).map(from: (0.0, 1.0), to: (0.01, 0.85))
             }
 
             if amount <= 0.01, smooth {
@@ -4583,84 +4519,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         return nil
     }
 
-    func defaultUserBrightness(modeKey: AdaptiveModeKey) -> [Double: Double] {
-        switch modeKey {
-        case .location:
-            return [-18: -20, 20: 100]
-        case .manual:
-            return [:]
-        case .sensor:
-            #if arch(arm64)
-                return nitsToPercentageMapping
-            #else
-                return Self.DEFAULT_USER_BRIGHTNESS_DICT[.sensor]!.dictionary
-            #endif
-        case .clock:
-            return [:]
-        case .auto:
-            return [:]
-        case .sync:
-            return [:]
-        }
-    }
-
-    func defaultUserContrast(modeKey: AdaptiveModeKey) -> [Double: Double] {
-        switch modeKey {
-        case .location:
-            return [-18: 0, 20: 100]
-        case .manual:
-            return [:]
-        case .sensor:
-            return [0: 20]
-        case .clock:
-            return [:]
-        case .auto:
-            return [:]
-        case .sync:
-            return [:]
-        }
-    }
-
-    func values(_ monitorValue: MonitorValue, modeKey: AdaptiveModeKey) -> (Double, Double, Double, [Double: Double]) {
-        var minValue, maxValue, value: Double
-        var userValues: [Double: Double]
-
-        switch monitorValue {
-        case let .preciseBrightness(brightness):
-            value = brightness
-            minValue = minBrightness.doubleValue
-            maxValue = maxBrightness.doubleValue
-            userValues = userBrightness[modeKey]?.dictionary ?! defaultUserBrightness(modeKey: modeKey)
-        case let .preciseContrast(contrast):
-            value = contrast
-            minValue = minContrast.doubleValue
-            maxValue = maxContrast.doubleValue
-            userValues = userContrast[modeKey]?.dictionary ?! defaultUserContrast(modeKey: modeKey)
-        case let .brightness(brightness):
-            value = brightness.d
-            minValue = minBrightness.doubleValue
-            maxValue = maxBrightness.doubleValue
-            userValues = userBrightness[modeKey]?.dictionary ?! defaultUserBrightness(modeKey: modeKey)
-        case let .contrast(contrast):
-            value = contrast.d
-            minValue = minContrast.doubleValue
-            maxValue = maxContrast.doubleValue
-            userValues = userContrast[modeKey]?.dictionary ?! defaultUserContrast(modeKey: modeKey)
-        case let .nsBrightness(brightness):
-            value = brightness.doubleValue
-            minValue = minBrightness.doubleValue
-            maxValue = maxBrightness.doubleValue
-            userValues = userBrightness[modeKey]?.dictionary ?! defaultUserBrightness(modeKey: modeKey)
-        case let .nsContrast(contrast):
-            value = contrast.doubleValue
-            minValue = minContrast.doubleValue
-            maxValue = maxContrast.doubleValue
-            userValues = userContrast[modeKey]?.dictionary ?! defaultUserContrast(modeKey: modeKey)
-        }
-
-        return (value, minValue, maxValue, userValues)
-    }
-
     func startControls() {
         guard !isGeneric(id) else { return }
         ensureAudioIdentifier()
@@ -4777,6 +4635,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             "\(vendorBytes)\(productBytes)-0000-0000-[\\dA-F]{4}-[\\dA-F]{6}\(horizontalBytes)\(verticalBytes)[\\dA-F]{2}",
         ]
     }
+
     func ensureAudioIdentifier() {
         #if !arch(arm64)
             if (infoDictionary["IODisplayPrefsKey"] as? String) == nil, let dict = displayInfoDictionary(id) {
@@ -4990,8 +4849,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     func encode(to encoder: Encoder) throws {
         try displayEncodingLock.aroundThrows(ignoreMainThread: true) {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            var userBrightnessContainer = container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userBrightness)
-            var userContrastContainer = container.nestedContainer(keyedBy: AdaptiveModeKeys.self, forKey: .userContrast)
             var enabledControlsContainer = container.nestedContainer(keyedBy: DisplayControlKeys.self, forKey: .enabledControls)
 
             try container.encode(active, forKey: .active)
@@ -5081,21 +4938,18 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try container.encode(applyBrightnessOnInputChange2, forKey: .applyBrightnessOnInputChange2)
             try container.encode(applyBrightnessOnInputChange3, forKey: .applyBrightnessOnInputChange3)
 
+            try container.encode(syncBrightnessMapping, forKey: .syncBrightnessMapping)
+            try container.encode(syncContrastMapping, forKey: .syncContrastMapping)
+            try container.encode(sensorBrightnessMapping, forKey: .sensorBrightnessMapping)
+            try container.encode(sensorContrastMapping, forKey: .sensorContrastMapping)
+            try container.encode(locationBrightnessMapping, forKey: .locationBrightnessMapping)
+            try container.encode(locationContrastMapping, forKey: .locationContrastMapping)
+            #if arch(arm64)
+                try container.encode(nitsBrightnessMapping, forKey: .nitsBrightnessMapping)
+                try container.encode(nitsContrastMapping, forKey: .nitsContrastMapping)
+            #endif
+
             try container.encode(rotation, forKey: .rotation)
-
-            let userBrightness = userBrightnessCodable
-            try userBrightnessContainer.encodeIfPresent(userBrightness[.sync], forKey: .sync)
-            try userBrightnessContainer.encodeIfPresent(userBrightness[.sensor], forKey: .sensor)
-            try userBrightnessContainer.encodeIfPresent(userBrightness[.location], forKey: .location)
-            try userBrightnessContainer.encodeIfPresent(userBrightness[.manual], forKey: .manual)
-            try userBrightnessContainer.encodeIfPresent(userBrightness[.clock], forKey: .clock)
-
-            let userContrast = userContrastCodable
-            try userContrastContainer.encodeIfPresent(userContrast[.sync], forKey: .sync)
-            try userContrastContainer.encodeIfPresent(userContrast[.sensor], forKey: .sensor)
-            try userContrastContainer.encodeIfPresent(userContrast[.location], forKey: .location)
-            try userContrastContainer.encodeIfPresent(userContrast[.manual], forKey: .manual)
-            try userContrastContainer.encodeIfPresent(userContrast[.clock], forKey: .clock)
 
             try enabledControlsContainer.encodeIfPresent(enabledControls[.network], forKey: .network)
             try enabledControlsContainer.encodeIfPresent(enabledControls[.appleNative], forKey: .appleNative)
@@ -5893,9 +5747,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         blackOutMirroringAllowed = supportsGammaByDefault || isFakeDummy
         mirroredBeforeBlackOut = false
 
-        userBrightness[DC.adaptiveModeKey] = ThreadSafeDictionary(dict: defaultUserBrightness(modeKey: DC.adaptiveModeKey))
-        userContrast[DC.adaptiveModeKey] = ThreadSafeDictionary(dict: defaultUserContrast(modeKey: DC.adaptiveModeKey))
-
+        resetCurveMappings()
         resetDefaultGamma()
 
         useOverlay = !supportsGammaByDefault
@@ -5919,6 +5771,25 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             _ = control?.reset()
         }
         readapt(newValue: false, oldValue: true)
+    }
+
+    func resetCurveMappings() {
+        syncBrightnessMapping = [:]
+        #if arch(arm64)
+            sensorBrightnessMapping = nitsToPercentageMapping
+        #else
+            sensorBrightnessMapping = SensorMode.DEFAULT_BRIGHTNESS_MAPPING
+        #endif
+        locationBrightnessMapping = LocationMode.DEFAULT_BRIGHTNESS_MAPPING
+
+        syncContrastMapping = [:]
+        sensorContrastMapping = SensorMode.DEFAULT_CONTRAST_MAPPING
+        locationContrastMapping = LocationMode.DEFAULT_CONTRAST_MAPPING
+
+        #if arch(arm64)
+            nitsBrightnessMapping = []
+            nitsContrastMapping = []
+        #endif
     }
 
     @inline(__always) func withoutDDCLimits(_ block: () -> Void) {
@@ -6018,121 +5889,110 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         brightnessTransition = oldTransition
     }
 
-    func insertBrightnessUserDataPoint(_ featureValue: Double, _ targetValue: Double, modeKey: AdaptiveModeKey) {
+    func insertBrightnessUserDataPoint(_ featureValue: Double, _ targetValue: Double, modeKey: AdaptiveModeKey? = nil) {
+        let modeKey = modeKey ?? DC.adaptiveModeKey
+
         guard !lockedBrightnessCurve, !adaptivePaused,
               modeKey != .sync || !isSource,
               modeKey != .location || featureValue != 0,
-              !noControls, timeSince(lastConnectionTime) > 5 else { return }
+              !noControls, timeSince(lastConnectionTime) > 5
+        else { return }
 
-        #if arch(arm64)
-            insertNitsBrightnessUserDataPoint(featureValue, targetValue, modeKey: modeKey)
-        #endif
-
-        brightnessDataPointInsertionTask?.cancel()
-        if userBrightness[modeKey] == nil || userBrightness[modeKey]!.isEmpty {
-            userBrightness[modeKey] = ThreadSafeDictionary(dict: defaultUserBrightness(modeKey: modeKey))
-        }
-        var targetValue = mapNumber(
-            targetValue,
-            fromLow: minBrightness.doubleValue,
-            fromHigh: maxBrightness.doubleValue,
-            toLow: 0.0,
-            toHigh: 100.0
-        )
+        var targetValue = targetValue.map(from: (minBrightness.doubleValue, maxBrightness.doubleValue), to: (0, 100))
         if adaptiveSubzero, softwareBrightness < 1 {
-            targetValue -= mapNumber(
-                softwareBrightness.d,
-                fromLow: 0.0,
-                fromHigh: 1.0,
-                toLow: 100.0,
-                toHigh: 0.0
-            )
+            targetValue -= softwareBrightness.d.map(from: (0, 1), to: (100, 0))
         }
 
-        brightnessDataPointInsertionTask = DispatchWorkItem(name: "brightnessDataPointInsertionTask") { [weak self] in
-            while let self, self.sendingBrightness {
-                self.sentBrightnessCondition.wait(until: Date().addingTimeInterval(5.seconds.timeInterval))
+        switch modeKey {
+        case .sync:
+            #if arch(arm64)
+                insertNitsBrightnessUserDataPoint(targetValue)
+            #endif
+
+            if let values = syncBrightnessMapping[DC.sourceDisplay.serial] {
+                syncBrightnessMapping[DC.sourceDisplay.serial] = Self.insertDataPoint([featureValue: targetValue], in: values)
+            } else {
+                syncBrightnessMapping[DC.sourceDisplay.serial] = [[featureValue: targetValue]]
             }
-
-            guard let self, var userValues = self.userBrightness[modeKey] else { return }
-            Display.insertDataPoint(values: &userValues, featureValue: featureValue, targetValue: targetValue)
-            if modeKey == .location { self.insertElevationDataPoint(&userValues, featureValue, targetValue) }
-
-            self.save()
-            self.brightnessDataPointInsertionTask = nil
-        }
-        serialAsyncAfter(ms: 2500, brightnessDataPointInsertionTask!)
-
-        var userValues = userBrightness[modeKey]!
-        Display.insertDataPoint(values: &userValues, featureValue: featureValue, targetValue: targetValue, logValue: false)
-        if modeKey == .location { insertElevationDataPoint(&userValues, featureValue, targetValue) }
-        NotificationCenter.default.post(name: brightnessDataPointInserted, object: self, userInfo: ["values": userValues.dictionary])
-    }
-
-    func insertElevationDataPoint(_ values: inout ThreadSafeDictionary<Double, Double>, _ featureValue: Double, _ targetValue: Double) {
-        guard let solar = LocationMode.specific.geolocation?.solar,
-              let astroSunrise = solar.astronomicalSunrisePosition?.elevation,
-              let astroSunset = solar.astronomicalSunsetPosition?.elevation,
-              let noon = solar.solarNoonPosition?.elevation,
-              let sunrise = solar.sunrisePosition?.elevation,
-              let sunset = solar.sunsetPosition?.elevation
-        else {
-            return
-        }
-        if featureValue < max(sunrise, sunset) {
-            Display.insertDataPoint(values: &values, featureValue: min(astroSunrise, astroSunset), targetValue: targetValue, logValue: false)
-        }
-
-        if featureValue > noon {
-            Display.insertDataPoint(values: &values, featureValue: noon, targetValue: targetValue, logValue: false)
+            NotificationCenter.default.post(name: brightnessDataPointInserted, object: self, userInfo: ["values": syncBrightnessMapping])
+            saveSyncMapping()
+        case .sensor:
+            sensorBrightnessMapping = Self.insertDataPoint([featureValue: targetValue], in: sensorBrightnessMapping)
+            saveSensorMapping()
+            NotificationCenter.default.post(name: brightnessDataPointInserted, object: self, userInfo: ["values": sensorBrightnessMapping])
+        case .location:
+            locationBrightnessMapping = Self.insertDataPoint([featureValue: targetValue], in: locationBrightnessMapping)
+            if let map = Self.insertElevationDataPoint([featureValue: targetValue], in: locationBrightnessMapping) {
+                locationBrightnessMapping = map
+            }
+            saveLocationMapping()
+            NotificationCenter.default.post(name: brightnessDataPointInserted, object: self, userInfo: ["values": locationBrightnessMapping])
+        default:
+            break
         }
     }
 
-    func insertContrastUserDataPoint(_ featureValue: Double, _ targetValue: Double, modeKey: AdaptiveModeKey) {
+    func insertContrastUserDataPoint(_ featureValue: Double, _ targetValue: Double, modeKey: AdaptiveModeKey? = nil) {
+        let modeKey = modeKey ?? DC.adaptiveModeKey
+
         guard !lockedContrastCurve, !adaptivePaused,
               modeKey != .sync || !isSource,
               modeKey != .location || featureValue != 0,
-              !noControls, timeSince(lastConnectionTime) > 5 else { return }
+              !noControls, timeSince(lastConnectionTime) > 5
+        else { return }
 
-        #if arch(arm64)
-            insertNitsContrastUserDataPoint(featureValue, targetValue, modeKey: modeKey)
-        #endif
+        let targetValue = targetValue.map(from: (minContrast.doubleValue, maxContrast.doubleValue), to: (0, 100))
 
-        contrastDataPointInsertionTask?.cancel()
-        if userContrast[modeKey] == nil, userContrast[modeKey]!.isEmpty {
-            userContrast[modeKey] = ThreadSafeDictionary(dict: defaultUserContrast(modeKey: modeKey))
-        }
-        let targetValue = mapNumber(
-            targetValue,
-            fromLow: minContrast.doubleValue,
-            fromHigh: maxContrast.doubleValue,
-            toLow: MIN_CONTRAST.d,
-            toHigh: MAX_CONTRAST.d
-        )
+        switch modeKey {
+        case .sync:
+            #if arch(arm64)
+                insertNitsContrastUserDataPoint(targetValue)
+            #endif
 
-        contrastDataPointInsertionTask = DispatchWorkItem(name: "contrastDataPointInsertionTask") { [weak self] in
-            while let self, self.sendingContrast {
-                self.sentContrastCondition.wait(until: Date().addingTimeInterval(5.seconds.timeInterval))
+            if let values = syncContrastMapping[DC.sourceDisplay.serial] {
+                syncContrastMapping[DC.sourceDisplay.serial] = Self.insertDataPoint([featureValue: targetValue], in: values)
+            } else {
+                syncContrastMapping[DC.sourceDisplay.serial] = [[featureValue: targetValue]]
             }
-
-            guard let self, var userValues = self.userContrast[modeKey] else { return }
-            Display.insertDataPoint(values: &userValues, featureValue: featureValue, targetValue: targetValue)
-            if modeKey == .location { self.insertElevationDataPoint(&userValues, featureValue, targetValue) }
-
-            self.save()
-            self.contrastDataPointInsertionTask = nil
+            NotificationCenter.default.post(name: contrastDataPointInserted, object: self, userInfo: ["values": syncContrastMapping])
+            saveSyncMapping()
+        case .sensor:
+            sensorContrastMapping = Self.insertDataPoint([featureValue: targetValue], in: sensorContrastMapping)
+            saveSensorMapping()
+            NotificationCenter.default.post(name: contrastDataPointInserted, object: self, userInfo: ["values": sensorContrastMapping])
+        case .location:
+            locationContrastMapping = Self.insertDataPoint([featureValue: targetValue], in: locationContrastMapping)
+            if let map = Self.insertElevationDataPoint([featureValue: targetValue], in: locationContrastMapping) {
+                locationContrastMapping = map
+            }
+            saveLocationMapping()
+            NotificationCenter.default.post(name: contrastDataPointInserted, object: self, userInfo: ["values": locationContrastMapping])
+        default:
+            break
         }
-        serialAsyncAfter(ms: 2500, contrastDataPointInsertionTask!)
-
-        var userValues = userContrast[modeKey]!
-        Display.insertDataPoint(values: &userValues, featureValue: featureValue, targetValue: targetValue, logValue: false)
-        if modeKey == .location { insertElevationDataPoint(&userValues, featureValue, targetValue) }
-
-        NotificationCenter.default.post(name: contrastDataPointInserted, object: self, userInfo: ["values": userValues.dictionary])
     }
 
     func isUserAdjusting() -> Bool {
-        userAdjusting || brightnessDataPointInsertionTask != nil || contrastDataPointInsertionTask != nil
+        if userAdjusting {
+            return true
+        }
+
+        switch DC.adaptiveModeKey {
+        case .sync:
+            #if arch(arm64)
+                if SyncMode.isUsingNits() {
+                    return nitsBrightnessMappingSaver != nil || nitsContrastMappingSaver != nil
+                }
+            #endif
+
+            return syncMappingSaver != nil
+        case .sensor:
+            return sensorMappingSaver != nil
+        case .location:
+            return locationMappingSaver != nil
+        default:
+            return false
+        }
     }
 
     func getAdaptiveController() -> AdaptiveController {

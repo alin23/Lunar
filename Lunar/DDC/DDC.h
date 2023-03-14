@@ -65,11 +65,6 @@
 #define BOTTOM_LEFT_SCREEN_PURITY 0xE8
 #define BOTTOM_RIGHT_SCREEN_PURITY 0xEB
 
-UInt8 DEBUG_FLAG = 0;
-FILE *logFile = NULL;
-char *logPath = "/tmp/lunar.log";
-bool logToFile(char* format, ...);
-
 bool DDCWriteIntel(io_service_t framebuffer, struct DDCWriteCommand *write);
 bool DDCReadIntel(io_service_t framebuffer, struct DDCReadCommand *read);
 bool EDIDTestIntel(io_service_t framebuffer, struct EDID *edid, uint8_t edidData[256]);
@@ -79,9 +74,8 @@ io_service_t IOFramebufferPortFromCGSServiceForDisplayNumber(CGDirectDisplayID d
 io_service_t IOFramebufferPortFromCGDisplayIOServicePort(CGDirectDisplayID displayID);
 
 UInt32 SupportedTransactionType(void);
-void setDebugMode(UInt8);
-void setLogPath(const char*, ssize_t);
 bool IsLidClosed(void);
+void initDDCLogging(void);
 
 extern io_service_t CGDisplayIOServicePort(CGDirectDisplayID display) __attribute__((weak_import));
 extern void CGSServiceForDisplayNumber(CGDirectDisplayID display, io_service_t* service) __attribute__((weak_import));

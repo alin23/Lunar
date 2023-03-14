@@ -129,7 +129,6 @@ extension Defaults.Keys {
     static let autoXdrTipShown = Key<Bool>("autoXdrTipShown", default: false)
     static let autoBlackoutBuiltin = Key<Bool>("autoBlackoutBuiltin", default: false)
     static let workaroundBuiltinDisplay = Key<Bool>("workaroundBuiltinDisplay", default: false)
-    static let streamLogs = Key<Bool>("streamLogs", default: false)
     static let mergeBrightnessContrast = Key<Bool>("mergeBrightnessContrast", default: true)
     static let enableBlackOutKillSwitch = Key<Bool>("enableBlackOutKillSwitch", default: true)
     static let enableSentry = Key<Bool>("enableSentry", default: true)
@@ -179,7 +178,6 @@ extension Defaults.Keys {
     static let scheduleTransition = Key<ScheduleTransition>("scheduleTransition", default: .minutes30)
     static let refreshValues = Key<Bool>("refreshValues", default: false)
     static let debug = Key<Bool>("debug", default: false)
-    static let trace = Key<Bool>("trace", default: false)
     static let showQuickActions = Key<Bool>("showQuickActions", default: true)
     static let manualLocation = Key<Bool>("manualLocation", default: false)
     static let startAtLogin = Key<Bool>("startAtLogin", default: true)
@@ -265,7 +263,7 @@ extension Defaults.Keys {
 
     #if arch(arm64)
         static let possiblyDisconnectedDisplays = Key<[Display]>("possiblyDisconnectedDisplays", default: [])
-        static let nitsBrightnessMapping = Key<[String: [AutoLearnMapping]]>("nitsBrightnessMapping", default: [:])
-        static let nitsContrastMapping = Key<[String: [AutoLearnMapping]]>("nitsContrastMapping", default: [:])
+        // static let nitsBrightnessMapping = Key<[String: [AutoLearnMapping]]>("nitsBrightnessMapping", default: [:])
+        // static let nitsContrastMapping = Key<[String: [AutoLearnMapping]]>("nitsContrastMapping", default: [:])
     #endif
 }

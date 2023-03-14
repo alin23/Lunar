@@ -482,36 +482,6 @@
                                                             <action selector="forceUpdateDisplayList:" target="Voe-Tx-rLC" id="yPJ-IE-ydo"/>
                                                         </connections>
                                                     </menuItem>
-                                                    <menuItem title="Stream logs to developer" id="WyA-oO-YoM">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <binding destination="z8z-AR-4ms" name="value" keyPath="values.streamLogs" id="eum-ic-LSA"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="Note: only do this if the developer explicitly asks" enabled="NO" indentationLevel="1" id="XB1-yg-J4q">
-                                                        <attributedString key="attributedTitle">
-                                                            <fragment content="Note: only do this if the developer explicitly asks">
-                                                                <attributes>
-                                                                    <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                                    <font key="NSFont" metaFont="system" size="10"/>
-                                                                    <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
-                                                                </attributes>
-                                                            </fragment>
-                                                        </attributedString>
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                    </menuItem>
-                                                    <menuItem title="Will deactivate automatically on next app launch" enabled="NO" indentationLevel="1" id="M1a-Zl-inx">
-                                                        <attributedString key="attributedTitle">
-                                                            <fragment content="Will deactivate automatically on next app launch">
-                                                                <attributes>
-                                                                    <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                                    <font key="NSFont" metaFont="system" size="10"/>
-                                                                    <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
-                                                                </attributes>
-                                                            </fragment>
-                                                        </attributedString>
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                    </menuItem>
                                                 </items>
                                             </menu>
                                         </menuItem>

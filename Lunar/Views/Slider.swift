@@ -52,13 +52,7 @@ final class SliderCell: NSSliderCell {
         let rect = NSRect(x: knobRect.midX - (size / 2) + 0.5, y: knobRect.midY - (size / 2) - 1.5, width: size - 1, height: size - 1)
         let value = (minValue == 0 && maxValue == 1)
             ? CGFloat(floatValue)
-            : CGFloat(mapNumber(
-                doubleValue,
-                fromLow: minValue,
-                fromHigh: maxValue,
-                toLow: 0.0,
-                toHigh: 1.0
-            ))
+            : CGFloat(doubleValue.map(from: (minValue, maxValue), to: (0.0, 1.0)))
 
         // Stolen from @waydabber: https://github.com/MonitorControl/MonitorControl/blob/1f595ff1df40b65c77d26a91a7f0de231eabb921/MonitorControl/Support/SliderHandler.swift#L111-L117
         let knobShadowAlpha = 0.03 * CGFloat(
@@ -137,13 +131,7 @@ final class SliderCell: NSSliderCell {
 
         let value = (minValue == 0 && maxValue == 1)
             ? CGFloat(floatValue)
-            : CGFloat(mapNumber(
-                doubleValue,
-                fromLow: minValue,
-                fromHigh: maxValue,
-                toLow: 0.0,
-                toHigh: 1.0
-            ))
+            : CGFloat(doubleValue.map(from: (minValue, maxValue), to: (0.0, 1.0)))
 
         var fillWidth: CGFloat
         var fillRect: NSRect
@@ -162,13 +150,7 @@ final class SliderCell: NSSliderCell {
 
             let left = value < fillOrigin
             fillWidth = (rect.width - rect.height) * abs(value - fillOrigin) + (rect.height / 2)
-            let x = CGFloat(mapNumber(
-                fillOrigin,
-                fromLow: 0.0,
-                fromHigh: 1.0,
-                toLow: rect.minX,
-                toHigh: rect.maxX
-            ))
+            let x = CGFloat(fillOrigin.map(from: (0.0, 1.0), to: (rect.minX, rect.maxX)))
             fillRect = NSRect(
                 x: left ? x - fillWidth : x,
                 y: rect.origin.y + 0.5,

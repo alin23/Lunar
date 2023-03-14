@@ -151,6 +151,10 @@ extension Bool {
         self ? 1 : 0
     }
 
+    @inline(__always) var s: String {
+        self ? "true" : "false"
+    }
+
     @inline(__always) var state: NSControl.StateValue {
         self ? .on : .off
     }

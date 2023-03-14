@@ -432,7 +432,9 @@ struct DisplayRowView: View {
                 withAnimation(.fastSpring) { display.enhanced = true }
                 if !xdrTipShown, autoXdr {
                     xdrTipShown = true
-                    showXDRTip = true
+                    mainAsyncAfter(ms: 2000) {
+                        showXDRTip = true
+                    }
                 }
             }
             .buttonStyle(PickerButton(
@@ -935,10 +937,7 @@ struct HDRSettingsView: View {
 struct AdvancedSettingsView: View {
     @ObservedObject var dc: DisplayController = DC
 
-    @Default(.silentUpdate) var silentUpdate
     @Default(.workaroundBuiltinDisplay) var workaroundBuiltinDisplay
-    @Default(.debug) var debug
-    @Default(.trace) var trace
     @Default(.ddcSleepLonger) var ddcSleepLonger
     @Default(.clamshellModeDetection) var clamshellModeDetection
     @Default(.enableOrientationHotkeys) var enableOrientationHotkeys
@@ -964,22 +963,6 @@ struct AdvancedSettingsView: View {
         ZStack {
             Color.clear.frame(maxWidth: .infinity, alignment: .leading)
             VStack(alignment: .leading) {
-                Group {
-                    SettingsToggle(text: "Install updates silently in the background", setting: $silentUpdate)
-                    SettingsToggle(
-                        text: "Enable verbose logging", setting: $debug,
-                        help: """
-                        Log path: ~/Library/Caches/Lunar/swiftybeaver.log
-
-                        This option will deactivate itself when the app quits
-                        to avoid filling up disk space with unnecessary logs.
-                        """
-                    )
-                    SettingsToggle(text: "Trace brightness changes", setting: $trace)
-                        .padding(.leading)
-                        .disabled(!debug)
-                }
-                Divider()
                 Group {
                     #if arch(arm64)
                         if #available(macOS 13, *) {
@@ -1623,6 +1606,8 @@ struct QuickActionsMenuView: View {
 
     @ObservedObject var km = KM
 
+    @ObservedObject var wm = WM
+
     var modeSelector: some View {
         let titleBinding = Binding<String>(
             get: { overrideAdaptiveMode ? "⁣\(dc.adaptiveModeKey.name)⁣" : "Auto: \(dc.adaptiveModeKey.str)" }, set: { _ in }
@@ -2021,6 +2006,10 @@ struct QuickActionsMenuView: View {
         }
         .frame(width: MENU_WIDTH + FULL_OPTIONS_MENU_WIDTH, height: env.menuMaxHeight, alignment: .top)
         .padding(.horizontal, showOptionsMenu ? MENU_HORIZONTAL_PADDING * 2 : 0)
+        .contrast(wm.focused ? 1.0 : 0.8)
+        .brightness(wm.focused ? 0.0 : -0.1)
+        .saturation(wm.focused ? 1.0 : 0.7)
+        .allowsHitTesting(wm.focused)
     }
     @ViewBuilder var optionsMenu: some View {
         VStack(spacing: 10) {
@@ -2107,7 +2096,7 @@ struct QuickActionsMenuView: View {
 
     func bg(optionsMenuOverflow _: Bool) -> some View {
         ZStack {
-            VisualEffectBlur(material: .hudWindow, blendingMode: .behindWindow, state: .active)
+            VisualEffectBlur(material: .hudWindow, blendingMode: .behindWindow, state: .followsWindowActiveState)
                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(colorScheme == .dark ? Colors.blackMauve.opacity(0.4) : Color.white.opacity(0.6))
