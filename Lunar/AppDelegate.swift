@@ -63,9 +63,6 @@ let serialQueue = DispatchQueue(label: "fyi.lunar.serial.queue", qos: .userIniti
 let gammaQueue = DispatchQueue(label: "fyi.lunar.gamma.queue", qos: .userInteractive)
 let appName = (Bundle.main.infoDictionary?["CFBundleName"] as? String) ?? "Lunar"
 
-let LOG_URL = fm.urls(for: .cachesDirectory, in: .userDomainMask).first?.appendingPathComponent(appName, isDirectory: true)
-    .appendingPathComponent("swiftybeaver.log", isDirectory: false)
-
 var activeDisplay: Display?
 
 var thisIsFirstRun = false
@@ -339,13 +336,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     }
 
     var sun: String {
-        guard let moment = LocationMode.specific.moment, let sun = LocationMode.specific.geolocation?.sun() else { return "" }
+        guard let moment = LocationMode.specific.moment, let elevation = LocationMode.specific.geolocation?.sun() else { return "" }
         let sunrise = moment.sunrise.toString(.time(.short))
         let sunset = moment.sunset.toString(.time(.short))
         let noon = moment.solarNoon.toString(.time(.short))
-        let elevation = sun.elevation.str(decimals: 1)
 
-        return "Sun: (**sunrise \(sunrise)**) (**sunset \(sunset)**)\n       (noon \(noon)) [elevation \(elevation)°]\n"
+        return "Sun: (**sunrise \(sunrise)**) (**sunset \(sunset)**)\n       (noon \(noon)) [elevation \(elevation.str(decimals: 1))°]\n"
     }
 
     var memory500MBPassed = false {
@@ -768,15 +764,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         showDisconnectedDisplaysPublisher.sink { _ in
             DC.resetDisplayList(configurationPage: true)
         }.store(in: &observers)
-        streamLogsPublisher.sink { change in
-            if change.newValue {
-                CachedDefaults[.debug] = true
-                SwiftyLogger.addDestination(SwiftyLogger.cloud)
-            } else {
-                CachedDefaults[.debug] = false
-                SwiftyLogger.removeDestination(SwiftyLogger.cloud)
-            }
-        }.store(in: &observers)
         detectResponsivenessPublisher.sink { change in
             let shouldDetect = change.newValue
             if !shouldDetect {
@@ -1041,6 +1028,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     func manageDisplayControllerActivity(mode: AdaptiveModeKey) {
 //        log.debug("Started DisplayController in \(mode.str) mode")
         mainAsyncAfter(ms: 1000) {
+            DC.recomputeAllDisplaysBrightness(activeDisplays: DC.activeDisplayList)
             DC.adaptBrightness()
         }
     }
@@ -1375,20 +1363,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                     d.maxEDR = maxEDR
 
                     if d.softwareBrightness > 1.0, timeSince(d.hdrWindowOpenedAt) > 1 {
-                        let oldSoftwareBrightness = mapNumber(
-                            d.softwareBrightness,
-                            fromLow: 1.0,
-                            fromHigh: oldMaxSoftwareBrightness,
-                            toLow: 0.0,
-                            toHigh: 1.0
-                        )
-                        d.softwareBrightness = mapNumber(
-                            oldSoftwareBrightness,
-                            fromLow: 0.0,
-                            fromHigh: 1.0,
-                            toLow: 1.0,
-                            toHigh: d.maxSoftwareBrightness
-                        )
+                        let oldSoftwareBrightness = d.softwareBrightness.map(from: (1.0, oldMaxSoftwareBrightness), to: (0.0, 1.0))
+                        d.softwareBrightness = oldSoftwareBrightness.map(from: (0.0, 1.0), to: (1.0, d.maxSoftwareBrightness))
                     }
                 }
             }.store(in: &observers)
@@ -1418,7 +1394,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             .merge(with: logoutPublisher)
             .debounce(for: .seconds(1), scheduler: RunLoop.main)
             .sink { notif in
-                log.info(notif.name)
+                log.info(notif.name.rawValue)
                 switch notif.name {
                 case NSWorkspace.sessionDidBecomeActiveNotification:
                     DC.loggedOut = false
@@ -1435,7 +1411,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         sleepPublisher
             .debounce(for: .milliseconds(1), scheduler: RunLoop.main)
             .sink { notif in
-                log.info(notif.name)
+                log.info(notif.name.rawValue)
                 switch notif.name {
                 case NSWorkspace.screensDidSleepNotification:
                     DC.screensSleeping = true
@@ -1452,7 +1428,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             .merge(with: loginPublisher)
             .debounce(for: .seconds(2), scheduler: RunLoop.main)
             .sink { notif in
-                log.info(notif.name)
+                log.info(notif.name.rawValue)
                 switch notif.name {
                 case NSWorkspace.screensDidWakeNotification where !DC.loggedOut,
                      NSWorkspace.sessionDidBecomeActiveNotification:
@@ -1955,7 +1931,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
         configureSentry()
         asyncNow { [self] in
-            log.initLogger(cli: true)
             #if DEBUG
                 let argList: [String]
                 if CommandLine.arguments.contains("-NSDocumentRevisionsDebugMode"), CommandLine.arguments.last == "YES" {
@@ -2002,7 +1977,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             }
 
             if let exc {
-                log.error(exc)
+                log.error(exc.description)
                 cliExit(1)
             }
         }
@@ -2027,7 +2002,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
         let release = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "1"
         SentrySDK.start { options in
-            options.dsn = secrets.sentryDSN
+            options.dsn = SENTRY_DSN
             options.releaseName = "v\(release)"
             options.dist = release
             #if DEBUG
@@ -2035,7 +2010,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             #else
                 options.environment = "production"
             #endif
-            options.appHangTimeoutInterval = 10
+            options.appHangTimeoutInterval = 60
         }
 
         let user = User(userId: SERIAL_NUMBER_HASH)
@@ -2059,14 +2034,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     }
 
     func initCacheTransitionLogging() {
-        if !CommandLine.arguments.contains("@") {
-            log.initLogger()
-        }
-
         initCache()
-        CachedDefaults[.trace] = false
-        CachedDefaults[.debug] = false
-        CachedDefaults[.streamLogs] = false
 
         brightnessTransition = CachedDefaults[.brightnessTransition]
         brightnessTransitionPublisher.sink { change in
@@ -2091,9 +2059,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         guard CommandLine.arguments.contains("install-cli") || CommandLine.arguments
             .contains("installcli") || (CommandLine.arguments.contains("install") && CommandLine.arguments.contains("cli"))
         else { return }
-
-        log.setMinLevel(debug: false, verbose: false, cloud: false, cli: false)
-        log.disable()
 
         do {
             try installCLIBinary()
@@ -2139,6 +2104,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     }
 
     func applicationDidFinishLaunching(_: Notification) {
+        initDDCLogging()
         guard !SWIFTUI_PREVIEW else {
             DC.displays = DC.getDisplaysLock.around {
                 DisplayController.getDisplays(
@@ -2194,13 +2160,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         terminateOtherLunarInstances()
         DDC.setup()
 
-        if let logPath = LOG_URL?.path.cString(using: .utf8) {
-            log.info("Setting log path to \(LOG_URL?.path ?? "")")
-            setLogPath(logPath, logPath.count)
-        }
-
         try? updater.start()
-        updater.automaticallyDownloadsUpdates = CachedDefaults[.silentUpdate]
+        updater.automaticallyDownloadsUpdates = Defaults[.silentUpdate]
 
         handleDaemon()
 
@@ -2220,6 +2181,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
         addObservers()
         initLicensing()
+        manageDisplayControllerActivity(mode: DC.adaptiveModeKey)
+        if DC.adaptiveMode.available {
+            DC.adaptiveMode.watch()
+        }
 
         NetworkControl.setup()
         if datastore.shouldOnboard {

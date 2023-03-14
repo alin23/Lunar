@@ -860,6 +860,7 @@ enum Hotkey {
     }
 
     static func showOsd(osdImage: OSDImage, value: UInt32, display: Display) {
+        guard !display.isAllDisplays, !display.isForTesting else { return }
         guard osdImage != .contrast else {
             display.showSoftwareOSD(
                 image: "circle.lefthalf.filled",
@@ -898,7 +899,7 @@ enum Hotkey {
             onDisplayID: osdID,
             priority: 0x1F4,
             msecUntilFade: 1500,
-            filledChiclets: mapNumber(value.d, fromLow: 0, fromHigh: 100, toLow: 0, toHigh: 240).u32,
+            filledChiclets: value.d.map(from: (0, 100), to: (0, 240)).u32,
             totalChiclets: 240,
             locked: locked
         )
@@ -984,6 +985,7 @@ extension AppDelegate: MediaKeyTapDelegate {
 
         switch mediaKey {
         case .brightnessUp where contrast:
+            DC.pressedContrastKey.true(for: 0.5)
             increaseContrast(
                 by: value,
                 currentDisplay: currentDisplay,
@@ -992,11 +994,13 @@ extension AppDelegate: MediaKeyTapDelegate {
                 nonMainDisplays: nonMainDisplays
             )
         case .brightnessUp where allDisplays:
+            DC.pressedBrightnessKey.true(for: 0.5)
             if builtinDisplay {
                 increaseBrightness(by: value, builtinDisplay: builtinDisplay)
             }
             increaseBrightness(by: value)
         case .brightnessUp:
+            DC.pressedBrightnessKey.true(for: 0.5)
             increaseBrightness(
                 by: value,
                 currentDisplay: currentDisplay,
@@ -1006,6 +1010,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                 nonMainDisplays: nonMainDisplays
             )
         case .brightnessDown where contrast:
+            DC.pressedContrastKey.true(for: 0.5)
             decreaseContrast(
                 by: value,
                 currentDisplay: currentDisplay,
@@ -1014,11 +1019,13 @@ extension AppDelegate: MediaKeyTapDelegate {
                 nonMainDisplays: nonMainDisplays
             )
         case .brightnessDown where allDisplays:
+            DC.pressedBrightnessKey.true(for: 0.5)
             if builtinDisplay {
                 decreaseBrightness(by: value, builtinDisplay: builtinDisplay)
             }
             decreaseBrightness(by: value)
         case .brightnessDown:
+            DC.pressedBrightnessKey.true(for: 0.5)
             decreaseBrightness(
                 by: value,
                 currentDisplay: currentDisplay,

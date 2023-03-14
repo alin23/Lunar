@@ -153,6 +153,9 @@ public struct VersionView: View {
             Toggle("Update to beta builds", isOn: beta)
                 .toggleStyle(CheckboxToggleStyle(style: .circle))
                 .font(.system(size: 12, weight: .medium))
+            Toggle("Install updates silently in the background", isOn: $silentUpdate)
+                .toggleStyle(CheckboxToggleStyle(style: .circle))
+                .font(.system(size: 12, weight: .medium))
         }
         .foregroundColor(.secondary)
         .padding(.horizontal, 8)
@@ -168,6 +171,7 @@ public struct VersionView: View {
     @Default(.checkForUpdate) var checkForUpdates
     @Default(.updateCheckInterval) var updateCheckInterval
     @Default(.updateChannel) var updateChannel
+    @Default(.silentUpdate) var silentUpdate
 
     @ObservedObject var updater: SPUUpdater
     @Environment(\.colors) var colors

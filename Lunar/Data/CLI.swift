@@ -347,15 +347,6 @@ func getFilteredDisplays(displays: [Display], filter: DisplayFilter) -> [Display
 
 struct Lunar: ParsableCommand {
     struct GlobalOptions: ParsableArguments {
-        @Flag(name: .shortAndLong, help: "Log errors and warnings.")
-        var log = false
-
-        @Flag(name: .shortAndLong, help: "Enable debug logging.")
-        var debug = false
-
-        @Flag(name: .shortAndLong, help: "Enable verbose logging.")
-        var verbose = false
-
         @Flag(name: .long, help: "Send the command to an already running instance of Lunar.")
         var remote = false
 
@@ -399,8 +390,6 @@ struct Lunar: ParsableCommand {
         var hex = false
 
         func run() throws {
-            Lunar.configureLogging(options: globals)
-
             guard let sig = getCodeSignature(hex: hex) else {
                 return cliExit(1)
             }
@@ -417,8 +406,6 @@ struct Lunar: ParsableCommand {
         @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
         func run() throws {
-            Lunar.configureLogging(options: globals)
-
             if isLidClosed() {
                 cliPrint("closed")
             } else {
@@ -436,8 +423,6 @@ struct Lunar: ParsableCommand {
         @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
         func run() throws {
-            Lunar.configureLogging(options: globals)
-
             DC.resetDisplayList()
             appDelegate!.startOrRestartMediaKeyTap()
 
@@ -453,7 +438,6 @@ struct Lunar: ParsableCommand {
         @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
         func run() throws {
-            Lunar.configureLogging(options: globals)
             if SensorMode.specific.externalSensorAvailable, let lux = SensorMode.specific.lastAmbientLight {
                 cliPrint(lux)
             } else {
@@ -478,8 +462,6 @@ struct Lunar: ParsableCommand {
         var display: DisplayFilter = .all
 
         func run() throws {
-            Lunar.configureLogging(options: globals)
-
             cliGetDisplays(
                 includeVirtual: false,
                 includeAirplay: false,
@@ -524,8 +506,6 @@ struct Lunar: ParsableCommand {
             @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
             func run() throws {
-                Lunar.configureLogging(options: globals)
-
                 DC.activeDisplayList.forEach { d in
                     cliPrint("""
                     \(d.name)
@@ -533,7 +513,7 @@ struct Lunar: ParsableCommand {
                       UUID:\t\t\(d.serial)
                       minNits:\t\(d.minNits)
                       maxNits:\t\(d.maxNits)
-                      nitsMap:\t\(DC.nitsBrightnessMapping[d.serial]?.json ?? "None")
+                      nitsMap:\t\(d.nitsBrightnessMapping.json ?? "None")
 
                     """)
                 }
@@ -596,8 +576,6 @@ struct Lunar: ParsableCommand {
         var value = 1.0
 
         func run() throws {
-            Lunar.configureLogging(options: globals)
-
             cliGetDisplays(
                 includeVirtual: false,
                 includeAirplay: false,
@@ -686,8 +664,6 @@ struct Lunar: ParsableCommand {
         var value2: Double = 0
 
         func run() throws {
-            Lunar.configureLogging(options: globals)
-
             cliGetDisplays(
                 includeVirtual: false,
                 includeAirplay: false,
@@ -826,8 +802,6 @@ struct Lunar: ParsableCommand {
         var values: [String]
 
         func run() throws {
-            Lunar.configureLogging(options: globals)
-
             cliGetDisplays(
                 includeVirtual: false,
                 includeAirplay: false,
@@ -889,8 +863,6 @@ struct Lunar: ParsableCommand {
         var json = false
 
         func run() throws {
-            Lunar.configureLogging(options: globals)
-
             guard !json else {
                 cliPrint((try! prettyEncoder.encode(CachedDefaults[.hotkeys])).str())
                 return cliExit(0)
@@ -918,8 +890,6 @@ struct Lunar: ParsableCommand {
         var id: CGDirectDisplayID
 
         func run() throws {
-            Lunar.configureLogging(options: globals)
-
             if let uuid = CGDisplayCreateUUIDFromDisplayID(id) {
                 let uuidValue = uuid.takeRetainedValue()
                 let uuidString = CFUUIDCreateString(kCFAllocatorDefault, uuidValue) as String
@@ -967,8 +937,6 @@ struct Lunar: ParsableCommand {
         }
 
         func run() throws {
-            Lunar.configureLogging(options: globals)
-
             cliGetDisplays()
             DC.disable()
             if !isServer {
@@ -1006,8 +974,46 @@ struct Lunar: ParsableCommand {
         @Argument(help: "Adaptive mode. One of (manual, clock, location, sync, sensor, auto)")
         var mode: AdaptiveModeKey
 
+        @Flag(name: .shortAndLong, help: "Print the learnt mapping of the adaptive mode")
+        var printMapping = false
+
+        func mappingStr(_ mapping: [AutoLearnMapping]?) -> String {
+            guard let mapping, !mapping.isEmpty else { return "{}" }
+
+            return "\n\t" + mapping.map { m in
+                "\(m.source.str(decimals: 2)):\t\(m.target.str(decimals: 2))"
+            }.joined(separator: "\n\t")
+        }
+
         func run() throws {
-            Lunar.configureLogging(options: globals)
+            if printMapping {
+                DC.activeDisplayList.forEach { d in
+                    cliPrint("\(d.name) [ID: \(d.id)] [UUID: \(d.serial)]")
+
+                    switch mode {
+                    case .location:
+                        cliPrint("""
+                          Brightness Mapping: \(mappingStr(d.locationBrightnessMapping))
+                          Contrast Mapping: \(mappingStr(d.locationContrastMapping))
+                        """)
+                    case .sync:
+                        cliPrint("""
+                          Brightness Mapping: \(mappingStr(d.syncBrightnessMapping[DC.sourceDisplay.serial]))
+                          Contrast Mapping: \(mappingStr(d.syncContrastMapping[DC.sourceDisplay.serial]))
+                        """)
+                    case .sensor:
+                        cliPrint("""
+                          Brightness Mapping: \(mappingStr(d.sensorBrightnessMapping))
+                          Contrast Mapping: \(mappingStr(d.sensorContrastMapping))
+                        """)
+                    default:
+                        break
+                    }
+
+                    cliPrint(" ")
+                }
+                return
+            }
 
             CachedDefaults[.adaptiveBrightnessMode] = mode
             cliSleep(1)
@@ -1083,7 +1089,6 @@ struct Lunar: ParsableCommand {
         var value: String?
 
         func run() throws {
-            Lunar.configureLogging(options: globals)
             let property = property == .mute ? .audioMuted : property
 
             cliGetDisplays(
@@ -1178,7 +1183,6 @@ struct Lunar: ParsableCommand {
         var property: Display.CodingKeys
 
         func run() throws {
-            Lunar.configureLogging(options: globals)
             let property = property == .mute ? .audioMuted : property
 
             cliGetDisplays(
@@ -1234,7 +1238,6 @@ struct Lunar: ParsableCommand {
         }
 
         func run() throws {
-            Lunar.configureLogging(options: globals)
             let property = property == .mute ? .audioMuted : property
 
             cliGetDisplays(
@@ -1309,7 +1312,6 @@ struct Lunar: ParsableCommand {
         func validate() throws {
             guard !globals.remote else { return }
 
-            Lunar.configureLogging(options: globals)
             cliGetDisplays(
                 includeVirtual: CachedDefaults[.showVirtualDisplays],
                 includeAirplay: CachedDefaults[.showAirplayDisplays],
@@ -1334,8 +1336,6 @@ struct Lunar: ParsableCommand {
         }
 
         func run() throws {
-            Lunar.configureLogging(options: globals)
-
             let displays = getFilteredDisplays(displays: DC.activeDisplayList, filter: display)
             guard !displays.isEmpty else {
                 throw LunarCommandError.displayNotFound(display.s)
@@ -1433,8 +1433,6 @@ struct Lunar: ParsableCommand {
         var state: FeatureState = .enable
 
         func run() throws {
-            Lunar.configureLogging(options: globals)
-
             cliGetDisplays(
                 includeVirtual: CachedDefaults[.showVirtualDisplays],
                 includeAirplay: CachedDefaults[.showAirplayDisplays],
@@ -1484,8 +1482,6 @@ struct Lunar: ParsableCommand {
         var state: FeatureState = .enable
 
         func run() throws {
-            Lunar.configureLogging(options: globals)
-
             cliGetDisplays(
                 includeVirtual: CachedDefaults[.showVirtualDisplays],
                 includeAirplay: CachedDefaults[.showAirplayDisplays],
@@ -1538,8 +1534,6 @@ struct Lunar: ParsableCommand {
             var force = false
 
             func run() throws {
-                Lunar.configureLogging(options: globals)
-
                 cliGetDisplays(
                     includeVirtual: CachedDefaults[.showVirtualDisplays],
                     includeAirplay: CachedDefaults[.showAirplayDisplays],
@@ -1576,7 +1570,6 @@ struct Lunar: ParsableCommand {
             var display = DisplayFilter.builtin
 
             func run() throws {
-                Lunar.configureLogging(options: globals)
                 guard display != .all else {
                     DC.en()
                     cliExit(0)
@@ -1627,8 +1620,6 @@ struct Lunar: ParsableCommand {
             var display = DisplayFilter.builtin
 
             func run() throws {
-                Lunar.configureLogging(options: globals)
-
                 cliGetDisplays(
                     includeVirtual: CachedDefaults[.showVirtualDisplays],
                     includeAirplay: CachedDefaults[.showAirplayDisplays],
@@ -1722,20 +1713,6 @@ struct Lunar: ParsableCommand {
     )
 
     @OptionGroup var globals: GlobalOptions
-
-    static func configureLogging(options globals: GlobalOptions) {
-        guard !isServer else { return }
-        if !globals.log, !globals.debug, !globals.verbose {
-            log.disable()
-        } else {
-            log.setMinLevel(
-                debug: globals.debug,
-                verbose: globals.verbose,
-                cloud: false,
-                cli: true
-            )
-        }
-    }
 
     static func prettyKey(_ key: String) -> String {
         UPPERCASE_LETTER_NAMES.replaceAll(
@@ -2201,8 +2178,6 @@ private func encodedValue(key: Display.CodingKeys, value: Any, prefix: String = 
          .defaultGammaGreenMin, .defaultGammaGreenMax, .defaultGammaGreenValue,
          .defaultGammaBlueMin, .defaultGammaBlueMax, .defaultGammaBlueValue:
         return (value as! NSNumber).floatValue.str(decimals: 2)
-    case .userBrightness, .userContrast:
-        return (try! encoder.encode(value as! [String: [[String: Double]]])).str()
     case .enabledControls:
         return (try! encoder.encode(value as! [String: Bool])).str()
     case .input, .hotkeyInput1, .hotkeyInput2, .hotkeyInput3:

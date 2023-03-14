@@ -196,7 +196,7 @@ final class DisplayImage: NSView {
         let layer = CAShapeLayer()
         layer.cornerCurve = .continuous
 
-        let radius = mapNumber(cornerRadius, fromLow: 0, fromHigh: maxCornerRadius, toLow: baseCornerRadius, toHigh: 24)
+        let radius = cornerRadius.map(from: (0, maxCornerRadius), to: (baseCornerRadius, 24))
 
         layer.path = CGPath(
             roundedRect: CGRect(
@@ -225,7 +225,7 @@ final class DisplayImage: NSView {
         let y = 1.1
         let hh = 0.03
 
-        let radius = mapNumber(cornerRadius, fromLow: 0, fromHigh: maxCornerRadius, toLow: 10, toHigh: 14)
+        let radius = cornerRadius.map(from: (0, maxCornerRadius), to: (10, 14))
         let rect = CGRect(
             x: 0, y: frame.height * y,
             width: frame.width,
@@ -283,7 +283,7 @@ final class DisplayImage: NSView {
         let tip1 = CGPoint(x: mid, y: tip)
         let tip2 = CGPoint(x: mid - 50, y: 0)
         let tip3 = CGPoint(x: mid + 50, y: 0)
-        let radius = mapNumber(cornerRadius, fromLow: 0, fromHigh: maxCornerRadius, toLow: baseCornerRadius, toHigh: 18)
+        let radius = cornerRadius.map(from: (0, maxCornerRadius), to: (baseCornerRadius, 18))
 
         if radius > 0 {
             path.move(to: tip3)
@@ -667,7 +667,7 @@ final class DisplayViewController: NSViewController {
 //    #endif
     @objc func adaptToUserDataPoint(notification: Notification) {
         guard DC.adaptiveModeKey != .manual, DC.adaptiveModeKey != .clock,
-              let values = notification.userInfo?["values"] as? [Double: Double]
+              let values = notification.userInfo?["values"] as? [AutoLearnMapping]
         else { return }
 
         if notification.name == brightnessDataPointInserted {
@@ -978,10 +978,9 @@ final class DisplayViewController: NSViewController {
             cancelScreenWakeAdapterTask()
 
             let lastDataPoint = datapointLock.around { DC.adaptiveMode.brightnessDataPoint.last }
-            display.insertBrightnessUserDataPoint(lastDataPoint, brightness.d, modeKey: DC.adaptiveModeKey)
+            display.insertBrightnessUserDataPoint(lastDataPoint, brightness.d)
 
-            let userValues = display.userBrightness[DC.adaptiveModeKey] ?? ThreadSafeDictionary()
-            self.updateDataset(currentBrightness: brightness.u16, userBrightness: userValues.dictionary)
+            self.updateDataset(currentBrightness: brightness.u16, userBrightness: display.brightnessCurveMapping())
         }
         scrollableContrast?.onCurrentValueChanged = { [weak self] contrast in
             guard let self, let display = self.display,
@@ -992,11 +991,10 @@ final class DisplayViewController: NSViewController {
                 return
             }
 
-            let lastDataPoint = DC.adaptiveMode.contrastDataPoint.last
-            display.insertContrastUserDataPoint(lastDataPoint, contrast.d, modeKey: DC.adaptiveModeKey)
+            let lastDataPoint = datapointLock.around { DC.adaptiveMode.contrastDataPoint.last }
+            display.insertContrastUserDataPoint(lastDataPoint, contrast.d)
 
-            let userValues = display.userContrast[DC.adaptiveModeKey] ?? ThreadSafeDictionary()
-            self.updateDataset(currentContrast: contrast.u16, userContrast: userValues.dictionary)
+            self.updateDataset(currentContrast: contrast.u16, userContrast: display.contrastCurveMapping())
         }
 
         display.onControlChange = { [weak self] control in
@@ -1023,7 +1021,7 @@ final class DisplayViewController: NSViewController {
             guard let display = self?.display, display.adaptiveSubzero else { return }
 
             let lastDataPoint = datapointLock.around { DC.adaptiveMode.brightnessDataPoint.last }
-            display.insertBrightnessUserDataPoint(lastDataPoint, display.brightness.doubleValue, modeKey: DC.adaptiveModeKey)
+            display.insertBrightnessUserDataPoint(lastDataPoint, display.brightness.doubleValue)
             self?.updateDataset()
         }
 
@@ -1210,8 +1208,8 @@ final class DisplayViewController: NSViewController {
         maxContrast: UInt16? = nil,
         currentBrightness: UInt16? = nil,
         currentContrast: UInt16? = nil,
-        userBrightness: [Double: Double]? = nil,
-        userContrast: [Double: Double]? = nil,
+        userBrightness: [AutoLearnMapping]? = nil,
+        userContrast: [AutoLearnMapping]? = nil,
 //        nitsMapping: [AutoLearnMapping]? = nil,
 //        spline: ((Double) -> Double)? = nil,
         force: Bool = false
@@ -1266,7 +1264,7 @@ final class DisplayViewController: NSViewController {
 //            } else {
             let brs = brightnessChartEntry.map { entry in
                 mode.interpolate(
-                    .preciseBrightness(entry.x),
+                    entry.x,
                     display: display,
                     minVal: minBrightness?.d,
                     maxVal: maxBrightness?.d
@@ -1279,10 +1277,11 @@ final class DisplayViewController: NSViewController {
 
             let crs = contrastChartEntry.map { entry in
                 mode.interpolate(
-                    .preciseContrast(entry.x),
+                    entry.x,
                     display: display,
                     minVal: minContrast?.d,
-                    maxVal: maxContrast?.d
+                    maxVal: maxContrast?.d,
+                    contrast: true
                 )
             }
             for (entry, y) in zip(contrastChartEntry, crs) {
@@ -1356,18 +1355,13 @@ final class DisplayViewController: NSViewController {
             return
         }
 
-        #if arch(arm64)
-            DC.nitsBrightnessMapping = DC.nitsBrightnessMapping.copyWithout(key: display.serial)
-            DC.nitsContrastMapping = DC.nitsContrastMapping.copyWithout(key: display.serial)
-        #endif
         display.adaptivePaused = true
         defer {
             display.adaptivePaused = false
             display.readapt(newValue: false, oldValue: true)
         }
 
-        display.userContrast[DC.adaptiveModeKey]?.removeAll()
-        display.userBrightness[DC.adaptiveModeKey]?.removeAll()
+        display.resetCurveMappings()
         display.save()
         updateDataset(force: true)
     }

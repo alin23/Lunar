@@ -1,17 +1,8 @@
 #!/bin/bash
 echo SENTRY VERSION = $FULL_VERSION
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-if [ -f $DIR/.env.sh ]; then
-    source $DIR/.env.sh
-fi
 if [[ "$DISABLE_SENTRY" == 1 ]]; then
     exit 0
-fi
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-if [ -f $DIR/.env.sh ]; then
-    source $DIR/.env.sh
 fi
 
 if ! which sentry-cli >/dev/null; then

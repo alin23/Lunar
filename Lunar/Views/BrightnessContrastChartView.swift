@@ -214,10 +214,7 @@ final class BrightnessContrastChartView: LineChartView {
                 contrastChartEntry.reserveCapacity(mode.maxChartDataPoints)
 
                 let brs = xs.map { sourceBrightness in
-                    mode.interpolate(
-                        .preciseBrightness(sourceBrightness),
-                        display: display
-                    )
+                    mode.interpolate(sourceBrightness, display: display)
                 }
 
                 brightnessChartEntry.append(
@@ -225,10 +222,7 @@ final class BrightnessContrastChartView: LineChartView {
                 )
 
                 let crs = xs.map { sourceContrast in
-                    mode.interpolate(
-                        .preciseContrast(sourceContrast),
-                        display: display
-                    )
+                    mode.interpolate(sourceContrast, display: display, contrast: true)
                 }
                 contrastChartEntry.append(
                     contentsOf: zip(xs, crs).map { ChartDataEntry(x: $0, y: $1) }

@@ -19,6 +19,12 @@ final class StatusItemButtonControllerDelegate: NSObject, NSWindowDelegate {
     }
 }
 
+class MenuWindowManager: ObservableObject {
+    @Published var focused = false
+}
+
+let WM = MenuWindowManager()
+
 // MARK: - StatusItemButtonController
 
 final class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObject {
@@ -76,6 +82,13 @@ final class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObje
         }
     }
 
+    func windowDidResignKey(_ notification: Notification) {
+        WM.focused = false
+    }
+    func windowDidBecomeKey(_ notification: Notification) {
+        WM.focused = true
+    }
+
     func windowDidBecomeMain(_ notification: Notification) {
         willCloseTask = nil
         displayHideTask?.cancel()
@@ -101,6 +114,7 @@ final class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObje
     }
 
     func showMenuBar() {
+        WM.focused = true
         willCloseTask = nil
         displayHideTask?.cancel()
         displayHideTask = nil

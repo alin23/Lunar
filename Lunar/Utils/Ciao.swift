@@ -51,7 +51,7 @@ final class CiaoBrowser {
 
     public var isSearching = false {
         didSet {
-            SwiftyLogger.info(isSearching)
+            log.info(isSearching.s)
         }
     }
 
@@ -172,7 +172,7 @@ final class CiaoResolver {
             log.verbose("START DEINIT")
             defer { log.verbose("END DEINIT") }
         #endif
-        SwiftyLogger.verbose(self)
+        log.verbose(String(describing: self))
         service.stop()
     }
 

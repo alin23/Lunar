@@ -11,6 +11,8 @@ import SwiftDate
 import SwiftyMarkdown
 import UserNotifications
 
+typealias DisplayUUID = String
+
 typealias FilePath = Path
 func p(_ string: String) -> FilePath? {
     FilePath(string)
@@ -295,6 +297,22 @@ final class DispatchSemaphore: CustomStringConvertible {
         }
     }
 }
+
+#if DEBUG
+    @inline(__always) func checkNaN(_ value: Double) {
+        guard value.isNaN else { return }
+        err("NaN!")
+        kill(getpid(), SIGSTOP)
+    }
+    @inline(__always) func checkNaN(_ value: Float) {
+        guard value.isNaN else { return }
+        err("NaN!")
+        kill(getpid(), SIGSTOP)
+    }
+#else
+    @inline(__always) func checkNaN(_: Double) {}
+    @inline(__always) func checkNaN(_: Float) {}
+#endif
 
 import SwiftyJSON
 
@@ -795,70 +813,117 @@ func mainAsyncAfter(ms: Int, name: String = "mainAsyncAfter", _ action: @escapin
     return workItem
 }
 
+func listener<T>(in observers: inout Set<AnyCancellable>, throttle: RunLoop.SchedulerTimeType.Stride? = nil, debounce: RunLoop.SchedulerTimeType.Stride? = nil, _ action: @escaping (T) -> Void) -> PassthroughSubject<T, Never> {
+    let subject = PassthroughSubject<T, Never>()
+
+    if let debounce {
+        subject
+            .debounce(for: debounce, scheduler: RunLoop.main)
+            .sink { action($0) }
+            .store(in: &observers)
+    } else if let throttle {
+        subject
+            .throttle(for: throttle, scheduler: RunLoop.main, latest: true)
+            .sink { action($0) }
+            .store(in: &observers)
+    } else {
+        subject
+            .sink { action($0) }
+            .store(in: &observers)
+    }
+
+    return subject
+}
+
 func mainAsyncAfter(ms: Int, _ action: DispatchWorkItem) {
     let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
 
     DispatchQueue.main.asyncAfter(deadline: deadline, execute: action.workItem)
 }
 
-func mapNumber<T: Numeric & Comparable & FloatingPoint>(_ number: T, fromLow: T, fromHigh: T, toLow: T, toHigh: T) -> T {
-    if fromLow == fromHigh {
-        return number
+extension Double {
+    func map(from: (Double, Double), to: (Double, Double)) -> Double {
+        lerp(invlerp(self, min: from.0, max: from.1), min: to.0, max: to.1)
     }
-
-    if number >= fromHigh {
-        return toHigh
-    } else if number <= fromLow {
-        return toLow
-    } else if toLow < toHigh {
-        let diff = toHigh - toLow
-        let fromDiff = fromHigh - fromLow
-        return (number - fromLow) * diff / fromDiff + toLow
-    } else {
-        let diff = toHigh - toLow
-        let fromDiff = fromHigh - fromLow
-        return (number - fromLow) * diff / fromDiff + toLow
+    func map(from: (Double, Double), to: (Double, Double), gamma: Double) -> Double {
+        lerp(pow(invlerp(self, min: from.0, max: from.1), 1.0 / gamma), min: to.0, max: to.1)
+    }
+}
+extension Float {
+    func map(from: (Float, Float), to: (Float, Float)) -> Float {
+        lerp(invlerp(self, min: from.0, max: from.1), min: to.0, max: to.1)
+    }
+    func map(from: (Float, Float), to: (Float, Float), gamma: Float) -> Float {
+        lerp(pow(invlerp(self, min: from.0, max: from.1), 1.0 / gamma), min: to.0, max: to.1)
+    }
+}
+extension CGFloat {
+    func map(from: (CGFloat, CGFloat), to: (CGFloat, CGFloat)) -> CGFloat {
+        lerp(invlerp(self, min: from.0, max: from.1), min: to.0, max: to.1)
+    }
+    func map(from: (CGFloat, CGFloat), to: (CGFloat, CGFloat), gamma: CGFloat) -> CGFloat {
+        lerp(pow(invlerp(self, min: from.0, max: from.1), 1.0 / gamma), min: to.0, max: to.1)
     }
 }
 
-func mapNumberSIMD(_ number: [Double], fromLow: Double, fromHigh: Double, toLow: Double, toHigh: Double) -> [Double] {
-    if fromLow == fromHigh {
-        log.warning("fromLow and fromHigh are both equal to \(fromLow)")
-        return number
-    }
+// func mapNumber<T: Numeric & Comparable & FloatingPoint>(_ number: T, fromLow: T, fromHigh: T, toLow: T, toHigh: T) -> T {
+//     if fromLow == fromHigh {
+//         return number
+//     }
 
-    let resultLow = number.firstIndex(where: { $0 > fromLow }) ?? 0
-    let resultHigh = number.lastIndex(where: { $0 < fromHigh }) ?? (number.count - 1)
+//     if number >= fromHigh {
+//         return toHigh
+//     } else if number <= fromLow {
+//         return toLow
+//     } else if toLow < toHigh {
+//         let diff = toHigh - toLow
+//         let fromDiff = fromHigh - fromLow
+//         return (number - fromLow) * diff / fromDiff + toLow
+//     } else {
+//         let diff = toHigh - toLow
+//         let fromDiff = fromHigh - fromLow
+//         return (number - fromLow) * diff / fromDiff + toLow
+//     }
+// }
 
-    if resultLow >= resultHigh {
-        var result = [Double](repeating: toLow, count: number.count)
-        if resultHigh != (number.count - 1) {
-            result.replaceSubrange((resultHigh + 1) ..< number.count, with: repeatElement(toHigh, count: number.count - resultHigh))
-        }
-        return result
-    }
-
-    let numbers = Array(number[resultLow ... resultHigh])
-
-    var value: [Double]
-    if toLow == 0.0, fromLow == 0.0, toHigh == 1.0 {
-        value = numbers / fromHigh
-    } else {
-        let diff = toHigh - toLow
-        let fromDiff = fromHigh - fromLow
-        value = numbers - fromLow
-        value = value * diff
-        value = value / fromDiff
-        value = value + toLow
-    }
-
-    var result = [Double](repeating: toLow, count: number.count)
-    result.replaceSubrange(resultLow ... resultHigh, with: value)
-    if resultHigh != (number.count - 1) {
-        result.replaceSubrange((resultHigh + 1) ..< number.count, with: repeatElement(toHigh, count: number.count - (resultHigh + 1)))
-    }
-    return result
-}
+// func mapNumberSIMD(_ number: [Double], fromLow: Double, fromHigh: Double, toLow: Double, toHigh: Double) -> [Double] {
+//    if fromLow == fromHigh {
+//        log.warning("fromLow and fromHigh are both equal to \(fromLow)")
+//        return number
+//    }
+//
+//    let resultLow = number.firstIndex(where: { $0 > fromLow }) ?? 0
+//    let resultHigh = number.lastIndex(where: { $0 < fromHigh }) ?? (number.count - 1)
+//
+//    if resultLow >= resultHigh {
+//        var result = [Double](repeating: toLow, count: number.count)
+//        if resultHigh != (number.count - 1) {
+//            result.replaceSubrange((resultHigh + 1) ..< number.count, with: repeatElement(toHigh, count: number.count - resultHigh))
+//        }
+//        return result
+//    }
+//
+//    let numbers = Array(number[resultLow ... resultHigh])
+//
+//    var value: [Double]
+//    if toLow == 0.0, fromLow == 0.0, toHigh == 1.0 {
+//        value = numbers / fromHigh
+//    } else {
+//        let diff = toHigh - toLow
+//        let fromDiff = fromHigh - fromLow
+//        value = numbers - fromLow
+//        value = value * diff
+//        value = value / fromDiff
+//        value = value + toLow
+//    }
+//
+//    var result = [Double](repeating: toLow, count: number.count)
+//    result.replaceSubrange(resultLow ... resultHigh, with: value)
+//    if resultHigh != (number.count - 1) {
+//        result.replaceSubrange((resultHigh + 1) ..< number.count, with: repeatElement(toHigh, count: number.count - (resultHigh + 1)))
+//    }
+//    return result
+// }
 
 func ramp(targetValue: Float, lastTargetValue: inout Float, samples: Int, step _: Float = 1.0) -> [Float] {
     var control = [Float](repeating: 0, count: samples)
@@ -1505,6 +1570,13 @@ class ExpiringBool: ExpressibleByBooleanLiteral, CustomStringConvertible, Observ
             DispatchQueue.main.sync(execute: task.workItem)
             self.task = nil
         }
+    }
+
+    func `true`(for time: TimeInterval) {
+        set(true, expireAfter: time)
+    }
+    func `false`(for time: TimeInterval) {
+        set(false, expireAfter: time)
     }
 
     func set(_ value: Bool, expireAfter: TimeInterval) {

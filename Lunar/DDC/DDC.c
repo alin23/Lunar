@@ -14,41 +14,8 @@
 
 const UInt8 ZEROARRAY[256] = { 0 };
 
-void setDebugMode(UInt8 debug_mode)
-{
-    DEBUG_FLAG = debug_mode;
-}
-
-void setLogPath(const char* newLogPath, ssize_t length)
-{
-    if (logFile != NULL) {
-        fclose(logFile);
-        logFile = NULL;
-    }
-    logPath = (char*)calloc(length + 1, sizeof(char));
-    strcpy(logPath, newLogPath);
-}
-
-bool logToFile(char* format, ...)
-{
-    if (DEBUG_FLAG == 0) {
-        return false;
-    }
-    va_list args;
-    va_start(args, format);
-
-    vprintf(format, args);
-    if (logFile == NULL) {
-        logFile = fopen(logPath, "a+");
-    }
-    if (logFile != NULL) {
-        vfprintf(logFile, format, args);
-    } else {
-        va_end(args);
-        return false;
-    }
-    va_end(args);
-    return true;
+void initDDCLogging(void) {
+    logger = os_log_create("fyi.lunar.Lunar", "ddc");
 }
 
 bool IsLidClosed(void)
@@ -60,7 +27,7 @@ bool IsLidClosed(void)
 
     IOReturn ioReturn = IOMasterPort(MACH_PORT_NULL, &masterPort);
     if (ioReturn != 0) {
-        // logToFile("Error on getting master port: %d\n", ioReturn);
+        os_log_error(logger, "Error on getting master port: %d", ioReturn);
         return false;
     }
 
@@ -96,7 +63,7 @@ static CFDataRef EDIDCreateFromFramebuffer(io_service_t framebuffer)
     io_service_t serv, displayPort = 0;
 
     if (IORegistryEntryGetChildIterator(framebuffer, kIOServicePlane, &iter) != KERN_SUCCESS) {
-        logToFile("Can't get child iterator for framebuffer port: %d\n", framebuffer);
+        os_log_error(logger, "Can't get child iterator for framebuffer port: %d", framebuffer);
         return NULL;
     }
 
@@ -105,26 +72,22 @@ static CFDataRef EDIDCreateFromFramebuffer(io_service_t framebuffer)
     CFDataRef edidData;
 
     while ((serv = IOIteratorNext(iter)) != MACH_PORT_NULL) {
-        logToFile("Getting service class for child %d\n", serv);
+        os_log_debug(logger, "Getting service class for child %d", serv);
         CFStringRef serviceClass = IORegistryEntrySearchCFProperty(serv, kIOServicePlane, key, kCFAllocatorDefault, kIORegistryIterateRecursively);
         if (serviceClass == NULL) {
-            logToFile("No service class for child %d\n", serv);
+            os_log_debug(logger, "No service class for child %d", serv);
             continue;
         }
-        //        const char *cServiceClass = CFStringGetCStringPtr(serviceClass, kCFStringEncodingASCII);
-        //        if (cServiceClass != NULL) {
-        //            logToFile("Got service class for child %d: %s\n", serv, cServiceClass);
-        //        }
-        logToFile("Got service class for child %d", serv);
+        os_log_debug(logger, "Got service class for child %d", serv);
 
         if (CFStringCompare(ioDisplayConnect, serviceClass, 0) == 0 && IORegistryEntryGetChildEntry(serv, kIOServicePlane, &displayPort) == KERN_SUCCESS) {
-            logToFile("Found display port for framebuffer %d: %d\n", framebuffer, displayPort);
+            os_log_debug(logger, "Found display port for framebuffer %d: %d", framebuffer, displayPort);
         } else {
             CFRelease(serviceClass);
             continue;
         }
 
-        logToFile("Getting info dict for display %d\n", serv);
+        os_log_debug(logger, "Getting info dict for display %d", serv);
         CFDictionaryRef info = IODisplayCreateInfoDictionary(displayPort, kIODisplayOnlyPreferredName);
         if (CFDictionaryGetValueIfPresent(info, CFSTR(kIODisplayEDIDKey), (const void**)&edidData)) {
             CFRetain(edidData);
@@ -133,7 +96,7 @@ static CFDataRef EDIDCreateFromFramebuffer(io_service_t framebuffer)
             CFRelease(key);
             CFRelease(info);
             IOObjectRelease(iter);
-            logToFile("Got EDID for display %d\n\n", displayPort);
+            os_log_debug(logger, "Got EDID for display %d", displayPort);
             return edidData;
         }
         CFRelease(serviceClass);
@@ -143,7 +106,7 @@ static CFDataRef EDIDCreateFromFramebuffer(io_service_t framebuffer)
     CFRelease(key);
     CFRelease(ioDisplayConnect);
     IOObjectRelease(iter);
-    logToFile("No EDID for framebuffer %d\n\n", framebuffer);
+    os_log_error(logger, "No EDID for framebuffer %d", framebuffer);
     return NULL;
 }
 
@@ -202,18 +165,18 @@ io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID, CFMut
         CFNumberRef vendorIDRef, productIDRef, serialNumberRef;
         Boolean success = 0;
 
-        logToFile("Getting EDID for framebuffer %d\n", serv);
+        os_log_debug(logger, "Getting EDID for framebuffer %d", serv);
         CFDataRef displayEDID = EDIDCreateFromFramebuffer(serv);
         if (displayEDID == NULL) {
             continue;
         }
 
-        logToFile("Checking to see if EDID already exists\n");
+        os_log_debug(logger, "Checking to see if EDID already exists");
         if (CFDictionaryGetValueIfPresent(displayUUIDByEDID, displayEDID, (const void**)&uuid)) {
             CFRetain(uuid);
 
-            logToFile("EDID already exists\n");
-            logToFile("Checking to see if EDID corresponds to display UUID\n");
+            os_log_debug(logger, "EDID already exists");
+            os_log_debug(logger, "Checking to see if EDID corresponds to display UUID");
 
             CFStringRef uuid1 = CFUUIDCreateString(kCFAllocatorDefault, displayUUID);
             CFStringRef uuid2 = CFUUIDCreateString(kCFAllocatorDefault, uuid);
@@ -222,7 +185,7 @@ io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID, CFMut
                 CFRelease(displayEDID);
                 CFRelease(uuid1);
                 CFRelease(uuid2);
-                logToFile("UUIDs differ\n");
+                os_log_debug(logger, "UUIDs differ");
                 continue;
             }
             if (uuid1) {
@@ -235,19 +198,19 @@ io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID, CFMut
 
         // get metadata from IOreg node
         IORegistryEntryGetName(serv, name);
-        logToFile("Getting info dict for fb: %d\n", serv);
+        os_log_debug(logger, "Getting info dict for fb: %d", serv);
         info = IODisplayCreateInfoDictionary(serv, kIODisplayOnlyPreferredName);
 
-        logToFile("Getting vendor for fb: %d\n", serv);
+        os_log_debug(logger, "Getting vendor for fb: %d", serv);
         if (CFDictionaryGetValueIfPresent(info, CFSTR(kDisplayVendorID), (const void**)&vendorIDRef)) {
             success = CFNumberGetValue(vendorIDRef, kCFNumberCFIndexType, &vendorID);
-            logToFile("Got vendor %d for fb: %d\n", vendorID, serv);
+            os_log_debug(logger, "Got vendor %ld for fb: %d", (long)vendorID, serv);
         }
 
-        logToFile("Getting product id for fb: %d\n", serv);
+        os_log_debug(logger, "Getting product id for fb: %d", serv);
         if (CFDictionaryGetValueIfPresent(info, CFSTR(kDisplayProductID), (const void**)&productIDRef)) {
             success &= CFNumberGetValue(productIDRef, kCFNumberCFIndexType, &productID);
-            logToFile("Got product id %d for fb: %d\n", productID, serv);
+            os_log_debug(logger, "Got product id %ld for fb: %d", (long)productID, serv);
         }
 
         IOItemCount busCount;
@@ -260,10 +223,10 @@ io_service_t IOFramebufferPortFromCGDisplayID(CGDirectDisplayID displayID, CFMut
             continue;
         }
 
-        logToFile("Getting serial number for fb: %d\n", serv);
+        os_log_debug(logger, "Getting serial number for fb: %d", serv);
         if (CFDictionaryGetValueIfPresent(info, CFSTR(kDisplaySerialNumber), (const void**)&serialNumberRef)) {
             CFNumberGetValue(serialNumberRef, kCFNumberCFIndexType, &serialNumber);
-            logToFile("Got serial number %d for fb: %d\n", serialNumber, serv);
+            os_log_debug(logger, "Got serial number %ld for fb: %d", (long)serialNumber, serv);
         }
 
         // compare IOreg's metadata to CGDisplay's metadata to infer if the IOReg's I2C monitor is the display for the given NSScreen.displayID
@@ -429,20 +392,20 @@ bool DDCReadIntel(io_service_t framebuffer, struct DDCReadCommand* read)
 
         if (result) { // checksum is ok
             if (i > 1) {
-                logToFile("D: Tries required to get data: %d \n", i);
+                os_log_debug(logger, "Tries required to get data: %d", i);
             }
             break;
         }
 
         if (request.result == kIOReturnUnsupportedMode)
-            logToFile("E: Unsupported Transaction Type! \n");
+            os_log_error(logger, "Unsupported Transaction Type!");
 
         // reset values and return 0, if data reading fails
         if (i >= kMaxRequests) {
             read->success = false;
             read->max_value = 0;
             read->current_value = 0;
-            logToFile("E: No data after %d tries! \n", i);
+            os_log_error(logger, "No data after %d tries!", i);
             return 0;
         }
 
@@ -456,13 +419,6 @@ bool DDCReadIntel(io_service_t framebuffer, struct DDCReadCommand* read)
 
 UInt32 SupportedTransactionType()
 {
-    /*
-     With my setup (Intel HD4600 via displaylink to 'DELL U2515H') the original app failed to read ddc and freezes my system.
-     This happens because AppleIntelFramebuffer do not support kIOI2CDDCciReplyTransactionType.
-     So this version comes with a reworked ddc read function to detect the correct TransactionType.
-     --SamanVDR 2016
-   */
-
     kern_return_t kr;
     io_iterator_t io_objects;
     io_service_t io_service;
@@ -471,7 +427,7 @@ UInt32 SupportedTransactionType()
                                       IOServiceNameMatching("IOFramebufferI2CInterface"), &io_objects);
 
     if (kr != KERN_SUCCESS) {
-        logToFile("E: Fatal - No matching service! \n");
+        os_log_error(logger, "Fatal - No matching service!");
         return 0;
     }
 
@@ -487,51 +443,47 @@ UInt32 SupportedTransactionType()
             if (CFDictionaryGetValueIfPresent(service_properties, CFSTR(kIOI2CTransactionTypesKey), (const void**)&typesRef))
                 CFNumberGetValue(typesRef, kCFNumberCFIndexType, &types);
 
-            /*
-             We want DDCciReply but Simple is better than No-thing.
-             Combined and DisplayPortNative are not useful in our case.
-             */
             if (types) {
 #ifdef DEBUG
-                logToFile("\nD: IOI2CTransactionTypes: 0x%02lx (%ld)\n", types, types);
+                os_log_debug(logger, "IOI2CTransactionTypes: 0x%02lx (%ld)", types, types);
 
                 // kIOI2CNoTransactionType = 0
                 if (0 == ((1 << kIOI2CNoTransactionType) & (UInt64)types)) {
-                    logToFile("E: IOI2CNoTransactionType                   unsupported \n");
+                    os_log_error(logger, "IOI2CNoTransactionType                   unsupported ");
                 } else {
-                    logToFile("D: IOI2CNoTransactionType                   supported \n");
+                    os_log_debug(logger, "IOI2CNoTransactionType                   supported ");
                     supportedType = kIOI2CNoTransactionType;
                 }
 
                 // kIOI2CSimpleTransactionType = 1
                 if (0 == ((1 << kIOI2CSimpleTransactionType) & (UInt64)types)) {
-                    logToFile("E: IOI2CSimpleTransactionType               unsupported \n");
+                    os_log_error(logger, "IOI2CSimpleTransactionType               unsupported ");
                 } else {
-                    logToFile("D: IOI2CSimpleTransactionType               supported \n");
+                    os_log_debug(logger, "IOI2CSimpleTransactionType               supported ");
                     supportedType = kIOI2CSimpleTransactionType;
                 }
 
                 // kIOI2CDDCciReplyTransactionType = 2
                 if (0 == ((1 << kIOI2CDDCciReplyTransactionType) & (UInt64)types)) {
-                    logToFile("E: IOI2CDDCciReplyTransactionType           unsupported \n");
+                    os_log_error(logger, "IOI2CDDCciReplyTransactionType           unsupported ");
                 } else {
-                    logToFile("D: IOI2CDDCciReplyTransactionType           supported \n");
+                    os_log_debug(logger, "IOI2CDDCciReplyTransactionType           supported ");
                     supportedType = kIOI2CDDCciReplyTransactionType;
                 }
 
                 // kIOI2CCombinedTransactionType = 3
                 if (0 == ((1 << kIOI2CCombinedTransactionType) & (UInt64)types)) {
-                    logToFile("E: IOI2CCombinedTransactionType             unsupported \n");
+                    os_log_error(logger, "IOI2CCombinedTransactionType             unsupported ");
                 } else {
-                    logToFile("D: IOI2CCombinedTransactionType             supported \n");
+                    os_log_debug(logger, "IOI2CCombinedTransactionType             supported ");
                     // supportedType = kIOI2CCombinedTransactionType;
                 }
 
                 // kIOI2CDisplayPortNativeTransactionType = 4
                 if (0 == ((1 << kIOI2CDisplayPortNativeTransactionType) & (UInt64)types)) {
-                    logToFile("E: IOI2CDisplayPortNativeTransactionType    unsupported\n");
+                    os_log_error(logger, "IOI2CDisplayPortNativeTransactionType    unsupported");
                 } else {
-                    logToFile("D: IOI2CDisplayPortNativeTransactionType    supported \n");
+                    os_log_debug(logger, "IOI2CDisplayPortNativeTransactionType    supported ");
                     // supportedType = kIOI2CDisplayPortNativeTransactionType;
                     //  http://hackipedia.org/Hardware/video/connectors/DisplayPort/VESA%20DisplayPort%20Standard%20v1.1a.pdf
                     //  http://www.electronic-products-design.com/geek-area/displays/display-port
@@ -548,7 +500,7 @@ UInt32 SupportedTransactionType()
                 }
 #endif
             } else
-                logToFile("E: Fatal - No supported Transaction Types! \n");
+                os_log_error(logger, "Fatal - No supported Transaction Types! ");
 
             CFRelease(service_properties);
             CFRelease(typesRef);

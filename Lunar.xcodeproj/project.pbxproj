@@ -7,10 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BF_746411459837 /* Secrets.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR_234235089941 /* Secrets.generated.swift */; };
 		C701A23F2546C8BF004747B5 /* MediaKeyTap in Frameworks */ = {isa = PBXBuildFile; productRef = C701A23E2546C8BF004747B5 /* MediaKeyTap */; };
 		C7045DAA24407CBC002289E5 /* Surge in Frameworks */ = {isa = PBXBuildFile; productRef = C7045DA924407CBC002289E5 /* Surge */; };
-		C7045DB22440DC5E002289E5 /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = C7045DB12440DC5E002289E5 /* SwiftyBeaver */; };
 		C7045DB82440DEEE002289E5 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = C7045DB72440DEEE002289E5 /* SwiftyJSON */; };
 		C7045DC12441015C002289E5 /* SwiftDate in Frameworks */ = {isa = PBXBuildFile; productRef = C7045DC02441015C002289E5 /* SwiftDate */; };
 		C705A04D268BA02E001ABBA9 /* AXSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C705A04C268BA02E001ABBA9 /* AXSwift */; };
@@ -371,7 +369,6 @@
 		C7E896D92652C0F60079A328 /* ExceptionCatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExceptionCatcher.h; sourceTree = "<group>"; };
 		C7E896DC2652C37E0079A328 /* CoreBrightness.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBrightness.framework; path = ../../../../../System/Library/PrivateFrameworks/CoreBrightness.framework; sourceTree = "<group>"; };
 		C7EF9534243F4E2200839A62 /* Sysctl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sysctl.swift; sourceTree = "<group>"; };
-		FR_234235089941 /* Secrets.generated.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Secrets.generated.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -398,7 +395,6 @@
 				C7E99267260A90E70055370A /* Solar in Frameworks */,
 				C7A7F2542913ECCA00CD450C /* FuzzyMatcher in Frameworks */,
 				C78BD04A259B33D500FC823F /* Path in Frameworks */,
-				C7045DB22440DC5E002289E5 /* SwiftyBeaver in Frameworks */,
 				C74F8DC425EB94660077DF27 /* DisplayServices.framework in Frameworks */,
 				C7E80E3A2637060F004718A4 /* libssh2.a in Frameworks */,
 				C740A1F826249176004BC1C7 /* ArgumentParser in Frameworks */,
@@ -650,7 +646,6 @@
 				C76545241FD8A10200DBACE9 /* Controllers */,
 				C76545231FD8A0E000DBACE9 /* Data */,
 				C7151945224E34BA0024C6F6 /* DDC */,
-				G_5197027794336 /* Generated */,
 				C78BD03D259B2FA300FC823F /* Modes */,
 				C790D4BC259B9DC100868689 /* Utils */,
 				C77CC75A1FEDB367009AA718 /* Views */,
@@ -754,14 +749,6 @@
 			path = Headers;
 			sourceTree = "<group>";
 		};
-		G_5197027794336 /* Generated */ = {
-			isa = PBXGroup;
-			children = (
-				FR_234235089941 /* Secrets.generated.swift */,
-			);
-			path = Generated;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -790,7 +777,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C7AEC81B1FD0B4350039B562 /* Build configuration list for PBXNativeTarget "Lunar" */;
 			buildPhases = (
-				C7574F84235469D600358397 /* ShellScript */,
 				C740A1D0262195D1004BC1C7 /* Headers */,
 				C7AEC7F11FD0B4350039B562 /* Sources */,
 				C7AEC7F31FD0B4350039B562 /* Resources */,
@@ -805,7 +791,6 @@
 			name = Lunar;
 			packageProductDependencies = (
 				C7045DA924407CBC002289E5 /* Surge */,
-				C7045DB12440DC5E002289E5 /* SwiftyBeaver */,
 				C7045DB72440DEEE002289E5 /* SwiftyJSON */,
 				C7045DC02441015C002289E5 /* SwiftDate */,
 				C73CC6AD24616462003B2658 /* Sauce */,
@@ -869,7 +854,6 @@
 			mainGroup = C7AEC7EC1FD0B4350039B562;
 			packageReferences = (
 				C7045DA824407CBC002289E5 /* XCRemoteSwiftPackageReference "Surge" */,
-				C7045DB02440DC5E002289E5 /* XCRemoteSwiftPackageReference "SwiftyBeaver" */,
 				C7045DB62440DEEE002289E5 /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
 				C7045DBF2441015C002289E5 /* XCRemoteSwiftPackageReference "SwiftDate" */,
 				C73CC6AC24616462003B2658 /* XCRemoteSwiftPackageReference "Sauce" */,
@@ -944,27 +928,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "mkdir -p \"$CODESIGNING_FOLDER_PATH/Contents/_MASReceipt\"\ntouch \"$CODESIGNING_FOLDER_PATH/Contents/_MASReceipt/receipt\"\n";
-		};
-		C7574F84235469D600358397 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/bin/.env.sh",
-				"$(SRCROOT)/.sourcery.yml",
-				"$(SRCROOT)/Lunar/Generated/Secrets.stencil",
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(SRCROOT)/Lunar/Generated/Secrets.generated.swift",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "./bin/gencode.sh\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1088,7 +1051,6 @@
 				C7A22756281C19D1005F2351 /* XDRTipView.swift in Sources */,
 				C7C1F7051FD635360039507C /* Moment.swift in Sources */,
 				C7AF321B26F62D3B00AC14AF /* Schedule.swift in Sources */,
-				BF_746411459837 /* Secrets.generated.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1273,7 +1235,7 @@
 				MARKETING_VERSION = 6.0.0b5;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
-				OTHER_LDFLAGS = "";
+				OTHER_LDFLAGS = "-fuse-ld=/usr/local/bin/ld64.mold";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1397,14 +1359,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 2.3.0;
-			};
-		};
-		C7045DB02440DC5E002289E5 /* XCRemoteSwiftPackageReference "SwiftyBeaver" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SwiftyBeaver/SwiftyBeaver";
-			requirement = {
-				branch = master;
-				kind = branch;
 			};
 		};
 		C7045DB62440DEEE002289E5 /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
@@ -1619,11 +1573,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C7045DA824407CBC002289E5 /* XCRemoteSwiftPackageReference "Surge" */;
 			productName = Surge;
-		};
-		C7045DB12440DC5E002289E5 /* SwiftyBeaver */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C7045DB02440DC5E002289E5 /* XCRemoteSwiftPackageReference "SwiftyBeaver" */;
-			productName = SwiftyBeaver;
 		};
 		C7045DB72440DEEE002289E5 /* SwiftyJSON */ = {
 			isa = XCSwiftPackageProductDependency;

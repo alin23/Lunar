@@ -10,6 +10,7 @@
 #define SharedDDC_h
 
 #include <ApplicationServices/ApplicationServices.h>
+#include <os/log.h>
 
 struct DDCWriteCommand
 {
@@ -197,5 +198,6 @@ struct EDID {
     } extensiondata;
 };
 
+static os_log_t logger = NULL;
 
 #endif /* SharedDDC_h */
