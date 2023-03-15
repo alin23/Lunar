@@ -162,7 +162,6 @@ final class ConfigurationViewController: NSViewController {
 
     func showRelevantSettings(_ adaptiveMode: AdaptiveModeKey) {
         let locationMode = adaptiveMode == .location
-        let syncMode = adaptiveMode == .sync
         let sensorMode = adaptiveMode == .sensor
         let clockMode = adaptiveMode == .clock
         // let manualMode = adaptiveMode == .manual

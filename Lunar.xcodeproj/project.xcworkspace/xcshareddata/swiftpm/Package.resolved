@@ -253,15 +253,6 @@
       }
     },
     {
-      "identity" : "swiftybeaver",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SwiftyBeaver/SwiftyBeaver",
-      "state" : {
-        "branch" : "master",
-        "revision" : "9f12cceff43dff63a8db36b9a426f84f8c6c4c57"
-      }
-    },
-    {
       "identity" : "swiftyjson",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SwiftyJSON/SwiftyJSON",

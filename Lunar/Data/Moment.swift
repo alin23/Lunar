@@ -8,7 +8,6 @@
 
 import Cocoa
 import Defaults
-import Solar
 import SwiftDate
 import SwiftyJSON
 

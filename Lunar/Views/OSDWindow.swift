@@ -442,7 +442,7 @@ public struct Colors {
     public static var light = Colors(.light, accent: Colors.lunarYellow)
     public static var dark = Colors(.dark, accent: Colors.peach)
 
-    public static let darkGray = Color(hue: 0, saturation: 0.01, brightness: 0.32)
+    public static let darkGray = Color(hue: 0, saturation: 0.01, brightness: 0.22)
     public static let blackGray = Color(hue: 0.03, saturation: 0.12, brightness: 0.18)
     public static let lightGray = Color(hue: 0, saturation: 0.0, brightness: 0.92)
 

@@ -1860,14 +1860,24 @@ extension [UserValue] {
 }
 
 import SwiftUI
-extension Binding {
-    static func oneway(getter: @escaping () -> Value) -> Binding {
-        Binding(get: getter, set: { _ in })
-    }
-}
 
 public extension Sequence {
     func dict<K: Hashable, V>(uniqueByLast: Bool = false, _ transformer: (Element) -> (K, V)?) -> [K: V] {
         Dictionary(compactMap(transformer), uniquingKeysWith: uniqueByLast ? last(this:other:) : first(this:other:))
+    }
+}
+
+public extension Binding where Value == Bool {
+    static let `false`: Binding<Value> = .constant(false)
+    static let `true`: Binding<Value> = .constant(true)
+}
+
+public extension Binding {
+    static func oneway(getter: @escaping () -> Value) -> Binding {
+        Binding(get: getter, set: { _ in })
+    }
+
+    var optional: Binding<Value?> {
+        .oneway { self.wrappedValue }
     }
 }
