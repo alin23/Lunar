@@ -129,10 +129,14 @@ final class ModeChoiceViewController: NSViewController {
 
     @objc func syncBuiltinClick() {
         queueChange {
-            guard let builtin = DC.builtinDisplay else { return }
-            builtin.isSource = true
+            var serial = ""
+            if let builtin = DC.builtinDisplay {
+                builtin.isSource = true
+                serial = builtin.serial
+            }
+
             DC.displays.values
-                .filter { $0.serial != builtin.serial }
+                .filter { $0.serial != serial }
                 .forEach { d in
                     d.isSource = false
                     d.lockedBrightnessCurve = false
@@ -229,25 +233,25 @@ final class ModeChoiceViewController: NSViewController {
         subheading.alphaValue = 0
 
         let externals = DC.externalActiveDisplays
-        let externalName = DC.externalActiveDisplays.count == 1 ? DC.externalActiveDisplays[0]
-            .name : "external monitors"
+        let externalName = externals.count == 1 ? externals[0].name : "external monitors"
         setupButton(
             syncBuiltin,
             notice: syncBuiltinNotice,
             color: green,
             title: markdown
                 .attributedString(
-                    from: "**Sync** the brightness of your\n**\(Sysctl.device)** to your **\(externalName)**"
+                    from: SyncMode.specific.builtinAvailable
+                        ? "**Sync** the brightness of your\n**\(Sysctl.device)** to your **\(externalName)**"
+                        : "**Keep** your monitors in **Sync** with each other\nwhen adjusting **brightness**"
                 ),
-            enabled: SyncMode.specific.builtinAvailable,
+            enabled: true,
             action: #selector(syncBuiltinClick)
         )
 
         let source = externals.first { $0.hasAmbientLightAdaptiveBrightness && AppleNativeControl.isAvailable(for: $0) }
         let targets = externals.filter { source == nil || $0.serial != source!.serial }
         let sourceName = source?.name ?? "Source Display"
-        let targetName =
-            "\((targets.count == 1 && targets[0].name == sourceName) ? "other " : "")\(targets.count == 1 ? targets[0].name : "other external monitors")"
+        let targetName = "\((targets.count == 1 && targets[0].name == sourceName) ? "other " : "")\(targets.count == 1 ? targets[0].name : "other monitors")"
         setupButton(
             syncSource,
             notice: syncSourceNotice,
@@ -290,9 +294,9 @@ final class ModeChoiceViewController: NSViewController {
             color: blue.highlight(withLevel: 0.2) ?? blue,
             title: markdown
                 .attributedString(
-                    from: "**Adapt** your **\(externalName)** based on readings\nfrom an **ambient light sensor**"
+                    from: "**Adapt** screen brightness based on readings\nfrom an **ambient light sensor**"
                 ),
-            enabled: true,
+            enabled: SensorMode.specific.available,
             action: #selector(sensorClick)
         )
 

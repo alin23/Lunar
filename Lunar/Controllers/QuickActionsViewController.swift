@@ -433,7 +433,7 @@ struct DisplayRowView: View {
     }
 
     var sdrXdrSelector: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: 2) {
             SwiftUI.Button("SDR") {
                 guard display.enhanced else { return }
                 withAnimation(.fastSpring) { display.enhanced = false }
@@ -464,6 +464,7 @@ struct DisplayRowView: View {
             .popover(isPresented: $showNeedsLunarPro) { NeedsLunarProView() }
             .popover(isPresented: $showXDRTip) { XDRTipView() }
         }
+        .padding(2)
         .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(colors.invertedGray))
         .padding(.bottom, 4)
     }
