@@ -290,7 +290,7 @@ final class ModeChoiceViewController: NSViewController {
             color: blue.highlight(withLevel: 0.2) ?? blue,
             title: markdown
                 .attributedString(
-                    from: "**Adapt** your **\(externalName)** based on readings\nfrom a wireless **ambient light sensor**"
+                    from: "**Adapt** your **\(externalName)** based on readings\nfrom an **ambient light sensor**"
                 ),
             enabled: true,
             action: #selector(sensorClick)

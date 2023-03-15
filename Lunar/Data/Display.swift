@@ -482,7 +482,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         preciseVolume = volume.doubleValue / 100.0
         audioMuted = (try container.decodeIfPresent(Bool.self, forKey: .audioMuted)) ?? false
         canChangeVolume = (try container.decodeIfPresent(Bool.self, forKey: .canChangeVolume)) ?? true
-        isSource = try container.decodeIfPresent(Bool.self, forKey: .isSource) ?? DDC.isSmartBuiltinDisplay(id)
+        isSource = try container.decodeIfPresent(Bool.self, forKey: .isSource) ?? false
         showVolumeOSD = try container.decodeIfPresent(Bool.self, forKey: .showVolumeOSD) ?? true
         muteByteValueOn = try container.decodeIfPresent(UInt16.self, forKey: .muteByteValueOn) ?? 1
         muteByteValueOff = try container.decodeIfPresent(UInt16.self, forKey: .muteByteValueOff) ?? 2
@@ -3512,7 +3512,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
         }
 
-        var isActiveSyncSource: Bool { DC.sourceDisplay.serial == serial }
         func recomputeNitsMapping() {
             nitsToPercentageMapping = Self.LUX_TO_NITS.sorted(by: { $0.key < $1.key }).map { k, v in
                 AutoLearnMapping(source: k, target: nitsToPercentage(v, minNits: minNits, maxNits: userMaxNits ?? maxNits) * 100)
@@ -3553,6 +3552,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     #endif
 
+    var isActiveSyncSource: Bool { DC.sourceDisplay.serial == serial }
     lazy var hdrOn: Bool = potentialEDR > 2 && edr > 1 {
         didSet {
             log.debug("\(name) HDR: \(hdrOn)")
@@ -4239,9 +4239,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 }
             } else if let builtinDisplay = DC.builtinDisplay, builtinDisplay.serial != serial {
                 builtinDisplay.isSource = true
-            } else if let smartDisplay = DC.externalActiveDisplays.first(where: \.hasAmbientLightAdaptiveBrightness),
-                      smartDisplay.serial != serial
-            {
+            } else if let smartDisplay = DC.externalActiveDisplays.first(where: { $0.hasAmbientLightAdaptiveBrightness && $0.serial != serial }) {
                 smartDisplay.isSource = true
             }
 
@@ -4263,19 +4261,15 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     static func insertElevationDataPoint(_ mapping: AutoLearnMapping, in values: [AutoLearnMapping]) -> [AutoLearnMapping]? {
         guard let solar = LocationMode.specific.geolocation?.solar,
-              let astroSunrise = solar.astronomicalSunrisePosition?.elevation,
-              let astroSunset = solar.astronomicalSunsetPosition?.elevation,
               let noon = solar.solarNoonPosition?.elevation,
-              let sunrise = solar.sunrisePosition?.elevation,
-              let sunset = solar.sunsetPosition?.elevation,
-              mapping.source < max(sunrise, sunset) || mapping.source > noon
+              mapping.source < 0 || mapping.source > noon
         else {
             return nil
         }
 
         var values = values
-        if mapping.source < max(sunrise, sunset), mapping.target > -100 {
-            values = Display.insertDataPoint([min(astroSunrise, astroSunset): mapping.target - 0.01], in: values)
+        if mapping.source < 0, mapping.target > -100 {
+            values = Display.insertDataPoint([-18: mapping.target - 0.01], in: values)
         }
 
         if mapping.source > noon {
@@ -4396,6 +4390,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func resetSoftwareControl() {
         guard active else { return }
+        log.verbose("Resetting software dimming")
+        log.traceCalls()
         resetGamma()
         shadeWindowController?.close()
         shadeWindowController = nil
@@ -5907,7 +5903,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         let modeKey = modeKey ?? DC.adaptiveModeKey
 
         guard !lockedBrightnessCurve, !adaptivePaused,
-              modeKey != .sync || !isSource,
+              modeKey != .sync || !isActiveSyncSource,
               modeKey != .location || featureValue != 0,
               !noControls, timeSince(lastConnectionTime) > 5
         else { return }
@@ -5950,9 +5946,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         let modeKey = modeKey ?? DC.adaptiveModeKey
 
         guard !lockedContrastCurve, !adaptivePaused,
-              modeKey != .sync || !isSource,
+              modeKey != .sync || !isActiveSyncSource,
               modeKey != .location || featureValue != 0,
-              !noControls, timeSince(lastConnectionTime) > 5
+              canChangeContrast, !noControls, timeSince(lastConnectionTime) > 5
         else { return }
 
         let targetValue = targetValue.map(from: (minContrast.doubleValue, maxContrast.doubleValue), to: (0, 100))

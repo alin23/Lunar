@@ -336,7 +336,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     }
 
     var sun: String {
-        guard let moment = LocationMode.specific.moment, let elevation = LocationMode.specific.geolocation?.sun() else { return "" }
+        guard let moment = LocationMode.specific.moment, let elevation = LocationMode.specific.geolocation?.sunElevation else { return "" }
         let sunrise = moment.sunrise.toString(.time(.short))
         let sunset = moment.sunset.toString(.time(.short))
         let noon = moment.solarNoon.toString(.time(.short))
@@ -2138,6 +2138,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 if restarted {
                     DC.possiblyDisconnectedDisplays = Defaults[.possiblyDisconnectedDisplays].dict { ($0.id, $0) }
                 } else {
+                    log.info("Reconnecting all displays")
                     DC.en()
                 }
 

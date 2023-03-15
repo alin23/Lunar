@@ -15,7 +15,6 @@ import Defaults
 import Foundation
 import FuzzyMatcher
 import Sentry
-import Solar
 import Surge
 import SwiftDate
 import SwiftyJSON
@@ -957,8 +956,8 @@ final class DisplayController: ObservableObject {
         }
     }
 
-    static func getSourceDisplay() -> Display {
-        guard let displays = CachedDefaults[.displays] else {
+    static func getSourceDisplay(_ displays: [Display]? = nil) -> Display {
+        guard let displays = displays ?? CachedDefaults[.displays] else {
             return ALL_DISPLAYS
         }
 
@@ -1019,15 +1018,7 @@ final class DisplayController: ObservableObject {
     }
 
     func getSourceDisplay() -> Display {
-        let externalSource = externalActiveDisplays.filter { $0.isSource && !$0.blackout }
-        if let source = externalSource.first(where: { $0.hasAmbientLightAdaptiveBrightness }) ?? externalSource.first(where: { $0.isNative }) ?? externalSource.first {
-            return source
-        }
-
-        if let builtinDisplay, builtinDisplay.isSource, !builtinDisplay.blackout {
-            return builtinDisplay
-        }
-        return ALL_DISPLAYS
+        DisplayController.getSourceDisplay(activeDisplayList)
     }
 
     #if arch(arm64)
@@ -1426,6 +1417,16 @@ final class DisplayController: ObservableObject {
             self.modeWatcherTask = nil
             self.screencaptureWatcherTask = nil
         }.store(in: &observers)
+
+        #if arch(arm64)
+            if #available(macOS 13, *), Sysctl.isMacBook {
+                autoBlackoutBuiltinPublisher
+                    .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
+                    .sink { [self] change in
+                        builtinDisplay?.keepDisconnected = change.newValue
+                    }.store(in: &observers)
+            }
+        #endif
 
         gammaDisabledCompletelyPublisher
             .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
@@ -1996,7 +1997,7 @@ final class DisplayController: ObservableObject {
             adaptiveMode.withForce {
                 activeDisplayList.forEach { d in
                     d.updateCornerWindow()
-                    if d.softwareBrightness == 1.0 {
+                    if d.softwareBrightness == 1.0, !d.hasSoftwareControl || d.preciseBrightness == 1.0 {
                         d.resetSoftwareControl()
                     }
                 }

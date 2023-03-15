@@ -150,7 +150,7 @@
       "location" : "https://github.com/alin23/sentry-cocoa.git",
       "state" : {
         "branch" : "master",
-        "revision" : "bae2454d1be63d5c91a86a284c39d7e4b081ff7e"
+        "revision" : "f4a58bc31e45f7530d4f29a2fd2222d099bf0df3"
       }
     },
     {
@@ -160,15 +160,6 @@
       "state" : {
         "branch" : "develop",
         "revision" : "73014324f2a916b445b4da5a4232aa57033267af"
-      }
-    },
-    {
-      "identity" : "solar",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/alin23/Solar",
-      "state" : {
-        "revision" : "7f35c6e225c0ac8000930f0c2b11f188e3be3163",
-        "version" : "3.1.1"
       }
     },
     {

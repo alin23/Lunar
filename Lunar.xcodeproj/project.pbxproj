@@ -143,6 +143,7 @@
 		C7C68F09201B75C700F49A2B /* DeleteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F08201B75C700F49A2B /* DeleteButton.swift */; };
 		C7C68F0B201D356800F49A2B /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F0A201D356800F49A2B /* SettingsViewController.swift */; };
 		C7C68F0D201D3D9800F49A2B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C68F0C201D3D9800F49A2B /* SettingsView.swift */; };
+		C7CB6C8529C20D0D00BC9941 /* Solar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CB6C8429C20D0D00BC9941 /* Solar.swift */; };
 		C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */; };
 		C7CBEFFD238E81FF00031E93 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFFC238E81FF00031E93 /* Util.swift */; };
 		C7CC5D1629437E2C00DEA106 /* DDC2.h in Headers */ = {isa = PBXBuildFile; fileRef = C7CC5D1529437E2C00DEA106 /* DDC2.h */; };
@@ -181,7 +182,6 @@
 		C7E896DA2652C0F60079A328 /* CBBlueLightClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C7E896D82652C0F60079A328 /* CBBlueLightClient.h */; };
 		C7E896DB2652C0F60079A328 /* ExceptionCatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = C7E896D92652C0F60079A328 /* ExceptionCatcher.h */; };
 		C7E896DD2652C37E0079A328 /* CoreBrightness.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7E896DC2652C37E0079A328 /* CoreBrightness.framework */; };
-		C7E99267260A90E70055370A /* Solar in Frameworks */ = {isa = PBXBuildFile; productRef = C7E99266260A90E70055370A /* Solar */; };
 		C7EBD80829452CB50075E6FD /* LunarShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = C795103C2944E912004C6082 /* LunarShortcuts.swift */; };
 		C7ECB6722750C75C00DA212D /* LDSwiftEventSourceStatic in Frameworks */ = {isa = PBXBuildFile; productRef = C7ECB6712750C75C00DA212D /* LDSwiftEventSourceStatic */; };
 		C7EF9535243F4E2200839A62 /* Sysctl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7EF9534243F4E2200839A62 /* Sysctl.swift */; };
@@ -328,6 +328,7 @@
 		C7C68F08201B75C700F49A2B /* DeleteButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteButton.swift; sourceTree = "<group>"; };
 		C7C68F0A201D356800F49A2B /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		C7C68F0C201D3D9800F49A2B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		C7CB6C8429C20D0D00BC9941 /* Solar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Solar.swift; sourceTree = "<group>"; };
 		C7CBEFF3238C147800031E93 /* StatusItemButtonController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusItemButtonController.swift; sourceTree = "<group>"; };
 		C7CBEFFC238E81FF00031E93 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreDisplay.framework; path = /System/Library/Frameworks/CoreDisplay.framework; sourceTree = "<absolute>"; };
@@ -392,7 +393,6 @@
 				C705A04D268BA02E001ABBA9 /* AXSwift in Frameworks */,
 				C7138D962634B02900406EE3 /* Paddle.framework in Frameworks */,
 				C7E80E352637060F004718A4 /* libcrypto.a in Frameworks */,
-				C7E99267260A90E70055370A /* Solar in Frameworks */,
 				C7A7F2542913ECCA00CD450C /* FuzzyMatcher in Frameworks */,
 				C78BD04A259B33D500FC823F /* Path in Frameworks */,
 				C74F8DC425EB94660077DF27 /* DisplayServices.framework in Frameworks */,
@@ -580,6 +580,7 @@
 				C74D07C7265BA68D00291FC2 /* LoginServiceKit.swift */,
 				C7E14F7E266BBC7500A4E2F1 /* Ciao.swift */,
 				C7656C55277BBAAD00F4922A /* Swizzle.swift */,
+				C7CB6C8429C20D0D00BC9941 /* Solar.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -801,7 +802,6 @@
 				C78BD049259B33D500FC823F /* Path */,
 				C7DA10F6259B8979006DD876 /* Regex */,
 				C73B9A0C25FB9AD7003184FC /* Glob */,
-				C7E99266260A90E70055370A /* Solar */,
 				C740A1F726249176004BC1C7 /* ArgumentParser */,
 				C7138D8C2634AF0500406EE3 /* KeyHolder */,
 				C7F48C492657A258000715A8 /* DataCompression */,
@@ -864,7 +864,6 @@
 				C78BD048259B33D500FC823F /* XCRemoteSwiftPackageReference "Path" */,
 				C7DA10F5259B8979006DD876 /* XCRemoteSwiftPackageReference "Regex" */,
 				C73B9A0B25FB9AD7003184FC /* XCRemoteSwiftPackageReference "Glob" */,
-				C7E99265260A90E70055370A /* XCRemoteSwiftPackageReference "Solar" */,
 				C740A1F626249176004BC1C7 /* XCRemoteSwiftPackageReference "swift-argument-parser" */,
 				C7138D8B2634AF0500406EE3 /* XCRemoteSwiftPackageReference "KeyHolder" */,
 				C7F48C482657A258000715A8 /* XCRemoteSwiftPackageReference "DataCompression" */,
@@ -951,6 +950,7 @@
 				C7A9AAB62707130E0058D1B2 /* OnboardPageController.swift in Sources */,
 				C71F8DB126542E1000C4648A /* GammaViewController.swift in Sources */,
 				C7764170272139A100C7C308 /* ResetPopoverController.swift in Sources */,
+				C7CB6C8529C20D0D00BC9941 /* Solar.swift in Sources */,
 				C7545E3225B1996300383AFB /* PopUpButton.swift in Sources */,
 				C76CB7A825CFD954007624DE /* ResetButton.swift in Sources */,
 				C7C1F7091FD639970039507C /* DataStore.swift in Sources */,
@@ -1200,7 +1200,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 6.0.0b5;
+				CURRENT_PROJECT_VERSION = 6.0.0b6;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -1232,7 +1232,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 6.0.0b5;
+				MARKETING_VERSION = 6.0.0b6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				OTHER_LDFLAGS = "-fuse-ld=/usr/local/bin/ld64.mold";
@@ -1269,7 +1269,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 6.0.0b5;
+				CURRENT_PROJECT_VERSION = 6.0.0b6;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1301,7 +1301,7 @@
 				);
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 6.0.0b5;
+				MARKETING_VERSION = 6.0.0b6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1529,14 +1529,6 @@
 				minimumVersion = 1.2.0;
 			};
 		};
-		C7E99265260A90E70055370A /* XCRemoteSwiftPackageReference "Solar" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/alin23/Solar";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.1.1;
-			};
-		};
 		C7ECB6702750C75C00DA212D /* XCRemoteSwiftPackageReference "swift-eventsource" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/alin23/swift-eventsource";
@@ -1678,11 +1670,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C7DA10F5259B8979006DD876 /* XCRemoteSwiftPackageReference "Regex" */;
 			productName = Regex;
-		};
-		C7E99266260A90E70055370A /* Solar */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C7E99265260A90E70055370A /* XCRemoteSwiftPackageReference "Solar" */;
-			productName = Solar;
 		};
 		C7ECB6712750C75C00DA212D /* LDSwiftEventSourceStatic */ = {
 			isa = XCSwiftPackageProductDependency;

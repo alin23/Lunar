@@ -241,9 +241,8 @@ struct PowerOffButtonView: View {
                                 Note: Press ⌘ Command more than 8 times in a row to force connect all displays.
                                 """
                                 : """
-                                Turns off the built-in screen automatically when a monitor is connected.
-
-                                Turns the screen back on when the last monitor is disconnected.
+                                Turns off the built-in screen automatically when a monitor is connected and turns
+                                it back on when the last monitor is disconnected.
 
                                 Keeps the screen disconnected between standby/wake or lid open/close states.
 
@@ -398,6 +397,9 @@ struct DisplayRowView: View {
 
     @Default(.autoBlackoutBuiltin) var autoBlackoutBuiltin
 
+    @State var adaptiveStateText = ""
+    @State var adaptivePausedText = "Adaptive brightness paused"
+
     var softwareSliders: some View {
         Group {
             if display.enhanced {
@@ -431,15 +433,15 @@ struct DisplayRowView: View {
     }
 
     var sdrXdrSelector: some View {
-        HStack {
+        HStack(spacing: 0) {
             SwiftUI.Button("SDR") {
                 guard display.enhanced else { return }
                 withAnimation(.fastSpring) { display.enhanced = false }
             }
             .buttonStyle(PickerButton(
-                enumValue: $display.enhanced, onValue: false
+                onColor: Color.black, offColor: .oneway { colors.invertedGray }, enumValue: $display.enhanced, onValue: false
             ))
-            .font(.system(size: 12, weight: display.enhanced ? .semibold : .bold, design: .monospaced))
+            .font(.system(size: 11, weight: display.enhanced ? .semibold : .bold, design: .monospaced))
 
             SwiftUI.Button("XDR") {
                 guard lunarProActive || lunarProOnTrial else {
@@ -456,12 +458,13 @@ struct DisplayRowView: View {
                 }
             }
             .buttonStyle(PickerButton(
-                enumValue: $display.enhanced, onValue: true
+                onColor: Color.black, offColor: .oneway { colors.invertedGray }, enumValue: $display.enhanced, onValue: true
             ))
-            .font(.system(size: 12, weight: display.enhanced ? .bold : .semibold, design: .monospaced))
+            .font(.system(size: 11, weight: display.enhanced ? .bold : .semibold, design: .monospaced))
             .popover(isPresented: $showNeedsLunarPro) { NeedsLunarProView() }
             .popover(isPresented: $showXDRTip) { XDRTipView() }
         }
+        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(colors.invertedGray))
         .padding(.bottom, 4)
     }
 
@@ -525,17 +528,15 @@ struct DisplayRowView: View {
                         app.runningApps?.first?.activate()
                     }
                     .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .secondary.opacity(0.8)))
-                    .font(.system(size: 9, weight: .bold))
+                    .font(.system(size: 9, weight: .semibold))
                 }
                 if display.adaptivePaused || SWIFTUI_PREVIEW {
-                    SwiftUI.Button(action: { display.adaptivePaused.toggle() }) {
-                        VStack {
-                            Text("Adaptive paused")
-                            Text("click to resume").font(.system(size: 9))
+                    SwiftUI.Button(adaptivePausedText) { display.adaptivePaused.toggle() }
+                        .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .secondary.opacity(0.8)))
+                        .font(.system(size: 9, weight: .semibold))
+                        .onHover { hovering in
+                            adaptivePausedText = hovering ? "Resume adaptive brightness" : "Adaptive brightness paused"
                         }
-                    }
-                    .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .secondary.opacity(0.8)))
-                    .font(.system(size: 9, weight: .bold))
                 }
 
                 if showRawValues {
@@ -648,7 +649,7 @@ struct DisplayRowView: View {
                 }.offset(x: 45)
 
             } else {
-                Text(display.name)
+                Text(display.name ?! "Unknown")
                     .font(.system(size: 22, weight: .black))
                     .padding(.bottom, xdrSelectorShown ? 0 : 6)
             }
@@ -658,18 +659,27 @@ struct DisplayRowView: View {
             } else if display.blackOutEnabled {
                 Text("Blacked Out").font(.system(size: 10, weight: .semibold, design: .rounded))
 
-                if display.isBuiltin {
+                if display.isMacBook {
+                    let binding = Binding<Bool>(
+                        get: { autoBlackoutBuiltin },
+                        set: {
+                            autoBlackoutBuiltin = $0
+                            display.keepDisconnected = $0
+                        }
+                    )
+
                     VStack {
                         SettingsToggle(
                             text: "Auto BlackOut",
-                            setting: $autoBlackoutBuiltin,
+                            setting: binding,
                             color: nil,
                             help: """
-                            Turns off display automatically when a monitor is connected.
+                            Turns off the built-in screen automatically when a monitor is connected and turns
+                            it back on when the last monitor is disconnected.
 
-                            Turns the display back on when the last monitor is disconnected.
+                            Keeps the screen disconnected between standby/wake or lid open/close states.
 
-                            Note: Press ⌘ Command more than 8 times in a row to force turn on all displays.
+                            Note: Press ⌘ Command more than 8 times in a row to force connect all displays.
                             """
                         )
                         .font(.system(size: 12, weight: .medium, design: .rounded))
@@ -682,8 +692,24 @@ struct DisplayRowView: View {
                 if xdrSelectorShown { sdrXdrSelector }
 
                 sliders
+                adaptiveState
                 volumeSlider
                 appPresetAdaptivePaused
+            }
+        }
+    }
+
+    @ViewBuilder var adaptiveState: some View {
+        let systemAdaptive = display.systemAdaptiveBrightness
+        let key = DC.adaptiveModeKey
+        if !display.adaptive, !display.xdr, !display.blackout, !display.facelight, !display.subzero, (key == .sync && !display.isActiveSyncSource) || key == .location || key == .sensor {
+            SwiftUI.Button(adaptiveStateText.isEmpty ? (systemAdaptive ? "Adapted by the system" : "Adaptive brightness disabled") : adaptiveStateText) {
+                display.adaptive = true
+            }
+            .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .secondary.opacity(0.8)))
+            .font(.system(size: 9, weight: .semibold))
+            .onHover { hovering in
+                adaptiveStateText = hovering ? "Adapt brightness with Lunar" : ""
             }
         }
     }
@@ -1605,7 +1631,6 @@ struct QuickActionsMenuView: View {
     @State var displays: [Display] = DC.nonCursorDisplays
     @State var cursorDisplay: Display? = DC.cursorDisplay
     @State var sourceDisplay: Display? = DC.sourceDisplay
-    @State var nonSourceDisplays: [Display] = DC.activeDisplayList.filter(!\.isSource)
     #if arch(arm64)
         @State var disconnectedDisplays: [Display] = DC.possiblyDisconnectedDisplayList
     #endif
@@ -2176,7 +2201,6 @@ struct QuickActionsMenuView: View {
                 displays = []
                 displayCount = 0
                 sourceDisplay = nil
-                nonSourceDisplays = []
                 #if arch(arm64)
                     disconnectedDisplays = []
                 #endif
@@ -2190,7 +2214,6 @@ struct QuickActionsMenuView: View {
         displays = dc.nonCursorDisplays
         displayCount = dc.activeDisplayCount
         sourceDisplay = dc.sourceDisplay
-        nonSourceDisplays = dc.activeDisplayList.filter(!\.isSource)
         #if arch(arm64)
             disconnectedDisplays = dc.possiblyDisconnectedDisplayList
 

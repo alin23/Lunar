@@ -299,15 +299,12 @@ public struct PickerButton<T: Equatable>: ButtonStyle {
             .padding(.vertical, verticalPadding)
             .padding(.horizontal, horizontalPadding)
             .background(
-                RoundedRectangle(
-                    cornerRadius: 8,
-                    style: .continuous
-                )
-                .fill(
-                    enumValue == onValue
-                        ? (onColor ?? Color.primary.opacity(colorScheme == .dark ? 0.15 : 0.9))
-                        : (offColor ?? color.opacity(colorScheme == .dark ? 0.5 : 0.8))
-                )
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(
+                        enumValue == onValue
+                            ? (onColor ?? Color.primary.opacity(colorScheme == .dark ? 0.15 : 0.9))
+                            : (offColor?.wrappedValue ?? color.opacity(colorScheme == .dark ? 0.5 : 0.8))
+                    )
 
             ).scaleEffect(scale).colorMultiply(hoverColor)
             .contentShape(Rectangle())
@@ -332,7 +329,7 @@ public struct PickerButton<T: Equatable>: ButtonStyle {
 
     @State var color = Color.primary.opacity(0.15)
     @State var onColor: Color? = nil
-    @State var offColor: Color? = nil
+    var offColor: Binding<Color>?
     @State var onTextColor: Color? = nil
     @State var offTextColor = Color.secondary
     @State var horizontalPadding: CGFloat = 8
