@@ -8,7 +8,7 @@
 import Foundation
 // import CSSH
 
-public struct FileAttributes {
+struct FileAttributes {
     init?(attributes: LIBSSH2_SFTP_ATTRIBUTES) {
         guard let fileType = FileType(rawValue: Int32(attributes.permissions)) else { return nil }
         self.fileType = fileType
@@ -20,17 +20,17 @@ public struct FileAttributes {
         lastModified = Date(timeIntervalSince1970: Double(attributes.mtime))
     }
 
-    public let fileType: FileType
+    let fileType: FileType
 
-    public let size: UInt64
+    let size: UInt64
 
-    public let userId: UInt
+    let userId: UInt
 
-    public let groupId: UInt
+    let groupId: UInt
 
-    public let permissions: FilePermissions
+    let permissions: FilePermissions
 
-    public let lastAccessed: Date
+    let lastAccessed: Date
 
-    public let lastModified: Date
+    let lastModified: Date
 }

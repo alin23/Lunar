@@ -23,12 +23,6 @@ final class HotkeyView: RecordView, RecordViewDelegate {
         setup()
     }
 
-    override public func mouseDown(with _: NSEvent) {
-        log.debug("Clicked on hotkey view: \(hotkey?.identifier ?? "")")
-        beginRecording()
-        transition()
-    }
-
     var hoverState: HoverState = .noHover
 
     var hotkeyColor: [HoverState: [String: NSColor]] {
@@ -59,6 +53,12 @@ final class HotkeyView: RecordView, RecordViewDelegate {
 
     override var frame: NSRect { didSet { trackHover() } }
     override var bounds: NSRect { didSet { trackHover() } }
+
+    override func mouseDown(with _: NSEvent) {
+        log.debug("Clicked on hotkey view: \(hotkey?.identifier ?? "")")
+        beginRecording()
+        transition()
+    }
 
     func recordViewShouldBeginRecording(_: RecordView) -> Bool {
         log.debug("Begin hotkey recording: \(hotkey?.identifier ?? "")")

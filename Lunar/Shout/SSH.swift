@@ -16,7 +16,7 @@ final class SSH {
     ///   - host: the host to connect to
     ///   - port: the port to connect to; default 22
     /// - Throws: SSHError if the SSH session couldn't be created
-    public init(host: String, port: Int32 = 22) throws {
+    init(host: String, port: Int32 = 22) throws {
         self.host = host
         self.port = port
 
@@ -28,7 +28,7 @@ final class SSH {
         try session.handshake(over: sock)
     }
 
-    public enum PtyType: String {
+    enum PtyType: String {
         case vanilla
         case vt100
         case vt102
@@ -37,10 +37,12 @@ final class SSH {
         case xterm
     }
 
-    public let host: String
-    public let port: Int32
+    let host: String
+    let port: Int32
 
-    public var ptyType: PtyType?
+    var ptyType: PtyType?
+
+    let session: Session
 
     /// Connects to a remote server and opens an SSH session
     ///
@@ -51,7 +53,7 @@ final class SSH {
     ///   - authMethod: the authentication method to use while logging in
     ///   - execution: the block executed with the open, authenticated SSH session
     /// - Throws: SSHError if the session fails at any point
-    public static func connect(
+    static func connect(
         host: String,
         port: Int32 = 22,
         username: String,
@@ -68,10 +70,10 @@ final class SSH {
     /// - Parameters:
     ///   - username: the username to login with
     ///   - privateKey: the path to the private key
-    ///   - publicKey: the path to the public key; defaults to private key path + ".pub"
+    ///   - publicKey: the path to the key; defaults to private key path + ".pub"
     ///   - passphrase: the passphrase encrypting the key; defaults to nil
     /// - Throws: SSHError if authentication fails
-    public func authenticate(username: String, privateKey: String, publicKey: String? = nil, passphrase: String? = nil) throws {
+    func authenticate(username: String, privateKey: String, publicKey: String? = nil, passphrase: String? = nil) throws {
         let key = SSHKey(privateKey: privateKey, publicKey: publicKey, passphrase: passphrase)
         try authenticate(username: username, authMethod: key)
     }
@@ -82,7 +84,7 @@ final class SSH {
     ///   - username: the username to login with
     ///   - password: the user's password
     /// - Throws: SSHError if authentication fails
-    public func authenticate(username: String, password: String) throws {
+    func authenticate(username: String, password: String) throws {
         try authenticate(username: username, authMethod: SSHPassword(password))
     }
 
@@ -90,7 +92,7 @@ final class SSH {
     ///
     /// - Parameter username: the username to login with
     /// - Throws: SSHError if authentication fails
-    public func authenticateByAgent(username: String) throws {
+    func authenticateByAgent(username: String) throws {
         try authenticate(username: username, authMethod: SSHAgent())
     }
 
@@ -100,7 +102,7 @@ final class SSH {
     ///   - username: the username to login with
     ///   - authMethod: the authentication method to use
     /// - Throws: SSHError if authentication fails
-    public func authenticate(username: String, authMethod: SSHAuthMethod) throws {
+    func authenticate(username: String, authMethod: SSHAuthMethod) throws {
         try authMethod.authenticate(ssh: self, username: username)
     }
 
@@ -112,7 +114,7 @@ final class SSH {
     /// - Returns: exit code of the command
     /// - Throws: SSHError if the command couldn't be executed
     @discardableResult
-    public func execute(_ command: String, silent: Bool = false) throws -> Int32 {
+    func execute(_ command: String, silent: Bool = false) throws -> Int32 {
         try execute(command, output: { output in
             if silent == false {
                 print(output, terminator: "")
@@ -126,7 +128,7 @@ final class SSH {
     /// - Parameter command: the command to execute
     /// - Returns: a tuple with the exit code of the command and the output of the command
     /// - Throws: SSHError if the command couldn't be executed
-    public func capture(_ command: String) throws -> (status: Int32, output: String) {
+    func capture(_ command: String) throws -> (status: Int32, output: String) {
         var ongoing = ""
         let status = try execute(command) { output in
             ongoing += output
@@ -141,7 +143,7 @@ final class SSH {
     ///   - output: block handler called every time a chunk of command output is received
     /// - Returns: exit code of the command
     /// - Throws: SSHError if the command couldn't be executed
-    public func execute(
+    func execute(
         _ command: String,
         onChannelOpened: ((Channel) -> Void)? = nil,
         output: (_ output: String) -> Void
@@ -191,7 +193,7 @@ final class SSH {
     ///   - permissions: the file permissions to create the new file with; defaults to FilePermissions.default
     /// - Throws: SSHError if local file can't be read or upload fails
     @discardableResult
-    public func sendFile(localURL: URL, remotePath: String, permissions: FilePermissions = .default) throws -> Int32 {
+    func sendFile(localURL: URL, remotePath: String, permissions: FilePermissions = .default) throws -> Int32 {
         guard let resources = try? localURL.resourceValues(forKeys: [.fileSizeKey]),
               let fileSize = resources.fileSize,
               let inputStream = InputStream(url: localURL)
@@ -243,11 +245,9 @@ final class SSH {
     ///
     /// - Returns: the opened SFTP session
     /// - Throws: SSHError if an SFTP session could not be opened
-    public func openSftp() throws -> SFTP {
+    func openSftp() throws -> SFTP {
         try session.openSftp()
     }
-
-    let session: Session
 
     private let sock: Socket
 }

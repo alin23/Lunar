@@ -11,28 +11,28 @@ import Foundation
 
 // import CSSH
 
-public struct Permissions: OptionSet {
-    public init(rawValue: UInt) {
+struct Permissions: OptionSet {
+    init(rawValue: UInt) {
         self.rawValue = rawValue
     }
 
-    public static let read = Permissions(rawValue: 1 << 1)
-    public static let write = Permissions(rawValue: 1 << 2)
-    public static let execute = Permissions(rawValue: 1 << 3)
+    static let read = Permissions(rawValue: 1 << 1)
+    static let write = Permissions(rawValue: 1 << 2)
+    static let execute = Permissions(rawValue: 1 << 3)
 
-    public let rawValue: UInt
+    let rawValue: UInt
 }
 
 // MARK: - FilePermissions
 
-public struct FilePermissions: RawRepresentable {
-    public init(owner: Permissions, group: Permissions, others: Permissions) {
+struct FilePermissions: RawRepresentable {
+    init(owner: Permissions, group: Permissions, others: Permissions) {
         self.owner = owner
         self.group = group
         self.others = others
     }
 
-    public init(rawValue: Int32) {
+    init(rawValue: Int32) {
         var owner: Permissions = []
         var group: Permissions = []
         var others: Permissions = []
@@ -50,13 +50,13 @@ public struct FilePermissions: RawRepresentable {
         self.init(owner: owner, group: group, others: others)
     }
 
-    public static let `default` = FilePermissions(owner: [.read, .write], group: [.read], others: [.read])
+    static let `default` = FilePermissions(owner: [.read, .write], group: [.read], others: [.read])
 
-    public var owner: Permissions
-    public var group: Permissions
-    public var others: Permissions
+    var owner: Permissions
+    var group: Permissions
+    var others: Permissions
 
-    public var rawValue: Int32 {
+    var rawValue: Int32 {
         var flag: Int32 = 0
 
         if owner.contains(.read) { flag |= LIBSSH2_SFTP_S_IRUSR }

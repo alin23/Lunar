@@ -11,7 +11,7 @@ import Combine
 import Foundation
 import Surge
 
-public extension String {
+extension String {
     func asURL() -> URL? {
         URL(string: self)
     }
@@ -900,7 +900,7 @@ extension MPDisplayMode {
         return tags.isEmpty ? "".attributedString : "   ".attributedString + tags.joined(separator: ", ")
     }
 
-    public var attributedString: NSAttributedString {
+    var attributedString: NSAttributedString {
         let res = "\(width) x \(height)"
         let dpi = "\(dotsPerInch)DPI"
 
@@ -916,7 +916,7 @@ extension MPDisplayMode {
             + tagsAttributedString.withFont(.monospacedSystemFont(ofSize: 12, weight: .regular))
     }
 
-    public var title: String {
+    var title: String {
         "\(width)×\(height)@\(refreshStringSafe)"
     }
 
@@ -927,14 +927,14 @@ extension MPDisplayMode {
         return PanelMode(screen: screen, id: (screen.id << 32) + modeNumber.i, title: title, subtitle: subtitle, image: imageSystemName)
     }
 
-    public var subtitle: String {
+    var subtitle: String {
         let tags = tagStrings.without("hidpi")
         let tagsString = tags.isEmpty ? "" : " (\(tags.joined(separator: ", ")))"
 
         return "\(dotsPerInch)dpi\(tagsString)"
     }
 
-    public var image: NSImage? {
+    var image: NSImage? {
         let symbol = NSImage.SymbolConfiguration(pointSize: 11, weight: .bold)
         if isTVMode {
             return NSImage(systemSymbolName: "tv", accessibilityDescription: "TV Mode")?.withSymbolConfiguration(symbol)
@@ -951,7 +951,7 @@ extension MPDisplayMode {
         return NSImage(systemSymbolName: "display", accessibilityDescription: "Computer Mode")?.withSymbolConfiguration(symbol)
     }
 
-    public var imageSystemName: String {
+    var imageSystemName: String {
         if isTVMode {
             return "tv"
         } else if !isSafeMode {
@@ -1008,7 +1008,7 @@ extension MPDisplay {
     }
 }
 
-public prefix func ! <T>(keyPath: KeyPath<T, Bool>) -> (T) -> Bool {
+prefix func ! <T>(keyPath: KeyPath<T, Bool>) -> (T) -> Bool {
     { !$0[keyPath: keyPath] }
 }
 
@@ -1861,18 +1861,18 @@ extension [UserValue] {
 
 import SwiftUI
 
-public extension Sequence {
+extension Sequence {
     func dict<K: Hashable, V>(uniqueByLast: Bool = false, _ transformer: (Element) -> (K, V)?) -> [K: V] {
         Dictionary(compactMap(transformer), uniquingKeysWith: uniqueByLast ? last(this:other:) : first(this:other:))
     }
 }
 
-public extension Binding where Value == Bool {
+extension Binding where Value == Bool {
     static let `false`: Binding<Value> = .constant(false)
     static let `true`: Binding<Value> = .constant(true)
 }
 
-public extension Binding {
+extension Binding {
     static func oneway(getter: @escaping () -> Value) -> Binding {
         Binding(get: getter, set: { _ in })
     }
@@ -1880,4 +1880,8 @@ public extension Binding {
     var optional: Binding<Value?> {
         .oneway { self.wrappedValue }
     }
+}
+
+extension View {
+    var any: AnyView { AnyView(self) }
 }

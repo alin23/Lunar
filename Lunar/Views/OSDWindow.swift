@@ -27,7 +27,14 @@ final class OSDWindow: NSWindow, NSWindowDelegate {
         delegate = self
     }
 
-    public func hide() {
+    weak var display: Display?
+    lazy var wc = NSWindowController(window: self)
+
+    var closer: DispatchWorkItem? { didSet { oldValue?.cancel() } }
+    var fader: DispatchWorkItem? { didSet { oldValue?.cancel() } }
+    var endFader: DispatchWorkItem? { didSet { oldValue?.cancel() } }
+
+    func hide() {
         fader = nil
         endFader = nil
         closer = nil
@@ -39,19 +46,12 @@ final class OSDWindow: NSWindow, NSWindowDelegate {
         windowController?.close()
     }
 
-    public func windowShouldClose(_ sender: NSWindow) -> Bool {
+    func windowShouldClose(_ sender: NSWindow) -> Bool {
         guard isReleasedWhenClosed else { return true }
         windowController?.window = nil
         windowController = nil
         return true
     }
-
-    weak var display: Display?
-    lazy var wc = NSWindowController(window: self)
-
-    var closer: DispatchWorkItem? { didSet { oldValue?.cancel() } }
-    var fader: DispatchWorkItem? { didSet { oldValue?.cancel() } }
-    var endFader: DispatchWorkItem? { didSet { oldValue?.cancel() } }
 
     func show(
         at point: NSPoint? = nil,
@@ -144,8 +144,8 @@ extension Color {
 
 // MARK: - BigSurSlider
 
-public struct BigSurSlider: View {
-    public init(
+struct BigSurSlider: View {
+    init(
         percentage: Binding<Float>,
         sliderWidth: CGFloat = 200,
         sliderHeight: CGFloat = 22,
@@ -166,7 +166,8 @@ public struct BigSurSlider: View {
         enableText: String? = nil,
         mark: Binding<Float>? = nil,
         beforeSettingPercentage: ((Float) -> Void)? = nil,
-        onSettingPercentage: ((Float) -> Void)? = nil
+        onSettingPercentage: ((Float) -> Void)? = nil,
+        insideText: (() -> AnyView)? = nil
     ) {
         _knobColor = .constant(knobColor)
         _knobTextColor = .constant(knobTextColor)
@@ -188,9 +189,39 @@ public struct BigSurSlider: View {
         _knobTextColor = knobTextColorBinding ?? .constant(knobTextColor ?? ((color ?? Colors.peach).textColor))
         self.beforeSettingPercentage = beforeSettingPercentage
         self.onSettingPercentage = onSettingPercentage
+        self.insideText = insideText?()
     }
 
-    public var body: some View {
+    var insideText: AnyView?
+
+    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.colors) var colors
+    @EnvironmentObject var env: EnvState
+
+    @Binding var percentage: Float
+    @State var sliderWidth: CGFloat = 200
+    @State var sliderHeight: CGFloat = 22
+    @Binding var image: String?
+    @Binding var color: Color?
+    @Binding var backgroundColor: Color
+    @Binding var knobColor: Color?
+    @Binding var knobTextColor: Color?
+    @Binding var showValue: Bool
+    @Binding var shownValue: Double?
+
+    @State var scrollWheelListener: Cancellable?
+
+    @State var hovering = false
+    @State var enableText: String? = nil
+    @State var lastCursorPosition = NSEvent.mouseLocation
+    @Binding var acceptsMouseEvents: Bool
+    @Binding var disabled: Bool
+    @Binding var mark: Float
+
+    var beforeSettingPercentage: ((Float) -> Void)?
+    var onSettingPercentage: ((Float) -> Void)?
+
+    var body: some View {
         GeometryReader { geometry in
             let w = geometry.size.width - self.sliderHeight
             let cgPercentage = cap(percentage, minVal: 0, maxVal: 1).cg
@@ -211,22 +242,10 @@ public struct BigSurSlider: View {
                             .foregroundColor(Color.black.opacity(0.5))
                             .offset(x: 3, y: 0)
                     }
-                    ZStack {
-                        Circle()
-                            .foregroundColor(knobColor)
-                            .shadow(color: Colors.blackMauve.opacity(percentage > 0.3 ? 0.3 : percentage.d), radius: 5, x: -1, y: 0)
-                            .frame(width: sliderHeight, height: sliderHeight, alignment: .trailing)
-                            .brightness(env.draggingSlider && hovering ? -0.2 : 0)
-                        if showValue {
-                            Text((shownValue?.f ?? (percentage * 100)).str(decimals: 0))
-                                .foregroundColor(knobTextColor)
-                                .font(.system(size: 8, weight: .medium, design: .monospaced))
-                                .allowsHitTesting(false)
-                        }
-                    }.offset(
-                        x: cgPercentage * w,
-                        y: 0
-                    )
+
+                    knob(cgPercentage: cgPercentage)
+                        .offset(x: cgPercentage * w, y: 0)
+
                     if mark > 0 {
                         RoundedRectangle(cornerRadius: 1, style: .continuous)
                             .fill(Color.red.opacity(0.7))
@@ -288,7 +307,7 @@ public struct BigSurSlider: View {
             )
             #if os(macOS)
             .onHover { hov in
-                hovering = hov
+                withAnimation { hovering = hov }
                 guard acceptsMouseEvents, !disabled else { return }
 
                 if hovering {
@@ -318,32 +337,26 @@ public struct BigSurSlider: View {
         }
     }
 
-    @Environment(\.colorScheme) var colorScheme
-    @Environment(\.colors) var colors
-    @EnvironmentObject var env: EnvState
-
-    @Binding var percentage: Float
-    @State var sliderWidth: CGFloat = 200
-    @State var sliderHeight: CGFloat = 22
-    @Binding var image: String?
-    @Binding var color: Color?
-    @Binding var backgroundColor: Color
-    @Binding var knobColor: Color?
-    @Binding var knobTextColor: Color?
-    @Binding var showValue: Bool
-    @Binding var shownValue: Double?
-
-    @State var scrollWheelListener: Cancellable?
-
-    @State var hovering = false
-    @State var enableText: String? = nil
-    @State var lastCursorPosition = NSEvent.mouseLocation
-    @Binding var acceptsMouseEvents: Bool
-    @Binding var disabled: Bool
-    @Binding var mark: Float
-
-    var beforeSettingPercentage: ((Float) -> Void)?
-    var onSettingPercentage: ((Float) -> Void)?
+    func knob(cgPercentage: CGFloat) -> some View {
+        ZStack {
+            if showValue, let insideText {
+                insideText
+                    .offset(x: (sliderHeight + 2) * (cgPercentage < 0.25 ? 1 : -1))
+                    .opacity(hovering ? 1 : 0)
+            }
+            Circle()
+                .foregroundColor(knobColor)
+                .shadow(color: Colors.blackMauve.opacity(percentage > 0.3 ? 0.3 : percentage.d), radius: 5, x: -1, y: 0)
+                .frame(width: sliderHeight, height: sliderHeight, alignment: .trailing)
+                .brightness(env.draggingSlider && hovering ? -0.2 : 0)
+            if showValue {
+                Text((shownValue?.f ?? (percentage * 100)).str(decimals: 0))
+                    .foregroundColor(knobTextColor)
+                    .font(.system(size: 8, weight: .medium, design: .monospaced))
+                    .allowsHitTesting(false)
+            }
+        }
+    }
 
     #if os(macOS)
         func trackScrollWheel() {
@@ -411,90 +424,90 @@ var draggingSliderSetter: DispatchWorkItem? {
 
 // MARK: - Colors
 
-public struct Colors {
-    public init(_ colorScheme: SwiftUI.ColorScheme = .light, accent: Color) {
+struct Colors {
+    init(_ colorScheme: SwiftUI.ColorScheme = .light, accent: Color) {
         self.accent = accent
         self.colorScheme = colorScheme
         bg = BG(colorScheme: colorScheme)
         fg = FG(colorScheme: colorScheme)
     }
 
-    public struct FG {
-        public var colorScheme: SwiftUI.ColorScheme
+    struct FG {
+        var colorScheme: SwiftUI.ColorScheme
 
-        public var isDark: Bool { colorScheme == .dark }
-        public var isLight: Bool { colorScheme == .light }
+        var isDark: Bool { colorScheme == .dark }
+        var isLight: Bool { colorScheme == .light }
 
         var gray: Color { isDark ? Colors.lightGray : Colors.darkGray }
         var primary: Color { isDark ? .white : .black }
     }
 
-    public struct BG {
-        public var colorScheme: SwiftUI.ColorScheme
+    struct BG {
+        var colorScheme: SwiftUI.ColorScheme
 
-        public var isDark: Bool { colorScheme == .dark }
-        public var isLight: Bool { colorScheme == .light }
+        var isDark: Bool { colorScheme == .dark }
+        var isLight: Bool { colorScheme == .light }
 
         var gray: Color { isDark ? Colors.darkGray : Colors.lightGray }
         var primary: Color { isDark ? .black : .white }
     }
 
-    public static var light = Colors(.light, accent: Colors.lunarYellow)
-    public static var dark = Colors(.dark, accent: Colors.peach)
+    static var light = Colors(.light, accent: Colors.lunarYellow)
+    static var dark = Colors(.dark, accent: Colors.peach)
 
-    public static let darkGray = Color(hue: 0, saturation: 0.01, brightness: 0.22)
-    public static let blackGray = Color(hue: 0.03, saturation: 0.12, brightness: 0.18)
-    public static let lightGray = Color(hue: 0, saturation: 0.0, brightness: 0.92)
+    static let darkGray = Color(hue: 0, saturation: 0.01, brightness: 0.22)
+    static let blackGray = Color(hue: 0.03, saturation: 0.12, brightness: 0.18)
+    static let lightGray = Color(hue: 0, saturation: 0.0, brightness: 0.92)
 
-    public static let red = Color(hue: 0.98, saturation: 0.82, brightness: 1.00)
-    public static let lightGold = Color(hue: 0.09, saturation: 0.28, brightness: 0.94)
-    public static let grayMauve = Color(hue: 252 / 360, saturation: 0.29, brightness: 0.43)
-    public static let mauve = Color(hue: 252 / 360, saturation: 0.29, brightness: 0.23)
-    public static let pinkMauve = Color(hue: 0.95, saturation: 0.76, brightness: 0.42)
-    public static let blackMauve = Color(
+    static let red = Color(hue: 0.98, saturation: 0.82, brightness: 1.00)
+    static let lightGold = Color(hue: 0.09, saturation: 0.28, brightness: 0.94)
+    static let grayMauve = Color(hue: 252 / 360, saturation: 0.29, brightness: 0.43)
+    static let mauve = Color(hue: 252 / 360, saturation: 0.29, brightness: 0.23)
+    static let pinkMauve = Color(hue: 0.95, saturation: 0.76, brightness: 0.42)
+    static let blackMauve = Color(
         hue: 252 / 360,
         saturation: 0.08,
         brightness:
         0.12
     )
-    public static let yellow = Color(hue: 39 / 360, saturation: 1.0, brightness: 0.64)
-    public static let lunarYellow = Color(hue: 0.11, saturation: 0.47, brightness: 1.00)
-    public static let sunYellow = Color(hue: 0.1, saturation: 0.57, brightness: 1.00)
-    public static let peach = Color(hue: 0.08, saturation: 0.42, brightness: 1.00)
-    public static let blue = Color(hue: 214 / 360, saturation: 1.0, brightness: 0.54)
-    public static let green = Color(hue: 141 / 360, saturation: 0.59, brightness: 0.58)
-    public static let lightGreen = Color(hue: 141 / 360, saturation: 0.50, brightness: 0.83)
+    static let yellow = Color(hue: 39 / 360, saturation: 1.0, brightness: 0.64)
+    static let lunarYellow = Color(hue: 0.11, saturation: 0.47, brightness: 1.00)
+    static let sunYellow = Color(hue: 0.1, saturation: 0.57, brightness: 1.00)
+    static let peach = Color(hue: 0.08, saturation: 0.42, brightness: 1.00)
+    static let blue = Color(hue: 214 / 360, saturation: 1.0, brightness: 0.54)
+    static let green = Color(hue: 141 / 360, saturation: 0.59, brightness: 0.58)
+    static let lightGreen = Color(hue: 141 / 360, saturation: 0.50, brightness: 0.83)
 
-    public static let xdr = Color(hue: 0.61, saturation: 0.26, brightness: 0.78)
-    public static let subzero = Color(hue: 0.98, saturation: 0.56, brightness: 1.00)
+    static let xdr = Color(hue: 0.61, saturation: 0.26, brightness: 0.78)
+    static let subzero = Color(hue: 0.98, saturation: 0.56, brightness: 1.00)
 
-    public var accent: Color
-    public var colorScheme: SwiftUI.ColorScheme
+    var accent: Color
+    var colorScheme: SwiftUI.ColorScheme
 
-    public var bg: BG
-    public var fg: FG
+    var bg: BG
+    var fg: FG
 
-    public var isDark: Bool { colorScheme == .dark }
-    public var isLight: Bool { colorScheme == .light }
-    public var inverted: Color { isDark ? .black : .white }
-    public var invertedGray: Color { isDark ? Colors.darkGray : Colors.lightGray }
-    public var gray: Color { isDark ? Colors.lightGray : Colors.darkGray }
+    var isDark: Bool { colorScheme == .dark }
+    var isLight: Bool { colorScheme == .light }
+    var inverted: Color { isDark ? .black : .white }
+    var invertedGray: Color { isDark ? Colors.darkGray : Colors.lightGray }
+    var gray: Color { isDark ? Colors.lightGray : Colors.darkGray }
 }
 
 // MARK: - ColorsKey
 
 private struct ColorsKey: EnvironmentKey {
-    public static let defaultValue = Colors.light
+    static let defaultValue = Colors.light
 }
 
-public extension EnvironmentValues {
+extension EnvironmentValues {
     var colors: Colors {
         get { self[ColorsKey.self] }
         set { self[ColorsKey.self] = newValue }
     }
 }
 
-public extension View {
+extension View {
     func colors(_ colors: Colors) -> some View {
         environment(\.colors, colors)
     }
@@ -805,7 +818,7 @@ import SwiftUI
 // MARK: - PanelWindow
 
 final class PanelWindow: NSWindow {
-    public convenience init(swiftuiView: AnyView, level: NSWindow.Level = .floating) {
+    convenience init(swiftuiView: AnyView, level: NSWindow.Level = .floating) {
         self.init(contentViewController: NSHostingController(rootView: swiftuiView))
 
         self.level = level
@@ -822,13 +835,13 @@ final class PanelWindow: NSWindow {
         isMovableByWindowBackground = false
     }
 
-    public func forceClose() {
+    override var canBecomeKey: Bool { true }
+
+    func forceClose() {
         wc.close()
         wc.window = nil
         close()
     }
-
-    override var canBecomeKey: Bool { true }
 
     func show(at point: NSPoint? = nil, animate: Bool = false) {
         if let point {

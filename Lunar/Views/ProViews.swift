@@ -15,8 +15,15 @@ import Paddle
 
 // MARK: - LicenseView
 
-public struct LicenseView: View {
-    public var body: some View {
+struct LicenseView: View {
+    @State var product: PADProduct? = lunarProProduct
+
+    @Default(.lunarProActive) var lunarProActive
+    @Default(.lunarProOnTrial) var lunarProOnTrial
+
+    @Environment(\.colors) var colors
+
+    var body: some View {
         HStack {
             Text("Licence:")
                 .font(.system(size: 12, weight: .medium))
@@ -68,22 +75,29 @@ public struct LicenseView: View {
         .onAppear { product = lunarProProduct }
     }
 
-    @State var product: PADProduct? = lunarProProduct
-
-    @Default(.lunarProActive) var lunarProActive
-    @Default(.lunarProOnTrial) var lunarProOnTrial
-
-    @Environment(\.colors) var colors
 }
 
 // MARK: - VersionView
 
-public struct VersionView: View {
-    public init(updater: SPUUpdater) {
+struct VersionView: View {
+    init(updater: SPUUpdater) {
         self.updater = updater
     }
 
-    public var body: some View {
+    var beta: Binding<Bool> = Binding(
+        get: { Defaults[.updateChannel] != .release },
+        set: { Defaults[.updateChannel] = $0 ? .beta : .release }
+    )
+
+    @Default(.checkForUpdate) var checkForUpdates
+    @Default(.updateCheckInterval) var updateCheckInterval
+    @Default(.updateChannel) var updateChannel
+    @Default(.silentUpdate) var silentUpdate
+
+    @ObservedObject var updater: SPUUpdater
+    @Environment(\.colors) var colors
+
+    var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
                 Text("Version:")
@@ -163,24 +177,15 @@ public struct VersionView: View {
         .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.05)))
     }
 
-    var beta: Binding<Bool> = Binding(
-        get: { Defaults[.updateChannel] != .release },
-        set: { Defaults[.updateChannel] = $0 ? .beta : .release }
-    )
-
-    @Default(.checkForUpdate) var checkForUpdates
-    @Default(.updateCheckInterval) var updateCheckInterval
-    @Default(.updateChannel) var updateChannel
-    @Default(.silentUpdate) var silentUpdate
-
-    @ObservedObject var updater: SPUUpdater
-    @Environment(\.colors) var colors
 }
 
 // MARK: - MenuDensityView
 
-public struct MenuDensityView: View {
-    public var body: some View {
+struct MenuDensityView: View {
+    @Default(.menuDensity) var menuDensity
+    @Environment(\.colors) var colors
+
+    var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 3) {
                 Text("Menu density")
@@ -237,8 +242,6 @@ public struct MenuDensityView: View {
         }
     }
 
-    @Default(.menuDensity) var menuDensity
-    @Environment(\.colors) var colors
 }
 
 extension Bundle {
@@ -253,15 +256,15 @@ extension SPUUpdater: ObservableObject {}
 
 // MARK: - DetailToggleStyle
 
-public struct DetailToggleStyle: ToggleStyle {
-    public init(style: Style = .circle) {
+struct DetailToggleStyle: ToggleStyle {
+    init(style: Style = .circle) {
         self.style = style
     }
 
-    public enum Style {
+    enum Style {
         case square, circle, empty
 
-        public var sfSymbolName: String {
+        var sfSymbolName: String {
             switch self {
             case .empty:
                 return ""
@@ -273,10 +276,10 @@ public struct DetailToggleStyle: ToggleStyle {
         }
     }
 
-    @Environment(\.isEnabled) public var isEnabled
-    public let style: Style // custom param
+    @Environment(\.isEnabled) var isEnabled
+    let style: Style // custom param
 
-    public func makeBody(configuration: Configuration) -> some View {
+    func makeBody(configuration: Configuration) -> some View {
         SwiftUI.Button(action: {
             configuration.isOn.toggle() // toggle the state binding
         }, label: {

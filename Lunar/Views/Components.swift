@@ -79,7 +79,7 @@ extension Float {
     }
 }
 
-public extension Color {
+extension Color {
     func blended(withFraction fraction: CGFloat, of color: Color) -> Color {
         let color1 = NSColor(self)
         let color2 = NSColor(color)
@@ -106,8 +106,8 @@ extension View {
     }
 }
 
-public struct OutlineButton: ButtonStyle {
-    public init(
+struct OutlineButton: ButtonStyle {
+    init(
         color: Color = Color.primary.opacity(0.8),
         hoverColor: Color = Color.primary,
         multiplyColor: Color = Color.white,
@@ -123,9 +123,16 @@ public struct OutlineButton: ButtonStyle {
         _font = State(initialValue: font)
     }
 
-    @Environment(\.isEnabled) public var isEnabled
+    @Environment(\.isEnabled) var isEnabled
 
-    public func makeBody(configuration: Configuration) -> some View {
+    @State var color = Color.primary.opacity(0.8)
+    @State var hoverColor: Color = .primary
+    @State var multiplyColor: Color = .white
+    @State var scale: CGFloat = 1
+    @State var thickness: CGFloat = 2
+    @State var font: Font = .body.bold()
+
+    func makeBody(configuration: Configuration) -> some View {
         configuration
             .label
             .font(font)
@@ -156,18 +163,12 @@ public struct OutlineButton: ButtonStyle {
             }
     }
 
-    @State var color = Color.primary.opacity(0.8)
-    @State var hoverColor: Color = .primary
-    @State var multiplyColor: Color = .white
-    @State var scale: CGFloat = 1
-    @State var thickness: CGFloat = 2
-    @State var font: Font = .body.bold()
 }
 
 // MARK: - FlatButton
 
-public struct FlatButton: ButtonStyle {
-    public init(
+struct FlatButton: ButtonStyle {
+    init(
         color: Color? = nil,
         textColor: Color? = nil,
         hoverColor: Color? = nil,
@@ -196,7 +197,25 @@ public struct FlatButton: ButtonStyle {
         _stretch = State(initialValue: stretch)
     }
 
-    public func makeBody(configuration: Configuration) -> some View {
+    @Environment(\.colors) var colors
+    @Environment(\.isEnabled) var isEnabled
+
+    @Binding var color: Color
+    @Binding var textColor: Color
+    @State var colorMultiply: Color = .white
+    @State var scale: CGFloat = 1.0
+    @Binding var hoverColor: Color
+    @State var pressedColor: Color = .white
+    @Binding var width: CGFloat?
+    @Binding var height: CGFloat?
+    @Binding var circle: Bool
+    @Binding var radius: CGFloat
+    @Binding var pressed: Bool
+    @State var horizontalPadding: CGFloat = 8
+    @State var verticalPadding: CGFloat = 4
+    @State var stretch = false
+
+    func makeBody(configuration: Configuration) -> some View {
         configuration
             .label
             .foregroundColor(textColor)
@@ -266,29 +285,29 @@ public struct FlatButton: ButtonStyle {
             .contrast(!isEnabled ? 0.3 : 1.0)
     }
 
-    @Environment(\.colors) var colors
-    @Environment(\.isEnabled) var isEnabled
-
-    @Binding var color: Color
-    @Binding var textColor: Color
-    @State var colorMultiply: Color = .white
-    @State var scale: CGFloat = 1.0
-    @Binding var hoverColor: Color
-    @State var pressedColor: Color = .white
-    @Binding var width: CGFloat?
-    @Binding var height: CGFloat?
-    @Binding var circle: Bool
-    @Binding var radius: CGFloat
-    @Binding var pressed: Bool
-    @State var horizontalPadding: CGFloat = 8
-    @State var verticalPadding: CGFloat = 4
-    @State var stretch = false
 }
 
 // MARK: - PickerButton
 
-public struct PickerButton<T: Equatable>: ButtonStyle {
-    public func makeBody(configuration: Configuration) -> some View {
+struct PickerButton<T: Equatable>: ButtonStyle {
+    @Environment(\.isEnabled) var isEnabled
+    @Environment(\.colors) var colors
+    @Environment(\.colorScheme) var colorScheme
+
+    @State var color = Color.primary.opacity(0.15)
+    @State var onColor: Color? = nil
+    var offColor: Binding<Color>?
+    @State var onTextColor: Color? = nil
+    @State var offTextColor = Color.secondary
+    @State var horizontalPadding: CGFloat = 8
+    @State var verticalPadding: CGFloat = 4
+    @State var brightness = 0.0
+    @State var scale: CGFloat = 1
+    @State var hoverColor = Color.white
+    @Binding var enumValue: T
+    @State var onValue: T
+
+    func makeBody(configuration: Configuration) -> some View {
         configuration
             .label
             .foregroundColor(
@@ -323,22 +342,6 @@ public struct PickerButton<T: Equatable>: ButtonStyle {
             .opacity(isEnabled ? 1 : 0.7)
     }
 
-    @Environment(\.isEnabled) var isEnabled
-    @Environment(\.colors) var colors
-    @Environment(\.colorScheme) var colorScheme
-
-    @State var color = Color.primary.opacity(0.15)
-    @State var onColor: Color? = nil
-    var offColor: Binding<Color>?
-    @State var onTextColor: Color? = nil
-    @State var offTextColor = Color.secondary
-    @State var horizontalPadding: CGFloat = 8
-    @State var verticalPadding: CGFloat = 4
-    @State var brightness = 0.0
-    @State var scale: CGFloat = 1
-    @State var hoverColor = Color.white
-    @Binding var enumValue: T
-    @State var onValue: T
 }
 
 // MARK: - CheckboxToggleStyle

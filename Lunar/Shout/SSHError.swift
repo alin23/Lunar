@@ -7,7 +7,7 @@
 
 // import CSSH
 
-public struct SSHError: Swift.Error, CustomStringConvertible {
+struct SSHError: Swift.Error, CustomStringConvertible {
     private init(kind: Kind, message: String) {
         self.kind = kind
         self.message = message
@@ -23,7 +23,7 @@ public struct SSHError: Swift.Error, CustomStringConvertible {
         self.init(kind: kind, message: message)
     }
 
-    public enum Kind: Int32 {
+    enum Kind: Int32 {
         case genericError = 1
         case bannerRecv
         case bannerSend
@@ -74,10 +74,10 @@ public struct SSHError: Swift.Error, CustomStringConvertible {
         case keyfileAuthFailed
     }
 
-    public let kind: Kind
-    public let message: String
+    let kind: Kind
+    let message: String
 
-    public var description: String {
+    var description: String {
         let kindMessage = "code \(kind.rawValue) = " + String(describing: kind)
         if message.isEmpty {
             return "Error: \(kindMessage)"
