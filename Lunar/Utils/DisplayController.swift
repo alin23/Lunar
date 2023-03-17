@@ -953,7 +953,7 @@ final class DisplayController: ObservableObject {
     }
 
     static func autoMode() -> AdaptiveMode {
-//        guard initialized else { return ManualMode.shared }
+        guard lunarProActive || lunarProOnTrial else { return ManualMode.shared }
 
         if let mode = SensorMode.specific.ifExternalSensorAvailable() {
             return mode

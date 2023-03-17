@@ -3846,14 +3846,28 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func getPowerOffTooltip(hasDDC: Bool? = nil) -> String {
+        #if arch(arm64)
+            if #available(macOS 13, *) {
+                let disconnect = CachedDefaults[.newBlackOutDisconnect]
+            } else {
+                let disconnect = false
+            }
+        #else
+            let disconnect = false
+        #endif
+
         guard !(hasDDC ?? self.hasDDC) else {
             return """
-            BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0.
+            \(
+                disconnect
+                    ? "BlackOut disconnects a monitor in software, freeing up GPU resources and removing it from the screen arrangement."
+                    : "BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0."
+            )
 
             Can also be toggled with the keyboard using Ctrl-Cmd-6.
 
             Hold the following keys while clicking the button (or while pressing the hotkey) to change BlackOut behaviour:
-            - Shift: make the screen black without mirroring
+            - Shift: make the screen black without \(disconnect ? "disconnecting" : "mirroring")
             - Option: turn off monitor completely using DDC
             - Option and Shift: BlackOut other monitors and keep this one visible
 
@@ -3875,12 +3889,16 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         return """
-        BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0.
+        \(
+            disconnect
+                ? "BlackOut disconnects a monitor in software, freeing up GPU resources and removing it from the screen arrangement."
+                : "BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0."
+        )
 
         Can also be toggled with the keyboard using Ctrl-Cmd-6.
 
         Hold the following keys while clicking the button (or while pressing the hotkey) to change BlackOut behaviour:
-        - Shift: make the screen black without mirroring
+        - Shift: make the screen black without \(disconnect ? "disconnecting" : "mirroring")
         - Option and Shift: BlackOut other monitors and keep this one visible
 
         Emergency Kill Switch: press the ⌘ Command key more than 8 times in a row to force disable BlackOut.

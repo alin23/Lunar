@@ -830,17 +830,17 @@ struct DisplayRowView: View {
 
 struct NeedsLunarProView: View {
     var body: some View {
-        PaddedPopoverView(background: AnyView(Colors.red.brightness(0.05))) {
+        PaddedPopoverView(background: Colors.red.brightness(0.1).any) {
             HStack(spacing: 4) {
                 Text("Needs a")
-                    .foregroundColor(.black)
-                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.black.opacity(0.8))
+                    .font(.system(size: 16, weight: .semibold))
                 SwiftUI.Button("Lunar Pro") { appDelegate!.getLunarPro(appDelegate!) }
-                    .buttonStyle(FlatButton(color: .black.opacity(0.5), textColor: .white))
+                    .buttonStyle(FlatButton(color: .black.opacity(0.3), textColor: .white))
                     .font(.system(size: 15, weight: .bold, design: .rounded))
                 Text("licence")
-                    .foregroundColor(.black)
-                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.black.opacity(0.8))
+                    .font(.system(size: 16, weight: .semibold))
             }
         }
     }
@@ -1113,12 +1113,15 @@ struct AdvancedSettingsView: View {
                     #if arch(arm64)
                         if #available(macOS 13, *) {
                             SettingsToggle(
-                                text: "Disconnect displays in BlackOut", setting: $newBlackOutDisconnect,
+                                text: "Disable the Disconnect API in BlackOut", setting: !$newBlackOutDisconnect,
                                 help: """
-                                Instead of mirroring the display to disable it, Lunar can also
-                                disconnect the display entirely, freeing up GPU resources.
+                                BlackOut can use a hidden macOS API to disconnect the display entirely,
+                                freeing up GPU resources and allowing for an easy reconnection when needed.
 
-                                This uses a hidden macOS API that's not guaranteed to work all the time.
+                                If you're having trouble with how this works, you can switch to the old
+                                method of mirroring the display to disable it.
+
+                                Note: Press ⌘ Command more than 8 times in a row to force connect all displays.
 
                                 In case the built-in MacBook display doesn't reconnect itself when it should,
                                 close the laptop lid and reopen it to bring the display back.
@@ -1134,17 +1137,22 @@ struct AdvancedSettingsView: View {
                         help: "Allows turning off a screen even if it's the only visible screen left"
                     )
 
-                    SettingsToggle(
-                        text: "Switch to the old BlackOut mirroring system", setting: $oldBlackOutMirroring,
-                        help: """
-                        Some setups will have trouble enabling mirroring with the new macOS 11+ API.
+                    #if !arch(arm64)
+                        if #available(macOS 13, *) {
+                        } else {
+                            SettingsToggle(
+                                text: "Switch to the old BlackOut mirroring system", setting: $oldBlackOutMirroring,
+                                help: """
+                                Some setups will have trouble enabling mirroring with the new macOS 11+ API.
 
-                        You can try enabling this option if BlackOut is not working properly.
+                                You can try enabling this option if BlackOut is not working properly.
 
-                        Note: the old mirroring system can't handle complex mirror sets with dummies and virtual/wireless displays.
-                        The best covered cases are "BlackOut built-in display" and "BlackOut only external displays".
-                        """
-                    )
+                                Note: the old mirroring system can't handle complex mirror sets with dummies and virtual/wireless displays.
+                                The best covered cases are "BlackOut built-in display" and "BlackOut only external displays".
+                                """
+                            )
+                        }
+                    #endif
                     Divider()
 
                     SettingsToggle(
