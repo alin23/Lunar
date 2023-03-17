@@ -381,12 +381,14 @@ struct DisplayRowView: View {
     #if arch(arm64)
         @Default(.syncNits) var syncNits
     #endif
+
     @Default(.showInputInQuickActions) var showInputInQuickActions
     @Default(.showPowerInQuickActions) var showPowerInQuickActions
     @Default(.showXDRSelector) var showXDRSelector
     @Default(.showRawValues) var showRawValues
     @Default(.xdrTipShown) var xdrTipShown
     @Default(.autoXdr) var autoXdr
+    @Default(.syncMode) var syncMode
 
     @State var showNeedsLunarPro = false
     @State var showXDRTip = false
@@ -399,6 +401,11 @@ struct DisplayRowView: View {
 
     @State var adaptiveStateText = ""
     @State var adaptivePausedText = "Adaptive brightness paused"
+
+    @State var editingMaxNits = false
+    @State var editingMinNits = false
+
+    @State var hovering = false
 
     var softwareSliders: some View {
         Group {
@@ -596,15 +603,34 @@ struct DisplayRowView: View {
                 get: { display.lockedBrightness && display.lockedContrast },
                 set: { display.lockedBrightness = $0 }
             )
-            BigSurSlider(
-                percentage: $display.preciseBrightnessContrast.f,
-                image: "sun.max.fill",
-                colorBinding: .constant(colors.accent),
-                backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
-                showValue: $showSliderValues,
-                disabled: mergedLockBinding,
-                enableText: "Unlock"
-            )
+            HStack {
+                #if arch(arm64)
+                    NitsTextField(nits: $display.minNits, placeholder: "min", display: display)
+                        .opacity(hovering ? 1 : 0)
+                #endif
+                BigSurSlider(
+                    percentage: $display.preciseBrightnessContrast.f,
+                    image: "sun.max.fill",
+                    colorBinding: .constant(colors.accent),
+                    backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                    showValue: $showSliderValues,
+                    disabled: mergedLockBinding,
+                    enableText: "Unlock",
+                    insideText: nitsText
+                )
+                #if arch(arm64)
+                    let maxNitsBinding = Binding<Double>(
+                        get: { display.userMaxNits ?? display.maxNits },
+                        set: {
+                            display.userMaxNits = nil
+                            display.maxNits = $0
+                        }
+                    )
+                    NitsTextField(nits: maxNitsBinding, placeholder: "max", display: display)
+                        .opacity(hovering ? 1 : 0)
+                #endif
+
+            }
             softwareSliders
         } else {
             BigSurSlider(
@@ -614,7 +640,8 @@ struct DisplayRowView: View {
                 backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
                 showValue: $showSliderValues,
                 disabled: $display.lockedBrightness,
-                enableText: "Unlock"
+                enableText: "Unlock",
+                insideText: nitsText
             )
             softwareSliders
             let contrastBinding: Binding<Float> = Binding(
@@ -697,7 +724,7 @@ struct DisplayRowView: View {
                 volumeSlider
                 appPresetAdaptivePaused
             }
-        }
+        }.onHover { h in withAnimation { hovering = h } }
     }
 
     @ViewBuilder var adaptiveState: some View {
@@ -715,6 +742,23 @@ struct DisplayRowView: View {
         }
     }
 
+    func nitsText() -> AnyView {
+        #if arch(arm64)
+            guard SyncMode.isUsingNits(), display.isNative, let nits = display.nits else {
+                return EmptyView().any
+            }
+            return VStack(spacing: -3) {
+                Text("\(nits.intround)")
+                Text("nits")
+            }
+            .font(.system(size: 8, weight: .bold, design: .rounded).leading(.tight))
+            .foregroundColor((display.preciseBrightnessContrast < 0.25 && colorScheme == .dark) ? Colors.lightGray.opacity(0.6) : Colors.grayMauve.opacity(0.7))
+            .any
+        #else
+            EmptyView().any
+        #endif
+    }
+
     func rotationPicker(_ degrees: Int) -> some View {
         SwiftUI.Button("\(degrees)°") {
             display.rotation = degrees
@@ -724,6 +768,63 @@ struct DisplayRowView: View {
         .help("No rotation")
     }
 }
+
+#if arch(arm64)
+    struct NitsTextField: View {
+        @Binding var nits: Double
+        @State var placeholder: String
+        @ObservedObject var display: Display
+        @State var editing = false
+
+        @Default(.syncMode) var syncMode
+
+        var editPopover: some View {
+            PaddedPopoverView(background: Colors.peach.any) {
+                VStack {
+                    Text("\(placeholder.titleCase())imum nits")
+                        .font(.title.bold())
+                    Text("for \(display.name)")
+
+                    TextField("nits", value: $nits, formatter: NumberFormatter.shared(decimals: 0, padding: 0))
+                        .onReceive(Just(nits)) { nits in
+                            display.nitsEditPublisher.send(true)
+                        }
+                        .textFieldStyle(PaddedTextFieldStyle(backgroundColor: .primary.opacity(0.1)))
+                        .font(.system(size: 20, weight: .bold, design: .monospaced).leading(.tight))
+                        .lineLimit(1)
+                        .frame(width: 70)
+                        .multilineTextAlignment(.center)
+                        .padding(.vertical)
+
+                    Text("Value estimated from monitor\nfirmware data and user input")
+                        .font(.system(size: 12, weight: .medium, design: .rounded).leading(.tight))
+                        .foregroundColor(Colors.grayMauve.opacity(0.8))
+                        .multilineTextAlignment(.center)
+                }
+            }
+        }
+
+        var body: some View {
+            if syncMode, SyncMode.isUsingNits() {
+                let disabled = display.isNative && (placeholder == "max" || display.isActiveSyncSource)
+                SwiftUI.Button(action: { editing = true }) {
+                    VStack(spacing: -3) {
+                        Text(nits.str(decimals: 0))
+                            .font(.system(size: 10, weight: .bold, design: .monospaced).leading(.tight))
+                        Text("nits")
+                            .font(.system(size: 8, weight: .semibold, design: .rounded).leading(.tight))
+                    }
+                }
+                .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                .frame(width: 50)
+                .popover(isPresented: $editing) { editPopover }
+                .disabled(disabled)
+                .help(disabled ? "Managed by the system" : "")
+            }
+        }
+    }
+
+#endif
 
 // MARK: - NeedsLunarProView
 
@@ -1536,11 +1637,19 @@ struct BlackoutPopoverView: View {
 
 // MARK: - PaddedTextFieldStyle
 
-public struct PaddedTextFieldStyle: TextFieldStyle {
-    public func _body(configuration: TextField<Self._Label>) -> some View {
+struct PaddedTextFieldStyle: TextFieldStyle {
+//    @State var font: Font = .system(size: 12, weight: .bold)
+    @State var verticalPadding: CGFloat = 4
+    @State var horizontalPadding: CGFloat = 8
+    @State var backgroundColor: Color? = nil
+
+    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.font) var font
+
+    func _body(configuration: TextField<Self._Label>) -> some View {
         configuration
             .textFieldStyle(.plain)
-            .font(font)
+            .font(font ?? .system(size: 12, weight: .bold))
             .padding(.vertical, verticalPadding)
             .padding(.horizontal, horizontalPadding)
             .background(
@@ -1550,12 +1659,6 @@ public struct PaddedTextFieldStyle: TextFieldStyle {
             )
     }
 
-    @State var font: Font = .system(size: 12, weight: .bold)
-    @State var verticalPadding: CGFloat = 4
-    @State var horizontalPadding: CGFloat = 8
-    @State var backgroundColor: Color? = nil
-
-    @Environment(\.colorScheme) var colorScheme
 }
 
 // MARK: - TextInputView

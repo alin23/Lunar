@@ -163,15 +163,6 @@
       }
     },
     {
-      "identity" : "solar",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/alin23/Solar",
-      "state" : {
-        "revision" : "7f35c6e225c0ac8000930f0c2b11f188e3be3163",
-        "version" : "3.1.1"
-      }
-    },
-    {
       "identity" : "surge",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Jounce/Surge",

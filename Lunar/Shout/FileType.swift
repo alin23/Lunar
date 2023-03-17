@@ -8,7 +8,7 @@
 import Foundation
 // import CSSH
 
-public enum FileType {
+enum FileType {
     case link
     case regularFile
     case directory
@@ -17,7 +17,7 @@ public enum FileType {
     case fifo
     case socket
 
-    public init?(rawValue: Int32) {
+    init?(rawValue: Int32) {
         switch rawValue & LIBSSH2_SFTP_S_IFMT {
         case LIBSSH2_SFTP_S_IFLNK:
             self = .link

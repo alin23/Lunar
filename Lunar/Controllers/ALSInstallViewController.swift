@@ -264,7 +264,7 @@ final class ALSInstallViewController: NSViewController {
 // MARK: NSControlTextEditingDelegate
 
 extension ALSInstallViewController: NSControlTextEditingDelegate {
-    public func control(_ control: NSControl, textView _: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+    func control(_ control: NSControl, textView _: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
         switch commandSelector {
         case #selector(NSResponder.insertTab(_:)), #selector(NSResponder.moveDown(_:)):
             control.window?.makeFirstResponder(control.nextKeyView)

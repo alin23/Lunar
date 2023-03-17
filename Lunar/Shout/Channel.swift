@@ -25,20 +25,12 @@ final class Channel {
         session = nil
     }
 
-    public var cancelled = false
-    public var session: Session?
-
-    public func cancel() throws {
-        cancelled = true
-        _ = write(data: Data([3]), length: 1)
-        try sendEOF()
-        try close()
-        try waitClosed()
-    }
-
     static let windowDefault: UInt32 = 2 * 1024 * 1024
     static let packetDefaultSize: UInt32 = 32768
     static let readBufferSize = 0x4000
+
+    var cancelled = false
+    var session: Session?
 
     static func createForCommand(cSession: OpaquePointer) throws -> Channel {
         guard let cChannel = libssh2_channel_open_ex(
@@ -61,6 +53,14 @@ final class Channel {
             throw SSHError.mostRecentError(session: cSession, backupMessage: "libssh2_scp_send64 failed")
         }
         return Channel(cSession: cSession, cChannel: cChannel)
+    }
+
+    func cancel() throws {
+        cancelled = true
+        _ = write(data: Data([3]), length: 1)
+        try sendEOF()
+        try close()
+        try waitClosed()
     }
 
     func requestPty(type: String) throws {

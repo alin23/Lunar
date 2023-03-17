@@ -183,8 +183,8 @@ extension NSVisualEffectView.Material {
 
 // MARK: - VisualEffectBlur
 
-public struct VisualEffectBlur: View {
-    public init(
+struct VisualEffectBlur: View {
+    init(
         material: NSVisualEffectView.Material = .headerView,
         blendingMode: NSVisualEffectView.BlendingMode = .withinWindow,
         state: NSVisualEffectView.State = .followsWindowActiveState,
@@ -196,7 +196,7 @@ public struct VisualEffectBlur: View {
         self.maskImage = maskImage
     }
 
-    public var body: some View {
+    var body: some View {
         Representable(
             material: material,
             blendingMode: blendingMode,

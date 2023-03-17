@@ -33,7 +33,7 @@ final class SFTP {
     ///   - remotePath: the path to the existing file on the remote server to download
     ///   - localURL: the location on the local device whether the file should be downloaded to
     /// - Throws: SSHError if file can't be created or download fails
-    public func download(remotePath: String, localURL: URL) throws {
+    func download(remotePath: String, localURL: URL) throws {
         let sftpHandle = try SFTPHandle(
             cSession: cSession,
             sftpSession: sftpSession,
@@ -72,7 +72,7 @@ final class SFTP {
     ///   - remotePath: the location on the remote server whether the file should be uploaded to
     ///   - permissions: the file permissions to create the new file with; defaults to FilePermissions.default
     /// - Throws: SSHError if local file can't be read or upload fails
-    public func upload(localURL: URL, remotePath: String, permissions: FilePermissions = .default) throws {
+    func upload(localURL: URL, remotePath: String, permissions: FilePermissions = .default) throws {
         let data = try Data(contentsOf: localURL, options: .alwaysMapped)
         try upload(data: data, remotePath: remotePath, permissions: permissions)
     }
@@ -84,7 +84,7 @@ final class SFTP {
     ///   - remotePath: the location on the remote server whether the file should be uploaded to
     ///   - permissions: the file permissions to create the new file with; defaults to FilePermissions.default
     /// - Throws: SSHError if string is not valid or upload fails
-    public func upload(string: String, remotePath: String, permissions: FilePermissions = .default) throws {
+    func upload(string: String, remotePath: String, permissions: FilePermissions = .default) throws {
         guard let data = string.data(using: .utf8) else {
             throw SSHError.genericError("Unable to convert string to utf8 data")
         }
@@ -98,7 +98,7 @@ final class SFTP {
     ///   - remotePath: the location on the remote server whether the file should be uploaded to
     ///   - permissions: the file permissions to create the new file with; defaults to FilePermissions.default
     /// - Throws: SSHError if upload fails
-    public func upload(data: Data, remotePath: String, permissions: FilePermissions = .default) throws {
+    func upload(data: Data, remotePath: String, permissions: FilePermissions = .default) throws {
         let sftpHandle = try SFTPHandle(
             cSession: cSession,
             sftpSession: sftpSession,
@@ -129,7 +129,7 @@ final class SFTP {
     /// - Parameters:
     ///   - remotePath: the path for the folder, which should be created
     /// - Throws: SSHError if folder can't be created
-    public func createDirectory(_ path: String) throws {
+    func createDirectory(_ path: String) throws {
         let result = path.withCString { (pointer: UnsafePointer<Int8>) -> Int32 in
             libssh2_sftp_mkdir_ex(
                 sftpSession,
@@ -148,7 +148,7 @@ final class SFTP {
     ///   - dest: the new path of the file
     ///   - override: set to true, if rename should override if there is already a file on dest path
     /// - Throws: SSHError if file can't be renamed
-    public func rename(src: String, dest: String, override: Bool) throws {
+    func rename(src: String, dest: String, override: Bool) throws {
         var flag = Int(LIBSSH2_SFTP_RENAME_OVERWRITE)
         if !override { flag = 0 }
 
@@ -165,7 +165,7 @@ final class SFTP {
     /// - Parameters:
     ///   - remotePath: the path of the file, which should be removed
     /// - Throws: SSHError if file can't be deleted
-    public func removeFile(_ path: String) throws {
+    func removeFile(_ path: String) throws {
         let result = path.withCString { (pointer: UnsafePointer<Int8>) -> Int32 in
             libssh2_sftp_unlink_ex(sftpSession, pointer, UInt32(strlen(pointer)))
         }
@@ -177,14 +177,14 @@ final class SFTP {
     /// - Parameters:
     ///   - remotePath: the path of the folder, which should be removed
     /// - Throws: SSHError if folder can't be deleted
-    public func removeDirectory(_ path: String) throws {
+    func removeDirectory(_ path: String) throws {
         let result = path.withCString { (pointer: UnsafePointer<Int8>) -> Int32 in
             libssh2_sftp_rmdir_ex(sftpSession, pointer, UInt32(strlen(pointer)))
         }
         try handleSFTPCommandResult(result)
     }
 
-    public func listFiles(in directory: String) throws -> [String: FileAttributes] {
+    func listFiles(in directory: String) throws -> [String: FileAttributes] {
         let sftpHandle = try SFTPHandle(
             cSession: cSession,
             sftpSession: sftpSession,

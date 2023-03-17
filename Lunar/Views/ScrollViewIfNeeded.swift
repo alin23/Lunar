@@ -24,7 +24,7 @@ import SwiftUI
 
 // MARK: - ScrollViewIfNeeded
 
-public struct ScrollViewIfNeeded<Content>: View where Content: View {
+struct ScrollViewIfNeeded<Content>: View where Content: View {
     /// Creates a new instance that's scrollable in the direction of the given
     /// axis and can show indicators while scrolling if the
     /// Content's size is greater than the ScrollView's.
@@ -37,28 +37,28 @@ public struct ScrollViewIfNeeded<Content>: View where Content: View {
     ///     suitable for the platform. The default value for this parameter is
     ///     `true`.
     ///   - content: The view builder that creates the scrollable view.
-    public init(_ axes: Axis.Set = .vertical, showsIndicators: Bool = true, @ViewBuilder content: () -> Content) {
+    init(_ axes: Axis.Set = .vertical, showsIndicators: Bool = true, @ViewBuilder content: () -> Content) {
         self.axes = axes
         self.showsIndicators = showsIndicators
         self.content = content()
     }
 
     /// The scroll view's content.
-    public var content: Content
+    var content: Content
 
     /// The scrollable axes of the scroll view.
     ///
     /// The default value is ``Axis/vertical``.
-    public var axes: Axis.Set
+    var axes: Axis.Set
 
     /// A value that indicates whether the scroll view displays the scrollable
     /// component of the content offset, in a way that's suitable for the
     /// platform.
     ///
     /// The default is `true`.
-    public var showsIndicators: Bool
+    var showsIndicators: Bool
 
-    public var body: some View {
+    var body: some View {
         GeometryReader { geometryReader in
             ScrollView(activeScrollingDirections, showsIndicators: showsIndicators) {
                 content

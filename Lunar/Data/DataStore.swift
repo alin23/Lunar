@@ -497,11 +497,11 @@ final class DataStore: NSObject {
 //
 //
 // extension Defaults.AnyKey: Hashable {
-//    public func hash(into hasher: inout Hasher) {
+//    func hash(into hasher: inout Hasher) {
 //        hasher.combine(name)
 //    }
 //
-//    public static func == (lhs: Defaults.Keys, rhs: Defaults.Keys) -> Bool {
+//    static func == (lhs: Defaults.Keys, rhs: Defaults.Keys) -> Bool {
 //        lhs.name == rhs.name
 //    }
 // }
@@ -577,7 +577,38 @@ final class ThreadSafeDictionary<V: Hashable, T>: Collection {
 // MARK: - CachedDefaults
 
 enum CachedDefaults {
-    public static subscript<Value: Defaults.Serializable>(key: Defaults.Key<Value>) -> Value {
+    static var crumbKeys: Set<Defaults.AnyKey> = [
+        .adaptiveBrightnessMode,
+        .astronomicalTwilightBegin,
+        .astronomicalTwilightEnd,
+        .civilTwilightBegin,
+        .civilTwilightEnd,
+        .clockMode,
+        .dayLength,
+        .hasActiveDisplays,
+        .hasActiveExternalDisplays,
+        .location,
+        .nauticalTwilightBegin,
+        .nauticalTwilightEnd,
+        .nonManualMode,
+        .curveMode,
+        .secure,
+        .solarNoon,
+        .sunrise,
+        .sunset,
+        .syncMode,
+        .hotkeys,
+        .displays,
+        .apiKey,
+    ]
+
+    static var cache: ThreadSafeDictionary<String, AnyCodable> = ThreadSafeDictionary()
+    static var locks: [String: NSRecursiveLock] = [:]
+    static var observers = Set<AnyCancellable>()
+    static var lock = NSRecursiveLock()
+    static var semaphore = DispatchSemaphore(value: 1, name: "Cached Defaults Lock")
+
+    static subscript<Value: Defaults.Serializable>(key: Defaults.Key<Value>) -> Value {
         get {
             mainThread {
                 if let value = cache[key.name]?.value as? Value {
@@ -615,37 +646,6 @@ enum CachedDefaults {
             return
         }
     }
-
-    static var crumbKeys: Set<Defaults.AnyKey> = [
-        .adaptiveBrightnessMode,
-        .astronomicalTwilightBegin,
-        .astronomicalTwilightEnd,
-        .civilTwilightBegin,
-        .civilTwilightEnd,
-        .clockMode,
-        .dayLength,
-        .hasActiveDisplays,
-        .hasActiveExternalDisplays,
-        .location,
-        .nauticalTwilightBegin,
-        .nauticalTwilightEnd,
-        .nonManualMode,
-        .curveMode,
-        .secure,
-        .solarNoon,
-        .sunrise,
-        .sunset,
-        .syncMode,
-        .hotkeys,
-        .displays,
-        .apiKey,
-    ]
-
-    static var cache: ThreadSafeDictionary<String, AnyCodable> = ThreadSafeDictionary()
-    static var locks: [String: NSRecursiveLock] = [:]
-    static var observers = Set<AnyCancellable>()
-    static var lock = NSRecursiveLock()
-    static var semaphore = DispatchSemaphore(value: 1, name: "Cached Defaults Lock")
 
     static func reset(_ keys: Defaults.AnyKey...) {
         reset(keys)

@@ -779,6 +779,13 @@ extension DispatchQueue {
             return sync { action() }
         }
     }
+    func syncSafe(execute task: DispatchWorkItem) {
+        if let q = DispatchQueue.current, self == q {
+            task.workItem.perform()
+        } else {
+            sync(execute: task.workItem)
+        }
+    }
 }
 
 extension DispatchQueue {
@@ -1567,7 +1574,7 @@ class ExpiringBool: ExpressibleByBooleanLiteral, CustomStringConvertible, Observ
 
     func expire() {
         if let task, !task.isCancelled {
-            DispatchQueue.main.sync(execute: task.workItem)
+            DispatchQueue.main.syncSafe(execute: task)
             self.task = nil
         }
     }
@@ -1596,15 +1603,87 @@ class ExpiringBool: ExpressibleByBooleanLiteral, CustomStringConvertible, Observ
     }
 }
 
+extension Optional {
+    var s: String {
+        guard let self else {
+            return "nil"
+        }
+        return "\(self)"
+    }
+}
+
+class ExpiringOptional<T>: ExpressibleByNilLiteral, CustomStringConvertible, ObservableObject {
+    required init(nilLiteral value: ()) {
+        self.value = nil
+    }
+
+    deinit {
+        if let task, !task.isCancelled {
+            task.cancel()
+        }
+    }
+
+    @Published var value: T?
+    var expiresAt: Date = .distantFuture
+
+    var description: String {
+        if let task, !task.isCancelled {
+            return "\(value.s) (expires at \(expiresAt))"
+        }
+        return "\(value.s)"
+    }
+    var task: DispatchWorkItem? {
+        didSet {
+            oldValue?.cancel()
+        }
+    }
+
+    func expire() {
+        if let task, !task.isCancelled {
+            DispatchQueue.main.syncSafe(execute: task)
+            self.task = nil
+        }
+    }
+
+    func setOrRefresh(_ value: T?, expireAfter: TimeInterval) {
+        guard let value else {
+            return
+        }
+
+        if value == nil {
+            set(value, expireAfter: 1)
+        } else {
+            refresh(expireAfter: 1)
+        }
+    }
+
+    func set(_ value: T, expireAfter: TimeInterval) {
+        self.value = value
+        refresh(expireAfter: expireAfter)
+    }
+
+    func refresh(expireAfter: TimeInterval) {
+        guard value != nil else { return }
+
+        expiresAt = .init(timeIntervalSinceNow: expireAfter)
+        task = mainAsyncAfter(ms: (expireAfter * 1000).intround) { [self] in
+            self.value = nil
+        }
+    }
+}
+
 // MARK: - AtomicLock
 
 @propertyWrapper
-public struct AtomicLock<Value> {
-    public init(wrappedValue: Value) {
+struct AtomicLock<Value> {
+    init(wrappedValue: Value) {
         value = wrappedValue
     }
 
-    public var wrappedValue: Value {
+    var value: Value
+    var lock = NSRecursiveLock()
+
+    var wrappedValue: Value {
         get {
             lock.around { value }
         }
@@ -1613,19 +1692,19 @@ public struct AtomicLock<Value> {
         }
     }
 
-    var value: Value
-    var lock = NSRecursiveLock()
 }
 
 // MARK: - Atomic
 
 @propertyWrapper
-public struct Atomic<Value: AtomicValue> {
-    public init(wrappedValue: Value) {
+struct Atomic<Value: AtomicValue> {
+    init(wrappedValue: Value) {
         value = ManagedAtomic<Value>(wrappedValue)
     }
 
-    public var wrappedValue: Value {
+    var value: ManagedAtomic<Value>
+
+    var wrappedValue: Value {
         get {
             value.load(ordering: .relaxed)
         }
@@ -1634,19 +1713,21 @@ public struct Atomic<Value: AtomicValue> {
         }
     }
 
-    var value: ManagedAtomic<Value>
 }
 
 // MARK: - AtomicOptional
 
 @propertyWrapper
-public struct AtomicOptional<Value: AtomicValue & Equatable> {
-    public init(wrappedValue: Value?, nilValue: Value) {
+struct AtomicOptional<Value: AtomicValue & Equatable> {
+    init(wrappedValue: Value?, nilValue: Value) {
         self.nilValue = nilValue
         value = ManagedAtomic<Value>(wrappedValue ?? nilValue)
     }
 
-    public var wrappedValue: Value? {
+    var nilValue: Value
+    var value: ManagedAtomic<Value>
+
+    var wrappedValue: Value? {
         get {
             let v = value.load(ordering: .relaxed)
             return v == nilValue ? nil : v
@@ -1656,19 +1737,20 @@ public struct AtomicOptional<Value: AtomicValue & Equatable> {
         }
     }
 
-    var nilValue: Value
-    var value: ManagedAtomic<Value>
 }
 
 // MARK: - LazyAtomic
 
 @propertyWrapper
-public struct LazyAtomic<Value> {
-    public init(wrappedValue constructor: @autoclosure @escaping () -> Value) {
+struct LazyAtomic<Value> {
+    init(wrappedValue constructor: @autoclosure @escaping () -> Value) {
         self.constructor = constructor
     }
 
-    public var wrappedValue: Value {
+    var storage: Value?
+    let constructor: () -> Value
+
+    var wrappedValue: Value {
         mutating get {
             if storage == nil {
                 self.storage = constructor()
@@ -1680,8 +1762,6 @@ public struct LazyAtomic<Value> {
         }
     }
 
-    var storage: Value?
-    let constructor: () -> Value
 }
 
 func localNow() -> DateInRegion {

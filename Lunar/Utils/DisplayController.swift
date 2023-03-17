@@ -485,9 +485,15 @@ final class DisplayController: ObservableObject {
 
     var displaysBySerial: [String: Display] = [:]
     var unmanagedDisplays: [Display] = []
-    @Published var sourceDisplay: Display = ALL_DISPLAYS
-
     @Atomic var clamshell: Bool = isLidClosed() && Sysctl.isMacBook
+    @Published var sourceDisplay: Display = ALL_DISPLAYS {
+        didSet {
+            activeDisplayList.forEach { d in
+                d.previousBrightnessMapping.expire()
+            }
+        }
+    }
+
     var activeDisplays: [CGDirectDisplayID: Display] {
         get { _activeDisplaysLock.around(ignoreMainThread: true) { _activeDisplays } }
         set {
@@ -614,6 +620,12 @@ final class DisplayController: ObservableObject {
 
     @Published var adaptiveModeKey: AdaptiveModeKey = DisplayController.getAdaptiveMode().key {
         didSet {
+            if adaptiveModeKey != oldValue {
+                activeDisplayList.forEach { d in
+                    d.previousBrightnessMapping.expire()
+                }
+            }
+
             guard apply else { return }
             guard adaptiveModeKey != .auto else {
                 CachedDefaults[.overrideAdaptiveMode] = false
@@ -979,15 +991,16 @@ final class DisplayController: ObservableObject {
 
         let recomputeAndAssign: (Display, Double) -> Void = { [self] display, brightness in
             let (brightnessOffset, _) = DC.appBrightnessContrastOffset(for: display) ?? (0, 0)
+            let sourceBrightness = SyncMode.specific.invInterpolate(brightness, display: display, offset: brightnessOffset.d)
 
-            let sourceBrightness: Double? = (-100 ... 100)
-                .map { br -> (Double, Int) in
-                    let newBr = SyncMode.specific.interpolate(br.d, display: display, offset: brightnessOffset.f, gamma22: false)
-                    return (newBr, abs(brightness.i - newBr.intround))
-                }
-                .min(by: { $0.1 < $1.1 })?.0
+//            let sourceBrightness: Double? = (-100 ... 100)
+//                .map { br -> (Double, Int) in
+//                    let newBr = SyncMode.specific.interpolate(br.d, display: display, offset: brightnessOffset.f, gamma22: false)
+//                    return (newBr, abs(brightness.i - newBr.intround))
+//                }
+//                .min(by: { $0.1 < $1.1 })?.0
 
-            guard let sourceBrightness else { return }
+//            guard let sourceBrightness else { return }
             if sourceBrightness < 0 {
                 sourceDisplay.preciseBrightnessContrast = 0
                 sourceDisplay.softwareBrightness = sourceBrightness.f.map(from: (-100, 0), to: (0, 1))
@@ -1008,11 +1021,11 @@ final class DisplayController: ObservableObject {
 
         for display in activeDisplays {
             if !display.lockedBrightnessCurve {
-                display.insertBrightnessUserDataPoint(sourceDisplay.softwareAdjustedBrightness.d, display.preciseBrightnessContrast * 100, modeKey: .sync)
+                display.insertBrightnessUserDataPoint(sourceDisplay.softwareAdjustedBrightness.d, display.brightness.doubleValue, modeKey: .sync)
             }
 
             if !display.lockedContrastCurve, !display.lockedContrast {
-                display.insertContrastUserDataPoint(sourceDisplay.preciseContrast * 100, display.preciseContrast * 100, modeKey: .sync)
+                display.insertContrastUserDataPoint(sourceDisplay.preciseContrast * 100, display.contrast.doubleValue, modeKey: .sync)
             }
         }
     }

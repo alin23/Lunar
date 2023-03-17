@@ -47,7 +47,13 @@ final class MacToggle: NSView {
 
     //================================================================================
 
-    public var isEnabled = true {
+    var callback: ((_ isOn: Bool) -> Void)?
+
+    //================================================================================
+
+    //================================================================================
+
+    var isEnabled = true {
         didSet {
             mainThread {
                 if isEnabled {
@@ -69,17 +75,17 @@ final class MacToggle: NSView {
 
     //================================================================================
 
-    @IBInspectable public var isOn = false {
+    @IBInspectable var isOn = false {
         didSet { animate() }
     }
 
     /// Change the toggle border on and off
-    @IBInspectable public var hasToggleBorder = true {
+    @IBInspectable var hasToggleBorder = true {
         didSet { circle.layer?.borderWidth = hasToggleBorder ? toggleBorderWidth : 0 }
     }
 
     /// Change the width of the outline border
-    @IBInspectable public var outlineWidth: CGFloat = 2 {
+    @IBInspectable var outlineWidth: CGFloat = 2 {
         didSet {
             backVw.layer?.borderWidth = outlineWidth
             layoutSwitch(resetingLayout: true)
@@ -87,12 +93,12 @@ final class MacToggle: NSView {
     }
 
     /// Change the width of the border on the toggle
-    @IBInspectable public var toggleBorderWidth: CGFloat = 2 {
+    @IBInspectable var toggleBorderWidth: CGFloat = 2 {
         didSet { circle.layer?.borderWidth = hasToggleBorder ? toggleBorderWidth : 0 }
     }
 
     /// Change the radius of the complete toggle
-    @IBInspectable public var toggleRadius: CGFloat {
+    @IBInspectable var toggleRadius: CGFloat {
         get {
             if let r = _radius { return r }
             return (height - (outlineWidth * 2)) / 2
@@ -104,30 +110,24 @@ final class MacToggle: NSView {
     }
 
     /// Change the color of the outline border
-    @IBInspectable public var outlineColor: NSColor = .lightGray {
+    @IBInspectable var outlineColor: NSColor = .lightGray {
         didSet { backVw.layer?.borderColor = outlineColor.cgColor }
     }
 
     /// Change the color of the fill when the toggle is on
-    @IBInspectable public var fillColor: NSColor = .lightGray {
+    @IBInspectable var fillColor: NSColor = .lightGray {
         didSet { if isOn { backVw.layer?.borderColor = fillColor.cgColor } }
     }
 
     /// Change the color of the toggle center
-    @IBInspectable public var toggleColor: NSColor = .white {
+    @IBInspectable var toggleColor: NSColor = .white {
         didSet { circle.bg = toggleColor }
     }
 
     /// Change the background color of the complete toggle (visible when switch is off)
-    @IBInspectable public var backColor: NSColor = .white {
+    @IBInspectable var backColor: NSColor = .white {
         didSet { backVw.bg = backColor }
     }
-
-    //================================================================================
-
-    //================================================================================
-
-    var callback: ((_ isOn: Bool) -> Void)?
 
     @inline(__always) func toggleWithoutCallback(value: Bool) {
         let oldCallback = callback
