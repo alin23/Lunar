@@ -1650,7 +1650,7 @@ class ExpiringOptional<T>: ExpressibleByNilLiteral, CustomStringConvertible, Obs
             return
         }
 
-        if value == nil {
+        if self.value == nil {
             set(value, expireAfter: 1)
         } else {
             refresh(expireAfter: 1)

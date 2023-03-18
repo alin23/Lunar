@@ -20,7 +20,31 @@ extension Display {
 // MARK: - Screen
 
 @available(iOS 16, macOS 13, *)
-final class Screen: NSObject, AppEntity {
+final class Screen: NSObject, AppEntity, ExpressibleByStringLiteral {
+    init(stringLiteral value: String) {
+        if let f = DisplayFilter(argument: value)?.screen {
+            isDynamicFilter = true
+            super.init()
+            id = f.id
+            name = f.name
+            serial = f.serial
+            return
+        }
+
+        isDynamicFilter = false
+        super.init()
+        guard let d = DC.activeDisplaysBySerial[value] else {
+            id = 0
+            name = "Unknown"
+            serial = value
+            return
+        }
+        id = d.id.i
+        name = d.name
+        serial = value
+        display = d
+    }
+
     init(id: CGDirectDisplayID, name: String, serial: String, display: Display? = nil, isDynamicFilter: Bool = false) {
         self.isDynamicFilter = isDynamicFilter
 
@@ -78,7 +102,6 @@ final class Screen: NSObject, AppEntity {
     @objc var serial: String
 
     weak var display: Display?
-
     @Property(title: "Brightness")
     @objc var brightness: Double
     @Property(title: "Contrast")
@@ -121,6 +144,10 @@ final class Screen: NSObject, AppEntity {
     @objc var facelight: Bool
     @Property(title: "Adaptive enabled")
     @objc var adaptive: Bool
+
+    var dynamicDisplay: Display? {
+        display ?? displays.first
+    }
 
     var displays: [Display] {
         guard let displayFilter = DisplayFilter(argument: serial) else {
@@ -370,7 +397,10 @@ struct ScreenQuery: EntityPropertyQuery {
         }
 
         guard !single else {
-            return (additionalScreens ?? []) + screens + [DisplayFilter.cursor.screen] + (sidecar ? [.sidecar] : [])
+            return (additionalScreens ?? []) + screens +
+                [DisplayFilter.cursor.screen, DisplayFilter.main.screen] +
+                ((Sysctl.isiMac || Sysctl.isMacBook) && !screens.contains(where: \.isBuiltin) ? [DisplayFilter.builtin.screen] : []) +
+                (sidecar ? [.sidecar] : [])
         }
 
         return (additionalScreens ?? []) + screens + Self.dynamicFilterScreens + (sidecar ? [.sidecar] : [])
@@ -773,7 +803,7 @@ Power off a screen by:
         When(\.$disableScreen, .equalTo, true, {
             Summary("Power off \(\.$screen) and \(\.$disableScreen) by mirroring from \(\.$visibleScreen)")
         }, otherwise: {
-            Summary("Power off \(\.$screen) and \(\.$disableScreen) (only make it black without mirroring)")
+            Summary("Power off \(\.$screen) and \(\.$disableScreen) (only make it black, without mirroring or disconnecting)")
         })
     }
 
@@ -801,7 +831,7 @@ Power off a screen by:
         let displayIDs = Set(displays.map(\.id))
 
         if disableScreen {
-            if let master = screen.display {
+            if let master = screen.dynamicDisplay {
                 if displays.contains(master) {
                     throw $visibleScreen.needsValueError("Screen to mirror from should not be in the list of displays to be powered off")
                 }
@@ -816,7 +846,7 @@ Power off a screen by:
         }
 
         var master: Display?
-        if disableScreen, let masterD = screen.display ?? DC.activeDisplayList.filter(
+        if disableScreen, let masterD = screen.dynamicDisplay ?? DC.activeDisplayList.filter(
             { !displayIDs.contains($0.id) && !$0.blackOutEnabled }
         ).first {
             master = masterD
@@ -969,38 +999,52 @@ If the action fails, try any one of the following to bring back the screen:
         title: "Screen",
         optionsProvider: ScreenQuery(
             single: true,
-            additionalScreens: [DisplayFilter.all.screen] + DC.possiblyDisconnectedDisplays.values.map(\.screen),
+            additionalScreens: [DisplayFilter.all.screen] + DC.possiblyDisconnectedDisplayList.map(\.screen),
             sidecar: true
         )
     )
     var screen: Screen
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<String> {
         #if !arch(arm64)
             throw IntentError.message("This action is only available on Apple Silicon")
+            return .result(value: "")
         #else
             if screen == Screen.sidecar, let sdm, let connected = sdm.connectedDevices {
                 if connected.isEmpty, let device = sdm.recentDevices?.first ?? sdm.devices?.first {
                     await sdm.connect(to: device)
+                    let screen = try await connectedScreen(screen)
+                    return .result(value: screen?.serial ?? "")
                 }
-                return .result()
+                return .result(value: "")
             }
 
             if let displayFilter = DisplayFilter(argument: screen.serial), displayFilter == .all || displayFilter == .cursor {
                 DC.en()
-                return .result()
+                return .result(value: screen.dynamicDisplay?.serial ?? "")
             }
 
-            if let display = DC.possiblyDisconnectedDisplays.values.first(where: { $0.serial == screen.serial }) {
+            if let display = DC.possiblyDisconnectedDisplayList.first(where: { $0.serial == screen.serial }) {
                 DC.en(display.id)
-            } else {
-                DC.en(screen.id.u32)
+                return .result(value: display.serial)
             }
-
+            DC.en(screen.id.u32)
+            return .result(value: screen.serial)
         #endif
-        return .result()
     }
+}
+
+@available(iOS 16, macOS 13, *)
+func connectedScreen(_ s: Screen) async throws -> Screen? {
+    for _ in 1 ... 30 {
+        if let d = s.dynamicDisplay {
+            return d.screen
+        }
+        try await Task.sleep(for: .milliseconds(100))
+    }
+
+    return nil
 }
 
 @available(iOS 16, macOS 13, *)
@@ -1031,33 +1075,58 @@ If the reconnect action fails, try any one of the following to bring back the sc
     var screen: Screen
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<String> {
         #if !arch(arm64)
             throw IntentError.message("This action is only available on Apple Silicon")
+            return .result(value: "")
         #else
-            if screen == Screen.sidecar, let sdm, let connected = sdm.connectedDevices {
-                if connected.isEmpty, let device = sdm.recentDevices?.first ?? sdm.devices?.first {
-                    await sdm.connect(to: device)
-                } else if let device = connected.first {
-                    await sdm.disconnect(from: device)
-                }
-                return .result()
+            if screen == Screen.sidecar, let sdm, sdm.connectedDevices != nil {
+                return .result(value: try await handleSidecar())
             }
 
-            if let display = screen.display, display.active {
+            return .result(value: try await handleScreen())
+        #endif
+    }
+
+    #if arch(arm64)
+        func handleScreen() async throws -> String {
+            if let display = screen.dynamicDisplay, display.active {
                 guard lunarProActive else {
                     throw IntentError.message("A Lunar Pro license is needed for this feature.")
                 }
                 DC.dis(display.id)
-            } else if let display = DC.possiblyDisconnectedDisplays.values.first(where: { $0.serial == screen.serial }) {
+                return ""
+            }
+            if let display = DC.possiblyDisconnectedDisplays.values.first(where: { $0.serial == screen.serial }) {
                 DC.en(display.id)
-            } else {
-                DC.en(screen.id.u32)
+                return display.serial
             }
 
-        #endif
-        return .result()
-    }
+            DC.en(screen.id.u32)
+            return screen.serial
+        }
+
+        func handleSidecar() async throws -> String {
+            guard let sdm, let connected = sdm.connectedDevices else {
+                return ""
+            }
+
+            if connected.isEmpty, let device = sdm.recentDevices?.first ?? sdm.devices?.first {
+                notify(identifier: "fyi.lunar.Lunar.Shortcuts", title: "Connecting to \(device.name ?? "Sidecar")", body: "")
+
+                await sdm.connect(to: device)
+                let screen = try await connectedScreen(screen)
+                return screen?.serial ?? ""
+            }
+
+            if let device = connected.first {
+                notify(identifier: "fyi.lunar.Lunar.Shortcuts", title: "Disconnecting from \(device.name ?? "Sidecar")", body: "")
+
+                await sdm.disconnect(from: device)
+            }
+            return ""
+        }
+    #endif
 }
 
 @available(iOS 16, macOS 13, *)
@@ -1770,7 +1839,7 @@ Note: very few monitors implement this functionality
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        guard let display = screen.displays.first else {
+        guard let display = screen.dynamicDisplay else {
             throw $screen.needsValueError()
         }
 
@@ -1805,7 +1874,7 @@ struct ReadSoftwareColorsIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        guard let display = screen.displays.first else {
+        guard let display = screen.dynamicDisplay else {
             throw $screen.needsValueError()
         }
 
@@ -1837,7 +1906,7 @@ struct MirrorSetIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        guard let mirrorMaster = mirrorMaster.displays.first else {
+        guard let mirrorMaster = mirrorMaster.dynamicDisplay else {
             throw $mirrorMaster.needsValueError()
         }
         mirrorMaster.refreshPanel()
@@ -1961,7 +2030,7 @@ struct SetPanelModeIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
 
-        mode.screen.display?.reconfigure { panel in
+        mode.screen.dynamicDisplay?.reconfigure { panel in
             panel.setModeNumber((mode.id & ((1 << 32) - 1)).i32)
         }
 
@@ -1992,7 +2061,7 @@ struct SetPanelPresetIntent: AppIntent {
         try checkShortcutsLimit()
 
         let presetIndex = (preset.id & ((1 << 32) - 1)).i64
-        guard let display = preset.screen.display,
+        guard let display = preset.screen.dynamicDisplay,
               let preset = display.panelPresets.first(where: { $0.presetIndex == presetIndex })
         else { return .result() }
         display.reconfigure { panel in
@@ -2227,7 +2296,7 @@ struct SwapMonitorsIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        guard let display1 = screen1.display, let display2 = screen2.display, display1 != display2 else {
+        guard let display1 = screen1.dynamicDisplay, let display2 = screen2.dynamicDisplay, display1 != display2 else {
             throw IntentError.message("Two different screens are needed to perform swapping.")
         }
         DC.swap(firstDisplay: display1.id, secondDisplay: display2.id, rotation: swapOrientations)
@@ -2264,7 +2333,7 @@ struct MakeMonitorMainIntent: AppIntent {
 
         Display.configure { config in
             if let mainDisplay = DC.mainDisplay, let mainDisplayBounds = mainDisplay.nsScreen?.bounds,
-               mainDisplayBounds.origin == .zero, let display = screen.display, let displayBounds = display.nsScreen?.bounds
+               mainDisplayBounds.origin == .zero, let display = screen.dynamicDisplay, let displayBounds = display.nsScreen?.bounds
             {
                 CGConfigureDisplayOrigin(config, mainDisplay.id, -displayBounds.origin.x.intround.i32, -displayBounds.origin.y.intround.i32)
             }
@@ -2298,7 +2367,7 @@ struct VerticalMonitorLayoutIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        guard let display1 = screenTop.display, let display2 = screenBottom.display, display1 != display2 else {
+        guard let display1 = screenTop.dynamicDisplay, let display2 = screenBottom.dynamicDisplay, display1 != display2 else {
             throw IntentError.message("Two different screens are needed to perform arrangement.")
         }
 
@@ -2350,7 +2419,7 @@ struct HorizontalMonitorLayoutIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        guard let display1 = screenLeft.display, let display2 = screenRight.display, display1 != display2 else {
+        guard let display1 = screenLeft.dynamicDisplay, let display2 = screenRight.dynamicDisplay, display1 != display2 else {
             throw IntentError.message("Two different screens are needed to perform arrangement.")
         }
 
@@ -2408,8 +2477,8 @@ struct ThreeAboveOneMonitorLayoutIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        guard let display1 = screenLeft.display, let display2 = screenMiddle.display,
-              let display3 = screenRight.display, let display4 = screenBottom.display,
+        guard let display1 = screenLeft.dynamicDisplay, let display2 = screenMiddle.dynamicDisplay,
+              let display3 = screenRight.dynamicDisplay, let display4 = screenBottom.dynamicDisplay,
               Set([display1.id, display2.id, display3.id, display4.id]).count == 4
         else {
             throw IntentError.message("Four different screens are needed to perform arrangement.")
@@ -2475,7 +2544,7 @@ struct TwoAboveOneMonitorLayoutIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        guard let display1 = screenLeft.display, let display2 = screenMiddle.display, let display3 = screenRight.display,
+        guard let display1 = screenLeft.dynamicDisplay, let display2 = screenMiddle.dynamicDisplay, let display3 = screenRight.dynamicDisplay,
               Set([display1.id, display2.id, display3.id]).count == 3
         else {
             throw IntentError.message("Three different screens are needed to perform arrangement.")
@@ -2558,7 +2627,7 @@ struct HorizontalMonitorThreeLayoutIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        guard let display1 = screenLeft.display, let display2 = screenMiddle.display, let display3 = screenRight.display,
+        guard let display1 = screenLeft.dynamicDisplay, let display2 = screenMiddle.dynamicDisplay, let display3 = screenRight.dynamicDisplay,
               Set([display1.id, display2.id, display3.id]).count == 3
         else {
             throw IntentError.message("Three different screens are needed to perform arrangement.")

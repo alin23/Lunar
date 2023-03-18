@@ -1100,6 +1100,14 @@ final class DisplayController: ObservableObject {
 
     static var serials: [CGDirectDisplayID: String] = [:]
 
+    static var observers: Set<AnyCancellable> = []
+    static var ddcSleepFactor: DDCSleepFactor = {
+        ddcSleepFactorPublisher.sink { change in
+            DisplayController.ddcSleepFactor = change.newValue
+        }.store(in: &observers)
+        return Defaults[.ddcSleepFactor]
+    }()
+
     @Published var calibrating = false
 
     var screencaptureIsRunning: CurrentValueSubject<Bool, Never> = .init(processIsRunning("/usr/sbin/screencapture", nil))
@@ -2128,16 +2136,18 @@ final class DisplayController: ObservableObject {
         display.fallbackPromptTime = Date()
         let semaphore = DispatchSemaphore(value: 0, name: "Non-responsive Control Watcher Prompt")
         let completionHandler = { (fallbackToGamma: NSApplication.ModalResponse) in
-            if fallbackToGamma == .alertFirstButtonReturn {
-                if let control = display.control?.displayControl {
-                    display.enabledControls[control] = false
+            mainAsync {
+                if fallbackToGamma == .alertFirstButtonReturn {
+                    if let control = display.control?.displayControl {
+                        display.enabledControls[control] = false
+                    }
+                    display.gammaEnabled = true
+                    display.control = GammaControl(display: display)
+                    display.setGamma()
                 }
-                display.gammaEnabled = true
-                display.control = GammaControl(display: display)
-                display.setGamma()
-            }
-            if fallbackToGamma == .alertThirdButtonReturn {
-                display.neverFallbackControl = true
+                if fallbackToGamma == .alertThirdButtonReturn {
+                    display.neverFallbackControl = true
+                }
             }
             semaphore.signal()
         }
@@ -2165,8 +2175,10 @@ final class DisplayController: ObservableObject {
             window: window,
             suppressionText: "Always fallback to software controls for this display when needed",
             onSuppression: { fallback in
-                display.alwaysFallbackControl = fallback
-                display.save()
+                mainAsync {
+                    display.alwaysFallbackControl = fallback
+                    display.save()
+                }
             },
             onCompletion: completionHandler,
             unique: true,

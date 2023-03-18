@@ -1213,6 +1213,11 @@ final class DisplayViewController: NSViewController {
         let brightnessChartEntry = brightnessContrastChart.brightnessGraph.entries
         let contrastChartEntry = brightnessContrastChart.contrastGraph.entries
 
+        guard !brightnessChartEntry.isEmpty else {
+            self.initGraphSubject.send(DC.adaptiveModeKey)
+            return
+        }
+
         let brColor = darkMode ? white.withAlphaComponent(0.5) : violet
         var gradient: CGGradient?
 

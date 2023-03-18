@@ -199,6 +199,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
     static var hdrWorkaround: Bool = Defaults[.hdrWorkaround]
 
+    static var colorScheme: ColorScheme = {
+        colorSchemePublisher.sink { AppDelegate.colorScheme = $0.newValue }.store(in: &observers)
+        return Defaults[.colorScheme]
+    }()
+
     @Atomic var paddleDismissed = true
 
     var locationManager: CLLocationManager?
