@@ -3,6 +3,34 @@
     <channel>
         <title>Lunar</title>
         <item>
+            <title>6.0.1</title>
+            <pubDate>Sat, 18 Mar 2023 20:08:53 +0200</pubDate>
+            <link>https://lunar.fyi/</link>
+            <sparkle:phasedRolloutInterval>172800</sparkle:phasedRolloutInterval>
+            <sparkle:fullReleaseNotesLink>https://lunar.fyi/changelog</sparkle:fullReleaseNotesLink>
+            <sparkle:minimumAutoupdateVersion>6.0.0</sparkle:minimumAutoupdateVersion>
+            <sparkle:version>6.0.1</sparkle:version>
+            <sparkle:shortVersionString>6.0.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-6.0.1.html</sparkle:releaseNotesLink>
+            <enclosure url="https://files.lunar.fyi/releases/Lunar-6.0.1.dmg" length="21792074" type="application/octet-stream" sparkle:edSignature="nY7bMk84BukCgML7QaliiElQfsh7NweLETQpvbHJouCPXHt9G1rAc8zJ6niq5r0Tco5Qwg6E1DR9GX4gzxmcDQ=="/>
+        </item>
+
+        <item>
+            <title>6.0.0</title>
+            <pubDate>Fri, 17 Mar 2023 16:24:07 +0200</pubDate>
+            <link>https://lunar.fyi/</link>
+            <sparkle:phasedRolloutInterval>172800</sparkle:phasedRolloutInterval>
+            <sparkle:fullReleaseNotesLink>https://lunar.fyi/changelog</sparkle:fullReleaseNotesLink>
+            <sparkle:minimumAutoupdateVersion>6.0.0</sparkle:minimumAutoupdateVersion>
+            <sparkle:version>6.0.0</sparkle:version>
+            <sparkle:shortVersionString>6.0.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-6.0.0.html</sparkle:releaseNotesLink>
+            <enclosure url="https://files.lunar.fyi/releases/Lunar-6.0.0.dmg" length="21741125" type="application/octet-stream" sparkle:edSignature="cimkFWSiigsnqMFaounK+7mLIo1sYCFJSkiRgCc41uct6wqugGHAPJeLjE8kR2WQ8wQqj42zt9CDZZM1iNNwCg=="/>
+        </item>
+
+        <item>
             <title>5.8.0</title>
             <pubDate>Tue, 08 Nov 2022 10:19:27 +0100</pubDate>
             <link>https://lunar.fyi/</link>

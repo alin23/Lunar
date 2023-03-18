@@ -53,6 +53,11 @@ enum AdaptiveModeKey: Int, Defaults.Serializable, CaseIterable, Sendable {
             self == .sync && !SyncMode.specific.isSyncingNits
         )
     }
+    var hasUsefulInfo: Bool {
+        self == .location || self == .sensor || (
+            self == .sync && SyncMode.specific.isSyncingNits
+        )
+    }
 }
 
 let XDR_DEFAULT_LUX: Float = 6500

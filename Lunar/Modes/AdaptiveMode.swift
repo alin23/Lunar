@@ -235,3 +235,15 @@ final class AdaptiveModeMenuValidator: NSObject, NSMenuItemValidation {
 }
 
 let adaptiveModeMenuValidator = AdaptiveModeMenuValidator()
+
+@MainActor
+final class AdaptiveModeInfo: ObservableObject {
+    init() {}
+
+    @Published var lux: Double?
+    @Published var nits: Double?
+    @Published var sunElevation: Double?
+}
+
+@MainActor
+let AMI = AdaptiveModeInfo()

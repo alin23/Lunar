@@ -3557,7 +3557,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             self.readapt(newValue: false, oldValue: true)
         }
 
-        @Published var nits: Double? = nil
+        @Published var nits: Double? = nil {
+            didSet {
+                guard isActiveSyncSource else { return }
+                Task.init {
+                    await MainActor.run { AMI.nits = nits }
+                }
+            }
+        }
         lazy var nitsToPercentageMapping: [AutoLearnMapping] = Self.LUX_TO_NITS.sorted(by: { $0.key < $1.key }).map { k, v in
             AutoLearnMapping(source: k, target: nitsToPercentage(v, minNits: minNits, maxNits: userMaxNits ?? maxNits) * 100)
         }
@@ -3847,10 +3854,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func getPowerOffTooltip(hasDDC: Bool? = nil) -> String {
         #if arch(arm64)
+            let disconnect: Bool
             if #available(macOS 13, *) {
-                let disconnect = CachedDefaults[.newBlackOutDisconnect]
+                disconnect = CachedDefaults[.newBlackOutDisconnect]
             } else {
-                let disconnect = false
+                disconnect = false
             }
         #else
             let disconnect = false

@@ -34,6 +34,7 @@
 		C731E85E27E1E5090016B36D /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = C731E85D27E1E5090016B36D /* Sentry */; };
 		C73716A526DE1F22008EEE53 /* CBTrueToneClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C737169E26DE1F22008EEE53 /* CBTrueToneClient.h */; };
 		C73716A726DE1F22008EEE53 /* CBAdaptationClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C73716A426DE1F22008EEE53 /* CBAdaptationClient.h */; };
+		C73A4E6229C5EAFC006A22F3 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = C73A4E6129C5EAFC006A22F3 /* Localizable.stringsdict */; };
 		C73AAC4B22241B690063AD2A /* Hotkeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = C73AAC4A22241B690063AD2A /* Hotkeys.swift */; };
 		C73B41EC263BE02E006F6783 /* LetsMove.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C73B41EA263BE01F006F6783 /* LetsMove.framework */; };
 		C73B41ED263BE02E006F6783 /* LetsMove.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C73B41EA263BE01F006F6783 /* LetsMove.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -231,6 +232,7 @@
 		C735DD791FD5C04D00FBD16F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		C737169E26DE1F22008EEE53 /* CBTrueToneClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBTrueToneClient.h; sourceTree = "<group>"; };
 		C73716A426DE1F22008EEE53 /* CBAdaptationClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBAdaptationClient.h; sourceTree = "<group>"; };
+		C73A4E6129C5EAFC006A22F3 /* Localizable.stringsdict */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; path = Localizable.stringsdict; sourceTree = "<group>"; };
 		C73AAC4A22241B690063AD2A /* Hotkeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hotkeys.swift; sourceTree = "<group>"; };
 		C73B41EA263BE01F006F6783 /* LetsMove.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = LetsMove.framework; sourceTree = "<group>"; };
 		C73B41F5263E1301006F6783 /* ddcctl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ddcctl; path = bin/ddcctl; sourceTree = SOURCE_ROOT; };
@@ -650,6 +652,7 @@
 				C78BD03D259B2FA300FC823F /* Modes */,
 				C790D4BC259B9DC100868689 /* Utils */,
 				C77CC75A1FEDB367009AA718 /* Views */,
+				C73A4E6129C5EAFC006A22F3 /* Localizable.stringsdict */,
 			);
 			path = Lunar;
 			sourceTree = "<group>";
@@ -899,6 +902,7 @@
 				C772802629AE09D900401C78 /* edid-decode in Resources */,
 				C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */,
 				C7AEC8001FD0B4350039B562 /* Main.storyboard in Resources */,
+				C73A4E6229C5EAFC006A22F3 /* Localizable.stringsdict in Resources */,
 				C780CF98269F241A007FFB58 /* tsl2591.h in Resources */,
 				C73B41F6263E1301006F6783 /* ddcctl in Resources */,
 				C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */,
@@ -1200,7 +1204,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 6.0.0;
+				CURRENT_PROJECT_VERSION = 6.0.1;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -1232,7 +1236,7 @@
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 6.0.0;
+				MARKETING_VERSION = 6.0.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				OTHER_LDFLAGS = "";
@@ -1269,7 +1273,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 6.0.0;
+				CURRENT_PROJECT_VERSION = 6.0.1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1301,7 +1305,7 @@
 				);
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 6.0.0;
+				MARKETING_VERSION = 6.0.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;

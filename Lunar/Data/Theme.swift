@@ -38,7 +38,7 @@ let logoColor = lunarYellow
 let settingsDividerColor = white.withAlphaComponent(0.3)
 
 var darkMode: Bool {
-    switch CachedDefaults[.colorScheme] {
+    switch AppDelegate.colorScheme {
     case .system:
         return (UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light") == "Dark"
     case .light:
