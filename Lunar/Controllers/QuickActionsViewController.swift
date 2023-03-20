@@ -1732,13 +1732,12 @@ struct QuickActionsMenuView: View {
     @Namespace var namespace
 
     @Default(.overrideAdaptiveMode) var overrideAdaptiveMode
-    @Default(.adaptiveBrightnessMode) var adaptiveBrightnessMode
     @Default(.showStandardPresets) var showStandardPresets
     @Default(.showCustomPresets) var showCustomPresets
     @Default(.showHeaderOnHover) var showHeaderOnHover
     @Default(.showFooterOnHover) var showFooterOnHover
     @Default(.showOptionsMenu) var showOptionsMenu
-    @Default(.infoMenuShown) var infoMenuShown
+
     @Default(.menuBarClosed) var menuBarClosed
     @Default(.menuDensity) var menuDensity
 
@@ -1768,7 +1767,6 @@ struct QuickActionsMenuView: View {
 
     @ObservedObject var km = KM
     @ObservedObject var wm = WM
-    @ObservedObject var ami = AMI
 
     var modeSelector: some View {
         let titleBinding = Binding<String>(
@@ -2006,52 +2004,14 @@ struct QuickActionsMenuView: View {
         }
     }
 
-    var usefulInfoText: (String, String)? {
-        guard infoMenuShown else { return nil }
-
-        switch adaptiveBrightnessMode {
-        case .sync:
-            #if arch(arm64)
-                guard SyncMode.syncNits, let nits = ami.nits else {
-                    return nil
-                }
-                return (nits.intround.s, "nits")
-            #else
-                return nil
-            #endif
-        case .sensor:
-            guard let lux = ami.lux else {
-                return nil
-            }
-            return (lux > 10 ? lux.intround.s : lux.str(decimals: 1), "lux")
-        case .location:
-            guard let elevation = ami.sunElevation else {
-                return nil
-            }
-            return ("\((elevation >= 10 || elevation <= -10) ? elevation.intround.s : elevation.str(decimals: 1))°", "sun")
-        default:
-            return nil
-        }
-    }
-
-    @ViewBuilder var usefulInfo: some View {
-        if let (t1, t2) = usefulInfoText {
-            VStack(spacing: -2) {
-                Text(t1)
-                    .font(.system(size: 10, weight: .bold, design: .monospaced).leading(.tight))
-                Text(t2)
-                    .font(.system(size: 9, weight: .semibold, design: .rounded).leading(.tight))
-            }
-            .foregroundColor(.secondary)
-        }
-    }
-
     var header: some View {
         let op = (showHeaderOnHover && !showOptionsMenu) ? headerOpacity : 1.0
         return ZStack {
             HStack {
-                modeSelector.fixedSize()
-                usefulInfo.fixedSize()
+                if !menuBarClosed {
+                    modeSelector.fixedSize()
+                    UsefulInfo().fixedSize()
+                }
                 Spacer()
                 topRightButtons.fixedSize()
             }
@@ -2106,7 +2066,7 @@ struct QuickActionsMenuView: View {
                         }
                     }
 
-                    if Sysctl.isMacBook, !dc.lidClosed, cursorDisplay?.id != 1, !displays.contains(where: { $0.id == 1 }), !disconnectedDisplays.contains(where: { $0.id == 1 }),
+                    if !menuBarClosed, Sysctl.isMacBook, !dc.lidClosed, cursorDisplay?.id != 1, !displays.contains(where: { $0.id == 1 }), !disconnectedDisplays.contains(where: { $0.id == 1 }),
                        !(DC.builtinDisplays.first?.unmanaged ?? false)
                     {
                         DisconnectedDisplayView(id: 1, name: "Built-in", display: dc.displays[1] ?? GENERIC_DISPLAY).padding(.vertical, 7)
@@ -2389,6 +2349,53 @@ struct QuickActionsMenuView: View {
         if showFooterOnHover { footerOpacity = 0.0 }
         env.menuMaxHeight = (NSScreen.main?.visibleFrame.height ?? 600) - 50
     }
+}
+
+struct UsefulInfo: View {
+    @Default(.infoMenuShown) var infoMenuShown
+    @Default(.adaptiveBrightnessMode) var adaptiveBrightnessMode
+    @ObservedObject var ami = AMI
+
+    var usefulInfoText: (String, String)? {
+        guard infoMenuShown else { return nil }
+
+        switch adaptiveBrightnessMode {
+        case .sync:
+            #if arch(arm64)
+                guard SyncMode.syncNits, let nits = ami.nits else {
+                    return nil
+                }
+                return (nits.intround.s, "nits")
+            #else
+                return nil
+            #endif
+        case .sensor:
+            guard let lux = ami.lux else {
+                return nil
+            }
+            return (lux > 10 ? lux.intround.s : lux.str(decimals: 1), "lux")
+        case .location:
+            guard let elevation = ami.sunElevation else {
+                return nil
+            }
+            return ("\((elevation >= 10 || elevation <= -10) ? elevation.intround.s : elevation.str(decimals: 1))°", "sun")
+        default:
+            return nil
+        }
+    }
+
+    var body: some View {
+        if let (t1, t2) = usefulInfoText {
+            VStack(spacing: -2) {
+                Text(t1)
+                    .font(.system(size: 10, weight: .bold, design: .monospaced).leading(.tight))
+                Text(t2)
+                    .font(.system(size: 9, weight: .semibold, design: .rounded).leading(.tight))
+            }
+            .foregroundColor(.secondary)
+        }
+    }
+
 }
 
 var windowShowTask: DispatchWorkItem? {

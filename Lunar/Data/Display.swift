@@ -4523,7 +4523,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
         }
 
-        if ddcEnabled {
+        if !isBuiltin, supportsGammaByDefault, ddcEnabled {
             let ddcControl = DDCControl(display: self)
             if ddcControl.isAvailable() {
                 if reapply, softwareBrightness == 1.0, applyGamma || gammaChanged {
@@ -4535,7 +4535,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
         }
 
-        if networkEnabled {
+        if !isBuiltin, networkEnabled {
             let networkControl = NetworkControl(display: self)
             if networkControl.isAvailable() {
                 if reapply, softwareBrightness == 1.0, applyGamma || gammaChanged {
@@ -4551,14 +4551,18 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func getBestAlternativeControlForAppleNative() -> Control? {
-        let networkControl = NetworkControl(display: self)
-        let ddcControl = DDCControl(display: self)
-
-        if ddcControl.isAvailable() {
-            return ddcControl
+        if !isBuiltin, supportsGammaByDefault, ddcEnabled {
+            let ddcControl = DDCControl(display: self)
+            if ddcControl.isAvailable() {
+                return ddcControl
+            }
         }
-        if networkControl.isAvailable() {
-            return networkControl
+
+        if !isBuiltin, networkEnabled {
+            let networkControl = NetworkControl(display: self)
+            if networkControl.isAvailable() {
+                return networkControl
+            }
         }
 
         return nil
