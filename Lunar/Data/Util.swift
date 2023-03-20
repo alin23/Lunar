@@ -104,7 +104,24 @@ func stderr(of process: Process) -> Data? {
     }
 }
 
-func shellProc(_ launchPath: String = "/bin/zsh", args: [String], env: [String: String]? = nil) -> Process? {
+func shellProc(_ launchPath: String = "/bin/zsh", args: [String], env: [String: String]? = nil, devnull: Bool = false) -> Process? {
+    guard !devnull else {
+        let task = Process()
+        task.launchPath = launchPath
+        task.arguments = args
+        task.environment = env ?? ProcessInfo.processInfo.environment
+        task.standardOutput = FileHandle.nullDevice
+        task.standardError = FileHandle.nullDevice
+
+        do {
+            try task.run()
+        } catch {
+            log.error("Error running \(launchPath) \(args): \(error)")
+            return nil
+        }
+        return task
+    }
+
     let outputDir = try! fm.url(
         for: .itemReplacementDirectory,
         in: .userDomainMask,
@@ -162,7 +179,7 @@ func shell(
     env: [String: String]? = nil,
     wait: Bool = true
 ) -> ProcessStatus {
-    guard let task = shellProc(launchPath, args: args, env: env) else {
+    guard let task = shellProc(launchPath, args: args, env: env, devnull: !wait) else {
         return ProcessStatus(output: nil, error: nil, success: false)
     }
 

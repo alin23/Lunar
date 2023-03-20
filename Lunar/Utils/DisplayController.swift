@@ -2076,6 +2076,7 @@ final class DisplayController: ObservableObject {
     }
 
     func cleanup() {
+        deletePID()
         guard !restarting else {
             print("Restarting")
             return
