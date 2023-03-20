@@ -35,6 +35,7 @@
 		C73716A526DE1F22008EEE53 /* CBTrueToneClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C737169E26DE1F22008EEE53 /* CBTrueToneClient.h */; };
 		C73716A726DE1F22008EEE53 /* CBAdaptationClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C73716A426DE1F22008EEE53 /* CBAdaptationClient.h */; };
 		C73A4E6229C5EAFC006A22F3 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = C73A4E6129C5EAFC006A22F3 /* Localizable.stringsdict */; };
+		C73A4E6429C87149006A22F3 /* Trap.swift in Sources */ = {isa = PBXBuildFile; fileRef = C73A4E6329C87149006A22F3 /* Trap.swift */; };
 		C73AAC4B22241B690063AD2A /* Hotkeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = C73AAC4A22241B690063AD2A /* Hotkeys.swift */; };
 		C73B41EC263BE02E006F6783 /* LetsMove.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C73B41EA263BE01F006F6783 /* LetsMove.framework */; };
 		C73B41ED263BE02E006F6783 /* LetsMove.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C73B41EA263BE01F006F6783 /* LetsMove.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -233,6 +234,7 @@
 		C737169E26DE1F22008EEE53 /* CBTrueToneClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBTrueToneClient.h; sourceTree = "<group>"; };
 		C73716A426DE1F22008EEE53 /* CBAdaptationClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBAdaptationClient.h; sourceTree = "<group>"; };
 		C73A4E6129C5EAFC006A22F3 /* Localizable.stringsdict */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; path = Localizable.stringsdict; sourceTree = "<group>"; };
+		C73A4E6329C87149006A22F3 /* Trap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trap.swift; sourceTree = "<group>"; };
 		C73AAC4A22241B690063AD2A /* Hotkeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hotkeys.swift; sourceTree = "<group>"; };
 		C73B41EA263BE01F006F6783 /* LetsMove.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = LetsMove.framework; sourceTree = "<group>"; };
 		C73B41F5263E1301006F6783 /* ddcctl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ddcctl; path = bin/ddcctl; sourceTree = SOURCE_ROOT; };
@@ -583,6 +585,7 @@
 				C7E14F7E266BBC7500A4E2F1 /* Ciao.swift */,
 				C7656C55277BBAAD00F4922A /* Swizzle.swift */,
 				C7CB6C8429C20D0D00BC9941 /* Solar.swift */,
+				C73A4E6329C87149006A22F3 /* Trap.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -951,6 +954,7 @@
 				C78BD04C259B365500FC823F /* Extensions.swift in Sources */,
 				C78F121E27073284009A3301 /* ControlChoiceViewController.swift in Sources */,
 				C77CC7551FED5501009AA718 /* SplitViewController.swift in Sources */,
+				C73A4E6429C87149006A22F3 /* Trap.swift in Sources */,
 				C7A9AAB62707130E0058D1B2 /* OnboardPageController.swift in Sources */,
 				C71F8DB126542E1000C4648A /* GammaViewController.swift in Sources */,
 				C7764170272139A100C7C308 /* ResetPopoverController.swift in Sources */,

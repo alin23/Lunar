@@ -1275,6 +1275,7 @@ extension Set where Element: BinaryInteger {
 }
 
 extension Collection {
+    // 0 means last, like seq[-1] in Python
     subscript(back i: Int) -> Iterator.Element {
         let backBy = i + 1
         return self[index(endIndex, offsetBy: -backBy)]

@@ -119,7 +119,7 @@ func playVolumeChangedSound() {
 final class NonClosingMenuText: NSTextField {
     var onClick: (() -> Void)?
 
-    override func mouseDown(with event: NSEvent) {
+    override func mouseDown(with _: NSEvent) {
         // log.info("mouseDown: \(event.locationInWindow)")
         onClick?()
     }
@@ -145,25 +145,24 @@ final class KeysManager: ObservableObject {
     @Published var optionKeyPressed = false {
         didSet {
             noModifiers = !optionKeyPressed && !shiftKeyPressed && !controlKeyPressed && !commandKeyPressed
-
         }
     }
+
     @Published var shiftKeyPressed = false {
         didSet {
             noModifiers = !optionKeyPressed && !shiftKeyPressed && !controlKeyPressed && !commandKeyPressed
-
         }
     }
+
     @Published var controlKeyPressed = false {
         didSet {
             noModifiers = !optionKeyPressed && !shiftKeyPressed && !controlKeyPressed && !commandKeyPressed
-
         }
     }
+
     @Published var commandKeyPressed = false {
         didSet {
             noModifiers = !optionKeyPressed && !shiftKeyPressed && !controlKeyPressed && !commandKeyPressed
-
         }
     }
 }
@@ -182,6 +181,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         case displayReset
     }
 
+    static var signalHandlers: [DispatchSourceSignal] = []
     static var observers: Set<AnyCancellable> = []
     static var enableSentry = CachedDefaults[.enableSentry]
     static var supportsHDR: Bool = {
@@ -300,6 +300,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             }.store(in: &observers)
         return p
     }()
+
     var zeroGammaChecker: Repeater?
 
     var enableSentryObserver: Cancellable?
@@ -310,8 +311,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     @Atomic var mediaKeyTapAudioStarting = false
 
     @Atomic var menuShown = false
-
-    var signalHandlers: [DispatchSourceSignal] = []
 
     var env = EnvState()
 
@@ -419,14 +418,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         }
     }
 
-    func standardUserDriverShouldHandleShowingScheduledUpdate(_ update: SUAppcastItem, andInImmediateFocus immediateFocus: Bool) -> Bool {
+    func standardUserDriverShouldHandleShowingScheduledUpdate(_: SUAppcastItem, andInImmediateFocus immediateFocus: Bool) -> Bool {
         // If the standard user driver will show the update in immediate focus (e.g. near app launch),
         // then let Sparkle take care of showing the update.
         // Otherwise we will handle showing any other scheduled updates
         immediateFocus
     }
 
-    func standardUserDriverWillHandleShowingUpdate(_ handleShowingUpdate: Bool, forUpdate update: SUAppcastItem, state: SPUUserUpdateState) {
+    func standardUserDriverWillHandleShowingUpdate(_ handleShowingUpdate: Bool, forUpdate update: SUAppcastItem, state _: SPUUserUpdateState) {
         // We will ignore updates that the user driver will handle showing
         // This includes user initiated (non-scheduled) updates
         guard !handleShowingUpdate else {
@@ -805,6 +804,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             )
         }
     }
+
     func handleDaemon() {
         let handler = { (shouldStartAtLogin: Bool) in
             guard let appPath = p(Bundle.main.bundlePath) else { return }
@@ -1030,7 +1030,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         infoMenuItem.isEnabled = false
     }
 
-    func manageDisplayControllerActivity(mode: AdaptiveModeKey) {
+    func manageDisplayControllerActivity(mode _: AdaptiveModeKey) {
 //        log.debug("Started DisplayController in \(mode.str) mode")
         mainAsyncAfter(ms: 1000) {
             DC.recomputeAllDisplaysBrightness(activeDisplays: DC.activeDisplayList)
@@ -1901,26 +1901,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             .first { item in item.processIdentifier != getpid() }
     }
 
-    func installCleanup(signal: Int32) {
+    func trap(signal: Int32, _ action: @escaping () -> Void) {
         let s = DispatchSource.makeSignalSource(signal: signal)
-        s.setEventHandler {
-            if isServer {
-                DC.cleanup()
-            }
-        }
+        s.setEventHandler(handler: action)
         s.activate()
-        signalHandlers.append(s)
+        AppDelegate.signalHandlers.append(s)
     }
 
     func handleCLI() -> Bool {
-        installCleanup(signal: SIGTERM)
-        installCleanup(signal: SIGKILL)
-        installCleanup(signal: SIGINT)
+        Trap.handle(signals: [.interrupt, .termination]) { signal in
+            if isServer { DC.cleanup() }
+            guard signal == SIGINT else { exit(0) }
 
-        signal(SIGINT) { _ in
-            if isServer {
-                DC.cleanup()
-            }
             for display in DC.displays.values {
                 if display.gammaChanged {
                     display.resetGamma()
@@ -2131,6 +2123,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         if handleCLI() {
             return
         }
+        watchdog()
 
         initCacheTransitionLogging()
         Defaults[.launchCount] += 1
@@ -2289,7 +2282,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     }
 
     func applicationWillTerminate(_: Notification) {
-        DC.cleanup()
+        if isServer {
+            DC.cleanup()
+        }
     }
 
     func geolocationFallback() {
@@ -2692,6 +2687,21 @@ let PATH_EXPORT = """
 export PATH="$PATH:\(CLI_BIN_DIR_ENV)"
 
 """
+let LUNAR_PID_FILE = "/tmp/lunar.pid"
+let LUNAR_RESTART_LOG = "/tmp/lunar-restart.log"
+var WATCHDOG: Process?
+
+func writePID() {
+    fm.createFile(
+        atPath: LUNAR_PID_FILE,
+        contents: "\(ProcessInfo.processInfo.processIdentifier)".data(using: .utf8)
+    )
+}
+
+func deletePID() {
+    WATCHDOG?.terminate()
+    try? fm.removeItem(atPath: LUNAR_PID_FILE)
+}
 
 func installCLIBinary() throws {
     if !fm.fileExists(atPath: CLI_BIN_DIR) {
@@ -2800,15 +2810,47 @@ func resetAllSettings() {
     UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
 }
 
+func restartedTooOften() -> Bool {
+    guard let restartLog = fm.contents(atPath: LUNAR_RESTART_LOG)?.s else {
+        return false
+    }
+    let lines = restartLog.trimmed.split(separator: "\n")
+    guard lines.count > 1, let threeRestartsAgo = Int(lines[back: 1]) else {
+        return false
+    }
+
+    return (Date().timeIntervalSince1970.intround - threeRestartsAgo) < 180
+}
+
+func watchdog() {
+    writePID()
+    _ = shell(command: "/usr/bin/pkill -f -l LUNAR_FYI_WATCHDOG", wait: false)
+    guard !restartedTooOften() else {
+        try? fm.removeItem(atPath: LUNAR_RESTART_LOG)
+        return
+    }
+
+    mainAsyncAfter(ms: 5000) {
+        WATCHDOG = shellProc(
+            args: [
+                "-c",
+                "/bin/echo LUNAR_FYI_WATCHDOG; while /bin/ps -o pid -p $(cat \(LUNAR_PID_FILE)) >/dev/null 2>/dev/null; do /bin/sleep 5; done; /bin/sleep 3; test -f \(LUNAR_PID_FILE) && /usr/bin/open '\(Bundle.main.path.string)' && date -u +%s >> \(LUNAR_RESTART_LOG)",
+            ],
+            devnull: true
+        )
+    }
+}
+
 func restart() {
     restarting = true
+    deletePID()
 
     #if arch(arm64)
         Defaults[.possiblyDisconnectedDisplays] = Array(DC.possiblyDisconnectedDisplays.values)
     #endif
 
     _ = shell(
-        command: "while /bin/ps -p \(ProcessInfo.processInfo.processIdentifier) >/dev/null 2>/dev/null; do /bin/sleep 0.1; done; /bin/sleep 0.5; /usr/bin/open '\(Bundle.main.path.string)' --args restarted",
+        command: "while /bin/ps -o pid -p \(ProcessInfo.processInfo.processIdentifier) >/dev/null 2>/dev/null; do /bin/sleep 0.1; done; /bin/sleep 0.5; /usr/bin/open '\(Bundle.main.path.string)' --args restarted",
         wait: false
     )
     exit(0)
