@@ -300,7 +300,7 @@ struct ForgivingEncodable: Encodable {
 func getFilteredDisplays(displays: [Display], filter: DisplayFilter) -> [Display] {
     switch filter {
     case .all:
-        return displays
+        return displays.filter { $0.id != ALL_DISPLAYS_ID }
     case .first:
         guard let first = displays.first else { return [] }
         return [first]
@@ -1098,7 +1098,7 @@ struct Lunar: ParsableCommand {
                 includeDummy: dummy || all
             )
 
-            let displays = (all ? DC.displayList : DC.activeDisplayList)
+            let displays = (all ? DC.displayList : DC.activeDisplayList).filter { $0.id != ALL_DISPLAYS_ID }
 
             if let displayFilter = display {
                 do {
@@ -1866,7 +1866,9 @@ private func printDisplay(
     let longestKeySize = displayDict.max(by: { $0.1.count <= $1.1.count })?.1.count ?? 1
 
     for (originalKey, key, value) in displayDict {
-        guard let displayKey = Display.CodingKeys(rawValue: originalKey) else { continue }
+        guard let displayKey = Display.CodingKeys(rawValue: originalKey), !Display.CodingKeys.hidden.contains(displayKey) else {
+            continue
+        }
         cliPrint("\(prefix)\(spaced(key, longestKeySize))\(encodedValue(key: displayKey, value: value, prefix: prefix))")
     }
     let s = { (k: String) in spaced(k, longestKeySize) }

@@ -155,6 +155,7 @@ final class Screen: NSObject, AppEntity, ExpressibleByStringLiteral {
         }
         return getFilteredDisplays(displays: DC.activeDisplayList, filter: displayFilter)
     }
+
     var displayRepresentation: DisplayRepresentation {
         DisplayRepresentation(title: "\(name)", subtitle: isDynamicFilter ? nil : "\(serial)")
     }
@@ -312,7 +313,6 @@ struct ScreenQuery: EntityPropertyQuery {
             GreaterThanComparator { NSPredicate(format: "xdrBrightness > %f", $0 / 100.0) }
             LessThanComparator { NSPredicate(format: "xdrBrightness < %f", $0 / 100.0) }
         }
-
     }
 
     static var sortingOptions = SortingOptions {
@@ -345,7 +345,7 @@ struct ScreenQuery: EntityPropertyQuery {
         limit: Int?
     ) async throws -> [Screen] {
         let predicate = NSCompoundPredicate(type: mode == .and ? .and : .or, subpredicates: comparators)
-        return displays
+        let filtered = displays
             .map(\.screen)
             .filter { predicate.evaluate(with: $0) }
             .sorted(by: { this, other in
@@ -365,6 +365,10 @@ struct ScreenQuery: EntityPropertyQuery {
 
                 return increasing > 0
             })
+        if let limit {
+            return Array(filtered.prefix(limit))
+        }
+        return filtered
     }
 
     func defaultResult() async -> Screen? {
@@ -642,7 +646,6 @@ enum ScreenToggleState: String, AppEnum, CaseDisplayRepresentable, TypeDisplayRe
             return .toggle
         }
     }
-
 }
 
 @available(iOS 16, macOS 13, *)
@@ -2124,9 +2127,11 @@ struct PanelPreset: AppEntity {
                 }
             } ?? []
         }
+
         func suggestedEntities() async throws -> ItemCollection<PanelPreset> {
             try await results()
         }
+
         func results() async throws -> ItemCollection<PanelPreset> {
             await DisplayController.panelManager?.withLock { _ in
                 let sections: [(Display, Int64)] = Array(
@@ -2158,6 +2163,7 @@ struct PanelPreset: AppEntity {
             } ?? ItemCollection(items: [])
         }
     }
+
     typealias DefaultQuery = PanelPresetQuery
 
     static var defaultQuery = PanelPresetQuery()
@@ -2180,7 +2186,7 @@ struct PanelPreset: AppEntity {
 
 @available(iOS 16, macOS 13, *)
 extension MPDisplayMgr {
-    func withLock<T>(refreshBefore: Bool = true, _ action: (MPDisplayMgr) -> T) async -> T? {
+    func withLock<T>(_ action: (MPDisplayMgr) -> T) async -> T? {
         while !tryLockAccess() {
             do {
                 try await Task.sleep(nanoseconds: 10)
@@ -2217,9 +2223,11 @@ struct PanelMode: AppEntity {
                 }
             } ?? []
         }
+
         func suggestedEntities() async throws -> ItemCollection<PanelMode> {
             try await results()
         }
+
         func results() async throws -> ItemCollection<PanelMode> {
             await DisplayController.panelManager?.withLock { _ in
                 let sections: [(Display, SortablePanelMode)] = Array(DC.activeDisplayList.map { d in
@@ -2245,6 +2253,7 @@ struct PanelMode: AppEntity {
             } ?? ItemCollection(items: [])
         }
     }
+
     typealias DefaultQuery = PanelModeQuery
 
     static var defaultQuery = PanelModeQuery()
@@ -2684,6 +2693,83 @@ struct HorizontalMonitorThreeLayoutIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
+struct FixMonitorArrangementIntent: AppIntent {
+    init() {}
+
+    static var title: LocalizedStringResource = "Fix monitor arrangement"
+    // swiftformat:disable all
+    static var description =
+        IntentDescription(
+    """
+Arrange external monitors horizontally in a specific order.
+
+Helpful in setups with 3 or more monitors that get swapped around by the system.
+
+How it works:
+• on each monitor you'll see a number
+• type the numbers on the keyboard from left to right
+    • start with the number on the leftmost monitor
+• Lunar will arrange the monitors in the order of the typed numbers
+
+Press `Esc` to cancel or `Enter` to partially arrange the monitors selected so far.
+""", categoryName: "Arrangement")
+
+    // swiftformat:enable all
+
+    static var parameterSummary: some ParameterSummary {
+        Summary("Fix monitor arrangement for \(\.$onlySameUUID)") {
+            \.$wait
+        }
+    }
+
+    @Parameter(title: "Only for monitors with same UUID", default: true, displayName: Bool.IntentDisplayName(true: "monitors with duplicate UUIDs", false: "all external monitors"))
+    var onlySameUUID: Bool
+
+    @Parameter(title: "Wait for operation to finish", default: false)
+    var wait: Bool
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
+
+        var idsToRearrange = DC.externalActiveDisplays.map(\.id).sorted()
+        if onlySameUUID {
+            #if arch(arm64)
+                let displayIDsWithEDIDUUIDs: [CGDirectDisplayID: String] = DC.externalActiveDisplays.dict { d in
+                    guard let edidUUID = DDC.DCP(displayID: d.id)?.edidUUID else {
+                        return nil
+                    }
+                    return (d.id, edidUUID)
+                }
+                var displayIDsByEDIDUUID: [String: [CGDirectDisplayID]] = displayIDsWithEDIDUUIDs.values.dict { ($0, []) }
+                for (id, edidUUID) in displayIDsWithEDIDUUIDs {
+                    displayIDsByEDIDUUID[edidUUID]!.append(id)
+                }
+
+                guard let mostSimilarUUIDs = displayIDsByEDIDUUID.map(\.1).max(by: \.count) else {
+                    throw IntentError.message("At least 2 identical monitors are needed to perform arrangement.")
+                }
+                idsToRearrange = mostSimilarUUIDs.sorted()
+            #endif
+        }
+
+        guard idsToRearrange.count >= 2 else {
+            throw IntentError.message("At least 2 external monitors are needed to perform arrangement.")
+        }
+
+        AM.start(idsToRearrange)
+        for (index, display) in idsToRearrange.compactMap({ DC.activeDisplays[$0] }).enumerated() {
+            display.showArrangementOSD(id: display.id, number: index + 1)
+        }
+
+        guard wait else { return .result() }
+
+        try await AM.wait()
+        return .result()
+    }
+}
+
+@available(iOS 16, macOS 13, *)
 struct ScreenColorGain: Equatable, Hashable, AppEntity {
     init(red: Int, green: Int, blue: Int) {
         self.red = red
@@ -2694,7 +2780,7 @@ struct ScreenColorGain: Equatable, Hashable, AppEntity {
     typealias DefaultQuery = ColorGainQuery
 
     struct ColorGainQuery: EntityQuery {
-        func entities(for identifiers: [Int]) async throws -> [ScreenColorGain] {
+        func entities(for _: [Int]) async throws -> [ScreenColorGain] {
             []
         }
     }
@@ -2742,7 +2828,7 @@ struct ScreenGammaTable: Equatable, Hashable, AppEntity {
     typealias DefaultQuery = GammaTableQuery
 
     struct GammaTableQuery: EntityQuery {
-        func entities(for identifiers: [Float]) async throws -> [ScreenGammaTable] {
+        func entities(for _: [Float]) async throws -> [ScreenGammaTable] {
             []
         }
     }

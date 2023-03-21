@@ -1,5 +1,7 @@
+import Carbon
 import Cocoa
 import Combine
+import Defaults
 import Foundation
 import SwiftUI
 
@@ -550,6 +552,179 @@ struct CheckerView: View {
 
 }
 
+enum ArrangementManagerState {
+    case started
+    case cancelled
+    case committed
+}
+
+final class ArrangementManager: ObservableObject {
+    init() {}
+
+    @Published var idsToRearrange: [CGDirectDisplayID] = []
+    @Published var idsOrderedLeftToRight: [CGDirectDisplayID] = []
+    var localMonitor: Any?
+    var globalMonitor: Any?
+
+    @Published var state: ArrangementManagerState = .started {
+        didSet {
+            switch state {
+            case .started:
+                return
+            case .cancelled:
+                timeoutTask = nil
+                hideOSD()
+            case .committed:
+                timeoutTask = nil
+                rearrange()
+                hideOSD()
+            }
+        }
+    }
+
+    var timeoutTask: DispatchWorkItem? {
+        didSet { oldValue?.cancel() }
+    }
+
+    func hideOSD() {
+        DC.activeDisplayList.forEach { $0.hideArrangementOSD() }
+    }
+
+    @available(iOS 16, macOS 13, *)
+    @discardableResult
+    func wait() async throws -> Bool? {
+        for _ in 1 ... 100 {
+            if state != .started {
+                return state == .committed
+            }
+            if Set(idsOrderedLeftToRight) == Set(idsToRearrange) {
+                return true
+            }
+            try await Task.sleep(for: .milliseconds(100))
+        }
+
+        state = .cancelled
+        return false
+    }
+
+    func rearrange() {
+        guard !idsOrderedLeftToRight.isEmpty else { return }
+
+        let boundsByID = idsOrderedLeftToRight.map { id in
+            (id, CGDisplayBounds(id))
+        }
+        var x = boundsByID.map(\.1).min(by: \.minX)!.minX
+
+        Display.configure { config in
+            for (id, bounds) in boundsByID {
+                CGConfigureDisplayOrigin(config, id, Int32(x.rounded()), Int32(bounds.minY.rounded()))
+                x += bounds.width
+            }
+
+            return true
+        }
+
+        notify(
+            identifier: "fyi.lunar.Lunar.Shortcuts",
+            title: "Arranged monitors",
+            body: "The monitor arrangement was fixed."
+        )
+    }
+
+    func pressedID(withIndex index: Int, event: NSEvent) -> NSEvent? {
+        guard index <= idsToRearrange.count, index > 0, let id = idsToRearrange[safe: index - 1] else {
+            return event
+        }
+
+        if idsOrderedLeftToRight.contains(id) {
+            idsOrderedLeftToRight = idsOrderedLeftToRight.without(id)
+        } else {
+            idsOrderedLeftToRight = idsOrderedLeftToRight + [id]
+        }
+
+        if Set(idsOrderedLeftToRight) == Set(idsToRearrange) {
+            mainAsyncAfter(ms: 500) {
+                self.state = .committed
+            }
+        }
+        return nil
+    }
+
+    @discardableResult
+    func handleKeyEvent(_ event: NSEvent) -> NSEvent? {
+        guard state == .started else {
+            return event
+        }
+
+        switch event.keyCode.i {
+        case kVK_Escape:
+            state = .cancelled
+        case kVK_Return:
+            state = .committed
+        case kVK_ANSI_1, kVK_ANSI_2, kVK_ANSI_3, kVK_ANSI_4, kVK_ANSI_5, kVK_ANSI_6, kVK_ANSI_7, kVK_ANSI_8, kVK_ANSI_9:
+            return pressedID(withIndex: KeyEventHandling.NUMBER_KEYS.firstIndex(of: event.keyCode.i)!, event: event)
+        default:
+            return event
+        }
+        return nil
+    }
+
+    func start(_ ids: [CGDirectDisplayID]) {
+        idsToRearrange = ids
+        idsOrderedLeftToRight = []
+        state = .started
+
+        if Defaults[.accessibilityPermissionsGranted], globalMonitor == nil {
+            globalMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.keyDown]) { event in
+                self.handleKeyEvent(event)
+            }
+        }
+        if localMonitor == nil {
+            localMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                self.handleKeyEvent(event)
+            }
+        }
+        timeoutTask = mainAsyncAfter(ms: 30000) {
+            if self.state == .started {
+                self.state = .cancelled
+            }
+        }
+    }
+}
+
+let AM = ArrangementManager()
+
+struct ArrangementOSDView: View {
+    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.colors) var colors
+
+    @ObservedObject var am = AM
+    @State var displayID: CGDirectDisplayID
+    @State var number: Int
+
+    var body: some View {
+        let selected = am.idsOrderedLeftToRight.contains(displayID)
+        ZStack {
+            Text(number.s).font(.system(size: 60, weight: .black, design: .monospaced))
+                .foregroundColor(selected ? Colors.blackMauve : .primary.opacity(0.75))
+        }
+        .padding(.vertical, 20)
+        .padding(.horizontal, 30)
+        .background(
+            ZStack {
+                VisualEffectBlur(material: .osd, blendingMode: .behindWindow, state: .active)
+                if selected {
+                    Colors.peach.opacity(0.8)
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        )
+        .frame(width: NATIVE_OSD_WIDTH, height: NATIVE_OSD_WIDTH, alignment: .center)
+        .fixedSize()
+        .colors(colorScheme == .dark ? .dark : .light)
+    }
+}
+
 struct BrightnessOSDView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.colors) var colors
@@ -751,6 +926,34 @@ extension Display {
             guard let osd = self.osdWindowController?.window as? OSDWindow else { return }
 
             osd.show(verticalOffset: 140)
+        }
+    }
+
+    func hideArrangementOSD() {
+        mainAsync { [weak self] in
+            guard let osd = self?.arrangementOsdWindowController?.window as? OSDWindow else { return }
+            osd.hide()
+            self?.arrangementOsdWindowController = nil
+        }
+    }
+
+    func showArrangementOSD(id: CGDirectDisplayID, number: Int) {
+        guard !isAllDisplays, !isForTesting else { return }
+        mainAsync { [weak self] in
+            guard let self else { return }
+
+            if self.arrangementOsdWindowController == nil {
+                let view = ArrangementOSDView(displayID: id, number: number)
+                self.arrangementOsdWindowController = OSDWindow(
+                    swiftuiView: AnyView(view),
+                    display: self,
+                    releaseWhenClosed: false
+                ).wc
+            }
+
+            guard let osd = self.arrangementOsdWindowController?.window as? OSDWindow else { return }
+
+            osd.show(closeAfter: 0, fadeAfter: 0, verticalOffset: 140)
         }
     }
 

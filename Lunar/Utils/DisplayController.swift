@@ -363,6 +363,18 @@ extension Collection {
             }
         })
     }
+
+    func max(by keyPath: KeyPath<Element, some Comparable>) -> Element? {
+        self.max(by: { e1, e2 in
+            e1[keyPath: keyPath] < e2[keyPath: keyPath]
+        })
+    }
+
+    func min(by keyPath: KeyPath<Element, some Comparable>) -> Element? {
+        self.min(by: { e1, e2 in
+            e1[keyPath: keyPath] < e2[keyPath: keyPath]
+        })
+    }
 }
 
 infix operator ?!: NilCoalescingPrecedence
