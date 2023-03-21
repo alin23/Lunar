@@ -748,6 +748,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         faceLightWindowController = nil
         osdWindowController?.close()
         osdWindowController = nil
+        arrangementOsdWindowController?.close()
+        arrangementOsdWindowController = nil
         hdrWindowController?.close()
         hdrWindowController = nil
         testWindowController?.close()
@@ -972,6 +974,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .hotkeyInput,
             .brightnessOnInputChange,
             .contrastOnInputChange,
+            .syncBrightnessMapping,
+            .syncContrastMapping,
+            .sensorBrightnessMapping,
+            .sensorContrastMapping,
+            .locationBrightnessMapping,
+            .locationContrastMapping,
+            .nitsBrightnessMapping,
+            .nitsContrastMapping,
         ]
 
         static var settableWithControl: Set<CodingKeys> = [
@@ -1857,6 +1867,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var osdWindowController: NSWindowController? {
         get { Self.getWindowController(id, type: "osd") }
         set { Self.setWindowController(id, type: "osd", windowController: newValue) }
+    }
+
+    var arrangementOsdWindowController: NSWindowController? {
+        get { Self.getWindowController(id, type: "arrangementOsd") }
+        set { Self.setWindowController(id, type: "arrangementOsd", windowController: newValue) }
     }
 
     var autoOsdWindowController: NSWindowController? {

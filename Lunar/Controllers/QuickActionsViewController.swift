@@ -199,6 +199,7 @@ struct PowerOffButtonView: View {
 
         @State var id: CGDirectDisplayID
         @State var name: String
+        @State var possibly = false
 
         @ObservedObject var display: Display
         @Default(.autoBlackoutBuiltin) var autoBlackoutBuiltin
@@ -215,7 +216,8 @@ struct PowerOffButtonView: View {
                         .offset(y: -8)
                 }.offset(x: 45)
 
-                Text("Disconnected").font(.system(size: 10, weight: .semibold, design: .rounded))
+                Text(possibly ? "Possibly disconnected" : "Disconnected")
+                    .font(.system(size: 10, weight: .semibold, design: .rounded))
 
                 if display.id == id, !display.isSidecar, !display.isAirplay {
                     let binding = !display.isMacBook ? $display.keepDisconnected : Binding<Bool>(
@@ -331,6 +333,7 @@ struct AllDisplaysView: View {
             )
         }
     }
+
     var body: some View {
         VStack(spacing: 4) {
             Text(display.name)
@@ -629,7 +632,6 @@ struct DisplayRowView: View {
                     NitsTextField(nits: maxNitsBinding, placeholder: "max", display: display)
                         .opacity(hovering ? 1 : 0)
                 #endif
-
             }
             softwareSliders
         } else {
@@ -661,6 +663,7 @@ struct DisplayRowView: View {
             )
         }
     }
+
     var body: some View {
         VStack(spacing: 4) {
             let xdrSelectorShown = display.supportsEnhance && showXDRSelector && !display.blackOutEnabled
@@ -786,7 +789,7 @@ struct DisplayRowView: View {
                     Text("for \(display.name)")
 
                     TextField("nits", value: $nits, formatter: NumberFormatter.shared(decimals: 0, padding: 0))
-                        .onReceive(Just(nits)) { nits in
+                        .onReceive(Just(nits)) { _ in
                             display.nitsEditPublisher.send(true)
                         }
                         .textFieldStyle(PaddedTextFieldStyle(backgroundColor: .primary.opacity(0.1)))
@@ -1671,7 +1674,6 @@ struct PaddedTextFieldStyle: TextFieldStyle {
                     .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)
             )
     }
-
 }
 
 // MARK: - TextInputView
@@ -1751,6 +1753,7 @@ struct QuickActionsMenuView: View {
     @State var sourceDisplay: Display? = DC.sourceDisplay
     #if arch(arm64)
         @State var disconnectedDisplays: [Display] = DC.possiblyDisconnectedDisplayList
+        @State var possiblyDisconnectedDisplays: [Display] = []
     #endif
     @State var unmanagedDisplays: [Display] = DC.unmanagedDisplays
     @State var adaptiveModes: [AdaptiveModeKey] = [.sensor, .sync, .location, .clock, .manual, .auto]
@@ -2066,6 +2069,10 @@ struct QuickActionsMenuView: View {
                         }
                     }
 
+                    ForEach(possiblyDisconnectedDisplays) { d in
+                        DisconnectedDisplayView(id: d.id, name: d.name, possibly: true, display: d).padding(.vertical, 7)
+                    }
+
                     if !menuBarClosed, Sysctl.isMacBook, !dc.lidClosed, cursorDisplay?.id != 1, !displays.contains(where: { $0.id == 1 }), !disconnectedDisplays.contains(where: { $0.id == 1 }),
                        !(DC.builtinDisplays.first?.unmanaged ?? false)
                     {
@@ -2174,6 +2181,7 @@ struct QuickActionsMenuView: View {
         .saturation(wm.focused ? 1.0 : 0.7)
         .allowsHitTesting(wm.focused)
     }
+
     @ViewBuilder var optionsMenu: some View {
         VStack(spacing: 10) {
             HStack {
@@ -2323,6 +2331,7 @@ struct QuickActionsMenuView: View {
                 sourceDisplay = nil
                 #if arch(arm64)
                     disconnectedDisplays = []
+                    possiblyDisconnectedDisplays = []
                 #endif
                 unmanagedDisplays = []
             }
@@ -2341,6 +2350,13 @@ struct QuickActionsMenuView: View {
             displays = displays.filter { !ids.contains($0.id) }
             if let id = cursorDisplay?.id, ids.contains(id) {
                 cursorDisplay = nil
+            }
+
+            let disconnectedSerials = disconnectedDisplays.map(\.serial)
+            possiblyDisconnectedDisplays = dc.displays.map(\.1).filter { d in
+                d.keepDisconnected && !(Sysctl.isMacBook && d.id == 1) &&
+                    dc.activeDisplaysBySerial[d.serial] == nil &&
+                    !disconnectedSerials.contains(d.serial)
             }
         #endif
         unmanagedDisplays = dc.unmanagedDisplays
@@ -2395,7 +2411,6 @@ struct UsefulInfo: View {
             .foregroundColor(.secondary)
         }
     }
-
 }
 
 var windowShowTask: DispatchWorkItem? {
