@@ -4326,11 +4326,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         var values = values
         if mapping.source < 0, mapping.target > -100 {
-            values = Display.insertDataPoint([-18: mapping.target - 0.01], in: values, cliffRatio: 3)
+            values = Display.insertDataPoint([-18: mapping.target - 0.01], in: values, cliffRatio: 3, cliffSourceDiff: 5)
         }
 
         if mapping.source > noon {
-            values = Display.insertDataPoint([noon: mapping.target], in: values, cliffRatio: 3)
+            values = Display.insertDataPoint([noon: mapping.target], in: values, cliffRatio: 3, cliffSourceDiff: 5)
         }
 
         return values
@@ -5986,7 +5986,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             if let values = previousBrightnessMapping.value ?? syncBrightnessMapping[DC.sourceDisplay.serial] {
                 previousBrightnessMapping.setOrRefresh(values, expireAfter: 1)
-                syncBrightnessMapping[DC.sourceDisplay.serial] = Self.insertDataPoint(mapping, in: values, cliffRatio: 1)
+                syncBrightnessMapping[DC.sourceDisplay.serial] = Self.insertDataPoint(mapping, in: values, cliffRatio: 1.5, cliffSourceDiff: 10)
             } else {
                 syncBrightnessMapping[DC.sourceDisplay.serial] = [mapping]
             }
@@ -5995,13 +5995,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case .sensor:
             previousBrightnessMapping.setOrRefresh(sensorBrightnessMapping, expireAfter: 1)
 
-            sensorBrightnessMapping = Self.insertDataPoint(mapping, in: previousBrightnessMapping.value ?? sensorBrightnessMapping, cliffRatio: 1)
+            sensorBrightnessMapping = Self.insertDataPoint(mapping, in: previousBrightnessMapping.value ?? sensorBrightnessMapping, cliffRatio: 1, cliffSourceDiff: 50)
             saveSensorMapping()
             NotificationCenter.default.post(name: brightnessDataPointInserted, object: self, userInfo: ["values": sensorBrightnessMapping])
         case .location:
             previousBrightnessMapping.setOrRefresh(locationBrightnessMapping, expireAfter: 1)
 
-            locationBrightnessMapping = Self.insertDataPoint(mapping, in: previousBrightnessMapping.value ?? locationBrightnessMapping, cliffRatio: 3)
+            locationBrightnessMapping = Self.insertDataPoint(mapping, in: previousBrightnessMapping.value ?? locationBrightnessMapping, cliffRatio: 3, cliffSourceDiff: 5)
             if let map = Self.insertElevationDataPoint(mapping, in: locationBrightnessMapping) {
                 locationBrightnessMapping = map
             }
@@ -6034,7 +6034,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             if let values = previousContrastMapping.value ?? syncContrastMapping[DC.sourceDisplay.serial] {
                 previousContrastMapping.setOrRefresh(values, expireAfter: 1)
-                syncContrastMapping[DC.sourceDisplay.serial] = Self.insertDataPoint(mapping, in: values, cliffRatio: 1)
+                syncContrastMapping[DC.sourceDisplay.serial] = Self.insertDataPoint(mapping, in: values, cliffRatio: 1.5, cliffSourceDiff: 10)
             } else {
                 syncContrastMapping[DC.sourceDisplay.serial] = [mapping]
             }
@@ -6043,13 +6043,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case .sensor:
             previousContrastMapping.setOrRefresh(sensorContrastMapping, expireAfter: 1)
 
-            sensorContrastMapping = Self.insertDataPoint(mapping, in: previousContrastMapping.value ?? sensorContrastMapping, cliffRatio: 1)
+            sensorContrastMapping = Self.insertDataPoint(mapping, in: previousContrastMapping.value ?? sensorContrastMapping, cliffRatio: 1, cliffSourceDiff: 50)
             saveSensorMapping()
             NotificationCenter.default.post(name: contrastDataPointInserted, object: self, userInfo: ["values": sensorContrastMapping])
         case .location:
             previousContrastMapping.setOrRefresh(locationContrastMapping, expireAfter: 1)
 
-            locationContrastMapping = Self.insertDataPoint(mapping, in: previousContrastMapping.value ?? locationContrastMapping, cliffRatio: 1)
+            locationContrastMapping = Self.insertDataPoint(mapping, in: previousContrastMapping.value ?? locationContrastMapping, cliffRatio: 3, cliffSourceDiff: 5)
             if let map = Self.insertElevationDataPoint(mapping, in: locationContrastMapping) {
                 locationContrastMapping = map
             }

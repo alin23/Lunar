@@ -2004,10 +2004,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             options.dist = release
             #if DEBUG
                 options.environment = "dev"
+                options.appHangTimeoutInterval = 10
             #else
                 options.environment = "production"
+                options.appHangTimeoutInterval = 60
             #endif
-            options.appHangTimeoutInterval = 60
+
+            options.beforeSend = { event in
+                if let exc = event.exceptions?.first, let mech = exc.mechanism, mech.type == "AppHang", let stack = exc.stacktrace {
+                    log.warning("App Hanging: \(stack)")
+                    concurrentQueue.asyncAfter(ms: 5000) { restart() }
+                    if event.tags == nil {
+                        event.tags = ["restarted": "true"]
+                    } else {
+                        event.tags!["restarted"] = "true"
+                    }
+                    return event
+                }
+
+                if event.tags == nil {
+                    event.tags = ["restarted": restarted ? "true" : "false"]
+                } else {
+                    event.tags!["restarted"] = restarted ? "true" : "false"
+                }
+                return event
+            }
         }
 
         let user = User(userId: SERIAL_NUMBER_HASH)
@@ -2200,16 +2221,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         startReceivingSignificantLocationChanges()
 
         #if DEBUG
-//            if !datastore.shouldOnboard {
-//                showWindow()
-//            }
-
             fm.createFile(
                 atPath: "\(CLI_BIN_DIR)/lunar",
                 contents: LUNAR_CLI_SCRIPT.data(using: .utf8),
                 attributes: [.posixPermissions: 0o755]
             )
-        // #endif
         #else
             mainAsyncAfter(ms: 60 * 1000 * 10) {
                 guard AppDelegate.enableSentry else { return }
