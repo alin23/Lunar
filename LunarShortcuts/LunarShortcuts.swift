@@ -925,6 +925,30 @@ struct PowerOnSoftwareIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
+struct SleepMacIntent: AppIntent {
+    init() {}
+
+    // swiftformat:disable all
+    static var title: LocalizedStringResource = "Sleep the Mac"
+    static var description = IntentDescription("Enters Sleep mode, same as clicking on Apple icon in the menu bar and clicking on 'Sleep'", categoryName: "Power")
+
+    // swiftformat:enable all
+
+    static var parameterSummary: some ParameterSummary {
+        Summary("Sleep the Mac")
+    }
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
+
+        sleepNow()
+
+        return .result()
+    }
+}
+
+@available(iOS 16, macOS 13, *)
 struct DisconnectScreenIntent: AppIntent {
     init() {}
 

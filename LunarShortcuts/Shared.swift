@@ -261,6 +261,7 @@ extension Defaults.Keys {
 
     static let autoRestartOnFailedDDC = Key<Bool>("autoRestartOnFailedDDC", default: true)
     static let autoRestartOnFailedDDCSooner = Key<Bool>("autoRestartOnFailedDDCSooner", default: false)
+    static let sleepInClamshellMode = Key<Bool>("sleepInClamshellMode", default: false)
 
     static let sensorHostname = Key<String>("sensorHostname", default: "lunarsensor.local")
     static let sensorPort = Key<Int>("sensorPort", default: 80)
