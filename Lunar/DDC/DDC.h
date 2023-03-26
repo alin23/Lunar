@@ -16,6 +16,8 @@
 #include <IOKit/graphics/IOGraphicsLib.h>
 #include <ApplicationServices/ApplicationServices.h>
 #include "SharedDDC.h"
+#include <IOKit/pwr_mgt/IOPMLib.h>
+
 
 #define RESET 0x04
 #define RESET_BRIGHTNESS_AND_CONTRAST 0x05

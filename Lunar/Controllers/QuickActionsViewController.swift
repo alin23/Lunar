@@ -1104,6 +1104,7 @@ struct AdvancedSettingsView: View {
 
     @Default(.autoRestartOnFailedDDC) var autoRestartOnFailedDDC
     @Default(.autoRestartOnFailedDDCSooner) var autoRestartOnFailedDDCSooner
+    @Default(.sleepInClamshellMode) var sleepInClamshellMode
     // @Default(.allowAnySyncSource) var allowAnySyncSource
 
     @State var sensorCheckerEnabled = !Defaults[.sensorHostname].isEmpty
@@ -1139,6 +1140,21 @@ struct AdvancedSettingsView: View {
                         text: "Allow BlackOut on single screen", setting: $allowBlackOutOnSingleScreen,
                         help: "Allows turning off a screen even if it's the only visible screen left"
                     )
+                    if Sysctl.isMacBook {
+                        SettingsToggle(
+                            text: "Trigger Sleep when the lid is closed", setting: $sleepInClamshellMode,
+                            help: """
+                            When the MacBook is connected to a monitor that's also charging the Mac,
+                            closing the lid will start Clamshell Mode.
+
+                            That system feature keeps the system awake to allow you to use the external
+                            monitor with the lid closed.
+
+                            If you don't use that feature, enabling this option will disable Clamshell
+                            Mode automatically when the lid is closed.
+                            """
+                        )
+                    }
 
                     #if !arch(arm64)
                         if #available(macOS 13, *) {
@@ -1173,10 +1189,12 @@ struct AdvancedSettingsView: View {
                           • Sub-zero Dimming
                         """
                     )
-                    SettingsToggle(
-                        text: "Toggle Manual/Sync when the lid is closed/opened",
-                        setting: $clamshellModeDetection
-                    ).disabled(!Sysctl.isMacBook)
+                    if Sysctl.isMacBook {
+                        SettingsToggle(
+                            text: "Toggle Manual/Sync when the lid is closed/opened",
+                            setting: $clamshellModeDetection
+                        )
+                    }
                     // SettingsToggle(
                     //     text: "Allow non-Apple monitors as Sync Mode source",
                     //     setting: $allowAnySyncSource.animation(.fastSpring)

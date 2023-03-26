@@ -580,3 +580,10 @@ bool EDIDTestIntel(io_service_t framebuffer, struct EDID* edid, uint8_t edidData
     return !sum;
 }
 
+void sleepNow() {
+    io_connect_t fb = IOPMFindPowerManagement(MACH_PORT_NULL);
+    if (fb != MACH_PORT_NULL) {
+        IOPMSleepSystem(fb);
+        IOServiceClose(fb);
+    }
+}

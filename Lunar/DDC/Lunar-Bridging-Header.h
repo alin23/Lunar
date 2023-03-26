@@ -75,3 +75,5 @@ bool DisplayServicesCanResetAmbientLight(CGDirectDisplayID display, UInt check);
 
 void SLSSetAppearanceThemeLegacy(BOOL);
 BOOL SLSGetAppearanceThemeLegacy();
+
+void sleepNow(void);

@@ -455,7 +455,7 @@ final class DisplayController: ObservableObject {
     var screencaptureWatcherTask: Repeater?
 
     let getDisplaysLock = NSRecursiveLock()
-    var clamshellMode = false
+    var disabledAdaptiveInClamshellMode = false
 
     var appObserver: NSKeyValueObservation?
     @AtomicLock var runningAppExceptions: [AppException]!
@@ -497,7 +497,15 @@ final class DisplayController: ObservableObject {
 
     var displaysBySerial: [String: Display] = [:]
     var unmanagedDisplays: [Display] = []
-    @Atomic var clamshell: Bool = isLidClosed() && Sysctl.isMacBook
+    @Atomic var clamshell: Bool = isLidClosed() && Sysctl.isMacBook {
+        didSet {
+            if CachedDefaults[.sleepInClamshellMode] {
+                log.info("Triggering Sleep because the lid was closed")
+                sleepNow()
+            }
+        }
+    }
+
     @Published var sourceDisplay: Display = ALL_DISPLAYS {
         didSet {
             activeDisplayList.forEach { d in
@@ -1390,7 +1398,7 @@ final class DisplayController: ObservableObject {
     func reset() {
 //        menuWindow?.forceClose()
 
-        manageClamshellMode()
+        manageAdaptiveInClamshellMode()
         resetDisplayList(autoBlackOut: Defaults[.autoBlackoutBuiltin])
 
         adaptBrightness(force: true)
@@ -2278,26 +2286,26 @@ final class DisplayController: ObservableObject {
         return mode.str
     }
 
-    func activateClamshellMode() {
+    func disableAdaptiveInClamshellMode() {
         if adaptiveModeKey == .sync {
-            clamshellMode = true
+            disabledAdaptiveInClamshellMode = true
             disable()
         }
     }
 
-    func deactivateClamshellMode() {
+    func reenableAdaptiveOutOfClamshellMode() {
         if adaptiveModeKey == .manual {
-            clamshellMode = false
+            disabledAdaptiveInClamshellMode = false
             enable()
         }
     }
 
-    func manageClamshellMode() {
+    func manageAdaptiveInClamshellMode() {
         SyncMode.refresh()
         log.info("Lid closed: \(lidClosed)")
         if CachedDefaults[.enableSentry] {
             SentrySDK.configureScope { [self] scope in
-                scope.setTag(value: String(describing: lidClosed), key: "clamshellMode")
+                scope.setTag(value: String(describing: clamshell), key: "clamshellMode")
             }
         }
 
@@ -2306,10 +2314,10 @@ final class DisplayController: ObservableObject {
             return
         }
 
-        if lidClosed {
-            activateClamshellMode()
-        } else if clamshellMode {
-            deactivateClamshellMode()
+        if clamshell {
+            disableAdaptiveInClamshellMode()
+        } else if disabledAdaptiveInClamshellMode {
+            reenableAdaptiveOutOfClamshellMode()
         }
     }
 
