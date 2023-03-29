@@ -5939,8 +5939,8 @@ Lunar will continue to check in the background</string>
         <scene sceneID="GTI-N2-9dZ">
             <objects>
                 <viewController storyboardIdentifier="SettingsPopoverController" id="21a-h6-6He" customClass="SettingsPopoverController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tQ8-3z-D4n">
-                        <rect key="frame" x="0.0" y="0.0" width="300" height="406"/>
+                    <view key="view" wantsLayer="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tQ8-3z-D4n">
+                        <rect key="frame" x="0.0" y="0.0" width="300" height="418"/>
                         <subviews>
                             <box boxType="custom" cornerRadius="4" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TwA-hL-Un1" customClass="Box" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="300" height="225"/>
@@ -6112,25 +6112,6 @@ Lunar will continue to check in the background</string>
                                     </binding>
                                 </connections>
                             </button>
-                            <button verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="fsC-TN-3ly">
-                                <rect key="frame" x="16" y="13" width="169" height="6"/>
-                                <shadow key="shadow" blurRadius="2">
-                                    <size key="offset" width="0.0" height="1"/>
-                                    <color key="color" white="0.0" alpha="0.099648178810000002" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                </shadow>
-                                <buttonCell key="cell" type="check" title="Disable Sub-zero Dimming" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="BYg-Db-oPt">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="systemMedium" size="11"/>
-                                </buttonCell>
-                                <connections>
-                                    <binding destination="21a-h6-6He" name="value" keyPath="self.display.allowBrightnessZero" id="0bG-vh-ZRu"/>
-                                    <binding destination="21a-h6-6He" name="hidden" keyPath="self.display.isBuiltin" id="sQj-zE-4Py">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
-                                </connections>
-                            </button>
                             <button verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="Pzq-sB-A8O">
                                 <rect key="frame" x="16" y="13" width="255" height="6"/>
                                 <shadow key="shadow" blurRadius="2">
@@ -6143,7 +6124,6 @@ Lunar will continue to check in the background</string>
                                 </buttonCell>
                                 <connections>
                                     <binding destination="21a-h6-6He" name="value" keyPath="self.display.adaptiveSubzero" id="bqI-Kd-BDw"/>
-                                    <binding destination="21a-h6-6He" name="hidden" keyPath="self.display.isBuiltin" id="tyO-61-BHb"/>
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dDl-nT-014">
@@ -6234,7 +6214,6 @@ control automatically</string>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="QRE-1k-k2f" secondAttribute="trailing" constant="13" id="0OR-Of-0uH"/>
-                            <constraint firstItem="fsC-TN-3ly" firstAttribute="top" secondItem="2Nm-jy-7uZ" secondAttribute="bottom" constant="10" id="2cW-55-bbi"/>
                             <constraint firstItem="1Tt-VZ-2bh" firstAttribute="top" secondItem="YSi-X1-Nsf" secondAttribute="bottom" constant="4" id="33t-k9-ySQ"/>
                             <constraint firstItem="3pb-zK-Mzz" firstAttribute="centerY" secondItem="TuO-c2-HDu" secondAttribute="centerY" id="3SJ-T2-vq1"/>
                             <constraint firstItem="dDl-nT-014" firstAttribute="top" secondItem="tQ8-3z-D4n" secondAttribute="top" constant="14" id="5hS-VJ-hPE"/>
@@ -6248,11 +6227,9 @@ control automatically</string>
                             <constraint firstItem="YSi-X1-Nsf" firstAttribute="leading" secondItem="gQ1-Jv-FTC" secondAttribute="leading" id="GYx-Yl-p83"/>
                             <constraint firstAttribute="width" constant="300" id="Gn4-1w-hac"/>
                             <constraint firstItem="rc0-ia-euE" firstAttribute="top" secondItem="dDl-nT-014" secondAttribute="bottom" constant="-1" id="IE1-Gb-jzF"/>
-                            <constraint firstItem="fsC-TN-3ly" firstAttribute="leading" secondItem="2Nm-jy-7uZ" secondAttribute="leading" id="Jav-W0-Xe2"/>
                             <constraint firstAttribute="bottom" secondItem="Pzq-sB-A8O" secondAttribute="bottom" constant="15" id="KZK-QQ-YRe"/>
                             <constraint firstAttribute="bottom" secondItem="TwA-hL-Un1" secondAttribute="bottom" id="PAd-12-Zlm"/>
                             <constraint firstAttribute="trailing" secondItem="gQ1-Jv-FTC" secondAttribute="trailing" constant="58" id="SYo-Ov-aQv"/>
-                            <constraint firstAttribute="bottom" secondItem="fsC-TN-3ly" secondAttribute="bottom" constant="15" id="XVY-Rb-2lr"/>
                             <constraint firstItem="YSi-X1-Nsf" firstAttribute="top" secondItem="gQ1-Jv-FTC" secondAttribute="bottom" constant="4" id="Y8C-pW-qsW"/>
                             <constraint firstItem="rc0-ia-euE" firstAttribute="leading" secondItem="dDl-nT-014" secondAttribute="leading" id="Yug-0t-AC3"/>
                             <constraint firstItem="Kap-E3-AbC" firstAttribute="leading" secondItem="dDl-nT-014" secondAttribute="leading" constant="5" id="a4y-gh-BtB"/>
@@ -8134,7 +8111,7 @@ Set the brightness to 100% manually using the monitor physical buttons to allow 
                             <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="94" horizontalPageScroll="10" verticalLineScroll="94" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pCi-19-ad7">
                                 <rect key="frame" x="40" y="161" width="870" height="463"/>
                                 <clipView key="contentView" drawsBackground="NO" id="2aL-54-fJ9">
-                                    <rect key="frame" x="-0.092941176470913781" y="4.5474735088646412e-13" width="869.7549019607593" height="463"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="870" height="463"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" enabled="NO" rowHeight="74" usesAutomaticRowHeights="YES" viewBased="YES" id="y0B-BE-wg3">
@@ -8144,7 +8121,7 @@ Set the brightness to 100% manually using the monitor physical buttons to allow 
                                             <color key="backgroundColor" red="0.11764705882352941" green="0.11764705882352941" blue="0.11764705882352941" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                             <color key="gridColor" red="0.10196078431372549" green="0.10196078431372549" blue="0.10196078431372549" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                             <tableColumns>
-                                                <tableColumn width="837.23777250018122" minWidth="40" maxWidth="1000" id="f1D-aq-AnX">
+                                                <tableColumn width="838" minWidth="40" maxWidth="1000" id="f1D-aq-AnX">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" enabled="NO" borderStyle="border">
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -8157,11 +8134,11 @@ Set the brightness to 100% manually using the monitor physical buttons to allow 
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="sL5-vP-v2A" customClass="OnboardingDisplayCellView" customModule="Lunar" customModuleProvider="target">
-                                                            <rect key="frame" x="10" y="10" width="849" height="99"/>
+                                                            <rect key="frame" x="10" y="10" width="850" height="99"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="OeB-of-Exl">
-                                                                    <rect key="frame" x="0.0" y="64" width="358" height="35"/>
+                                                                    <rect key="frame" x="0.0" y="64" width="359" height="35"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="LG Ultra HD" id="5c7-9S-BIb">
                                                                         <font key="font" metaFont="systemHeavy" size="30"/>
                                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -8217,7 +8194,7 @@ Set the brightness to 100% manually using the monitor physical buttons to allow 
                                                                     </userDefinedRuntimeAttributes>
                                                                 </button>
                                                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EHh-8X-aIP" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="441" y="47" width="120" height="52"/>
+                                                                    <rect key="frame" x="442" y="47" width="120" height="52"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="120" id="CyL-qg-pjW"/>
                                                                     </constraints>
@@ -8236,7 +8213,7 @@ Set the brightness to 100% manually using the monitor physical buttons to allow 
                                                                     </connections>
                                                                 </textField>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qhi-zE-8qh">
-                                                                    <rect key="frame" x="453" y="29" width="97" height="13"/>
+                                                                    <rect key="frame" x="454" y="29" width="97" height="13"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="93" id="G6c-D1-mNE"/>
                                                                     </constraints>
@@ -8247,7 +8224,7 @@ Set the brightness to 100% manually using the monitor physical buttons to allow 
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="L2z-Az-Qjc" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="577" y="47" width="120" height="52"/>
+                                                                    <rect key="frame" x="578" y="47" width="120" height="52"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="120" id="tDB-SB-sox"/>
                                                                     </constraints>
@@ -8274,7 +8251,7 @@ Set the brightness to 100% manually using the monitor physical buttons to allow 
                                                                     </connections>
                                                                 </textField>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qkc-ca-jKp">
-                                                                    <rect key="frame" x="589" y="29" width="97" height="13"/>
+                                                                    <rect key="frame" x="590" y="29" width="97" height="13"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="93" id="giw-9n-9pF"/>
                                                                     </constraints>
@@ -8285,7 +8262,7 @@ Set the brightness to 100% manually using the monitor physical buttons to allow 
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TG4-Wk-HOk" customClass="ScrollableTextField" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="713" y="47" width="120" height="52"/>
+                                                                    <rect key="frame" x="714" y="47" width="120" height="52"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="120" id="Mf3-JJ-TNF"/>
                                                                     </constraints>
@@ -8312,7 +8289,7 @@ Set the brightness to 100% manually using the monitor physical buttons to allow 
                                                                     </connections>
                                                                 </textField>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Iso-bc-Ka2">
-                                                                    <rect key="frame" x="725" y="29" width="97" height="13"/>
+                                                                    <rect key="frame" x="726" y="29" width="97" height="13"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="93" id="irz-9n-lRy"/>
                                                                     </constraints>

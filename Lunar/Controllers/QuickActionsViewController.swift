@@ -1094,6 +1094,7 @@ struct AdvancedSettingsView: View {
     @Default(.disableControllerVideo) var disableControllerVideo
     @Default(.allowBlackOutOnSingleScreen) var allowBlackOutOnSingleScreen
     @Default(.reapplyValuesAfterWake) var reapplyValuesAfterWake
+    @Default(.clockMode) var clockMode
     @Default(.oldBlackOutMirroring) var oldBlackOutMirroring
     @Default(.newBlackOutDisconnect) var newBlackOutDisconnect
 
@@ -1105,7 +1106,6 @@ struct AdvancedSettingsView: View {
     @Default(.autoRestartOnFailedDDC) var autoRestartOnFailedDDC
     @Default(.autoRestartOnFailedDDCSooner) var autoRestartOnFailedDDCSooner
     @Default(.sleepInClamshellMode) var sleepInClamshellMode
-    // @Default(.allowAnySyncSource) var allowAnySyncSource
 
     @State var sensorCheckerEnabled = !Defaults[.sensorHostname].isEmpty
 
@@ -1195,12 +1195,8 @@ struct AdvancedSettingsView: View {
                             setting: $clamshellModeDetection
                         )
                     }
-                    // SettingsToggle(
-                    //     text: "Allow non-Apple monitors as Sync Mode source",
-                    //     setting: $allowAnySyncSource.animation(.fastSpring)
-                    // )
                     SettingsToggle(
-                        text: "Re-apply brightness on screen wake", setting: $reapplyValuesAfterWake,
+                        text: "Re-apply last brightness on screen wake", setting: $reapplyValuesAfterWake,
                         help: """
                         On each screen wake/reconnection, Lunar will try to
                         re-apply previous brightness and contrast 3 times.
@@ -1266,18 +1262,6 @@ struct AdvancedSettingsView: View {
                         Text("Don't use unless really needed or asked by the developer")
                             .foregroundColor(Colors.red)
                             .font(.caption)
-                        // SettingsToggle(
-                        //     text: "Refresh values from monitor settings", setting: $refreshValues,
-                        //     help: """
-                        //     Keep Lunar state in sync by reading monitor settings periodically.
-
-                        //     This is only useful if monitor values are changed externally,
-                        //     from another computer or through special buttons/knobs.
-
-                        //     Caution: Most monitors don't support read commands and enabling this setting
-                        //     can cause many issues with losing signal, system freezes, hanging apps etc.
-                        //     """
-                        // )
                         SettingsToggle(
                             text: "Disable usage of Gamma API completely", setting: $gammaDisabledCompletely,
                             help: """
@@ -1389,9 +1373,6 @@ struct QuickActionsLayoutView: View {
     @ObservedObject var dc: DisplayController = DC
 
     @Default(.showSliderValues) var showSliderValues
-    // #if arch(arm64)
-    //     @Default(.showSliderValuesNits) var showSliderValuesNits
-    // #endif
     @Default(.mergeBrightnessContrast) var mergeBrightnessContrast
     @Default(.showVolumeSlider) var showVolumeSlider
     @Default(.showRawValues) var showRawValues
@@ -1426,10 +1407,6 @@ struct QuickActionsLayoutView: View {
                     Divider()
                     Group {
                         SettingsToggle(text: "Show slider values", setting: $showSliderValues.animation(.fastSpring))
-                        // #if arch(arm64)
-                        //     SettingsToggle(text: "Show brightness in nits when possible", setting: $showSliderValuesNits.animation(.fastSpring))
-                        //         .padding(.leading)
-                        // #endif
                         if dc.activeDisplayList.contains(where: \.hasDDC) {
                             SettingsToggle(text: "Show volume slider", setting: $showVolumeSlider.animation(.fastSpring))
                             SettingsToggle(text: "Show input source selector", setting: $showInputInQuickActions.animation(.fastSpring))
@@ -1672,7 +1649,6 @@ struct BlackoutPopoverView: View {
 // MARK: - PaddedTextFieldStyle
 
 struct PaddedTextFieldStyle: TextFieldStyle {
-//    @State var font: Font = .system(size: 12, weight: .bold)
     @State var verticalPadding: CGFloat = 4
     @State var horizontalPadding: CGFloat = 8
     @State var backgroundColor: Color? = nil
@@ -1910,17 +1886,6 @@ struct QuickActionsMenuView: View {
                                 .scaledToFit()
                         }
 
-//                        SwiftUI.Button("Calibrate") {
-//                            if dc.calibrating {
-//                                dc.stopCalibration()
-//                            } else {
-//                                dc.startCalibration()
-//                            }
-//                        }
-//                        .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-//                        .font(.system(size: 12, weight: .medium, design: .rounded))
-//                        .fixedSize()
-
                         SwiftUI.Button("Preferences") { appDelegate!.showPreferencesWindow(sender: nil) }
                             .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
                             .font(.system(size: 12, weight: .medium, design: .rounded))
@@ -2124,23 +2089,10 @@ struct QuickActionsMenuView: View {
                 optionsMenu.padding(.leading, 20)
                     .matchedGeometryEffect(id: "options-menu", in: namespace)
             }
-            // ZStack {
             VStack {
-                // if dc.calibrating {
-                //     VStack(spacing: 15) {
-                //         calibrations
-                //         SwiftUI.Button("Finish calibration") { dc.stopCalibration() }
-                //             .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
-                //             .font(.system(size: 12, weight: .medium, design: .rounded))
-                //             .fixedSize()
-                //     }.padding()
-                // } else {
                 content
                 footer
-                // }
             }
-            // computingNitsProgress
-            // }
             .frame(maxWidth: env.menuWidth, alignment: .center)
             .scrollOnOverflow()
             .frame(width: env.menuWidth, height: cap(env.menuHeight, minVal: 100, maxVal: env.menuMaxHeight - 50), alignment: .top)
