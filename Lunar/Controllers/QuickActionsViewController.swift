@@ -733,7 +733,7 @@ struct DisplayRowView: View {
     @ViewBuilder var adaptiveState: some View {
         let systemAdaptive = display.systemAdaptiveBrightness
         let key = DC.adaptiveModeKey
-        if !display.adaptive, !display.xdr, !display.blackout, !display.facelight, !display.subzero, (key == .sync && !display.isActiveSyncSource) || key == .location || key == .sensor {
+        if !display.adaptive, !display.xdr, !display.blackout, !display.facelight, !display.subzero, (key == .sync && !display.isActiveSyncSource) || key == .location || key == .sensor || key == .clock {
             SwiftUI.Button(adaptiveStateText.isEmpty ? (systemAdaptive ? "Adapted by the system" : "Adaptive brightness disabled") : adaptiveStateText) {
                 display.adaptive = true
             }

@@ -1522,7 +1522,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     lazy var usesDDCBrightnessControl: Bool = control is DDCControl || control is NetworkControl
 
     @Published @objc dynamic var keepDisconnected = false
-    lazy var canChangeContrast: Bool = usesDDCBrightnessControl || (isNative && (alternativeControlForAppleNative?.isDDC ?? false))
+    @objc dynamic lazy var canChangeContrast: Bool = usesDDCBrightnessControl || (isNative && (alternativeControlForAppleNative?.isDDC ?? false))
 
     var isAllDisplays = false
 
