@@ -19,6 +19,10 @@ final class SliderCell: NSSliderCell {
     @IBInspectable dynamic var borderOpacity: CGFloat = 0.02
     @IBInspectable dynamic var bgOpacity: CGFloat = 0.3
 
+    var valueFormatter: ((Float) -> String)?
+
+    var gradient: [NSColor]?
+
     var shouldDrawText: Bool {
         drawText
     }
@@ -81,9 +85,14 @@ final class SliderCell: NSSliderCell {
             let textHeight = font.boundingRectForFont.height
             let textRect = NSRect(x: rect.minX, y: rect.midY - (textHeight / 2) + 1, width: rect.width, height: textHeight)
 
-            let value = (minValue == 0 && maxValue == 1) ? CGFloat(floatValue * 100) : CGFloat(floatValue.intround)
+            let str: String
+            if let valueFormatter {
+                str = valueFormatter(floatValue)
+            } else {
+                str = ((minValue == 0 && maxValue == 1) ? CGFloat(floatValue * 100) : CGFloat(floatValue.intround)).str(decimals: 0)
+            }
 
-            value.str(decimals: 0)
+            str
                 .withFont(font)
                 .withTextColor(knobColor.hsb.2 > 70 ? .black : .white)
                 .withParagraphStyle(centered)
@@ -123,11 +132,24 @@ final class SliderCell: NSSliderCell {
         let rect = NSRect(x: aRect.origin.x, y: aRect.midY - (verticalPadding / 2), width: aRect.width, height: verticalPadding)
 
         let bg = NSBezierPath(roundedRect: rect, xRadius: cornerRadius, yRadius: cornerRadius)
-        let color = isEnabled ? color : (color.blended(withFraction: 0.5, of: .gray) ?? .gray)
-        color.withAlphaComponent(bgOpacity).setFill()
-        bg.fill()
-        sliderBorderColor.withAlphaComponent(borderOpacity).setStroke()
-        bg.stroke()
+
+        if let gradient, let cgGradient = CGGradient(colorsSpace: .init(name: CGColorSpace.sRGB), colors: gradient.map { $0.withAlphaComponent(bgOpacity).cgColor } as CFArray, locations: nil),
+           let context = NSGraphicsContext.current?.cgContext
+        {
+            bg.addClip()
+            context.drawLinearGradient(
+                cgGradient,
+                start: CGPoint(x: rect.minX, y: rect.midY),
+                end: CGPoint(x: rect.maxX, y: rect.midY),
+                options: [.drawsBeforeStartLocation, .drawsAfterEndLocation]
+            )
+        } else {
+            let color = isEnabled ? color : (color.blended(withFraction: 0.5, of: .gray) ?? .gray)
+            color.withAlphaComponent(bgOpacity).setFill()
+            bg.fill()
+            sliderBorderColor.withAlphaComponent(borderOpacity).setStroke()
+            bg.stroke()
+        }
 
         let value = (minValue == 0 && maxValue == 1)
             ? CGFloat(floatValue)
@@ -143,8 +165,19 @@ final class SliderCell: NSSliderCell {
             fillWidth = (rect.width - rect.height) * value + rect.height
             fillRect = NSRect(x: rect.origin.x, y: rect.origin.y + 0.5, width: fillWidth, height: rect.size.height - 1)
             active = NSBezierPath(roundedRect: fillRect, xRadius: cornerRadius, yRadius: cornerRadius)
-            color.setFill()
-            active.fill()
+
+            if let gradient, let cgGradient = CGGradient(colorsSpace: .init(name: CGColorSpace.sRGB), colors: gradient.map(\.cgColor) as CFArray, locations: nil), let context = NSGraphicsContext.current?.cgContext {
+                active.addClip()
+                context.drawLinearGradient(
+                    cgGradient,
+                    start: CGPoint(x: rect.minX, y: rect.midY),
+                    end: CGPoint(x: rect.maxX, y: rect.midY),
+                    options: [.drawsBeforeStartLocation, .drawsAfterEndLocation]
+                )
+            } else {
+                color.setFill()
+                active.fill()
+            }
         } else {
             guard abs(value - fillOrigin) > 0.02 else { return }
 

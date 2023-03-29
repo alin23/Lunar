@@ -10,6 +10,8 @@
         <customObject id="-2" userLabel="File's Owner" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
             <connections>
                 <outlet property="box" destination="wRp-Hv-A02" id="R0e-6f-cvX"/>
+                <outlet property="brightnessContrastSliderCell" destination="8GJ-hW-12T" id="YTM-Bh-And"/>
+                <outlet property="brightnessSliderCell" destination="3LK-5D-5CR" id="brn-Cd-QzZ"/>
                 <outlet property="dropdown" destination="aM2-4L-F67" id="wuf-eQ-7RW"/>
                 <outlet property="hour" destination="IRQ-gP-bkE" id="iJs-BK-4RT"/>
                 <outlet property="minute" destination="7vR-RW-TFl" id="V2S-xS-tsE"/>

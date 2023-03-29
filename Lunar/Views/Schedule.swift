@@ -27,8 +27,8 @@ struct BrightnessSchedule: Codable, Defaults.Serializable, Comparable {
     let type: ScheduleType
     let hour: UInt8
     let minute: UInt8
-    let brightness: PreciseBrightness
-    let contrast: PreciseContrast
+    let brightness: PreciseBrightness // [-1, 1] when adaptiveSubzero else [0, 1]
+    let contrast: PreciseContrast // [0, 1]
     let negative: Bool
 
     var enabled: Bool { type != .disabled }
@@ -131,7 +131,6 @@ final class Schedule: NSView {
     @IBOutlet var minute: ScrollableTextField!
     @IBOutlet var signButton: ToggleButton!
     @IBOutlet var box: NSBox!
-
     @IBOutlet var dropdown: NSPopUpButton!
     @IBInspectable dynamic var title = "Schedule 1"
     @IBInspectable dynamic var number = 1
@@ -144,6 +143,13 @@ final class Schedule: NSView {
     var hover = false
 
     @objc dynamic lazy var hideContrast: Bool = !(display?.canChangeContrast ?? true) || CachedDefaults[.mergeBrightnessContrast]
+
+    @IBOutlet var brightnessSliderCell: SliderCell!
+    @IBOutlet var brightnessContrastSliderCell: SliderCell!
+
+    @Atomic var alreadyMapped = false
+
+    var adaptiveSubzeroObserver: Cancellable?
 
     var schedule: BrightnessSchedule? {
         get { display?.schedules[number - 1] }
@@ -159,16 +165,19 @@ final class Schedule: NSView {
             guard let display, let schedule else {
                 return 0.5
             }
+            let min: Double = display.adaptiveSubzero ? -1 : 0
+            let br = cap(schedule.brightness, minVal: min, maxVal: 1)
 
-            return display.brightnessToSliderValue(schedule.brightness.ns)
+            return display.adaptiveSubzero ? br.map(from: (-1, 1), to: (0, 1)) : br
         }
         set {
             guard let display, let schedule else {
                 return
             }
-            let (brightness, contrast) = display.sliderValueToBrightnessContrast(newValue)
-            self.schedule = schedule.with(brightness: brightness.d, contrast: contrast.d)
-            display.save()
+
+            let br = display.adaptiveSubzero && !alreadyMapped ? newValue.map(from: (0, 1), to: (-1, 1)) : newValue
+
+            self.schedule = schedule.with(brightness: br, contrast: newValue)
         }
     }
 
@@ -177,36 +186,24 @@ final class Schedule: NSView {
             guard let display, let schedule else {
                 return 0.5
             }
+            let min: Double = display.adaptiveSubzero ? -1 : 0
+            let br = cap(schedule.brightness, minVal: min, maxVal: 1)
 
-            return display.brightnessToSliderValue(schedule.brightness.ns)
+            return display.adaptiveSubzero ? br.map(from: (-1, 1), to: (0, 1)) : br
         }
         set {
             guard let display, let schedule else {
                 return
             }
-            let brightness = display.sliderValueToBrightness(newValue)
-            self.schedule = schedule.with(brightness: brightness.doubleValue)
-            display.save()
+            let br = display.adaptiveSubzero && !alreadyMapped ? newValue.map(from: (0, 1), to: (-1, 1)) : newValue
+
+            self.schedule = schedule.with(brightness: br)
         }
     }
 
     @objc dynamic var preciseContrast: Double {
-        get {
-            guard let display, let schedule else {
-                return 0.5
-            }
-
-            return display.contrastToSliderValue(schedule.contrast.ns, merged: CachedDefaults[.mergeBrightnessContrast])
-        }
-        set {
-            guard let display, let schedule else {
-                return
-            }
-
-            let contrast = display.sliderValueToContrast(newValue)
-            self.schedule = schedule.with(contrast: contrast.doubleValue)
-            display.save()
-        }
+        get { schedule?.contrast ?? 0.5 }
+        set { schedule = schedule?.with(contrast: newValue) }
     }
 
     @objc dynamic var negativeState = NSControl.StateValue.off {
@@ -265,6 +262,7 @@ final class Schedule: NSView {
     weak var display: Display? {
         didSet {
             guard let display else {
+                adaptiveSubzeroObserver = nil
                 return
             }
 
@@ -274,12 +272,12 @@ final class Schedule: NSView {
 
             setTempValues(from: schedule)
 
-            if CachedDefaults[.mergeBrightnessContrast] {
-                preciseBrightnessContrast = display.brightnessToSliderValue(schedule.brightness.ns)
+            if DC.mergeBrightnessContrast {
+                withoutRemapping { preciseBrightnessContrast = cap(schedule.brightness, minVal: display.adaptiveSubzero ? -1 : 0, maxVal: 1) }
                 hideContrast = true
             } else {
-                preciseBrightness = display.brightnessToSliderValue(schedule.brightness.ns)
-                preciseContrast = display.contrastToSliderValue(schedule.contrast.ns, merged: false)
+                withoutRemapping { preciseBrightness = cap(schedule.brightness, minVal: display.adaptiveSubzero ? -1 : 0, maxVal: 1) }
+                preciseContrast = schedule.contrast
                 hideContrast = !display.canChangeContrast
             }
 
@@ -288,6 +286,12 @@ final class Schedule: NSView {
             type = schedule.type.rawValue
             negativeState = schedule.negative ? .on : .off
             dropdown.selectItem(withTag: schedule.type.rawValue)
+            if let brightnessSliderCell {
+                brightnessSliderCell.gradient = display.adaptiveSubzero ? [subzeroColor, lunarYellow] : nil
+            }
+            if let brightnessContrastSliderCell {
+                brightnessContrastSliderCell.gradient = display.adaptiveSubzero ? [subzeroColor, lunarYellow] : nil
+            }
 
             hour.onValueChanged = { [weak self] value in
                 guard let self, let display = self.display,
@@ -308,6 +312,7 @@ final class Schedule: NSView {
                 case .disabled:
                     break
                 }
+                display.save()
             }
             minute.onValueChanged = { [weak self] value in
                 guard let self, let display = self.display,
@@ -328,7 +333,28 @@ final class Schedule: NSView {
                 case .disabled:
                     break
                 }
+                display.save()
             }
+
+            adaptiveSubzeroObserver = display.$adaptiveSubzero
+                .debounce(for: .milliseconds(50), scheduler: RunLoop.main)
+                .sink { [weak self] adaptiveSubzero in
+                    guard let self, let display = self.display, let schedule = self.schedule else { return }
+                    if DC.mergeBrightnessContrast {
+                        self.withoutRemapping { self.preciseBrightnessContrast = cap(schedule.brightness, minVal: adaptiveSubzero ? -1 : 0, maxVal: 1) }
+                        self.hideContrast = true
+                    } else {
+                        self.withoutRemapping { self.preciseBrightness = cap(schedule.brightness, minVal: adaptiveSubzero ? -1 : 0, maxVal: 1) }
+                        self.hideContrast = !display.canChangeContrast
+                    }
+
+                    if let brightnessSliderCell = self.brightnessSliderCell {
+                        brightnessSliderCell.gradient = adaptiveSubzero ? [subzeroColor, lunarYellow] : nil
+                    }
+                    if let brightnessContrastSliderCell = self.brightnessContrastSliderCell {
+                        brightnessContrastSliderCell.gradient = adaptiveSubzero ? [subzeroColor, lunarYellow] : nil
+                    }
+                }
         }
     }
 
@@ -360,15 +386,21 @@ final class Schedule: NSView {
         didSet { fade() }
     }
 
+    func withoutRemapping(_ action: () -> Void) {
+        alreadyMapped = true
+        action()
+        alreadyMapped = false
+    }
+
     @objc func useCurrentBrightness() {
         guard let display else {
             return
         }
-        if CachedDefaults[.mergeBrightnessContrast] {
-            preciseBrightnessContrast = display.brightnessToSliderValue(display.brightness)
+        if DC.mergeBrightnessContrast {
+            withoutRemapping { preciseBrightnessContrast = display.softwareAdjustedBrightnessIfAdaptive / 100 }
         } else {
-            preciseBrightness = display.brightnessToSliderValue(display.brightness)
-            preciseContrast = display.contrastToSliderValue(display.contrast, merged: CachedDefaults[.mergeBrightnessContrast])
+            withoutRemapping { preciseBrightness = display.softwareAdjustedBrightnessIfAdaptive / 100 }
+            preciseContrast = display.preciseContrast
         }
     }
 
@@ -395,16 +427,15 @@ final class Schedule: NSView {
             break
         }
     }
-
     func addObservers() {
         mergeBrightnessContrastPublisher.sink { [weak self] change in
-            guard let self, let display = self.display else { return }
+            guard let self, let display = self.display, let schedule = self.schedule else { return }
             if change.newValue {
-                self.preciseBrightnessContrast = display.brightnessToSliderValue(display.brightness)
+                self.withoutRemapping { self.preciseBrightnessContrast = schedule.brightness }
                 self.hideContrast = true
             } else {
-                self.preciseBrightness = display.brightnessToSliderValue(display.brightness)
-                self.preciseContrast = display.contrastToSliderValue(display.contrast, merged: change.newValue)
+                self.withoutRemapping { self.preciseBrightness = schedule.brightness }
+                self.preciseContrast = schedule.contrast
                 self.hideContrast = !display.canChangeContrast
             }
         }.store(in: &observers)
@@ -449,7 +480,7 @@ final class Schedule: NSView {
         view.frame = bounds
         addSubview(view)
         signButton?.page = darkMode ? .hotkeys : .display
-//        dropdown?.page = darkMode ? .hotkeys : .display
+
         for item in dropdown.itemArray {
             guard let type = ScheduleType(rawValue: item.tag) else { continue }
             switch type {
@@ -469,6 +500,23 @@ final class Schedule: NSView {
                 break
             }
         }
+
+        if let brightnessSliderCell {
+            brightnessSliderCell.valueFormatter = { [weak self] in self?.formatBrightness($0) ?? "0" }
+            if let display, display.adaptiveSubzero {
+                brightnessSliderCell.gradient = [subzeroColor, lunarYellow]
+            }
+        }
+        if let brightnessContrastSliderCell {
+            brightnessContrastSliderCell.valueFormatter = { [weak self] in self?.formatBrightness($0) ?? "0" }
+            if let display, display.adaptiveSubzero {
+                brightnessContrastSliderCell.gradient = [subzeroColor, lunarYellow]
+            }
+        }
+    }
+
+    func formatBrightness(_ val: Float) -> String {
+        (((display?.adaptiveSubzero ?? true) ? val.map(from: (0, 1), to: (-1, 1)) : val) * 100).str(decimals: 0)
     }
 
     override func draw(_ dirtyRect: NSRect) {

@@ -1218,6 +1218,8 @@ final class DisplayController: ObservableObject {
     @Atomic var usingFlux = isFluxRunning()
     @Atomic var xdrPausedBecauseOfFlux = false
 
+    @Published var mergeBrightnessContrast = CachedDefaults[.mergeBrightnessContrast]
+
     var targetDisplays: [Display] {
         activeDisplayList.filter { !$0.isSource }
     }
@@ -1515,6 +1517,7 @@ final class DisplayController: ObservableObject {
         mergeBrightnessContrastPublisher
             .debounce(for: .milliseconds(50), scheduler: RunLoop.main)
             .sink { [self] change in
+                mergeBrightnessContrast = change.newValue
                 displayList.forEach {
                     $0.noDDCOrMergedBrightnessContrast = !$0.hasDDC || change.newValue
                 }
@@ -1574,6 +1577,12 @@ final class DisplayController: ObservableObject {
                 guard let schedule = d.schedules[safe: 4] else { return }
                 d.schedules[4] = schedule.with(type: .disabled)
                 d.save()
+            }
+        }.store(in: &observers)
+
+        scheduleTransitionPublisher.sink { [self] change in
+            activeDisplayList.forEach { d in
+                d.resetScheduledTransition()
             }
         }.store(in: &observers)
 

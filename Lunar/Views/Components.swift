@@ -19,34 +19,60 @@ struct SettingsToggle: View {
     @State var color: Color? = Colors.blackMauve
     @State var help: String?
     @State var helpShown = false
+    @State var mode: AdaptiveModeKey? = nil
+
+    var modeColor: Color? {
+        guard let mode else { return nil }
+
+        switch mode {
+        case .sync:
+            return Colors.green
+        case .sensor:
+            return Colors.blue
+        case .location:
+            return Colors.lunarYellow
+        case .clock:
+            return Color.orange
+        case .manual:
+            return Colors.red
+        case .auto:
+            return Colors.blackMauve
+        }
+    }
 
     var body: some View {
-        HStack {
-            Toggle(text, isOn: $setting)
-                .toggleStyle(CheckboxToggleStyle(style: .circle))
-                .foregroundColor(color)
-            if let help {
-                SwiftUI.Button(action: { helpShown = true }) {
-                    Image(systemName: "questionmark.circle.fill")
-                        .font(.system(size: 12, weight: .black))
-                        .imageScale(.medium)
-                }
-                .buttonStyle(FlatButton(
-                    color: .clear,
-                    textColor: .gray.opacity(0.7),
-                    hoverColor: .blue,
-                    circle: true,
-                    horizontalPadding: 0,
-                    verticalPadding: 0
-                ))
-                .popover(isPresented: $helpShown, arrowEdge: .bottom) {
-                    PaddedPopoverView(background: AnyView(Color.white)) {
-                        Text(help)
-                            .foregroundColor(.primary)
+        ZStack(alignment: .leading) {
+            HStack(alignment: .center) {
+                Toggle(text, isOn: $setting)
+                    .toggleStyle(CheckboxToggleStyle(style: .circle))
+                    .foregroundColor(color)
+                if let help {
+                    SwiftUI.Button(action: { helpShown = true }) {
+                        Image(systemName: "questionmark.circle.fill")
+                            .font(.system(size: 13, weight: .black))
+                            .imageScale(.medium)
+                    }
+                    .buttonStyle(FlatButton(
+                        color: .clear,
+                        textColor: .gray.opacity(0.7),
+                        hoverColor: .blue,
+                        circle: true,
+                        horizontalPadding: 0,
+                        verticalPadding: 0
+                    ))
+                    .popover(isPresented: $helpShown, arrowEdge: .bottom) {
+                        PaddedPopoverView(background: AnyView(Color.white)) {
+                            Text(help)
+                                .foregroundColor(.primary)
+                        }
                     }
                 }
             }
-        }.frame(height: 14)
+            if let modeColor {
+                Circle().size(width: 8, height: 8).fill(modeColor)
+                    .offset(x: -15, y: 4)
+            }
+        }.frame(height: 14, alignment: .leading)
     }
 }
 
