@@ -143,6 +143,8 @@ final class Schedule: NSView {
 
     var hover = false
 
+    @objc dynamic lazy var hideContrast: Bool = !(display?.canChangeContrast ?? true) || CachedDefaults[.mergeBrightnessContrast]
+
     var schedule: BrightnessSchedule? {
         get { display?.schedules[number - 1] }
         set {
@@ -274,9 +276,11 @@ final class Schedule: NSView {
 
             if CachedDefaults[.mergeBrightnessContrast] {
                 preciseBrightnessContrast = display.brightnessToSliderValue(schedule.brightness.ns)
+                hideContrast = true
             } else {
                 preciseBrightness = display.brightnessToSliderValue(schedule.brightness.ns)
-                preciseContrast = display.contrastToSliderValue(schedule.contrast.ns, merged: CachedDefaults[.mergeBrightnessContrast])
+                preciseContrast = display.contrastToSliderValue(schedule.contrast.ns, merged: false)
+                hideContrast = !display.canChangeContrast
             }
 
             hour.integerValue = schedule.hour.i
@@ -397,9 +401,11 @@ final class Schedule: NSView {
             guard let self, let display = self.display else { return }
             if change.newValue {
                 self.preciseBrightnessContrast = display.brightnessToSliderValue(display.brightness)
+                self.hideContrast = true
             } else {
                 self.preciseBrightness = display.brightnessToSliderValue(display.brightness)
                 self.preciseContrast = display.contrastToSliderValue(display.contrast, merged: change.newValue)
+                self.hideContrast = !display.canChangeContrast
             }
         }.store(in: &observers)
 
