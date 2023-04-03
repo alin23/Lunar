@@ -496,7 +496,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         menuShown = true
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "6"
 
-        initLicensingMenuItems(version)
+        initGammaMenuItems(version)
         initMenuItems()
         menuUpdater = Repeater(every: 0.5) { [self] in
             updateInfoMenuItem()
@@ -2200,7 +2200,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         DC.listenForRunningApps()
 
         addObservers()
-        initLicensing()
+        initGamma()
         manageDisplayControllerActivity(mode: DC.adaptiveModeKey)
         if DC.adaptiveMode.available {
             DC.adaptiveMode.watch()
