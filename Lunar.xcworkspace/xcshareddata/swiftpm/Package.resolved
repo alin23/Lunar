@@ -150,7 +150,7 @@
       "location" : "https://github.com/alin23/sentry-cocoa.git",
       "state" : {
         "branch" : "master",
-        "revision" : "f4a58bc31e45f7530d4f29a2fd2222d099bf0df3"
+        "revision" : "3fc79ea6ebcfd726e48bea1d98f89bc3a32d5cf2"
       }
     },
     {
@@ -239,8 +239,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/eddiekaiger/SwiftyAttributes",
       "state" : {
-        "revision" : "0fbf992e6e4e1b98954f3d48f8523a67dfa5c8f3",
-        "version" : "5.2.0"
+        "revision" : "3951ee4ed487aa1c3f16ae16d99a4ebf9506dad9",
+        "version" : "5.3.0"
       }
     },
     {
