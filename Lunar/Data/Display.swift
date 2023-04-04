@@ -1323,6 +1323,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Atomic var shouldStopContrastTransition = true
     @Atomic var lastWrittenBrightness: UInt16 = 50
     @Atomic var lastWrittenContrast: UInt16 = 50
+    var lastNativeBrightness: Double? = nil
 
     let DEFAULT_DDC_BLOCKERS = """
     * Disable any **Ambient Light Sensing** feature
@@ -1821,7 +1822,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             if let control = control as? DDCControl {
                 _ = control.setContrastDebounced(contrast, oldValue: oldContrast, transition: brightnessTransition)
-            } else if let control, !control.setContrast(contrast, oldValue: oldContrast, transition: brightnessTransition, onChange: nil) {
+            } else if canChangeContrast, let control, !control.setContrast(contrast, oldValue: oldContrast, transition: brightnessTransition, onChange: nil) {
                 log.warning(
                     "Error writing contrast using \(control.str)",
                     context: context
@@ -2242,6 +2243,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 }
 
                 log.verbose("newBrightness: \(newBrightness) display.isUserAdjusting: \(display.isUserAdjusting())")
+                display.lastNativeBrightness = value
                 display.withoutDisplayServices {
                     display.brightness = newBrightness.ns
                 }

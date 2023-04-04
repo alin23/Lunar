@@ -1395,6 +1395,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         let loginPublisher = NSWorkspace.shared.notificationCenter
             .publisher(for: NSWorkspace.sessionDidBecomeActiveNotification, object: nil)
 
+        wakePublisher
+            .debounce(for: .milliseconds(200), scheduler: RunLoop.main)
+            .sink { _ in
+                if CachedDefaults[.reapplyValuesAfterWake] {
+                    for display in DC.activeDisplayList.filter(\.isNative) {
+                        guard let control = display.control as? AppleNativeControl else { continue }
+
+                        let brightness = AppleNativeControl.readBrightnessDisplayServices(id: display.id)
+                        guard let lastBrightness = display.lastNativeBrightness, brightness != lastBrightness else {
+                            continue
+                        }
+
+                        log.debug("After wake brightness is \(brightness). Re-applying previous brightness \(lastBrightness) for \(display.description)")
+                        _ = control.writeBrightness(0, preciseBrightness: lastBrightness)
+                    }
+                }
+            }.store(in: &observers)
+
         loginPublisher
             .merge(with: logoutPublisher)
             .debounce(for: .seconds(1), scheduler: RunLoop.main)
@@ -1453,27 +1471,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
                     if CachedDefaults[.reapplyValuesAfterWake] {
                         self.screenWakeAdapterTask = Repeater(every: 2, times: CachedDefaults[.wakeReapplyTries]) {
-                            if DC.adaptiveModeKey == .manual, CachedDefaults[.jitterAfterWake] {
-                                for (num, display) in DC.activeDisplayList.enumerated() {
-                                    let br = display.brightness.uint16Value
-                                    mainAsyncAfter(ms: num * 50) {
-                                        display.withForce { display.brightness = cap(br - 1, minVal: 0, maxVal: 100).ns }
-                                    }
-                                    mainAsyncAfter(ms: 300 + num * 50) {
-                                        display.withForce { display.brightness = cap(br, minVal: 0, maxVal: 100).ns }
-                                    }
-                                    mainAsyncAfter(ms: 600 + num * 50) {
-                                        display.withForce { display.brightness = cap(br + 1, minVal: 0, maxVal: 100).ns }
-                                    }
-                                    mainAsyncAfter(ms: 900 + num * 50) {
-                                        display.withForce { display.brightness = cap(br, minVal: 0, maxVal: 100).ns }
-                                    }
-                                }
-                            } else {
-                                DC.adaptBrightness(force: true)
-                            }
+                            DC.adaptBrightness(force: true)
 
-                            for display in DC.activeDisplays.values.filter(\.blackOutEnabled) {
+                            for display in DC.activeDisplayList.filter(\.blackOutEnabled) {
                                 display.apply(gamma: GammaTable.zero, force: true)
 
                                 if display.isSmartBuiltin, display.readBrightness() != 0 {

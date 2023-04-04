@@ -146,6 +146,7 @@ final class AppleNativeControl: Control {
         }
 
         DisplayServicesBrightnessChanged(display.id, br)
+        display.lastNativeBrightness = br
         return success
     }
 
@@ -336,7 +337,7 @@ final class AppleNativeControl: Control {
         case .coreDisplay:
             return (CoreDisplay_Display_GetUserBrightness(display.id) * 100.0).u16
         case .displayServices:
-            var br = display.brightness.floatValue
+            var br = display.preciseBrightness.f
             DisplayServicesGetBrightness(display.id, &br)
             return (br * 100.0).u16
         }
