@@ -1306,7 +1306,7 @@ final class DisplayController: ObservableObject {
             #endif
 
             printMirrors(storedDisplays)
-            return storedDisplays.dict { ($0.id, $0) }
+            return storedDisplays.filter { $0.id != ALL_DISPLAYS_ID }.dict { ($0.id, $0) }
         }
 
         // Update IDs after reconnection
@@ -1343,7 +1343,7 @@ final class DisplayController: ObservableObject {
         #endif
 
         printMirrors(storedDisplays)
-        return Dictionary(storedDisplays.map { d in (d.id, d) }, uniquingKeysWith: first(this:other:))
+        return Dictionary(storedDisplays.filter { $0.id != ALL_DISPLAYS_ID }.map { d in (d.id, d) }, uniquingKeysWith: first(this:other:))
     }
 
     static func printMirrors(_ displays: [Display]) {
