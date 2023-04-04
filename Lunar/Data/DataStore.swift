@@ -178,7 +178,6 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .volumeKeysEnabled,
     .volumeStep,
     .reapplyValuesAfterWake,
-    .jitterAfterWake,
     .waitAfterWakeSeconds,
     .delayDDCAfterWake,
     .wakeReapplyTries,
@@ -811,7 +810,6 @@ func initCache() {
     cacheKey(.syncMode)
     cacheKey(.overrideAdaptiveMode)
     cacheKey(.reapplyValuesAfterWake)
-    cacheKey(.jitterAfterWake)
     cacheKey(.waitAfterWakeSeconds)
     cacheKey(.delayDDCAfterWake)
     cacheKey(.wakeReapplyTries)
