@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -3163,15 +3163,15 @@ disabled</string>
                                 </connections>
                             </textField>
                             <box fixedFrame="YES" title="Schedule" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mcs-8U-Dl2">
-                                <rect key="frame" x="-3" y="46" width="956" height="182"/>
+                                <rect key="frame" x="-3" y="-4" width="956" height="232"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <view key="contentView" id="H08-7g-sez">
-                                    <rect key="frame" x="4" y="5" width="948" height="174"/>
+                                    <rect key="frame" x="4" y="5" width="948" height="224"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WET-aM-MU7" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="29" y="5" width="180" height="146"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <rect key="frame" x="29" y="55" width="180" height="146"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="number">
                                                     <integer key="value" value="1"/>
@@ -3179,8 +3179,8 @@ disabled</string>
                                             </userDefinedRuntimeAttributes>
                                         </customView>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Qx8-vD-Roe" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="208" y="5" width="180" height="146"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <rect key="frame" x="208" y="55" width="180" height="146"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="number">
                                                     <integer key="value" value="2"/>
@@ -3188,8 +3188,8 @@ disabled</string>
                                             </userDefinedRuntimeAttributes>
                                         </customView>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6NV-4N-tbR" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="386" y="5" width="180" height="146"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <rect key="frame" x="386" y="55" width="180" height="146"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="number">
                                                     <integer key="value" value="3"/>
@@ -3204,8 +3204,8 @@ disabled</string>
                                             </connections>
                                         </customView>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gkp-TR-IaX" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="566" y="5" width="180" height="146"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <rect key="frame" x="566" y="55" width="180" height="146"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="number">
                                                     <integer key="value" value="4"/>
@@ -3220,8 +3220,8 @@ disabled</string>
                                             </connections>
                                         </customView>
                                         <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="c7W-w3-0q6" customClass="Schedule" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="744" y="5" width="180" height="146"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <rect key="frame" x="744" y="55" width="180" height="146"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="number">
                                                     <integer key="value" value="5"/>
@@ -3236,8 +3236,8 @@ disabled</string>
                                             </connections>
                                         </customView>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8G3-fq-bS8" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="208" y="4" width="180" height="148"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <rect key="frame" x="208" y="54" width="180" height="148"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="smallSquare" title="Add schedule" bezelStyle="smallSquare" image="add" imagePosition="above" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1XL-8g-e52">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -3257,11 +3257,12 @@ disabled</string>
                                             </connections>
                                         </button>
                                         <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jzB-lh-fCv" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="734" y="158" width="200" height="16"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="inline" title="Show fewer schedules" alternateTitle="Less" bezelStyle="inline" image="arrow.left.circle.fill" imagePosition="leading" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="h1u-Bi-fDD">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="cellTitle"/>
+                                            <rect key="frame" x="817" y="14" width="118" height="15"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <buttonCell key="cell" type="inline" title=" Fewer schedules" bezelStyle="inline" imagePosition="leading" alignment="left" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="h1u-Bi-fDD">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES"/>
+                                                <font key="font" metaFont="smallSystemBold"/>
+                                                <imageReference key="image" image="arrowtriangle.left.circle.fill" catalog="system" symbolScale="medium"/>
                                             </buttonCell>
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="color" keyPath="color">
@@ -3286,6 +3287,28 @@ disabled</string>
                                                 </binding>
                                             </connections>
                                         </button>
+                                        <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fnT-9H-DK4">
+                                            <rect key="frame" x="392" y="37" width="164" height="23"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <segmentedCell key="cell" refusesFirstResponder="YES" borderStyle="border" alignment="left" segmentDistribution="fillEqually" style="capsule" trackingMode="selectOne" id="OcQ-dq-2Ub">
+                                                <font key="font" metaFont="systemMedium" size="9"/>
+                                                <segments>
+                                                    <segment label="User controlled" imageScaling="proportionallyUpOrDown" selected="YES">
+                                                        <string key="toolTip">This makes Clock Mode respect manual adjustments done by the user.
+
+Brightness will always transition to the next schedule starting from the user adjusted brightness.</string>
+                                                    </segment>
+                                                    <segment label="Fully automated" tag="1">
+                                                        <string key="toolTip">This makes Clock Mode override any manual adjustments done by the user.
+
+It also makes it re-apply the brightness of the previous schedule after standby/wake or after a screen reconnection.</string>
+                                                    </segment>
+                                                </segments>
+                                            </segmentedCell>
+                                            <connections>
+                                                <binding destination="rew-Tm-BHz" name="selectedTag" keyPath="values.fullyAutomatedClockMode" id="89p-ny-WSq"/>
+                                            </connections>
+                                        </segmentedControl>
                                     </subviews>
                                 </view>
                                 <font key="titleFont" size="14" name="Menlo-Bold"/>
@@ -3496,20 +3519,6 @@ disabled</string>
                                     </binding>
                                 </connections>
                             </button>
-                            <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="brE-6o-Vsl">
-                                <rect key="frame" x="405" y="37" width="140" height="23"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <segmentedCell key="cell" refusesFirstResponder="YES" borderStyle="border" alignment="left" segmentDistribution="fillEqually" style="capsule" trackingMode="selectOne" id="atp-y4-Gi0">
-                                    <font key="font" metaFont="systemSemibold" size="12"/>
-                                    <segments>
-                                        <segment label="Simple" toolTip="Keep the user interface simple, hiding more advanced settings" imageScaling="proportionallyUpOrDown" selected="YES"/>
-                                        <segment label="Advanced" toolTip="Show advanced settings" tag="1"/>
-                                    </segments>
-                                </segmentedCell>
-                                <connections>
-                                    <binding destination="rew-Tm-BHz" name="selectedTag" keyPath="values.showAdvancedDisplaySettings" id="BNd-CG-Kbk"/>
-                                </connections>
-                            </segmentedControl>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="BGp-R3-21E">
                                 <rect key="frame" x="591" y="495" width="21" height="10"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
@@ -9930,7 +9939,7 @@ settings for this monitor.</string>
         <image name="NSInfo" width="32" height="32"/>
         <image name="Trash" width="22" height="22"/>
         <image name="add" width="30" height="30"/>
-        <image name="arrow.left.circle.fill" width="48" height="48"/>
+        <image name="arrowtriangle.left.circle.fill" catalog="system" width="15" height="15"/>
         <image name="automode" width="14" height="14"/>
         <image name="brightness" width="50.5" height="50.5"/>
         <image name="clockmode" width="14" height="14"/>

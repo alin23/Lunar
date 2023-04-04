@@ -3,6 +3,23 @@
     <channel>
         <title>Lunar</title>
         <item>
+            <title>6.0.4b2</title>
+            <pubDate>Tue, 04 Apr 2023 15:21:12 +0300</pubDate>
+            <link>https://lunar.fyi/</link>
+            <sparkle:fullReleaseNotesLink>https://lunar.fyi/changelog</sparkle:fullReleaseNotesLink>
+            <sparkle:channel>beta</sparkle:channel>
+            <sparkle:minimumAutoupdateVersion>6.0.0</sparkle:minimumAutoupdateVersion>
+            <sparkle:version>6.0.4b2</sparkle:version>
+            <sparkle:shortVersionString>6.0.4b2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-6.0.4b2.html</sparkle:releaseNotesLink>
+            <enclosure url="https://files.lunar.fyi/releases/Lunar-6.0.4b2.dmg" length="22055175" type="application/octet-stream" sparkle:edSignature="yJV8ZyDE0+4ehk2WzioeCa9EQpBaIQ/NGoxXmhnHq4dnzh8JxEPjL+FfsWDLanRnC27WIGhPidNP0P8xWg6IBQ=="/>
+            <sparkle:deltas>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar6.0.4b2-6.0.4b1.delta" sparkle:deltaFrom="6.0.4b1" length="6769258" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="1842416" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,en" sparkle:edSignature="QyWbpdMvyDi7zbR4z5Fx2W/Kk604dqx9Z/Kp9L68tbr5EB0l3Rvs5Br9JoFPJRJtRO/Dh+aOczYgOC91nQ/1Ag=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar6.0.4b2-6.0.3.delta" sparkle:deltaFrom="6.0.3" length="6850114" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="1842416" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,en" sparkle:edSignature="8GvsmBcEGyDa+S1olRcQHBCbz4Wu/WCqLaIV0hYJdJNLmj+BmVJdOjZerx3ujjrk8UGQR4g3ctesWEgaARqHCQ=="/>
+            </sparkle:deltas>
+        </item>
+        <item>
             <title>6.0.4b1</title>
             <pubDate>Wed, 29 Mar 2023 22:51:43 +0300</pubDate>
             <link>https://lunar.fyi/</link>

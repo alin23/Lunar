@@ -156,6 +156,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .nonManualMode,
     .curveMode,
     .clockMode,
+    .fullyAutomatedClockMode,
     .syncMode,
     .overrideAdaptiveMode,
     .refreshValues,
@@ -806,6 +807,7 @@ func initCache() {
     cacheKey(.nonManualMode)
     cacheKey(.curveMode)
     cacheKey(.clockMode)
+    cacheKey(.fullyAutomatedClockMode)
     cacheKey(.syncMode)
     cacheKey(.overrideAdaptiveMode)
     cacheKey(.reapplyValuesAfterWake)
@@ -959,3 +961,4 @@ let ddcSleepFactorPublisher = pub(.ddcSleepFactor)
 let updateChannelPublisher = pub(.updateChannel)
 let sensorHostnamePublisher = pub(.sensorHostname)
 let scheduleTransitionPublisher = pub(.scheduleTransition)
+let fullyAutomatedClockModePublisher = pub(.fullyAutomatedClockMode)

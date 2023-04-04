@@ -1142,7 +1142,7 @@ struct AdvancedSettingsView: View {
                     )
                     if Sysctl.isMacBook {
                         SettingsToggle(
-                            text: "Trigger Sleep when the lid is closed", setting: $sleepInClamshellMode,
+                            text: "Force Sleep when the lid is closed", setting: $sleepInClamshellMode,
                             help: """
                             When the MacBook is connected to a monitor that's also charging the Mac,
                             closing the lid will start Clamshell Mode.
