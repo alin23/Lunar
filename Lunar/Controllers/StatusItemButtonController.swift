@@ -150,6 +150,11 @@ final class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObje
     }
 
     override func mouseDown(with event: NSEvent) {
+        guard event.modifierFlags.intersection([.control, .command, .shift, .option]) != [.control] else {
+            guard let button = statusButton else { return }
+            appDelegate!.menu.popUp(positioning: nil, at: NSPoint(x: 0, y: button.frame.height + 8), in: button)
+            return
+        }
         toggleMenuBar()
         super.mouseDown(with: event)
     }

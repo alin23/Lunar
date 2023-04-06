@@ -3,6 +3,23 @@
     <channel>
         <title>Lunar</title>
         <item>
+            <title>6.0.4b4</title>
+            <pubDate>Thu, 06 Apr 2023 17:31:02 +0300</pubDate>
+            <link>https://lunar.fyi/</link>
+            <sparkle:fullReleaseNotesLink>https://lunar.fyi/changelog</sparkle:fullReleaseNotesLink>
+            <sparkle:channel>beta</sparkle:channel>
+            <sparkle:minimumAutoupdateVersion>6.0.0</sparkle:minimumAutoupdateVersion>
+            <sparkle:version>6.0.4b4</sparkle:version>
+            <sparkle:shortVersionString>6.0.4b4</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-6.0.4b4.html</sparkle:releaseNotesLink>
+            <enclosure url="https://files.lunar.fyi/releases/Lunar-6.0.4b4.dmg" length="22061539" type="application/octet-stream" sparkle:edSignature="ulrtRdiZ7cG9/zgKWJBeQBfmpvlB2ZlC7KWIQg0KjOAF9Oh4CQp6HkkPsmd4CM86b8dsi2I4vKC/gSgpNn62AQ=="/>
+            <sparkle:deltas>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar6.0.4b4-6.0.4b3.delta" sparkle:deltaFrom="6.0.4b3" length="2191042" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="1842416" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,en" sparkle:edSignature="CwEgxTezzPF7n1m0k+YLMWSt6Qf4fsm5Jy68yOI5lLY9nFDcjNx0CbNvytAVxKzjft2YmkiZFXBXO/+kyqL2BA=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar6.0.4b4-6.0.4b2.delta" sparkle:deltaFrom="6.0.4b2" length="2223354" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="1842416" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,en" sparkle:edSignature="fJL2Nn2ik+IJWf/scN7x/S2qwZqf4WUZPDX5ey0WOyjFolYYQd6ttpOjWsnZImN0x74+2YyKoHy2U91jqkGYBQ=="/>
+            </sparkle:deltas>
+        </item>
+        <item>
             <title>6.0.4b3</title>
             <pubDate>Tue, 04 Apr 2023 19:02:39 +0300</pubDate>
             <link>https://lunar.fyi/</link>

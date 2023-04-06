@@ -1802,8 +1802,8 @@ struct QuickActionsMenuView: View {
                 action: { showOptionsMenu.toggle() },
                 label: {
                     HStack(spacing: 2) {
-                        Image(systemName: "line.horizontal.3.decrease.circle.fill").font(.system(size: 12, weight: .semibold))
-                        Text("Options").font(.system(size: 13, weight: .semibold))
+                        Image(systemName: "gear.circle.fill").font(.system(size: 12, weight: .semibold))
+                        Text("Settings").font(.system(size: 13, weight: .semibold))
                     }
                 }
             )
@@ -1886,7 +1886,7 @@ struct QuickActionsMenuView: View {
                                 .scaledToFit()
                         }
 
-                        SwiftUI.Button("Preferences") { appDelegate!.showPreferencesWindow(sender: nil) }
+                        SwiftUI.Button("Display Settings") { appDelegate!.showPreferencesWindow(sender: nil) }
                             .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
                             .font(.system(size: 12, weight: .medium, design: .rounded))
                             .fixedSize()
