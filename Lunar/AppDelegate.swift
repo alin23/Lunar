@@ -1439,6 +1439,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 case NSWorkspace.screensDidSleepNotification:
                     DC.screensSleeping = true
                     DC.resetDisplayListTask?.cancel()
+                    DC.activeDisplayList.forEach { display in
+                        display.resetScheduledTransition()
+                    }
+                    ClockMode.specific.readaptTask = nil
+
                     log.info("SESSION: Screen sleep warmup")
                 default:
                     break
