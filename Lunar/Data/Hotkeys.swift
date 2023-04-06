@@ -1313,15 +1313,33 @@ extension AppDelegate: MediaKeyTapDelegate {
 
         switch mediaKey {
         case .volumeUp:
+            if Defaults[.volumeKeysControlAllMonitors] {
+                let displays = DC.activeDisplayList.filter(\.supportsVolumeControl)
+                guard !displays.isEmpty else { return event }
+
+                increaseVolume(by: flags.isSuperset(of: [.option, .shift]) ? 1 : nil, for: displays, currentAudioDisplay: false)
+
+                let mutedDisplays = displays.filter(\.audioMuted)
+                if !mutedDisplays.isEmpty {
+                    toggleAudioMuted(for: mutedDisplays, currentAudioDisplay: false)
+                }
+
+                displays.forEach { display in
+                    Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, display: display)
+                }
+
+                if (Defaults[.beepFeedback] && !flags.contains(.shift)) || (!Defaults[.beepFeedback] && flags.contains(.shift)) {
+                    playVolumeChangedSound()
+                }
+
+                return nil
+            }
+
             guard let display = DC.currentAudioDisplay, display.supportsVolumeControl else {
                 return event
             }
 
-            if flags.isSuperset(of: [.option, .shift]) {
-                increaseVolume(by: 1)
-            } else {
-                increaseVolume()
-            }
+            increaseVolume(by: flags.isSuperset(of: [.option, .shift]) ? 1 : nil)
             if display.audioMuted {
                 toggleAudioMuted()
             }
@@ -1332,15 +1350,33 @@ extension AppDelegate: MediaKeyTapDelegate {
                 playVolumeChangedSound()
             }
         case .volumeDown:
+            if Defaults[.volumeKeysControlAllMonitors] {
+                let displays = DC.activeDisplayList.filter(\.supportsVolumeControl)
+                guard !displays.isEmpty else { return event }
+
+                decreaseVolume(by: flags.isSuperset(of: [.option, .shift]) ? 1 : nil, for: displays, currentAudioDisplay: false)
+
+                let mutedDisplays = displays.filter(\.audioMuted)
+                if !mutedDisplays.isEmpty {
+                    toggleAudioMuted(for: mutedDisplays, currentAudioDisplay: false)
+                }
+
+                displays.forEach { display in
+                    Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, display: display)
+                }
+
+                if (Defaults[.beepFeedback] && !flags.contains(.shift)) || (!Defaults[.beepFeedback] && flags.contains(.shift)) {
+                    playVolumeChangedSound()
+                }
+
+                return nil
+            }
+
             guard let display = DC.currentAudioDisplay, display.supportsVolumeControl else {
                 return event
             }
 
-            if flags.isSuperset(of: [.option, .shift]) {
-                decreaseVolume(by: 1)
-            } else {
-                decreaseVolume()
-            }
+            decreaseVolume(by: flags.isSuperset(of: [.option, .shift]) ? 1 : nil)
             if display.audioMuted {
                 toggleAudioMuted()
             }
@@ -1351,6 +1387,23 @@ extension AppDelegate: MediaKeyTapDelegate {
                 playVolumeChangedSound()
             }
         case .mute:
+            if Defaults[.volumeKeysControlAllMonitors] {
+                let displays = DC.activeDisplayList.filter(\.supportsVolumeControl)
+                guard !displays.isEmpty else { return event }
+
+                toggleAudioMuted(for: displays, currentAudioDisplay: false)
+
+                displays.forEach { display in
+                    Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, display: display)
+                }
+
+                if (Defaults[.beepFeedback] && !flags.contains(.shift)) || (!Defaults[.beepFeedback] && flags.contains(.shift)) {
+                    playVolumeChangedSound()
+                }
+
+                return nil
+            }
+
             guard let display = DC.currentAudioDisplay, display.supportsVolumeControl else {
                 return event
             }

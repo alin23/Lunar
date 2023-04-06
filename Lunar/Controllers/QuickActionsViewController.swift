@@ -1819,27 +1819,27 @@ struct QuickActionsMenuView: View {
                 if old { mainAsyncAfter(ms: 500) { showOptionsMenu = true }}
             }
 
-            SwiftUI.Button(
-                action: {
-                    guard let view = menuWindow?.contentViewController?.view else { return }
-                    appDelegate!.menu.popUp(
-                        positioning: nil,
-                        at: NSPoint(
-                            x: env
-                                .menuWidth +
-                                (showOptionsMenu ? MENU_HORIZONTAL_PADDING * 2 : OPTIONS_MENU_WIDTH / 2 + MENU_HORIZONTAL_PADDING / 2),
-                            y: 0
-                        ),
-                        in: view
-                    )
-                },
-                label: {
-                    HStack(spacing: 2) {
-                        Image(systemName: "ellipsis.circle.fill").font(.system(size: 12, weight: .semibold))
-                        Text("Menu").font(.system(size: 13, weight: .semibold))
-                    }
-                }
-            ).buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+//            SwiftUI.Button(
+//                action: {
+//                    guard let view = menuWindow?.contentViewController?.view else { return }
+//                    appDelegate!.menu.popUp(
+//                        positioning: nil,
+//                        at: NSPoint(
+//                            x: env
+//                                .menuWidth +
+//                                (showOptionsMenu ? MENU_HORIZONTAL_PADDING * 2 : OPTIONS_MENU_WIDTH / 2 + MENU_HORIZONTAL_PADDING / 2),
+//                            y: 0
+//                        ),
+//                        in: view
+//                    )
+//                },
+//                label: {
+//                    HStack(spacing: 2) {
+//                        Image(systemName: "ellipsis.circle.fill").font(.system(size: 12, weight: .semibold))
+//                        Text("Menu").font(.system(size: 13, weight: .semibold))
+//                    }
+//                }
+//            ).buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
         }
     }
 

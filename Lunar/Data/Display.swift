@@ -1518,7 +1518,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Atomic var isNative = false
 
     lazy var isMacBook: Bool = isBuiltin && Sysctl.isMacBook
-
     lazy var usesDDCBrightnessControl: Bool = control is DDCControl || control is NetworkControl
 
     @Published @objc dynamic var keepDisconnected = false
