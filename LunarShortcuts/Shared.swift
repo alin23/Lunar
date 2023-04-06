@@ -169,7 +169,7 @@ extension Defaults.Keys {
     static let enableOrientationHotkeys = Key<Bool>("enableOrientationHotkeys", default: false)
     static let detectKeyHold = Key<Bool>("detectKeyHold", default: true)
     static let volumeKeysEnabled = Key<Bool>("volumeKeysEnabled", default: true)
-    static let mediaKeysControlAllMonitors = Key<Bool>("mediaKeysControlAllMonitors", default: false)
+    static let volumeKeysControlAllMonitors = Key<Bool>("volumeKeysControlAllMonitors", default: false)
     static let brightnessHotkeysControlAllMonitors = Key<Bool>("brightnessHotkeysControlAllMonitors", default: false)
     static let contrastHotkeysControlAllMonitors = Key<Bool>("contrastHotkeysControlAllMonitors", default: false)
     static let volumeHotkeysControlAllMonitors = Key<Bool>("volumeHotkeysControlAllMonitors", default: false)
@@ -209,6 +209,7 @@ extension Defaults.Keys {
     static let sensorPollingSeconds = Key<Int>("sensorPollingSeconds", default: 1)
     static let adaptiveBrightnessMode = Key<AdaptiveModeKey>("adaptiveBrightnessMode", default: .sync)
 
+    static let hasBuiltin = Key<Bool>("hasBuiltin", default: Sysctl.isMacBook || Sysctl.isiMac)
     static let nonManualMode = Key<Bool>("nonManualMode", default: true)
     static let curveMode = Key<Bool>("curveMode", default: true)
     static let clockMode = Key<Bool>("clockMode", default: false)

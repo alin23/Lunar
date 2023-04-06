@@ -3930,7 +3930,7 @@ enabled</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3e4-2T-uSq">
-                                            <rect key="frame" x="13" y="360" width="78" height="19"/>
+                                            <rect key="frame" x="13" y="315" width="78" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="in Sync Mode" id="jT7-rI-1rC">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -3938,28 +3938,44 @@ enabled</string>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Uhe-Ho-lYU">
-                                            <rect key="frame" x="0.0" y="427" width="245" height="51"/>
+                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" alphaValue="0.69999999999999996" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Uhe-Ho-lYU">
+                                            <rect key="frame" x="-2" y="487" width="245" height="35"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Disable to free up F14/F15 keys. Might not work on all keyboards" id="kPG-QJ-rNC">
+                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Disable to free up F14/F15 keys Might not work on all keyboards" id="kPG-QJ-rNC">
                                                 <font key="font" size="11" name="Menlo-Regular"/>
                                                 <color key="textColor" red="1" green="0.96670034069999999" blue="0.90229060370000003" alpha="0.69823572020000002" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
                                             </textFieldCell>
+                                            <connections>
+                                                <binding destination="v8h-S8-Qqg" name="hidden" keyPath="values.brightnessKeysEnabled" id="eSA-Z9-ILf">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
                                         </textField>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qeo-Sh-Lb8">
                                             <rect key="frame" x="0.0" y="547" width="300" height="20"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <buttonCell key="cell" type="check" title="Listen for brightness keys" bezelStyle="regularSquare" imagePosition="trailing" alignment="left" state="on" inset="2" id="3rc-5l-2Pq">
+                                            <buttonCell key="cell" type="bevel" title="Listen for brightness keys" bezelStyle="regularSquare" imagePosition="trailing" alignment="left" state="on" inset="2" id="3rc-5l-2Pq">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" size="14" name="Menlo-Bold"/>
+                                                <imageReference key="image" image="sun.max.circle" catalog="system" symbolScale="default" renderingMode="hierarchical-single">
+                                                    <hierarchicalColors>
+                                                        <color red="0.87843137979999997" green="0.87843137979999997" blue="0.87843137979999997" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                                        <color name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                        <color name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                    </hierarchicalColors>
+                                                </imageReference>
+                                                <imageReference key="alternateImage" image="sun.max.circle.fill" catalog="system" symbolScale="default" renderingMode="original"/>
                                             </buttonCell>
+                                            <color key="contentTintColor" red="0.91764706370000004" green="0.91764706370000004" blue="0.91764706370000004" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                             <connections>
                                                 <binding destination="upY-F0-APc" name="value" keyPath="values.brightnessKeysEnabled" id="y1P-e0-mdp"/>
                                             </connections>
                                         </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="H7D-Tn-d6X">
-                                            <rect key="frame" x="0.0" y="573" width="305" height="37"/>
+                                            <rect key="frame" x="0.0" y="593" width="305" height="27"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="left" title="Media Keys" id="KWP-bv-hne">
                                                 <font key="font" metaFont="systemBlack" size="23"/>
@@ -3968,7 +3984,7 @@ enabled</string>
                                             </textFieldCell>
                                         </textField>
                                         <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="RZN-qo-Knd" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="115" y="334" width="73" height="12"/>
+                                            <rect key="frame" x="115" y="289" width="73" height="12"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="inline" title="All displays" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="62m-O0-ejM" id="Wj4-48-ddQ" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -4014,7 +4030,7 @@ enabled</string>
                                             </connections>
                                         </popUpButton>
                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IFX-Lv-Too">
-                                            <rect key="frame" x="0.0" y="386" width="303" height="25"/>
+                                            <rect key="frame" x="0.0" y="341" width="303" height="25"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Brightness keys adjust" id="Hen-8a-cpa">
                                                 <font key="font" size="15" name="Menlo-Bold"/>
@@ -4023,7 +4039,7 @@ enabled</string>
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9SN-bX-ipB">
-                                            <rect key="frame" x="5" y="333" width="86" height="19"/>
+                                            <rect key="frame" x="5" y="288" width="86" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="in other modes" id="Anu-4Q-8pe">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4032,7 +4048,7 @@ enabled</string>
                                             </textFieldCell>
                                         </textField>
                                         <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ske-w4-cem" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="115" y="362" width="73" height="12"/>
+                                            <rect key="frame" x="115" y="317" width="73" height="12"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="inline" title="All displays" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="GrK-so-l5A" id="fgz-OR-aj6" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -4084,7 +4100,7 @@ enabled</string>
                                             </connections>
                                         </popUpButton>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="64T-5y-0v5">
-                                            <rect key="frame" x="13" y="265" width="78" height="19"/>
+                                            <rect key="frame" x="13" y="220" width="78" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="in Sync Mode" id="nMr-wY-hZu">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4093,7 +4109,7 @@ enabled</string>
                                             </textFieldCell>
                                         </textField>
                                         <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="L5R-Jf-CYq" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="115" y="239" width="73" height="12"/>
+                                            <rect key="frame" x="115" y="194" width="73" height="12"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="inline" title="All displays" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="CRe-nn-c6r" id="pxu-I3-TJW" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -4139,7 +4155,7 @@ enabled</string>
                                             </connections>
                                         </popUpButton>
                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iiF-bT-vMa">
-                                            <rect key="frame" x="0.0" y="291" width="303" height="25"/>
+                                            <rect key="frame" x="0.0" y="246" width="303" height="25"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Ctrl+Brightness keys adjust" id="bu9-l5-Uan">
                                                 <font key="font" size="15" name="Menlo-Bold"/>
@@ -4148,7 +4164,7 @@ enabled</string>
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FhM-JW-maE">
-                                            <rect key="frame" x="5" y="238" width="86" height="19"/>
+                                            <rect key="frame" x="5" y="193" width="86" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="in other modes" id="Edw-yU-lJa">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4157,7 +4173,7 @@ enabled</string>
                                             </textFieldCell>
                                         </textField>
                                         <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xvH-4n-Tdb" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="115" y="267" width="73" height="12"/>
+                                            <rect key="frame" x="115" y="222" width="73" height="12"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="inline" title="All displays" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="K6k-uA-bhA" id="gYb-Qy-LM6" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -4209,7 +4225,7 @@ enabled</string>
                                             </connections>
                                         </popUpButton>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Wc5-nt-nOZ">
-                                            <rect key="frame" x="11" y="170" width="78" height="19"/>
+                                            <rect key="frame" x="11" y="125" width="78" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="in Sync Mode" id="k0I-L6-w90">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4218,7 +4234,7 @@ enabled</string>
                                             </textFieldCell>
                                         </textField>
                                         <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="whW-nP-Sm4" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="113" y="144" width="73" height="12"/>
+                                            <rect key="frame" x="113" y="99" width="73" height="12"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="inline" title="All displays" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="fRv-Fr-fuC" id="qg7-MK-IF7" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -4264,7 +4280,7 @@ enabled</string>
                                             </connections>
                                         </popUpButton>
                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ebb-yB-Fsv">
-                                            <rect key="frame" x="-2" y="196" width="303" height="25"/>
+                                            <rect key="frame" x="-2" y="151" width="303" height="25"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Shift+Brightness keys adjust" id="L8p-e6-fZh">
                                                 <font key="font" size="15" name="Menlo-Bold"/>
@@ -4273,7 +4289,7 @@ enabled</string>
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Y8U-UN-0gm">
-                                            <rect key="frame" x="3" y="143" width="86" height="19"/>
+                                            <rect key="frame" x="3" y="98" width="86" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="in other modes" id="Oja-ib-XhU">
                                                 <font key="font" metaFont="systemSemibold" size="11"/>
@@ -4282,7 +4298,7 @@ enabled</string>
                                             </textFieldCell>
                                         </textField>
                                         <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sQt-gS-ue8" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="113" y="172" width="73" height="12"/>
+                                            <rect key="frame" x="113" y="127" width="73" height="12"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="inline" title="All displays" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="fyN-kS-fMs" id="xeS-zp-kJh" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -4334,38 +4350,195 @@ enabled</string>
                                             </connections>
                                         </popUpButton>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UXx-CB-NSj">
-                                            <rect key="frame" x="0.0" y="514" width="300" height="20"/>
+                                            <rect key="frame" x="0.0" y="459" width="300" height="20"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <buttonCell key="cell" type="check" title="Listen for volume keys" bezelStyle="regularSquare" imagePosition="right" alignment="left" state="on" inset="2" id="uTy-73-2cK">
+                                            <buttonCell key="cell" type="bevel" title="Listen for volume keys" bezelStyle="regularSquare" imagePosition="right" alignment="left" state="on" inset="2" id="uTy-73-2cK">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" size="14" name="Menlo-Bold"/>
+                                                <imageReference key="image" image="speaker.slash.circle" catalog="system" symbolScale="default" renderingMode="hierarchical-single">
+                                                    <hierarchicalColors>
+                                                        <color red="0.87843137979999997" green="0.87843137979999997" blue="0.87843137979999997" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                                        <color name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                        <color name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                    </hierarchicalColors>
+                                                </imageReference>
+                                                <imageReference key="alternateImage" image="speaker.circle.fill" catalog="system" symbolScale="default" renderingMode="original"/>
                                             </buttonCell>
+                                            <color key="contentTintColor" red="0.91764706370000004" green="0.91764706370000004" blue="0.91764706370000004" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                             <connections>
                                                 <binding destination="upY-F0-APc" name="value" keyPath="values.volumeKeysEnabled" id="bIb-nm-rY0"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ese-6H-Ch6">
-                                            <rect key="frame" x="0.0" y="481" width="300" height="20"/>
+                                            <rect key="frame" x="0.0" y="524" width="300" height="20"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <buttonCell key="cell" type="check" title="F14/F15 as brightness keys" bezelStyle="regularSquare" imagePosition="right" alignment="left" state="on" inset="2" id="MFI-Wk-4bg">
+                                            <buttonCell key="cell" type="bevel" title="F14/F15 as brightness keys" bezelStyle="regularSquare" imagePosition="right" alignment="left" state="on" inset="2" id="MFI-Wk-4bg">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" size="14" name="Menlo-Bold"/>
+                                                <imageReference key="image" image="circle" catalog="system" symbolScale="default" renderingMode="hierarchical-single">
+                                                    <hierarchicalColors>
+                                                        <color red="0.91764706370000004" green="0.91764706370000004" blue="0.91764706370000004" alpha="0.39533319536423839" colorSpace="custom" customColorSpace="displayP3"/>
+                                                        <color name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                        <color name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                    </hierarchicalColors>
+                                                </imageReference>
+                                                <imageReference key="alternateImage" image="checkmark.circle.fill" catalog="system" symbolScale="default" renderingMode="original"/>
                                             </buttonCell>
+                                            <color key="contentTintColor" red="0.91549464020000004" green="0.91549464020000004" blue="0.91549464020000004" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                             <connections>
+                                                <binding destination="upY-F0-APc" name="hidden" keyPath="values.brightnessKeysEnabled" id="u7g-Gp-f5H">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                    </dictionary>
+                                                </binding>
                                                 <binding destination="upY-F0-APc" name="value" keyPath="values.useAlternateBrightnessKeys" id="UcE-vx-PVW"/>
+                                            </connections>
+                                        </button>
+                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ONe-xp-8aG">
+                                            <rect key="frame" x="0.0" y="579" width="245" height="13"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Native 🔆/🔊 keys" id="OmG-Lm-cvo">
+                                                <font key="font" size="11" name="Menlo-Regular"/>
+                                                <color key="textColor" red="1" green="0.96670034069999999" blue="0.90229060370000003" alpha="0.69823572020000002" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" alphaValue="0.69999999999999996" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="R9l-hD-eDE">
+                                            <rect key="frame" x="-2" y="399" width="245" height="35"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="Ebe-yM-dsz">
+                                                <font key="font" size="11" name="Menlo-Regular"/>
+                                                <string key="title">Useful when audio outputs can't
+be matched to the correct monitor</string>
+                                                <color key="textColor" red="1" green="0.96670034069999999" blue="0.90229060370000003" alpha="0.69823572020000002" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <binding destination="v8h-S8-Qqg" name="hidden" keyPath="values.volumeKeysEnabled" id="by5-PJ-2pU">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </textField>
+                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ewV-Qp-k6g">
+                                            <rect key="frame" x="0.0" y="436" width="300" height="20"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <buttonCell key="cell" type="bevel" title="Send volume to all monitors" bezelStyle="regularSquare" imagePosition="right" alignment="left" state="on" inset="2" id="di7-qT-w3f">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" size="14" name="Menlo-Bold"/>
+                                                <imageReference key="image" image="circle" catalog="system" symbolScale="default" renderingMode="hierarchical-single">
+                                                    <hierarchicalColors>
+                                                        <color red="0.91764706370000004" green="0.91764706370000004" blue="0.91764706370000004" alpha="0.40218853476821192" colorSpace="custom" customColorSpace="displayP3"/>
+                                                        <color name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                        <color name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                    </hierarchicalColors>
+                                                </imageReference>
+                                                <imageReference key="alternateImage" image="checkmark.circle.fill" catalog="system" symbolScale="default" renderingMode="original"/>
+                                            </buttonCell>
+                                            <color key="contentTintColor" red="0.91549464023061233" green="0.91549464023061233" blue="0.91549464023061233" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                            <connections>
+                                                <binding destination="upY-F0-APc" name="hidden" keyPath="values.volumeKeysEnabled" id="RkB-2c-LxR">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                    </dictionary>
+                                                </binding>
+                                                <binding destination="upY-F0-APc" name="value" keyPath="values.volumeKeysControlAllMonitors" id="alJ-TQ-aWE"/>
+                                            </connections>
+                                        </button>
+                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" alphaValue="0.20000000000000001" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yRF-js-eI9">
+                                            <rect key="frame" x="-2" y="487" width="245" height="35"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" enabled="NO" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" alignment="left" title="Disable to free up F14/F15 keys Might not work on all keyboards" id="oy5-Ho-epZ">
+                                                <font key="font" size="11" name="Menlo-Regular"/>
+                                                <color key="textColor" red="1" green="0.96670034069999999" blue="0.90229060370000003" alpha="0.69823572020000002" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <binding destination="v8h-S8-Qqg" name="hidden" keyPath="values.brightnessKeysEnabled" id="gGs-DJ-Apd"/>
+                                            </connections>
+                                        </textField>
+                                        <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="NgN-bb-fFE">
+                                            <rect key="frame" x="0.0" y="524" width="300" height="20"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <buttonCell key="cell" type="bevel" title="F14/F15 as brightness keys" bezelStyle="regularSquare" imagePosition="right" alignment="left" enabled="NO" refusesFirstResponder="YES" state="on" inset="2" id="qaN-uX-Dlt">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" size="14" name="Menlo-Bold"/>
+                                                <imageReference key="image" image="circle" catalog="system" symbolScale="default" renderingMode="hierarchical-single">
+                                                    <hierarchicalColors>
+                                                        <color red="0.91764706370000004" green="0.91764706370000004" blue="0.91764706370000004" alpha="0.39533319536423839" colorSpace="custom" customColorSpace="displayP3"/>
+                                                        <color name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                        <color name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                    </hierarchicalColors>
+                                                </imageReference>
+                                                <imageReference key="alternateImage" image="checkmark.circle.fill" catalog="system" symbolScale="default" renderingMode="hierarchical-single">
+                                                    <hierarchicalColors>
+                                                        <color red="0.91764706370000004" green="0.91764706370000004" blue="0.91764706370000004" alpha="0.3953331954" colorSpace="custom" customColorSpace="displayP3"/>
+                                                        <color name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                        <color name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                    </hierarchicalColors>
+                                                </imageReference>
+                                            </buttonCell>
+                                            <color key="contentTintColor" red="0.91549464020000004" green="0.91549464020000004" blue="0.91549464020000004" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                            <connections>
+                                                <binding destination="upY-F0-APc" name="enabled" keyPath="values.brightnessKeysEnabled" id="L12-OT-FEr"/>
+                                                <binding destination="upY-F0-APc" name="hidden" keyPath="values.brightnessKeysEnabled" previousBinding="L12-OT-FEr" id="jDY-2E-3WT"/>
+                                                <binding destination="upY-F0-APc" name="value" keyPath="values.useAlternateBrightnessKeys" id="rc7-1O-Y83"/>
+                                            </connections>
+                                        </button>
+                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" alphaValue="0.20000000000000001" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MYi-hF-0D9">
+                                            <rect key="frame" x="-2" y="399" width="245" height="35"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" enabled="NO" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" alignment="left" id="NH9-rS-BJT">
+                                                <font key="font" size="11" name="Menlo-Regular"/>
+                                                <string key="title">Useful when audio outputs can't
+be matched to the correct monitor</string>
+                                                <color key="textColor" red="1" green="0.96670034069999999" blue="0.90229060370000003" alpha="0.69823572020000002" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <binding destination="v8h-S8-Qqg" name="hidden" keyPath="values.volumeKeysEnabled" id="E1G-VS-4pb"/>
+                                            </connections>
+                                        </textField>
+                                        <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="LHN-C6-YU7">
+                                            <rect key="frame" x="0.0" y="436" width="300" height="20"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <buttonCell key="cell" type="bevel" title="Send volume to all monitors" bezelStyle="regularSquare" imagePosition="right" alignment="left" enabled="NO" refusesFirstResponder="YES" state="on" inset="2" id="dwP-j4-CgZ">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" size="14" name="Menlo-Bold"/>
+                                                <imageReference key="image" image="circle" catalog="system" symbolScale="default" renderingMode="hierarchical-single">
+                                                    <hierarchicalColors>
+                                                        <color red="0.91764706370000004" green="0.91764706370000004" blue="0.91764706370000004" alpha="0.40218853476821192" colorSpace="custom" customColorSpace="displayP3"/>
+                                                        <color name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                        <color name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                    </hierarchicalColors>
+                                                </imageReference>
+                                                <imageReference key="alternateImage" image="checkmark.circle.fill" catalog="system" symbolScale="default" renderingMode="hierarchical-single">
+                                                    <hierarchicalColors>
+                                                        <color red="0.91764706370000004" green="0.91764706370000004" blue="0.91764706370000004" alpha="0.3953331954" colorSpace="custom" customColorSpace="displayP3"/>
+                                                        <color name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                        <color name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                    </hierarchicalColors>
+                                                </imageReference>
+                                            </buttonCell>
+                                            <color key="contentTintColor" red="0.91549464020000004" green="0.91549464020000004" blue="0.91549464020000004" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                            <connections>
+                                                <binding destination="upY-F0-APc" name="enabled" keyPath="values.volumeKeysEnabled" id="aCn-VM-1lE"/>
+                                                <binding destination="upY-F0-APc" name="hidden" keyPath="values.volumeKeysEnabled" previousBinding="aCn-VM-1lE" id="dVq-16-V3F"/>
+                                                <binding destination="upY-F0-APc" name="value" keyPath="values.volumeKeysControlAllMonitors" id="mfo-IJ-U1l"/>
                                             </connections>
                                         </button>
                                     </subviews>
                                 </view>
                             </box>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5cZ-MH-JKf">
-                                <rect key="frame" x="22" y="65" width="280" height="42"/>
+                                <rect key="frame" x="22" y="39" width="309" height="56"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" selectable="YES" id="aWn-9O-e5g">
-                                    <font key="font" metaFont="systemSemibold" size="11"/>
+                                    <font key="font" size="11" name="Menlo-Regular"/>
                                     <string key="title">Adjusting contrast:
-    • Simple:  Ctrl-Shift Brightness Up/Down
-    • Precise: Ctrl-Shift-Option Brightness Up/Down</string>
+ • Large Step: Control Shift 􀆫/􀆭
+ • Small Step: Control Shift Option 􀆫/􀆭</string>
                                     <color key="textColor" red="1" green="0.96670034069999999" blue="0.90229060370000003" alpha="0.69823572020000002" colorSpace="custom" customColorSpace="sRGB"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
@@ -4765,7 +4938,7 @@ enabled</string>
                                 <font key="titleFont" metaFont="systemHeavy" size="14"/>
                             </box>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="98o-iY-Wj8">
-                                <rect key="frame" x="342" y="597" width="217" height="37"/>
+                                <rect key="frame" x="342" y="614" width="217" height="27"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="left" title="Function Keys" id="6SS-1x-zE1">
                                     <font key="font" metaFont="systemBlack" size="23"/>
@@ -4773,8 +4946,17 @@ enabled</string>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qmj-PN-0gW">
+                                <rect key="frame" x="342" y="600" width="245" height="13"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="For keyboards without Media Keys" id="mL9-bY-Pba">
+                                    <font key="font" size="11" name="Menlo-Regular"/>
+                                    <color key="textColor" red="1" green="0.96670034069999999" blue="0.90229060370000003" alpha="0.69823572020000002" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
+                                </textFieldCell>
+                            </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eVc-uT-kBC" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="839" y="608" width="90" height="14"/>
+                                <rect key="frame" x="839" y="618" width="90" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Disable all" alternateTitle="Extended" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="dBn-v8-dYQ">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -4785,29 +4967,27 @@ enabled</string>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="pdQ-qM-FvR">
-                                <rect key="frame" x="645" y="585" width="268" height="20"/>
+                                <rect key="frame" x="645" y="580" width="268" height="20"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" title="Allow hotkeys to affect built-in display" bezelStyle="regularSquare" imagePosition="leading" alignment="left" state="on" inset="2" id="0iP-7b-qXQ">
+                                <buttonCell key="cell" type="check" title="Disable hotkeys on built-in screen" bezelStyle="regularSquare" imagePosition="leading" alignment="left" state="on" inset="2" id="0iP-7b-qXQ">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="systemSemibold" size="13"/>
                                 </buttonCell>
                                 <connections>
-                                    <binding destination="upY-F0-APc" name="value" keyPath="values.hotkeysAffectBuiltin" id="sQh-PB-JO0"/>
-                                </connections>
-                            </button>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="HaY-Cu-Ev7">
-                                <rect key="frame" x="342" y="585" width="268" height="20"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" title="Detect press-and-hold events" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="sB3-PN-qqa">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="systemSemibold" size="13"/>
-                                </buttonCell>
-                                <connections>
-                                    <binding destination="upY-F0-APc" name="value" keyPath="values.detectKeyHold" id="WHC-cv-KQX"/>
+                                    <binding destination="v8h-S8-Qqg" name="hidden" keyPath="values.hasBuiltin" id="MRM-wV-7gh">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="upY-F0-APc" name="value" keyPath="values.hotkeysAffectBuiltin" id="g9I-J7-qJ4">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LsA-6Y-wu2" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="765" y="608" width="66" height="14"/>
+                                <rect key="frame" x="765" y="618" width="66" height="14"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <buttonCell key="cell" type="inline" title="Reset" alternateTitle="Extended" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="xya-5q-Etj">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -4850,6 +5030,7 @@ enabled</string>
                 <customObject id="r0V-Yr-EMT" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController id="upY-F0-APc"/>
                 <userDefaultsController id="sqj-Qq-bef"/>
+                <userDefaultsController id="v8h-S8-Qqg"/>
             </objects>
             <point key="canvasLocation" x="-1933" y="2861"/>
         </scene>
@@ -9942,6 +10123,8 @@ settings for this monitor.</string>
         <image name="arrowtriangle.left.circle.fill" catalog="system" width="15" height="15"/>
         <image name="automode" width="14" height="14"/>
         <image name="brightness" width="50.5" height="50.5"/>
+        <image name="checkmark.circle.fill" catalog="system" width="15" height="15"/>
+        <image name="circle" catalog="system" width="15" height="15"/>
         <image name="clockmode" width="14" height="14"/>
         <image name="colors" width="24" height="24"/>
         <image name="component" width="14" height="14"/>
@@ -9959,6 +10142,10 @@ settings for this monitor.</string>
         <image name="reset" width="24" height="24"/>
         <image name="sensormode" width="14" height="14"/>
         <image name="settings" width="24" height="24"/>
+        <image name="speaker.circle.fill" catalog="system" width="15" height="15"/>
+        <image name="speaker.slash.circle" catalog="system" width="15" height="15"/>
+        <image name="sun.max.circle" catalog="system" width="15" height="15"/>
+        <image name="sun.max.circle.fill" catalog="system" width="15" height="15"/>
         <image name="svideo" width="14" height="14"/>
         <image name="syncmode" width="14" height="14"/>
         <image name="tuner" width="14" height="14"/>

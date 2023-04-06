@@ -532,7 +532,8 @@ final class DisplayController: ObservableObject {
             _activeDisplaysLock.around {
                 _activeDisplays = newValue
                 CachedDefaults[.hasActiveDisplays] = !_activeDisplays.isEmpty
-                CachedDefaults[.hasActiveExternalDisplays] = !_activeDisplays.values.filter(\.isExternal).isEmpty
+                CachedDefaults[.hasActiveExternalDisplays] = _activeDisplays.values.contains(where: \.isExternal)
+                CachedDefaults[.hasBuiltin] = _activeDisplays.values.contains(where: \.isBuiltin)
                 onActiveDisplaysChange?()
                 newValue.values.forEach { d in
                     d.updateCornerWindow()

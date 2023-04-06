@@ -139,7 +139,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .hotkeys,
     .ignoredVolumes,
     .manualLocation,
-    .mediaKeysControlAllMonitors,
+    .volumeKeysControlAllMonitors,
     .brightnessHotkeysControlAllMonitors,
     .contrastHotkeysControlAllMonitors,
     .volumeHotkeysControlAllMonitors,
@@ -155,6 +155,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .sensorPathPrefix,
     .nonManualMode,
     .curveMode,
+    .hasBuiltin,
     .clockMode,
     .fullyAutomatedClockMode,
     .syncMode,
@@ -339,11 +340,10 @@ final class DataStore: NSObject {
 
     static func firstRunAfterHotkeysUpgrade() {
         thisIsFirstRunAfterHotkeysUpgrade = true
-        CachedDefaults[.brightnessKeysControl] = CachedDefaults[.mediaKeysControlAllMonitors] ? .all : .cursor
-        CachedDefaults[.ctrlBrightnessKeysSyncControl] = CachedDefaults[.mediaKeysControlAllMonitors] ? .external : .cursor
-        CachedDefaults[.ctrlBrightnessKeysControl] = CachedDefaults[.mediaKeysControlAllMonitors] ? .external : .cursor
+        CachedDefaults[.brightnessKeysControl] = UserDefaults.standard.bool(forKey: "mediaKeysControlAllMonitors") ? .all : .cursor
+        CachedDefaults[.ctrlBrightnessKeysSyncControl] = UserDefaults.standard.bool(forKey: "mediaKeysControlAllMonitors") ? .external : .cursor
+        CachedDefaults[.ctrlBrightnessKeysControl] = UserDefaults.standard.bool(forKey: "mediaKeysControlAllMonitors") ? .external : .cursor
         CachedDefaults[.brightnessTransition] = CachedDefaults[.smoothTransition] ? .smooth : .instant
-        CachedDefaults.reset(.mediaKeysControlAllMonitors)
     }
 
     static func firstRunAfterBuiltinUpgrade() {
@@ -768,7 +768,7 @@ func initCache() {
     cacheKey(.enableOrientationHotkeys)
     cacheKey(.detectKeyHold)
     cacheKey(.volumeKeysEnabled)
-    cacheKey(.mediaKeysControlAllMonitors)
+    cacheKey(.volumeKeysControlAllMonitors)
     cacheKey(.brightnessHotkeysControlAllMonitors)
     cacheKey(.contrastHotkeysControlAllMonitors)
     cacheKey(.volumeHotkeysControlAllMonitors)
@@ -805,6 +805,7 @@ func initCache() {
     cacheKey(.colorScheme)
     cacheKey(.nonManualMode)
     cacheKey(.curveMode)
+    cacheKey(.hasBuiltin)
     cacheKey(.clockMode)
     cacheKey(.fullyAutomatedClockMode)
     cacheKey(.syncMode)
