@@ -208,8 +208,8 @@ struct MenuDensityView: View {
                 Text("Click on")
                     .font(.system(size: 10, weight: .semibold, design: .rounded))
                 HStack(spacing: 2) {
-                    Image(systemName: "line.horizontal.3.decrease.circle.fill").font(.system(size: 10, weight: .semibold))
-                    Text("Options")
+                    Image(systemName: "gear.circle.fill").font(.system(size: 10, weight: .semibold))
+                    Text("Settings")
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
                 }
                 .padding(.horizontal, 4)

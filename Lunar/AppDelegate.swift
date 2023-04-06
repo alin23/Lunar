@@ -1264,11 +1264,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             #endif
 
             #if arch(arm64)
-                if #available(macOS 13, *), addedDisplay, let d = DC.displaysBySerial[Display.uuid(id: displayID)], !d.active, d.keepDisconnected {
-                    mainAsyncAfter(ms: 10) {
-                        DC.dis(displayID, display: d, force: true)
+                if #available(macOS 13, *) {
+                    if addedDisplay, let d = DC.displaysBySerial[Display.uuid(id: displayID)], !d.active, d.keepDisconnected {
+                        mainAsyncAfter(ms: 10) {
+                            DC.dis(displayID, display: d, force: true)
+                        }
+                        return
+                    } else {
+                        log.verbose("addedDisplay: \(addedDisplay)")
+                        if let d = DC.displaysBySerial[Display.uuid(id: displayID)] {
+                            log.verbose("storedDisplay: \(d)")
+                            log.verbose("storedDisplay.active: \(d.active)")
+                            log.verbose("storedDisplay.keepDisconnected: \(d.keepDisconnected)")
+                        } else {
+                            log.verbose("storedDisplay: \(Display.uuid(id: displayID))")
+                        }
                     }
-                    return
                 }
             #endif
 
