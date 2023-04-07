@@ -81,6 +81,7 @@ pack:
 appcast: export SPARKLE_BIN_DIR="$$PWD/Frameworks/Sparkle/bin/"
 appcast: VERSION=$(shell xcodebuild -scheme $(ENV) -configuration $(ENV) -workspace Lunar.xcworkspace -showBuildSettings -json 2>/dev/null | jq -r .[0].buildSettings.MARKETING_VERSION)
 appcast: Releases/Lunar-$(FULL_VERSION).html
+ifneq ($(DISABLE_APPCAST),1)
 	rm Releases/Lunar.dmg || true
 ifneq (, $(CHANNEL))
 	rm Releases/Lunar$(FULL_VERSION)*.delta || true
@@ -95,6 +96,7 @@ else
 	sd 'https://files.lunar.fyi/releases/([^"]+).delta' 'https://files.lunar.fyi/deltas/$$1.delta' Releases/appcast-stable.xml
 endif
 	sd 'https://files.lunar.fyi/releases/([^"]+).delta' 'https://files.lunar.fyi/deltas/$$1.delta' Releases/appcast2.xml
+endif
 
 
 setversion: OLD_VERSION=$(shell xcodebuild -scheme $(ENV) -configuration $(ENV) -workspace Lunar.xcworkspace -showBuildSettings -json 2>/dev/null | jq -r .[0].buildSettings.MARKETING_VERSION)

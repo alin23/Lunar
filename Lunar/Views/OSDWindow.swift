@@ -729,16 +729,7 @@ struct BrightnessOSDView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.colors) var colors
 
-    @ObservedObject var osd = OSD_STATE
-
-    var nsImage: NSImage? {
-        guard let img = NSImage(systemSymbolName: osd.image, accessibilityDescription: nil) else {
-            return nil
-        }
-        img.resizingMode = .stretch
-
-        return img
-    }
+    @ObservedObject var osd: OSDState
 
     var body: some View {
         ZStack {
@@ -763,14 +754,20 @@ struct BrightnessOSDView: View {
                 }
                 .stroke(style: StrokeStyle(lineWidth: 8))
                 .foregroundColor(Color.black.opacity(0.9))
-                Path { path in
-                    path.move(to: CGPoint(x: 1, y: 0))
-                    path.addLine(to: CGPoint(x: value, y: 0))
-                }
-                .stroke(style: StrokeStyle(lineWidth: 6, dash: [9, 1]))
-                .foregroundColor(osd.color)
-                .shadow(color: osd.glowRadius == 0 ? .clear : osd.color, radius: osd.value.cg * osd.glowRadius, x: 0, y: 0)
-                .animation(.easeOut(duration: 0.15), value: osd.value)
+
+                VisualEffectBlur(material: .osd, blendingMode: .behindWindow, state: .active)
+                    .if(colorScheme == .dark) { $0.colorInvert() }
+                    .overlay(osd.color ?? (colorScheme == .dark ? .white : .clear))
+                    .clipShape(
+                        Path { path in
+                            path.move(to: CGPoint(x: 1, y: 0))
+                            path.addLine(to: CGPoint(x: value, y: 0))
+                        }
+                        .stroke(style: StrokeStyle(lineWidth: 12, dash: [9, 1]))
+                    )
+                    .offset(y: -3)
+                    .shadow(color: osd.glowRadius == 0 ? .clear : (osd.color ?? .clear), radius: osd.value.cg * osd.glowRadius, x: 0, y: 0)
+                    .animation(.easeOut(duration: 0.15), value: osd.value)
             }.offset(y: NATIVE_OSD_WIDTH * 0.78)
         }
         .padding(.horizontal, 20)
@@ -888,11 +885,9 @@ final class OSDState: ObservableObject {
     @Published var image = "sun.max"
     @Published var value: Float = 1.0
     @Published var text = ""
-    @Published var color: Color = .white
+    @Published var color: Color? = nil
     @Published var glowRadius: CGFloat = 5
 }
-
-let OSD_STATE = OSDState()
 
 extension Display {
     func hideSoftwareOSD() {
@@ -903,19 +898,19 @@ extension Display {
         }
     }
 
-    func showSoftwareOSD(image: String, value: Float, text: String, color: Color, glowRadius: CGFloat = 5) {
+    func showSoftwareOSD(image: String, value: Float, text: String, color: Color?, glowRadius: CGFloat = 5) {
         guard !isAllDisplays, !isForTesting else { return }
         mainAsync { [weak self] in
             guard let self else { return }
 
-            OSD_STATE.image = image
-            OSD_STATE.value = value
-            OSD_STATE.text = text
-            OSD_STATE.color = color
-            OSD_STATE.glowRadius = glowRadius
+            osdState.image = image
+            osdState.value = value
+            osdState.text = text
+            osdState.color = color
+            osdState.glowRadius = glowRadius
 
             if self.osdWindowController == nil {
-                let view = BrightnessOSDView()
+                let view = BrightnessOSDView(osd: osdState)
                 self.osdWindowController = OSDWindow(
                     swiftuiView: AnyView(view),
                     display: self,

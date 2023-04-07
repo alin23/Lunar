@@ -1176,6 +1176,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     static let FILLED_CHICLET_OFFSET: Float = 1 / 16
     static let SUBZERO_FILLED_CHICLETS_THRESHOLDS: [Float] = (0 ... 16).map { FILLED_CHICLET_OFFSET * $0.f }
 
+    let osdState = OSDState()
+
     lazy var xdrFilledChicletOffset = 6 / (96 * (1 / (maxSoftwareBrightness - Self.MIN_SOFTWARE_BRIGHTNESS)))
     lazy var xdrFilledChicletsThresholds: [Float] = (0 ... 16).map { 1.0 + xdrFilledChicletOffset * $0.f }
     @Published @objc dynamic var appPreset: AppException? = nil
@@ -4774,7 +4776,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             #endif
         }()
 
-        mainAsync { self.hasI2C = i2c }
+        mainAsync {
+            self.hasI2C = i2c
+            if i2c, let mode = DC.adaptiveMode as? ClockMode {
+                log.debug("Clock mode adapting all screens after DDC port matching")
+                mode.readapt()
+            }
+        }
     }
 
     func startI2CDetection() {
