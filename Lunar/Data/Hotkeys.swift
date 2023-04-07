@@ -866,7 +866,7 @@ enum Hotkey {
                 image: "circle.lefthalf.filled",
                 value: value.f / 100,
                 text: "Contrast",
-                color: .white.opacity(0.6),
+                color: nil,
                 glowRadius: 0
             )
             return
