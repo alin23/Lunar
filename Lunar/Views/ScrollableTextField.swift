@@ -413,7 +413,7 @@ final class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         }
 
         mainThread { caption.stringValue = message }
-        highlighterTask = Repeater(every: 1) { [weak self] in
+        highlighterTask = Repeater(every: 1, name: "scrollableTextFieldHighlighter") { [weak self] in
             guard let s = self else {
                 self?.stopHighlighting()
                 return

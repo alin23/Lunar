@@ -498,7 +498,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
         initGammaMenuItems(version)
         initMenuItems()
-        menuUpdater = Repeater(every: 0.5) { [self] in
+        menuUpdater = Repeater(every: 0.5, name: "infoMenuItemUpdater") { [self] in
             updateInfoMenuItem()
         }
     }
@@ -1039,7 +1039,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     }
 
     func startValuesReaderThread() {
-        valuesReaderThread = Repeater(every: 10, tolerance: 5) {
+        valuesReaderThread = Repeater(every: 10, name: "DDCReader", tolerance: 5) {
             guard !DC.screensSleeping else { return }
 
             if CachedDefaults[.refreshValues] {
@@ -1419,6 +1419,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                         }
 
                         log.debug("After wake brightness is \(brightness). Re-applying previous brightness \(lastBrightness) for \(display.description)")
+                        if lastBrightness == 1.0 {
+                            _ = control.writeBrightness(0, preciseBrightness: 0.99)
+                        }
                         _ = control.writeBrightness(0, preciseBrightness: lastBrightness)
                     }
                 }
@@ -1486,7 +1489,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                     self.resetStatesPublisher.send(true)
 
                     if CachedDefaults[.reapplyValuesAfterWake] {
-                        self.screenWakeAdapterTask = Repeater(every: 2, times: CachedDefaults[.wakeReapplyTries]) {
+                        self.screenWakeAdapterTask = Repeater(every: 2, times: CachedDefaults[.wakeReapplyTries], name: "screenWakeAdapter") {
                             DC.adaptBrightness(force: true)
 
                             for display in DC.activeDisplayList.filter(\.blackOutEnabled) {
@@ -2276,7 +2279,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         }
 
         if CachedDefaults[.reapplyValuesAfterWake] {
-            screenWakeAdapterTask = Repeater(every: 2, times: CachedDefaults[.wakeReapplyTries]) {
+            screenWakeAdapterTask = Repeater(every: 2, times: CachedDefaults[.wakeReapplyTries], name: "launchAdapter") {
                 DC.adaptBrightness(force: true)
                 for display in DC.activeDisplays.values.filter({ !$0.blackOutEnabled && $0.reapplyColorGain }) {
                     _ = display.control?.setRedGain(display.redGain.uint16Value)

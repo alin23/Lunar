@@ -1954,7 +1954,7 @@ struct MirrorSetIntent: AppIntent {
         }
 
         mirrorMaster.resolutionBlackoutResetterTask = Repeater(
-            every: 1, times: 5, name: "master-resolution-blackout-on",
+            every: 1, times: 5, name: "masterResolutionBlackoutOn",
             onFinish: { mirrorMaster.refreshPanel() }
         ) {
             Display.reconfigure(panel: panel) { panel in
@@ -2023,7 +2023,7 @@ struct StopMirroringIntent: AppIntent {
         }
 
         mirrorMaster.resolutionBlackoutResetterTask = Repeater(
-            every: 1, times: 5, name: "master-resolution-blackout-on",
+            every: 1, times: 5, name: "masterResolutionBlackoutOn",
             onFinish: { mirrorMaster.refreshPanel() }
         ) {
             Display.reconfigure(panel: panel) { panel in
