@@ -222,7 +222,7 @@ final class ALSInstallViewController: NSViewController {
             self?.cancelFirmwareInstallation()
         }
 
-        installFinishChecker = Repeater(every: 1) { [weak self] in
+        installFinishChecker = Repeater(every: 1, name: "ALSInstallFinishChecker") { [weak self] in
             guard let self, !self.stopped else {
                 self?.installFinishChecker = nil
                 return

@@ -1399,7 +1399,7 @@ struct Lunar: ParsableCommand {
                 }
 
                 var stepsDone = 0
-                gammaRepeater = Repeater(every: refreshSeconds) {
+                gammaRepeater = Repeater(every: refreshSeconds, name: "CLIGammaRepeater") {
                     // display.gammaLock()
 
                     display.red = red
@@ -2081,7 +2081,7 @@ private func handleDisplays(
                 case .brightness:
                     let old = display.brightness
                     display.brightness = value
-                    display.control?.write(property, display.limitedBrightness, old)
+                    display.control?.write(property, display.limitedBrightness, old.uint16Value)
                     display.insertBrightnessUserDataPoint(
                         DC.adaptiveMode.brightnessDataPoint.last,
                         display.brightness.doubleValue, modeKey: DC.adaptiveModeKey
@@ -2089,7 +2089,7 @@ private func handleDisplays(
                 case .contrast:
                     let old = display.contrast
                     display.contrast = value
-                    display.control?.write(property, display.limitedContrast, old)
+                    display.control?.write(property, display.limitedContrast, old.uint16Value)
                     display.insertContrastUserDataPoint(
                         DC.adaptiveMode.contrastDataPoint.last,
                         display.contrast.doubleValue, modeKey: DC.adaptiveModeKey

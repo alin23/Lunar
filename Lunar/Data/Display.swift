@@ -1446,7 +1446,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
                 self.resetControl()
 
-                appDelegate?.screenWakeAdapterTask = appDelegate?.screenWakeAdapterTask ?? Repeater(every: 2, times: 3) {
+                appDelegate?.screenWakeAdapterTask = appDelegate?.screenWakeAdapterTask ?? Repeater(every: 2, times: 3, name: "DDCResetAdapter") {
                     DC.adaptBrightness(force: true)
                 }
             }.store(in: &observers)
@@ -1467,7 +1467,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
                 self.resetControl()
 
-                appDelegate?.screenWakeAdapterTask = appDelegate?.screenWakeAdapterTask ?? Repeater(every: 2, times: 5) {
+                appDelegate?.screenWakeAdapterTask = appDelegate?.screenWakeAdapterTask ?? Repeater(every: 2, times: 5, name: "NetworkResetAdapter") {
                     DC.adaptBrightness(force: true)
                 }
             }.store(in: &observers)
@@ -3706,7 +3706,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
                     if let cornerRadiusBeforeNotchDisable, cornerRadiusBeforeNotchDisable == 0 {
                         cornerRadius = 0
-                        cornerRadiusApplier = Repeater(every: 0.1, times: 20) { [weak self] in
+                        cornerRadiusApplier = Repeater(every: 0.1, times: 20, name: "cornerRadiusApplier") { [weak self] in
                             self?.updateCornerWindow()
                         }
                     }
@@ -3718,7 +3718,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
                     if let cornerRadiusBeforeNotchDisable, cornerRadiusBeforeNotchDisable == 0 {
                         cornerRadius = 12
-                        cornerRadiusApplier = Repeater(every: 0.1, times: 20) { [weak self] in
+                        cornerRadiusApplier = Repeater(every: 0.1, times: 20, name: "cornerRadiusApplier") { [weak self] in
                             self?.updateCornerWindow()
                         }
                     }
@@ -5275,7 +5275,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         var steps = stride(from: currentValue, through: value, by: currentValue < value ? 0.005 : -0.005).map { $0 }
 
         log.debug("Starting slow brightness transition until \(period.fromNow): \(currentValue) -> \(value)")
-        scheduledBrightnessTask = Repeater(every: period.timeInterval / steps.count.d, times: steps.count, onFinish: { [weak self] in self?.scheduledBrightnessTask = nil }) { [weak self] in
+        scheduledBrightnessTask = Repeater(every: period.timeInterval / steps.count.d, times: steps.count, name: "scheduledBrightnessSlowTransition", onFinish: { [weak self] in self?.scheduledBrightnessTask = nil }) { [weak self] in
             guard !DC.screensSleeping, let self, !steps.isEmpty else { return }
 
             self.inSchedule = true
@@ -5290,7 +5290,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         var steps = stride(from: currentValue, through: value, by: currentValue < value ? 0.01 : -0.01).map { $0 }
 
         log.debug("Starting slow contrast transition until \(period.fromNow): \(currentValue) -> \(value)")
-        scheduledContrastTask = Repeater(every: period.timeInterval / steps.count.d, times: steps.count, onFinish: { [weak self] in self?.scheduledContrastTask = nil }) { [weak self] in
+        scheduledContrastTask = Repeater(every: period.timeInterval / steps.count.d, times: steps.count, name: "scheduledContrastSlowTransition", onFinish: { [weak self] in self?.scheduledContrastTask = nil }) { [weak self] in
             guard !DC.screensSleeping, let self, !steps.isEmpty else { return }
 
             self.inSchedule = true
