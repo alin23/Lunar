@@ -997,7 +997,7 @@ struct HDRSettingsView: View {
         Group {
             SettingsToggle(text: "Disable Night Shift and f.lux when toggling XDR", setting: $disableNightShiftXDR.animation(.fastSpring))
             SettingsToggle(
-                text: "Enable Dark Mode when toggling XDR", setting: $enableDarkModeXDR.animation(.fastSpring),
+                text: "Enable Dark Mode when enabling XDR", setting: $enableDarkModeXDR.animation(.fastSpring),
                 help: """
                 Use dark backgrounds with bright text for minimizing power usage and LED temperature while XDR is active.
 
