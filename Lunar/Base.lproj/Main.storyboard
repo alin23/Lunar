@@ -25,7 +25,7 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="Mv9-Ul-4bR"/>
-                                        <menuItem title="Preferences…" keyEquivalent="," id="J7R-cQ-ch6"/>
+                                        <menuItem title="Display Settings" keyEquivalent="," id="J7R-cQ-ch6"/>
                                         <menuItem isSeparatorItem="YES" id="i4P-eW-SSm"/>
                                         <menuItem title="Services" id="KFE-j0-F7X">
                                             <modifierMask key="keyEquivalentModifierMask"/>
@@ -312,7 +312,7 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Lunar" systemMenu="apple" id="uQy-DD-JDr">
                                     <items>
-                                        <menuItem title="Preferences…" keyEquivalent="L" allowsKeyEquivalentWhenHidden="YES" id="BOF-NM-1cW">
+                                        <menuItem title="Display Settings" keyEquivalent="L" allowsKeyEquivalentWhenHidden="YES" id="BOF-NM-1cW">
                                             <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                             <connections>
                                                 <action selector="showPreferencesWindowWithSender:" target="Voe-Tx-rLC" id="qbP-Ur-gqG"/>
@@ -1620,7 +1620,7 @@ the ⌘ Command key more than 8 times in a row</string>
                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zK2-UT-kkE">
                                 <rect key="frame" x="30" y="295" width="360" height="26"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Which kind of displays to show in Preferences" id="Ks8-hg-KDN">
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Which kind of displays to show in Display Settings" id="Ks8-hg-KDN">
                                     <font key="font" size="11" name="Menlo-Regular"/>
                                     <color key="textColor" red="0.28788789339999998" green="0.28788789339999998" blue="0.28788789339999998" alpha="0.79132121600000005" colorSpace="custom" customColorSpace="sRGB"/>
                                     <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>
@@ -4438,12 +4438,12 @@ be matched to the correct monitor</string>
                                             </buttonCell>
                                             <color key="contentTintColor" red="0.91549464023061233" green="0.91549464023061233" blue="0.91549464023061233" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                             <connections>
+                                                <binding destination="upY-F0-APc" name="value" keyPath="values.volumeKeysControlAllMonitors" id="alJ-TQ-aWE"/>
                                                 <binding destination="upY-F0-APc" name="hidden" keyPath="values.volumeKeysEnabled" id="RkB-2c-LxR">
                                                     <dictionary key="options">
                                                         <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                     </dictionary>
                                                 </binding>
-                                                <binding destination="upY-F0-APc" name="value" keyPath="values.volumeKeysControlAllMonitors" id="alJ-TQ-aWE"/>
                                             </connections>
                                         </button>
                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" alphaValue="0.20000000000000001" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yRF-js-eI9">
@@ -4523,9 +4523,9 @@ be matched to the correct monitor</string>
                                             </buttonCell>
                                             <color key="contentTintColor" red="0.91549464020000004" green="0.91549464020000004" blue="0.91549464020000004" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                             <connections>
+                                                <binding destination="upY-F0-APc" name="value" keyPath="values.volumeKeysControlAllMonitors" id="mfo-IJ-U1l"/>
                                                 <binding destination="upY-F0-APc" name="enabled" keyPath="values.volumeKeysEnabled" id="aCn-VM-1lE"/>
                                                 <binding destination="upY-F0-APc" name="hidden" keyPath="values.volumeKeysEnabled" previousBinding="aCn-VM-1lE" id="dVq-16-V3F"/>
-                                                <binding destination="upY-F0-APc" name="value" keyPath="values.volumeKeysControlAllMonitors" id="mfo-IJ-U1l"/>
                                             </connections>
                                         </button>
                                     </subviews>
