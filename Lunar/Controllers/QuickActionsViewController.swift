@@ -1449,7 +1449,7 @@ struct QuickActionsLayoutView: View {
                     SettingsToggle(
                         text: "Show more graph data",
                         setting: $moreGraphData,
-                        help: "Renders values and data lines on the bottom graph of the preferences window"
+                        help: "Renders values and data lines on the bottom graph of the Display Settings window"
                     )
                 }
                 Spacer()
