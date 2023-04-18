@@ -235,7 +235,7 @@ final class SplitViewController: NSSplitViewController {
                         .sink { [weak self] name in
                             guard let self else { return }
 
-                            self.pages = self.pages.map { tab in
+                            pages = pages.map { tab in
                                 guard (tab.identifier as? String) == serial else { return tab }
 
                                 let newTab = NSTabViewItem(identifier: tab.identifier)
@@ -261,7 +261,7 @@ final class SplitViewController: NSSplitViewController {
 
     func listenForAdaptiveModeChange() {
         overrideAdaptiveModeObserver = overrideAdaptiveModePublisher.sink { [weak self] _ in
-            guard let self, let button = self.activeModeButton else { return }
+            guard let self, let button = activeModeButton else { return }
 
             mainAsync { [weak self] in
                 guard let self else { return }

@@ -118,18 +118,18 @@ class ToggleButton: NSButton {
 
     func highlight() {
         mainAsync { [weak self] in
-            guard let self, !self.isHidden, self.window?.isVisible ?? false, self.highligherTask == nil
+            guard let self, !self.isHidden, window?.isVisible ?? false, highligherTask == nil
             else { return }
 
-            self.highligherTask = Repeater(
+            highligherTask = Repeater(
                 every: 5,
-                name: self.highlighterKey
+                name: highlighterKey
             ) { [weak self] in
                 guard let self else { return }
 
-                guard self.window?.isVisible ?? false, let notice = self.notice
+                guard window?.isVisible ?? false, let notice
                 else {
-                    self.highligherTask = nil
+                    highligherTask = nil
                     return
                 }
 
@@ -138,15 +138,15 @@ class ToggleButton: NSButton {
                     notice.alphaValue = 0.9
                     notice.needsDisplay = true
 
-                    self.hover(fadeDuration: 1)
-                    self.needsDisplay = true
+                    hover(fadeDuration: 1)
+                    needsDisplay = true
                 } else {
                     notice.transition(3)
                     notice.alphaValue = 0.01
                     notice.needsDisplay = true
 
-                    self.defocus(fadeDuration: 3)
-                    self.needsDisplay = true
+                    defocus(fadeDuration: 3)
+                    needsDisplay = true
                 }
             }
         }
@@ -155,16 +155,16 @@ class ToggleButton: NSButton {
     func stopHighlighting() {
         mainAsync { [weak self] in
             guard let self else { return }
-            self.highligherTask = nil
+            highligherTask = nil
 
-            if let notice = self.notice {
+            if let notice {
                 notice.transition(0.3)
                 notice.alphaValue = 0.0
                 notice.needsDisplay = true
             }
 
-            self.defocus(fadeDuration: 0.3)
-            self.needsDisplay = true
+            defocus(fadeDuration: 0.3)
+            needsDisplay = true
         }
     }
 

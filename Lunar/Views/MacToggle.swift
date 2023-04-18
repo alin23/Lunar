@@ -277,8 +277,8 @@ final class MacToggle: NSView {
             animator().layoutSubtreeIfNeeded()
         }) { [weak self] in
             guard let self else { return }
-            self.allowedTouchTypes = [.direct, .indirect]
-            callback?(self.isOn)
+            allowedTouchTypes = [.direct, .indirect]
+            callback?(isOn)
         }
     }
 }

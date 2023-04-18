@@ -109,9 +109,9 @@ enum NanoIDAlphabet {
         case .uppercasedLatinLetters, .lowercasedLatinLetters, .numbers:
             return chars()
         case .urlSafe:
-            return (
+            return
                 "\(NanoIDAlphabet.uppercasedLatinLetters.chars())\(NanoIDAlphabet.lowercasedLatinLetters.chars())\(NanoIDAlphabet.numbers.chars())~_"
-            )
+
         }
     }
 

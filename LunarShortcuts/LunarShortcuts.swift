@@ -389,7 +389,7 @@ struct ScreenQuery: EntityPropertyQuery {
     }
 
     func suggestedEntities() async throws -> Result<[Screen], Error> {
-        .success(try await results())
+        try await .success(results())
     }
 
     func results() async throws -> [Screen] {
@@ -1108,10 +1108,10 @@ If the reconnect action fails, try any one of the following to bring back the sc
             return .result(value: "")
         #else
             if screen == Screen.sidecar, let sdm, sdm.connectedDevices != nil {
-                return .result(value: try await handleSidecar())
+                return try await .result(value: handleSidecar())
             }
 
-            return .result(value: try await handleScreen())
+            return try await .result(value: handleScreen())
         #endif
     }
 

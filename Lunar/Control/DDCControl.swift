@@ -47,7 +47,7 @@ final class DDCControl: Control, ObservableObject {
                     return
                 }
 
-                _ = self.setBrightness(range.value, oldValue: range.oldValue, transition: range.transition, onChange: nil)
+                _ = setBrightness(range.value, oldValue: range.oldValue, transition: range.transition, onChange: nil)
             }.store(in: &observers)
         return p
     }()
@@ -63,7 +63,7 @@ final class DDCControl: Control, ObservableObject {
                     return
                 }
 
-                _ = self.setContrast(range.value, oldValue: range.oldValue, transition: range.transition, onChange: nil)
+                _ = setContrast(range.value, oldValue: range.oldValue, transition: range.transition, onChange: nil)
             }.store(in: &observers)
         return p
     }()
@@ -228,7 +228,7 @@ final class DDCControl: Control, ObservableObject {
                 from: oldValue, to: brightness, delay: delay,
                 onStart: { display.shouldStopBrightnessTransition = false }
             ) { [weak self] brightness in
-                guard let self, faults <= 5 || self.ignoreFaults, let display = self.display,
+                guard let self, faults <= 5 || ignoreFaults, let display = self.display,
                       !display.shouldStopBrightnessTransition
                 else {
                     #if DEBUG
@@ -288,7 +288,7 @@ final class DDCControl: Control, ObservableObject {
                 from: oldValue, to: contrast, delay: delay,
                 onStart: { display.shouldStopContrastTransition = false }
             ) { [weak self] contrast in
-                guard let self, faults <= 5 || self.ignoreFaults, let display = self.display,
+                guard let self, faults <= 5 || ignoreFaults, let display = self.display,
                       !display.shouldStopContrastTransition
                 else {
                     #if DEBUG

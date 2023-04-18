@@ -242,7 +242,7 @@ final class AppleNativeControl: Control {
                         Thread.sleep(forTimeInterval: 0.01)
                         guard !display.shouldStopBrightnessTransition else {
                             log.debug("Stopping smooth transition on brightness=\(brightness) using \(self) for \(display)")
-                            display.lastWrittenBrightness = self.getBrightness() ?? display.lastWrittenBrightness
+                            display.lastWrittenBrightness = getBrightness() ?? display.lastWrittenBrightness
                             return
                         }
                     }
@@ -268,13 +268,13 @@ final class AppleNativeControl: Control {
                     }
 
                     // log.debug("Writing brightness=\(brightness) using \(self) to \(display)")
-                    _ = self.writeBrightness(0, preciseBrightness: brightness)
+                    _ = writeBrightness(0, preciseBrightness: brightness)
                     let br = (brightness * 100).intround.u16
                     display.lastWrittenBrightness = br
                     onChange?(br)
                     Thread.sleep(forTimeInterval: interval)
                 }
-                _ = self.writeBrightness(brightness)
+                _ = writeBrightness(brightness)
                 display.lastWrittenBrightness = brightness
                 onChange?(brightness)
                 display.inSmoothTransition = false

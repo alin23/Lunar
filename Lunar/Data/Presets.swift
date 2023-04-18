@@ -27,7 +27,7 @@ struct Preset: Codable, Defaults.Serializable, Hashable, Equatable, Identifiable
         id = try container.decode(String.self, forKey: .id)
         configs = try container.decode([PresetConfig].self, forKey: .configs)
 
-        key = (try container.decodeIfPresent(Int.self, forKey: .key)) ?? 0
+        key = try (container.decodeIfPresent(Int.self, forKey: .key)) ?? 0
         hotkey = getHotkey()
     }
 
@@ -110,7 +110,7 @@ struct PresetConfig: Codable, Defaults.Serializable, Hashable, Equatable, Identi
         brightness = try container.decode(Double.self, forKey: .brightness)
         contrast = try container.decode(Double.self, forKey: .contrast)
 
-        softwareBrightness = (try container.decodeIfPresent(Double.self, forKey: .softwareBrightness)) ?? 1.0
+        softwareBrightness = try (container.decodeIfPresent(Double.self, forKey: .softwareBrightness)) ?? 1.0
     }
 
     enum CodingKeys: String, CodingKey {

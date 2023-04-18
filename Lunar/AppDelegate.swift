@@ -1679,12 +1679,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             .debounce(for: .milliseconds(100), scheduler: RunLoop.main)
             .sink { [self] change in
                 if change.newValue {
-                    self.statusItem.button?.imagePosition = .imageLeading
+                    statusItem.button?.imagePosition = .imageLeading
                 } else {
-                    self.statusItem.button?.imagePosition = .imageOnly
+                    statusItem.button?.imagePosition = .imageOnly
                 }
-                self.updateInfoMenuItem(showBrightnessMenuBar: change.newValue)
-                self.closeAndOpenMenuWindow()
+                updateInfoMenuItem(showBrightnessMenuBar: change.newValue)
+                closeAndOpenMenuWindow()
 
             }.store(in: &observers)
     }
@@ -1982,7 +1982,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                     try socket.connect(to: opts.host, port: LUNAR_CLI_PORT)
                     try socket.write(from: "\(key)\(CLI_ARG_SEPARATOR)\(argString)")
 
-                    if let response = (try socket.readString())?.trimmed, !response.isEmpty {
+                    if let response = try (socket.readString())?.trimmed, !response.isEmpty {
                         print(response)
                     }
                     cliExit(0)

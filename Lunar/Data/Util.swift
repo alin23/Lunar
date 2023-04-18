@@ -644,7 +644,7 @@ let SERIAL_NUMBER_HASH = getSerialNumberHash() ?? generateAPIKey()
     guard !Thread.isMainThread else {
         return try action()
     }
-    return try DispatchQueue.main.sync { return try action() }
+    return try DispatchQueue.main.sync { try action() }
 }
 
 @discardableResult
@@ -652,7 +652,7 @@ let SERIAL_NUMBER_HASH = getSerialNumberHash() ?? generateAPIKey()
     guard !Thread.isMainThread else {
         return action()
     }
-    return DispatchQueue.main.sync { return action() }
+    return DispatchQueue.main.sync { action() }
 }
 
 @inline(__always) func mainAsync(_ action: @escaping () -> Void) {
@@ -1615,7 +1615,7 @@ class ExpiringBool: ExpressibleByBooleanLiteral, CustomStringConvertible, Observ
         value.toggle()
         expiresAt = .init(timeIntervalSinceNow: expireAfter)
         task = mainAsyncAfter(ms: (expireAfter * 1000).intround) { [self] in
-            self.value.toggle()
+            value.toggle()
         }
     }
 }
@@ -1684,7 +1684,7 @@ class ExpiringOptional<T>: ExpressibleByNilLiteral, CustomStringConvertible, Obs
 
         expiresAt = .init(timeIntervalSinceNow: expireAfter)
         task = mainAsyncAfter(ms: (expireAfter * 1000).intround) { [self] in
-            self.value = nil
+            value = nil
         }
     }
 }
@@ -1770,7 +1770,7 @@ struct LazyAtomic<Value> {
     var wrappedValue: Value {
         mutating get {
             if storage == nil {
-                self.storage = constructor()
+                storage = constructor()
             }
             return storage!
         }

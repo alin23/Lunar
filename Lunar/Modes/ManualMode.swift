@@ -100,7 +100,7 @@ final class ManualMode: AdaptiveMode {
     func compute(percent: Int8, minVal: Int, maxVal: Int) -> NSNumber {
         let percent = cap(percent, minVal: 0, maxVal: 100).d / 100.0
         let value = round(percent * (maxVal - minVal).d).i + minVal
-        return (cap(value, minVal: minVal, maxVal: maxVal)).ns
+        return cap(value, minVal: minVal, maxVal: maxVal).ns
     }
 
     func computeSIMD(from percent: [Double], minVal: Double, maxVal: Double) -> [Double] {

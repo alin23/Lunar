@@ -167,18 +167,18 @@ let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
 
             do {
                 let ssh = try SSH(host: hostname, port: port)
-                guard !self.cancelled else { return }
+                guard !cancelled else { return }
 
                 mainThread {
                     self.connectionMessage = "Authenticating user '\(username)' with \(self.sshKeySelected ? "private key" : "password")"
                 }
-                if self.sshKeySelected {
+                if sshKeySelected {
                     try ssh.authenticate(username: username, privateKey: sshKeyPath, passphrase: passphrase)
                 } else {
                     try ssh.authenticate(username: username, password: password)
                 }
 
-                guard !self.cancelled else { return }
+                guard !cancelled else { return }
 
                 mainThread {
                     self.connectionMessage = "Downloading installer to '\(DDCUTIL_SERVER_INSTALLER_DIR)/'"
@@ -193,7 +193,7 @@ let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
                     log.verbose(output)
                 }
 
-                guard let channel = self.commandChannel, !channel.cancelled else {
+                guard let channel = commandChannel, !channel.cancelled else {
                     return
                 }
 
@@ -218,7 +218,7 @@ let DDCUTIL_SERVER_INSTALLER_DIR = "/tmp/ddcutil-server"
     @IBAction func cancel(_: Any) {
         cancelled = true
         asyncNow { [weak self] in
-            guard let self, let channel = self.commandChannel else { return }
+            guard let self, let channel = commandChannel else { return }
 
             mainThread {
                 self.cancellingCommand = true

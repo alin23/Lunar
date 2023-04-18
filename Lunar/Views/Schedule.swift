@@ -295,20 +295,20 @@ final class Schedule: NSView {
 
             hour.onValueChanged = { [weak self] value in
                 guard let self, let display = self.display,
-                      let schedule = display.schedules.prefix(self.number).last,
+                      let schedule = display.schedules.prefix(number).last,
                       schedule.enabled
                 else { return }
 
-                display.schedules[self.number - 1] = schedule.with(hour: value.u8)
+                display.schedules[number - 1] = schedule.with(hour: value.u8)
                 switch schedule.type {
                 case .time:
-                    self.timeHour = value.u8
+                    timeHour = value.u8
                 case .sunrise:
-                    self.sunriseOffsetHour = value.u8
+                    sunriseOffsetHour = value.u8
                 case .sunset:
-                    self.sunsetOffsetHour = value.u8
+                    sunsetOffsetHour = value.u8
                 case .noon:
-                    self.noonOffsetHour = value.u8
+                    noonOffsetHour = value.u8
                 case .disabled:
                     break
                 }
@@ -316,20 +316,20 @@ final class Schedule: NSView {
             }
             minute.onValueChanged = { [weak self] value in
                 guard let self, let display = self.display,
-                      let schedule = display.schedules.prefix(self.number).last,
+                      let schedule = display.schedules.prefix(number).last,
                       schedule.enabled
                 else { return }
 
-                display.schedules[self.number - 1] = schedule.with(minute: value.u8)
+                display.schedules[number - 1] = schedule.with(minute: value.u8)
                 switch schedule.type {
                 case .time:
-                    self.timeMinute = value.u8
+                    timeMinute = value.u8
                 case .sunrise:
-                    self.sunriseOffsetMinute = value.u8
+                    sunriseOffsetMinute = value.u8
                 case .sunset:
-                    self.sunsetOffsetMinute = value.u8
+                    sunsetOffsetMinute = value.u8
                 case .noon:
-                    self.noonOffsetMinute = value.u8
+                    noonOffsetMinute = value.u8
                 case .disabled:
                     break
                 }
@@ -341,17 +341,17 @@ final class Schedule: NSView {
                 .sink { [weak self] adaptiveSubzero in
                     guard let self, let display = self.display, let schedule = self.schedule else { return }
                     if DC.mergeBrightnessContrast {
-                        self.withoutRemapping { self.preciseBrightnessContrast = cap(schedule.brightness, minVal: adaptiveSubzero ? -1 : 0, maxVal: 1) }
-                        self.hideContrast = true
+                        withoutRemapping { self.preciseBrightnessContrast = cap(schedule.brightness, minVal: adaptiveSubzero ? -1 : 0, maxVal: 1) }
+                        hideContrast = true
                     } else {
-                        self.withoutRemapping { self.preciseBrightness = cap(schedule.brightness, minVal: adaptiveSubzero ? -1 : 0, maxVal: 1) }
-                        self.hideContrast = !display.canChangeContrast
+                        withoutRemapping { self.preciseBrightness = cap(schedule.brightness, minVal: adaptiveSubzero ? -1 : 0, maxVal: 1) }
+                        hideContrast = !display.canChangeContrast
                     }
 
-                    if let brightnessSliderCell = self.brightnessSliderCell {
+                    if let brightnessSliderCell {
                         brightnessSliderCell.gradient = adaptiveSubzero ? [subzeroColor, lunarYellow] : nil
                     }
-                    if let brightnessContrastSliderCell = self.brightnessContrastSliderCell {
+                    if let brightnessContrastSliderCell {
                         brightnessContrastSliderCell.gradient = adaptiveSubzero ? [subzeroColor, lunarYellow] : nil
                     }
                 }
@@ -429,39 +429,39 @@ final class Schedule: NSView {
     }
     func addObservers() {
         mergeBrightnessContrastPublisher.sink { [weak self] change in
-            guard let self, let display = self.display, let schedule = self.schedule else { return }
+            guard let self, let display, let schedule else { return }
             if change.newValue {
-                self.withoutRemapping { self.preciseBrightnessContrast = schedule.brightness }
-                self.hideContrast = true
+                withoutRemapping { self.preciseBrightnessContrast = schedule.brightness }
+                hideContrast = true
             } else {
-                self.withoutRemapping { self.preciseBrightness = schedule.brightness }
-                self.preciseContrast = schedule.contrast
-                self.hideContrast = !display.canChangeContrast
+                withoutRemapping { self.preciseBrightness = schedule.brightness }
+                preciseContrast = schedule.contrast
+                hideContrast = !display.canChangeContrast
             }
         }.store(in: &observers)
 
         showTwoSchedulesPublisher.sink { [weak self] change in
             guard let self else { return }
-            if self.number == 2 {
-                self.isEnabled = change.newValue
+            if number == 2 {
+                isEnabled = change.newValue
             }
         }.store(in: &observers)
         showThreeSchedulesPublisher.sink { [weak self] change in
             guard let self else { return }
-            if self.number == 3 {
-                self.isEnabled = change.newValue
+            if number == 3 {
+                isEnabled = change.newValue
             }
         }.store(in: &observers)
         showFourSchedulesPublisher.sink { [weak self] change in
             guard let self else { return }
-            if self.number == 4 {
-                self.isEnabled = change.newValue
+            if number == 4 {
+                isEnabled = change.newValue
             }
         }.store(in: &observers)
         showFiveSchedulesPublisher.sink { [weak self] change in
             guard let self else { return }
-            if self.number == 5 {
-                self.isEnabled = change.newValue
+            if number == 5 {
+                isEnabled = change.newValue
             }
         }.store(in: &observers)
     }

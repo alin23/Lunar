@@ -1140,7 +1140,7 @@ final class DisplayController: ObservableObject {
         p.debounce(for: .seconds(2), scheduler: RunLoop.main)
             .sink { [self] id in
                 DisplayController.panelManager = MPDisplayMgr()
-                if let display = self.activeDisplays[id] {
+                if let display = activeDisplays[id] {
                     display.refreshPanel()
                 }
             }.store(in: &observers)
@@ -1888,7 +1888,7 @@ final class DisplayController: ObservableObject {
                 adaptiveCrumb("Changed mode from \(change.oldValue) to \(change.newValue)")
                 guard let self else { return }
 
-                guard !self.pausedAdaptiveModeObserver else {
+                guard !pausedAdaptiveModeObserver else {
                     return
                 }
 
@@ -2512,7 +2512,7 @@ final class DisplayController: ObservableObject {
             )
 
             if autoSubzero || display.softwareBrightness < 1.0,
-               !display.hasSoftwareControl, minBrightness <= 1,
+               !display.hasSoftwareControl,
                (value == minBrightness && value == oldValue && timeSince(lastTimeBrightnessKeyPressed) < 3) ||
                (oldValue == minBrightness && display.softwareBrightness < 1.0)
             {

@@ -368,7 +368,7 @@ final class ConfigurationViewController: NSViewController {
                 if let key = settingKeyInt {
                     CachedDefaults[key] = value
                 }
-                handler(value, self.settingsController)
+                handler(value, settingsController)
             }
         }
         if let handler = onValueChangedDouble {
@@ -377,20 +377,20 @@ final class ConfigurationViewController: NSViewController {
                 if let key = settingKeyDouble {
                     CachedDefaults[key] = value
                 }
-                handler(value, self.settingsController)
+                handler(value, settingsController)
             }
         }
         if let handler = onMouseExit {
             field.onMouseExit = { [weak self] in
                 guard let self else { return }
-                handler(self.settingsController)
+                handler(settingsController)
             }
         }
 
         if let handler = onMouseEnter {
             field.onMouseEnter = { [weak self] in
                 guard let self else { return }
-                handler(self.settingsController)
+                handler(settingsController)
             }
         }
     }
