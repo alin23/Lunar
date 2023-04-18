@@ -120,15 +120,15 @@ final class ScrollableBrightness: NSView {
             .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] value in
                 guard let self, let display = self.display, display.id != GENERIC_DISPLAY_ID else { return }
-                self.minValue?.integerValue = value.intValue
-                self.maxValue?.lowerLimit = value.doubleValue + 1
+                minValue?.integerValue = value.intValue
+                maxValue?.lowerLimit = value.doubleValue + 1
             }.store(in: &displayObservers, for: "minBrightness")
         display.$maxBrightness
             .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] value in
                 guard let self, let display = self.display, display.id != GENERIC_DISPLAY_ID else { return }
-                self.maxValue?.integerValue = value.intValue
-                self.minValue?.upperLimit = value.doubleValue - 1
+                maxValue?.integerValue = value.intValue
+                minValue?.upperLimit = value.doubleValue - 1
             }.store(in: &displayObservers, for: "maxBrightness")
     }
 
@@ -171,22 +171,22 @@ final class ScrollableBrightness: NSView {
         minValue?.onValueChanged = minValue?.onValueChanged ?? { [weak self] (value: Int) in
             guard let self else { return }
 
-            self.maxValue?.lowerLimit = (value + 1).d
-            self.currentValue?.lowerLimit = value.d
-            self.currentValue.integerValue = max(self.currentValue.integerValue, value)
-            if self.display != nil {
-                self.displayMinValue = value
+            maxValue?.lowerLimit = (value + 1).d
+            currentValue?.lowerLimit = value.d
+            currentValue.integerValue = max(currentValue.integerValue, value)
+            if display != nil {
+                displayMinValue = value
             }
         }
         maxValue?.onValueChangedInstant = maxValue?.onValueChangedInstant ?? onMaxValueChanged
         maxValue?.onValueChanged = maxValue?.onValueChanged ?? { [weak self] (value: Int) in
             guard let self else { return }
 
-            self.minValue?.upperLimit = (value - 1).d
-            self.currentValue?.upperLimit = value.d
-            self.currentValue.integerValue = min(self.currentValue.integerValue, value)
-            if self.display != nil {
-                self.displayMaxValue = value
+            minValue?.upperLimit = (value - 1).d
+            currentValue?.upperLimit = value.d
+            currentValue.integerValue = min(currentValue.integerValue, value)
+            if display != nil {
+                displayMaxValue = value
             }
         }
 

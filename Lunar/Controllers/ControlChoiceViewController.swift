@@ -65,11 +65,11 @@ final class LunarTestViewController: NSViewController {
                 end()
                 return
             }
-            self.label.transition(1.5, easing: .easeInOutCubic)
-            if self.label.textColor == .white {
-                self.label.textColor = darkMauve
+            label.transition(1.5, easing: .easeInOutCubic)
+            if label.textColor == .white {
+                label.textColor = darkMauve
             } else {
-                self.label.textColor = .white
+                label.textColor = .white
             }
         }
     }
@@ -184,8 +184,8 @@ final class ControlChoiceViewController: NSViewController {
         }
         mainAsyncAfter(ms: 1000) { [weak self] in
             guard let self else { return }
-            self.actionLabel.transition(1.0, easing: .easeOutCubic)
-            self.actionLabel.textColor = self.actionLabelColor
+            actionLabel.transition(1.0, easing: .easeOutCubic)
+            actionLabel.textColor = actionLabelColor
         }
     }
 
@@ -237,8 +237,8 @@ final class ControlChoiceViewController: NSViewController {
     func waitForAction(_ text: String, buttonColor: NSColor, buttonText: NSAttributedString, action: @escaping (() -> Void)) {
         mainAsyncAfter(ms: 1100) { [weak self] in
             guard let self else { return }
-            self.actionInfo.transition(0.5, easing: .easeInOutExpo)
-            self.actionInfo.textColor = self.actionInfoColor
+            actionInfo.transition(0.5, easing: .easeInOutExpo)
+            actionInfo.textColor = actionInfoColor
         }
 
         mainThread {
@@ -260,8 +260,8 @@ final class ControlChoiceViewController: NSViewController {
                 self?.semaphore.signal()
                 return
             }
-            self.semaphore.signal()
-            self.hideAction()
+            semaphore.signal()
+            hideAction()
         }
         semaphore.wait(for: 0)
         guard !cancelled else { return }
@@ -277,8 +277,8 @@ final class ControlChoiceViewController: NSViewController {
     ) {
         mainAsyncAfter(ms: 1100) { [weak self] in
             guard let self else { return }
-            self.actionInfo.transition(0.8, easing: .easeOutCubic)
-            self.actionInfo.textColor = self.actionInfoColor
+            actionInfo.transition(0.8, easing: .easeOutCubic)
+            actionInfo.textColor = actionInfoColor
         }
 
         mainThread {
@@ -316,8 +316,8 @@ final class ControlChoiceViewController: NSViewController {
             }
 
             answerResult = false
-            self.semaphore.signal()
-            self.hideQuestion()
+            semaphore.signal()
+            hideQuestion()
         }
         yesButton.onClick = { [weak self] in
             log.info("Answered 'yes' to '\(question)'")
@@ -326,8 +326,8 @@ final class ControlChoiceViewController: NSViewController {
                 return
             }
             answerResult = true
-            self.semaphore.signal()
-            self.hideQuestion()
+            semaphore.signal()
+            hideQuestion()
         }
         semaphore.wait(for: 0)
         guard !cancelled else { return }
@@ -552,10 +552,10 @@ final class ControlChoiceViewController: NSViewController {
             ) { [weak self] itWorked in
                 guard let self else { return }
                 if itWorked {
-                    self.setResult(self.brightnessWriteResult, text: "Write worked", color: green)
+                    setResult(brightnessWriteResult, text: "Write worked", color: green)
                 } else {
                     brightnessWriteWorked = false
-                    self.setResult(self.brightnessWriteResult, text: "Failed to write", color: red)
+                    setResult(brightnessWriteResult, text: "Failed to write", color: red)
                 }
             }
         } else {
@@ -621,10 +621,10 @@ final class ControlChoiceViewController: NSViewController {
             ) { [weak self] itWorked in
                 guard let self else { return }
                 if itWorked {
-                    self.setResult(self.contrastWriteResult, text: "Write worked", color: green)
+                    setResult(contrastWriteResult, text: "Write worked", color: green)
                 } else {
                     contrastWriteWorked = false
-                    self.setResult(self.contrastWriteResult, text: "Failed to write", color: red)
+                    setResult(contrastWriteResult, text: "Failed to write", color: red)
                 }
             }
         } else {
@@ -658,10 +658,10 @@ final class ControlChoiceViewController: NSViewController {
             ) { [weak self] itWorked in
                 guard let self else { return }
                 if itWorked {
-                    self.setResult(self.volumeWriteResult, text: "Write worked", color: white)
+                    setResult(volumeWriteResult, text: "Write worked", color: white)
                 } else {
                     volumeWriteWorked = false
-                    self.setResult(self.volumeWriteResult, text: "Failed to write", color: peach)
+                    setResult(volumeWriteResult, text: "Failed to write", color: peach)
                 }
             }
         } else {
@@ -951,13 +951,13 @@ final class ControlChoiceViewController: NSViewController {
                     cancelButton: "Skip Onboarding",
                     window: w,
                     onCompletion: { [weak self] (restart: Bool) in
-                        guard let self, let w = self.view.window, let wc = w.windowController as? OnboardWindowController else {
+                        guard let self, let w = view.window, let wc = w.windowController as? OnboardWindowController else {
                             return
                         }
 
-                        self.cancelled = true
+                        cancelled = true
                         OnboardPageController.task?.cancel()
-                        self.semaphore.signal()
+                        semaphore.signal()
 
                         wc.changes = []
                         w.close()
@@ -1034,17 +1034,17 @@ final class ControlChoiceViewController: NSViewController {
                 self.displayName.display = firstDisplay
                 self.setControl(firstDisplay.getBestControl(reapply: false).displayControl, display: firstDisplay)
             }
-            self.waitForAction(
+            waitForAction(
                 "Lunar will try to read and then change the monitor brightness, contrast and volume\nIf Lunar can't revert the changes, you can do that by using the monitor's physical buttons",
                 buttonColor: lunarYellow, buttonText: "Continue".withTextColor(mauve)
             ) {}
 
-            self.displayProgressStep = 1.0 / displays.count.d
+            displayProgressStep = 1.0 / displays.count.d
             displays.enumerated().forEach { i, d in
                 self.testDisplay(d, index: i)
             }
 
-            self.queueChange {
+            queueChange {
                 DC.externalActiveDisplays.forEach { $0.resetControl() }
             }
 

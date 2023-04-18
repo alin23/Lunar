@@ -2279,7 +2279,7 @@ final class LunarServer {
                         return
                     }
 
-                    if let self, self.continueRunning {
+                    if let self, continueRunning {
                         log.error("Error reported\n\t\(socketError.description)")
                     }
                 }
@@ -2345,8 +2345,8 @@ final class LunarServer {
 
     func addNewConnection(socket: Socket) {
         socketLockQueue.sync { [unowned self, socket] in
-            self.currentSocketFD = socket.socketfd
-            self.connectedSockets[socket.socketfd] = socket
+            currentSocketFD = socket.socketfd
+            connectedSockets[socket.socketfd] = socket
         }
 
         DispatchQueue.global(qos: .default).async { [unowned self, socket] in
@@ -2387,7 +2387,7 @@ final class LunarServer {
                 #endif
                 socket.close()
 
-                self.socketLockQueue.sync { [unowned self, socket] in
+                socketLockQueue.sync { [unowned self, socket] in
                     self.connectedSockets[socket.socketfd] = nil
                 }
             } catch {
@@ -2395,7 +2395,7 @@ final class LunarServer {
                     log.error("Unexpected error by connection at \(socket.remoteHostname):\(socket.remotePort)...")
                     return
                 }
-                if self.continueRunning {
+                if continueRunning {
                     log.error("Error reported by connection at \(socket.remoteHostname):\(socket.remotePort):\n \(socketError.description)")
                 }
             }
@@ -2405,7 +2405,7 @@ final class LunarServer {
     func closeOldSockets() {
         socketLockQueue.sync { [unowned self] in
             for socket in connectedSockets.values.filter({ $0.socketfd != self.currentSocketFD }) {
-                self.connectedSockets.removeValue(forKey: socket.socketfd)
+                connectedSockets.removeValue(forKey: socket.socketfd)
                 socket.close()
             }
         }
@@ -2417,7 +2417,7 @@ final class LunarServer {
 
         for socket in connectedSockets.values {
             socketLockQueue.sync { [unowned self, socket] in
-                self.connectedSockets[socket.socketfd] = nil
+                connectedSockets[socket.socketfd] = nil
                 socket.close()
             }
         }

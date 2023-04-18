@@ -1026,7 +1026,7 @@ enum DDC {
 
         let realName = (name ?? Display.printableName(id)).lowercased()
         let vendorID = CGDisplayVendorNumber(id)
-        return (realName =~ Display.notDummyNamePattern && vendorID == DUMMY_VENDOR_ID)
+        return realName =~ Display.notDummyNamePattern && vendorID == DUMMY_VENDOR_ID
     }
 
     static func isVirtualDisplay(_ id: CGDirectDisplayID, name: String? = nil, checkName: Bool = true) -> Bool {
@@ -1097,16 +1097,16 @@ enum DDC {
         if let panel = DisplayController.panel(with: id) {
             return panel.isBuiltIn || panel.isBuiltInRetina
         }
-        return (
+        return
             CGDisplayIsBuiltin(id) == 1 ||
-                id == lastKnownBuiltinDisplayID ||
-                (
-                    checkName && Display
-                        .printableName(id).stripped
-                        .lowercased().replacingOccurrences(of: "-", with: "")
-                        .contains("builtin")
-                )
-        )
+            id == lastKnownBuiltinDisplayID ||
+            (
+                checkName && Display
+                    .printableName(id).stripped
+                    .lowercased().replacingOccurrences(of: "-", with: "")
+                    .contains("builtin")
+            )
+
     }
 
     static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt16) -> Bool {

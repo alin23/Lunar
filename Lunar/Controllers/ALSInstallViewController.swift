@@ -198,7 +198,7 @@ final class ALSInstallViewController: NSViewController {
                 return
             }
 
-            self.stopped = true
+            stopped = true
             if proc.terminationStatus == 0 {
                 mainThread { self.done = true }
             } else {
@@ -208,7 +208,7 @@ final class ALSInstallViewController: NSViewController {
                     self.operationDescription = "Error installing the firmware!\nCheck the logs for more details.".attributedString
                     self.progressBar?.stopAnimation(nil)
                 }
-                self.onClick = { NSWorkspace.shared.open(URL(fileURLWithPath: INSTALL_LOG_PATH)) }
+                onClick = { NSWorkspace.shared.open(URL(fileURLWithPath: INSTALL_LOG_PATH)) }
             }
         }
 
@@ -235,7 +235,7 @@ final class ALSInstallViewController: NSViewController {
                 .joined(separator: [0x0A])
             else { return }
 
-            self.operationDescription = Data(lastLines).str().attributedString
+            operationDescription = Data(lastLines).str().attributedString
         }
     }
     override func viewDidLoad() {

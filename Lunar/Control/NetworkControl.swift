@@ -408,7 +408,7 @@ final class NetworkControl: Control {
                             )
                             return
                         }
-                        guard let display = self.display else { return }
+                        guard let display else { return }
                         log.debug("Sent \(request.controlID)=\(request.value), received response `\(resp)` for display \(display)")
                     }
                 }.store(in: &observers)
@@ -421,7 +421,7 @@ final class NetworkControl: Control {
                     print("network responsiveCheckPublisher")
                 #endif
 
-                guard let self, let display = self.display else { return }
+                guard let self, let display else { return }
                 serviceBrowserQueue.async { [weak self] in
                     guard let self else { return }
                     guard let service = NetworkControl.controllersForDisplay[display.serial],

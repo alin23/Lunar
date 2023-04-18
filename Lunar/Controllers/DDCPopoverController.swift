@@ -56,36 +56,36 @@ final class DDCPopoverController: NSViewController {
         }
         display.$showVolumeOSD.sink { [weak self] value in
             guard let self else { return }
-            self.volumeOSDToggle.toggleWithoutCallback(value: value)
+            volumeOSDToggle.toggleWithoutCallback(value: value)
         }.store(in: &displayObservers, for: "showVolumeOSD")
 
         mainAsync { [weak self] in
             guard let self else { return }
-            self.minDDCBrightnessField.integerValue = display.minDDCBrightness.intValue
-            self.minDDCContrastField.integerValue = display.minDDCContrast.intValue
-            self.minDDCVolumeField.integerValue = display.minDDCVolume.intValue
+            minDDCBrightnessField.integerValue = display.minDDCBrightness.intValue
+            minDDCContrastField.integerValue = display.minDDCContrast.intValue
+            minDDCVolumeField.integerValue = display.minDDCVolume.intValue
 
-            self.maxDDCBrightnessField.integerValue = display.maxDDCBrightness.intValue
-            self.maxDDCContrastField.integerValue = display.maxDDCContrast.intValue
-            self.maxDDCVolumeField.integerValue = display.maxDDCVolume.intValue
+            maxDDCBrightnessField.integerValue = display.maxDDCBrightness.intValue
+            maxDDCContrastField.integerValue = display.maxDDCContrast.intValue
+            maxDDCVolumeField.integerValue = display.maxDDCVolume.intValue
 
-            self.minDDCBrightnessField.upperLimit = self.maxDDCBrightnessField.intValue.d
-            self.maxDDCBrightnessField.lowerLimit = self.minDDCBrightnessField.intValue.d
-            self.minDDCContrastField.upperLimit = self.maxDDCContrastField.intValue.d
-            self.maxDDCContrastField.lowerLimit = self.minDDCContrastField.intValue.d
-            self.minDDCVolumeField.upperLimit = self.maxDDCVolumeField.intValue.d
-            self.maxDDCVolumeField.lowerLimit = self.minDDCVolumeField.intValue.d
+            minDDCBrightnessField.upperLimit = maxDDCBrightnessField.intValue.d
+            maxDDCBrightnessField.lowerLimit = minDDCBrightnessField.intValue.d
+            minDDCContrastField.upperLimit = maxDDCContrastField.intValue.d
+            maxDDCContrastField.lowerLimit = minDDCContrastField.intValue.d
+            minDDCVolumeField.upperLimit = maxDDCVolumeField.intValue.d
+            maxDDCVolumeField.lowerLimit = minDDCVolumeField.intValue.d
 
-            self.muteByteValueOnField.integerValue = display.muteByteValueOn.i
-            self.muteByteValueOffField.integerValue = display.muteByteValueOff.i
-            self.volumeValueOnMuteField.integerValue = display.volumeValueOnMute.i
+            muteByteValueOnField.integerValue = display.muteByteValueOn.i
+            muteByteValueOffField.integerValue = display.muteByteValueOff.i
+            volumeValueOnMuteField.integerValue = display.volumeValueOnMute.i
 
-            self.muteByteValueOnField.lowerLimit = 0
-            self.muteByteValueOnField.upperLimit = UInt16.max.d
-            self.muteByteValueOffField.lowerLimit = 0
-            self.muteByteValueOffField.upperLimit = UInt16.max.d
-            self.volumeValueOnMuteField.lowerLimit = 0
-            self.volumeValueOnMuteField.upperLimit = UInt16.max.d
+            muteByteValueOnField.lowerLimit = 0
+            muteByteValueOnField.upperLimit = UInt16.max.d
+            muteByteValueOffField.lowerLimit = 0
+            muteByteValueOffField.upperLimit = UInt16.max.d
+            volumeValueOnMuteField.lowerLimit = 0
+            volumeValueOnMuteField.upperLimit = UInt16.max.d
         }
 
         muteByteValueOnField.onValueChanged = { [weak self] value in
@@ -126,46 +126,46 @@ final class DDCPopoverController: NSViewController {
 
         display.$minDDCBrightness.sink { [weak self] value in
             guard let self else { return }
-            self.minDDCBrightnessField.integerValue = value.intValue
-            self.maxDDCBrightnessField.lowerLimit = value.doubleValue
+            minDDCBrightnessField.integerValue = value.intValue
+            maxDDCBrightnessField.lowerLimit = value.doubleValue
         }.store(in: &displayObservers, for: "minDDCBrightness")
         display.$minDDCContrast.sink { [weak self] value in
             guard let self else { return }
-            self.minDDCContrastField.integerValue = value.intValue
-            self.maxDDCContrastField.lowerLimit = value.doubleValue
+            minDDCContrastField.integerValue = value.intValue
+            maxDDCContrastField.lowerLimit = value.doubleValue
         }.store(in: &displayObservers, for: "minDDCContrast")
         display.$minDDCVolume.sink { [weak self] value in
             guard let self else { return }
-            self.minDDCVolumeField.integerValue = value.intValue
-            self.maxDDCVolumeField.lowerLimit = value.doubleValue
+            minDDCVolumeField.integerValue = value.intValue
+            maxDDCVolumeField.lowerLimit = value.doubleValue
         }.store(in: &displayObservers, for: "minDDCVolume")
         display.$maxDDCBrightness.sink { [weak self] value in
             guard let self else { return }
-            self.maxDDCBrightnessField.integerValue = value.intValue
-            self.minDDCBrightnessField.upperLimit = value.doubleValue
+            maxDDCBrightnessField.integerValue = value.intValue
+            minDDCBrightnessField.upperLimit = value.doubleValue
         }.store(in: &displayObservers, for: "maxDDCBrightness")
         display.$maxDDCContrast.sink { [weak self] value in
             guard let self else { return }
-            self.maxDDCContrastField.integerValue = value.intValue
-            self.minDDCContrastField.upperLimit = value.doubleValue
+            maxDDCContrastField.integerValue = value.intValue
+            minDDCContrastField.upperLimit = value.doubleValue
         }.store(in: &displayObservers, for: "maxDDCContrast")
         display.$maxDDCVolume.sink { [weak self] value in
             guard let self else { return }
-            self.maxDDCVolumeField.integerValue = value.intValue
-            self.minDDCVolumeField.upperLimit = value.doubleValue
+            maxDDCVolumeField.integerValue = value.intValue
+            minDDCVolumeField.upperLimit = value.doubleValue
         }.store(in: &displayObservers, for: "maxDDCVolume")
 
         display.$muteByteValueOn.sink { [weak self] value in
             guard let self else { return }
-            self.muteByteValueOnField.integerValue = value.i
+            muteByteValueOnField.integerValue = value.i
         }.store(in: &displayObservers, for: "muteByteValueOn")
         display.$muteByteValueOff.sink { [weak self] value in
             guard let self else { return }
-            self.muteByteValueOffField.integerValue = value.i
+            muteByteValueOffField.integerValue = value.i
         }.store(in: &displayObservers, for: "muteByteValueOff")
         display.$volumeValueOnMute.sink { [weak self] value in
             guard let self else { return }
-            self.volumeValueOnMuteField.integerValue = value.i
+            volumeValueOnMuteField.integerValue = value.i
         }.store(in: &displayObservers, for: "volumeValueOnMute")
     }
 }

@@ -225,7 +225,7 @@ struct BigSurSlider: View {
 
     var body: some View {
         GeometryReader { geometry in
-            let w = geometry.size.width - self.sliderHeight
+            let w = geometry.size.width - sliderHeight
             let cgPercentage = cap(percentage, minVal: 0, maxVal: 1).cg
 
             ZStack(alignment: .leading) {
@@ -294,16 +294,16 @@ struct BigSurSlider: View {
                             }
                         }
 
-                        self.beforeSettingPercentage?(self.percentage)
-                        self.percentage = cap(Float(value.location.x / geometry.size.width), minVal: 0, maxVal: 1)
-                        self.onSettingPercentage?(self.percentage)
+                        beforeSettingPercentage?(percentage)
+                        percentage = cap(Float(value.location.x / geometry.size.width), minVal: 0, maxVal: 1)
+                        onSettingPercentage?(percentage)
                     }
                     .onEnded { value in
                         guard acceptsMouseEvents, !disabled else { return }
                         draggingSliderSetter = nil
-                        self.beforeSettingPercentage?(self.percentage)
-                        self.percentage = cap(Float(value.location.x / geometry.size.width), minVal: 0, maxVal: 1)
-                        self.onSettingPercentage?(self.percentage)
+                        beforeSettingPercentage?(percentage)
+                        percentage = cap(Float(value.location.x / geometry.size.width), minVal: 0, maxVal: 1)
+                        onSettingPercentage?(percentage)
                         env.draggingSlider = false
                     }
             )
@@ -393,9 +393,9 @@ struct BigSurSlider: View {
                             env.draggingSlider = false
                         }
                     }
-                    self.beforeSettingPercentage?(self.percentage)
-                    self.percentage = cap(self.percentage - (delta / 100), minVal: 0, maxVal: 1)
-                    self.onSettingPercentage?(self.percentage)
+                    beforeSettingPercentage?(percentage)
+                    percentage = cap(percentage - (delta / 100), minVal: 0, maxVal: 1)
+                    onSettingPercentage?(percentage)
                 }
         }
     #endif
@@ -909,16 +909,16 @@ extension Display {
             osdState.color = color
             osdState.glowRadius = glowRadius
 
-            if self.osdWindowController == nil {
+            if osdWindowController == nil {
                 let view = BrightnessOSDView(osd: osdState)
-                self.osdWindowController = OSDWindow(
+                osdWindowController = OSDWindow(
                     swiftuiView: AnyView(view),
                     display: self,
                     releaseWhenClosed: false
                 ).wc
             }
 
-            guard let osd = self.osdWindowController?.window as? OSDWindow else { return }
+            guard let osd = osdWindowController?.window as? OSDWindow else { return }
 
             osd.show(verticalOffset: 140)
         }
@@ -937,16 +937,16 @@ extension Display {
         mainAsync { [weak self] in
             guard let self else { return }
 
-            if self.arrangementOsdWindowController == nil {
+            if arrangementOsdWindowController == nil {
                 let view = ArrangementOSDView(displayID: id, number: number)
-                self.arrangementOsdWindowController = OSDWindow(
+                arrangementOsdWindowController = OSDWindow(
                     swiftuiView: AnyView(view),
                     display: self,
                     releaseWhenClosed: false
                 ).wc
             }
 
-            guard let osd = self.arrangementOsdWindowController?.window as? OSDWindow else { return }
+            guard let osd = arrangementOsdWindowController?.window as? OSDWindow else { return }
 
             osd.show(closeAfter: 0, fadeAfter: 0, verticalOffset: 140)
         }
@@ -958,14 +958,14 @@ extension Display {
                 self?.autoOsdWindowController?.close()
                 return
             }
-            self.autoOsdWindowController?.close()
-            self.autoOsdWindowController = OSDWindow(
+            autoOsdWindowController?.close()
+            autoOsdWindowController = OSDWindow(
                 swiftuiView: AnyView(
                     AutoOSDView(
                         display: self,
                         done: .oneway { [weak self] in self?.blackOutEnabled ?? true },
                         title: "Turning off",
-                        subtitle: self.name,
+                        subtitle: name,
                         color: Colors.red,
                         icon: "power.circle.fill"
                     )
@@ -975,7 +975,7 @@ extension Display {
                 display: self, releaseWhenClosed: true
             ).wc
 
-            guard let osd = self.autoOsdWindowController?.window as? OSDWindow else { return }
+            guard let osd = autoOsdWindowController?.window as? OSDWindow else { return }
 
             osd.show(closeAfter: 1000, fadeAfter: ((AUTO_OSD_DEBOUNCE_SECONDS + 0.5) * 1000).i)
         }
@@ -985,8 +985,8 @@ extension Display {
         mainAsync { [weak self] in
             guard let self else { return }
 
-            self.autoOsdWindowController?.close()
-            self.autoOsdWindowController = OSDWindow(
+            autoOsdWindowController?.close()
+            autoOsdWindowController = OSDWindow(
                 swiftuiView: AnyView(
                     AutoOSDView(
                         display: self,
@@ -1002,7 +1002,7 @@ extension Display {
                 display: self, releaseWhenClosed: true
             ).wc
 
-            guard let osd = self.autoOsdWindowController?.window as? OSDWindow else { return }
+            guard let osd = autoOsdWindowController?.window as? OSDWindow else { return }
 
             osd.show(closeAfter: 1000, fadeAfter: ((AUTO_OSD_DEBOUNCE_SECONDS + 0.5) * 1000).i)
         }

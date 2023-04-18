@@ -34,11 +34,11 @@ final class ResetButton: ToggleButton {
         fade()
         mainAsyncAfter(ms: 3000) { [weak self] in
             guard let self else { return }
-            self.attributedTitle = text.withAttribute(.textColor(self.labelColor))
-            self.state = .off
-            self.hoverState = .noHover
-            self.isEnabled = true
-            self.fade()
+            attributedTitle = text.withAttribute(.textColor(labelColor))
+            state = .off
+            hoverState = .noHover
+            isEnabled = true
+            fade()
         }
     }
 }
