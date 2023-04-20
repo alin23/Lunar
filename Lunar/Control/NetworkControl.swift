@@ -223,7 +223,7 @@ final class NetworkControl: Control {
         }
 
         let window = mainThread { appDelegate!.sshWindowController?.window ?? appDelegate!.windowController?.window }
-        let resp = ask(
+        let resp = askMultiButton(
             message: "Lunar Network Controller",
             info: """
             Lunar found a network controller at `\(service.urls.first!.absoluteString)` for the `\(display.name)` monitor.

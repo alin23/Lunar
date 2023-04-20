@@ -2190,7 +2190,7 @@ final class DisplayController: ObservableObject {
 
         let window = mainThread { appDelegate!.windowController?.window }
 
-        let resp = ask(
+        let resp = askMultiButton(
             message: "Non-responsive display \"\(display.name)\"",
             info: """
             `\(display.name.trimmed)` is not responding to commands in **\(display.control!.str)** mode.

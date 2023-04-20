@@ -1289,7 +1289,7 @@ func askAndHandle(
     markdown: Bool = false,
     onCompletion: ((Bool) -> Void)? = nil
 ) {
-    let resp = ask(
+    let resp = askMultiButton(
         message: message,
         info: info,
         okButton: okButton,
@@ -1329,7 +1329,7 @@ func ask(
     ultrawide: Bool = false,
     markdown: Bool = false
 ) -> Bool {
-    ask(
+    askMultiButton(
         message: message,
         info: info,
         okButton: okButton,
@@ -1348,7 +1348,7 @@ func ask(
     ) == .alertFirstButtonReturn
 }
 
-func ask(
+func askMultiButton(
     message: String,
     info: String,
     okButton: String = "OK",
