@@ -322,7 +322,7 @@ final class GammaControl: Control {
             display.gammaEnabled = false
         }
 
-        let resp = ask(
+        let resp = askMultiButton(
             message: "Conflict between F.lux and Lunar detected",
             info: """
             **F.lux** adjusts the colour temperature of your screen using the same method used by Lunar for *Software Dimming*.
@@ -401,7 +401,7 @@ final class GammaControl: Control {
             ? ""
             :
             "\n\nIf you wish to keep using f.lux, you can **Pause XDR** until f.lux is quit *(or until Lunar is relaunched)*.\n\nYou can also disable the XDR feature completely if you don't have a need for it (it can be reenabled later from the **Options** menu)."
-        let resp = ask(
+        let resp = askMultiButton(
             message: "Conflict between F.lux and Lunar detected",
             info: """
             **F.lux** adjusts the colour temperature of your screen using the same method used by Lunar for **[XDR Brightness](https://lunar.fyi/#xdr)**.

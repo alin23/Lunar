@@ -1296,7 +1296,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     let DEFAULT_GAMMA_PARAMETERS: (Float, Float, Float, Float, Float, Float, Float, Float, Float) = (0, 1, 1, 0, 1, 1, 0, 1, 1)
 
     @Atomic var settingGamma = false
-
     lazy var isSidecar: Bool = DDC.isSidecarDisplay(id, name: edidName)
     lazy var isAirplay: Bool = DDC.isAirplayDisplay(id, name: edidName)
     lazy var isVirtual: Bool = DDC.isVirtualDisplay(id, name: edidName)
@@ -1381,7 +1380,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .sink { [weak self] shouldDisable in
                 guard shouldDisable, let self, !self.isInMirrorSet else { return }
                 lastBlackOutToggleDate = .distantPast
-                disableBlackOut()
+                self.disableBlackOut()
             }
             .store(in: &observers)
 
@@ -1438,13 +1437,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .sink { [weak self] run in
                 guard run, let self else { return }
 
-                if control is DDCControl {
-                    control?.resetState()
+                if self.control is DDCControl {
+                    self.control?.resetState()
                 } else {
                     DDCControl(display: self).resetState()
                 }
 
-                resetControl()
+                self.resetControl()
 
                 appDelegate?.screenWakeAdapterTask = appDelegate?.screenWakeAdapterTask ?? Repeater(every: 2, times: 3, name: "DDCResetAdapter") {
                     DC.adaptBrightness(force: true)
@@ -1459,13 +1458,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .sink { [weak self] run in
                 guard run, let self else { return }
 
-                if control is NetworkControl {
-                    control?.resetState()
+                if self.control is NetworkControl {
+                    self.control?.resetState()
                 } else {
-                    NetworkControl.resetState(serial: serial)
+                    NetworkControl.resetState(serial: self.serial)
                 }
 
-                resetControl()
+                self.resetControl()
 
                 appDelegate?.screenWakeAdapterTask = appDelegate?.screenWakeAdapterTask ?? Repeater(every: 2, times: 5, name: "NetworkResetAdapter") {
                     DC.adaptBrightness(force: true)
@@ -1534,6 +1533,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var locationBrightnessMapping: [AutoLearnMapping] = LocationMode.DEFAULT_BRIGHTNESS_MAPPING
     var locationContrastMapping: [AutoLearnMapping] = LocationMode.DEFAULT_CONTRAST_MAPPING
     var scheduledBrightnessTask: Repeater? = nil
+    var settingShade: Bool {
+        shadeWindowController?.window?.contentView?.layer?.animation(forKey: kCATransition) != nil
+    }
+
     var schedules: [BrightnessSchedule] = Display.DEFAULT_SCHEDULES {
         didSet {
             resetScheduledTransition()
@@ -1602,7 +1605,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             guard !isNative else {
-                withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
+                withBrightnessTransition(smallDiff && !inSmoothTransition ? .instant : brightnessTransition) {
                     mainThread {
                         self.brightness = brightness.ns
                         self.insertBrightnessUserDataPoint(
@@ -1615,7 +1618,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             smallDiff = abs(brightness - self.brightness.doubleValue.intround) < 5
-            withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
+            withBrightnessTransition(smallDiff && !inSmoothTransition ? .instant : brightnessTransition) {
                 mainThread {
                     self.brightness = brightness.ns
                     self.insertBrightnessUserDataPoint(
@@ -1646,7 +1649,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             let smallDiff = abs(contrast - self.contrast.doubleValue.intround) < 5
-            withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
+            withBrightnessTransition(smallDiff && !inSmoothTransition ? .instant : brightnessTransition) {
                 mainThread {
                     self.contrast = contrast.ns
                     self.insertContrastUserDataPoint(
@@ -1924,27 +1927,25 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
         }
     }
-
     @objc dynamic lazy var panelMode: MPDisplayMode? = panel?.currentMode {
         didSet {
             guard DDC.apply, modeChangeAsk, let window = appDelegate!.windowController?.window else { return }
             modeNumber = panelMode?.modeNumber ?? -1
             if modeNumber != -1 {
+                let onCompletion: (Bool) -> Void = { [weak self] keep in
+                    guard !keep, let self else { return }
+
+                    self.modeChangeAsk = false
+                    self.setMode(oldValue)
+                    self.modeChangeAsk = true
+                }
+
                 ask(
                     message: "Resolution Change",
                     info: "Do you want to keep this resolution?\n\nLunar will revert to the last resolution if no option is selected in 15 seconds.",
                     window: window,
                     okButton: "Keep", cancelButton: "Revert",
-                    onCompletion: { [weak self] keep in
-                        if !keep, let self {
-                            withoutModeChangeAsk {
-                                mainThread {
-                                    self.panelMode = oldValue
-                                    self.modeNumber = oldValue?.modeNumber ?? -1
-                                }
-                            }
-                        }
-                    }
+                    onCompletion: onCompletion
                 )
             }
 
@@ -2442,6 +2443,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         manager.unlockAccess()
     }
 
+    func setMode(_ mode: MPDisplayMode?) {
+        mainThread {
+            self.panelMode = mode
+            self.modeNumber = mode?.modeNumber ?? -1
+        }
+    }
+
     func brightnessCurveMapping(_ modeKey: AdaptiveModeKey? = nil) -> [AutoLearnMapping] {
         switch modeKey ?? DC.adaptiveModeKey {
         case .sync:
@@ -2535,7 +2543,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             var smallDiff = abs(brightness.i - self.brightness.doubleValue.intround) < 5
             if !lockedBrightness || hasSoftwareControl {
-                withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
+                withBrightnessTransition(smallDiff && !inSmoothTransition ? .instant : brightnessTransition) {
                     mainThread {
                         withoutReapplyPreciseValue {
                             self.brightness = brightness.ns
@@ -2550,7 +2558,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             if !lockedContrast || DC.calibrating {
                 smallDiff = abs(contrast.i - self.contrast.doubleValue.intround) < 5
-                withBrightnessTransition(smallDiff ? .instant : brightnessTransition) {
+                withBrightnessTransition(smallDiff && !inSmoothTransition ? .instant : brightnessTransition) {
                     mainThread {
                         withoutReapplyPreciseValue {
                             self.contrast = contrast.ns
@@ -2810,6 +2818,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             guard apply else { return }
             resetScheduledTransition()
 
+            if softwareBrightness < 1.0, oldValue == 1.0 {
+                systemAdaptiveBrightness = false
+            } else if softwareBrightness == 1.0, oldValue < 1.0, ambientLightCompensationEnabledByUser {
+                systemAdaptiveBrightness = true
+            }
+
             log.info("\(name) SOFT BRIGHTNESS: \(softwareBrightness.str(decimals: 2))")
 
             let br = softwareBrightness
@@ -2883,7 +2897,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             Self.setThreadDictValue(id, type: "ambientLightCompensationEnabledByUser", value: value)
             return value
         }
-        if enabled { return true }
+        if enabled { return !adaptive }
         if systemAdaptiveBrightness {
             // User must have enabled this manually in the meantime, set it to true manually
             Self.setThreadDictValue(id, type: "ambientLightCompensationEnabledByUser", value: true)
@@ -4352,6 +4366,17 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         return preciseBrightness * 100
     }
 
+    var smoothGammaQueue: DispatchQueue {
+        switch control {
+        case is DDCControl:
+            return smoothDDCQueue
+        case is AppleNativeControl:
+            return smoothDisplayServicesQueue
+        default:
+            return serialQueue
+        }
+    }
+
     static func insertElevationDataPoint(_ mapping: AutoLearnMapping, in values: [AutoLearnMapping]) -> [AutoLearnMapping]? {
         guard let solar = LocationMode.specific.geolocation?.solar,
               let noon = solar.solarNoonPosition?.elevation,
@@ -4443,7 +4468,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         shadeTask = nil
         mainThread {
             let brightnessTransition = transition ?? brightnessTransition
-            if shadeWindowController?.window == nil {
+            let windowAlreadyOpen = shadeWindowController?.window == nil
+
+            if !windowAlreadyOpen {
                 createWindow(
                     "shadeWindowController",
                     controller: &shadeWindowController,
@@ -4465,6 +4492,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 }
             }
             guard let w = shadeWindowController?.window else { return }
+
             w.setFrameOrigin(CGPoint(x: screen.frame.minX, y: screen.frame.minY))
             w.setFrame(screen.frame, display: false)
 
@@ -4472,8 +4500,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             if smooth { w.contentView?.transition(delay) }
             if amount == 2 {
                 w.contentView?.alphaValue = 1
-            } else {
+            } else if windowAlreadyOpen {
                 w.contentView?.alphaValue = cap(amount, minVal: 0.0, maxVal: 1.0).map(from: (0.0, 1.0), to: (0.01, 0.85))
+            } else {
+                shadeTask = mainAsyncAfter(ms: 10) {
+                    w.contentView?.alphaValue = cap(amount, minVal: 0.0, maxVal: 1.0).map(from: (0.0, 1.0), to: (0.01, 0.85))
+                }
             }
 
             if amount <= 0.01, smooth {
@@ -4515,7 +4547,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         if hasSoftwareControl {
-            setGamma(transition: .instant)
+            setGamma(transition: inSmoothTransition ? brightnessTransition : .instant)
         } else if applyGamma, !blackOutEnabled {
             resetSoftwareControl()
         }
@@ -4571,8 +4603,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         if appleNativeEnabled {
             let appleNativeControl = AppleNativeControl(display: self)
             if appleNativeControl.isAvailable() {
-                if reapply, softwareBrightness == 1.0, applyGamma || gammaChanged {
-                    if !blackOutEnabled { resetSoftwareControl() }
+                if reapply, softwareBrightness == 1.0, applyGamma || gammaChanged, gammaEnabled {
+                    if !blackOutEnabled, !faceLightEnabled, !settingGamma, !settingShade, !inSmoothTransition {
+                        resetSoftwareControl()
+                    }
                     appleNativeControl.reapply()
                 }
                 enabledControls[.gamma] = false
@@ -4583,8 +4617,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         if !isBuiltin, supportsGammaByDefault, ddcEnabled {
             let ddcControl = DDCControl(display: self)
             if ddcControl.isAvailable() {
-                if reapply, softwareBrightness == 1.0, applyGamma || gammaChanged {
-                    if !blackOutEnabled { resetSoftwareControl() }
+                if reapply, softwareBrightness == 1.0, applyGamma || gammaChanged, gammaEnabled {
+                    if !blackOutEnabled, !faceLightEnabled, !settingGamma, !settingShade, !inSmoothTransition {
+                        resetSoftwareControl()
+                    }
                     ddcControl.reapply()
                 }
                 enabledControls[.gamma] = false
@@ -4595,8 +4631,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         if !isBuiltin, networkEnabled {
             let networkControl = NetworkControl(display: self)
             if networkControl.isAvailable() {
-                if reapply, softwareBrightness == 1.0, applyGamma || gammaChanged {
-                    if !blackOutEnabled { resetSoftwareControl() }
+                if reapply, softwareBrightness == 1.0, applyGamma || gammaChanged, gammaEnabled {
+                    if !blackOutEnabled, !faceLightEnabled, !settingGamma, !settingShade, !inSmoothTransition {
+                        resetSoftwareControl()
+                    }
                     networkControl.reapply()
                 }
                 enabledControls[.gamma] = false
@@ -5813,7 +5851,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             return
         }
 
-        gammaSetterTask = serialAsyncAfter(ms: 1, name: "gamma-setter") { [weak self] in
+        let delay = brightnessTransition == .slow ? 0.025 : 0.002
+        gammaSetterTask = DispatchWorkItem(name: "gammaSetter: \(description)", flags: .barrier) { [weak self] in
+            // gammaSetterTask = serialAsyncAfter(ms: 1, name: "gamma-setter") { [weak self] in
             guard let self else { return }
 
             self.settingGamma = true
@@ -5840,7 +5880,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     lastGammaBrightness = brightness
                     onChange?(brightness)
                 }
-                Thread.sleep(forTimeInterval: brightnessTransition == .slow ? 0.025 : 0.002)
+                Thread.sleep(forTimeInterval: delay)
             }
 
             guard !newGammaTable.isZero else {
@@ -5853,6 +5893,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
             onChange?(brightness)
         }
+        smoothGammaQueue.asyncAfter(deadline: DispatchTime.now(), execute: gammaSetterTask!.workItem)
     }
 
     func resetBlackOut() {
@@ -6074,7 +6115,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case .sensor:
             previousBrightnessMapping.setOrRefresh(sensorBrightnessMapping, expireAfter: 1)
 
-            sensorBrightnessMapping = Self.insertDataPoint(mapping, in: previousBrightnessMapping.value ?? sensorBrightnessMapping, cliffRatio: 1, cliffSourceDiff: 50)
+            sensorBrightnessMapping = Self.insertDataPoint(mapping, in: previousBrightnessMapping.value ?? sensorBrightnessMapping, cliffRatio: 2, cliffSourceDiff: 30, stopCliffDetectionBelow: 35)
             saveSensorMapping()
             NotificationCenter.default.post(name: brightnessDataPointInserted, object: self, userInfo: ["values": sensorBrightnessMapping])
         case .location:
@@ -6122,7 +6163,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case .sensor:
             previousContrastMapping.setOrRefresh(sensorContrastMapping, expireAfter: 1)
 
-            sensorContrastMapping = Self.insertDataPoint(mapping, in: previousContrastMapping.value ?? sensorContrastMapping, cliffRatio: 1, cliffSourceDiff: 50)
+            sensorContrastMapping = Self.insertDataPoint(mapping, in: previousContrastMapping.value ?? sensorContrastMapping, cliffRatio: 2, cliffSourceDiff: 30, stopCliffDetectionBelow: 35)
             saveSensorMapping()
             NotificationCenter.default.post(name: contrastDataPointInserted, object: self, userInfo: ["values": sensorContrastMapping])
         case .location:
