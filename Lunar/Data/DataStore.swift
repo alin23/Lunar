@@ -116,6 +116,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .brightnessStep,
     .clamshellModeDetection,
     .sleepInClamshellMode,
+    .disableCliffDetection,
     .disableBrightnessObservers,
     .contrastStep,
     .didScrollTextField,
@@ -790,6 +791,7 @@ func initCache() {
     cacheKey(.showInputInQuickActions)
     cacheKey(.clamshellModeDetection)
     cacheKey(.sleepInClamshellMode)
+    cacheKey(.disableCliffDetection)
     cacheKey(.disableBrightnessObservers)
     cacheKey(.brightnessStep)
     cacheKey(.contrastStep)
