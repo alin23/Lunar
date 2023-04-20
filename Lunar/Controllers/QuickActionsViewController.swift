@@ -1095,6 +1095,7 @@ struct AdvancedSettingsView: View {
     @Default(.allowBlackOutOnSingleScreen) var allowBlackOutOnSingleScreen
     @Default(.reapplyValuesAfterWake) var reapplyValuesAfterWake
     @Default(.clockMode) var clockMode
+    @Default(.nonManualMode) var nonManualMode
     @Default(.oldBlackOutMirroring) var oldBlackOutMirroring
     @Default(.newBlackOutDisconnect) var newBlackOutDisconnect
 
@@ -1106,6 +1107,7 @@ struct AdvancedSettingsView: View {
     @Default(.autoRestartOnFailedDDC) var autoRestartOnFailedDDC
     @Default(.autoRestartOnFailedDDCSooner) var autoRestartOnFailedDDCSooner
     @Default(.sleepInClamshellMode) var sleepInClamshellMode
+    @Default(.disableCliffDetection) var disableCliffDetection
 
     @State var sensorCheckerEnabled = !Defaults[.sensorHostname].isEmpty
 
@@ -1354,6 +1356,22 @@ struct AdvancedSettingsView: View {
                                     .padding(.leading, 20)
                                     .padding(.top, -5)
                             }
+                        }
+                        if nonManualMode {
+                            SettingsToggle(
+                                text: "Disable cliff detection for auto-learning", setting: $disableCliffDetection,
+                                help: """
+                                The Cliff Detection algorithm is a safe guard that avoids having Lunar learn
+                                a very low brightness and a very high brightness very close together.
+                                (e.g. 5% at 10lux, 100% at 20lux)
+
+                                That would cause constant transitioning between the two learnt brightnesses
+                                and very high CPU usage when the ambient light changed continuously.
+                                (which happens often when clouds are passing, or when in a moving vehicle)
+
+                                This will disable that safe guard.
+                                """
+                            )
                         }
                     }
                 }

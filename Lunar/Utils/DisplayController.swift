@@ -1128,6 +1128,12 @@ final class DisplayController: ObservableObject {
         }.store(in: &observers)
         return Defaults[.ddcSleepFactor]
     }()
+    static var disableCliffDetection: Bool = {
+        pub(.disableCliffDetection).sink { change in
+            DisplayController.disableCliffDetection = change.newValue
+        }.store(in: &observers)
+        return Defaults[.disableCliffDetection]
+    }()
 
     @Published var calibrating = false
 
