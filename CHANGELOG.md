@@ -1,3 +1,108 @@
+# 6.1.1
+## PWM flicker minimization
+
+By combining hardware and software dimming at specific thresholds, Lunar can help people sensitive to PWM flickering.
+
+For the Apple Silicon MacBooks adjust the **Min Brightness** to `38` in [Display Settings](https://app.lunar.fyi/display/builtin) to get advantage of this.
+
+For other screens, play with the **Min Brightness** setting until you find the threshold under which PWM flicker becomes noticeable. Then set the min brightness to the lowest value that doesn't cause flicker.
+
+Here's a thread that explains how to better find the flicker limit: https://forums.macrumors.com/threads/macbook-pro-14-m2pro-pwm-solution.2386836/?post=32099271#post-32099271
+
+Limiting the min brightness to the range which does not cause PWM flicker will allow Lunar to lower LED voltage in that range, while keeping voltage steady and only blocking light through the liquid crystals below that range.
+
+## Improvements
+
+* Added `sidecar` option to `lunar toggle-connection` CLI command
+
+## Fixes
+
+* Fix `Sub-zero Dimming` being overridden by the system adaptive brightness
+* Fix contrast jumping from max to min when going to/from Sub-zero Dimming
+* Fix flashes and sudden transitions when going in and out of `Sub-zero Dimming`
+
+# 6.1.0
+## Clock Mode improvements
+
+* Added **Sub-zero dimming** range *(can be disabled from the [Controls menu](https://app.lunar.fyi/display/controls))*
+
+![sub-zero dimming in clock mode](https://files.lunar.fyi/clock-mode-subzero.png)
+
+### Algorithm Variations
+
+![fully automated clock mode selector](https://files.lunar.fyi/fully-automated-clock-mode-selector.png)
+
+#### Fully Automated
+
+This makes Clock Mode override any manual adjustments done by the user.
+
+It also makes it re-apply the brightness of the previous schedule after standby/wake or after a screen reconnection.
+
+#### User Controlled
+
+This makes Clock Mode respect manual adjustments done by the user.
+
+Brightness will always transition to the next schedule starting from the user adjusted brightness.
+
+Also if the system wakes within 30 minutes of a passed schedule, the brightness of that previous schedule is re-applied
+
+### Features
+
+* Add **Send volume to all monitors** setting
+    * Helpful for setups with multiple similar monitors, where the audio device can't be matched to the correct monitor
+
+![send volume to all monitors setting](https://files.lunar.fyi/send-volume-to-all-monitors.png)
+
+## Improvements
+
+* Remove **Menu** button and allow `Control`+`Click` on the menubar icon to see the menu
+    * `Right Click` or `Two Finger Trackpad Click` also works
+* Renamed *Options* button to *Settings*
+* Renamed *Preferences* button to *Display Settings*
+* Fix an annoying macOS bug that keeps resetting the brightness of Apple displays to `50%` after wake
+* Remove the `jitterAfterWake` setting since it's no longer needed
+* When disconnecting a screen, re-apply previous scaling on remaining screens one by one instead of all at once
+
+# 6.0.3
+## Features
+
+* `Watchdog`: restart Lunar when it hangs 
+* **Trigger Sleep when the lid is closed** feature
+    * for those people that want the Mac to sleep when closing the lid while connected to a monitor and charging
+
+![trigger sleep lid closed option](https://files.lunar.fyi/trigger-sleep-lid-closed-option.png)
+
+* **Sleep the Mac** Apple Shortcut
+
+![sleep the mac shortcut](https://files.lunar.fyi/sleep-the-mac-shortcut.png)
+
+## Improvements
+
+* Allow for steeper curves in Sync/Sensor/Location modes
+
+## Fixes
+
+* Sync Mode should not flicker anymore
+
+# 6.0.2
+## Features
+
+* `Watchdog`: restart Lunar when it crashes
+    * some crashes happen because of causes outside Lunar's control
+    * this will ensure Lunar keeps running until the user quits it explicitly
+    * when crashing too often, the Watchdog will be disabled automatically
+* **[Fix Monitor Arrangement](https://lunar.fyi/shortcuts#fix-monitor-arrangement)** Shortcut to aid in repairing horizontal arrangements that get swapped around by the system
+
+<video height=330 src="https://files.lunar.fyi/fix-monitor-arrangement-demo-h264.mp4" autoplay loop muted playsinline disablepictureinpicture></video>
+
+
+## Improvements
+
+* Better performance and lower CPU usage when the menu is not visible
+* Show **"Possibly disconnected"** displays: 
+    * these are displays that have **Auto Disconnect** enabled but can't be detected as having the cable connected or not
+    * they are always shown until connected to make sure there's always a way to disable Auto Disconnect
+
 # 6.0.1
 ## Features
 
