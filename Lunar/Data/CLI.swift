@@ -1526,7 +1526,7 @@ struct Lunar: ParsableCommand {
             @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
             @Argument(
-                help: "Display serial, ID or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
+                help: "Display serial, ID or name (without spaces) or one of the following special values (sidecar, \(DisplayFilter.allValueStrings.joined(separator: ", ")))"
             )
             var display = DisplayFilter.builtin
 
@@ -1551,6 +1551,19 @@ struct Lunar: ParsableCommand {
                 } else {
                     DC.dis(displays.map(\.id))
                 }
+
+                guard display != .name("sidecar") else {
+                    guard let sdm, let connected = sdm.connectedDevices, let device = connected.first else {
+                        cliExit(1)
+                        return
+                    }
+
+                    Task.init { await sdm.disconnect(from: device) }
+
+                    cliExit(0)
+                    return
+                }
+
                 cliExit(0)
             }
         }
@@ -1565,7 +1578,7 @@ struct Lunar: ParsableCommand {
             @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
             @Argument(
-                help: "Display serial, ID or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
+                help: "Display serial, ID or name (without spaces) or one of the following special values (sidecar, \(DisplayFilter.allValueStrings.joined(separator: ", ")))"
             )
             var display = DisplayFilter.builtin
 
@@ -1578,6 +1591,20 @@ struct Lunar: ParsableCommand {
 
                 guard display != .builtin else {
                     DC.en(1)
+                    cliExit(0)
+                    return
+                }
+
+                guard display != .name("sidecar") else {
+                    guard let sdm, let connected = sdm.connectedDevices, connected.isEmpty,
+                          let device = sdm.recentDevices?.first ?? sdm.devices?.first
+                    else {
+                        cliExit(1)
+                        return
+                    }
+
+                    Task.init { await sdm.connect(to: device) }
+
                     cliExit(0)
                     return
                 }
@@ -1615,7 +1642,7 @@ struct Lunar: ParsableCommand {
             @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
             @Argument(
-                help: "Display serial, ID or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
+                help: "Display serial, ID or name (without spaces) or one of the following special values (sidecar, \(DisplayFilter.allValueStrings.joined(separator: ", ")))"
             )
             var display = DisplayFilter.builtin
 
@@ -1645,6 +1672,21 @@ struct Lunar: ParsableCommand {
                     } else {
                         DC.en(1)
                     }
+                    cliExit(0)
+                    return
+                }
+                guard display != .name("sidecar") else {
+                    guard let sdm, let connected = sdm.connectedDevices else {
+                        cliExit(1)
+                        return
+                    }
+
+                    if connected.isEmpty, let device = sdm.recentDevices?.first ?? sdm.devices?.first {
+                        Task.init { await sdm.connect(to: device) }
+                    } else if let device = connected.first {
+                        Task.init { await sdm.disconnect(from: device) }
+                    }
+
                     cliExit(0)
                     return
                 }
