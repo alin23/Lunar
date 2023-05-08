@@ -363,36 +363,42 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     var memory1GBPassed = false {
         didSet {
             guard AppDelegate.enableSentry, memory1GBPassed, !oldValue, let mb = memoryFootprintMB() else { return }
-            SentrySDK.configureScope { scope in
-                scope.setTag(value: "1GB", key: "memory")
-                scope.setExtra(value: mb, key: "usedMB")
-                SentrySDK.capture(error: MemoryUsageError.highMemoryUsage(mb.intround))
-                self.restartApp(self)
-            }
+            #if !DEBUG
+                SentrySDK.configureScope { scope in
+                    scope.setTag(value: "1GB", key: "memory")
+                    scope.setExtra(value: mb, key: "usedMB")
+                    SentrySDK.capture(error: MemoryUsageError.highMemoryUsage(mb.intround))
+                    self.restartApp(self)
+                }
+            #endif
         }
     }
 
     var memory2GBPassed = false {
         didSet {
             guard AppDelegate.enableSentry, memory2GBPassed, !oldValue, let mb = memoryFootprintMB() else { return }
-            SentrySDK.configureScope { scope in
-                scope.setTag(value: "2GB", key: "memory")
-                scope.setExtra(value: mb, key: "usedMB")
-                SentrySDK.capture(error: MemoryUsageError.highMemoryUsage(mb.intround))
-                self.restartApp(self)
-            }
+            #if !DEBUG
+                SentrySDK.configureScope { scope in
+                    scope.setTag(value: "2GB", key: "memory")
+                    scope.setExtra(value: mb, key: "usedMB")
+                    SentrySDK.capture(error: MemoryUsageError.highMemoryUsage(mb.intround))
+                    self.restartApp(self)
+                }
+            #endif
         }
     }
 
     var memory4GBPassed = false {
         didSet {
             guard AppDelegate.enableSentry, memory4GBPassed, !oldValue, let mb = memoryFootprintMB() else { return }
-            SentrySDK.configureScope { scope in
-                scope.setTag(value: "4GB", key: "memory")
-                scope.setExtra(value: mb, key: "usedMB")
-                SentrySDK.capture(error: MemoryUsageError.highMemoryUsage(mb.intround))
-                self.restartApp(self)
-            }
+            #if !DEBUG
+                SentrySDK.configureScope { scope in
+                    scope.setTag(value: "4GB", key: "memory")
+                    scope.setExtra(value: mb, key: "usedMB")
+                    SentrySDK.capture(error: MemoryUsageError.highMemoryUsage(mb.intround))
+                    self.restartApp(self)
+                }
+            #endif
         }
     }
 
@@ -850,8 +856,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
         switch locationManager.authorizationStatus {
         case .notDetermined, .restricted:
-            log.debug("Requesting location permissions")
-            locationManager.requestAlwaysAuthorization()
+            if !CachedDefaults[.manualLocation] {
+                log.debug("Requesting location permissions")
+                locationManager.requestAlwaysAuthorization()
+            }
         case .authorizedAlways:
             log.debug("Location authorized")
         case .denied:
@@ -2383,7 +2391,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     func startReceivingSignificantLocationChanges() {
         if CachedDefaults[.manualLocation] {
             LocationMode.specific.geolocation = CachedDefaults[.location]
-            return
         }
 
         if locationManager == nil {
@@ -2394,13 +2401,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         }
 
         guard let locationManager, locationManager.authorizationStatus != .denied else {
-            log.debug("Location authStatus denied")
+            log.warning("Location authStatus denied")
             locationManager?.stopUpdatingLocation()
             return
         }
 
         locationManager.stopUpdatingLocation()
-        locationManager.startUpdatingLocation()
+        if !CachedDefaults[.manualLocation] {
+            locationManager.startUpdatingLocation()
+        }
 
         switch locationManager.authorizationStatus {
         case .authorizedAlways:

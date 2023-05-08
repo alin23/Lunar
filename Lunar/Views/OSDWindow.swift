@@ -737,9 +737,10 @@ struct BrightnessOSDView: View {
                 Image(systemName: osd.image)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: NATIVE_OSD_WIDTH * 0.5, height: NATIVE_OSD_WIDTH * 0.5)
-                    .font(.system(size: 48, weight: .light, design: .rounded))
+                    .frame(width: NATIVE_OSD_WIDTH * 0.42, height: NATIVE_OSD_WIDTH * 0.42)
+                    .font(.system(size: 48, weight: .medium, design: .rounded))
                     .foregroundColor(.primary.opacity(0.75))
+                    .padding(NATIVE_OSD_WIDTH * 0.05)
 
                 Text(osd.text).font(.system(size: 12, weight: .medium))
                     .foregroundColor(.primary.opacity(0.75))

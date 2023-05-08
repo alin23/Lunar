@@ -871,7 +871,9 @@ enum Hotkey {
             )
             return
         }
-        guard !display.blackOutEnabled, display.softwareBrightness == 1.0, let manager = OSDManager.sharedManager() as? OSDManager else {
+        guard !display.blackOutEnabled, osdImage != .brightness || display.softwareBrightness == 1.0,
+              let manager = OSDManager.sharedManager() as? OSDManager
+        else {
             log.warning("No OSDManager available")
             return
         }
