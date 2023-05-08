@@ -1737,9 +1737,9 @@ final class DisplayController: ObservableObject {
     }
 
     func getCurrentAudioDisplay() -> Display? {
-        #if DEBUG
-            return externalActiveDisplays.first
-        #endif
+        // #if DEBUG
+        //     return externalActiveDisplays.first
+        // #endif
 
         guard let audioDevice = simplyCA.defaultOutputDevice,
               !audioDevice.canSetVirtualMainVolume(scope: .output),
