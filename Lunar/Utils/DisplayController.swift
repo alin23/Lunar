@@ -441,7 +441,7 @@ final class DisplayController: ObservableObject {
         adaptiveMode = DisplayController.getAdaptiveMode()
     }
 
-    static var panelManager: MPDisplayMgr? = MPDisplayMgr()
+    static var panelManager: MPDisplayMgr? = MPDisplayMgr.shared() ?? MPDisplayMgr()
     static var manualModeFromSyncMode = false
 
     static var initialized = false
@@ -1145,7 +1145,7 @@ final class DisplayController: ObservableObject {
         let p = PassthroughSubject<CGDirectDisplayID, Never>()
         p.debounce(for: .seconds(2), scheduler: RunLoop.main)
             .sink { [self] id in
-                DisplayController.panelManager = MPDisplayMgr()
+                DisplayController.panelManager = MPDisplayMgr.shared() ?? MPDisplayMgr()
                 if let display = activeDisplays[id] {
                     display.refreshPanel()
                 }
@@ -1300,7 +1300,7 @@ final class DisplayController: ObservableObject {
             restoreColorSyncSettings()
         }
 
-        DisplayController.panelManager = MPDisplayMgr()
+        DisplayController.panelManager = MPDisplayMgr.shared() ?? MPDisplayMgr()
         guard let displayList = datastore.displays(serials: serials), !displayList.isEmpty else {
             let displays = ids.dict { ($0, Display(id: $0, active: true)) }
 
@@ -1737,6 +1737,10 @@ final class DisplayController: ObservableObject {
     }
 
     func getCurrentAudioDisplay() -> Display? {
+        #if DEBUG
+            return externalActiveDisplays.first
+        #endif
+
         guard let audioDevice = simplyCA.defaultOutputDevice,
               !audioDevice.canSetVirtualMainVolume(scope: .output),
               volumeHotkeysEnabled
@@ -1946,7 +1950,7 @@ final class DisplayController: ObservableObject {
         resetDisplayListTask = mainAsyncAfter(ms: now ? 0 : 200) {
             self.resetDisplayListTask = nil
             self.getDisplaysLock.around {
-                Self.panelManager = MPDisplayMgr()
+                Self.panelManager = MPDisplayMgr.shared() ?? MPDisplayMgr()
                 DDC.reset()
 
                 let activeOldDisplays = self.displayList.filter(\.active)

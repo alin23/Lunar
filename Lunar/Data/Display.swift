@@ -1877,7 +1877,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     var canChangeOrientation: Bool {
         #if DEBUG
-            if isForTesting { return true }
+            if isForTesting || isFakeDummy { return true }
         #endif
 
         return panel?.canChangeOrientation() ?? false
@@ -2812,7 +2812,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var softwareBrightness: Float = 1.0 {
         didSet {
             checkNaN(softwareBrightness)
-            guard supportsGammaByDefault else { return }
+            guard softwareBrightness <= 1.0 || (supportsGammaByDefault && supportsEnhance && enhanced) else { return }
 
             lastSoftwareBrightness = oldValue
             guard apply else { return }
@@ -3192,8 +3192,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             && vendor != .samsung
             && !Self.notDummyNamePattern.matches(name)
     )
-    @objc dynamic lazy var isFakeDummy: Bool = (Self.notDummyNamePattern.matches(name) && vendor == .dummy)
-
+    #if DEBUG
+        @objc dynamic var isFakeDummy: Bool { Self.notDummyNamePattern.matches(name) && vendor == .dummy }
+    #else
+        @objc dynamic lazy var isFakeDummy: Bool = (Self.notDummyNamePattern.matches(name) && vendor == .dummy)
+    #endif
     @objc dynamic lazy var otherDisplays: [Display] = DC.activeDisplayList.filter { $0.serial != serial }
 
     @Atomic var userAdjusting = false {
@@ -3274,17 +3277,19 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func sliderValueToBrightnessContrast(_ value: Double) -> (Brightness, Contrast) {
-        var brightness = brightness.uint16Value
-        var contrast = contrast.uint16Value
+        var br = brightness.uint16Value
+        var cr = contrast.uint16Value
 
         if !lockedBrightness || hasSoftwareControl {
-            brightness = (cap(value, minVal: 0.0, maxVal: 1.0).map(from: (0.0, 1.0), to: (minBrightness.doubleValue / 100.0, maxBrightness.doubleValue / 100.0)) * 100).intround.u16
+            let brd = (cap(value, minVal: 0.0, maxVal: 1.0).map(from: (0.0, 1.0), to: (minBrightness.doubleValue / 100.0, maxBrightness.doubleValue / 100.0)) * 100)
+            br = brd.isNaN ? br : brd.intround.u16
         }
         if !lockedContrast {
-            contrast = (pow(cap(value, minVal: 0.0, maxVal: 1.0), 0.5).map(from: (0.0, 1.0), to: (minContrast.doubleValue / 100.0, maxContrast.doubleValue / 100.0)) * 100).intround.u16
+            let crd = (pow(cap(value, minVal: 0.0, maxVal: 1.0), 0.5).map(from: (0.0, 1.0), to: (minContrast.doubleValue / 100.0, maxContrast.doubleValue / 100.0)) * 100)
+            cr = crd.isNaN ? cr : crd.intround.u16
         }
 
-        return (brightness, contrast)
+        return (br, cr)
     }
 
     func updateCornerWindow() {
@@ -3909,6 +3914,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var onlySoftwareDimmingEnabled: Bool { !ddcEnabled && !networkEnabled && !appleNativeEnabled }
 
     var supportsVolumeControl: Bool {
+        #if DEBUG
+            if isForTesting || isFakeDummy { return true }
+        #endif
+
         guard let control, !hasSoftwareControl else { return false }
         if isNative, let alternativeControl = alternativeControlForAppleNative {
             return alternativeControl is DDCControl || alternativeControl is NetworkControl
@@ -4468,7 +4477,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         shadeTask = nil
         mainThread {
             let brightnessTransition = transition ?? brightnessTransition
-            let windowAlreadyOpen = shadeWindowController?.window == nil
+            let windowAlreadyOpen = shadeWindowController?.window != nil
 
             if !windowAlreadyOpen {
                 createWindow(
@@ -4614,7 +4623,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
         }
 
-        if !isBuiltin, supportsGammaByDefault, ddcEnabled {
+        if !isBuiltin, supportsGammaByDefault || isFakeDummy, ddcEnabled {
             let ddcControl = DDCControl(display: self)
             if ddcControl.isAvailable() {
                 if reapply, softwareBrightness == 1.0, applyGamma || gammaChanged, gammaEnabled {
@@ -4810,8 +4819,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         let i2c = {
             #if DEBUG
-                guard id != TEST_DISPLAY_ID, id != TEST_DISPLAY_PERSISTENT_ID, id != TEST_DISPLAY_PERSISTENT2_ID
-                else {
+                if id == TEST_DISPLAY_ID || id == TEST_DISPLAY_PERSISTENT_ID || id == TEST_DISPLAY_PERSISTENT2_ID || isFakeDummy {
                     return true
                 }
             #endif

@@ -6,7 +6,6 @@
 //  Copyright © 2018 Alin. All rights reserved.
 //
 
-import Defaults
 import Foundation
 import os
 

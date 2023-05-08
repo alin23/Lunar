@@ -114,11 +114,15 @@ final class DDCControl: Control, ObservableObject {
     }
 
     static func isAvailable(for display: Display) -> Bool {
-        display.active && display.hasI2C || display.isForTesting
+        display.active && display.hasI2C || display.isForTesting || display.isFakeDummy
     }
 
     func isAvailable() -> Bool {
         guard let display else { return false }
+
+        #if DEBUG
+            if display.isFakeDummy { return true }
+        #endif
 
         guard display.active else { return false }
         guard let enabledForDisplay = display.enabledControls[displayControl], enabledForDisplay else { return false }
@@ -127,6 +131,10 @@ final class DDCControl: Control, ObservableObject {
 
     func isResponsive() -> Bool {
         guard let display else { return false }
+
+        #if DEBUG
+            if display.isFakeDummy { return true }
+        #endif
 
         return display.responsiveDDC
     }
