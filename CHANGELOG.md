@@ -1,15 +1,48 @@
+# 6.1.3
+## Fixes
+
+* Fix **volume OSD** not appearing in **Sub-zero Dimming**
+* Fix Sub-zero Dimming not working with the dark overlay in some cases
+* Fix Lunar not responding for some users
+
+## Features
+
+- [MediaMate](https://wouter01.github.io/MediaMate/) integration:
+    - `lunar listen` CLI command for getting realtime brightness/contrast/volume changes
+    - `hideOSD` setting forces Lunar to not show any OSD whatsoever
+
+# 6.1.2
+## Fixes
+
+* Fix `Overlay Dimming` not working anymore
+
 # 6.1.1
 ## PWM flicker minimization
 
 By combining hardware and software dimming at specific thresholds, Lunar can help people sensitive to PWM flickering.
 
-For the Apple Silicon MacBooks adjust the **Min Brightness** to `38` in [Display Settings](https://app.lunar.fyi/display/builtin) to get advantage of this.
+*The below video shows how you can use the [Halide](https://halide.cam/) iOS app to find the lowest brightness where flickering starts to appear.*
 
-For other screens, play with the **Min Brightness** setting until you find the threshold under which PWM flicker becomes noticeable. Then set the min brightness to the lowest value that doesn't cause flicker.
+<video playsinline controls>
+    <source src="https://files.lunar.fyi/lunar-pwm-flickering-h265.mp4" type="video/mp4; codecs=hvc1">
+    <source src="https://files.lunar.fyi/lunar-pwm-flickering-h264.mp4" type="video/mp4">
+</video>
 
-Here's a thread that explains how to better find the flicker limit: https://forums.macrumors.com/threads/macbook-pro-14-m2pro-pwm-solution.2386836/?post=32099271#post-32099271
+---
 
-Limiting the min brightness to the range which does not cause PWM flicker will allow Lunar to lower LED voltage in that range, while keeping voltage steady and only blocking light through the liquid crystals below that range.
+#### How to use it
+
+For 2021 Apple Silicon MacBooks, adjust the **Min Brightness** to `38` in [Display Settings](https://app.lunar.fyi/display/builtin) to get advantage of this.
+
+Lunar will then use [Sub-zero Dimming](https://lunar.fyi/#subzero) below that value, which keeps the LED voltage steady while blocking light using the LCD.
+
+![min brightness set to 38](https://files.lunar.fyi/macbook-min-brightness-38.png)
+
+For external monitors and other screens, play with the **Min Brightness** setting until you find the threshold under which PWM flicker becomes noticeable.
+
+Then set the minimum brightness to the lowest value that doesn't cause flicker.
+
+---
 
 ## Improvements
 
