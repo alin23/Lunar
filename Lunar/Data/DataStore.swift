@@ -51,6 +51,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .autoXdr,
     .autoXdrSensor,
     .autoXdrSensorShowOSD,
+    .hideOSD,
     .autoXdrSensorLuxThreshold,
     .allowAnySyncSource,
     .gammaDisabledCompletely,
@@ -711,6 +712,7 @@ func initCache() {
     cacheKey(.autoXdrSensorLuxThreshold)
     cacheKey(.customOSDVerticalOffset)
     cacheKey(.allowAnySyncSource)
+    cacheKey(.hideOSD)
 
     cacheKey(.gammaDisabledCompletely)
     cacheKey(.oldHdrWorkaround)

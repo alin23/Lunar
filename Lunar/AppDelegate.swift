@@ -1993,6 +1993,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                     if let response = try (socket.readString())?.trimmed, !response.isEmpty {
                         print(response)
                     }
+                    if argList.contains("listen") {
+                        var line = try socket.readString()
+                        while let currentLine = line, !currentLine.isEmpty {
+                            print(currentLine.trimmed)
+                            line = try socket.readString()
+                        }
+                    }
                     cliExit(0)
                 } catch {
                     print(error.localizedDescription)

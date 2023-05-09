@@ -1585,9 +1585,9 @@ extension NSAttributedString {
 let storeLock = NSRecursiveLock()
 
 extension AnyCancellable {
-    func store(
-        in dictionary: inout [String: AnyCancellable],
-        for key: String
+    func store<T: Hashable>(
+        in dictionary: inout [T: AnyCancellable],
+        for key: T
     ) {
         storeLock.around {
             dictionary[key] = self

@@ -862,6 +862,7 @@ enum Hotkey {
     static func showOsd(osdImage: OSDImage, value: UInt32, display: Display) {
         guard !display.isAllDisplays, !display.isForTesting else { return }
         guard osdImage != .contrast else {
+            display.userContrast = value.d
             display.showSoftwareOSD(
                 image: "circle.lefthalf.filled",
                 value: value.f / 100,
@@ -881,13 +882,15 @@ enum Hotkey {
         switch osdImage {
         case .brightness:
             controlID = .BRIGHTNESS
-        case .contrast:
-            controlID = .CONTRAST
+            display.fullRangeUserBrightness = value.d.map(from: (0, 100), to: (0, 1))
         case .volume:
+            display.userVolume = value.d.map(from: (0, 100), to: (0, 1))
             guard display.showVolumeOSD else { return }
             controlID = .AUDIO_SPEAKER_VOLUME
         case .muted:
             guard display.showVolumeOSD else { return }
+        default:
+            return
         }
 
         let locked = (display.control is DDCControl && (DDC.skipWritingPropertyById[display.id]?.contains(controlID) ?? false))
@@ -896,6 +899,7 @@ enum Hotkey {
         let mirroredID = CGDisplayMirrorsDisplay(display.id)
         let osdID = (mirroredID != kCGNullDirectDisplay && mirroredID != UINT32_MAX) ? mirroredID : display.id
 
+        guard !CachedDefaults[.hideOSD] else { return }
         manager.showImage(
             osdImage.rawValue,
             onDisplayID: osdID,
