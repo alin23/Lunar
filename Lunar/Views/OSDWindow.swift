@@ -900,7 +900,7 @@ extension Display {
     }
 
     func showSoftwareOSD(image: String, value: Float, text: String, color: Color?, glowRadius: CGFloat = 5) {
-        guard !isAllDisplays, !isForTesting else { return }
+        guard !isAllDisplays, !isForTesting, !CachedDefaults[.hideOSD] else { return }
         mainAsync { [weak self] in
             guard let self else { return }
 

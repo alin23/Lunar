@@ -102,6 +102,7 @@ extension Defaults.Keys {
     static let autoXdrSensorLuxThreshold = Key<Float>("autoXdrSensorLuxThreshold", default: XDR_DEFAULT_LUX)
     static let customOSDVerticalOffset = Key<Float>("customOSDVerticalOffset", default: 0)
     static let allowAnySyncSource = Key<Bool>("allowAnySyncSource", default: true)
+    static let hideOSD = Key<Bool>("hideOSD", default: false)
 
     static let gammaDisabledCompletely = Key<Bool>("gammaDisabledCompletely", default: false)
     static let oldHdrWorkaround = Key<Bool?>("oldHdrWorkaround", default: nil)

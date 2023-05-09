@@ -1533,6 +1533,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var locationBrightnessMapping: [AutoLearnMapping] = LocationMode.DEFAULT_BRIGHTNESS_MAPPING
     var locationContrastMapping: [AutoLearnMapping] = LocationMode.DEFAULT_CONTRAST_MAPPING
     var scheduledBrightnessTask: Repeater? = nil
+    @Published var userMute: Double = 0
     var settingShade: Bool {
         shadeWindowController?.window?.contentView?.layer?.animation(forKey: kCATransition) != nil
     }
@@ -1553,8 +1554,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         didSet {
             checkNaN(preciseBrightness)
 
+            defer {
+                fullRangeBrightness = computeFullRangeBrightness()
+            }
+
             percentage = preciseBrightness
-            guard initialised, applyPreciseValue else { return }
+            guard initialised, applyPreciseValue else {
+                return
+            }
             resetScheduledTransition()
 
             if subzero, preciseBrightness > 0 {
@@ -2006,6 +2013,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var audioMuted = false {
         didSet {
+            userMute = audioMuted ? 1 : 0
             save()
 
             guard !isForTesting, let control else { return }
@@ -2777,6 +2785,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var xdrBrightness: Float = 0.0 {
         didSet {
             guard apply else { return }
+            defer {
+                fullRangeBrightness = computeFullRangeBrightness()
+            }
 
             if xdrBrightness > 0, !enhanced {
                 handleEnhance(true, withoutSettingBrightness: true)
@@ -2812,6 +2823,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var softwareBrightness: Float = 1.0 {
         didSet {
             checkNaN(softwareBrightness)
+            defer {
+                fullRangeBrightness = computeFullRangeBrightness()
+            }
+
             guard softwareBrightness <= 1.0 || (supportsGammaByDefault && supportsEnhance && enhanced) else { return }
 
             lastSoftwareBrightness = oldValue
@@ -3387,6 +3402,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var previousContrastMapping: ExpiringOptional<[AutoLearnMapping]> = nil
     var previousNitsBrightnessMapping: ExpiringOptional<[AutoLearnMapping]> = nil
     var previousNitsContrastMapping: ExpiringOptional<[AutoLearnMapping]> = nil
+
+    @Published var fullRangeBrightness = 0.5
+    @Published var fullRangeUserBrightness = 0.5
+    @Published var userContrast = 0.5
+    @Published var userVolume = 0.5
 
     var edidName: String {
         didSet {
@@ -4404,6 +4424,16 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         return values
+    }
+
+    func computeFullRangeBrightness() -> Double {
+        if softwareBrightness < 1 {
+            return softwareBrightness.d.map(from: (0, 1), to: (-1, 0))
+        }
+        if xdrBrightness > 0 {
+            return xdrBrightness.d.map(from: (0, 1), to: (1, 2))
+        }
+        return preciseBrightness
     }
 
     func resetScheduledTransition() {

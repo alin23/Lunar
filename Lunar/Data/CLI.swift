@@ -30,6 +30,7 @@ private var prettyEncoder: JSONEncoder = {
 
 private enum LunarCommandError: Error, CustomStringConvertible {
     case noDisplay
+    case noServer
     case displayNotFound(String)
     case propertyNotValid(String)
     case cantReadProperty(String)
@@ -44,6 +45,8 @@ private enum LunarCommandError: Error, CustomStringConvertible {
         switch self {
         case .noDisplay:
             return "No display available"
+        case .noServer:
+            return "This command needs to be run through the client-server interface with the Lunar app already running"
         case let .displayNotFound(string):
             return "Display Not Found: \(string)"
         case let .propertyNotValid(string):
@@ -1022,6 +1025,98 @@ struct Lunar: ParsableCommand {
         }
     }
 
+    struct Listen: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Listen to changes in brightness/contrast/volume of specific displays",
+            discussion: """
+            In non-JSON mode, each change will be wrote as a line of the following form:
+
+                \("PROPERTY_NAME".magenta().bold()) \("VALUE".green().bold()) \("DISPLAY_ID".blue().bold())
+
+            \("PROPERTY_NAME".magenta().bold()) will be one of "brightness", "contrast", "volume", "mute".
+
+            For `mute`, \("VALUE".green().bold()) will be a `true` or a `false`.
+
+            For `brightness`, \("VALUE".green().bold()) will be a floating-point value between -1.0 and 2.0 where:
+              - [0.0, 1.0] represents the normal brightness range
+              - [-1.0, 0.0] represents the \("Sub-zero Dimming".red().bold()) brightness range
+              - [1.0, 2.0] represents the \("XDR Brightness".cyan().bold()) brightness range
+
+            For `contrast` and `volume`, \("VALUE".green().bold()) will be a floating-point value between 0.0 and 1.0.
+
+            \("DISPLAY_ID".blue().bold()) will be the `id: CGDirectDisplayID` of each screen.
+
+            In JSON mode, each change will be wrote as a JSON line exemplified below:
+
+                {"brightness": 0.9, "display": 1}
+                {"volume": 0.5, "display": 3}
+
+            A JSON line will never contain more than one property.
+
+            \("Usage examples:".bold()):
+                Listen for changes on all monitors: \("lunar listen".yellow().bold())
+                Get changes as JSON for external monitors: \("lunar listen external --json".yellow().bold())
+                Listen for changes on Dell monitors: \("lunar listen dell".yellow().bold())
+            """
+        )
+
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
+
+        @Flag(name: .shortAndLong, help: "Format output as JSON")
+        var json = false
+
+        @Flag(name: .long, help: "Listen only to changes made using the brightness keys")
+        var onlyUserAdjustments = false
+
+        @Argument(
+            help: "Display serial or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
+        )
+        var display: DisplayFilter = .all
+
+        func run() throws {
+            guard isServer, let server = appDelegate?.server else {
+                throw LunarCommandError.noServer
+            }
+
+            let displays = getFilteredDisplays(displays: DC.activeDisplayList, filter: display)
+            guard !displays.isEmpty else {
+                throw LunarCommandError.displayNotFound(display.s)
+            }
+            let socketFd = server.currentSocketFD
+
+            let brightnessPublishers = displays.map { d in
+                (onlyUserAdjustments ? d.$fullRangeUserBrightness : d.$fullRangeBrightness)
+                    .map { val in DisplayStateChange(property: "brightness", value: val, display: d.id) }
+                    .dropFirst(onlyUserAdjustments ? 1 : 0)
+            }
+            let contrastPublishers = displays.map { d in
+                (onlyUserAdjustments ? d.$userContrast : d.$preciseContrast)
+                    .map { val in DisplayStateChange(property: "contrast", value: val, display: d.id) }
+                    .dropFirst(onlyUserAdjustments ? 1 : 0)
+            }
+            let volumePublishers = displays.map { d in
+                (onlyUserAdjustments ? d.$userVolume : d.$preciseVolume)
+                    .map { val in DisplayStateChange(property: "volume", value: val, display: d.id) }
+                    .dropFirst(onlyUserAdjustments ? 1 : 0)
+            }
+            let mutePublishers = displays.map { d in
+                d.$userMute
+                    .map { val in DisplayStateChange(property: "mute", value: val, display: d.id) }
+                    .dropFirst(onlyUserAdjustments ? 1 : 0)
+            }
+            let mergedPublisher = Publishers.MergeMany(brightnessPublishers + contrastPublishers + volumePublishers + mutePublishers)
+
+            mergedPublisher
+                .removeDuplicates()
+                .sink { db in
+                    guard let server = appDelegate?.server else {
+                        return
+                    }
+                    server.write(db, to: socketFd, json: json)
+                }.store(in: &server.brightnessListeners, for: socketFd)
+        }
+    }
+
     struct Displays: ParsableCommand {
         static let configuration = CommandConfiguration(
             abstract: "Control displays or get data about the current state of the displays.",
@@ -1751,6 +1846,7 @@ struct Lunar: ParsableCommand {
             DisplayUuid.self,
             RefreshDisplays.self,
             Edid.self,
+            Listen.self,
         ] + ARCH_SPECIFIC_COMMANDS
     )
 
@@ -1811,6 +1907,8 @@ struct Lunar: ParsableCommand {
         case let cmd as Facelight:
             return cmd.globals
         case let cmd as CoreDisplay:
+            return cmd.globals
+        case let cmd as Listen:
             return cmd.globals
         case let cmd as DisplayServices:
             return cmd.globals
@@ -2264,6 +2362,8 @@ var cliServerTask: DispatchWorkItem? {
     }
 }
 
+import Combine
+
 // MARK: - LunarServer
 
 final class LunarServer {
@@ -2281,6 +2381,7 @@ final class LunarServer {
 
     var listenSocket: Socket?
     var connectedSockets = [Int32: Socket]()
+    var brightnessListeners: [Int32: AnyCancellable] = [:]
     let socketLockQueue = DispatchQueue(label: "com.kitura.serverSwift.socketLockQueue")
 
     var currentSocketFD: Int32 = 0
@@ -2355,10 +2456,11 @@ final class LunarServer {
             key = key ?? args.removeFirst()
 
             guard key == CachedDefaults[.apiKey] else {
+                let resp = "Unauthorized\n"
                 if serverHTTP {
-                    try socket.write(from: "HTTP/1.1 401 Unauthorized\r\nContent-Length: \("Unauthorized\n".count)\r\n\r\n")
+                    try socket.write(from: "HTTP/1.1 401 Unauthorized\r\nContent-Length: \(resp.count)\r\n\r\n")
                 }
-                try socket.write(from: "Unauthorized\n")
+                try socket.write(from: resp)
                 return
             }
 
@@ -2382,6 +2484,23 @@ final class LunarServer {
                 try socket.write(from: "HTTP/1.1 400 Bad Request\r\nContent-Length: \(err.count)\r\n\r\n")
             }
             try socket.write(from: err)
+        }
+    }
+
+    func write(_ change: DisplayStateChange, to socketFd: Int32, json: Bool) {
+        socketLockQueue.async { [weak self] in
+            guard let self, let socket = connectedSockets[socketFd] else {
+                _ = storeLock.around {
+                    self?.brightnessListeners.removeValue(forKey: socketFd)
+                }
+                return
+            }
+            let val = change.property == "mute" ? (change.value == 1 ? "true" : "false") : change.value.str(decimals: 3)
+            if json {
+                _ = try? socket.write(from: "{\"\(change.property)\": \(val), \"display\": \(change.display)}\n")
+            } else {
+                _ = try? socket.write(from: "\(change.property) \(val) \(change.display)\n")
+            }
         }
     }
 
@@ -2424,13 +2543,16 @@ final class LunarServer {
                     readData.removeAll(keepingCapacity: true)
                 } while shouldKeepRunning
 
+                guard storeLock.around({ brightnessListeners[socket.socketfd] }) == nil else {
+                    return
+                }
                 #if DEBUG
                     log.info("Socket \(socket.remoteHostname):\(socket.remotePort) closed...")
                 #endif
                 socket.close()
 
                 socketLockQueue.sync { [unowned self, socket] in
-                    self.connectedSockets[socket.socketfd] = nil
+                    connectedSockets[socket.socketfd] = nil
                 }
             } catch {
                 guard let socketError = error as? Socket.Error else {
@@ -2480,6 +2602,12 @@ final class LunarServer {
             self.connectedSockets.removeAll()
         }
     }
+}
+
+struct DisplayStateChange: Equatable {
+    var property: String
+    var value: Double
+    var display: CGDirectDisplayID
 }
 
 var isServer = false
