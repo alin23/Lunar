@@ -269,6 +269,7 @@ extension Defaults.Keys {
     static let sensorHostname = Key<String>("sensorHostname", default: "lunarsensor.local")
     static let sensorPort = Key<Int>("sensorPort", default: 80)
     static let sensorPathPrefix = Key<String>("sensorPathPrefix", default: "")
+    static let disableExternalSensorWhenNoExternalMonitor = Key<Bool>("disableExternalSensorWhenNoExternalMonitor", default: false)
 
     #if arch(arm64)
         static let possiblyDisconnectedDisplays = Key<[Display]>("possiblyDisconnectedDisplays", default: [])
