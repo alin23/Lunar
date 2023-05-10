@@ -155,6 +155,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .sensorHostname,
     .sensorPort,
     .sensorPathPrefix,
+    .disableExternalSensorWhenNoExternalMonitor,
     .nonManualMode,
     .curveMode,
     .hasBuiltin,
@@ -843,6 +844,7 @@ func initCache() {
     cacheKey(.sensorHostname)
     cacheKey(.sensorPort)
     cacheKey(.sensorPathPrefix)
+    cacheKey(.disableExternalSensorWhenNoExternalMonitor)
     cacheKey(.apiKey)
 
     cacheKey(.location)
