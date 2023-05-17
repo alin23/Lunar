@@ -13,10 +13,10 @@
             <sparkle:shortVersionString>6.1.4b1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
             <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-6.1.4b1.html</sparkle:releaseNotesLink>
-            <enclosure url="https://files.lunar.fyi/releases/Lunar-6.1.4b1.dmg" length="21932220" type="application/octet-stream" sparkle:edSignature="lsfOvx09LCMaRITbSzQD+0dKwXgYarewaOOg0XX4Z7Adhq049UnHGF323QnXWakIvZFXRPXe+eOO5IxfjhDdCQ=="/>
+            <enclosure url="https://files.lunar.fyi/releases/Lunar-6.1.4b1.dmg" length="21932323" type="application/octet-stream" sparkle:edSignature="73y4im937Jhs70MZti2B/1WEgzRkDWDaMS0JSNtnQDGwKl+mlnfj2LT1p2+eKwem6v9/xG0k/a//fxqHlN0FBg=="/>
             <sparkle:deltas>
-                <enclosure url="https://files.lunar.fyi/deltas/Lunar6.1.4b1-6.1.3.delta" sparkle:deltaFrom="6.1.3" length="1665138" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="1842416" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,en" sparkle:edSignature="vv1O45ckCwmfTBpXiPNfc3uh/pFAIHrfy4nfjSC8E8iERtxLgc2PeazV/FMRONPw6KBToDJ+qPcM/uJjjUcuAA=="/>
-                <enclosure url="https://files.lunar.fyi/deltas/Lunar6.1.4b1-6.1.2.delta" sparkle:deltaFrom="6.1.2" length="2549238" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="1842416" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,en" sparkle:edSignature="48qbIh2cg1vy1NV03Ho4hiUt/xCacyLM8DcsVLw0DRWsPZ5hpnolTNFhxtcjUpMiooww7rx4+LnHKilBTZFdDQ=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar6.1.4b1-6.1.3.delta" sparkle:deltaFrom="6.1.3" length="1785406" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="1842416" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,en" sparkle:edSignature="d9uY8tKdqOhjn8a69NH7t/lZ/aAYj/zHwlmzx5KxMHO5lROW/HQIH6u+SyJygWjJ7rQ6kbRWndB1z6ZnO97NBQ=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar6.1.4b1-6.1.2.delta" sparkle:deltaFrom="6.1.2" length="2718754" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="1842416" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,en" sparkle:edSignature="20O8OkIF3STpq2NcHyGKYpxyhirbLvHcNGj9Wo4LYs+lXgetawzckJCGC0WbJ0UF9xdv83hAN29A6jxpM/KoAg=="/>
             </sparkle:deltas>
         </item>
         <item>

@@ -1245,6 +1245,15 @@ final class DisplayController: ObservableObject {
             sourceDisplay = getSourceDisplay()
         }
     }
+    @Atomic var displayLinkRunning = isDisplayLinkRunning() {
+        didSet {
+            #if arch(arm64)
+                if #available(macOS 13, *) {
+                    CachedDefaults[.newBlackOutDisconnect] = !displayLinkRunning
+                }
+            #endif
+        } s
+    }
     @Atomic var fluxRunning = isFluxRunning() {
         didSet {
             if fluxRunning, !usingFlux, let app = fluxApp() {
@@ -2346,6 +2355,11 @@ final class DisplayController: ObservableObject {
         runningAppExceptions = datastore.appExceptions(identifiers: appIdentifiers) ?? []
         adaptBrightness()
 
+        #if arch(arm64)
+            if #available(macOS 13, *) {
+                CachedDefaults[.newBlackOutDisconnect] = !displayLinkRunning
+            }
+        #endif
         NSWorkspace.shared.publisher(for: \.runningApplications, options: [.new])
             .debounce(for: .seconds(1), scheduler: RunLoop.main)
             .sink { [self] change in
@@ -2353,6 +2367,7 @@ final class DisplayController: ObservableObject {
 
                 runningAppExceptions = datastore.appExceptions(identifiers: Array(identifiers.uniqued())) ?? []
                 log.info("Running app presets: \(runningAppExceptions.map(\.name))")
+                displayLinkRunning = isDisplayLinkRunning()
                 adaptBrightness()
             }
             .store(in: &observers)

@@ -2360,3 +2360,13 @@ final class Reachability {
         return isReachable && !needsConnection
     }
 }
+
+let DISPLAYLINK_IDENTIFIER = "com.displaylink.DisplayLinkUserAgent"
+
+func displayLinkApp() -> NSRunningApplication? {
+    NSRunningApplication.runningApplications(withBundleIdentifier: DISPLAYLINK_IDENTIFIER).first
+}
+
+func isDisplayLinkRunning() -> Bool {
+    !NSRunningApplication.runningApplications(withBundleIdentifier: DISPLAYLINK_IDENTIFIER).isEmpty
+}
