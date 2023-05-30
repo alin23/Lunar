@@ -499,7 +499,7 @@ final class DisplayController: ObservableObject {
     var unmanagedDisplays: [Display] = []
     @Atomic var clamshell: Bool = isLidClosed() && Sysctl.isMacBook {
         didSet {
-            if CachedDefaults[.sleepInClamshellMode] {
+            if clamshell, CachedDefaults[.sleepInClamshellMode] {
                 log.info("Triggering Sleep because the lid was closed")
                 sleepNow()
             }
@@ -1252,7 +1252,7 @@ final class DisplayController: ObservableObject {
                     CachedDefaults[.newBlackOutDisconnect] = !displayLinkRunning
                 }
             #endif
-        } s
+        }
     }
     @Atomic var fluxRunning = isFluxRunning() {
         didSet {
