@@ -1,0 +1,12 @@
+  - platform: max44009
+    name: "Ambient Light MAX44009"
+    id: ambient_light
+    mode: auto
+    update_interval: 1s
+    filters:
+      - filter_out: 65535
+      - filter_out: nan
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 2
+          send_first_at: 2

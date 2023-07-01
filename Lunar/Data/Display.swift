@@ -703,9 +703,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             blackOutMirroringAllowed = supportsGammaByDefault || isFakeDummy
         }
 
-        if isLEDCinema() || isThunderbolt() || isCinemaHD() {
-            maxDDCBrightness = 255
-        }
+        maxDDCBrightness = defaultMaxDDCBrightness
         if isLEDCinema() {
             maxDDCVolume = 255
         }
@@ -4950,10 +4948,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         minDDCBrightness = 0.ns
         minDDCContrast = 0.ns
         minDDCVolume = 0.ns
+        maxDDCBrightness = defaultMaxDDCBrightness.ns
 
-        if isLEDCinema() || isThunderbolt() {
-            maxDDCBrightness = 255
-        }
         if isLEDCinema() {
             maxDDCVolume = 255
         }
@@ -5952,11 +5948,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func reset(resetControl: Bool = true) {
-        if isLEDCinema() || isThunderbolt() {
-            maxDDCBrightness = 255.ns
-        } else {
-            maxDDCBrightness = 100.ns
-        }
+        maxDDCBrightness = defaultMaxDDCBrightness.ns
         if isLEDCinema() {
             maxDDCVolume = 255.ns
         } else {

@@ -1,0 +1,19 @@
+  - platform: tsl2591
+    name: "Ambient Light TSL2591"
+    gain: auto
+    integration_time: 200ms
+    update_interval: 1s
+    infrared:
+      name: "TSL2591 Infrared Light"
+    full_spectrum:
+      name: "TSL2591 Full Spectrum Light"
+    calculated_lux:
+      id: ambient_light
+      name: "TSL2591 Lux"
+      filters:
+        - filter_out: 65535
+        - filter_out: nan
+        - sliding_window_moving_average:
+            window_size: 15
+            send_every: 2
+            send_first_at: 2

@@ -1,0 +1,31 @@
+  - platform: tsl2561
+    name: "Ambient Light TSL2561"
+    id: ambient_light
+    update_interval: 1s
+    gain: 1x
+    filters:
+      - filter_out: 65535
+      - filter_out: nan
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 2
+          send_first_at: 2
+    on_raw_value:
+      then:
+        - lambda: |-
+            if (isnan(x) || x == -1) {
+              id(ambient_light_tsl2561).set_gain(esphome::tsl2561::TSL2561_GAIN_1X);
+              id(ambient_light_tsl2561).set_integration_time(esphome::tsl2561::TSL2561_INTEGRATION_14MS);
+            } else if (x < 30) {
+              id(ambient_light_tsl2561).set_gain(esphome::tsl2561::TSL2561_GAIN_16X);
+              id(ambient_light_tsl2561).set_integration_time(esphome::tsl2561::TSL2561_INTEGRATION_402MS);
+            } else if (x > 30000) {
+              id(ambient_light_tsl2561).set_gain(esphome::tsl2561::TSL2561_GAIN_1X);
+              id(ambient_light_tsl2561).set_integration_time(esphome::tsl2561::TSL2561_INTEGRATION_14MS);
+            } else if (x > 400) {
+              id(ambient_light_tsl2561).set_gain(esphome::tsl2561::TSL2561_GAIN_1X);
+              id(ambient_light_tsl2561).set_integration_time(esphome::tsl2561::TSL2561_INTEGRATION_101MS);
+            } else {
+              id(ambient_light_tsl2561).set_gain(esphome::tsl2561::TSL2561_GAIN_1X);
+              id(ambient_light_tsl2561).set_integration_time(esphome::tsl2561::TSL2561_INTEGRATION_402MS);
+            }

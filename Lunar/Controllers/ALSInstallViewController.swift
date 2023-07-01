@@ -33,6 +33,15 @@ func getDevices() -> [String] {
     return devicePaths
 }
 
+enum AmbientLightSensor: String, CaseIterable {
+    case bh1750
+    case ltr390
+    case max44009
+    case tcs34725
+    case tsl2561
+    case tsl2591
+}
+
 // MARK: - ALSInstallViewController
 
 final class ALSInstallViewController: NSViewController {
@@ -59,6 +68,8 @@ final class ALSInstallViewController: NSViewController {
     }
 
     var installFinishChecker: Repeater?
+
+    @objc dynamic var sensor = "tsl2591"
 
     @objc dynamic var board: String = SELECT_BOARD_ITEM {
         didSet {
@@ -177,7 +188,7 @@ final class ALSInstallViewController: NSViewController {
               let installScript = (try? Bundle.main.path(forResource: "install", ofType: "sh")?.realpath())?.string,
               let process = shellProc(
                   args: [installScript],
-                  env: ["WIFI_SSID": ssid, "WIFI_PASSWORD": password, "ESP_DEVICE": device, "BOARD": boardID, "LOG_PATH": INSTALL_LOG_PATH]
+                  env: ["WIFI_SSID": ssid, "WIFI_PASSWORD": password, "ESP_DEVICE": device, "BOARD": boardID, "LOG_PATH": INSTALL_LOG_PATH, "SENSOR": sensor]
               )
         else {
             mainThread {

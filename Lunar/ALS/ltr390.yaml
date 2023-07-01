@@ -1,0 +1,16 @@
+  - platform: ltr390
+    update_interval: 1s
+    resolution: 20
+    gain: "X6"
+    uv:
+      name: "LTR390 UV Light"
+    light:
+      name: "LTR390 Lux"
+      id: ambient_light
+      filters:
+        - filter_out: 65535
+        - filter_out: nan
+        - sliding_window_moving_average:
+            window_size: 15
+            send_every: 2
+            send_first_at: 2
