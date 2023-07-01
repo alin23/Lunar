@@ -57,3 +57,4 @@ Releases/*.html
 Lunar/DDC/DDC2.h
 Lunar/DDC/DDC2.c
 old_updates
+.ruby-lsp

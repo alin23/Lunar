@@ -1,0 +1,15 @@
+  - platform: tcs34725
+    red_channel:
+      name: "TCS34725 Red Channel"
+    green_channel:
+      name: "TCS34725 Green Channel"
+    blue_channel:
+      name: "TCS34725 Blue Channel"
+    clear_channel:
+      name: "TCS34725 Clear Channel"
+    illuminance:
+      name: "TCS34725 Lux"
+      id: ambient_light
+    color_temperature:
+      name: "TCS34725 Color Temperature"
+    update_interval: 1s

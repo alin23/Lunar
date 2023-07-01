@@ -1,0 +1,11 @@
+  - platform: bh1750
+    name: "Ambient Light BH1750"
+    id: ambient_light
+    update_interval: 1s
+    filters:
+      - filter_out: 65535
+      - filter_out: nan
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 2
+          send_first_at: 2

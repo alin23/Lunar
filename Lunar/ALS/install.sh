@@ -2,9 +2,16 @@
 
 DIR="${0:a:h}"
 BOARD_DIR="/tmp/lunarsensor/$BOARD"
+SENSOR="${SENSOR:-tsl2591}"
 
 mkdir -p "$BOARD_DIR"
-cp -RL "$DIR"/{lunar.yaml,install.sh,tsl2591.h} "$BOARD_DIR/"
+cp -RL "$DIR/install.sh" "$BOARD_DIR/"
+/usr/bin/python3 -c "open('$BOARD_DIR/lunar.yaml', 'w')\
+    .write(\
+        open('$DIR/lunar.yaml')\
+        .read()\
+        .replace('SENSOR_DEFINITION', open('$DIR/$SENSOR.yaml').read())\
+    )"
 cd "$BOARD_DIR"
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
@@ -48,13 +55,14 @@ echo "" | tee -a "$LOG_PATH"
 echo "Installing ESPHome..." | tee -a "$LOG_PATH"
 echo "" | tee -a "$LOG_PATH"
 echo "" | tee -a "$LOG_PATH"
-/usr/bin/python3 -m pip install --user --no-cache git+https://github.com/alin23/esphome@dev#egg=esphome 2>&1 | tee -a "$LOG_PATH"
+/usr/bin/python3 -m pip install --user esphome==2023.6.3 2>&1 | tee -a "$LOG_PATH"
 
 echo "" | tee -a "$LOG_PATH"
 echo "Compiling and uploading firmware to $ESP_DEVICE ($BOARD) ..." | tee -a "$LOG_PATH"
 echo "" | tee -a "$LOG_PATH"
 echo "SSID=$WIFI_SSID" | tee -a "$LOG_PATH"
 echo "PASSWORD=$WIFI_PASSWORD" | tee -a "$LOG_PATH"
+echo "SENSOR=$SENSOR" | tee -a "$LOG_PATH"
 echo "" | tee -a "$LOG_PATH"
 
 echo /usr/bin/python3 -m esphome \
