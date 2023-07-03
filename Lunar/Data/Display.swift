@@ -703,7 +703,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             blackOutMirroringAllowed = supportsGammaByDefault || isFakeDummy
         }
 
-        maxDDCBrightness = defaultMaxDDCBrightness
+        maxDDCBrightness = defaultMaxDDCBrightness.ns
         if isLEDCinema() {
             maxDDCVolume = 255
         }
