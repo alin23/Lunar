@@ -1025,6 +1025,39 @@ struct Lunar: ParsableCommand {
         }
     }
 
+    struct CleaningMode: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Blackout screens and disable keyboard to allow cleaning.",
+            discussion: """
+            Activates "Cleaning Mode" to allow cleaning the screens and the keyboard without triggering any actions.
+
+            WARNING: this will make all your screens black and completely disable the keyboard for the duration of its activation.
+
+            Press the ⌘ Command key more than 8 times in a row to force deactivation of this mode.
+            """
+        )
+
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
+
+        @Flag(name: .shortAndLong, help: "Keep cleaning mode active until manually deactivated (using ⌘ Command key or the `lunar cleaning-mode off` command)")
+        var keepActive = false
+
+        @Option(name: .shortAndLong, help: "Deactivate cleaning mode automatically after a certain amount of time (in seconds)")
+        var deactivateAfter = 120
+
+        @Argument(help: "Whether Cleaning Mode should be `on` or `off`")
+        var state: PowerState
+
+        func run() throws {
+            if state == .off {
+                deactivateCleaningMode()
+                return cliExit(0)
+            }
+            activateCleaningMode(deactivateAfter: keepActive ? nil : deactivateAfter.d)
+            return cliExit(0)
+        }
+    }
+
     struct Listen: ParsableCommand {
         static let configuration = CommandConfiguration(
             abstract: "Listen to changes in brightness/contrast/volume of specific displays",
@@ -1847,6 +1880,7 @@ struct Lunar: ParsableCommand {
             RefreshDisplays.self,
             Edid.self,
             Listen.self,
+            CleaningMode.self,
         ] + ARCH_SPECIFIC_COMMANDS
     )
 
@@ -1915,6 +1949,8 @@ struct Lunar: ParsableCommand {
         case let cmd as Hotkeys:
             return cmd.globals
         case let cmd as DisplayUuid:
+            return cmd.globals
+        case let cmd as CleaningMode:
             return cmd.globals
         #if arch(arm64)
             case let cmd as Nits:

@@ -724,13 +724,6 @@ the ⌘ Command key more than 8 times in a row</string>
                                                 </items>
                                             </menu>
                                         </menuItem>
-                                        <menuItem title="Start at Login" state="on" id="zif-S3-Ajq">
-                                            <attributedString key="attributedTitle"/>
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <binding destination="3YV-ka-Eop" name="value" keyPath="values.startAtLogin" id="GX2-ut-AvY"/>
-                                            </connections>
-                                        </menuItem>
                                         <menuItem title="Check for updates..." id="Gfc-g2-RLO">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
@@ -742,6 +735,37 @@ the ⌘ Command key more than 8 times in a row</string>
                                             <connections>
                                                 <action selector="openOnboardingProcess:" target="Voe-Tx-rLC" id="6gk-g2-GOe"/>
                                                 <binding destination="u0a-cA-m1f" name="enabled" keyPath="values.hasActiveDisplays" id="EPR-i8-QIz"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Cleaning Mode" id="lDh-kP-usK">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="toggleCleaningMode:" target="Voe-Tx-rLC" id="3Jh-as-sZC"/>
+                                                <binding destination="Voe-Tx-rLC" name="value" keyPath="self.cleaningMode" id="WLs-dm-d9A"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem enabled="NO" id="6M6-C8-vuI">
+                                            <string key="title">Disables screens, keys and clicks to help cleaning up
+(press ⌘ Command key 10 times to deactivate)</string>
+                                            <attributedString key="attributedTitle">
+                                                <fragment>
+                                                    <string key="content">Disables screens, keys and clicks to help cleaning up
+(press ⌘ Command key 10 times to deactivate)</string>
+                                                    <attributes>
+                                                        <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                        <font key="NSFont" metaFont="systemMedium" size="10"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
+                                                    </attributes>
+                                                </fragment>
+                                            </attributedString>
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" title="Intensity" id="l1t-k1-CZx"/>
+                                        <menuItem title="Start at Login" state="on" id="zif-S3-Ajq">
+                                            <attributedString key="attributedTitle"/>
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <binding destination="3YV-ka-Eop" name="value" keyPath="values.startAtLogin" id="GX2-ut-AvY"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Restart Lunar" id="8Oe-Go-Jnc">
@@ -7399,7 +7423,7 @@ when FaceLight is activated</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="reQ-Qm-LQ9" customClass="PaddedButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="205" y="13" width="88" height="13"/>
+                                <rect key="frame" x="204" y="13" width="88" height="13"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <buttonCell key="cell" type="inline" title="View logs" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="5zn-di-UnM">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>

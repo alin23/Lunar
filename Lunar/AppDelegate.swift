@@ -317,6 +317,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     let APP_DIR = ((try? p("/Applications")?.realpath()) ?? p("/Applications"))?.components ?? ["Applications"]
     let SVAPP_DIR = ((try? p("/System/Volumes/Data/Applications")?.realpath()) ?? p("/System/Volumes/Data/Applications"))?.components ?? ["System", "Volumes", "Data", "Applications"]
 
+    @Atomic @objc dynamic var cleaningMode = false {
+        didSet {
+            log.debug("Cleaning Mode: \(cleaningMode)")
+        }
+    }
+
     var supportsGentleScheduledUpdateReminders: Bool { true }
     var currentPage: Int = Page.display.rawValue {
         didSet {
@@ -1787,12 +1793,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         #endif
     }
 
-    func checkEmergencyBlackoutOff(event: NSEvent) {
-        guard CachedDefaults[.enableBlackOutKillSwitch],
-              event.modifierFlags.intersection([.command, .option, .shift, .control]) == [.command]
+    func checkEmergencyBlackoutOff(flags: NSEvent.ModifierFlags) {
+        guard CachedDefaults[.enableBlackOutKillSwitch] || appDelegate!.cleaningMode,
+              flags.intersection([.command, .option, .shift, .control]) == [.command]
         else {
             if commandModifierPressedCount > 0 {
-                let mods = event.modifierFlags.intersection([.command, .option, .shift, .control])
+                let mods = flags.intersection([.command, .option, .shift, .control])
                 log.debug(
                     "Setting commandModifierPressedCount to 0",
                     context: ["modifiers": mods.keyEquivalentStrings(), "modifiersRawValue": mods]
@@ -1823,25 +1829,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 }
             #endif
 
-            guard DC.activeDisplayList.contains(where: \.blackOutEnabled) else { return }
-
-            DC.activeDisplayList.map(\.id).enumerated().forEach { i, id in
-                mainAsyncAfter(ms: i * 1000) {
-                    guard let d = DC.activeDisplays[id] else { return }
-                    log.warning("Disabling BlackOut forcefully for \(d.description)")
-                    d.resetSoftwareControl()
-                    lastBlackOutToggleDate = .distantPast
-                    DC.blackOut(display: d.id, state: .off)
-                    d.blackOutEnabled = false
-                    d.mirroredBeforeBlackOut = false
-                    if d.brightness.doubleValue <= 10 {
-                        d.brightness = 50
-                    }
-                    if d.contrast.doubleValue <= 10 {
-                        d.contrast = 50
-                    }
-                }
-            }
+            deactivateCleaningMode()
         }
     }
 
@@ -1879,11 +1867,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 if KM.commandKeyPressed { KM.commandKeyPressed = false }
                 return
             }
-            checkEmergencyBlackoutOff(event: event)
+            checkEmergencyBlackoutOff(flags: event.modifierFlags)
         }
         NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [self] event in
             if !event.modifierFlags.intersection([.command, .option, .shift, .control]).isEmpty {
-                checkEmergencyBlackoutOff(event: event)
+                checkEmergencyBlackoutOff(flags: event.modifierFlags)
             }
             handleModifierScrollThreshold(event: event)
 
@@ -2310,6 +2298,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         NotificationCenter.default.post(name: displayListChanged, object: nil)
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "4"
         log.info("App finished launching v\(version)")
+    }
+
+    @IBAction func toggleCleaningMode(_: Any) {
+        if cleaningMode {
+            deactivateCleaningMode(withoutSettingFlag: true)
+        } else {
+            activateCleaningMode(withoutSettingFlag: true)
+        }
     }
 
     @IBAction func forceUpdateDisplayList(_: Any) {
@@ -2908,4 +2904,29 @@ func restart() {
         wait: false
     )
     exit(0)
+}
+
+extension CGEventFlags {
+    var nsModifierFlags: NSEvent.ModifierFlags {
+        var flags = NSEvent.ModifierFlags()
+        if contains(.maskAlphaShift) {
+            flags.insert(.capsLock)
+        }
+        if contains(.maskShift) {
+            flags.insert(.shift)
+        }
+        if contains(.maskControl) {
+            flags.insert(.control)
+        }
+        if contains(.maskAlternate) {
+            flags.insert(.option)
+        }
+        if contains(.maskCommand) {
+            flags.insert(.command)
+        }
+        if contains(.maskSecondaryFn) {
+            flags.insert(.function)
+        }
+        return flags
+    }
 }
