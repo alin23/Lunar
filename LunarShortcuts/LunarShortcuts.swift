@@ -784,6 +784,153 @@ struct ToggleFacelightIntent: AppIntent {
     }
 }
 
+extension UnitDuration: @unchecked Sendable {}
+
+@available(iOS 16, macOS 13, *)
+struct CleaningModeIntent: AppIntent {
+    init() {}
+
+    // swiftformat:disable all
+    static var title: LocalizedStringResource = "Cleaning Mode"
+    static var description = IntentDescription(
+    """
+Activates "Cleaning Mode" to allow cleaning the screens and the keyboard without triggering any actions.
+
+WARNING: this will make all your screens black and completely disable the keyboard for the duration of its activation.
+
+Press the ⌘ Command key more than 8 times in a row to force deactivation of this mode.
+""", categoryName: "Toggles")
+
+    static var parameterSummary: some ParameterSummary {
+        When(\.$deactivateAutomatically, .equalTo, true, {
+            Summary("Activate cleaning mode and \(\.$deactivateAutomatically) \(\.$deactivateAfter)   (press the `⌘ Command` key more than 8 times in a row to force deactivation)")
+        }, otherwise: {
+            Summary("Activate cleaning mode and \(\.$deactivateAutomatically)   (press the `⌘ Command` key more than 8 times in a row to deactivate)")
+        })
+    }
+
+    // swiftformat:enable all
+
+    @Parameter(title: "Deactivate automatically", default: true, displayName: Bool.IntentDisplayName(true: "deactivate after", false: "wait for manual deactivation"))
+    var deactivateAutomatically: Bool
+
+    @Parameter(title: "Auto-deactivation duration", defaultValue: 120, defaultUnit: .seconds, supportsNegativeNumbers: false)
+    var deactivateAfter: Measurement<UnitDuration>
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        if deactivateAutomatically, deactivateAfter.converted(to: .seconds).value < 5 {
+            throw IntentError.message("Auto-deactivation duration must be at least 5 seconds.")
+        }
+        activateCleaningMode(deactivateAfter: deactivateAutomatically ? deactivateAfter.converted(to: .seconds).value : nil)
+        return .result()
+    }
+}
+
+var cleaningModeTask: DispatchWorkItem?
+var swallowKeyboardEventTap: CFMachPort?
+var swallowKeyboardRunLoopSource: CFRunLoopSource?
+var swallowKeyboardRunLoop: CFRunLoop?
+let swallowKeyboardQueue = DispatchQueue(label: "Cleaning Mode Runloop", attributes: [])
+
+func swallowKeyboardEvents() {
+    // creates a CGEventTap that will swallow all keyboard events and makes the keyboard acts as disabled
+
+    let keyMask = (1 << CGEventType.keyDown.rawValue) | (1 << CGEventType.keyUp.rawValue) | (1 << NX_SYSDEFINED) | (1 << CGEventType.flagsChanged.rawValue)
+    let leftMouseMask = (1 << CGEventType.leftMouseDown.rawValue) | (1 << CGEventType.leftMouseUp.rawValue) | (1 << CGEventType.leftMouseDragged.rawValue)
+    let rightMouseMask = (1 << CGEventType.rightMouseDown.rawValue) | (1 << CGEventType.rightMouseUp.rawValue) | (1 << CGEventType.rightMouseDragged.rawValue)
+    let otherMouseMask = (1 << CGEventType.otherMouseDown.rawValue) | (1 << CGEventType.otherMouseUp.rawValue) | (1 << CGEventType.otherMouseDragged.rawValue)
+    let eventMask = (
+        keyMask | leftMouseMask | rightMouseMask | otherMouseMask
+            | (1 << CGEventType.scrollWheel.rawValue) | (1 << CGEventType.tabletPointer.rawValue) | (1 << CGEventType.tabletProximity.rawValue)
+    )
+    let swallowKeyboardEventTap = CGEvent.tapCreate(
+        tap: .cgSessionEventTap,
+        place: .headInsertEventTap,
+        options: .defaultTap,
+        eventsOfInterest: CGEventMask(eventMask),
+        callback: { _, type, event, _ in
+            #if DEBUG
+                print("EVENT:", type, event)
+            #endif
+
+            if type == .flagsChanged {
+                let flags = event.flags.nsModifierFlags.intersection([.command, .option, .shift, .control])
+                if !flags.isEmpty {
+                    appDelegate!.checkEmergencyBlackoutOff(flags: event.flags.nsModifierFlags)
+                }
+            }
+            return nil
+        },
+        userInfo: nil
+    )
+    let swallowKeyboardRunLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, swallowKeyboardEventTap, 0)
+    guard let swallowKeyboardEventTap, let swallowKeyboardRunLoopSource else { return }
+
+    swallowKeyboardQueue.async {
+        swallowKeyboardRunLoop = CFRunLoopGetCurrent()
+        CFRunLoopAddSource(swallowKeyboardRunLoop, swallowKeyboardRunLoopSource, CFRunLoopMode.commonModes)
+        CFRunLoopRun()
+    }
+    CGEvent.tapEnable(tap: swallowKeyboardEventTap, enable: true)
+}
+
+func disableSwallowKeyboardEvents() {
+    if let source = swallowKeyboardRunLoopSource {
+        CFRunLoopSourceInvalidate(source)
+        swallowKeyboardRunLoopSource = nil
+    }
+    if let runLoop = swallowKeyboardRunLoop {
+        CFRunLoopStop(runLoop)
+        swallowKeyboardRunLoop = nil
+    }
+    if let eventTap = swallowKeyboardEventTap {
+        CFMachPortInvalidate(eventTap)
+        swallowKeyboardEventTap = nil
+    }
+}
+
+func deactivateCleaningMode(withoutSettingFlag: Bool = false) {
+    mainAsync {
+        cleaningModeTask = nil
+        defer {
+            if !withoutSettingFlag {
+                appDelegate!.cleaningMode = false
+            }
+        }
+
+        disableSwallowKeyboardEvents()
+        guard DC.activeDisplayList.contains(where: \.blackOutEnabled) else { return }
+        DC.forceDeactivateBlackOut()
+    }
+}
+
+func activateCleaningMode(deactivateAfter: TimeInterval? = 120, withoutSettingFlag: Bool = false) {
+    mainAsync {
+        guard Defaults[.accessibilityPermissionsGranted] else {
+            notify(identifier: "permissions", title: "Cleaning Mode needs Accessibility permissions", body: "")
+            return
+        }
+
+        if !withoutSettingFlag {
+            appDelegate!.cleaningMode = true
+        }
+
+        #if !DEBUG
+            DC.activeDisplayList.filter(!\.blackOutEnabled).forEach { display in
+                lastBlackOutToggleDate = .distantPast
+                DC.blackOut(display: display.secondaryMirrorScreenID ?? display.id, state: .on, mirroringAllowed: false)
+            }
+        #endif
+        swallowKeyboardEvents()
+
+        guard let deactivateAfter else { return }
+        cleaningModeTask = mainAsyncAfter(ms: (deactivateAfter * 1000).intround) {
+            deactivateCleaningMode()
+        }
+    }
+}
+
 @available(iOS 16, macOS 13, *)
 struct PowerOffSoftwareIntent: AppIntent {
     init() {}

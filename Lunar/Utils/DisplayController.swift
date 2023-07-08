@@ -1369,6 +1369,27 @@ final class DisplayController: ObservableObject {
         }
     }
 
+    func forceDeactivateBlackOut() {
+        activeDisplayList.map(\.id).enumerated().forEach { i, id in
+            mainAsyncAfter(ms: i * 1000) {
+                guard let d = self.activeDisplays[id] else { return }
+                log.warning("Disabling BlackOut forcefully for \(d.description)")
+                d.resetSoftwareControl()
+                lastBlackOutToggleDate = .distantPast
+                self.blackOut(display: d.id, state: .off)
+                d.blackOutEnabled = false
+                d.mirroredBeforeBlackOut = false
+                if d.brightness.doubleValue <= 10 {
+                    d.brightness = 50
+                }
+                if d.contrast.doubleValue <= 10 {
+                    d.contrast = 50
+                }
+            }
+        }
+
+    }
+
     func swap(firstDisplay: CGDirectDisplayID, secondDisplay: CGDirectDisplayID, rotation: Bool = true) {
         Display.configure { config in
             let firstMonitorBounds = CGDisplayBounds(firstDisplay)
