@@ -1197,7 +1197,7 @@ final class DisplayController: ObservableObject {
 
     var panelModesBeforeMirroring: [CGDirectDisplayID: MPDisplayMode] = [:]
     var mirrorSetBeforeBlackout: [CGDirectDisplayID: [MPDisplay]] = [:]
-    var enabledHDRBeforeXDR: [CGDirectDisplayID: Bool] = [:]
+    var enabledHDRBeforeXDR: [String: Bool] = [:]
 
     var lastXdrContrast: Float = 0.0
     var xdrContrast: Float = 0.0

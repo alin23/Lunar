@@ -1512,10 +1512,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                                 }
                             }
 
-                            for display in DC.activeDisplays.values.filter({ !$0.blackOutEnabled && $0.reapplyColorGain }) {
+                            for display in DC.activeDisplayList.filter({ !$0.blackOutEnabled && $0.reapplyColorGain }) {
                                 _ = display.control?.setRedGain(display.redGain.uint16Value)
                                 _ = display.control?.setGreenGain(display.greenGain.uint16Value)
                                 _ = display.control?.setBlueGain(display.blueGain.uint16Value)
+                            }
+                            for (serial, hdrShouldBeOn) in DC.enabledHDRBeforeXDR where hdrShouldBeOn {
+                                DC.activeDisplaysBySerial[serial]?.panel?.setPreferHDRModes(true)
                             }
                         }
                     }
