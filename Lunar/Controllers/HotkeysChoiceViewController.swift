@@ -76,6 +76,7 @@ final class HotkeysChoiceViewController: NSViewController {
     var cancelled = false
 
     @IBOutlet var skipButton: Button!
+    @IBOutlet var brightnessKeysControlButton: PopUpButton?
 
     @objc dynamic var displays: [Display] = []
     var didAppear = false
@@ -85,6 +86,11 @@ final class HotkeysChoiceViewController: NSViewController {
         didAppear = true
 
         uiCrumb("\(useOnboardingForDiagnostics ? "Diagnostics" : "Onboarding") Summary")
+
+        brightnessKeysControlButton?.page = .hotkeys
+        brightnessKeysControlButton?.origin = .left
+        brightnessKeysControlButton?.fade()
+
         displays = DC.activeDisplays.values.map { $0 }
         if let wc = view.window?.windowController as? OnboardWindowController {
             wc.setupSkipButton(skipButton, color: peach, text: useOnboardingForDiagnostics ? "Complete Diagnostics" : nil) {

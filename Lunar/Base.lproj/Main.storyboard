@@ -7399,7 +7399,7 @@ when FaceLight is activated</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="reQ-Qm-LQ9" customClass="PaddedButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="204" y="13" width="88" height="13"/>
+                                <rect key="frame" x="205" y="13" width="88" height="13"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <buttonCell key="cell" type="inline" title="View logs" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="5zn-di-UnM">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -8791,6 +8791,47 @@ to send arbitrary DDC commands to monitors</string>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6TU-V4-xYP" customClass="PopUpButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="193" y="50" width="73" height="12"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="inline" title="All displays" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="H5G-3k-Ijk" id="Cz3-vW-Ank" customClass="PopUpButtonCell" customModule="Lunar" customModuleProvider="target">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <menu key="menu" id="2Kh-cI-bkw">
+                                        <items>
+                                            <menuItem title="All displays" state="on" id="H5G-3k-Ijk">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Display with cursor" tag="2" id="OxD-S1-ebs">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                        </items>
+                                    </menu>
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="string" keyPath="prefix" value=" ▼ "/>
+                                    </userDefinedRuntimeAttributes>
+                                </popUpButtonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="dotColor">
+                                        <color key="value" red="0.16159625520000001" green="0.13462888410000001" blue="0.17708333330000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="padding">
+                                        <real key="value" value="34"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <binding destination="hp0-gh-qzJ" name="selectedTag" keyPath="values.brightnessKeysControl" id="7Sh-Ih-t4h"/>
+                                </connections>
+                            </popUpButton>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9eJ-gQ-0XS">
+                                <rect key="frame" x="38" y="49" width="133" height="19"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Brightness keys control" id="LI1-aw-TD3">
+                                    <font key="font" metaFont="systemSemibold" size="11"/>
+                                    <color key="textColor" white="1" alpha="0.84903169010000001" colorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                         <constraints>
                             <constraint firstItem="QUs-8j-Z1e" firstAttribute="centerX" secondItem="mrc-xi-Q8h" secondAttribute="centerX" id="3Ue-qW-3nT"/>
@@ -8819,6 +8860,7 @@ to send arbitrary DDC commands to monitors</string>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="brightnessKeysControlButton" destination="6TU-V4-xYP" id="ZbG-U2-f8P"/>
                         <outlet property="skipButton" destination="QUs-8j-Z1e" id="xjr-KG-9aU"/>
                     </connections>
                 </viewController>
@@ -8830,6 +8872,7 @@ to send arbitrary DDC commands to monitors</string>
                 </arrayController>
                 <userDefaultsController id="TmP-FH-I7c"/>
                 <userDefaultsController id="Ot4-Aq-BQO"/>
+                <userDefaultsController id="hp0-gh-qzJ"/>
             </objects>
             <point key="canvasLocation" x="-900" y="4707"/>
         </scene>
