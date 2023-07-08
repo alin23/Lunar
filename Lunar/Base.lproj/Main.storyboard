@@ -1004,7 +1004,7 @@ the ⌘ Command key more than 8 times in a row</string>
                                 </connections>
                             </containerView>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E8L-4P-FG0">
-                                <rect key="frame" x="389" y="656" width="171" height="29"/>
+                                <rect key="frame" x="387" y="656" width="171" height="29"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="LUNAR" id="imn-dq-JnU">
                                     <font key="font" size="25" name="Menlo-Bold"/>
@@ -3257,7 +3257,7 @@ disabled</string>
                                             </connections>
                                         </button>
                                         <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jzB-lh-fCv" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                            <rect key="frame" x="817" y="14" width="118" height="15"/>
+                                            <rect key="frame" x="816" y="14" width="118" height="15"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <buttonCell key="cell" type="inline" title=" Fewer schedules" bezelStyle="inline" imagePosition="leading" alignment="left" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="h1u-Bi-fDD">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES"/>
@@ -7097,11 +7097,11 @@ when FaceLight is activated</string>
             <objects>
                 <viewController id="O9d-y6-vOC" customClass="ALSInstallViewController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" appearanceType="darkAqua" id="Xkk-ke-cVZ">
-                        <rect key="frame" x="0.0" y="0.0" width="500" height="508"/>
+                        <rect key="frame" x="0.0" y="0.0" width="500" height="546"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nVO-DE-ejt">
-                                <rect key="frame" x="0.0" y="433" width="500" height="39"/>
+                                <rect key="frame" x="0.0" y="471" width="500" height="39"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" refusesFirstResponder="YES" alignment="center" title="Ambient Light Sensor" id="OSB-zJ-KqT">
                                     <font key="font" metaFont="systemSemibold" size="20"/>
@@ -7145,7 +7145,7 @@ when FaceLight is activated</string>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" fixedFrame="YES" tag="1" contentType="username" translatesAutoresizingMaskIntoConstraints="NO" id="3SH-TV-r9R" customClass="PaddedTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="120" y="369" width="260" height="32"/>
+                                <rect key="frame" x="120" y="407" width="260" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="My WiFi" drawsBackground="YES" id="Z8l-bn-aim" customClass="PaddedTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="systemMedium" size="13"/>
@@ -7159,7 +7159,7 @@ when FaceLight is activated</string>
                                 </connections>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DYZ-cA-n1W">
-                                <rect key="frame" x="118" y="409" width="260" height="16"/>
+                                <rect key="frame" x="118" y="447" width="260" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Wireless Network Name" id="raA-dc-UTF">
                                     <font key="font" metaFont="systemMedium" size="13"/>
@@ -7168,7 +7168,7 @@ when FaceLight is activated</string>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lFv-oO-4p7">
-                                <rect key="frame" x="118" y="336" width="260" height="16"/>
+                                <rect key="frame" x="118" y="374" width="260" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Wireless Network Password" id="led-fS-0j4">
                                     <font key="font" metaFont="systemMedium" size="13"/>
@@ -7184,7 +7184,7 @@ when FaceLight is activated</string>
                                 </connections>
                             </textField>
                             <secureTextField verticalHuggingPriority="750" fixedFrame="YES" tag="2" contentType="password" translatesAutoresizingMaskIntoConstraints="NO" id="SOD-zT-RhJ" customClass="PaddedSecureTextField" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="120" y="296" width="260" height="32"/>
+                                <rect key="frame" x="120" y="334" width="260" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" title="passw0rd" placeholderString="•••••••••" drawsBackground="YES" usesSingleLineMode="YES" id="USS-5e-ORa" customClass="PaddedSecureTextFieldCell" customModule="Lunar" customModuleProvider="target">
                                     <font key="font" metaFont="system"/>
@@ -7201,7 +7201,7 @@ when FaceLight is activated</string>
                                 </connections>
                             </secureTextField>
                             <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JBC-07-QzE">
-                                <rect key="frame" x="152" y="229" width="197" height="25"/>
+                                <rect key="frame" x="152" y="267" width="197" height="25"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="push" title="Select a device" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="27" imageScaling="proportionallyDown" inset="2" selectedItem="sdb-jG-nGo" id="nC4-NC-leG">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -7221,23 +7221,16 @@ when FaceLight is activated</string>
                                 </connections>
                             </popUpButton>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EiP-Qd-5fN">
-                                <rect key="frame" x="192" y="260" width="115" height="16"/>
+                                <rect key="frame" x="192" y="298" width="115" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Sensor Device" id="iko-LP-qfn">
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Sensor Location" id="iko-LP-qfn">
                                     <font key="font" metaFont="systemMedium" size="13"/>
                                     <color key="textColor" red="0.94735863099999995" green="0.94735863099999995" blue="0.94735863099999995" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
-                                <connections>
-                                    <binding destination="bOz-xh-ozO" name="hidden" keyPath="self.sshKeySelected" id="6t8-QC-DOf">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
-                                </connections>
                             </textField>
                             <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3cz-yU-8LZ">
-                                <rect key="frame" x="150" y="178" width="197" height="25"/>
+                                <rect key="frame" x="150" y="216" width="197" height="25"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="push" title="Metro ESP32 S2" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="30" imageScaling="proportionallyDown" inset="2" selectedItem="Qtb-lf-Oop" id="9r2-0M-ffe">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -7275,6 +7268,9 @@ when FaceLight is activated</string>
                                             <menuItem title="NodeMCU v2 (ESP8266)" tag="41" identifier="nodemcuv2" id="hZE-8f-Kh1">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
+                                            <menuItem title="NodeMCU v3 (ESP8266)" tag="48" identifier="nodemcuv2" id="hZE-8f-Kj1">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
                                             <menuItem title="WEMOS D1 Mini (ESP8266)" tag="42" identifier="d1_mini" id="hZE-8f-Kh2">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
@@ -7301,25 +7297,128 @@ when FaceLight is activated</string>
                                 </popUpButtonCell>
                                 <connections>
                                     <binding destination="O9d-y6-vOC" name="selectedValue" keyPath="self.board" id="Gtr-dm-44x"/>
-                                    <outlet property="nextKeyView" destination="ACw-Vy-6XO" id="Am5-3M-TEw"/>
+                                    <outlet property="nextKeyView" destination="zdb-gt-XqV" id="nUa-mR-eRe"/>
                                 </connections>
                             </popUpButton>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Kby-R2-kpV">
-                                <rect key="frame" x="190" y="209" width="115" height="16"/>
+                                <rect key="frame" x="190" y="247" width="115" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Sensor Board" id="5hg-Un-GSM">
                                     <font key="font" metaFont="systemMedium" size="13"/>
                                     <color key="textColor" red="0.94735863099999995" green="0.94735863099999995" blue="0.94735863099999995" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
+                            </textField>
+                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zdb-gt-XqV">
+                                <rect key="frame" x="150" y="165" width="197" height="25"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="push" title="TSL2591" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="47" imageScaling="proportionallyDown" inset="2" selectedItem="QGb-cz-va5" id="VJc-uD-Ygz">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <menu key="menu" id="PCt-YS-OMe">
+                                        <items>
+                                            <menuItem title="TSL2591" state="on" tag="47" identifier="tsl2591" id="QGb-cz-va5">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="BH1750" tag="42" identifier="bh1750" id="SzO-mM-wu0">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="LTR390" tag="43" identifier="ltr390" id="4fo-Ho-ZK1">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="MAX44009" tag="44" identifier="max44009" id="3uL-WF-Lq2">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="TCS34725" tag="45" identifier="tcs34725" id="WcH-Zt-0J3">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="TSL2561" tag="46" identifier="tsl2561" id="OSP-iD-NH4">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
                                 <connections>
-                                    <binding destination="bOz-xh-ozO" name="hidden" keyPath="self.sshKeySelected" id="oKw-n9-meE">
+                                    <binding destination="O9d-y6-vOC" name="selectedValue" keyPath="self.sensor" id="KsS-rJ-KdG"/>
+                                    <outlet property="nextKeyView" destination="ACw-Vy-6XO" id="3Jn-d6-Uzu"/>
+                                </connections>
+                            </popUpButton>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YCt-EB-Ve4">
+                                <rect key="frame" x="190" y="196" width="115" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Light Sensor" id="Yhc-7E-e7l">
+                                    <font key="font" metaFont="systemMedium" size="13"/>
+                                    <color key="textColor" red="0.94735863099999995" green="0.94735863099999995" blue="0.94735863099999995" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" fixedFrame="YES" tag="1" contentType="username" translatesAutoresizingMaskIntoConstraints="NO" id="Zag-Jj-3RW" customClass="PaddedTextField" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="45" y="167" width="70" height="26"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" title="GPIO4" placeholderString="sda" drawsBackground="YES" id="fdD-50-rP0" customClass="PaddedTextFieldCell" customModule="Lunar" customModuleProvider="target">
+                                    <font key="font" size="10" name="Menlo-Bold"/>
+                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.89784250830000001" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="O9d-y6-vOC" name="value" keyPath="self.sda" id="pCv-f7-yEK"/>
+                                    <outlet property="delegate" destination="O9d-y6-vOC" id="TSI-bb-fgF"/>
+                                    <outlet property="nextKeyView" destination="iIM-gq-sGB" id="Xcz-d0-UoC"/>
+                                </connections>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Cv6-t7-vEk">
+                                <rect key="frame" x="49" y="196" width="61" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="SDA Pin" id="jfa-KV-YOw">
+                                    <font key="font" metaFont="systemMedium" size="13"/>
+                                    <color key="textColor" red="0.94735863099999995" green="0.94735863099999995" blue="0.94735863099999995" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" fixedFrame="YES" tag="1" contentType="username" translatesAutoresizingMaskIntoConstraints="NO" id="iIM-gq-sGB" customClass="PaddedTextField" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="381" y="167" width="70" height="26"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" title="GPIO5" placeholderString="scl" drawsBackground="YES" id="Z6P-Vb-2hK" customClass="PaddedTextFieldCell" customModule="Lunar" customModuleProvider="target">
+                                    <font key="font" size="10" name="Menlo-Bold"/>
+                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.89784250830000001" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="O9d-y6-vOC" name="value" keyPath="self.scl" id="XN3-YF-5Ht"/>
+                                    <outlet property="delegate" destination="O9d-y6-vOC" id="sMw-Xb-mB5"/>
+                                    <outlet property="nextKeyView" destination="SOD-zT-RhJ" id="a8G-TG-sPw"/>
+                                </connections>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kHp-QA-cCP">
+                                <rect key="frame" x="386" y="196" width="61" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="SCL Pin" id="doE-u7-88M">
+                                    <font key="font" metaFont="systemMedium" size="13"/>
+                                    <color key="textColor" red="0.94735863099999995" green="0.94735863099999995" blue="0.94735863099999995" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="reQ-Qm-LQ9" customClass="PaddedButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="204" y="13" width="88" height="13"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <buttonCell key="cell" type="inline" title="View logs" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="5zn-di-UnM">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="systemSemibold" size="10"/>
+                                </buttonCell>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="textColor">
+                                        <color key="value" red="0.87843137979999997" green="0.87843137979999997" blue="0.87843137979999997" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="viewLogs:" target="O9d-y6-vOC" id="NdH-ZW-lip"/>
+                                    <binding destination="O9d-y6-vOC" name="hidden" keyPath="self.done" id="nb2-Ly-JdV">
                                         <dictionary key="options">
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
                                         </dictionary>
                                     </binding>
                                 </connections>
-                            </textField>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
@@ -7331,7 +7430,7 @@ when FaceLight is activated</string>
                 <userDefaultsController id="Pi0-YM-0J1"/>
                 <userDefaultsController id="Re8-UY-BbK"/>
             </objects>
-            <point key="canvasLocation" x="-817" y="1312"/>
+            <point key="canvasLocation" x="-817" y="1331"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="gAz-nZ-5HL">

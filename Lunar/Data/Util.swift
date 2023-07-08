@@ -1714,7 +1714,7 @@ struct AtomicLock<Value> {
 // MARK: - Atomic
 
 @propertyWrapper
-struct Atomic<Value: AtomicValue> {
+struct Atomic<Value: AtomicValue> where Value.AtomicRepresentation.Value == Value {
     init(wrappedValue: Value) {
         value = ManagedAtomic<Value>(wrappedValue)
     }
@@ -1735,7 +1735,7 @@ struct Atomic<Value: AtomicValue> {
 // MARK: - AtomicOptional
 
 @propertyWrapper
-struct AtomicOptional<Value: AtomicValue & Equatable> {
+struct AtomicOptional<Value: AtomicValue & Equatable> where Value.AtomicRepresentation.Value == Value {
     init(wrappedValue: Value?, nilValue: Value) {
         self.nilValue = nilValue
         value = ManagedAtomic<Value>(wrappedValue ?? nilValue)

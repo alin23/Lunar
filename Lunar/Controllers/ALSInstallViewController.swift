@@ -69,11 +69,14 @@ final class ALSInstallViewController: NSViewController {
 
     var installFinishChecker: Repeater?
 
-    @objc dynamic var sensor = "tsl2591"
+    @objc dynamic var sensor = "TSL2591"
+    @objc dynamic var sda = "GPIO4"
+    @objc dynamic var scl = "GPIO5"
 
     @objc dynamic var board: String = SELECT_BOARD_ITEM {
         didSet {
             setInstallButtonEnabled()
+            setPins()
         }
     }
 
@@ -99,6 +102,8 @@ final class ALSInstallViewController: NSViewController {
             return "esp32dev"
 
         case "NodeMCU v2 (ESP8266)":
+            return "nodemcuv2"
+        case "NodeMCU v3 (ESP8266)":
             return "nodemcuv2"
         case "WEMOS D1 Mini (ESP8266)":
             return "d1_mini"
@@ -153,6 +158,30 @@ final class ALSInstallViewController: NSViewController {
         }
     }
 
+    func setPins() {
+        switch boardID {
+        case "sparkfun_esp32s2_thing_plus":
+            sda = "01"
+            scl = "02"
+        case "adafruit_metro_esp32s2", "adafruit_funhouse_esp32s2", "adafruit_feather_esp32s2_tft", "adafruit_magtag29_esp32s2":
+            sda = "33"
+            scl = "34"
+        case "nodemcuv2", "d1_mini", "d1_mini_lite", "d1_mini_pro", "nodemcu":
+            sda = "D2"
+            scl = "D1"
+        case "esp32dev", "lolin32", "lolin32_lite", "nodemcu-32s":
+            sda = "19"
+            scl = "23"
+        default:
+            sda = "GPIO4"
+            scl = "GPIO5"
+        }
+    }
+
+    @IBAction func viewLogs(_: Any) {
+        NSWorkspace.shared.open(URL(fileURLWithPath: INSTALL_LOG_PATH))
+    }
+
     @IBAction func onDoneClicked(_: Any) {
         onClick?()
     }
@@ -188,7 +217,7 @@ final class ALSInstallViewController: NSViewController {
               let installScript = (try? Bundle.main.path(forResource: "install", ofType: "sh")?.realpath())?.string,
               let process = shellProc(
                   args: [installScript],
-                  env: ["WIFI_SSID": ssid, "WIFI_PASSWORD": password, "ESP_DEVICE": device, "BOARD": boardID, "LOG_PATH": INSTALL_LOG_PATH, "SENSOR": sensor]
+                  env: ["WIFI_SSID": ssid, "WIFI_PASSWORD": password, "ESP_DEVICE": device, "BOARD": boardID, "LOG_PATH": INSTALL_LOG_PATH, "SENSOR": sensor.lowercased(), "SDA": sda, "SCL": scl]
               )
         else {
             mainThread {
@@ -249,6 +278,7 @@ final class ALSInstallViewController: NSViewController {
             operationDescription = Data(lastLines).str().attributedString
         }
     }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 

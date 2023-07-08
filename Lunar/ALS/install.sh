@@ -1,11 +1,22 @@
 #!/bin/zsh
 
+set -xe
+
+LOG_PATH=${LOG_PATH:-/tmp/lunar-sensor-install.log}
+echo "" > "$LOG_PATH"
+
 DIR="${0:a:h}"
 BOARD_DIR="/tmp/lunarsensor/$BOARD"
 SENSOR="${SENSOR:-tsl2591}"
 
-mkdir -p "$BOARD_DIR"
-cp -RL "$DIR/install.sh" "$BOARD_DIR/"
+mkdir -p "$BOARD_DIR" || true
+cp -RL "$DIR/install.sh" "$BOARD_DIR/" || true
+echo /usr/bin/python3 -c "open('$BOARD_DIR/lunar.yaml', 'w')\
+    .write(\
+        open('$DIR/lunar.yaml')\
+        .read()\
+        .replace('SENSOR_DEFINITION', open('$DIR/$SENSOR.yaml').read())\
+    )" >> "$LOG_PATH"
 /usr/bin/python3 -c "open('$BOARD_DIR/lunar.yaml', 'w')\
     .write(\
         open('$DIR/lunar.yaml')\
@@ -15,7 +26,6 @@ cp -RL "$DIR/install.sh" "$BOARD_DIR/"
 cd "$BOARD_DIR"
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
-LOG_PATH=${LOG_PATH:-/tmp/lunar-sensor-install.log}
 BOARD="${BOARD:-esp32dev}"
 
 if [[ "$BOARD" == "sparkfun_esp32s2_thing_plus" ]]; then
@@ -45,17 +55,24 @@ else
     SCL="${SCL:-GPIO5}"
 fi
 
-echo "" > "$LOG_PATH"
 echo "Installing latest Python pip..." | tee -a "$LOG_PATH"
 echo "" | tee -a "$LOG_PATH"
 echo "" | tee -a "$LOG_PATH"
 /usr/bin/python3 -m pip install --user -U pip 2>&1 | tee -a "$LOG_PATH"
+if [[ $PIPESTATUS ]]; then
+    echo "\${PIPESTATUS[0]} == ${PIPESTATUS[0]}"
+    test ${PIPESTATUS[0]} == 0 || exit ${PIPESTATUS[0]}
+fi
 
 echo "" | tee -a "$LOG_PATH"
 echo "Installing ESPHome..." | tee -a "$LOG_PATH"
 echo "" | tee -a "$LOG_PATH"
 echo "" | tee -a "$LOG_PATH"
 /usr/bin/python3 -m pip install --user esphome==2023.6.3 2>&1 | tee -a "$LOG_PATH"
+if [[ $PIPESTATUS ]]; then
+    echo "\${PIPESTATUS[0]} == ${PIPESTATUS[0]}"
+    test ${PIPESTATUS[0]} == 0 || exit ${PIPESTATUS[0]}
+fi
 
 echo "" | tee -a "$LOG_PATH"
 echo "Compiling and uploading firmware to $ESP_DEVICE ($BOARD) ..." | tee -a "$LOG_PATH"
@@ -74,6 +91,10 @@ echo /usr/bin/python3 -m esphome \
     -s sda "$SDA" \
     -s scl "$SCL" \
     run "$BOARD_DIR/lunar.yaml" --no-logs --device "$ESP_DEVICE" 2>&1 | tee -a "$LOG_PATH"
+if [[ $PIPESTATUS ]]; then
+    echo "\${PIPESTATUS[0]} == ${PIPESTATUS[0]}"
+    test ${PIPESTATUS[0]} == 0 || exit ${PIPESTATUS[0]}
+fi
 
 /usr/bin/python3 -m esphome \
     -s ssid "$WIFI_SSID" \
@@ -84,3 +105,7 @@ echo /usr/bin/python3 -m esphome \
     -s sda "$SDA" \
     -s scl "$SCL" \
     run "$BOARD_DIR/lunar.yaml" --no-logs --device "$ESP_DEVICE" 2>&1 | tee -a "$LOG_PATH"
+if [[ $PIPESTATUS ]]; then
+    echo "\${PIPESTATUS[0]} == ${PIPESTATUS[0]}"
+    test ${PIPESTATUS[0]} == 0 || exit ${PIPESTATUS[0]}
+fi
