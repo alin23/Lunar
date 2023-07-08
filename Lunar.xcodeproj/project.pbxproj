@@ -83,6 +83,12 @@
 		C77CC7551FED5501009AA718 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC7541FED5501009AA718 /* SplitViewController.swift */; };
 		C77CC7591FED9ECE009AA718 /* DisplayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */; };
 		C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */; };
+		C78210FA2A595C69008DB106 /* tcs34725.yaml in Resources */ = {isa = PBXBuildFile; fileRef = C78210F42A595C69008DB106 /* tcs34725.yaml */; };
+		C78210FB2A595C69008DB106 /* tsl2561.yaml in Resources */ = {isa = PBXBuildFile; fileRef = C78210F52A595C69008DB106 /* tsl2561.yaml */; };
+		C78210FC2A595C69008DB106 /* bh1750.yaml in Resources */ = {isa = PBXBuildFile; fileRef = C78210F62A595C69008DB106 /* bh1750.yaml */; };
+		C78210FD2A595C69008DB106 /* ltr390.yaml in Resources */ = {isa = PBXBuildFile; fileRef = C78210F72A595C69008DB106 /* ltr390.yaml */; };
+		C78210FE2A595C69008DB106 /* tsl2591.yaml in Resources */ = {isa = PBXBuildFile; fileRef = C78210F82A595C69008DB106 /* tsl2591.yaml */; };
+		C78210FF2A595C69008DB106 /* max44009.yaml in Resources */ = {isa = PBXBuildFile; fileRef = C78210F92A595C69008DB106 /* max44009.yaml */; };
 		C784143827DDFBC400E14941 /* OSDWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C784143727DDFBC400E14941 /* OSDWindow.swift */; };
 		C78A1964294E700800B0410A /* DDC2.c in Sources */ = {isa = PBXBuildFile; fileRef = C78A1963294E700800B0410A /* DDC2.c */; };
 		C78AB66720F0C73900863CB1 /* SwiftyLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78AB66620F0C73900863CB1 /* SwiftyLogger.swift */; };
@@ -271,6 +277,12 @@
 		C77CC7541FED5501009AA718 /* SplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
 		C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayViewController.swift; sourceTree = "<group>"; };
 		C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayView.swift; sourceTree = "<group>"; };
+		C78210F42A595C69008DB106 /* tcs34725.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = tcs34725.yaml; sourceTree = "<group>"; };
+		C78210F52A595C69008DB106 /* tsl2561.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = tsl2561.yaml; sourceTree = "<group>"; };
+		C78210F62A595C69008DB106 /* bh1750.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = bh1750.yaml; sourceTree = "<group>"; };
+		C78210F72A595C69008DB106 /* ltr390.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = ltr390.yaml; sourceTree = "<group>"; };
+		C78210F82A595C69008DB106 /* tsl2591.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = tsl2591.yaml; sourceTree = "<group>"; };
+		C78210F92A595C69008DB106 /* max44009.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = max44009.yaml; sourceTree = "<group>"; };
 		C784143727DDFBC400E14941 /* OSDWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSDWindow.swift; sourceTree = "<group>"; };
 		C78A1963294E700800B0410A /* DDC2.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = DDC2.c; sourceTree = "<group>"; };
 		C78A1965294E70D100B0410A /* SharedDDC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SharedDDC.h; sourceTree = "<group>"; };
@@ -670,6 +682,12 @@
 		C7BAD9CE26386ABC0058974C /* ALS */ = {
 			isa = PBXGroup;
 			children = (
+				C78210F62A595C69008DB106 /* bh1750.yaml */,
+				C78210F72A595C69008DB106 /* ltr390.yaml */,
+				C78210F92A595C69008DB106 /* max44009.yaml */,
+				C78210F42A595C69008DB106 /* tcs34725.yaml */,
+				C78210F52A595C69008DB106 /* tsl2561.yaml */,
+				C78210F82A595C69008DB106 /* tsl2591.yaml */,
 				C7C43190269DD9AE00DCD0F5 /* install.sh */,
 				C7C43191269DD9AE00DCD0F5 /* lunar.yaml */,
 			);
@@ -898,10 +916,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				C7A6A08927BF8F5D008E52E0 /* Schedule.xib in Resources */,
+				C78210FE2A595C69008DB106 /* tsl2591.yaml in Resources */,
+				C78210FB2A595C69008DB106 /* tsl2561.yaml in Resources */,
+				C78210FA2A595C69008DB106 /* tcs34725.yaml in Resources */,
 				C7C43192269DD9AE00DCD0F5 /* install.sh in Resources */,
+				C78210FF2A595C69008DB106 /* max44009.yaml in Resources */,
+				C78210FD2A595C69008DB106 /* ltr390.yaml in Resources */,
 				C772802629AE09D900401C78 /* edid-decode in Resources */,
 				C7AEC7FD1FD0B4350039B562 /* Assets.xcassets in Resources */,
 				C7AEC8001FD0B4350039B562 /* Main.storyboard in Resources */,
+				C78210FC2A595C69008DB106 /* bh1750.yaml in Resources */,
 				C73A4E6229C5EAFC006A22F3 /* Localizable.stringsdict in Resources */,
 				C73B41F6263E1301006F6783 /* ddcctl in Resources */,
 				C7A2574220EA249B003B3A84 /* dsa_pub.pem in Resources */,

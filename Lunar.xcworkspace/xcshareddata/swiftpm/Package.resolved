@@ -78,7 +78,7 @@
       "location" : "https://github.com/alin23/FuzzyMatcher",
       "state" : {
         "branch" : "main",
-        "revision" : "ba9f3c5a9a77499d8cfdeda8b9c90a3d6d698349"
+        "revision" : "b97b7b900faf2a3881b5536be0f50b5c904c2798"
       }
     },
     {
@@ -150,7 +150,7 @@
       "location" : "https://github.com/alin23/sentry-cocoa.git",
       "state" : {
         "branch" : "master",
-        "revision" : "3fc79ea6ebcfd726e48bea1d98f89bc3a32d5cf2"
+        "revision" : "a890c38828010ebcdbe6b0edad84a97d06e54e0b"
       }
     },
     {
@@ -159,7 +159,7 @@
       "location" : "https://github.com/rnine/SimplyCoreAudio",
       "state" : {
         "branch" : "develop",
-        "revision" : "73014324f2a916b445b4da5a4232aa57033267af"
+        "revision" : "35cc0e6eac5c2ee5049431f4238b0e333cf79869"
       }
     },
     {
@@ -194,8 +194,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-atomics.git",
       "state" : {
-        "revision" : "ff3d2212b6b093db7f177d0855adbc4ef9c5f036",
-        "version" : "1.0.3"
+        "revision" : "6c89474e62719ddcc1e9614989fff2f68208fe10",
+        "version" : "1.1.0"
       }
     },
     {
@@ -230,8 +230,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/siteline/SwiftUI-Introspect",
       "state" : {
-        "revision" : "c18951c747ab62af7c15e17a81bd37d4fd5a9979",
-        "version" : "0.2.3"
+        "revision" : "adb9e7a69fd75322dcdee0c20f2fb6640d6f0087",
+        "version" : "0.9.0"
       }
     },
     {
@@ -239,8 +239,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/eddiekaiger/SwiftyAttributes",
       "state" : {
-        "revision" : "3951ee4ed487aa1c3f16ae16d99a4ebf9506dad9",
-        "version" : "5.3.0"
+        "revision" : "7b39078c0920b46e0967573eedb7a8811a80e7b9",
+        "version" : "5.4.0"
       }
     },
     {
