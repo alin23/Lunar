@@ -1,3 +1,37 @@
+# 6.1.5
+### Features
+
+- **Cleaning Mode**: disable screens, keys and clicks to help cleaning the keyboard and screens
+
+![cleaning mode UI](https://files.lunar.fyi/cleaning-mode-accessible.png)
+
+### Improvements
+
+- Default max brightness to `500` for Dell Alienware monitors
+- Keep HDR enabled after standby for external monitors when using XDR brightness
+- Allow customizing I2C sensor pins
+- Add support for more hardware light sensors:
+    - [BH1750](https://esphome.io/components/sensor/bh1750.html)
+    - [LTR390](https://esphome.io/components/sensor/ltr390.html)
+    - [MAX44009](https://esphome.io/components/sensor/max44009.html)
+    - [TCS34725](https://esphome.io/components/sensor/tcs34725.html)
+    - [TSL2561](https://esphome.io/components/sensor/tsl2561.html)
+    - [TSL2591](https://esphome.io/components/sensor/tsl2591.html)
+
+### Fixes
+
+- Fix **Auto XDR** blinking when battery is lower than 20%
+
+# 6.1.4
+### Improvements
+
+- Add `disableExternalSensorWhenNoExternalMonitor` hidden setting
+- Disable the new **Disconnect API** when DisplayLink is running
+
+### Fixes
+
+- Fix the **Force Sleep when lid is closed** functionality
+
 # 6.1.3
 ## Fixes
 
