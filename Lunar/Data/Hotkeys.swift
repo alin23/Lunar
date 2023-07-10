@@ -1317,13 +1317,14 @@ extension AppDelegate: MediaKeyTapDelegate {
             return event
         }
 
+        let fine = flags.isSuperset(of: [.option, .shift])
         switch mediaKey {
         case .volumeUp:
             if Defaults[.volumeKeysControlAllMonitors] {
                 let displays = DC.activeDisplayList.filter(\.supportsVolumeControl)
                 guard !displays.isEmpty else { return event }
 
-                increaseVolume(by: flags.isSuperset(of: [.option, .shift]) ? 1 : nil, for: displays, currentAudioDisplay: false)
+                increaseVolume(by: fine ? 1 : nil, for: displays, currentAudioDisplay: false)
 
                 let mutedDisplays = displays.filter(\.audioMuted)
                 if !mutedDisplays.isEmpty {
@@ -1334,7 +1335,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                     Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, display: display)
                 }
 
-                if (Defaults[.beepFeedback] && !flags.contains(.shift)) || (!Defaults[.beepFeedback] && flags.contains(.shift)) {
+                if (Defaults[.beepFeedback] && !flags.contains(.shift)) || (!Defaults[.beepFeedback] && flags.contains(.shift) && !fine) {
                     playVolumeChangedSound()
                 }
 
@@ -1345,14 +1346,14 @@ extension AppDelegate: MediaKeyTapDelegate {
                 return event
             }
 
-            increaseVolume(by: flags.isSuperset(of: [.option, .shift]) ? 1 : nil)
+            increaseVolume(by: fine ? 1 : nil)
             if display.audioMuted {
                 toggleAudioMuted()
             }
 
             Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, display: display)
 
-            if (Defaults[.beepFeedback] && !flags.contains(.shift)) || (!Defaults[.beepFeedback] && flags.contains(.shift)) {
+            if (Defaults[.beepFeedback] && !flags.contains(.shift)) || (!Defaults[.beepFeedback] && flags.contains(.shift) && !fine) {
                 playVolumeChangedSound()
             }
         case .volumeDown:
@@ -1360,7 +1361,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                 let displays = DC.activeDisplayList.filter(\.supportsVolumeControl)
                 guard !displays.isEmpty else { return event }
 
-                decreaseVolume(by: flags.isSuperset(of: [.option, .shift]) ? 1 : nil, for: displays, currentAudioDisplay: false)
+                decreaseVolume(by: fine ? 1 : nil, for: displays, currentAudioDisplay: false)
 
                 let mutedDisplays = displays.filter(\.audioMuted)
                 if !mutedDisplays.isEmpty {
@@ -1371,7 +1372,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                     Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, display: display)
                 }
 
-                if (Defaults[.beepFeedback] && !flags.contains(.shift)) || (!Defaults[.beepFeedback] && flags.contains(.shift)) {
+                if (Defaults[.beepFeedback] && !flags.contains(.shift)) || (!Defaults[.beepFeedback] && flags.contains(.shift) && !fine) {
                     playVolumeChangedSound()
                 }
 
@@ -1382,14 +1383,14 @@ extension AppDelegate: MediaKeyTapDelegate {
                 return event
             }
 
-            decreaseVolume(by: flags.isSuperset(of: [.option, .shift]) ? 1 : nil)
+            decreaseVolume(by: fine ? 1 : nil)
             if display.audioMuted {
                 toggleAudioMuted()
             }
 
             Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, display: display)
 
-            if (Defaults[.beepFeedback] && !flags.contains(.shift)) || (!Defaults[.beepFeedback] && flags.contains(.shift)) {
+            if (Defaults[.beepFeedback] && !flags.contains(.shift)) || (!Defaults[.beepFeedback] && flags.contains(.shift) && !fine) {
                 playVolumeChangedSound()
             }
         case .mute:
@@ -1403,7 +1404,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                     Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, display: display)
                 }
 
-                if (Defaults[.beepFeedback] && !flags.contains(.shift)) || (!Defaults[.beepFeedback] && flags.contains(.shift)) {
+                if (Defaults[.beepFeedback] && !flags.contains(.shift)) || (!Defaults[.beepFeedback] && flags.contains(.shift) && !fine) {
                     playVolumeChangedSound()
                 }
 
@@ -1418,7 +1419,7 @@ extension AppDelegate: MediaKeyTapDelegate {
 
             Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, display: display)
 
-            if (Defaults[.beepFeedback] && !flags.contains(.shift)) || (!Defaults[.beepFeedback] && flags.contains(.shift)) {
+            if (Defaults[.beepFeedback] && !flags.contains(.shift)) || (!Defaults[.beepFeedback] && flags.contains(.shift) && !fine) {
                 playVolumeChangedSound()
             }
         default:
