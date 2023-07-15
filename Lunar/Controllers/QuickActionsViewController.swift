@@ -486,7 +486,7 @@ struct DisplayRowView: View {
             height: 20,
             noValueText: "Video Input",
             noValueImage: "input",
-            content: .constant(VideoInputSource.mostUsed)
+            content: display.vendor == .lg ? .constant(VideoInputSource.mostUsed + [VideoInputSource.separator] + VideoInputSource.lgSpecific) : .constant(VideoInputSource.mostUsed)
         )
         .frame(width: 150, height: 20, alignment: .center)
         .padding(.vertical, 2)
@@ -2390,7 +2390,7 @@ struct UsefulInfo: View {
 
     var body: some View {
         if let (t1, t2) = usefulInfoText {
-            VStack(spacing: -2) {
+            VStack(alignment: .leading, spacing: -2) {
                 Text(t1)
                     .font(.system(size: 10, weight: .bold, design: .monospaced).leading(.tight))
                 Text(t2)

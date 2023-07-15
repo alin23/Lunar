@@ -52,9 +52,12 @@ final class HotkeyButton: PopoverButton<HotkeyPopoverController> {
             guard let dropdown else { continue }
             dropdown.removeAllItems()
             dropdown.addItems(
-                withTitles: VideoInputSource.mostUsed
-                    .map { input in input.str } + VideoInputSource.leastUsed
-                    .map { input in input.str } + ["Unknown"]
+                withTitles: (
+                    VideoInputSource.mostUsed.map { input in input.str }
+                        + (display.isLG ? VideoInputSource.lgSpecific.map { input in input.str } : [])
+                        + VideoInputSource.leastUsed.map { input in input.str }
+                        + ["Unknown"]
+                )
             )
             for item in dropdown.itemArray {
                 switch item.title.lowercased() {
@@ -82,6 +85,9 @@ final class HotkeyButton: PopoverButton<HotkeyPopoverController> {
             }
 
             dropdown.menu?.insertItem(.separator(), at: VideoInputSource.mostUsed.count)
+            if display.isLG {
+                dropdown.menu?.insertItem(.separator(), at: VideoInputSource.mostUsed.count + VideoInputSource.lgSpecific.count + 1)
+            }
             for item in dropdown.itemArray {
                 guard let input = inputSourceMapping[item.title] else { continue }
                 item.tag = input.rawValue.i

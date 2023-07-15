@@ -67,7 +67,7 @@
 #define BOTTOM_LEFT_SCREEN_PURITY 0xE8
 #define BOTTOM_RIGHT_SCREEN_PURITY 0xEB
 
-bool DDCWriteIntel(io_service_t framebuffer, struct DDCWriteCommand *write);
+bool DDCWriteIntel(io_service_t framebuffer, struct DDCWriteCommand *write, uint8_t sourceAddr);
 bool DDCReadIntel(io_service_t framebuffer, struct DDCReadCommand *read);
 bool EDIDTestIntel(io_service_t framebuffer, struct EDID *edid, uint8_t edidData[256]);
 

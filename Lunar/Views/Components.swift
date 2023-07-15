@@ -411,6 +411,8 @@ protocol Nameable {
     var image: String? { get }
     var tag: Int? { get }
     var enabled: Bool { get }
+
+    var isSeparator: Bool { get }
 }
 
 // MARK: - SizedPopUpButton
@@ -469,6 +471,10 @@ struct Dropdown<T: Nameable>: NSViewRepresentable {
 
     func makeMenuItems(context: Context) -> [NSMenuItem] {
         content.map { input -> NSMenuItem in
+            guard !input.isSeparator else {
+                return NSMenuItem.separator()
+            }
+
             let item = NSMenuItem(title: input.name, action: nil, keyEquivalent: "")
             item.identifier = NSUserInterfaceItemIdentifier(rawValue: input.name)
             if let image = input.image {

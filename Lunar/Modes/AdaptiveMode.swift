@@ -19,6 +19,7 @@ let AUTO_MODE_TAG = 99
 // MARK: - AdaptiveModeKey + Codable, ExpressibleByArgument, Nameable
 
 extension AdaptiveModeKey: Codable, ExpressibleByArgument, Nameable {
+    var isSeparator: Bool { false }
     init?(argument: String) {
         guard argument.lowercased().stripped != "auto" else {
             CachedDefaults[.overrideAdaptiveMode] = false

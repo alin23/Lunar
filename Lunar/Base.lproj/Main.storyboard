@@ -2849,6 +2849,9 @@ CORNERS</string>
                                             <menuItem title="USB-C 2" image="usbc" tag="27" id="ZyO-bq-Etf">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
+                                            <menuItem title="USB-C 3" image="usbc" tag="28" id="XEr-sX-pGs">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
                                             <menuItem title="DisplayPort 1" image="displayport" tag="15" id="V8w-47-33R">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
@@ -2861,7 +2864,142 @@ CORNERS</string>
                                             <menuItem title="HDMI 2" image="hdmi" tag="18" id="e14-Ly-D7b">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem isSeparatorItem="YES" id="QB5-7H-QtY"/>
+                                            <menuItem title="HDMI 3" image="hdmi" tag="19" id="lTS-vs-ks7">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="HDMI 4" image="hdmi" tag="20" id="mbj-hR-5EF">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem isSeparatorItem="YES" id="QB5-7H-QtY">
+                                                <connections>
+                                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.isLG" id="lks-iE-yAb">
+                                                        <dictionary key="options">
+                                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                        </dictionary>
+                                                    </binding>
+                                                </connections>
+                                            </menuItem>
+                                            <menuItem title="USB-C 1 (LG specific)" image="usbc" tag="210" id="XEE-Df-ajR">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                <connections>
+                                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.isLG" id="fMp-FV-30i">
+                                                        <dictionary key="options">
+                                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                        </dictionary>
+                                                    </binding>
+                                                </connections>
+                                            </menuItem>
+                                            <menuItem title="USB-C 2 (LG specific)" image="usbc" tag="211" id="xfQ-Nw-3ai">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                <connections>
+                                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.isLG" id="KoD-OL-3C0">
+                                                        <dictionary key="options">
+                                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                        </dictionary>
+                                                    </binding>
+                                                </connections>
+                                            </menuItem>
+                                            <menuItem title="USB-C 3 (LG specific)" image="usbc" tag="224" id="n8d-Ii-yTe">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                <connections>
+                                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.isLG" id="V0f-8H-O1u">
+                                                        <dictionary key="options">
+                                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                        </dictionary>
+                                                    </binding>
+                                                </connections>
+                                            </menuItem>
+                                            <menuItem title="USB-C 4 (LG specific)" image="usbc" tag="225" id="Qju-45-2hF">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                <connections>
+                                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.isLG" id="nhe-J5-xi4">
+                                                        <dictionary key="options">
+                                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                        </dictionary>
+                                                    </binding>
+                                                </connections>
+                                            </menuItem>
+                                            <menuItem title="DisplayPort 1 (LG specific)" image="displayport" tag="208" id="rUk-9v-Ue4">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                <connections>
+                                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.isLG" id="EBz-lq-QuP">
+                                                        <dictionary key="options">
+                                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                        </dictionary>
+                                                    </binding>
+                                                </connections>
+                                            </menuItem>
+                                            <menuItem title="DisplayPort 2 (LG specific)" image="displayport" tag="209" id="csI-en-qt7">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                <connections>
+                                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.isLG" id="7L3-pF-yig">
+                                                        <dictionary key="options">
+                                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                        </dictionary>
+                                                    </binding>
+                                                </connections>
+                                            </menuItem>
+                                            <menuItem title="DisplayPort 3 (LG specific)" image="displayport" tag="192" id="xNe-SW-xKX">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                <connections>
+                                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.isLG" id="O9n-uQ-1Ke">
+                                                        <dictionary key="options">
+                                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                        </dictionary>
+                                                    </binding>
+                                                </connections>
+                                            </menuItem>
+                                            <menuItem title="DisplayPort 4 (LG specific)" image="displayport" tag="193" id="E6x-LF-0oP">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                <connections>
+                                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.isLG" id="sRP-SO-6IO">
+                                                        <dictionary key="options">
+                                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                        </dictionary>
+                                                    </binding>
+                                                </connections>
+                                            </menuItem>
+                                            <menuItem title="HDMI 1 (LG specific)" image="hdmi" tag="144" id="Clz-hG-CXw">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                <connections>
+                                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.isLG" id="4Fb-ul-Xct">
+                                                        <dictionary key="options">
+                                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                        </dictionary>
+                                                    </binding>
+                                                </connections>
+                                            </menuItem>
+                                            <menuItem title="HDMI 2 (LG specific)" image="hdmi" tag="145" id="fQd-KD-J01">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                <connections>
+                                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.isLG" id="pwW-CQ-YAG">
+                                                        <dictionary key="options">
+                                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                        </dictionary>
+                                                    </binding>
+                                                </connections>
+                                            </menuItem>
+                                            <menuItem title="HDMI 3 (LG specific)" image="hdmi" tag="146" id="mdj-Nj-WCM">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                <connections>
+                                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.isLG" id="ja3-TS-WKM">
+                                                        <dictionary key="options">
+                                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                        </dictionary>
+                                                    </binding>
+                                                </connections>
+                                            </menuItem>
+                                            <menuItem title="HDMI 4 (LG specific)" image="hdmi" tag="147" id="u2L-pi-67L">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                <connections>
+                                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.isLG" id="DxC-vr-FOL">
+                                                        <dictionary key="options">
+                                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                        </dictionary>
+                                                    </binding>
+                                                </connections>
+                                            </menuItem>
+                                            <menuItem isSeparatorItem="YES" id="f0Q-GZ-MO6"/>
                                             <menuItem title="VGA 1" image="vga" tag="1" id="rsY-ez-htZ">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
@@ -7423,7 +7561,7 @@ when FaceLight is activated</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="reQ-Qm-LQ9" customClass="PaddedButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="204" y="13" width="88" height="13"/>
+                                <rect key="frame" x="203" y="13" width="88" height="13"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <buttonCell key="cell" type="inline" title="View logs" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="5zn-di-UnM">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
