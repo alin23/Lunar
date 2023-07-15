@@ -85,13 +85,13 @@ ifneq ($(DISABLE_APPCAST),1)
 	rm Releases/Lunar.dmg || true
 ifneq (, $(CHANNEL))
 	rm Releases/Lunar$(FULL_VERSION)*.delta || true
-	"$(SPARKLE_BIN_DIR)/generate_appcast" --maximum-versions 10 --maximum-deltas 2 --major-version "6.0.0" --link "https://lunar.fyi/" --full-release-notes-url "https://lunar.fyi/changelog" --channel "$(CHANNEL)" --release-notes-url-prefix https://files.lunar.fyi/ReleaseNotes/ --download-url-prefix https://files.lunar.fyi/releases/ -o Releases/appcast2.xml Releases
+	"$(SPARKLE_BIN_DIR)/generate_appcast" --maximum-versions 10 --maximum-deltas 2 --major-version "5.0.0" --link "https://lunar.fyi/" --full-release-notes-url "https://lunar.fyi/changelog" --channel "$(CHANNEL)" --release-notes-url-prefix https://files.lunar.fyi/ReleaseNotes/ --download-url-prefix https://files.lunar.fyi/releases/ -o Releases/appcast2.xml Releases
 else
 	rm Releases/Lunar$(FULL_VERSION)*.delta || true
 	rm Releases/Lunar-*{a,b}*.dmg || true
 	rm Releases/Lunar*{a,b}*.delta || true
-	"$(SPARKLE_BIN_DIR)/generate_appcast" --maximum-versions 10 --major-version "6.0.0" --link "https://lunar.fyi/" --full-release-notes-url "https://lunar.fyi/changelog" --release-notes-url-prefix https://files.lunar.fyi/ReleaseNotes/ --download-url-prefix https://files.lunar.fyi/releases/ -o Releases/appcast2.xml Releases
-	"$(SPARKLE_BIN_DIR)/generate_appcast" --maximum-versions 10 --major-version "6.0.0" --link "https://lunar.fyi/" --full-release-notes-url "https://lunar.fyi/changelog" --release-notes-url-prefix https://files.lunar.fyi/ReleaseNotes/ --download-url-prefix https://files.lunar.fyi/releases/ -o Releases/appcast-stable.xml Releases
+	"$(SPARKLE_BIN_DIR)/generate_appcast" --maximum-versions 10 --major-version "5.0.0" --link "https://lunar.fyi/" --full-release-notes-url "https://lunar.fyi/changelog" --release-notes-url-prefix https://files.lunar.fyi/ReleaseNotes/ --download-url-prefix https://files.lunar.fyi/releases/ -o Releases/appcast2.xml Releases
+	"$(SPARKLE_BIN_DIR)/generate_appcast" --maximum-versions 10 --major-version "5.0.0" --link "https://lunar.fyi/" --full-release-notes-url "https://lunar.fyi/changelog" --release-notes-url-prefix https://files.lunar.fyi/ReleaseNotes/ --download-url-prefix https://files.lunar.fyi/releases/ -o Releases/appcast-stable.xml Releases
 	cp Releases/Lunar-$(FULL_VERSION).dmg Releases/Lunar.dmg
 	sd 'https://files.lunar.fyi/releases/([^"]+).delta' 'https://files.lunar.fyi/deltas/$$1.delta' Releases/appcast-stable.xml
 endif
