@@ -20,7 +20,7 @@ set APP_ZIP_TMP "$TMP_DIR/Lunar.zip"
 
 rm -rf $TMP_DIR
 mkdir -p $TMP_DIR || exit 1
-rsync -avzP "$BUILD_DIR" "$TMP_DIR" || exit 1
+rsync -avzP --include 'Resources/Base.lproj' --include 'Resources/en.lproj' --include 'langs/en.json' --exclude '*.lproj' --exclude 'langs/*.json' "$BUILD_DIR" "$TMP_DIR" || exit 1
 find "$APP_TMP" -not -perm 644 -and -not -perm 755 -exec chmod 644 \{\} \;
 
 set filesToSign $APP_TMP/Contents/Frameworks/Sparkle.framework/Versions/Current/Resources/Autoupdate.app/Contents/MacOS/* \

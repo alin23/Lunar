@@ -52,8 +52,11 @@ final class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
         disabledString(menuItem, reason: "needs Lunar Pro")
     }
 
-    static func enabledString(_ menuItem: NSMenuItem) -> NSAttributedString {
-        let title = MODE_DISABLED_REASON_PATTERN.replaceAll(in: menuItem.title, with: " Mode")
+    static func enabledString(_ menuItem: NSMenuItem, reason: String = "") -> NSAttributedString {
+        let title = MODE_DISABLED_REASON_PATTERN.replaceAll(
+            in: menuItem.title,
+            with: reason.isEmpty ? " Mode" : " Mode\(spacer(menuItem))(\(reason))"
+        )
         return title.withFont(.monospacedSystemFont(ofSize: 12, weight: .semibold)).withTextColor(.labelColor)
     }
 
@@ -61,7 +64,7 @@ final class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
         MENU_MARKDOWN.attributedString(
             from: MODE_DISABLED_REASON_PATTERN.replaceAll(
                 in: menuItem.title,
-                with: reason.isEmpty ? " Mode" : " Mode\(spacer(menuItem))`(\(reason))`"
+                with: reason.isEmpty ? " Mode" : " Mode\(spacer(menuItem))(\(reason))"
             )
         )
     }
@@ -113,8 +116,24 @@ final class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
             }
             return false
         }
-        menuItem.toolTip = nil
-        menuItem.attributedTitle = enabledString(menuItem)
+
+        if mode == .location {
+            if let lm = appDelegate?.locationManager, lm.authorizationStatus == .denied || lm.authorizationStatus == .notDetermined || lm.authorizationStatus == .restricted {
+                menuItem.toolTip =
+                    "Location can't be requested.\nCheck if Lunar has access to Location Services in System Preferences -> Security & Privacy"
+                menuItem.attributedTitle = enabledString(menuItem, reason: "missing permissions")
+            } else if CachedDefaults[.manualLocation] {
+                menuItem.toolTip =
+                    "Location can't be requested.\nLunar is using the manually configured coordinates in Display Settings -> Configuration"
+                menuItem.attributedTitle = enabledString(menuItem, reason: "manual coordinates")
+            } else {
+                menuItem.toolTip = nil
+                menuItem.attributedTitle = enabledString(menuItem)
+            }
+        } else {
+            menuItem.toolTip = nil
+            menuItem.attributedTitle = enabledString(menuItem)
+        }
         return true
     }
 

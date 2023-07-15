@@ -303,7 +303,7 @@ bool FramebufferI2CRequest(io_service_t framebuffer, IOI2CRequest* request)
     return result && request->result == KERN_SUCCESS;
 }
 
-bool DDCWriteIntel(io_service_t framebuffer, struct DDCWriteCommand* write)
+bool DDCWriteIntel(io_service_t framebuffer, struct DDCWriteCommand* write, uint8_t sourceAddr)
 {
     IOI2CRequest request;
     UInt8 data[256];
@@ -317,7 +317,7 @@ bool DDCWriteIntel(io_service_t framebuffer, struct DDCWriteCommand* write)
     request.sendBuffer = (vm_address_t)&data[0];
     request.sendBytes = 7;
 
-    data[0] = 0x51;
+    data[0] = sourceAddr;
     data[1] = 0x84;
     data[2] = 0x03;
     data[3] = write->control_id;

@@ -786,6 +786,9 @@ struct Lunar: ParsableCommand {
 
         @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
+        @Option(name: .shortAndLong, help: "I²C source address")
+        var sourceAddress = "0x51"
+
         @Argument(
             help: "Display serial or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
         )
@@ -836,14 +839,26 @@ struct Lunar: ParsableCommand {
                 return cliExit(0)
             }
 
+            guard let sourceAddr = sourceAddress.parseHex(strict: true)?.u8 else {
+                throw LunarCommandError.ddcError("Can't parse source address: \(sourceAddress)")
+            }
+
             for display in displays {
                 for value in values {
                     guard let value = hex ? value.parseHex() : Int(value) ?? value.parseHex(strict: true) else {
                         cliPrint("Can't parse value \(value) as number")
                         continue
                     }
+
+                    var localSourceAddr = sourceAddr
+                    var localControl = control
+                    if control == .INPUT_SOURCE, let input = VideoInputSource(rawValue: value.u16), input.isLGSpecific, sourceAddr == 0x51 {
+                        localSourceAddr = 0x50
+                        localControl = .MANUFACTURER_SPECIFIC_F4
+                    }
+
                     cliPrint("\(display): Writing \(value) for \(control)", terminator: ": ")
-                    if DDC.write(displayID: display.id, controlID: control, newValue: value.u16) {
+                    if DDC.write(displayID: display.id, controlID: localControl, newValue: value.u16, sourceAddr: localSourceAddr) {
                         cliPrint("Ok")
                     } else {
                         cliPrint("Error")

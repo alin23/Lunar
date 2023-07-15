@@ -67,56 +67,74 @@ enum VideoInputSource: UInt16, Sendable, CaseIterable, Nameable, CustomStringCon
     case sVideo1 = 7
     case sVideo2 = 8
     case tuner1 = 9
-    case tuner2 = 10
-    case tuner3 = 11
-    case componentVideoYPrPbYCrCb1 = 12
-    case componentVideoYPrPbYCrCb2 = 13
-    case componentVideoYPrPbYCrCb3 = 14
-    case displayPort1 = 15
-    case displayPort2 = 16
-    case hdmi1 = 17
-    case hdmi2 = 18
-    case thunderbolt1 = 25
-    case thunderbolt2 = 27
-    case unknown = 246
+    case tuner2 = 0x0A
+    case tuner3 = 0x0B
+    case componentVideoYPrPbYCrCb1 = 0x0C
+    case componentVideoYPrPbYCrCb2 = 0x0D
+    case componentVideoYPrPbYCrCb3 = 0x0E
+    case displayPort1 = 0x0F
+    case displayPort2 = 0x10
+    case hdmi1 = 0x11
+    case hdmi2 = 0x12
+    case hdmi3 = 0x13
+    case hdmi4 = 0x14
+    case thunderbolt1 = 0x19
+    case thunderbolt2 = 0x1B
+    case thunderbolt3 = 0x1C
+    case unknown = 0xF6
+
+    case lgSpecificDisplayPort1 = 0xD0
+    case lgSpecificDisplayPort2 = 0xD1
+    case lgSpecificDisplayPort3 = 0xC0
+    case lgSpecificDisplayPort4 = 0xC1
+    case lgSpecificHdmi1 = 0x90
+    case lgSpecificHdmi2 = 0x91
+    case lgSpecificHdmi3 = 0x92
+    case lgSpecificHdmi4 = 0x93
+    case lgSpecificThunderbolt1 = 0xD2
+    case lgSpecificThunderbolt2 = 0xD3
+    case lgSpecificThunderbolt3 = 0xE0
+    case lgSpecificThunderbolt4 = 0xE1
+
+    case separator = 0x7FDF
 
     init?(stringValue: String) {
         switch #"[^\w\s]+"#.r!.replaceAll(in: stringValue.lowercased().stripped, with: "") {
-        case "vga": self = .vga1
-        case "vga1": self = .vga1
+        case "vga", "vga1": self = .vga1
         case "vga2": self = .vga2
-        case "dvi": self = .dvi1
-        case "dvi1": self = .dvi1
+        case "dvi", "dvi1": self = .dvi1
         case "dvi2": self = .dvi2
-        case "composite": self = .compositeVideo1
-        case "compositevideo": self = .compositeVideo1
-        case "compositevideo1": self = .compositeVideo1
+        case "composite", "compositevideo", "compositevideo1": self = .compositeVideo1
         case "compositevideo2": self = .compositeVideo2
-        case "svideo": self = .sVideo1
-        case "svideo1": self = .sVideo1
+        case "svideo", "svideo1": self = .sVideo1
         case "svideo2": self = .sVideo2
-        case "tuner": self = .tuner1
-        case "tuner1": self = .tuner1
+        case "tuner", "tuner1": self = .tuner1
         case "tuner2": self = .tuner2
         case "tuner3": self = .tuner3
-        case "component": self = .componentVideoYPrPbYCrCb1
-        case "componentvideo": self = .componentVideoYPrPbYCrCb1
-        case "componentvideoyprpbycrcb": self = .componentVideoYPrPbYCrCb1
-        case "componentvideoyprpbycrcb1": self = .componentVideoYPrPbYCrCb1
+        case "component", "componentvideo", "componentvideoyprpbycrcb", "componentvideoyprpbycrcb1": self = .componentVideoYPrPbYCrCb1
         case "componentvideoyprpbycrcb2": self = .componentVideoYPrPbYCrCb2
         case "componentvideoyprpbycrcb3": self = .componentVideoYPrPbYCrCb3
         case "dp", "minidp", "minidisplayport", "displayport", "dp1", "displayport1": self = .displayPort1
         case "dp2", "minidp2", "minidisplayport2", "displayport2": self = .displayPort2
-        case "hdmi": self = .hdmi1
-        case "hdmi1": self = .hdmi1
+        case "hdmi", "hdmi1": self = .hdmi1
         case "hdmi2": self = .hdmi2
-        case "thunderbolt": self = .thunderbolt2
-        case "thunderbolt1": self = .thunderbolt1
-        case "thunderbolt2": self = .thunderbolt2
-        case "thunderbolt3": self = .thunderbolt2
-        case "usbc": self = .thunderbolt2
-        case "usbc1": self = .thunderbolt1
-        case "usbc2": self = .thunderbolt2
+        case "hdmi3": self = .hdmi3
+        case "hdmi4": self = .hdmi4
+        case "thunderbolt", "thunderbolt2", "usbc", "usbc2": self = .thunderbolt2
+        case "thunderbolt1", "usbc1": self = .thunderbolt1
+        case "thunderbolt3", "usbc3": self = .thunderbolt3
+        case "lgdp", "lgminidp", "lgminidisplayport", "lgdisplayport", "lgdp1", "lgdisplayport1": self = .lgSpecificDisplayPort1
+        case "lgdp2", "lgminidp2", "lgminidisplayport2", "lgdisplayport2": self = .lgSpecificDisplayPort2
+        case "lgdp3", "lgminidp3", "lgminidisplayport3", "lgdisplayport3": self = .lgSpecificDisplayPort3
+        case "lgdp4", "lgminidp4", "lgminidisplayport4", "lgdisplayport4": self = .lgSpecificDisplayPort4
+        case "lghdmi", "lghdmi1": self = .lgSpecificHdmi1
+        case "lghdmi2": self = .lgSpecificHdmi2
+        case "lghdmi3": self = .lgSpecificHdmi3
+        case "lghdmi4": self = .lgSpecificHdmi4
+        case "lgthunderbolt2", "lgusbc2": self = .lgSpecificThunderbolt2
+        case "lgthunderbolt1", "lgusbc1", "lgusbc", "lgthunderbolt": self = .lgSpecificThunderbolt1
+        case "lgthunderbolt3", "lgusbc3": self = .lgSpecificThunderbolt3
+        case "lgthunderbolt4", "lgusbc4": self = .lgSpecificThunderbolt4
         case "unknown": self = .unknown
         default:
             return nil
@@ -124,7 +142,14 @@ enum VideoInputSource: UInt16, Sendable, CaseIterable, Nameable, CustomStringCon
     }
 
     static var mostUsed: [VideoInputSource] {
-        [.thunderbolt1, .thunderbolt2, .displayPort1, .displayPort2, .hdmi1, .hdmi2]
+        [.thunderbolt1, .thunderbolt2, .thunderbolt3, .displayPort1, .displayPort2, .hdmi1, .hdmi2, .hdmi3, .hdmi4]
+    }
+    static var lgSpecific: [VideoInputSource] {
+        [
+            .lgSpecificThunderbolt1, .lgSpecificThunderbolt2, .lgSpecificThunderbolt3, .lgSpecificThunderbolt4,
+            .lgSpecificDisplayPort1, .lgSpecificDisplayPort2, .lgSpecificDisplayPort3, .lgSpecificDisplayPort4,
+            .lgSpecificHdmi1, .lgSpecificHdmi2, .lgSpecificHdmi3, .lgSpecificHdmi4,
+        ]
     }
 
     static var leastUsed: [VideoInputSource] {
@@ -146,6 +171,28 @@ enum VideoInputSource: UInt16, Sendable, CaseIterable, Nameable, CustomStringCon
         ]
     }
 
+    var isSeparator: Bool { self == .separator }
+
+    var isLGSpecific: Bool {
+        switch self {
+        case .lgSpecificDisplayPort1,
+             .lgSpecificDisplayPort2,
+             .lgSpecificDisplayPort3,
+             .lgSpecificDisplayPort4,
+             .lgSpecificHdmi1,
+             .lgSpecificHdmi2,
+             .lgSpecificHdmi3,
+             .lgSpecificHdmi4,
+             .lgSpecificThunderbolt1,
+             .lgSpecificThunderbolt2,
+             .lgSpecificThunderbolt3,
+             .lgSpecificThunderbolt4:
+            return true
+        default:
+            return false
+        }
+    }
+
     var description: String { displayName() }
 
     var name: String {
@@ -161,10 +208,11 @@ enum VideoInputSource: UInt16, Sendable, CaseIterable, Nameable, CustomStringCon
         case .sVideo1, .sVideo2: return "svideo"
         case .tuner1, .tuner2, .tuner3: return "tuner"
         case .componentVideoYPrPbYCrCb1, .componentVideoYPrPbYCrCb2, .componentVideoYPrPbYCrCb3: return "component"
-        case .displayPort1, .displayPort2: return "displayport"
-        case .hdmi1, .hdmi2: return "hdmi"
-        case .thunderbolt1, .thunderbolt2: return "usbc"
+        case .displayPort1, .displayPort2, .lgSpecificDisplayPort1, .lgSpecificDisplayPort2, .lgSpecificDisplayPort3, .lgSpecificDisplayPort4: return "displayport"
+        case .hdmi1, .hdmi2, .hdmi3, .hdmi4, .lgSpecificHdmi1, .lgSpecificHdmi2, .lgSpecificHdmi3, .lgSpecificHdmi4: return "hdmi"
+        case .thunderbolt1, .thunderbolt2, .thunderbolt3, .lgSpecificThunderbolt1, .lgSpecificThunderbolt2, .lgSpecificThunderbolt3, .lgSpecificThunderbolt4: return "usbc"
         case .unknown: return "input"
+        case .separator: return nil
         }
     }
 
@@ -192,9 +240,27 @@ enum VideoInputSource: UInt16, Sendable, CaseIterable, Nameable, CustomStringCon
         case .displayPort2: return "DisplayPort 2"
         case .hdmi1: return "HDMI 1"
         case .hdmi2: return "HDMI 2"
+        case .hdmi3: return "HDMI 3"
+        case .hdmi4: return "HDMI 4"
         case .thunderbolt1: return "USB-C 1"
         case .thunderbolt2: return "USB-C 2"
+        case .thunderbolt3: return "USB-C 3"
+
+        case .lgSpecificDisplayPort1: return "DisplayPort 1 (LG specific)"
+        case .lgSpecificDisplayPort2: return "DisplayPort 2 (LG specific)"
+        case .lgSpecificDisplayPort3: return "DisplayPort 3 (LG specific)"
+        case .lgSpecificDisplayPort4: return "DisplayPort 4 (LG specific)"
+        case .lgSpecificHdmi1: return "HDMI 1 (LG specific)"
+        case .lgSpecificHdmi2: return "HDMI 2 (LG specific)"
+        case .lgSpecificHdmi3: return "HDMI 3 (LG specific)"
+        case .lgSpecificHdmi4: return "HDMI 4 (LG specific)"
+        case .lgSpecificThunderbolt1: return "USB-C 1 (LG specific)"
+        case .lgSpecificThunderbolt2: return "USB-C 2 (LG specific)"
+        case .lgSpecificThunderbolt3: return "USB-C 3 (LG specific)"
+        case .lgSpecificThunderbolt4: return "USB-C 4 (LG specific)"
+
         case .unknown: return "Unknown"
+        case .separator: return "------"
         }
     }
 }
@@ -968,7 +1034,7 @@ enum DDC {
         }
 
         #if DEBUG
-            return displayIDs
+            // return displayIDs
             if !displayIDs.isEmpty {
                 // displayIDs.append(TEST_DISPLAY_PERSISTENT_ID)
                 return displayIDs
@@ -1109,7 +1175,7 @@ enum DDC {
 
     }
 
-    static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt16) -> Bool {
+    static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt16, sourceAddr: UInt8? = nil) -> Bool {
         #if DEBUG
             guard apply, !isTestID(displayID), !shouldWait, !DC.screensSleeping else { return true }
         #else
@@ -1128,17 +1194,24 @@ enum DDC {
                 return false
             }
 
+            var localControlID = controlID
+            var localSourceAddr = sourceAddr ?? 0x51
+            if controlID == .INPUT_SOURCE, let input = VideoInputSource(rawValue: newValue), input.isLGSpecific, sourceAddr == nil {
+                localSourceAddr = 0x50
+                localControlID = .MANUFACTURER_SPECIFIC_F4
+            }
+
             var command = DDCWriteCommand(
-                control_id: controlID.rawValue,
+                control_id: localControlID.rawValue,
                 new_value: newValue
             )
 
             let writeStartedAt = DispatchTime.now()
 
             #if arch(arm64)
-                let result = DDCWrite(avService: dcp.avService, command: &command, displayID: displayID, isMCDP: dcp.isMCDP)
+                let result = DDCWrite(avService: dcp.avService, command: &command, displayID: displayID, isMCDP: dcp.isMCDP, sourceAddr: localSourceAddr)
             #else
-                let result = DDCWrite(fb: fb, command: &command)
+                let result = DDCWrite(fb: fb, command: &command, sourceAddr: localSourceAddr)
             #endif
 
             let writeNs = DispatchTime.now().rawValue - writeStartedAt.rawValue

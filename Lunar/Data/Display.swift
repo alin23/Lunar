@@ -568,6 +568,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         } else {
             useOverlay = try (container.decodeIfPresent(Bool.self, forKey: .useOverlay)) ?? false
         }
+        useAlternateInputSwitching = try (container.decodeIfPresent(Bool.self, forKey: .useAlternateInputSwitching)) ?? false
 
         if let networkControlEnabled = try enabledControlsContainer.decodeIfPresent(Bool.self, forKey: .network) {
             enabledControls[.network] = networkControlEnabled
@@ -837,6 +838,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case hotkeyInput2
         case hotkeyInput3
         case useOverlay
+        case useAlternateInputSwitching
         case alwaysUseNetworkControl
         case neverUseNetworkControl
         case alwaysFallbackControl
@@ -937,6 +939,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .canChangeVolume,
             .power,
             .useOverlay,
+            .useAlternateInputSwitching,
             .alwaysUseNetworkControl,
             .neverUseNetworkControl,
             .alwaysFallbackControl,
@@ -1062,6 +1065,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .hotkeyInput2,
             .hotkeyInput3,
             .useOverlay,
+            .useAlternateInputSwitching,
             .alwaysUseNetworkControl,
             .neverUseNetworkControl,
             .alwaysFallbackControl,
@@ -2213,6 +2217,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 connection = ConnectionType.fromTransportType(transportType) ?? ConnectionType.fromTransport(transport) ?? .unknown
                 log.info("\(description) connected through \(connection) connection")
             }
+            isLG = vendor == .lg
         }
     }
 
@@ -3406,6 +3411,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published var userContrast = 0.5
     @Published var userVolume = 0.5
 
+    @objc dynamic var useAlternateInputSwitching = false
+
+    @objc dynamic lazy var isLG: Bool = (vendor == .lg)
+
     var edidName: String {
         didSet {
             normalizedName = Self.numberNamePattern.replaceAll(in: edidName, with: "").trimmed
@@ -3872,6 +3881,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     var vendor: Vendor {
+        #if DEBUG
+            if id == TEST_DISPLAY_PERSISTENT2_ID { return .lg }
+        #endif
         guard let vendorID = infoDictionary[kDisplayVendorID] as? Int64, let v = Vendor(rawValue: vendorID) else {
             return .unknown
         }
@@ -5141,6 +5153,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try enabledControlsContainer.encodeIfPresent(enabledControls[.gamma], forKey: .gamma)
 
             try container.encode(useOverlay, forKey: .useOverlay)
+            try container.encode(useAlternateInputSwitching, forKey: .useAlternateInputSwitching)
             try container.encode(alwaysUseNetworkControl, forKey: .alwaysUseNetworkControl)
             try container.encode(neverUseNetworkControl, forKey: .neverUseNetworkControl)
             try container.encode(alwaysFallbackControl, forKey: .alwaysFallbackControl)
