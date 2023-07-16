@@ -293,6 +293,8 @@ final class ConfigurationViewController: NSViewController {
         latField.step = 0.01
         lonField.decimalPoints = 2
         lonField.step = 0.01
+        latField.doubleValue = LocationMode.specific.geolocation?.latitude ?? 0
+        lonField.doubleValue = LocationMode.specific.geolocation?.longitude ?? 0
 
         setupScrollableTextField(
             latField, caption: latCaption, lowerLimit: -90.00, upperLimit: 90.00,

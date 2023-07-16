@@ -68,10 +68,6 @@ It works well along Night Shift and True Tone (and f.lux if Gamma dimming is not
 
 ![Configuration page](https://files.lunar.fyi/configuration-page.png)
 
-## Advanced Settings
-
-![Advanced Settings](https://files.lunar.fyi/advanced-settings.png)
-
 ## Hotkeys Page
 
 ![Hotkeys page](https://files.lunar.fyi/hotkeys-page.png)
