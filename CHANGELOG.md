@@ -1,3 +1,9 @@
+# 6.2.1
+### Fixes
+
+* Fix auto-learning logic for contrast
+* Ensure brightness and contrast values don't overshoot the min/max values
+
 # 6.2.0
 ### Improvements
 
