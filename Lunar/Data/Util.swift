@@ -872,6 +872,10 @@ extension Double {
     func map(from: (Double, Double), to: (Double, Double), gamma: Double) -> Double {
         lerp(pow(invlerp(self, min: from.0, max: from.1), 1.0 / gamma), min: to.0, max: to.1)
     }
+    @inline(__always)
+    func capped(between minVal: Double, and maxVal: Double) -> Double {
+        cap(self, minVal: minVal, maxVal: maxVal)
+    }
 }
 extension Float {
     func map(from: (Float, Float), to: (Float, Float)) -> Float {
@@ -880,6 +884,10 @@ extension Float {
     func map(from: (Float, Float), to: (Float, Float), gamma: Float) -> Float {
         lerp(pow(invlerp(self, min: from.0, max: from.1), 1.0 / gamma), min: to.0, max: to.1)
     }
+    @inline(__always)
+    func capped(between minVal: Float, and maxVal: Float) -> Float {
+        cap(self, minVal: minVal, maxVal: maxVal)
+    }
 }
 extension CGFloat {
     func map(from: (CGFloat, CGFloat), to: (CGFloat, CGFloat)) -> CGFloat {
@@ -887,6 +895,10 @@ extension CGFloat {
     }
     func map(from: (CGFloat, CGFloat), to: (CGFloat, CGFloat), gamma: CGFloat) -> CGFloat {
         lerp(pow(invlerp(self, min: from.0, max: from.1), 1.0 / gamma), min: to.0, max: to.1)
+    }
+    @inline(__always)
+    func capped(between minVal: CGFloat, and maxVal: CGFloat) -> CGFloat {
+        cap(self, minVal: minVal, maxVal: maxVal)
     }
 }
 
