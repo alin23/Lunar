@@ -9,7 +9,7 @@
       name: "TSL2591 Full Spectrum Light"
     calculated_lux:
       id: ambient_light
-      name: "TSL2591 Lux"
+      name: "Ambient Light"
       filters:
         - filter_out: 65535
         - filter_out: nan

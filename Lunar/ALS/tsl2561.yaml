@@ -1,5 +1,5 @@
   - platform: tsl2561
-    name: "Ambient Light TSL2561"
+    name: "Ambient Light"
     id: ambient_light
     update_interval: 1s
     gain: 1x

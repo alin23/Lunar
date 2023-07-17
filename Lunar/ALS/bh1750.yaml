@@ -1,5 +1,5 @@
   - platform: bh1750
-    name: "Ambient Light BH1750"
+    name: "Ambient Light"
     id: ambient_light
     update_interval: 1s
     filters:

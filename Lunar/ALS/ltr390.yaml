@@ -5,7 +5,7 @@
     uv:
       name: "LTR390 UV Light"
     light:
-      name: "LTR390 Lux"
+      name: "Ambient Light"
       id: ambient_light
       filters:
         - filter_out: 65535
