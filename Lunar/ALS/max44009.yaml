@@ -1,5 +1,5 @@
   - platform: max44009
-    name: "Ambient Light MAX44009"
+    name: "Ambient Light"
     id: ambient_light
     mode: auto
     update_interval: 1s

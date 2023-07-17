@@ -8,7 +8,7 @@
     clear_channel:
       name: "TCS34725 Clear Channel"
     illuminance:
-      name: "TCS34725 Lux"
+      name: "Ambient Light"
       id: ambient_light
     color_temperature:
       name: "TCS34725 Color Temperature"
