@@ -1,3 +1,37 @@
+# 6.2.0
+### Improvements
+
+* Don't beep when doing fine volume adjustments
+
+### Features
+
+* Add `--source-address` to `lunar ddc` command for monitors that allow some DDC commands only on the service port (e.g. [most newer LG models](https://github.com/rockowitz/ddcutil/issues/100#issuecomment-1634924423))
+* Add **LG specific inputs** for those models where input switching only blinks the monitor but doesn't actually switch the input
+
+![LG specific inputs](https://files.lunar.fyi/lg-specific-input-hotkeys.png)
+
+The new inputs can also be accessed from [macOS Shortcuts](https://lunar.fyi/shortcuts#switch-inputs) or from the CLI using commands like:
+
+```sh
+lunar displays lg input lgHdmi1
+
+# Newly added inputs:
+#   lgHdmi1 lgHdmi2 lgHdmi3 lgHdmi4
+#   lgUsbC1 lgUsbC2 lgUsbC3 lgUsbC4
+#   lgDisplayPort1 lgDisplayPort2 lgDisplayPort3 lgDisplayPort4
+```
+
+Some LG models respond to the `3` and `4` inputs while others use the `1` and `2` inputs. For example **32UD99** uses `USB-C 3` and `DisplayPort 3` while **32QN650** uses `USB-C 1` and `DisplayPort 1`.
+
+### Fixes
+
+* Fix VCP code for LG specific inputs
+* Fix zero coordinates in UI even when location is available
+* Fix sensor flasher not assigning the correct IDs to the sensors
+* Show when **Location Mode** doesn't have permissions to request actual coordinates
+
+![location mode missing permissions](https://files.lunar.fyi/location-mode-missing-permissions.png)
+
 # 6.1.5
 ### Features
 
