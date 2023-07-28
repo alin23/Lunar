@@ -1142,7 +1142,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
     func initMenubarIcon() {
         if let button = statusItem.button {
-            button.image = NSImage(named: NSImage.Name("MenubarIcon"))
+            button.image = NSImage(named: NSImage.Name(Defaults[.alternateMenuBarIcon] ? "MenubarIcon2" : "MenubarIcon"))
             button.image?.isTemplate = true
             button.imagePosition = CachedDefaults[.showBrightnessMenuBar] ? .imageLeading : .imageOnly
 
@@ -1151,6 +1151,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         }
         statusItem.menu = nil
         initMenuItems()
+
+        pub(.alternateMenuBarIcon)
+            .sink { change in
+                guard let button = self.statusItem.button else {
+                    return
+                }
+                button.image = NSImage(named: NSImage.Name(change.newValue ? "MenubarIcon2" : "MenubarIcon"))
+            }.store(in: &observers)
 
         initMenuWindow()
         DistributedNotificationCenter.default()

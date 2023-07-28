@@ -1406,6 +1406,7 @@ struct QuickActionsLayoutView: View {
     @Default(.showFooterOnHover) var showFooterOnHover
     @Default(.keepOptionsMenu) var keepOptionsMenu
 
+    @Default(.alternateMenuBarIcon) var alternateMenuBarIcon
     @Default(.hideMenuBarIcon) var hideMenuBarIcon
     @Default(.showDockIcon) var showDockIcon
     @Default(.moreGraphData) var moreGraphData
@@ -1463,6 +1464,7 @@ struct QuickActionsLayoutView: View {
                 Divider()
                 Group {
                     SettingsToggle(text: "Hide menubar icon", setting: $hideMenuBarIcon)
+                    SettingsToggle(text: "Alternate menubar icon", setting: $alternateMenuBarIcon)
                     SettingsToggle(text: "Show dock icon", setting: $showDockIcon)
                     SettingsToggle(
                         text: "Show more graph data",

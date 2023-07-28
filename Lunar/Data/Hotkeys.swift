@@ -1299,7 +1299,7 @@ extension AppDelegate: MediaKeyTapDelegate {
         }
     }
 
-    func handle(mediaKey: MediaKey, event _: KeyEvent?, modifiers flags: NSEvent.ModifierFlags?, event: CGEvent) -> CGEvent? {
+    func handle(mediaKey: MediaKey, event keyEvent: KeyEvent?, modifiers flags: NSEvent.ModifierFlags?, event: CGEvent) -> CGEvent? {
         let flags = flags?.filterUnsupportModifiers() ?? NSEvent.ModifierFlags(rawValue: 0)
         guard flags != [.option] else {
             return event
@@ -1314,6 +1314,7 @@ extension AppDelegate: MediaKeyTapDelegate {
             let event = handleBrightnessKeys(withLidClosed: lidClosed, mediaKey: mediaKey, modifiers: flags, event: event)
             if event != nil { log.debug("Forwarding brightness key event to the system") }
             DC.lastTimeBrightnessKeyPressed = Date()
+            DC.lastBrightnessKeyEvent = keyEvent
             return event
         }
 

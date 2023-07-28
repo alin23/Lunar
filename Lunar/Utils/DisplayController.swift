@@ -14,6 +14,7 @@ import CoreLocation
 import Defaults
 import Foundation
 import FuzzyMatcher
+import MediaKeyTap
 import Sentry
 import Surge
 import SwiftDate
@@ -491,12 +492,15 @@ final class DisplayController: ObservableObject {
     var autoXdrSensor: Bool = Defaults[.autoXdrSensor]
     var autoXdrSensorShowOSD: Bool = Defaults[.autoXdrSensorShowOSD]
 
-    var lastTimeBrightnessKeyPressed = Date.distantPast
+    var lastBrightnessKeyEvent: KeyEvent?
 
     @Published var possiblyDisconnectedDisplayList: [Display] = []
 
     var displaysBySerial: [String: Display] = [:]
     var unmanagedDisplays: [Display] = []
+    var lastTimeBrightnessKeyPressed = Date.distantPast { didSet {
+        lastBrightnessKeyEvent = nil
+    }}
     @Atomic var clamshell: Bool = isLidClosed() && Sysctl.isMacBook {
         didSet {
             if clamshell, CachedDefaults[.sleepInClamshellMode] {
@@ -688,8 +692,7 @@ final class DisplayController: ObservableObject {
     }
 
     var mainDisplay: Display? {
-        guard let screenID = NSScreen.main?.displayID else { return nil }
-        return activeDisplays[screenID]
+        activeDisplayList.first(where: { CGDisplayIsMain($0.id) == 1 })
     }
 
     var nonMainDisplays: [Display] {
@@ -2584,7 +2587,9 @@ final class DisplayController: ObservableObject {
                 return
             }
 
-            if autoXdr || display.softwareBrightness > 1.0 || display.enhanced,
+            let ignoreHoldingKey = display.enhanced ? false : (lastBrightnessKeyEvent?.keyRepeat ?? false)
+
+            if autoXdr || display.softwareBrightness > 1.0 || display.enhanced, !ignoreHoldingKey,
                display.supportsEnhance, !xdrPausedBecauseOfFlux,
                (value == maxBrightness && value == oldValue && timeSince(lastTimeBrightnessKeyPressed) < 3) ||
                (oldValue == maxBrightness && display.softwareBrightness > Display.MIN_SOFTWARE_BRIGHTNESS),
