@@ -234,6 +234,7 @@ extension Defaults.Keys {
     static let astronomicalTwilightEnd = Key<String?>("astronomicalTwilightEnd", default: nil)
     static let dayLength = Key<UInt64>("dayLength", default: 0)
     static let hideMenuBarIcon = Key<Bool>("hideMenuBarIcon", default: false)
+    static let alternateMenuBarIcon = Key<Bool>("alternateMenuBarIcon", default: false)
     static let showDockIcon = Key<Bool>("showDockIcon", default: false)
     static let disableControllerVideo = Key<Bool>("disableControllerVideo", default: true)
     static let neverAskAboutFlux = Key<Bool>("neverAskAboutFlux", default: false)
