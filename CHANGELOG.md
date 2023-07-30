@@ -1,3 +1,19 @@
+# 6.2.2
+### Features
+
+* Add alternate menubar icon for people with **trypophobia**
+
+![alternate menubar icon](https://files.lunar.fyi/alternate-menubar-icon.png)
+
+### Improvements
+
+* Don't automatically activate XDR when **holding** the brightness up key
+    * It still activates when pressing the key after 100% brightness
+
+### Fixes
+
+* Fix Main Screen ID fetching
+
 # 6.2.1
 ### Fixes
 
