@@ -76,6 +76,7 @@ final class Screen: NSObject, AppEntity, ExpressibleByStringLiteral {
         blackout = display.blackout
         facelight = display.facelight
         adaptive = display.adaptive
+        systemAdaptiveBrightness = display.systemAdaptiveBrightness
 
         brightness = display.preciseBrightness
         contrast = display.preciseContrast
@@ -142,8 +143,10 @@ final class Screen: NSObject, AppEntity, ExpressibleByStringLiteral {
     @objc var blackout: Bool
     @Property(title: "Facelight enabled")
     @objc var facelight: Bool
-    @Property(title: "Adaptive enabled")
+    @Property(title: "Lunar adaptive brightness enabled")
     @objc var adaptive: Bool
+    @Property(title: "System adaptive brightness enabled")
+    @objc var systemAdaptiveBrightness: Bool
 
     var dynamicDisplay: Display? {
         display ?? displays.first
@@ -271,6 +274,11 @@ struct ScreenQuery: EntityPropertyQuery {
         Property(\.$adaptive) {
             EqualToComparator { _ in NSPredicate(format: "adaptive = YES") }
             NotEqualToComparator { _ in NSPredicate(format: "adaptive = NO") }
+        }
+
+        Property(\.$systemAdaptiveBrightness) {
+            EqualToComparator { _ in NSPredicate(format: "systemAdaptiveBrightness = YES") }
+            NotEqualToComparator { _ in NSPredicate(format: "systemAdaptiveBrightness = NO") }
         }
 
         Property(\.$brightness) {
@@ -465,6 +473,7 @@ enum IntentError: Swift.Error, CustomLocalizedStringResourceConvertible {
 }
 
 @available(iOS 16, macOS 13, *)
+@discardableResult
 func controlScreen(screen: IntentParameter<Screen>, property: Display.CodingKeys, value: String) throws -> some IntentResult {
     let scr = screen.wrappedValue
     guard !(scr.serial + scr.name).isEmpty else {
@@ -503,7 +512,8 @@ struct SetBrightnessIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        return try controlScreen(screen: $screen, property: .normalizedBrightness, value: value.str(decimals: 3))
+        try controlScreen(screen: $screen, property: .normalizedBrightness, value: value.str(decimals: 3))
+        return .result(value: screen.display?.preciseBrightness ?? value)
     }
 }
 
@@ -525,7 +535,8 @@ struct SetContrastIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        return try controlScreen(screen: $screen, property: .normalizedContrast, value: value.str(decimals: 3))
+        try controlScreen(screen: $screen, property: .normalizedContrast, value: value.str(decimals: 3))
+        return .result(value: screen.display?.preciseContrast ?? value)
     }
 }
 
@@ -550,7 +561,8 @@ struct SetBrightnessContrastIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        return try controlScreen(screen: $screen, property: .normalizedBrightnessContrast, value: value.str(decimals: 3))
+        try controlScreen(screen: $screen, property: .normalizedBrightnessContrast, value: value.str(decimals: 3))
+        return .result(value: screen.display?.preciseBrightnessContrast ?? value)
     }
 }
 
@@ -572,7 +584,8 @@ struct SetSubZeroDimmingIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        return try controlScreen(screen: $screen, property: .softwareBrightness, value: value.str(decimals: 3))
+        try controlScreen(screen: $screen, property: .softwareBrightness, value: value.str(decimals: 3))
+        return .result(value: screen.display?.softwareBrightness.d ?? value)
     }
 }
 
@@ -596,7 +609,8 @@ struct SetXDRBrightnessIntent: AppIntent {
         guard lunarProActive else {
             throw IntentError.message("A Lunar Pro license is needed for this feature.")
         }
-        return try controlScreen(screen: $screen, property: .xdrBrightness, value: value.str(decimals: 3))
+        try controlScreen(screen: $screen, property: .xdrBrightness, value: value.str(decimals: 3))
+        return .result(value: screen.display?.xdrBrightness.d ?? value)
     }
 }
 
@@ -618,7 +632,9 @@ struct SetVolumeIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        return try controlScreen(screen: $screen, property: .volume, value: (value * 100).rounded().u16.s)
+
+        try controlScreen(screen: $screen, property: .volume, value: (value * 100).rounded().u16.s)
+        return .result(value: screen.display?.preciseVolume ?? value)
     }
 }
 
@@ -635,6 +651,8 @@ enum ScreenToggleState: String, AppEnum, CaseDisplayRepresentable, TypeDisplayRe
     ]
 
     static var typeDisplayRepresentation: TypeDisplayRepresentation { TypeDisplayRepresentation(name: "State") }
+
+    var bool: Bool { self == .on }
 
     var inverted: ScreenToggleState {
         switch self {
@@ -666,7 +684,8 @@ struct ToggleAudioMuteIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        return try controlScreen(screen: $screen, property: .mute, value: state.rawValue)
+        try controlScreen(screen: $screen, property: .mute, value: state.rawValue)
+        return .result(value: screen.display?.audioMuted ?? state.bool)
     }
 }
 
@@ -688,7 +707,8 @@ struct ToggleSystemAdaptiveBrightnessIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        return try controlScreen(screen: $screen, property: .systemAdaptiveBrightness, value: state.rawValue)
+        try controlScreen(screen: $screen, property: .systemAdaptiveBrightness, value: state.rawValue)
+        return .result(value: screen.display?.systemAdaptiveBrightness ?? state.bool)
     }
 }
 
@@ -710,7 +730,8 @@ struct ToggleHDRIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        return try controlScreen(screen: $screen, property: .hdr, value: state.rawValue)
+        try controlScreen(screen: $screen, property: .hdr, value: state.rawValue)
+        return .result(value: screen.display?.hdr ?? state.bool)
     }
 }
 
@@ -734,7 +755,8 @@ struct ToggleXDRIntent: AppIntent {
         guard lunarProActive else {
             throw IntentError.message("A Lunar Pro license is needed for this feature.")
         }
-        return try controlScreen(screen: $screen, property: .xdr, value: state.rawValue)
+        try controlScreen(screen: $screen, property: .xdr, value: state.rawValue)
+        return .result(value: screen.display?.xdr ?? state.bool)
     }
 }
 
@@ -756,7 +778,8 @@ struct ToggleSubZeroIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        return try controlScreen(screen: $screen, property: .subzero, value: state.rawValue)
+        try controlScreen(screen: $screen, property: .subzero, value: state.rawValue)
+        return .result(value: screen.display?.subzero ?? state.bool)
     }
 }
 
@@ -780,7 +803,8 @@ struct ToggleFacelightIntent: AppIntent {
         guard lunarProActive else {
             throw IntentError.message("A Lunar Pro license is needed for this feature.")
         }
-        return try controlScreen(screen: $screen, property: .facelight, value: state.rawValue)
+        try controlScreen(screen: $screen, property: .facelight, value: state.rawValue)
+        return .result(value: screen.display?.facelight ?? state.bool)
     }
 }
 
@@ -1344,7 +1368,8 @@ struct ToggleBlackOutIntent: AppIntent {
             }
         }
 
-        return try controlScreen(screen: $screen, property: .blackout, value: state.inverted.rawValue)
+        try controlScreen(screen: $screen, property: .blackout, value: state.inverted.rawValue)
+        return .result(value: screen.display?.blackout ?? state.bool)
     }
 }
 
@@ -1383,7 +1408,8 @@ struct RotateScreenIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        return try controlScreen(screen: $screen, property: .rotation, value: rotation.rawValue.s)
+        try controlScreen(screen: $screen, property: .rotation, value: rotation.rawValue.s)
+        return .result(value: screen.display?.rotation ?? rotation.rawValue)
     }
 }
 
@@ -1615,7 +1641,8 @@ Note: Not all inputs are supported by all monitors, and some monitors may use no
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        return try controlScreen(screen: $screen, property: .input, value: input.s)
+        try controlScreen(screen: $screen, property: .input, value: input.s)
+        return .result(value: screen.display?.inputSource.rawValue.i ?? input)
     }
 
     private struct InputProvider: DynamicOptionsProvider {
@@ -1759,7 +1786,11 @@ struct ControlScreenValueFloatNumeric: AppIntent {
             throw IntentError.message("A Lunar Pro license is needed for controlling \"\(property.name)\".")
         }
         try checkShortcutsLimit()
-        return try controlScreen(screen: $screen, property: property.id, value: value.str(decimals: 3))
+        try controlScreen(screen: $screen, property: property.id, value: value.str(decimals: 3))
+        guard let val = screen.display?.dictionary?[property.id.rawValue] as? Double else {
+            return .result(value: value)
+        }
+        return .result(value: val)
     }
 }
 
@@ -1787,7 +1818,11 @@ struct ControlScreenValueNumeric: AppIntent {
             throw IntentError.message("A Lunar Pro license is needed for controlling \"\(property.name)\".")
         }
         try checkShortcutsLimit()
-        return try controlScreen(screen: $screen, property: property.id, value: value.s)
+        try controlScreen(screen: $screen, property: property.id, value: value.s)
+        guard let val = screen.display?.dictionary?[property.id.rawValue] as? Int else {
+            return .result(value: value)
+        }
+        return .result(value: val)
     }
 }
 
@@ -1815,7 +1850,11 @@ struct ControlScreenValueBool: AppIntent {
             throw IntentError.message("A Lunar Pro license is needed for controlling \"\(property.name)\".")
         }
         try checkShortcutsLimit()
-        return try controlScreen(screen: $screen, property: property.id, value: state.rawValue)
+        try controlScreen(screen: $screen, property: property.id, value: state.rawValue)
+        guard let val = screen.display?.dictionary?[property.id.rawValue] as? Bool else {
+            return .result(value: state.bool)
+        }
+        return .result(value: val)
     }
 }
 
