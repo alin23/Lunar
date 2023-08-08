@@ -2546,7 +2546,8 @@ final class LunarServer {
                 }
                 return
             }
-            let val = change.property == "mute" ? (change.value == 1 ? "true" : "false") : change.value.str(decimals: 3)
+            let val = change.property == "mute" ? (change.value == 1 ? "true" : "false") : String(format: "%.3f", change.value)
+
             if json {
                 _ = try? socket.write(from: "{\"\(change.property)\": \(val), \"display\": \(change.display)}\n")
             } else {
