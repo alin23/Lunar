@@ -2892,7 +2892,7 @@ func watchdog() {
         WATCHDOG = shellProc(
             args: [
                 "-c",
-                "/bin/echo LUNAR_FYI_WATCHDOG; while /bin/ps -o pid -p $(cat \(LUNAR_PID_FILE)) >/dev/null 2>/dev/null; do /bin/sleep 5; done; /bin/sleep 3; test -f \(LUNAR_PID_FILE) && /usr/bin/open '\(Bundle.main.path.string)' && date -u +%s >> \(LUNAR_RESTART_LOG)",
+                "/bin/echo LUNAR_FYI_WATCHDOG; while /bin/ps -o pid -p \(ProcessInfo.processInfo.processIdentifier) >/dev/null 2>/dev/null; do /bin/sleep 5; done; /bin/sleep 3; test -f \(LUNAR_PID_FILE) && /usr/bin/open '\(Bundle.main.path.string)' && date -u +%s >> \(LUNAR_RESTART_LOG)",
             ],
             devnull: true
         )
