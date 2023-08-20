@@ -1,3 +1,17 @@
+# 6.2.3
+## Features
+
+* Turn off keyboard backlight when blacking out the MacBook screen
+
+## Improvements
+
+* Return the current state after toggling boolean values in Shortcuts
+
+## Fixes
+
+* Fix JSON number formatting in `lunar listen` CLI command
+* Make watchdog more resilient so that Lunar restarts after crashes
+
 # 6.2.2
 ### Features
 
