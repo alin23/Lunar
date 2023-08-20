@@ -1,5 +1,5 @@
 //
-//  HotkeyView.swift
+//  HotKeyView.swift
 //  Lunar
 //
 //  Created by Alin on 24/02/2019.

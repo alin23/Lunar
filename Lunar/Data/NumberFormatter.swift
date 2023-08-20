@@ -1,5 +1,5 @@
 //
-//  HourValueFormatter.swift
+//  NumberFormatter.swift
 //  Lunar
 //
 //  Created by Alin on 18/06/2018.

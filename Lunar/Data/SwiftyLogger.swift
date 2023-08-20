@@ -1,5 +1,5 @@
 //
-//  Logger.swift
+//  SwiftyLogger.swift
 //  Lunar
 //
 //  Created by Alin on 07/07/2018.
