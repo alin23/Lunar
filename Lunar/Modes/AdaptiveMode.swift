@@ -1,5 +1,5 @@
 //
-//  Mode.swift
+//  AdaptiveMode.swift
 //  Lunar
 //
 //  Created by Alin Panaitiu on 29.12.2020.

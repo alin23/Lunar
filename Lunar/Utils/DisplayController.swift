@@ -1230,6 +1230,8 @@ final class DisplayController: ObservableObject {
 
     @Published var mergeBrightnessContrast = CachedDefaults[.mergeBrightnessContrast]
 
+    let kbc = KeyboardBrightnessClient()
+
     var targetDisplays: [Display] {
         activeDisplayList.filter { !$0.isSource }
     }
@@ -2522,7 +2524,6 @@ final class DisplayController: ObservableObject {
             display.volume = value.ns
         }
     }
-
     func adjustBrightness(
         by offset: Int,
         for displays: [Display]? = nil,

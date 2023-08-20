@@ -1,6 +1,7 @@
 --acronyms ID,URL,UUID
 --allman false
 --assetliterals visual-width
+--asynccapturing 
 --beforemarks 
 --binarygrouping 4,8
 --categorymark "MARK: %c"
@@ -55,10 +56,11 @@
 --semicolons inline
 --shortoptionals always
 --smarttabs enabled
---someAny true
+--someany true
 --stripunusedargs always
 --structthreshold 0
 --tabwidth unspecified
+--throwcapturing 
 --trailingclosures 
 --trimwhitespace always
 --typeattributes preserve
@@ -69,11 +71,13 @@
 --wraparguments before-first
 --wrapcollections before-first
 --wrapconditions after-first
+--wrapeffects preserve
+--wrapenumcases always
 --wrapparameters before-first
 --wrapreturntype preserve
 --wrapternary before-operators
 --wraptypealiases preserve
 --xcodeindentation disabled
 --yodaswap always
---disable blankLinesAtEndOfScope,blankLinesBetweenScopes,unusedArguments
+--disable blankLinesAtEndOfScope,blankLinesBetweenScopes,redundantStaticSelf,unusedArguments
 --enable markTypes,organizeDeclarations

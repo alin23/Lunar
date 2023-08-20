@@ -22,6 +22,7 @@
 		C71F8DBA265640C400C4648A /* DDCCTLControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71F8DB9265640C400C4648A /* DDCCTLControl.swift */; };
 		C722FB9F271AC83200ED4C94 /* Slider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C722FB9C271AC83200ED4C94 /* Slider.swift */; };
 		C722FBA0271AC83200ED4C94 /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = C722FB9E271AC83200ED4C94 /* Button.swift */; };
+		C724D4D12A9211C200C6321F /* KeyboardBrightnessClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C724D4D02A9211C200C6321F /* KeyboardBrightnessClient.h */; };
 		C72776E9201F1BED0055934F /* ExceptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776E8201F1BED0055934F /* ExceptionsView.swift */; };
 		C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EA201F1DE50055934F /* ExceptionsViewController.swift */; };
 		C72776ED201F26CB0055934F /* AppException.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72776EC201F26CB0055934F /* AppException.swift */; };
@@ -226,6 +227,7 @@
 		C71F8DB9265640C400C4648A /* DDCCTLControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDCCTLControl.swift; sourceTree = "<group>"; };
 		C722FB9C271AC83200ED4C94 /* Slider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Slider.swift; sourceTree = "<group>"; };
 		C722FB9E271AC83200ED4C94 /* Button.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
+		C724D4D02A9211C200C6321F /* KeyboardBrightnessClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyboardBrightnessClient.h; sourceTree = "<group>"; };
 		C72776E8201F1BED0055934F /* ExceptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExceptionsView.swift; sourceTree = "<group>"; };
 		C72776EA201F1DE50055934F /* ExceptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExceptionsViewController.swift; sourceTree = "<group>"; };
 		C72776EC201F26CB0055934F /* AppException.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppException.swift; sourceTree = "<group>"; };
@@ -758,6 +760,7 @@
 		C7E896D72652C0F60079A328 /* Headers */ = {
 			isa = PBXGroup;
 			children = (
+				C724D4D02A9211C200C6321F /* KeyboardBrightnessClient.h */,
 				C72BB4B32727E03400941708 /* Extensions.h */,
 				C72BB4B52727E03400941708 /* Extensions.m */,
 				C73716A426DE1F22008EEE53 /* CBAdaptationClient.h */,
@@ -783,6 +786,7 @@
 				C73716A526DE1F22008EEE53 /* CBTrueToneClient.h in Headers */,
 				C7CC5D1629437E2C00DEA106 /* DDC2.h in Headers */,
 				C72BB4B62727E03500941708 /* Extensions.h in Headers */,
+				C724D4D12A9211C200C6321F /* KeyboardBrightnessClient.h in Headers */,
 				C73716A726DE1F22008EEE53 /* CBAdaptationClient.h in Headers */,
 				C76168FA29B8B79F00D0A33A /* Bridge.h in Headers */,
 				C7E80E362637060F004718A4 /* libssh2_sftp.h in Headers */,

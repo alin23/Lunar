@@ -1,5 +1,5 @@
 //
-//  ProgressViewController.swift
+//  ALSInstallViewController.swift
 //  Lunar
 //
 //  Created by Alin Panaitiu on 25.04.2021.

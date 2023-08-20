@@ -1,5 +1,5 @@
 //
-//  ScrollableValueController.swift
+//  ScrollableContrast.swift
 //  Lunar
 //
 //  Created by Alin on 25/12/2017.

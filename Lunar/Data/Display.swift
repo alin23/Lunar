@@ -1267,7 +1267,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     lazy var maxContrastBeforeFacelight = maxContrast
 
     @Atomic @objc dynamic var mirroredBeforeBlackOut = false
-    @Published @objc dynamic var blackOutEnabled = false
     @Atomic @objc dynamic var blackOutEnabledWithoutMirroring = false
     @Atomic @objc dynamic var blackOutMirroringAllowed = true
     lazy var brightnessBeforeBlackout = brightness
@@ -1536,6 +1535,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var locationContrastMapping: [AutoLearnMapping] = LocationMode.DEFAULT_CONTRAST_MAPPING
     var scheduledBrightnessTask: Repeater? = nil
     @Published var userMute: Double = 0
+    @Published @objc dynamic var blackOutEnabled = false {
+        didSet {
+            guard blackOutEnabled != oldValue, isMacBook else {
+                return
+            }
+            DC.kbc.setBrightness(blackOutEnabled ? 0.0 : 0.5, forKeyboard: 1)
+        }
+    }
     var settingShade: Bool {
         shadeWindowController?.window?.contentView?.layer?.animation(forKey: kCATransition) != nil
     }

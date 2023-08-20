@@ -172,7 +172,7 @@ let UM = UpdateManager()
 
 // MARK: - AppDelegate
 
-@NSApplicationMain
+@main
 final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDelegate, NSMenuDelegate, SPUStandardUserDriverDelegate {
     enum UIElement {
         case displayControls
@@ -2348,7 +2348,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         LocationMode.specific.fetchGeolocation()
     }
 
-    internal func locationManager(_ lm: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    func locationManager(_ lm: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard !CachedDefaults[.manualLocation] else { return }
 
         guard lm.authorizationStatus != .denied, let location = locations.last ?? lm.location,
@@ -2367,7 +2367,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         LocationMode.specific.fetchMoments()
     }
 
-    internal func locationManager(_ lm: CLLocationManager, didFailWithError error: Error) {
+    func locationManager(_ lm: CLLocationManager, didFailWithError error: Error) {
         log.error("Location manager failed with error \(error)")
         guard !CachedDefaults[.manualLocation] else { return }
 

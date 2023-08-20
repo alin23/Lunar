@@ -6,6 +6,7 @@
 #import "Extensions.h"
 // #import "BrightnessSystemClient.h"
 #import "CBBlueLightClient.h"
+#import "KeyboardBrightnessClient.h"
 // #import "CBTrueToneClient.h"
 // #import "CBAdaptationClient.h"
 #import "DDC.h"
