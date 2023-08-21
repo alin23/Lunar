@@ -1541,6 +1541,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 return
             }
             DC.kbc.setBrightness(blackOutEnabled ? 0.0 : 0.5, forKeyboard: 1)
+            DC.kbc.enableAutoBrightness(!blackOutEnabled, forKeyboard: 1)
         }
     }
     var settingShade: Bool {
@@ -2845,8 +2846,17 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             if softwareBrightness < 1.0, oldValue == 1.0 {
                 systemAdaptiveBrightness = false
-            } else if softwareBrightness == 1.0, oldValue < 1.0, ambientLightCompensationEnabledByUser {
-                systemAdaptiveBrightness = true
+                if isMacBook {
+                    DC.kbc.setBrightness(0.01, forKeyboard: 1)
+                }
+            } else if softwareBrightness == 1.0, oldValue < 1.0 {
+                if ambientLightCompensationEnabledByUser {
+                    systemAdaptiveBrightness = true
+                }
+                if isMacBook {
+                    DC.kbc.enableAutoBrightness(true, forKeyboard: 1)
+                    DC.kbc.setBrightness(0.3, forKeyboard: 1)
+                }
             }
 
             log.info("\(name) SOFT BRIGHTNESS: \(softwareBrightness.str(decimals: 2))")
