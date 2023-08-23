@@ -2224,15 +2224,15 @@ struct QuickActionsMenuView: View {
                 HDRSettingsView().padding(10).foregroundColor(Colors.blackMauve)
             }
 
-            SwiftUI.Button("Reset \(km.optionKeyPressed ? "ALL" : (km.commandKeyPressed ? "display-specific" : "global")) settings") {
+            SwiftUI.Button("Reset \(km.optionKeyPressed ? "global" : (km.commandKeyPressed ? "display-specific" : "ALL")) settings") {
                 if km.optionKeyPressed {
-                    resetAllSettings()
+                    DataStore.reset()
                 } else if km.commandKeyPressed {
                     appDelegate!.resetStates()
                     Defaults.reset(.displays)
                     dc.displays = [:]
                 } else {
-                    DataStore.reset()
+                    resetAllSettings()
                 }
 
                 mainAsyncAfter(ms: 300) {

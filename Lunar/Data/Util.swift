@@ -681,15 +681,23 @@ func stringRepresentation(forAddress address: Data) -> String? {
     }
 }
 
+let IPV6_INTERFACE_REGEX = "%.+".r!
+
 func resolve(hostname: String) -> String? {
     let host = CFHostCreateWithName(nil, hostname as CFString).takeRetainedValue()
     CFHostStartInfoResolution(host, .addresses, nil)
     var success: DarwinBoolean = false
-    guard let addresses = CFHostGetAddressing(host, &success)?.takeUnretainedValue() as NSArray?,
-          let theAddress = addresses.firstObject as? NSData
-    else { return nil }
+    guard let addresses = CFHostGetAddressing(host, &success)?.takeUnretainedValue() as NSArray? else {
+        return nil
+    }
+    let ips: [String] = addresses.compactMap { addr in
+        guard let data = (addr as? NSData) as? Data, let ip = stringRepresentation(forAddress: data) else {
+            return nil
+        }
 
-    return stringRepresentation(forAddress: theAddress as Data)
+        return ip.contains(":") ? IPV6_INTERFACE_REGEX.replaceAll(in: ip, with: "") : ip
+    }
+    return ips.first { !$0.contains(":") } ?? ips.first
 }
 
 @discardableResult

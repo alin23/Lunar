@@ -8,12 +8,16 @@ endef
 DISABLE_NOTARIZATION := ${DISABLE_NOTARIZATION}
 DISABLE_PACKING := ${DISABLE_PACKING}
 ENV=Release
-CHANNEL=
-V=
-DSA=0
+DERIVED_DATA_DIR=$(shell ls -td $$HOME/Library/Developer/Xcode/DerivedData/Lunar-* | head -1)
 
-ifeq (beta, $(CHANNEL))
-FULL_VERSION:=$(VERSION)b$V
+BETA=
+
+ifeq (, $(VERSION))
+VERSION=$(shell rg -o --no-filename 'MARKETING_VERSION = ([^;]+).+' -r '$$1' *.xcodeproj/project.pbxproj | head -1)
+endif
+
+ifneq (, $(BETA))
+FULL_VERSION:=$(VERSION)b$(BETA)
 else
 FULL_VERSION:=$(VERSION)
 endif
@@ -55,6 +59,7 @@ upload: ReleaseNotes/release.css
 	rsync -avz Releases/*.html ReleaseNotes/*.css darkwoods:/static/Lunar/ReleaseNotes/
 	rsync -avzP Releases/appcast*.xml darkwoods:/static/Lunar/
 	cfcli -d lunar.fyi purge
+	$(MAKE) sentry
 
 release: changelog
 	echo "$(VERSION)" > /tmp/release_file_$(VERSION).md
@@ -65,7 +70,7 @@ release: changelog
 
 sentry: export DWARF_DSYM_FOLDER_PATH="$(shell xcodebuild -scheme $(ENV) -configuration $(ENV) -showBuildSettings -json 2>/dev/null | jq -r .[0].buildSettings.DWARF_DSYM_FOLDER_PATH)"
 sentry:
-	./bin/sentry.sh
+	sentry-cli upload-dif --include-sources -o alin-panaitiu -p lunar --wait -- $(DERIVED_DATA_DIR)/Build/Products/Release/
 
 print-%  : ; @echo $* = $($*)
 
@@ -83,9 +88,9 @@ appcast: VERSION=$(shell xcodebuild -scheme $(ENV) -configuration $(ENV) -worksp
 appcast: Releases/Lunar-$(FULL_VERSION).html
 ifneq ($(DISABLE_APPCAST),1)
 	rm Releases/Lunar.dmg || true
-ifneq (, $(CHANNEL))
+ifneq (, $(BETA))
 	rm Releases/Lunar$(FULL_VERSION)*.delta || true
-	"$(SPARKLE_BIN_DIR)/generate_appcast" --maximum-versions 10 --maximum-deltas 2 --major-version "5.0.0" --link "https://lunar.fyi/" --full-release-notes-url "https://lunar.fyi/changelog" --channel "$(CHANNEL)" --release-notes-url-prefix https://files.lunar.fyi/ReleaseNotes/ --download-url-prefix https://files.lunar.fyi/releases/ -o Releases/appcast2.xml Releases
+	"$(SPARKLE_BIN_DIR)/generate_appcast" --maximum-versions 10 --maximum-deltas 2 --major-version "5.0.0" --link "https://lunar.fyi/" --full-release-notes-url "https://lunar.fyi/changelog" --channel "beta" --release-notes-url-prefix https://files.lunar.fyi/ReleaseNotes/ --download-url-prefix https://files.lunar.fyi/releases/ -o Releases/appcast2.xml Releases
 else
 	rm Releases/Lunar$(FULL_VERSION)*.delta || true
 	rm Releases/Lunar-*{a,b}*.dmg || true
@@ -117,10 +122,7 @@ else
 	xcodebuild -scheme $(ENV) -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=$(ONLY_ACTIVE_ARCH)
 endif
 ifneq ($(DISABLE_PACKING),1)
-	make pack VERSION=$(VERSION) CHANNEL=$(CHANNEL) V=$V
-endif
-ifneq ($(DISABLE_SENTRY),1)
-	make sentry VERSION=$(VERSION) CHANNEL=$(CHANNEL) V=$V
+	make pack VERSION=$(VERSION) BETA=$(BETA)
 endif
 
 css: ReleaseNotes/release.css
@@ -129,7 +131,7 @@ ReleaseNotes/release.css: ReleaseNotes/release.styl
 
 Releases/Lunar-%.html: ReleaseNotes/$(VERSION)*.md
 	@echo Compiling $^ to $@
-ifneq (, $(CHANNEL))
+ifneq (, $(BETA))
 	pandoc -f gfm -o $@ --standalone --metadata title="Lunar $(FULL_VERSION) - Release Notes" --css https://files.lunar.fyi/ReleaseNotes/release.css $(shell ls -t ReleaseNotes/$(VERSION)*.md)
 else
 	pandoc -f gfm -o $@ --standalone --metadata title="Lunar $(FULL_VERSION) - Release Notes" --css https://files.lunar.fyi/ReleaseNotes/release.css ReleaseNotes/$(VERSION).md
