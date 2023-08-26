@@ -82,16 +82,27 @@ final class ALSInstallViewController: NSViewController {
 
     var boardID: String {
         switch board {
+        // ESP32-S2
         case "Metro ESP32 S2":
             return "adafruit_metro_esp32s2"
         case "SparkFun Thing Plus ESP32 S2":
             return "sparkfun_esp32s2_thing_plus"
         case "Feather ESP32 S2":
+            return "featheresp32-s2"
+        case "Feather ESP32 S2 TFT":
             return "adafruit_feather_esp32s2_tft"
+        case "Feather ESP32 S2 Reverse TFT":
+            return "adafruit_feather_esp32s2_reversetft"
         case "MagTag ESP32 S2":
             return "adafruit_magtag29_esp32s2"
         case "Funhouse ESP32 S2":
             return "adafruit_funhouse_esp32s2"
+        case "NodeMCU ESP32 S2":
+            return "nodemcu-32s2"
+
+        // ESP32
+        case "Adafruit HUZZAH32 Feather ESP32":
+            return "featheresp32"
         case "WEMOS LOLIN32":
             return "lolin32"
         case "WEMOS LOLIN32 Lite":
@@ -101,6 +112,7 @@ final class ALSInstallViewController: NSViewController {
         case "Generic ESP32":
             return "esp32dev"
 
+        // ESP8266
         case "NodeMCU v2 (ESP8266)":
             return "nodemcuv2"
         case "NodeMCU v3 (ESP8266)":
@@ -163,7 +175,19 @@ final class ALSInstallViewController: NSViewController {
         case "sparkfun_esp32s2_thing_plus":
             sda = "01"
             scl = "02"
-        case "adafruit_metro_esp32s2", "adafruit_funhouse_esp32s2", "adafruit_feather_esp32s2_tft", "adafruit_magtag29_esp32s2":
+        case "featheresp32-s2", "adafruit_feather_esp32s2_reversetft":
+            sda = "03"
+            scl = "04"
+        case "adafruit_funhouse_esp32s2":
+            sda = "34"
+            scl = "33"
+        case "adafruit_feather_esp32s2_tft":
+            sda = "42"
+            scl = "41"
+        case "nodemcu-32s2":
+            sda = "08"
+            scl = "09"
+        case "adafruit_metro_esp32s2", "adafruit_magtag29_esp32s2":
             sda = "33"
             scl = "34"
         case "nodemcuv2", "d1_mini", "d1_mini_lite", "d1_mini_pro", "nodemcu":

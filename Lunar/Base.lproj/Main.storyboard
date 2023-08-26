@@ -7402,7 +7402,13 @@ when FaceLight is activated</string>
                                             <menuItem title="Metro ESP32 S2" state="on" tag="30" identifier="adafruit_metro_esp32s2" id="Qtb-lf-Oop">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="Feather ESP32 S2" tag="31" identifier="adafruit_feather_esp32s2_tft" id="Qtb-lf-Ool">
+                                            <menuItem title="Feather ESP32 S2" tag="35" identifier="featheresp32-s2" id="Qt1-lf-Ool">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Feather ESP32 S2 TFT" tag="31" identifier="adafruit_feather_esp32s2_tft" id="Qtb-lf-Ool">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Feather ESP32 S2 Reverse TFT" tag="37" identifier="adafruit_feather_esp32s2_reversetft" id="Qtc-lf-Ool">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                             <menuItem title="MagTag ESP32 S2" tag="32" identifier="adafruit_magtag29_esp32s2" id="Qtb-lf-kol">
@@ -7412,6 +7418,14 @@ when FaceLight is activated</string>
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                             <menuItem title="SparkFun Thing Plus ESP32 S2" tag="34" identifier="sparkfun_esp32s2_thing_plus" id="Qtb-lf-nol">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="NodeMCU ESP32 S2" tag="36" identifier="nodemcu-32s2" id="Qt2-lf-nol">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+
+                                            <menuItem isSeparatorItem="YES" id="Mv2-Ul-4bR"/>
+                                            <menuItem title="Adafruit HUZZAH32 Feather ESP32" tag="25" identifier="featheresp32" id="e1f-R5-jxy">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                             <menuItem title="WEMOS LOLIN32" tag="29" identifier="lolin32" id="e7f-R5-jxy">
@@ -7426,6 +7440,7 @@ when FaceLight is activated</string>
                                             <menuItem title="Generic ESP32" tag="26" identifier="esp32dev" id="hZE-8f-OhL">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
+
                                             <menuItem isSeparatorItem="YES" id="Mv1-Ul-4bR"/>
                                             <menuItem title="NodeMCU v2 (ESP8266)" tag="41" identifier="nodemcuv2" id="hZE-8f-Kh1">
                                                 <modifierMask key="keyEquivalentModifierMask"/>

@@ -16,7 +16,6 @@ esphome:
     - "Adafruit Unified Sensor@^1.1.6"
     - "Adafruit BusIO@^1.13.2"
     - "Adafruit TSL2591 Library@^1.4.3"
-    - https://github.com/blackhack/ESPAsyncWebServer#8a43124
   platformio_options:
     platform: $platform_version
     lib_ldf_mode: "chain+"

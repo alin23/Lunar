@@ -28,31 +28,40 @@ export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 BOARD="${BOARD:-esp32dev}"
 
+PLATFORM_VERSION="${PLATFORM_VERSION:-platformio/espressif32@6.3.2}"
+PLATFORM="${PLATFORM:-ESP32}"
 if [[ "$BOARD" == "sparkfun_esp32s2_thing_plus" ]]; then
-    PLATFORM_VERSION="${PLATFORM_VERSION:-platformio/espressif32@5.3.0}"
-    PLATFORM="${PLATFORM:-ESP32}"
     SDA="${SDA:-01}"
     SCL="${SCL:-02}"
-elif [[ "$BOARD" == "adafruit_metro_esp32s2" || "$BOARD" == "adafruit_funhouse_esp32s2"  || "$BOARD" == "adafruit_feather_esp32s2_tft"  || "$BOARD" == "adafruit_magtag29_esp32s2" ]]; then
-    PLATFORM_VERSION="${PLATFORM_VERSION:-platformio/espressif32@5.3.0}"
-    PLATFORM="${PLATFORM:-ESP32}"
+elif [[ "$BOARD" == "adafruit_metro_esp32s2" || "$BOARD" == "adafruit_magtag29_esp32s2" ]]; then
     SDA="${SDA:-33}"
     SCL="${SCL:-34}"
-elif [[ "$BOARD" == "nodemcuv2" || "$BOARD" == "d1_mini" || "$BOARD" == "d1_mini_lite" || "$BOARD" == "d1_mini_pro" || "$BOARD" == "nodemcu" ]]; then
-    PLATFORM_VERSION="${PLATFORM_VERSION:-platformio/espressif8266@4.0.1}"
-    PLATFORM="${PLATFORM:-ESP8266}"
-    SDA="${SDA:-D2}"
-    SCL="${SCL:-D1}"
+elif [[ "$BOARD" == "nodemcu-32s2" ]]; then
+    SDA="${SDA:-08}"
+    SCL="${SCL:-09}"
+elif [[ "$BOARD" == "featheresp32-s2" || "$BOARD" == "adafruit_feather_esp32s2_reversetft" ]]; then
+    SDA="${SDA:-03}"
+    SCL="${SCL:-04}"
+elif [[ "$BOARD" == "featheresp32" ]]; then
+    SDA="${SDA:-23}"
+    SCL="${SCL:-22}"
+elif [[ "$BOARD" == "adafruit_funhouse_esp32s2" ]]; then
+    SDA="${SDA:-34}"
+    SCL="${SCL:-33}"
+elif [[ "$BOARD" == "adafruit_feather_esp32s2_tft" ]]; then
+    SDA="${SDA:-42}"
+    SCL="${SCL:-41}"
 elif [[ "$BOARD" == "esp32dev" || "$BOARD" == "lolin32" || "$BOARD" == "lolin32_lite" || "$BOARD" == "nodemcu-32s" ]]; then
-    PLATFORM_VERSION="${PLATFORM_VERSION:-platformio/espressif32@5.3.0}"
-    PLATFORM="${PLATFORM:-ESP32}"
     SDA="${SDA:-19}"
     SCL="${SCL:-23}"
-else
-    PLATFORM_VERSION="${PLATFORM_VERSION:-platformio/espressif8266@4.0.1}"
-    PLATFORM="${PLATFORM:-ESP8266}"
-    SDA="${SDA:-GPIO4}"
-    SCL="${SCL:-GPIO5}"
+elif [[ "$BOARD" == "nodemcuv2" || "$BOARD" == "d1_mini" || "$BOARD" == "d1_mini_lite" || "$BOARD" == "d1_mini_pro" || "$BOARD" == "nodemcu" ]]; then
+    PLATFORM_VERSION="platformio/espressif8266@4.2.1"
+    PLATFORM="ESP8266"
+    SDA="${SDA:-D2}"
+    SCL="${SCL:-D1}"
+elif [[ -z "$SDA" || -z "$SCL" ]]; then
+    echo "Unknown board $BOARD" | tee -a "$LOG_PATH"
+    exit 1
 fi
 
 echo "Installing latest Python pip..." | tee -a "$LOG_PATH"
@@ -68,7 +77,7 @@ echo "" | tee -a "$LOG_PATH"
 echo "Installing ESPHome..." | tee -a "$LOG_PATH"
 echo "" | tee -a "$LOG_PATH"
 echo "" | tee -a "$LOG_PATH"
-/usr/bin/python3 -m pip install --user esphome==2023.6.3 2>&1 | tee -a "$LOG_PATH"
+/usr/bin/python3 -m pip install --user git+https://github.com/alin23/esphome.git@lunar#egg=esphome 2>&1 | tee -a "$LOG_PATH"
 if [[ $PIPESTATUS ]]; then
     echo "\${PIPESTATUS[0]} == ${PIPESTATUS[0]}"
     test ${PIPESTATUS[0]} == 0 || exit ${PIPESTATUS[0]}
