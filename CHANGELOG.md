@@ -1,3 +1,19 @@
+# 6.2.4
+## Features
+
+* Dim keyboard backlight to minimum when **Sub-zero dimming** is used
+* Automatically detect a light sensor running as the [official HomeAssistant Addon](https://github.com/alin23/lunarsensor/tree/main/homeassistant_addon)
+* Add support for the following boards:
+    * Feather ESP32 S2
+    * Feather ESP32 S2 Reverse TFT
+    * NodeMCU ESP32 S2
+    * Adafruit HUZZAH32 Feather ESP32
+
+## Improvements
+
+* Make the reset button do a full reset by default *(instead of resetting just the non-display specific settings)*
+* Replace watchdog with `restartOnCrash` signal handler
+
 # 6.2.3
 ## Features
 
