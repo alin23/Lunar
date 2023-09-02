@@ -2390,3 +2390,28 @@ func displayLinkApp() -> NSRunningApplication? {
 func isDisplayLinkRunning() -> Bool {
     !NSRunningApplication.runningApplications(withBundleIdentifier: DISPLAYLINK_IDENTIFIER).isEmpty
 }
+
+func getConnectedKeyboards() -> Int {
+    var iterator: io_iterator_t = 0
+    var service: io_registry_entry_t = 0
+    var count = 0
+
+    let matching = IOServiceMatching(kIOHIDDeviceKey)
+    let result = IOServiceGetMatchingServices(kIOMasterPortDefault, matching, &iterator)
+    guard result == kIOReturnSuccess else {
+        return count
+    }
+
+    service = IOIteratorNext(iterator)
+    while service != 0 {
+        if IOServiceProperty(service, kIOHIDTransportKey) == "USB" {
+            count += 1
+        }
+
+        IOObjectRelease(service)
+        service = IOIteratorNext(iterator)
+    }
+
+    IOObjectRelease(iterator)
+    return count
+}

@@ -129,7 +129,12 @@ extension Defaults.Keys {
     static let enableDarkModeXDR = Key<Bool>("enableDarkModeXDR", default: false)
     static let screenBlankingIssueWarningShown = Key<Bool>("screenBlankingIssueWarningShown", default: false)
     static let xdrContrast = Key<Bool>("xdrContrast", default: true)
+    static let subzeroContrast = Key<Bool>("subzeroContrast", default: true)
     static let xdrContrastFactor = Key<Float>("xdrContrastFactor", default: 0.3)
+    static let subzeroContrastFactor = Key<Float>("subzeroContrastFactor", default: 1.75)
+
+    static let keyboardBacklightOffBlackout = Key<Bool>("keyboardBacklightOffBlackout", default: true)
+
     static let xdrWarningShown = Key<Bool>("xdrWarningShown", default: false)
     static let xdrTipShown = Key<Bool>("xdrTipShown", default: false)
     static let autoXdrTipShown = Key<Bool>("autoXdrTipShown", default: false)

@@ -756,6 +756,20 @@ final class DisplayController: ObservableObject {
         }
     }
 
+    var subzeroContrastEnabled: Bool = Defaults[.subzeroContrast] {
+        didSet {
+            guard activeDisplayCount == 1, let display = firstNonTestingDisplay else { return }
+
+            guard subzeroContrastEnabled, display.subzero else {
+                setXDRContrast(0.0, now: true)
+                return
+            }
+
+            setXDRContrast(xdrContrast, now: true)
+            display.setIndependentSoftwareBrightness(display.softwareBrightness, withoutSettingContrast: true)
+        }
+    }
+
     var autoXdr: Bool = Defaults[.autoXdr] {
         didSet {
             guard !autoXdr else { return }
@@ -1645,8 +1659,16 @@ final class DisplayController: ObservableObject {
             self.recomputeEDR(factor: change.newValue)
             self.xdrContrastEnabled = CachedDefaults[.xdrContrast]
         }.store(in: &observers)
+        subzeroContrastFactorPublisher.sink { [self] change in
+            if activeDisplayCount == 1, let d = firstNonTestingDisplay {
+                xdrContrast = d.computeXDRContrast(xdrBrightness: d.softwareBrightness, xdrContrastFactor: change.newValue, maxBrightness: 0.0)
+                setXDRContrast(xdrContrast, now: true)
+            }
+            subzeroContrastEnabled = CachedDefaults[.subzeroContrast]
+        }.store(in: &observers)
 
         xdrContrastPublisher.sink { self.xdrContrastEnabled = $0.newValue }.store(in: &observers)
+        subzeroContrastPublisher.sink { self.subzeroContrastEnabled = $0.newValue }.store(in: &observers)
         autoXdrPublisher.sink { self.autoXdr = $0.newValue }.store(in: &observers)
         autoSubzeroPublisher.sink { self.autoSubzero = $0.newValue }.store(in: &observers)
     }

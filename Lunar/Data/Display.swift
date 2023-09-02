@@ -1537,11 +1537,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published var userMute: Double = 0
     @Published @objc dynamic var blackOutEnabled = false {
         didSet {
-            guard blackOutEnabled != oldValue, isMacBook else {
+            guard blackOutEnabled != oldValue, isMacBook, CachedDefaults[.keyboardBacklightOffBlackout] else {
                 return
             }
-            DC.kbc.setBrightness(blackOutEnabled ? 0.0 : 0.5, forKeyboard: 1)
             DC.kbc.enableAutoBrightness(!blackOutEnabled, forKeyboard: 1)
+            log.debug("Setting keyboard backlight to \(blackOutEnabled ? 0.0 : 0.5)")
+            DC.kbc.setBrightness(blackOutEnabled ? 0.0 : 0.5, forKeyboard: 1)
         }
     }
     var settingShade: Bool {
@@ -2844,17 +2845,19 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             guard apply else { return }
             resetScheduledTransition()
 
-            if softwareBrightness < 1.0, oldValue == 1.0 {
+            if softwareBrightness < 1.0, oldValue == 1.0, softwareBrightness >= 0 {
                 systemAdaptiveBrightness = false
                 if isMacBook {
+                    log.debug("Setting keyboard backlight to \(0.01)")
                     DC.kbc.setBrightness(0.01, forKeyboard: 1)
                 }
-            } else if softwareBrightness == 1.0, oldValue < 1.0 {
+            } else if softwareBrightness == 1.0, oldValue < 1.0, oldValue >= 0 {
                 if ambientLightCompensationEnabledByUser {
                     systemAdaptiveBrightness = true
                 }
                 if isMacBook {
                     DC.kbc.enableAutoBrightness(true, forKeyboard: 1)
+                    log.debug("Setting keyboard backlight to \(0.3)")
                     DC.kbc.setBrightness(0.3, forKeyboard: 1)
                 }
             }

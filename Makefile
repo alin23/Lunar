@@ -90,7 +90,7 @@ ifneq ($(DISABLE_APPCAST),1)
 	rm Releases/Lunar.dmg || true
 ifneq (, $(BETA))
 	rm Releases/Lunar$(FULL_VERSION)*.delta || true
-	"$(SPARKLE_BIN_DIR)/generate_appcast" --maximum-versions 10 --maximum-deltas 2 --major-version "5.0.0" --link "https://lunar.fyi/" --full-release-notes-url "https://lunar.fyi/changelog" --channel "beta" --release-notes-url-prefix https://files.lunar.fyi/ReleaseNotes/ --download-url-prefix https://files.lunar.fyi/releases/ -o Releases/appcast2.xml Releases
+	"$(SPARKLE_BIN_DIR)/generate_appcast" --maximum-versions 10 --maximum-deltas 5 --major-version "5.0.0" --link "https://lunar.fyi/" --full-release-notes-url "https://lunar.fyi/changelog" --channel "beta" --release-notes-url-prefix https://files.lunar.fyi/ReleaseNotes/ --download-url-prefix https://files.lunar.fyi/releases/ -o Releases/appcast2.xml Releases
 else
 	rm Releases/Lunar$(FULL_VERSION)*.delta || true
 	rm Releases/Lunar-*{a,b}*.dmg || true

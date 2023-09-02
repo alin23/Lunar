@@ -63,6 +63,9 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .screenBlankingIssueWarningShown,
     .xdrContrast,
     .xdrContrastFactor,
+    .subzeroContrast,
+    .subzeroContrastFactor,
+    .keyboardBacklightOffBlackout,
     .xdrWarningShown,
     .xdrTipShown,
     .autoXdrTipShown,
@@ -737,6 +740,9 @@ func initCache() {
     cacheKey(.screenBlankingIssueWarningShown)
     cacheKey(.xdrContrast)
     cacheKey(.xdrContrastFactor)
+    cacheKey(.subzeroContrast)
+    cacheKey(.subzeroContrastFactor)
+    cacheKey(.keyboardBacklightOffBlackout)
     cacheKey(.xdrWarningShown)
     cacheKey(.xdrTipShown)
     cacheKey(.autoXdrTipShown)
@@ -904,6 +910,8 @@ let hdrWorkaroundPublisher = pub(.hdrWorkaround)
 let oldBlackOutMirroringPublisher = pub(.oldBlackOutMirroring)
 let xdrContrastPublisher = pub(.xdrContrast)
 let xdrContrastFactorPublisher = pub(.xdrContrastFactor)
+let subzeroContrastPublisher = pub(.subzeroContrast)
+let subzeroContrastFactorPublisher = pub(.subzeroContrastFactor)
 let allowHDREnhanceContrastPublisher = pub(.allowHDREnhanceContrast)
 let allowHDREnhanceBrightnessPublisher = pub(.allowHDREnhanceBrightness)
 let workaroundBuiltinDisplayPublisher = pub(.workaroundBuiltinDisplay)
