@@ -906,6 +906,8 @@ struct HDRSettingsView: View {
     @Default(.hdrWorkaround) var hdrWorkaround
     @Default(.xdrContrast) var xdrContrast
     @Default(.xdrContrastFactor) var xdrContrastFactor
+    @Default(.subzeroContrast) var subzeroContrast
+    @Default(.subzeroContrastFactor) var subzeroContrastFactor
     @Default(.allowHDREnhanceBrightness) var allowHDREnhanceBrightness
     @Default(.allowHDREnhanceContrast) var allowHDREnhanceContrast
 
@@ -983,6 +985,43 @@ struct HDRSettingsView: View {
                         SettingsToggle(text: "Allow on non-Apple HDR monitors", setting: $allowHDREnhanceContrast.animation(.fastSpring))
                             .padding(.leading)
                             .disabled(!xdrContrast)
+                    }
+                    if DC.activeDisplayList.contains(where: \.supportsGammaByDefault) {
+                        SettingsToggle(
+                            text: "Enhance contrast in Sub-zero Dimming", setting: $subzeroContrast,
+                            help: """
+                            Improve readability in very low light by increasing contrast.
+                            This option is especially useful when using apps with light backgrounds.
+
+                            Note: works only when using a single display
+                            """
+                        )
+                        let binding = Binding<Float>(
+                            get: { subzeroContrastFactor / 5.0 },
+                            set: { subzeroContrastFactor = $0 * 5.0 }
+                        )
+                        HStack {
+                            BigSurSlider(
+                                percentage: binding,
+                                image: "circle.lefthalf.filled",
+                                color: Colors.lightGray,
+                                backgroundColor: Colors.grayMauve.opacity(0.1),
+                                knobColor: Colors.lightGray,
+                                showValue: .constant(false),
+                                disabled: !$subzeroContrast
+                            )
+                            .padding(.leading)
+
+                            SwiftUI.Button("Reset") { subzeroContrastFactor = 1.75 }
+                                .buttonStyle(FlatButton(
+                                    color: Colors.lightGray,
+                                    textColor: Colors.darkGray,
+                                    radius: 10,
+                                    verticalPadding: 3
+                                ))
+                                .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                                .disabled(!subzeroContrast)
+                        }
                     }
                 }
                 Divider()
@@ -1108,6 +1147,7 @@ struct AdvancedSettingsView: View {
     @Default(.autoRestartOnFailedDDCSooner) var autoRestartOnFailedDDCSooner
     @Default(.sleepInClamshellMode) var sleepInClamshellMode
     @Default(.disableCliffDetection) var disableCliffDetection
+    @Default(.keyboardBacklightOffBlackout) var keyboardBacklightOffBlackout
 
     @State var sensorCheckerEnabled = !Defaults[.sensorHostname].isEmpty
 
@@ -1143,6 +1183,9 @@ struct AdvancedSettingsView: View {
                         help: "Allows turning off a screen even if it's the only visible screen left"
                     )
                     if Sysctl.isMacBook {
+                        SettingsToggle(
+                            text: "Turn off keyboard backlight in BlackOut", setting: $keyboardBacklightOffBlackout
+                        )
                         SettingsToggle(
                             text: "Force Sleep when the lid is closed", setting: $sleepInClamshellMode,
                             help: """

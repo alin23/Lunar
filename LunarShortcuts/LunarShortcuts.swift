@@ -1651,6 +1651,9 @@ Note: Not all inputs are supported by all monitors, and some monitors may use no
                 ItemSection(title: "Common", items: VideoInputSource.mostUsed.map(
                     { IntentItem($0.rawValue.i, title: "\($0.description)", image: .init(named: $0.image ?? "input", isTemplate: true)) }
                 ))
+                ItemSection(title: "LG Specific", items: VideoInputSource.lgSpecific.map(
+                    { IntentItem($0.rawValue.i, title: "\($0.description)", image: .init(named: $0.image ?? "input", isTemplate: true)) }
+                ))
                 ItemSection(title: "Less used", items: VideoInputSource.leastUsed.map(
                     { IntentItem($0.rawValue.i, title: "\($0.description)", image: .init(named: $0.image ?? "input", isTemplate: true)) }
                 ))
