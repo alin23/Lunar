@@ -8,6 +8,7 @@
 
 import AnyCodable
 import Cocoa
+import Combine
 import Defaults
 import Sentry
 
@@ -22,6 +23,22 @@ let DEFAULT_APP_BRIGHTNESS_CONTRAST = 0.8
         self.identifier = identifier
         self.name = name
         super.init()
+
+        manualObserver = adaptiveBrightnessModePublisher
+            .debounce(for: .milliseconds(10), scheduler: RunLoop.main)
+            .sink { [weak self] change in
+                guard let self else { return }
+                self.showManualValues = change.newValue == .manual || self.useStaticValuesInAdaptiveModes
+                self.hideManualValuesMerged = !self.showManualValues || !CachedDefaults[.mergeBrightnessContrast]
+                self.hideManualValuesNonMerged = !self.showManualValues || CachedDefaults[.mergeBrightnessContrast]
+            }
+        mergeBrightnessContrastObserver = mergeBrightnessContrastPublisher
+            .debounce(for: .milliseconds(10), scheduler: RunLoop.main)
+            .sink { [weak self] change in
+                guard let self else { return }
+                self.hideManualValuesMerged = !self.showManualValues || !change.newValue
+                self.hideManualValuesNonMerged = !self.showManualValues || change.newValue
+            }
     }
 
     required init(from decoder: Decoder) throws {
@@ -31,14 +48,31 @@ let DEFAULT_APP_BRIGHTNESS_CONTRAST = 0.8
         name = try container.decode(String.self, forKey: .name)
         brightness = try container.decodeIfPresent(Int8.self, forKey: .brightness) ?? APP_MAX_BRIGHTNESS_OFFSET
         contrast = try container.decodeIfPresent(Int8.self, forKey: .contrast) ?? APP_MAX_CONTRAST_OFFSET
-        manualBrightnessContrast = try container
-            .decodeIfPresent(Double.self, forKey: .manualBrightnessContrast) ?? DEFAULT_APP_BRIGHTNESS_CONTRAST
-        manualBrightness = try container
-            .decodeIfPresent(Double.self, forKey: .manualBrightness) ?? DEFAULT_APP_BRIGHTNESS_CONTRAST
-        manualContrast = try container
-            .decodeIfPresent(Double.self, forKey: .manualContrast) ?? DEFAULT_APP_BRIGHTNESS_CONTRAST
+
+        manualBrightnessContrast = try container.decodeIfPresent(Double.self, forKey: .manualBrightnessContrast) ?? DEFAULT_APP_BRIGHTNESS_CONTRAST
+        manualBrightness = try container.decodeIfPresent(Double.self, forKey: .manualBrightness) ?? DEFAULT_APP_BRIGHTNESS_CONTRAST
+        manualContrast = try container.decodeIfPresent(Double.self, forKey: .manualContrast) ?? DEFAULT_APP_BRIGHTNESS_CONTRAST
+
         applyBuiltin = try container.decodeIfPresent(Bool.self, forKey: .applyBuiltin) ?? false
+        useStaticValuesInAdaptiveModes = try container.decodeIfPresent(Bool.self, forKey: .useStaticValuesInAdaptiveModes) ?? false
         reapplyPreviousBrightness = try container.decodeIfPresent(Bool.self, forKey: .reapplyPreviousBrightness) ?? true
+
+        super.init()
+        manualObserver = adaptiveBrightnessModePublisher
+            .debounce(for: .milliseconds(10), scheduler: RunLoop.main)
+            .sink { [weak self] change in
+                guard let self else { return }
+                self.showManualValues = change.newValue == .manual || self.useStaticValuesInAdaptiveModes
+                self.hideManualValuesMerged = !self.showManualValues || !CachedDefaults[.mergeBrightnessContrast]
+                self.hideManualValuesNonMerged = !self.showManualValues || CachedDefaults[.mergeBrightnessContrast]
+            }
+        mergeBrightnessContrastObserver = mergeBrightnessContrastPublisher
+            .debounce(for: .milliseconds(10), scheduler: RunLoop.main)
+            .sink { [weak self] change in
+                guard let self else { return }
+                self.hideManualValuesMerged = !self.showManualValues || !change.newValue
+                self.hideManualValuesNonMerged = !self.showManualValues || change.newValue
+            }
     }
 
     enum CodingKeys: String, CodingKey {
@@ -51,8 +85,20 @@ let DEFAULT_APP_BRIGHTNESS_CONTRAST = 0.8
         case manualContrast
         case applyBuiltin
         case reapplyPreviousBrightness
+        case useStaticValuesInAdaptiveModes
     }
 
+    var manualObserver: Cancellable?
+    var mergeBrightnessContrastObserver: Cancellable?
+    @objc dynamic lazy var hideManualValuesMerged = !showManualValues || !CachedDefaults[.mergeBrightnessContrast]
+    @objc dynamic lazy var hideManualValuesNonMerged = !showManualValues || CachedDefaults[.mergeBrightnessContrast]
+
+    @objc dynamic lazy var showManualValues = DC.adaptiveModeKey == .manual || useStaticValuesInAdaptiveModes {
+        didSet {
+            hideManualValuesMerged = !showManualValues || !CachedDefaults[.mergeBrightnessContrast]
+            hideManualValuesNonMerged = !showManualValues || CachedDefaults[.mergeBrightnessContrast]
+        }
+    }
     override var description: String {
         "\(name)[\(identifier)]"
     }
@@ -110,6 +156,13 @@ let DEFAULT_APP_BRIGHTNESS_CONTRAST = 0.8
 
     @objc dynamic var applyBuiltin = false {
         didSet { save() }
+    }
+
+    @objc dynamic var useStaticValuesInAdaptiveModes = false {
+        didSet {
+            save()
+            showManualValues = DC.adaptiveModeKey == .manual || useStaticValuesInAdaptiveModes
+        }
     }
 
     @objc dynamic var reapplyPreviousBrightness = true {

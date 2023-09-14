@@ -4097,7 +4097,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-    var shouldAdapt: Bool { adaptive && !adaptivePaused && !systemAdaptiveBrightness && !noControls }
+    var shouldAdapt: Bool { adaptive && !adaptivePaused && !systemAdaptiveBrightness && !noControls && !DC.screensSleeping }
     @Published @objc dynamic var adaptive: Bool {
         didSet {
             save()

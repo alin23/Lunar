@@ -505,6 +505,7 @@ final class DisplayController: ObservableObject {
         didSet {
             if clamshell, CachedDefaults[.sleepInClamshellMode] {
                 log.info("Triggering Sleep because the lid was closed")
+                DC.screensSleeping = true
                 sleepNow()
             }
         }
@@ -1028,8 +1029,8 @@ final class DisplayController: ObservableObject {
         }
 
         let recomputeAndAssign: (Display, Double) -> Void = { [self] display, brightness in
-            let (brightnessOffset, _) = DC.appBrightnessContrastOffset(for: display) ?? (0, 0)
-            let sourceBrightness = SyncMode.specific.invInterpolate(brightness, display: display, offset: brightnessOffset.d)
+            let (brightnessOffset, _, staticValues) = DC.appBrightnessContrastOffset(for: display) ?? (0, 0, false)
+            let sourceBrightness = staticValues ? brightnessOffset.d : SyncMode.specific.invInterpolate(brightness, display: display, offset: brightnessOffset.d)
 
 //            let sourceBrightness: Double? = (-100 ... 100)
 //                .map { br -> (Double, Int) in
@@ -1830,6 +1831,7 @@ final class DisplayController: ObservableObject {
     }
 
     func autoAdaptMode() {
+        guard !screensSleeping else { return }
         guard !CachedDefaults[.overrideAdaptiveMode] else {
             if adaptiveMode.available {
                 adaptiveMode.watch()
@@ -1863,7 +1865,7 @@ final class DisplayController: ObservableObject {
         return (br, cr)
     }
 
-    func appBrightnessContrastOffset(for display: Display) -> (Int, Int)? {
+    func appBrightnessContrastOffset(for display: Display) -> (br: Int, cr: Int, staticValues: Bool)? {
         guard lunarProActive, !display.enhanced, let exceptions = runningAppExceptions, !exceptions.isEmpty,
               let screen = display.nsScreen
         else {
@@ -1886,25 +1888,25 @@ final class DisplayController: ObservableObject {
             log.debug("App offset (single monitor): \(app.identifier) \(app.name) \(app.brightness) \(app.contrast)")
             mainAsync { display.appPreset = app }
 
-            if adaptiveModeKey == .manual {
+            if adaptiveModeKey == .manual || app.useStaticValuesInAdaptiveModes {
                 guard !display.isBuiltin || app.applyBuiltin else { return nil }
                 let (br, cr) = manualAppBrightnessContrast(for: display, app: app)
 
-                return (br.i, cr.i)
+                return (br.i, cr.i, app.useStaticValuesInAdaptiveModes)
             }
 
-            return (app.brightness.i, app.contrast.i)
+            return (app.brightness.i, app.contrast.i, app.useStaticValuesInAdaptiveModes)
         }
 
         if let app = activeWindow(on: screen)?.appException {
             mainAsync { display.appPreset = app }
-            if adaptiveModeKey == .manual {
+            if adaptiveModeKey == .manual || app.useStaticValuesInAdaptiveModes {
                 guard !display.isBuiltin || app.applyBuiltin else { return nil }
                 let (br, cr) = manualAppBrightnessContrast(for: display, app: app)
 
-                return (br.i, cr.i)
+                return (br.i, cr.i, app.useStaticValuesInAdaptiveModes)
             }
-            return (app.brightness.i, app.contrast.i)
+            return (app.brightness.i, app.contrast.i, app.useStaticValuesInAdaptiveModes)
         }
 
         let windows = exceptions.compactMap { (app: AppException) -> FlattenSequence<[[AXWindow]]>? in
@@ -1927,14 +1929,14 @@ final class DisplayController: ObservableObject {
         log.debug("App offset: \(app.identifier) \(app.name) \(app.brightness) \(app.contrast)")
         mainAsync { display.appPreset = app }
 
-        if adaptiveModeKey == .manual {
+        if adaptiveModeKey == .manual || app.useStaticValuesInAdaptiveModes {
             guard !display.isBuiltin || app.applyBuiltin else { return nil }
             let (br, cr) = manualAppBrightnessContrast(for: display, app: app)
 
-            return (br.i, cr.i)
+            return (br.i, cr.i, app.useStaticValuesInAdaptiveModes)
         }
 
-        return (app.brightness.i, app.contrast.i)
+        return (app.brightness.i, app.contrast.i, app.useStaticValuesInAdaptiveModes)
     }
 
     func removeDisplay(serial: String) {
@@ -2418,7 +2420,20 @@ final class DisplayController: ObservableObject {
                 runningAppExceptions = datastore.appExceptions(identifiers: Array(identifiers.uniqued())) ?? []
                 log.info("Running app presets: \(runningAppExceptions.map(\.name))")
                 displayLinkRunning = isDisplayLinkRunning()
-                adaptBrightness()
+
+                guard adaptiveModeKey != .manual else {
+                    adaptBrightness()
+                    return
+                }
+                let adaptiveDisplays = activeDisplayList.filter(\.adaptive)
+                let nonAdaptiveDisplays = activeDisplayList.filter { !$0.adaptive && !$0.blackOutEnabled && !$0.enhanced }
+                adaptBrightness(for: adaptiveDisplays)
+
+                for display in nonAdaptiveDisplays {
+                    ManualMode.specific.withForce {
+                        ManualMode.specific.adapt(display)
+                    }
+                }
             }
             .store(in: &observers)
 
@@ -2452,14 +2467,14 @@ final class DisplayController: ObservableObject {
     }
 
     func adaptBrightness(for display: Display, force: Bool = false) {
-        guard adaptiveMode.available else { return }
+        guard adaptiveMode.available, !screensSleeping else { return }
         adaptiveMode.withForce(force || display.force) {
             self.adaptiveMode.adapt(display)
         }
     }
 
     func adaptBrightness(for displays: [Display]? = nil, force: Bool = false) {
-        guard adaptiveMode.available else { return }
+        guard adaptiveMode.available, !screensSleeping else { return }
         for display in (displays ?? activeDisplayList).filter({ !$0.blackOutEnabled }) {
             adaptiveMode.withForce(force || display.force) {
                 guard !display.enhanced else {

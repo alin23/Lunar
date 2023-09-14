@@ -1767,14 +1767,14 @@ the ⌘ Command key more than 8 times in a row</string>
                         <rect key="frame" x="0.0" y="0.0" width="475" height="700"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <scrollView fixedFrame="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="120" horizontalPageScroll="10" verticalLineScroll="120" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="uGn-PW-Pif">
+                            <scrollView fixedFrame="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="144" horizontalPageScroll="10" verticalLineScroll="144" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="uGn-PW-Pif">
                                 <rect key="frame" x="0.0" y="111" width="475" height="423"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="QLY-hc-WFL">
                                     <rect key="frame" x="0.0" y="0.0" width="475" height="423"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" enabled="NO" rowHeight="100" viewBased="YES" id="fw1-Tz-zwm" customClass="ExceptionsView" customModule="Lunar" customModuleProvider="target">
+                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" enabled="NO" rowHeight="124" viewBased="YES" id="fw1-Tz-zwm" customClass="ExceptionsView" customModule="Lunar" customModuleProvider="target">
                                             <rect key="frame" x="0.0" y="0.0" width="475" height="423"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="0.0" height="20"/>
@@ -1794,11 +1794,11 @@ the ⌘ Command key more than 8 times in a row</string>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="RB2-V9-vwF">
-                                                            <rect key="frame" x="10" y="10" width="452" height="100"/>
+                                                            <rect key="frame" x="10" y="10" width="452" height="124"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bPk-JH-iHh">
-                                                                    <rect key="frame" x="23" y="64" width="184" height="25"/>
+                                                                    <rect key="frame" x="23" y="88" width="184" height="25"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="height" constant="25" id="CA7-K0-c3W"/>
                                                                     </constraints>
@@ -1816,7 +1816,7 @@ the ⌘ Command key more than 8 times in a row</string>
                                                                     </connections>
                                                                 </textField>
                                                                 <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="WQ3-j3-c4C" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="187" y="-6" width="198" height="38"/>
+                                                                    <rect key="frame" x="187" y="18" width="198" height="38"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="height" constant="30" id="9PQ-4X-LF8"/>
                                                                     </constraints>
@@ -1847,15 +1847,11 @@ the ⌘ Command key more than 8 times in a row</string>
                                                                     </userDefinedRuntimeAttributes>
                                                                     <connections>
                                                                         <binding destination="RB2-V9-vwF" name="value" keyPath="objectValue.contrast" id="3h3-b3-FOm"/>
-                                                                        <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="IJ8-Yx-ogU">
-                                                                            <dictionary key="options">
-                                                                                <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                                            </dictionary>
-                                                                        </binding>
+                                                                        <binding destination="RB2-V9-vwF" name="hidden" keyPath="objectValue.showManualValues" id="qZR-Aq-HcC"/>
                                                                     </connections>
                                                                 </slider>
                                                                 <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="9eQ-mp-6BP" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="187" y="24" width="198" height="38"/>
+                                                                    <rect key="frame" x="187" y="48" width="198" height="38"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="194" id="trB-Z0-ydo"/>
                                                                         <constraint firstAttribute="height" constant="30" id="zz4-Pc-YDf"/>
@@ -1887,15 +1883,11 @@ the ⌘ Command key more than 8 times in a row</string>
                                                                     </userDefinedRuntimeAttributes>
                                                                     <connections>
                                                                         <binding destination="RB2-V9-vwF" name="value" keyPath="objectValue.brightness" id="Ojw-0i-o03"/>
-                                                                        <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="HhM-2T-ZWU">
-                                                                            <dictionary key="options">
-                                                                                <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                                            </dictionary>
-                                                                        </binding>
+                                                                        <binding destination="RB2-V9-vwF" name="hidden" keyPath="objectValue.showManualValues" id="P4K-nI-3Ec"/>
                                                                     </connections>
                                                                 </slider>
                                                                 <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="b30-Pt-whw" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="256" y="56" width="198" height="38"/>
+                                                                    <rect key="frame" x="256" y="80" width="198" height="38"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="height" constant="30" id="gJv-Db-Eud"/>
                                                                         <constraint firstAttribute="width" constant="194" id="jSh-j7-GnU"/>
@@ -1922,21 +1914,12 @@ the ⌘ Command key more than 8 times in a row</string>
                                                                         </userDefinedRuntimeAttribute>
                                                                     </userDefinedRuntimeAttributes>
                                                                     <connections>
+                                                                        <binding destination="RB2-V9-vwF" name="hidden" keyPath="objectValue.hideManualValuesMerged" id="c2p-A8-VH2"/>
                                                                         <binding destination="RB2-V9-vwF" name="value" keyPath="objectValue.manualBrightnessContrast" id="GVQ-GO-nKq"/>
-                                                                        <binding destination="BWa-81-Fof" name="hidden2" keyPath="values.mergeBrightnessContrast" previousBinding="7Ya-X7-OiB" id="gcm-Z4-KaY">
-                                                                            <dictionary key="options">
-                                                                                <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                                                <integer key="NSNullPlaceholder" value="-1"/>
-                                                                                <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                                            </dictionary>
-                                                                        </binding>
-                                                                        <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="7Ya-X7-OiB"/>
                                                                     </connections>
                                                                 </slider>
                                                                 <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="SFe-z3-ghT" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="256" y="56" width="198" height="38"/>
+                                                                    <rect key="frame" x="256" y="80" width="198" height="38"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="194" id="Qfp-He-aC4"/>
                                                                         <constraint firstAttribute="height" constant="30" id="kha-g0-Xdw"/>
@@ -1964,19 +1947,11 @@ the ⌘ Command key more than 8 times in a row</string>
                                                                     </userDefinedRuntimeAttributes>
                                                                     <connections>
                                                                         <binding destination="RB2-V9-vwF" name="value" keyPath="objectValue.manualBrightness" id="3GP-cS-1aT"/>
-                                                                        <binding destination="BWa-81-Fof" name="hidden2" keyPath="values.mergeBrightnessContrast" previousBinding="kdh-wY-CyT" id="czd-0X-A53">
-                                                                            <dictionary key="options">
-                                                                                <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                                                <integer key="NSNullPlaceholder" value="-1"/>
-                                                                            </dictionary>
-                                                                        </binding>
-                                                                        <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="kdh-wY-CyT"/>
+                                                                        <binding destination="RB2-V9-vwF" name="hidden" keyPath="objectValue.hideManualValuesNonMerged" id="yIa-aD-bBJ"/>
                                                                     </connections>
                                                                 </slider>
                                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="kiv-mk-M5q" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="193" y="39" width="12" height="12"/>
+                                                                    <rect key="frame" x="193" y="63" width="12" height="12"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="height" constant="12" id="jo2-iD-Or3"/>
                                                                         <constraint firstAttribute="width" constant="12" id="wRa-ry-f9u"/>
@@ -1993,15 +1968,11 @@ the ⌘ Command key more than 8 times in a row</string>
                                                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="brightness" id="14v-SP-MNG"/>
                                                                     <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                                                     <connections>
-                                                                        <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="eN2-iK-m2Q">
-                                                                            <dictionary key="options">
-                                                                                <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                                            </dictionary>
-                                                                        </binding>
+                                                                        <binding destination="RB2-V9-vwF" name="hidden" keyPath="objectValue.showManualValues" id="l1T-aj-I1Q"/>
                                                                     </connections>
                                                                 </imageView>
                                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="b0y-87-zYg" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="262" y="71" width="12" height="12"/>
+                                                                    <rect key="frame" x="262" y="95" width="12" height="12"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="12" id="7g1-yG-I5X"/>
                                                                         <constraint firstAttribute="height" constant="12" id="RjX-vg-mLR"/>
@@ -2018,11 +1989,15 @@ the ⌘ Command key more than 8 times in a row</string>
                                                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="brightness" id="HUd-eT-e0M"/>
                                                                     <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                                                     <connections>
-                                                                        <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="vbP-I3-NQu"/>
+                                                                        <binding destination="RB2-V9-vwF" name="hidden" keyPath="objectValue.showManualValues" id="FTe-Tt-pYN">
+                                                                            <dictionary key="options">
+                                                                                <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                                            </dictionary>
+                                                                        </binding>
                                                                     </connections>
                                                                 </imageView>
                                                                 <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="pMQ-7f-6rg" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="256" y="31" width="198" height="38"/>
+                                                                    <rect key="frame" x="256" y="55" width="198" height="38"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="194" id="Gyj-k2-niJ"/>
                                                                         <constraint firstAttribute="height" constant="30" id="ghd-6n-SWM"/>
@@ -2049,20 +2024,12 @@ the ⌘ Command key more than 8 times in a row</string>
                                                                         </userDefinedRuntimeAttribute>
                                                                     </userDefinedRuntimeAttributes>
                                                                     <connections>
+                                                                        <binding destination="RB2-V9-vwF" name="hidden" keyPath="objectValue.hideManualValuesNonMerged" id="t2d-a9-Qf3"/>
                                                                         <binding destination="RB2-V9-vwF" name="value" keyPath="objectValue.manualContrast" id="T4t-Bg-wKx"/>
-                                                                        <binding destination="BWa-81-Fof" name="hidden2" keyPath="values.mergeBrightnessContrast" previousBinding="p6B-95-Xhy" id="G3R-2S-XPC">
-                                                                            <dictionary key="options">
-                                                                                <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                                                <integer key="NSNullPlaceholder" value="-1"/>
-                                                                            </dictionary>
-                                                                        </binding>
-                                                                        <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="p6B-95-Xhy"/>
                                                                     </connections>
                                                                 </slider>
                                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="wPr-Vf-LWH" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="260" y="45" width="14" height="14"/>
+                                                                    <rect key="frame" x="260" y="69" width="14" height="14"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="14" id="HVp-9J-wBt"/>
                                                                         <constraint firstAttribute="height" constant="14" id="kNt-o3-NxI"/>
@@ -2079,19 +2046,11 @@ the ⌘ Command key more than 8 times in a row</string>
                                                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="contrast" id="950-Bi-UvY"/>
                                                                     <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                                                     <connections>
-                                                                        <binding destination="BWa-81-Fof" name="hidden2" keyPath="values.mergeBrightnessContrast" previousBinding="36Z-4c-mbo" id="zE7-ZC-YuB">
-                                                                            <dictionary key="options">
-                                                                                <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                                                <integer key="NSNullPlaceholder" value="-1"/>
-                                                                            </dictionary>
-                                                                        </binding>
-                                                                        <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="36Z-4c-mbo"/>
+                                                                        <binding destination="RB2-V9-vwF" name="hidden" keyPath="objectValue.hideManualValuesNonMerged" id="Yg9-r9-QhD"/>
                                                                     </connections>
                                                                 </imageView>
                                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" alphaValue="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="RSR-3x-myv" customClass="ClickThroughImageView" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="191" y="8" width="14" height="14"/>
+                                                                    <rect key="frame" x="191" y="32" width="14" height="14"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="14" id="IZH-cu-etH"/>
                                                                         <constraint firstAttribute="height" constant="14" id="lZE-LE-oXF"/>
@@ -2108,15 +2067,11 @@ the ⌘ Command key more than 8 times in a row</string>
                                                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="contrast" id="fJS-dl-dhb"/>
                                                                     <color key="contentTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                                                     <connections>
-                                                                        <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="33P-vk-g6K">
-                                                                            <dictionary key="options">
-                                                                                <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                                            </dictionary>
-                                                                        </binding>
+                                                                        <binding destination="RB2-V9-vwF" name="hidden" keyPath="objectValue.showManualValues" id="ylH-hs-JCR"/>
                                                                     </connections>
                                                                 </imageView>
                                                                 <button focusRingType="none" alphaValue="0.80000000000000004" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jZV-WT-Ktg" customClass="Button" customModule="Lunar" customModuleProvider="target">
-                                                                    <rect key="frame" x="2" y="69" width="16" height="16"/>
+                                                                    <rect key="frame" x="2" y="93" width="16" height="16"/>
                                                                     <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="Trash" imagePosition="only" alignment="center" lineBreakMode="truncatingTail" state="on" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="hx2-dn-Fp9">
                                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                         <font key="font" metaFont="system"/>
@@ -2143,7 +2098,7 @@ the ⌘ Command key more than 8 times in a row</string>
                                                                     </connections>
                                                                 </button>
                                                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dCR-ep-nRF">
-                                                                    <rect key="frame" x="397" y="38" width="28" height="15"/>
+                                                                    <rect key="frame" x="397" y="62" width="28" height="15"/>
                                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="+20" id="4Ix-O1-34z">
                                                                         <font key="font" size="13" name="Menlo-Regular"/>
                                                                         <color key="textColor" red="0.49875312319999998" green="0.45549487399999999" blue="0.50531462589999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -2155,15 +2110,11 @@ the ⌘ Command key more than 8 times in a row</string>
                                                                                 <string key="NSValueTransformerName">SignedIntTransformer</string>
                                                                             </dictionary>
                                                                         </binding>
-                                                                        <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="1X8-Zl-hv4">
-                                                                            <dictionary key="options">
-                                                                                <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                                            </dictionary>
-                                                                        </binding>
+                                                                        <binding destination="RB2-V9-vwF" name="hidden" keyPath="objectValue.showManualValues" id="h16-m9-OjJ"/>
                                                                     </connections>
                                                                 </textField>
                                                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5cd-8Z-v4l">
-                                                                    <rect key="frame" x="397" y="8" width="28" height="15"/>
+                                                                    <rect key="frame" x="397" y="32" width="28" height="15"/>
                                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="+20" id="gN5-cl-Edw">
                                                                         <font key="font" size="13" name="Menlo-Regular"/>
                                                                         <color key="textColor" red="0.49875312319999998" green="0.45549487399999999" blue="0.50531462589999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -2175,63 +2126,74 @@ the ⌘ Command key more than 8 times in a row</string>
                                                                                 <string key="NSValueTransformerName">SignedIntTransformer</string>
                                                                             </dictionary>
                                                                         </binding>
-                                                                        <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="Xo0-55-KcQ">
-                                                                            <dictionary key="options">
-                                                                                <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                                            </dictionary>
-                                                                        </binding>
+                                                                        <binding destination="RB2-V9-vwF" name="hidden" keyPath="objectValue.showManualValues" id="hEX-nO-aZC"/>
                                                                     </connections>
                                                                 </textField>
                                                                 <button alphaValue="0.59999999999999998" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yNh-or-HM8">
-                                                                    <rect key="frame" x="4" y="37" width="234" height="18"/>
+                                                                    <rect key="frame" x="4" y="61" width="234" height="18"/>
                                                                     <buttonCell key="cell" type="check" title="Also apply when on built-in display" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="iD6-ds-hSV">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                         <font key="font" metaFont="systemLight" size="13"/>
                                                                     </buttonCell>
                                                                     <connections>
                                                                         <binding destination="RB2-V9-vwF" name="value" keyPath="objectValue.applyBuiltin" id="j5B-es-p9s"/>
-                                                                        <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="j2B-Bg-0KW"/>
+                                                                        <binding destination="RB2-V9-vwF" name="hidden" keyPath="objectValue.showManualValues" id="80g-kd-uUS">
+                                                                            <dictionary key="options">
+                                                                                <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                                            </dictionary>
+                                                                        </binding>
                                                                     </connections>
                                                                 </button>
                                                                 <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="38T-rK-uwv">
-                                                                    <rect key="frame" x="23" y="37" width="68" height="16"/>
+                                                                    <rect key="frame" x="23" y="61" width="68" height="16"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Brightness" id="0QU-Qf-yvK">
                                                                         <font key="font" metaFont="systemLight" size="13"/>
                                                                         <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                     <connections>
-                                                                        <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="Fb1-qh-RBl">
-                                                                            <dictionary key="options">
-                                                                                <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                                            </dictionary>
-                                                                        </binding>
+                                                                        <binding destination="RB2-V9-vwF" name="hidden" keyPath="objectValue.showManualValues" id="O7w-JF-t2U"/>
                                                                     </connections>
                                                                 </textField>
                                                                 <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yfs-eH-oiE">
-                                                                    <rect key="frame" x="23" y="7" width="56" height="16"/>
+                                                                    <rect key="frame" x="23" y="31" width="56" height="16"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Contrast" id="bMJ-CA-NhC">
                                                                         <font key="font" metaFont="systemLight" size="13"/>
                                                                         <color key="textColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.5" colorSpace="calibratedRGB"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                     <connections>
-                                                                        <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="Q87-QX-Vwm">
-                                                                            <dictionary key="options">
-                                                                                <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                                            </dictionary>
-                                                                        </binding>
+                                                                        <binding destination="RB2-V9-vwF" name="hidden" keyPath="objectValue.showManualValues" id="kuE-l0-Lsw"/>
                                                                     </connections>
                                                                 </textField>
                                                                 <button alphaValue="0.59999999999999998" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4EQ-S2-v6N">
-                                                                    <rect key="frame" x="4" y="6" width="295" height="18"/>
+                                                                    <rect key="frame" x="4" y="30" width="295" height="18"/>
                                                                     <buttonCell key="cell" type="check" title="Re-apply previous brightness when app exits" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="oex-yg-EGS">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                         <font key="font" metaFont="systemLight" size="13"/>
                                                                     </buttonCell>
                                                                     <connections>
                                                                         <binding destination="RB2-V9-vwF" name="value" keyPath="objectValue.reapplyPreviousBrightness" id="WHK-Jg-Xjj"/>
-                                                                        <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="5IS-b8-z4d"/>
+                                                                        <binding destination="RB2-V9-vwF" name="hidden" keyPath="objectValue.showManualValues" id="FJ6-SS-gKh">
+                                                                            <dictionary key="options">
+                                                                                <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                                            </dictionary>
+                                                                        </binding>
+                                                                    </connections>
+                                                                </button>
+                                                                <button alphaValue="0.59999999999999998" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LV4-dw-v7P">
+                                                                    <rect key="frame" x="4" y="-1" width="246" height="18"/>
+                                                                    <buttonCell key="cell" type="check" title="Use static values instead of offsets" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="7eb-ju-b3q">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="systemLight" size="13"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <binding destination="RB2-V9-vwF" name="value" keyPath="objectValue.useStaticValuesInAdaptiveModes" id="YrX-tB-MP3"/>
+                                                                        <binding destination="WQv-ud-wrT" name="hidden" keyPath="values.nonManualMode" id="3TX-yu-sxW">
+                                                                            <dictionary key="options">
+                                                                                <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                                            </dictionary>
+                                                                        </binding>
                                                                     </connections>
                                                                 </button>
                                                             </subviews>
@@ -2248,7 +2210,6 @@ the ⌘ Command key more than 8 times in a row</string>
                                                                 <constraint firstItem="9eQ-mp-6BP" firstAttribute="centerY" secondItem="kiv-mk-M5q" secondAttribute="centerY" id="HFb-sY-0cV"/>
                                                                 <constraint firstItem="jZV-WT-Ktg" firstAttribute="leading" secondItem="RB2-V9-vwF" secondAttribute="leading" constant="2" id="HQt-kh-FN5"/>
                                                                 <constraint firstItem="WQ3-j3-c4C" firstAttribute="centerY" secondItem="RSR-3x-myv" secondAttribute="centerY" id="JpZ-hr-O9S"/>
-                                                                <constraint firstAttribute="bottom" secondItem="WQ3-j3-c4C" secondAttribute="bottom" id="Kn8-ai-7cP"/>
                                                                 <constraint firstItem="Yfs-eH-oiE" firstAttribute="centerY" secondItem="WQ3-j3-c4C" secondAttribute="centerY" id="MCx-RS-Kw3"/>
                                                                 <constraint firstItem="b30-Pt-whw" firstAttribute="leading" secondItem="b0y-87-zYg" secondAttribute="trailing" constant="-16" id="Mff-IU-PL4"/>
                                                                 <constraint firstItem="SFe-z3-ghT" firstAttribute="top" secondItem="b30-Pt-whw" secondAttribute="top" id="Pmo-aN-yeQ"/>
@@ -2267,7 +2228,9 @@ the ⌘ Command key more than 8 times in a row</string>
                                                                 <constraint firstItem="pMQ-7f-6rg" firstAttribute="leading" secondItem="wPr-Vf-LWH" secondAttribute="trailing" constant="-16" id="nY2-07-120"/>
                                                                 <constraint firstItem="5cd-8Z-v4l" firstAttribute="leading" secondItem="dCR-ep-nRF" secondAttribute="leading" id="odP-rR-uZt"/>
                                                                 <constraint firstItem="9eQ-mp-6BP" firstAttribute="leading" secondItem="38T-rK-uwv" secondAttribute="trailing" constant="100" id="p75-Z8-o2U"/>
+                                                                <constraint firstAttribute="bottom" secondItem="LV4-dw-v7P" secondAttribute="bottom" id="piZ-95-BhU"/>
                                                                 <constraint firstItem="yNh-or-HM8" firstAttribute="leading" secondItem="bPk-JH-iHh" secondAttribute="leading" constant="-19" id="scM-th-Xop"/>
+                                                                <constraint firstItem="LV4-dw-v7P" firstAttribute="top" secondItem="4EQ-S2-v6N" secondAttribute="bottom" constant="15" id="t2F-Q4-EO8"/>
                                                                 <constraint firstItem="b30-Pt-whw" firstAttribute="leading" secondItem="SFe-z3-ghT" secondAttribute="leading" id="ufz-xY-lYw"/>
                                                                 <constraint firstItem="b30-Pt-whw" firstAttribute="centerY" secondItem="bPk-JH-iHh" secondAttribute="centerY" id="uqM-OX-MeQ"/>
                                                                 <constraint firstItem="9eQ-mp-6BP" firstAttribute="top" secondItem="bPk-JH-iHh" secondAttribute="bottom" constant="4" id="uro-0R-Vlp"/>
@@ -4699,8 +4662,8 @@ be matched to the correct monitor</string>
                                 <textFieldCell key="cell" selectable="YES" id="aWn-9O-e5g">
                                     <font key="font" size="11" name="Menlo-Regular"/>
                                     <string key="title">Adjusting contrast:
- • Large Step: Control Shift 􀆫/􀆭
- • Small Step: Control Shift Option 􀆫/􀆭</string>
+ • Large Step: Control Shift 🔅/🔆
+ • Small Step: Control Shift Option 🔅/🔆</string>
                                     <color key="textColor" red="1" green="0.96670034069999999" blue="0.90229060370000003" alpha="0.69823572020000002" colorSpace="custom" customColorSpace="sRGB"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
@@ -6909,9 +6872,9 @@ Keep this disabled when using f.lux</string>
                                 </textFieldCell>
                             </textField>
                             <box boxType="custom" cornerRadius="4" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3WS-M3-Uq4" customClass="Box" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="38" width="321" height="132"/>
+                                <rect key="frame" x="0.0" y="39" width="321" height="131"/>
                                 <view key="contentView" id="lze-8q-n95">
-                                    <rect key="frame" x="1" y="1" width="319" height="130"/>
+                                    <rect key="frame" x="1" y="1" width="319" height="129"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NNs-XH-c30">
@@ -7119,12 +7082,12 @@ when FaceLight is activated</string>
                                     <font key="font" metaFont="systemMedium" size="11"/>
                                 </buttonCell>
                                 <connections>
+                                    <binding destination="nX7-a1-Ggz" name="value" keyPath="self.display.keepHDREnabled" id="UiF-i6-WVV"/>
                                     <binding destination="nX7-a1-Ggz" name="hidden" keyPath="self.display.supportsHDR" id="JoN-Ok-wCz">
                                         <dictionary key="options">
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
                                         </dictionary>
                                     </binding>
-                                    <binding destination="nX7-a1-Ggz" name="value" keyPath="self.display.keepHDREnabled" id="UiF-i6-WVV"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -7162,7 +7125,7 @@ when FaceLight is activated</string>
                             <constraint firstItem="GhA-MN-iPc" firstAttribute="centerX" secondItem="eOP-NJ-wxV" secondAttribute="centerX" id="qIH-mo-z5p"/>
                             <constraint firstItem="qWx-Pr-1FV" firstAttribute="leading" secondItem="OwA-0Z-pPX" secondAttribute="trailing" constant="5" id="qXh-pd-1f9"/>
                             <constraint firstAttribute="bottom" secondItem="wIA-fS-IuI" secondAttribute="bottom" constant="15" id="umY-HI-Z4y"/>
-                            <constraint firstItem="wIA-fS-IuI" firstAttribute="top" secondItem="3WS-M3-Uq4" secondAttribute="bottom" priority="250" constant="10" id="unT-iT-loc"/>
+                            <constraint firstItem="wIA-fS-IuI" firstAttribute="top" secondItem="3WS-M3-Uq4" secondAttribute="bottom" constant="10" id="unT-iT-loc"/>
                             <constraint firstItem="hlP-z7-qa1" firstAttribute="centerY" secondItem="dqJ-Ws-iFA" secondAttribute="centerY" id="xTH-9V-peQ"/>
                             <constraint firstItem="zsO-49-UWV" firstAttribute="top" secondItem="Ium-k3-3BT" secondAttribute="bottom" constant="-1" id="xyP-zC-RTd"/>
                             <constraint firstItem="3WS-M3-Uq4" firstAttribute="top" secondItem="dqJ-Ws-iFA" secondAttribute="bottom" constant="15" id="ymF-gu-pcj"/>
@@ -7466,7 +7429,7 @@ when FaceLight is activated</string>
                                             <menuItem title="NodeMCU v2 (ESP8266)" tag="41" identifier="nodemcuv2" id="hZE-8f-Kh1">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
-                                            <menuItem title="NodeMCU v3 (ESP8266)" tag="48" identifier="nodemcuv2" id="hZE-8f-Kj1">
+                                            <menuItem title="NodeMCU v3 (ESP8266)" tag="48" identifier="nodemcuv3" id="hZE-8f-Kj1">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                             <menuItem title="WEMOS D1 Mini (ESP8266)" tag="42" identifier="d1_mini" id="hZE-8f-Kh2">
