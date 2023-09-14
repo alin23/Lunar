@@ -3,6 +3,19 @@
     <channel>
         <title>Lunar</title>
         <item>
+            <title>6.2.5</title>
+            <pubDate>Sun, 03 Sep 2023 13:05:49 +0300</pubDate>
+            <link>https://lunar.fyi/</link>
+            <sparkle:fullReleaseNotesLink>https://lunar.fyi/changelog</sparkle:fullReleaseNotesLink>
+            <sparkle:minimumAutoupdateVersion>5.0.0</sparkle:minimumAutoupdateVersion>
+            <sparkle:version>6.2.5</sparkle:version>
+            <sparkle:shortVersionString>6.2.5</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-6.2.5.html</sparkle:releaseNotesLink>
+            <enclosure url="https://files.lunar.fyi/releases/Lunar-6.2.5.dmg" length="21411414" type="application/octet-stream" sparkle:edSignature="MWAuG3mZlQAgnH2AixVKrr9+jRPrCPQUfST39mmOQspz2iHQFfTZo7pKE+MAUD2bXTr95+ghCVe4oOP+1Nn1Dw=="/>
+        </item>
+
+        <item>
             <title>6.2.4</title>
             <pubDate>Sat, 26 Aug 2023 14:52:48 +0300</pubDate>
             <link>https://lunar.fyi/</link>

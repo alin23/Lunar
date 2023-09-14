@@ -1384,7 +1384,7 @@ extension NSView {
     }
 
     func center(within view: NSView, horizontally: Bool = true, vertically: Bool = true) {
-        center(within: view.visibleRect, horizontally: horizontally, vertically: vertically)
+        center(within: view.frame, horizontally: horizontally, vertically: vertically)
     }
 
     @objc dynamic var bg: NSColor? {

@@ -1246,6 +1246,8 @@ final class DisplayController: ObservableObject {
 
     let kbc = KeyboardBrightnessClient()
 
+    lazy var keyboardAutoBrightnessEnabledByUser = kbc.isAutoBrightnessEnabled(forKeyboard: 1)
+
     var targetDisplays: [Display] {
         activeDisplayList.filter { !$0.isSource }
     }
