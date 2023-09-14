@@ -886,7 +886,7 @@ struct RawValuesView: View {
                     RawValueView(
                         value: $display.lastRawBrightness,
                         icon: "sun.max.fill",
-                        decimals: display.control is AppleNativeControl ? 2 : 0
+                        decimals: display.control is AppleNativeControl && (display.lastRawBrightness ?? 0 <= 1) ? 2 : 0
                     )
                     RawValueView(value: $display.lastRawContrast, icon: "circle.righthalf.fill")
                     RawValueView(value: $display.lastRawVolume, icon: "speaker.2.fill")
