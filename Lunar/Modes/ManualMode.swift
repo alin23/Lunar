@@ -48,12 +48,12 @@ final class ManualMode: AdaptiveMode {
     }
 
     func adapt(_ display: Display) {
-        guard DC.adaptiveModeKey == .manual else { return }
+        guard DC.adaptiveModeKey == .manual || force else { return }
 
         let lastAppPreset = display.appPreset
         var (brightness, contrast) = (display.brightness.intValue, display.contrast.intValue)
 
-        if let (br, cr) = DC.appBrightnessContrastOffset(for: display) {
+        if let (br, cr, _) = DC.appBrightnessContrastOffset(for: display) {
             (brightness, contrast) = (br, cr)
 
             if lastAppPreset == nil {
