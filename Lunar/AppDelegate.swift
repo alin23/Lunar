@@ -1534,6 +1534,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                             for (serial, hdrShouldBeOn) in DC.enabledHDRBeforeXDR where hdrShouldBeOn {
                                 DC.activeDisplaysBySerial[serial]?.panel?.setPreferHDRModes(true)
                             }
+
+                            for display in DC.activeDisplayList.filter({ $0.keepHDREnabled && !$0.hdr }) {
+                                display.hdr = true
+                            }
                         }
                     }
                     serve(host: CachedDefaults[.listenForRemoteCommands] ? "0.0.0.0" : "127.0.0.1")

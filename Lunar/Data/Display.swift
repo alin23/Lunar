@@ -498,6 +498,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         adaptiveSubzero = try container.decodeIfPresent(Bool.self, forKey: .adaptiveSubzero) ?? true
         unmanaged = try container.decodeIfPresent(Bool.self, forKey: .unmanaged) ?? false
         keepDisconnected = try container.decodeIfPresent(Bool.self, forKey: .keepDisconnected) ?? false
+        keepHDREnabled = try container.decodeIfPresent(Bool.self, forKey: .keepHDREnabled) ?? false
 
         hotkeyInput1 = try (
             (container.decodeIfPresent(UInt16.self, forKey: .hotkeyInput1))?
@@ -797,6 +798,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case adaptiveSubzero
         case unmanaged
         case keepDisconnected
+        case keepHDREnabled
         case maxNits
         case minNits
         case nits
@@ -968,6 +970,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .systemAdaptiveBrightness,
             .adaptiveSubzero,
             .unmanaged,
+            .keepHDREnabled,
             // .keepDisconnected,
         ]
 
@@ -1535,6 +1538,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var locationContrastMapping: [AutoLearnMapping] = LocationMode.DEFAULT_CONTRAST_MAPPING
     var scheduledBrightnessTask: Repeater? = nil
     @Published var userMute: Double = 0
+
+    @Published @objc dynamic var keepHDREnabled = false
+    @objc dynamic lazy var supportsHDR: Bool = panel?.hasHDRModes ?? false
     @Published @objc dynamic var blackOutEnabled = false {
         didSet {
             guard blackOutEnabled != oldValue, isMacBook, CachedDefaults[.keyboardBacklightOffBlackout] else {
@@ -2238,6 +2244,290 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var potentialEDR: CGFloat { nsScreen?.maximumPotentialExtendedDynamicRangeColorComponentValue ?? 1.0 }
     var edr: CGFloat { NSScreen.forDisplayID(id)?.maximumExtendedDynamicRangeColorComponentValue ?? 1.0 }
 
+    lazy var hdrOn: Bool = potentialEDR > 2 && edr > 1 {
+        didSet {
+            log.debug("\(name) HDR: \(hdrOn)")
+        }
+    }
+
+    var brightnessRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+    var contrastRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+    var volumeRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+    var inputRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+    var colorRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
+
+    var gammaSetterTask: DispatchWorkItem? {
+        didSet { oldValue?.cancel() }
+    }
+
+    @Published @objc dynamic var sendingBrightness = false {
+        didSet {
+            manageSendingValue(.sendingBrightness, oldValue: oldValue)
+            guard sendingBrightness else {
+                sendingBrightnessResetter = nil
+                return
+            }
+            sendingBrightnessResetter = mainAsyncAfter(ms: 3000) { [weak self] in
+                self?.sendingBrightness = false
+            }
+        }
+    }
+
+    var sendingBrightnessResetter: DispatchWorkItem? = nil {
+        didSet { oldValue?.cancel() }
+    }
+
+    @Published @objc dynamic var sendingContrast = false {
+        didSet {
+            manageSendingValue(.sendingContrast, oldValue: oldValue)
+            guard sendingContrast else {
+                sendingContrastResetter = nil
+                return
+            }
+            sendingContrastResetter = mainAsyncAfter(ms: 3000) { [weak self] in
+                self?.sendingContrast = false
+            }
+        }
+    }
+
+    var sendingContrastResetter: DispatchWorkItem? = nil {
+        didSet { oldValue?.cancel() }
+    }
+
+    @Published @objc dynamic var sendingInput = false {
+        didSet {
+            manageSendingValue(.sendingInput, oldValue: oldValue)
+            guard sendingInput else {
+                sendingInputResetter = nil
+                return
+            }
+            sendingInputResetter = mainAsyncAfter(ms: 3000) { [weak self] in
+                self?.sendingInput = false
+            }
+        }
+    }
+
+    var sendingInputResetter: DispatchWorkItem? = nil {
+        didSet { oldValue?.cancel() }
+    }
+
+    @Published @objc dynamic var sendingVolume = false {
+        didSet {
+            manageSendingValue(.sendingVolume, oldValue: oldValue)
+            guard sendingVolume else {
+                sendingVolumeResetter = nil
+                return
+            }
+            sendingVolumeResetter = mainAsyncAfter(ms: 3000) { [weak self] in
+                self?.sendingVolume = false
+            }
+        }
+    }
+
+    var sendingVolumeResetter: DispatchWorkItem? = nil {
+        didSet { oldValue?.cancel() }
+    }
+
+    var readableID: String {
+        if name.isEmpty || name == "Unknown" {
+            return shortHash(string: serial)
+        }
+        let safeName = "[^\\w\\d]+".r!.replaceAll(in: name.lowercased(), with: "")
+        return "\(safeName)-\(shortHash(string: serial))"
+    }
+
+    @Published @objc dynamic var xdrBrightness: Float = 0.0 {
+        didSet {
+            guard apply else { return }
+            defer {
+                fullRangeBrightness = computeFullRangeBrightness()
+            }
+
+            if xdrBrightness > 0, !enhanced {
+                handleEnhance(true, withoutSettingBrightness: true)
+            }
+            if xdrBrightness == 0, enhanced, !sliderTracking {
+                handleEnhance(false)
+            }
+
+            maxEDR = computeMaxEDR()
+
+            softwareBrightness = xdrBrightness.map(from: (0.0, 1.0), to: (Self.MIN_SOFTWARE_BRIGHTNESS, maxSoftwareBrightness))
+        }
+    }
+
+    @objc dynamic var subzeroDimming: Float {
+        get { min(softwareBrightness, 1.0) }
+        set { softwareBrightness = cap(newValue, minVal: 0.0, maxVal: 1.0) }
+    }
+
+    @objc dynamic lazy var softwareBrightnessSlider: Float = softwareBrightness {
+        didSet {
+            guard apply else { return }
+            forceHideSoftwareOSD = true
+            softwareBrightness = softwareBrightnessSlider
+
+            guard adaptiveSubzero else { return }
+
+            let lastDataPoint = datapointLock.around { DC.adaptiveMode.brightnessDataPoint.last }
+            insertBrightnessUserDataPoint(lastDataPoint, brightness.doubleValue, modeKey: DC.adaptiveModeKey)
+        }
+    }
+
+    @Published @objc dynamic var softwareBrightness: Float = 1.0 {
+        didSet {
+            checkNaN(softwareBrightness)
+            defer {
+                fullRangeBrightness = computeFullRangeBrightness()
+            }
+
+            guard softwareBrightness <= 1.0 || (supportsGammaByDefault && supportsEnhance && enhanced) else { return }
+
+            lastSoftwareBrightness = oldValue
+            guard apply else { return }
+            resetScheduledTransition()
+
+            if softwareBrightness < 1.0, oldValue == 1.0, softwareBrightness >= 0 {
+                systemAdaptiveBrightness = false
+                if isMacBook, DC.kbc.brightness(forKeyboard: 1) > 0 {
+                    log.debug("Setting keyboard backlight to \(0.01)")
+                    DC.kbc.setBrightness(0.01, forKeyboard: 1)
+                }
+            } else if softwareBrightness == 1.0, oldValue < 1.0, oldValue >= 0 {
+                if ambientLightCompensationEnabledByUser {
+                    systemAdaptiveBrightness = true
+                }
+                if isMacBook, DC.kbc.brightness(forKeyboard: 1) == 0.01 {
+                    if DC.keyboardAutoBrightnessEnabledByUser {
+                        DC.kbc.enableAutoBrightness(true, forKeyboard: 1)
+                    }
+                    log.debug("Setting keyboard backlight to \(0.3)")
+                    DC.kbc.setBrightness(0.3, forKeyboard: 1)
+                }
+            }
+
+            log.info("\(name) SOFT BRIGHTNESS: \(softwareBrightness.str(decimals: 2))")
+
+            let br = softwareBrightness
+            mainAsync {
+                self.withoutApply {
+                    self.softwareBrightnessSlider = br
+                    self.subzero = br < 1.0 || (
+                        br == 1.0 && !self.hasSoftwareControl &&
+                            self.brightness.uint16Value == self.minBrightness.uint16Value
+                    )
+                    guard br > 1 else {
+                        self.xdrBrightness = 0.0
+                        return
+                    }
+                    self.xdrBrightness = br.map(from: (Self.MIN_SOFTWARE_BRIGHTNESS, self.maxSoftwareBrightness), to: (0.0, 1.0))
+                }
+            }
+
+            setIndependentSoftwareBrightness(softwareBrightness, oldValue: oldValue)
+        }
+    }
+
+    var preciseBrightnessContrastBeforeAppPreset = 0.5 {
+        didSet {
+            guard CachedDefaults[.mergeBrightnessContrast] else { return }
+            preciseBrightnessBeforeAppPreset = preciseBrightnessContrastBeforeAppPreset
+            preciseContrastBeforeAppPreset = preciseBrightnessContrastBeforeAppPreset
+        }
+    }
+
+    var preciseBrightnessBeforeAppPreset = 0.5 {
+        didSet {
+            guard !CachedDefaults[.mergeBrightnessContrast] else { return }
+            preciseBrightnessContrastBeforeAppPreset = preciseBrightnessBeforeAppPreset
+        }
+    }
+
+    // #endif
+
+    @Published @objc dynamic var canChangeVolume = true {
+        didSet {
+            showVolumeSlider = canChangeVolume && CachedDefaults[.showVolumeSlider]
+            save()
+        }
+    }
+
+    var noControls: Bool {
+        guard let control else { return true }
+        return control.isSoftware && !gammaEnabled
+    }
+
+    @objc dynamic var systemAdaptiveBrightness: Bool {
+        get { Self.ambientLightCompensationEnabled(id) }
+        set {
+            guard ambientLightCompensationEnabledByUser || force else {
+                return
+            }
+            if !newValue, isBuiltin {
+                log.warning("Disabling system adaptive brightness")
+                log.traceCalls()
+            }
+            DisplayServicesEnableAmbientLightCompensation(id, newValue)
+        }
+    }
+
+    var ambientLightCompensationEnabledByUser: Bool {
+        guard let enabled = Self.getThreadDictValue(id, type: "ambientLightCompensationEnabledByUser") as? Bool
+        else {
+            // First time checking out this flag, set it manually
+            let value = systemAdaptiveBrightness
+            Self.setThreadDictValue(id, type: "ambientLightCompensationEnabledByUser", value: value)
+            return value
+        }
+        if enabled { return !adaptive }
+        if systemAdaptiveBrightness {
+            // User must have enabled this manually in the meantime, set it to true manually
+            Self.setThreadDictValue(id, type: "ambientLightCompensationEnabledByUser", value: true)
+            return true
+        }
+        return false
+    }
+
+    var zeroGammaTask: Repeater? {
+        get { Self.getThreadDictValue(id, type: "zero-gamma") as? Repeater }
+        set { Self.setThreadDictValue(id, type: "zero-gamma", value: newValue) }
+    }
+
+    var zeroGammaWarmupTask: Repeater? {
+        get { Self.getThreadDictValue(id, type: "zero-gamma-warmup") as? Repeater }
+        set { Self.setThreadDictValue(id, type: "zero-gamma-warmup", value: newValue) }
+    }
+
+    var blackOutEnforceTask: Repeater? {
+        get { Self.getThreadDictValue(id, type: "blackout-enforce") as? Repeater }
+        set { Self.setThreadDictValue(id, type: "blackout-enforce", value: newValue) }
+    }
+
+    var resolutionBlackoutResetterTask: Repeater? {
+        get { Self.getThreadDictValue(id, type: "resolution-blackout-resetter") as? Repeater }
+        set { Self.setThreadDictValue(id, type: "resolution-blackout-resetter", value: newValue) }
+    }
+
+    var testWindowController: NSWindowController? {
+        get { Self.getWindowController(id, type: "test") }
+        set { Self.setWindowController(id, type: "test", windowController: newValue) }
+    }
+
+    var cornerWindowControllerTopLeft: NSWindowController? {
+        get { Self.getWindowController(id, type: "corner-topLeft") }
+        set { Self.setWindowController(id, type: "corner-topLeft", windowController: newValue) }
+    }
+
+    var cornerWindowControllerTopRight: NSWindowController? {
+        get { Self.getWindowController(id, type: "corner-topRight") }
+        set { Self.setWindowController(id, type: "corner-topRight", windowController: newValue) }
+    }
+
+    var cornerWindowControllerBottomLeft: NSWindowController? {
+        get { Self.getWindowController(id, type: "corner-bottomLeft") }
+        set { Self.setWindowController(id, type: "corner-bottomLeft", windowController: newValue) }
+    }
+
     static func ambientLightCompensationEnabled(_ id: CGDirectDisplayID) -> Bool {
         guard !isGeneric(id), DisplayServicesHasAmbientLightCompensation(id) else { return false }
 
@@ -2704,290 +2994,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     #endif
 
     var isActiveSyncSource: Bool { DC.sourceDisplay.serial == serial }
-    lazy var hdrOn: Bool = potentialEDR > 2 && edr > 1 {
-        didSet {
-            log.debug("\(name) HDR: \(hdrOn)")
-        }
-    }
-
-    var brightnessRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
-    var contrastRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
-    var volumeRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
-    var inputRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
-    var colorRefresher: DispatchWorkItem? { didSet { oldValue?.cancel() }}
-
-    var gammaSetterTask: DispatchWorkItem? {
-        didSet { oldValue?.cancel() }
-    }
-
-    @Published @objc dynamic var sendingBrightness = false {
-        didSet {
-            manageSendingValue(.sendingBrightness, oldValue: oldValue)
-            guard sendingBrightness else {
-                sendingBrightnessResetter = nil
-                return
-            }
-            sendingBrightnessResetter = mainAsyncAfter(ms: 3000) { [weak self] in
-                self?.sendingBrightness = false
-            }
-        }
-    }
-
-    var sendingBrightnessResetter: DispatchWorkItem? = nil {
-        didSet { oldValue?.cancel() }
-    }
-
-    @Published @objc dynamic var sendingContrast = false {
-        didSet {
-            manageSendingValue(.sendingContrast, oldValue: oldValue)
-            guard sendingContrast else {
-                sendingContrastResetter = nil
-                return
-            }
-            sendingContrastResetter = mainAsyncAfter(ms: 3000) { [weak self] in
-                self?.sendingContrast = false
-            }
-        }
-    }
-
-    var sendingContrastResetter: DispatchWorkItem? = nil {
-        didSet { oldValue?.cancel() }
-    }
-
-    @Published @objc dynamic var sendingInput = false {
-        didSet {
-            manageSendingValue(.sendingInput, oldValue: oldValue)
-            guard sendingInput else {
-                sendingInputResetter = nil
-                return
-            }
-            sendingInputResetter = mainAsyncAfter(ms: 3000) { [weak self] in
-                self?.sendingInput = false
-            }
-        }
-    }
-
-    var sendingInputResetter: DispatchWorkItem? = nil {
-        didSet { oldValue?.cancel() }
-    }
-
-    @Published @objc dynamic var sendingVolume = false {
-        didSet {
-            manageSendingValue(.sendingVolume, oldValue: oldValue)
-            guard sendingVolume else {
-                sendingVolumeResetter = nil
-                return
-            }
-            sendingVolumeResetter = mainAsyncAfter(ms: 3000) { [weak self] in
-                self?.sendingVolume = false
-            }
-        }
-    }
-
-    var sendingVolumeResetter: DispatchWorkItem? = nil {
-        didSet { oldValue?.cancel() }
-    }
-
-    var readableID: String {
-        if name.isEmpty || name == "Unknown" {
-            return shortHash(string: serial)
-        }
-        let safeName = "[^\\w\\d]+".r!.replaceAll(in: name.lowercased(), with: "")
-        return "\(safeName)-\(shortHash(string: serial))"
-    }
-
-    @Published @objc dynamic var xdrBrightness: Float = 0.0 {
-        didSet {
-            guard apply else { return }
-            defer {
-                fullRangeBrightness = computeFullRangeBrightness()
-            }
-
-            if xdrBrightness > 0, !enhanced {
-                handleEnhance(true, withoutSettingBrightness: true)
-            }
-            if xdrBrightness == 0, enhanced, !sliderTracking {
-                handleEnhance(false)
-            }
-
-            maxEDR = computeMaxEDR()
-
-            softwareBrightness = xdrBrightness.map(from: (0.0, 1.0), to: (Self.MIN_SOFTWARE_BRIGHTNESS, maxSoftwareBrightness))
-        }
-    }
-
-    @objc dynamic var subzeroDimming: Float {
-        get { min(softwareBrightness, 1.0) }
-        set { softwareBrightness = cap(newValue, minVal: 0.0, maxVal: 1.0) }
-    }
-
-    @objc dynamic lazy var softwareBrightnessSlider: Float = softwareBrightness {
-        didSet {
-            guard apply else { return }
-            forceHideSoftwareOSD = true
-            softwareBrightness = softwareBrightnessSlider
-
-            guard adaptiveSubzero else { return }
-
-            let lastDataPoint = datapointLock.around { DC.adaptiveMode.brightnessDataPoint.last }
-            insertBrightnessUserDataPoint(lastDataPoint, brightness.doubleValue, modeKey: DC.adaptiveModeKey)
-        }
-    }
-
-    @Published @objc dynamic var softwareBrightness: Float = 1.0 {
-        didSet {
-            checkNaN(softwareBrightness)
-            defer {
-                fullRangeBrightness = computeFullRangeBrightness()
-            }
-
-            guard softwareBrightness <= 1.0 || (supportsGammaByDefault && supportsEnhance && enhanced) else { return }
-
-            lastSoftwareBrightness = oldValue
-            guard apply else { return }
-            resetScheduledTransition()
-
-            if softwareBrightness < 1.0, oldValue == 1.0, softwareBrightness >= 0 {
-                systemAdaptiveBrightness = false
-                if isMacBook, DC.kbc.brightness(forKeyboard: 1) > 0 {
-                    log.debug("Setting keyboard backlight to \(0.01)")
-                    DC.kbc.setBrightness(0.01, forKeyboard: 1)
-                }
-            } else if softwareBrightness == 1.0, oldValue < 1.0, oldValue >= 0 {
-                if ambientLightCompensationEnabledByUser {
-                    systemAdaptiveBrightness = true
-                }
-                if isMacBook, DC.kbc.brightness(forKeyboard: 1) == 0.01 {
-                    if DC.keyboardAutoBrightnessEnabledByUser {
-                        DC.kbc.enableAutoBrightness(true, forKeyboard: 1)
-                    }
-                    log.debug("Setting keyboard backlight to \(0.3)")
-                    DC.kbc.setBrightness(0.3, forKeyboard: 1)
-                }
-            }
-
-            log.info("\(name) SOFT BRIGHTNESS: \(softwareBrightness.str(decimals: 2))")
-
-            let br = softwareBrightness
-            mainAsync {
-                self.withoutApply {
-                    self.softwareBrightnessSlider = br
-                    self.subzero = br < 1.0 || (
-                        br == 1.0 && !self.hasSoftwareControl &&
-                            self.brightness.uint16Value == self.minBrightness.uint16Value
-                    )
-                    guard br > 1 else {
-                        self.xdrBrightness = 0.0
-                        return
-                    }
-                    self.xdrBrightness = br.map(from: (Self.MIN_SOFTWARE_BRIGHTNESS, self.maxSoftwareBrightness), to: (0.0, 1.0))
-                }
-            }
-
-            setIndependentSoftwareBrightness(softwareBrightness, oldValue: oldValue)
-        }
-    }
-
-    var preciseBrightnessContrastBeforeAppPreset = 0.5 {
-        didSet {
-            guard CachedDefaults[.mergeBrightnessContrast] else { return }
-            preciseBrightnessBeforeAppPreset = preciseBrightnessContrastBeforeAppPreset
-            preciseContrastBeforeAppPreset = preciseBrightnessContrastBeforeAppPreset
-        }
-    }
-
-    var preciseBrightnessBeforeAppPreset = 0.5 {
-        didSet {
-            guard !CachedDefaults[.mergeBrightnessContrast] else { return }
-            preciseBrightnessContrastBeforeAppPreset = preciseBrightnessBeforeAppPreset
-        }
-    }
-
-    // #endif
-
-    @Published @objc dynamic var canChangeVolume = true {
-        didSet {
-            showVolumeSlider = canChangeVolume && CachedDefaults[.showVolumeSlider]
-            save()
-        }
-    }
-
-    var noControls: Bool {
-        guard let control else { return true }
-        return control.isSoftware && !gammaEnabled
-    }
-
-    @objc dynamic var systemAdaptiveBrightness: Bool {
-        get { Self.ambientLightCompensationEnabled(id) }
-        set {
-            guard ambientLightCompensationEnabledByUser || force else {
-                return
-            }
-            if !newValue, isBuiltin {
-                log.warning("Disabling system adaptive brightness")
-                log.traceCalls()
-            }
-            DisplayServicesEnableAmbientLightCompensation(id, newValue)
-        }
-    }
-
-    var ambientLightCompensationEnabledByUser: Bool {
-        guard let enabled = Self.getThreadDictValue(id, type: "ambientLightCompensationEnabledByUser") as? Bool
-        else {
-            // First time checking out this flag, set it manually
-            let value = systemAdaptiveBrightness
-            Self.setThreadDictValue(id, type: "ambientLightCompensationEnabledByUser", value: value)
-            return value
-        }
-        if enabled { return !adaptive }
-        if systemAdaptiveBrightness {
-            // User must have enabled this manually in the meantime, set it to true manually
-            Self.setThreadDictValue(id, type: "ambientLightCompensationEnabledByUser", value: true)
-            return true
-        }
-        return false
-    }
-
-    var zeroGammaTask: Repeater? {
-        get { Self.getThreadDictValue(id, type: "zero-gamma") as? Repeater }
-        set { Self.setThreadDictValue(id, type: "zero-gamma", value: newValue) }
-    }
-
-    var zeroGammaWarmupTask: Repeater? {
-        get { Self.getThreadDictValue(id, type: "zero-gamma-warmup") as? Repeater }
-        set { Self.setThreadDictValue(id, type: "zero-gamma-warmup", value: newValue) }
-    }
-
-    var blackOutEnforceTask: Repeater? {
-        get { Self.getThreadDictValue(id, type: "blackout-enforce") as? Repeater }
-        set { Self.setThreadDictValue(id, type: "blackout-enforce", value: newValue) }
-    }
-
-    var resolutionBlackoutResetterTask: Repeater? {
-        get { Self.getThreadDictValue(id, type: "resolution-blackout-resetter") as? Repeater }
-        set { Self.setThreadDictValue(id, type: "resolution-blackout-resetter", value: newValue) }
-    }
-
-    var testWindowController: NSWindowController? {
-        get { Self.getWindowController(id, type: "test") }
-        set { Self.setWindowController(id, type: "test", windowController: newValue) }
-    }
-
-    var cornerWindowControllerTopLeft: NSWindowController? {
-        get { Self.getWindowController(id, type: "corner-topLeft") }
-        set { Self.setWindowController(id, type: "corner-topLeft", windowController: newValue) }
-    }
-
-    var cornerWindowControllerTopRight: NSWindowController? {
-        get { Self.getWindowController(id, type: "corner-topRight") }
-        set { Self.setWindowController(id, type: "corner-topRight", windowController: newValue) }
-    }
-
-    var cornerWindowControllerBottomLeft: NSWindowController? {
-        get { Self.getWindowController(id, type: "corner-bottomLeft") }
-        set { Self.setWindowController(id, type: "corner-bottomLeft", windowController: newValue) }
-    }
-
     func resetSendingValues() {
         mainAsync { [weak self] in
             self?.sendingBrightness = false
@@ -5209,6 +5215,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try container.encode(adaptiveSubzero, forKey: .adaptiveSubzero)
             try container.encode(unmanaged, forKey: .unmanaged)
             try container.encode(keepDisconnected, forKey: .keepDisconnected)
+            try container.encode(keepHDREnabled, forKey: .keepHDREnabled)
             #if arch(arm64)
                 try container.encode(maxNits, forKey: .maxNits)
                 try container.encode(minNits, forKey: .minNits)
