@@ -1696,6 +1696,16 @@ extension AutoRemovingConstraintsView {
     }
 }
 
+// MARK: - AutoRemovingConstraintsButton
+
+final class AutoRemovingConstraintsButton: NSButton, AutoRemovingConstraintsView {
+    var originalConstraints: [NSLayoutConstraint] = []
+
+    override var isHidden: Bool {
+        didSet { autoRemoveConstraints() }
+    }
+}
+
 // MARK: - AutoRemovingConstraintsTextField
 
 final class AutoRemovingConstraintsTextField: NSTextField, AutoRemovingConstraintsView {

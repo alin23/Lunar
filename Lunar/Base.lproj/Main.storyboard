@@ -6623,12 +6623,12 @@ control automatically</string>
         <scene sceneID="LcY-BN-6rN">
             <objects>
                 <viewController storyboardIdentifier="ColorsPopoverController" id="nX7-a1-Ggz" customClass="ColorsPopoverController" customModule="Lunar" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" wantsLayer="YES" id="Zvk-a3-Jd9">
-                        <rect key="frame" x="0.0" y="0.0" width="321" height="401"/>
+                    <view key="view" wantsLayer="YES" misplaced="YES" id="Zvk-a3-Jd9">
+                        <rect key="frame" x="0.0" y="0.0" width="321" height="440"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="xJf-g4-pvH" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="79" y="298" width="220" height="28"/>
+                                <rect key="frame" x="79" y="326" width="220" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="216" id="4bc-p0-mdn"/>
                                     <constraint firstAttribute="height" constant="20" id="pBs-uN-tx3"/>
@@ -6660,7 +6660,7 @@ control automatically</string>
                                 </connections>
                             </slider>
                             <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="24i-WR-hhK" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="79" y="263" width="220" height="28"/>
+                                <rect key="frame" x="79" y="291" width="220" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="uDD-fL-8Uw"/>
                                     <constraint firstAttribute="width" constant="216" id="uDN-3B-QcE"/>
@@ -6692,7 +6692,7 @@ control automatically</string>
                                 </connections>
                             </slider>
                             <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="eOP-NJ-wxV" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="79" y="228" width="220" height="28"/>
+                                <rect key="frame" x="79" y="256" width="220" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="216" id="42k-LY-Yjt"/>
                                     <constraint firstAttribute="height" constant="20" id="XaY-vJ-OrU"/>
@@ -6724,7 +6724,7 @@ control automatically</string>
                                 </connections>
                             </slider>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ium-k3-3BT">
-                                <rect key="frame" x="13" y="360" width="83" height="25"/>
+                                <rect key="frame" x="13" y="388" width="83" height="25"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Gamma" id="cxp-ek-Eg0">
                                     <font key="font" metaFont="systemHeavy" size="21"/>
                                     <color key="textColor" name="Caption"/>
@@ -6732,7 +6732,7 @@ control automatically</string>
                                 </textFieldCell>
                             </textField>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SBj-vv-rYi">
-                                <rect key="frame" x="13" y="306" width="32" height="17"/>
+                                <rect key="frame" x="13" y="334" width="32" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Red" id="TKY-NL-Ye2">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -6740,7 +6740,7 @@ control automatically</string>
                                 </textFieldCell>
                             </textField>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fEp-XD-Xa5">
-                                <rect key="frame" x="13" y="271" width="47" height="17"/>
+                                <rect key="frame" x="13" y="299" width="47" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Green" id="Cuv-7l-lor">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -6748,7 +6748,7 @@ control automatically</string>
                                 </textFieldCell>
                             </textField>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="43A-zg-cG3">
-                                <rect key="frame" x="13" y="236" width="36" height="17"/>
+                                <rect key="frame" x="13" y="264" width="36" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Blue" id="9ca-AA-0bw">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -6756,7 +6756,7 @@ control automatically</string>
                                 </textFieldCell>
                             </textField>
                             <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="GhA-MN-iPc" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="79" y="186" width="220" height="28"/>
+                                <rect key="frame" x="79" y="214" width="220" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="55S-JA-7bT"/>
                                     <constraint firstAttribute="width" constant="216" id="eTY-bj-rEe"/>
@@ -6789,7 +6789,7 @@ control automatically</string>
                                 </connections>
                             </slider>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="88B-o4-DdE">
-                                <rect key="frame" x="13" y="194" width="52" height="17"/>
+                                <rect key="frame" x="13" y="222" width="52" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Blacks" id="plo-wK-KSM">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -6797,7 +6797,7 @@ control automatically</string>
                                 </textFieldCell>
                             </textField>
                             <slider verticalHuggingPriority="750" alphaValue="0.90000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="dqJ-Ws-iFA" customClass="Slider" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="79" y="151" width="220" height="28"/>
+                                <rect key="frame" x="79" y="179" width="220" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="216" id="KTM-VD-Ygr"/>
                                     <constraint firstAttribute="height" constant="20" id="fe9-g8-KXR"/>
@@ -6830,7 +6830,7 @@ control automatically</string>
                                 </connections>
                             </slider>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hlP-z7-qa1">
-                                <rect key="frame" x="13" y="159" width="55" height="17"/>
+                                <rect key="frame" x="13" y="187" width="55" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Whites" id="JXX-Ub-ygV">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
@@ -6838,7 +6838,7 @@ control automatically</string>
                                 </textFieldCell>
                             </textField>
                             <button focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mmh-YL-IXM" customClass="ResetButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="240" y="362" width="66" height="22"/>
+                                <rect key="frame" x="240" y="390" width="66" height="22"/>
                                 <buttonCell key="cell" type="inline" title="Reset" alternateTitle="Extended" bezelStyle="inline" alignment="center" lineBreakMode="truncatingTail" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="PkE-Wf-rSj">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="smallSystemBold"/>
@@ -6866,7 +6866,7 @@ control automatically</string>
                                 </connections>
                             </button>
                             <button focusRingType="none" tag="1" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6rV-Qv-PJI" customClass="EnableButton" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="153" y="362" width="80" height="22"/>
+                                <rect key="frame" x="153" y="390" width="80" height="22"/>
                                 <shadow key="shadow" blurRadius="4">
                                     <size key="offset" width="0.0" height="1"/>
                                     <color key="color" white="0.0" alpha="0.10107098509933775" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -6895,7 +6895,7 @@ control automatically</string>
                                 </connections>
                             </button>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zsO-49-UWV">
-                                <rect key="frame" x="13" y="335" width="183" height="26"/>
+                                <rect key="frame" x="13" y="363" width="183" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="26" id="OUY-LV-QLW"/>
                                     <constraint firstAttribute="width" constant="179" id="sn3-cv-Kqo"/>
@@ -6909,7 +6909,7 @@ Keep this disabled when using f.lux</string>
                                 </textFieldCell>
                             </textField>
                             <box boxType="custom" cornerRadius="4" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3WS-M3-Uq4" customClass="Box" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="10" width="321" height="132"/>
+                                <rect key="frame" x="0.0" y="38" width="321" height="132"/>
                                 <view key="contentView" id="lze-8q-n95">
                                     <rect key="frame" x="1" y="1" width="319" height="130"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -7101,13 +7101,32 @@ when FaceLight is activated</string>
                                 </userDefinedRuntimeAttributes>
                             </box>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OwA-0Z-pPX">
-                                <rect key="frame" x="14" y="56" width="83" height="17"/>
+                                <rect key="frame" x="14" y="84" width="83" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Brightness" id="8U4-Oa-WQv">
                                     <font key="font" metaFont="systemHeavy" size="14"/>
                                     <color key="textColor" name="Caption Tertiary"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <button alphaValue="0.90000000000000002" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wIA-fS-IuI" customClass="AutoRemovingConstraintsButton" customModule="Lunar" customModuleProvider="target">
+                                <rect key="frame" x="14" y="13" width="159" height="18"/>
+                                <shadow key="shadow" blurRadius="2">
+                                    <size key="offset" width="0.0" height="1"/>
+                                    <color key="color" white="0.0" alpha="0.099648178810000002" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </shadow>
+                                <buttonCell key="cell" type="check" title="Force keep HDR enabled" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="A2v-kY-Ob8">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="systemMedium" size="11"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="nX7-a1-Ggz" name="hidden" keyPath="self.display.supportsHDR" id="JoN-Ok-wCz">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="nX7-a1-Ggz" name="value" keyPath="self.display.keepHDREnabled" id="UiF-i6-WVV"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="fEp-XD-Xa5" firstAttribute="centerY" secondItem="24i-WR-hhK" secondAttribute="centerY" id="0fg-JH-EFs"/>
@@ -7118,7 +7137,8 @@ when FaceLight is activated</string>
                             <constraint firstItem="eOP-NJ-wxV" firstAttribute="centerX" secondItem="24i-WR-hhK" secondAttribute="centerX" id="6d3-Ca-uHO"/>
                             <constraint firstItem="eOP-NJ-wxV" firstAttribute="top" secondItem="24i-WR-hhK" secondAttribute="bottom" constant="15" id="7M2-Vw-sER"/>
                             <constraint firstItem="dqJ-Ws-iFA" firstAttribute="top" secondItem="GhA-MN-iPc" secondAttribute="bottom" constant="15" id="B6N-wE-vKs"/>
-                            <constraint firstAttribute="bottom" secondItem="3WS-M3-Uq4" secondAttribute="bottom" constant="10" id="CcA-aV-Qns"/>
+                            <constraint firstAttribute="bottom" secondItem="3WS-M3-Uq4" secondAttribute="bottom" priority="250" constant="10" id="CcA-aV-Qns"/>
+                            <constraint firstItem="wIA-fS-IuI" firstAttribute="leading" secondItem="Zvk-a3-Jd9" secondAttribute="leading" constant="16" id="DQW-uE-d9t"/>
                             <constraint firstItem="43A-zg-cG3" firstAttribute="leading" secondItem="Zvk-a3-Jd9" secondAttribute="leading" constant="15" id="FUH-b2-mLN"/>
                             <constraint firstItem="5cJ-qK-ANe" firstAttribute="leading" secondItem="OwA-0Z-pPX" secondAttribute="leading" id="LKp-Y2-RqO"/>
                             <constraint firstItem="xJf-g4-pvH" firstAttribute="centerX" secondItem="Zvk-a3-Jd9" secondAttribute="centerX" constant="28.5" id="Min-zy-zKB"/>
@@ -7137,9 +7157,12 @@ when FaceLight is activated</string>
                             <constraint firstItem="88B-o4-DdE" firstAttribute="centerY" secondItem="GhA-MN-iPc" secondAttribute="centerY" id="jYB-uf-9rQ"/>
                             <constraint firstItem="24i-WR-hhK" firstAttribute="top" secondItem="xJf-g4-pvH" secondAttribute="bottom" constant="15" id="kau-sz-Gx1"/>
                             <constraint firstAttribute="trailing" secondItem="mmh-YL-IXM" secondAttribute="trailing" constant="15" id="nCI-Ha-lqF"/>
+                            <constraint firstItem="wIA-fS-IuI" firstAttribute="top" secondItem="lze-8q-n95" secondAttribute="bottom" constant="10" id="oJZ-cY-vXA"/>
                             <constraint firstItem="mmh-YL-IXM" firstAttribute="leading" secondItem="6rV-Qv-PJI" secondAttribute="trailing" constant="7" id="ozw-ys-PzC"/>
                             <constraint firstItem="GhA-MN-iPc" firstAttribute="centerX" secondItem="eOP-NJ-wxV" secondAttribute="centerX" id="qIH-mo-z5p"/>
                             <constraint firstItem="qWx-Pr-1FV" firstAttribute="leading" secondItem="OwA-0Z-pPX" secondAttribute="trailing" constant="5" id="qXh-pd-1f9"/>
+                            <constraint firstAttribute="bottom" secondItem="wIA-fS-IuI" secondAttribute="bottom" constant="15" id="umY-HI-Z4y"/>
+                            <constraint firstItem="wIA-fS-IuI" firstAttribute="top" secondItem="3WS-M3-Uq4" secondAttribute="bottom" priority="250" constant="10" id="unT-iT-loc"/>
                             <constraint firstItem="hlP-z7-qa1" firstAttribute="centerY" secondItem="dqJ-Ws-iFA" secondAttribute="centerY" id="xTH-9V-peQ"/>
                             <constraint firstItem="zsO-49-UWV" firstAttribute="top" secondItem="Ium-k3-3BT" secondAttribute="bottom" constant="-1" id="xyP-zC-RTd"/>
                             <constraint firstItem="3WS-M3-Uq4" firstAttribute="top" secondItem="dqJ-Ws-iFA" secondAttribute="bottom" constant="15" id="ymF-gu-pcj"/>
