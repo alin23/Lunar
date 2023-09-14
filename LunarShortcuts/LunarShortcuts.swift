@@ -474,9 +474,13 @@ enum IntentError: Swift.Error, CustomLocalizedStringResourceConvertible {
 
 @available(iOS 16, macOS 13, *)
 @discardableResult
-func controlScreen(screen: IntentParameter<Screen>, property: Display.CodingKeys, value: String) throws -> some IntentResult {
+func controlScreen(screen: IntentParameter<Screen>, property: Display.CodingKeys, value: String, skipMissingScreen: Bool = false) throws -> some IntentResult {
     let scr = screen.wrappedValue
     guard !(scr.serial + scr.name).isEmpty else {
+        if skipMissingScreen {
+            return .result()
+        }
+
         throw screen.needsValueError()
     }
 
@@ -501,7 +505,11 @@ struct SetBrightnessIntent: AppIntent {
     static var title: LocalizedStringResource = "Set Brightness"
     static var description = IntentDescription("Sets the Brightness of a screen to a specific value. The percentage will compute a value between the Min and Max Brightness of the screen.", categoryName: "Brightness")
 
-    static var parameterSummary: some ParameterSummary { Summary("Set \(\.$screen) brightness to \(\.$value)") }
+    static var parameterSummary: some ParameterSummary {
+        Summary("Set \(\.$screen) brightness to \(\.$value)") {
+            \.$skipMissingScreen
+        }
+    }
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery())
     var screen: Screen
@@ -509,10 +517,13 @@ struct SetBrightnessIntent: AppIntent {
     @Parameter(title: "Value", controlStyle: .slider, inclusiveRange: (0.0, 1.0))
     var value: Double
 
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
+
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        try controlScreen(screen: $screen, property: .normalizedBrightness, value: value.str(decimals: 3))
+        try controlScreen(screen: $screen, property: .normalizedBrightness, value: value.str(decimals: 3), skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.preciseBrightness ?? value)
     }
 }
@@ -524,7 +535,11 @@ struct SetContrastIntent: AppIntent {
     static var title: LocalizedStringResource = "Set Contrast"
     static var description = IntentDescription("Sets the Contrast of a screen to a specific value. The percentage will compute a value between the Min and Max Contrast of the screen.", categoryName: "Brightness")
 
-    static var parameterSummary: some ParameterSummary { Summary("Set \(\.$screen) contrast to \(\.$value)") }
+    static var parameterSummary: some ParameterSummary {
+        Summary("Set \(\.$screen) contrast to \(\.$value)") {
+            \.$skipMissingScreen
+        }
+    }
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery(filter: { $0.hasDDC }))
     var screen: Screen
@@ -532,10 +547,13 @@ struct SetContrastIntent: AppIntent {
     @Parameter(title: "Value", controlStyle: .slider, inclusiveRange: (0.0, 1.0))
     var value: Double
 
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
+
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        try controlScreen(screen: $screen, property: .normalizedContrast, value: value.str(decimals: 3))
+        try controlScreen(screen: $screen, property: .normalizedContrast, value: value.str(decimals: 3), skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.preciseContrast ?? value)
     }
 }
@@ -550,7 +568,11 @@ struct SetBrightnessContrastIntent: AppIntent {
         categoryName: "Brightness"
     )
 
-    static var parameterSummary: some ParameterSummary { Summary("Set \(\.$screen) combined brightness & contrast to \(\.$value)") }
+    static var parameterSummary: some ParameterSummary {
+        Summary("Set \(\.$screen) combined brightness & contrast to \(\.$value)") {
+            \.$skipMissingScreen
+        }
+    }
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery())
     var screen: Screen
@@ -558,10 +580,13 @@ struct SetBrightnessContrastIntent: AppIntent {
     @Parameter(title: "Value", controlStyle: .slider, inclusiveRange: (0.0, 1.0))
     var value: Double
 
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
+
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        try controlScreen(screen: $screen, property: .normalizedBrightnessContrast, value: value.str(decimals: 3))
+        try controlScreen(screen: $screen, property: .normalizedBrightnessContrast, value: value.str(decimals: 3), skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.preciseBrightnessContrast ?? value)
     }
 }
@@ -573,7 +598,11 @@ struct SetSubZeroDimmingIntent: AppIntent {
     static var title: LocalizedStringResource = "Set Sub-zero Dimming"
     static var description = IntentDescription("Sets the Sub-zero Dimming of a screen to specific value. 0% means as black as possible while 100% means no dimming is applied.", categoryName: "Brightness")
 
-    static var parameterSummary: some ParameterSummary { Summary("Set \(\.$screen) Sub-zero Dimming to \(\.$value)") }
+    static var parameterSummary: some ParameterSummary {
+        Summary("Set \(\.$screen) Sub-zero Dimming to \(\.$value)") {
+            \.$skipMissingScreen
+        }
+    }
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery())
     var screen: Screen
@@ -581,10 +610,13 @@ struct SetSubZeroDimmingIntent: AppIntent {
     @Parameter(title: "Value", controlStyle: .slider, inclusiveRange: (0.0, 1.0))
     var value: Double
 
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
+
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        try controlScreen(screen: $screen, property: .softwareBrightness, value: value.str(decimals: 3))
+        try controlScreen(screen: $screen, property: .softwareBrightness, value: value.str(decimals: 3), skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.softwareBrightness.d ?? value)
     }
 }
@@ -596,7 +628,11 @@ struct SetXDRBrightnessIntent: AppIntent {
     static var title: LocalizedStringResource = "Set XDR Brightness"
     static var description = IntentDescription("Sets the XDR Brightness of a screen to specific value if it supports brightness higher than 500 nits.", categoryName: "Brightness")
 
-    static var parameterSummary: some ParameterSummary { Summary("Set \(\.$screen) XDR Brightness to \(\.$value)") }
+    static var parameterSummary: some ParameterSummary {
+        Summary("Set \(\.$screen) XDR Brightness to \(\.$value)") {
+            \.$skipMissingScreen
+        }
+    }
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery(filter: { $0.supportsEnhance }))
     var screen: Screen
@@ -604,12 +640,15 @@ struct SetXDRBrightnessIntent: AppIntent {
     @Parameter(title: "Value", controlStyle: .slider, inclusiveRange: (0.0, 1.0))
     var value: Double
 
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
+
     @MainActor
     func perform() async throws -> some IntentResult {
         guard lunarProActive else {
             throw IntentError.message("A Lunar Pro license is needed for this feature.")
         }
-        try controlScreen(screen: $screen, property: .xdrBrightness, value: value.str(decimals: 3))
+        try controlScreen(screen: $screen, property: .xdrBrightness, value: value.str(decimals: 3), skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.xdrBrightness.d ?? value)
     }
 }
@@ -621,7 +660,11 @@ struct SetVolumeIntent: AppIntent {
     static var title: LocalizedStringResource = "Set Volume"
     static var description = IntentDescription("Sets the Volume of a screen to specific value if it supports the volume control.", categoryName: "DDC")
 
-    static var parameterSummary: some ParameterSummary { Summary("Set \(\.$screen) volume to \(\.$value)") }
+    static var parameterSummary: some ParameterSummary {
+        Summary("Set \(\.$screen) volume to \(\.$value)") {
+            \.$skipMissingScreen
+        }
+    }
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery(filter: { $0.canChangeVolume }))
     var screen: Screen
@@ -629,11 +672,14 @@ struct SetVolumeIntent: AppIntent {
     @Parameter(title: "Value", controlStyle: .slider, inclusiveRange: (0.0, 1.0))
     var value: Double
 
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
+
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
 
-        try controlScreen(screen: $screen, property: .volume, value: (value * 100).rounded().u16.s)
+        try controlScreen(screen: $screen, property: .volume, value: (value * 100).rounded().u16.s, skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.preciseVolume ?? value)
     }
 }
@@ -673,7 +719,11 @@ struct ToggleAudioMuteIntent: AppIntent {
     static var title: LocalizedStringResource = "Toggle Audio Mute"
     static var description = IntentDescription("Toggles audio mute on a screen if it supports audio control.", categoryName: "DDC")
 
-    static var parameterSummary: some ParameterSummary { Summary("Toggle audio mute of \(\.$screen) to \(\.$state)") }
+    static var parameterSummary: some ParameterSummary {
+        Summary("Toggle audio mute of \(\.$screen) to \(\.$state)") {
+            \.$skipMissingScreen
+        }
+    }
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery(filter: { $0.canChangeVolume }))
     var screen: Screen
@@ -681,10 +731,13 @@ struct ToggleAudioMuteIntent: AppIntent {
     @Parameter(title: "State")
     var state: ScreenToggleState
 
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
+
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        try controlScreen(screen: $screen, property: .mute, value: state.rawValue)
+        try controlScreen(screen: $screen, property: .mute, value: state.rawValue, skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.audioMuted ?? state.bool)
     }
 }
@@ -696,7 +749,11 @@ struct ToggleSystemAdaptiveBrightnessIntent: AppIntent {
     static var title: LocalizedStringResource = "Toggle System Adaptive Brightness"
     static var description = IntentDescription("Toggles the \"Automatically adjust brightness\" checkbox in System Settings for a specific screen.", categoryName: "Toggles")
 
-    static var parameterSummary: some ParameterSummary { Summary("Toggle system adaptive brightness for \(\.$screen) to \(\.$state)") }
+    static var parameterSummary: some ParameterSummary {
+        Summary("Toggle system adaptive brightness for \(\.$screen) to \(\.$state)") {
+            \.$skipMissingScreen
+        }
+    }
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery(filter: { $0.hasAmbientLightAdaptiveBrightness }))
     var screen: Screen
@@ -704,10 +761,13 @@ struct ToggleSystemAdaptiveBrightnessIntent: AppIntent {
     @Parameter(title: "State")
     var state: ScreenToggleState
 
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
+
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        try controlScreen(screen: $screen, property: .systemAdaptiveBrightness, value: state.rawValue)
+        try controlScreen(screen: $screen, property: .systemAdaptiveBrightness, value: state.rawValue, skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.systemAdaptiveBrightness ?? state.bool)
     }
 }
@@ -719,7 +779,11 @@ struct ToggleHDRIntent: AppIntent {
     static var title: LocalizedStringResource = "Toggle HDR"
     static var description = IntentDescription("Toggles HDR on/off for a screen if it supports high dynamic range.", categoryName: "Toggles")
 
-    static var parameterSummary: some ParameterSummary { Summary("Toggle HDR for \(\.$screen) to \(\.$state)") }
+    static var parameterSummary: some ParameterSummary {
+        Summary("Toggle HDR for \(\.$screen) to \(\.$state)") {
+            \.$skipMissingScreen
+        }
+    }
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery(filter: { $0.panel?.hasHDRModes ?? false }))
     var screen: Screen
@@ -727,10 +791,13 @@ struct ToggleHDRIntent: AppIntent {
     @Parameter(title: "State")
     var state: ScreenToggleState
 
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
+
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        try controlScreen(screen: $screen, property: .hdr, value: state.rawValue)
+        try controlScreen(screen: $screen, property: .hdr, value: state.rawValue, skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.hdr ?? state.bool)
     }
 }
@@ -742,7 +809,11 @@ struct ToggleXDRIntent: AppIntent {
     static var title: LocalizedStringResource = "Toggle XDR Brightness"
     static var description = IntentDescription("Toggles XDR Brightness on/off for a screen if it supports brightness higher than 500 nits.", categoryName: "Toggles")
 
-    static var parameterSummary: some ParameterSummary { Summary("Toggle XDR Brightness for \(\.$screen) to \(\.$state)") }
+    static var parameterSummary: some ParameterSummary {
+        Summary("Toggle XDR Brightness for \(\.$screen) to \(\.$state)") {
+            \.$skipMissingScreen
+        }
+    }
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery(filter: { $0.supportsEnhance }))
     var screen: Screen
@@ -750,12 +821,15 @@ struct ToggleXDRIntent: AppIntent {
     @Parameter(title: "State")
     var state: ScreenToggleState
 
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
+
     @MainActor
     func perform() async throws -> some IntentResult {
         guard lunarProActive else {
             throw IntentError.message("A Lunar Pro license is needed for this feature.")
         }
-        try controlScreen(screen: $screen, property: .xdr, value: state.rawValue)
+        try controlScreen(screen: $screen, property: .xdr, value: state.rawValue, skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.xdr ?? state.bool)
     }
 }
@@ -767,7 +841,11 @@ struct ToggleSubZeroIntent: AppIntent {
     static var title: LocalizedStringResource = "Toggle Sub-zero Dimming"
     static var description = IntentDescription("Toggles Sub-zero Dimming on/off for a screen.", categoryName: "Toggles")
 
-    static var parameterSummary: some ParameterSummary { Summary("Toggle Sub-zero Dimming to \(\.$screen) to \(\.$state)") }
+    static var parameterSummary: some ParameterSummary {
+        Summary("Toggle Sub-zero Dimming to \(\.$screen) to \(\.$state)") {
+            \.$skipMissingScreen
+        }
+    }
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery(filter: { $0.supportsEnhance }))
     var screen: Screen
@@ -775,10 +853,13 @@ struct ToggleSubZeroIntent: AppIntent {
     @Parameter(title: "State")
     var state: ScreenToggleState
 
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
+
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        try controlScreen(screen: $screen, property: .subzero, value: state.rawValue)
+        try controlScreen(screen: $screen, property: .subzero, value: state.rawValue, skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.subzero ?? state.bool)
     }
 }
@@ -790,7 +871,11 @@ struct ToggleFacelightIntent: AppIntent {
     static var title: LocalizedStringResource = "Toggle Facelight"
     static var description = IntentDescription("Toggles Facelight on/off for a screen.", categoryName: "Toggles")
 
-    static var parameterSummary: some ParameterSummary { Summary("Toggle Facelight for \(\.$screen) to \(\.$state)") }
+    static var parameterSummary: some ParameterSummary {
+        Summary("Toggle Facelight for \(\.$screen) to \(\.$state)") {
+            \.$skipMissingScreen
+        }
+    }
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery())
     var screen: Screen
@@ -798,12 +883,15 @@ struct ToggleFacelightIntent: AppIntent {
     @Parameter(title: "State")
     var state: ScreenToggleState
 
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
+
     @MainActor
     func perform() async throws -> some IntentResult {
         guard lunarProActive else {
             throw IntentError.message("A Lunar Pro license is needed for this feature.")
         }
-        try controlScreen(screen: $screen, property: .facelight, value: state.rawValue)
+        try controlScreen(screen: $screen, property: .facelight, value: state.rawValue, skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.facelight ?? state.bool)
     }
 }
@@ -975,11 +1063,18 @@ Power off a screen by:
 
     static var parameterSummary: some ParameterSummary {
         When(\.$disableScreen, .equalTo, true, {
-            Summary("Power off \(\.$screen) and \(\.$disableScreen) by mirroring from \(\.$visibleScreen)")
+            Summary("Power off \(\.$screen) and \(\.$disableScreen) by mirroring from \(\.$visibleScreen)") {
+                \.$skipMissingScreen
+            }
         }, otherwise: {
-            Summary("Power off \(\.$screen) and \(\.$disableScreen) (only make it black, without mirroring or disconnecting)")
+            Summary("Power off \(\.$screen) and \(\.$disableScreen) (only make it black, without mirroring or disconnecting)") {
+                \.$skipMissingScreen
+            }
         })
     }
+
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery())
     var screen: Screen
@@ -999,6 +1094,10 @@ Power off a screen by:
         let displays = screen.displays
 
         guard !displays.isEmpty else {
+            if skipMissingScreen {
+                return .result()
+            }
+
             throw $screen.needsValueError()
         }
 
@@ -1007,14 +1106,23 @@ Power off a screen by:
         if disableScreen {
             if let master = screen.dynamicDisplay {
                 if displays.contains(master) {
+                    if skipMissingScreen {
+                        return .result()
+                    }
                     throw $visibleScreen.needsValueError("Screen to mirror from should not be in the list of displays to be powered off")
                 }
                 if master.blackOutEnabled {
+                    if skipMissingScreen {
+                        return .result()
+                    }
                     throw $visibleScreen.needsValueError("Screen to mirror from should not be powered off")
                 }
             } else if DC.activeDisplayList.filter(
                 { !displayIDs.contains($0.id) && !$0.blackOutEnabled }
             ).first == nil {
+                if skipMissingScreen {
+                    return .result()
+                }
                 throw $visibleScreen.needsValueError("No visible screen remaining to mirror from")
             }
         }
@@ -1056,8 +1164,13 @@ struct PowerOnSoftwareIntent: AppIntent {
     // swiftformat:enable all
 
     static var parameterSummary: some ParameterSummary {
-        Summary("Power on \(\.$screen)")
+        Summary("Power on \(\.$screen)") {
+            \.$skipMissingScreen
+        }
     }
+
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery())
     var screen: Screen
@@ -1068,6 +1181,9 @@ struct PowerOnSoftwareIntent: AppIntent {
         let displays = screen.displays
 
         guard !displays.isEmpty else {
+            if skipMissingScreen {
+                return .result()
+            }
             throw $screen.needsValueError()
         }
 
@@ -1337,6 +1453,7 @@ struct ToggleBlackOutIntent: AppIntent {
     static var parameterSummary: some ParameterSummary {
         Summary("Toggle power of \(\.$screen) to \(\.$state)") {
             \.$allowMirroring
+            \.$skipMissingScreen
         }
     }
 
@@ -1348,6 +1465,9 @@ struct ToggleBlackOutIntent: AppIntent {
 
     @Parameter(title: "Allow mirroring", default: false)
     var allowMirroring: Bool
+
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
 
     @MainActor
     func perform() async throws -> some IntentResult {
@@ -1368,7 +1488,7 @@ struct ToggleBlackOutIntent: AppIntent {
             }
         }
 
-        try controlScreen(screen: $screen, property: .blackout, value: state.inverted.rawValue)
+        try controlScreen(screen: $screen, property: .blackout, value: state.inverted.rawValue, skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.blackout ?? state.bool)
     }
 }
@@ -1397,7 +1517,11 @@ struct RotateScreenIntent: AppIntent {
     static var title: LocalizedStringResource = "Rotate Screen"
     static var description = IntentDescription("Sets screen rotation/orientation to 0°/90°/180°/270°.", categoryName: "Arrangement")
 
-    static var parameterSummary: some ParameterSummary { Summary("Rotate \(\.$screen) to \(\.$rotation)") }
+    static var parameterSummary: some ParameterSummary {
+        Summary("Rotate \(\.$screen) to \(\.$rotation)") {
+            \.$skipMissingScreen
+        }
+    }
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery())
     var screen: Screen
@@ -1405,10 +1529,13 @@ struct RotateScreenIntent: AppIntent {
     @Parameter(title: "Degrees")
     var rotation: ScreenRotationDegrees
 
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
+
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        try controlScreen(screen: $screen, property: .rotation, value: rotation.rawValue.s)
+        try controlScreen(screen: $screen, property: .rotation, value: rotation.rawValue.s, skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.rotation ?? rotation.rawValue)
     }
 }
@@ -1530,15 +1657,22 @@ Note: a screen can't also be powered on using this method because a powered off 
 
     // swiftformat:enable all
 
-    static var parameterSummary: some ParameterSummary { Summary("Power off \(\.$screen)") }
+    static var parameterSummary: some ParameterSummary {
+        Summary("Power off \(\.$screen)") {
+            \.$skipMissingScreen
+        }
+    }
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery(filter: { $0.hasDDC }))
     var screen: Screen
 
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
+
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        return try controlScreen(screen: $screen, property: .power, value: "off")
+        return try controlScreen(screen: $screen, property: .power, value: "off", skipMissingScreen: skipMissingScreen)
     }
 }
 
@@ -1630,7 +1764,11 @@ Note: Not all inputs are supported by all monitors, and some monitors may use no
 
     // swiftformat:enable all
 
-    static var parameterSummary: some ParameterSummary { Summary("Change \(\.$screen) input to \(\.$input)") }
+    static var parameterSummary: some ParameterSummary {
+        Summary("Change \(\.$screen) input to \(\.$input)") {
+            \.$skipMissingScreen
+        }
+    }
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery(filter: { $0.hasDDC }))
     var screen: Screen
@@ -1638,10 +1776,13 @@ Note: Not all inputs are supported by all monitors, and some monitors may use no
     @Parameter(title: "Input", optionsProvider: InputProvider())
     var input: Int
 
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
+
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        try controlScreen(screen: $screen, property: .input, value: input.s)
+        try controlScreen(screen: $screen, property: .input, value: input.s, skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.inputSource.rawValue.i ?? input)
     }
 
@@ -1772,7 +1913,11 @@ struct ControlScreenValueFloatNumeric: AppIntent {
     static var title: LocalizedStringResource = "Control a floating point Screen Value"
     static var description = IntentDescription("Configure any screen property that supports a numeric value with a floating point.", categoryName: "Scripting")
 
-    static var parameterSummary: some ParameterSummary { Summary("Set \(\.$property) of \(\.$screen) to \(\.$value)") }
+    static var parameterSummary: some ParameterSummary {
+        Summary("Set \(\.$property) of \(\.$screen) to \(\.$value)") {
+            \.$skipMissingScreen
+        }
+    }
 
     @Parameter(title: "Property", optionsProvider: DisplayFloatNumericPropertyQuery())
     var property: DisplayProperty
@@ -1783,13 +1928,16 @@ struct ControlScreenValueFloatNumeric: AppIntent {
     @Parameter(title: "Value", controlStyle: .slider, inclusiveRange: (0.0, 1.0))
     var value: Double
 
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
+
     @MainActor
     func perform() async throws -> some IntentResult {
         guard !Display.CodingKeys.needsLunarPro.contains(property.id) || lunarProActive else {
             throw IntentError.message("A Lunar Pro license is needed for controlling \"\(property.name)\".")
         }
         try checkShortcutsLimit()
-        try controlScreen(screen: $screen, property: property.id, value: value.str(decimals: 3))
+        try controlScreen(screen: $screen, property: property.id, value: value.str(decimals: 3), skipMissingScreen: skipMissingScreen)
         guard let val = screen.display?.dictionary?[property.id.rawValue] as? Double else {
             return .result(value: value)
         }
@@ -1804,7 +1952,11 @@ struct ControlScreenValueNumeric: AppIntent {
     static var title: LocalizedStringResource = "Control an integer Screen Value"
     static var description = IntentDescription("Configure any screen property that supports an integer numeric value.", categoryName: "Scripting")
 
-    static var parameterSummary: some ParameterSummary { Summary("Set \(\.$property) of \(\.$screen) to \(\.$value)") }
+    static var parameterSummary: some ParameterSummary {
+        Summary("Set \(\.$property) of \(\.$screen) to \(\.$value)") {
+            \.$skipMissingScreen
+        }
+    }
 
     @Parameter(title: "Property", optionsProvider: DisplayNumericPropertyQuery())
     var property: DisplayProperty
@@ -1815,13 +1967,16 @@ struct ControlScreenValueNumeric: AppIntent {
     @Parameter(title: "Value", controlStyle: .field, inclusiveRange: (0, 65535))
     var value: Int
 
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
+
     @MainActor
     func perform() async throws -> some IntentResult {
         guard !Display.CodingKeys.needsLunarPro.contains(property.id) || lunarProActive else {
             throw IntentError.message("A Lunar Pro license is needed for controlling \"\(property.name)\".")
         }
         try checkShortcutsLimit()
-        try controlScreen(screen: $screen, property: property.id, value: value.s)
+        try controlScreen(screen: $screen, property: property.id, value: value.s, skipMissingScreen: skipMissingScreen)
         guard let val = screen.display?.dictionary?[property.id.rawValue] as? Int else {
             return .result(value: value)
         }
@@ -1836,7 +1991,11 @@ struct ControlScreenValueBool: AppIntent {
     static var title: LocalizedStringResource = "Control a boolean Screen Value"
     static var description = IntentDescription("Configure any screen property that supports a boolean value.", categoryName: "Scripting")
 
-    static var parameterSummary: some ParameterSummary { Summary("Set \(\.$property) of \(\.$screen) to \(\.$state)") }
+    static var parameterSummary: some ParameterSummary {
+        Summary("Set \(\.$property) of \(\.$screen) to \(\.$state)") {
+            \.$skipMissingScreen
+        }
+    }
 
     @Parameter(title: "Property", optionsProvider: DisplayBoolPropertyQuery())
     var property: DisplayProperty
@@ -1847,13 +2006,16 @@ struct ControlScreenValueBool: AppIntent {
     @Parameter(title: "State")
     var state: ScreenToggleState
 
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
+
     @MainActor
     func perform() async throws -> some IntentResult {
         guard !Display.CodingKeys.needsLunarPro.contains(property.id) || lunarProActive else {
             throw IntentError.message("A Lunar Pro license is needed for controlling \"\(property.name)\".")
         }
         try checkShortcutsLimit()
-        try controlScreen(screen: $screen, property: property.id, value: state.rawValue)
+        try controlScreen(screen: $screen, property: property.id, value: state.rawValue, skipMissingScreen: skipMissingScreen)
         guard let val = screen.display?.dictionary?[property.id.rawValue] as? Bool else {
             return .result(value: state.bool)
         }
@@ -2046,8 +2208,13 @@ Note: very few monitors implement this functionality
 
     // swiftformat:enable all
     static var parameterSummary: some ParameterSummary {
-        Summary("Read color gain values from \(\.$screen)")
+        Summary("Read color gain values from \(\.$screen)") {
+            \.$skipMissingScreen
+        }
     }
+
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery(filter: { $0.hasDDC }, single: true))
     var screen: Screen
@@ -2056,6 +2223,9 @@ Note: very few monitors implement this functionality
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
         guard let display = screen.dynamicDisplay else {
+            if skipMissingScreen {
+                return .result(value: ScreenColorGain(red: 0, green: 0, blue: 0))
+            }
             throw $screen.needsValueError()
         }
 
@@ -2081,8 +2251,13 @@ struct ReadSoftwareColorsIntent: AppIntent {
         )
 
     static var parameterSummary: some ParameterSummary {
-        Summary("Read color Gamma values from \(\.$screen)")
+        Summary("Read color Gamma values from \(\.$screen)") {
+            \.$skipMissingScreen
+        }
     }
+
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery(filter: { $0.supportsGammaByDefault }, single: true))
     var screen: Screen
@@ -2091,6 +2266,10 @@ struct ReadSoftwareColorsIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
         guard let display = screen.dynamicDisplay else {
+            if skipMissingScreen {
+                return .result(value: ScreenGammaTable(red: 0, green: 0, blue: 0))
+            }
+
             throw $screen.needsValueError()
         }
 
@@ -2110,8 +2289,13 @@ struct MirrorSetIntent: AppIntent {
         )
 
     static var parameterSummary: some ParameterSummary {
-        Summary("Mirror \(\.$mirrorMaster) onto \(\.$mirrors)")
+        Summary("Mirror \(\.$mirrorMaster) onto \(\.$mirrors)") {
+            \.$skipMissingScreen
+        }
     }
+
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery(single: true))
     var mirrorMaster: Screen
@@ -2123,6 +2307,10 @@ struct MirrorSetIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
         guard let mirrorMaster = mirrorMaster.dynamicDisplay else {
+            if skipMissingScreen {
+                return .result()
+            }
+
             throw $mirrorMaster.needsValueError()
         }
         mirrorMaster.refreshPanel()
@@ -2167,8 +2355,13 @@ struct StopMirroringIntent: AppIntent {
         )
 
     static var parameterSummary: some ParameterSummary {
-        Summary("Stop mirroring for \(\.$mirrorMaster).")
+        Summary("Stop mirroring for \(\.$mirrorMaster).") {
+            \.$skipMissingScreen
+        }
     }
+
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery(single: true, additionalScreens: [
         Screen(id: UInt32.max - 40, name: "All screens", serial: "allScreens", isDynamicFilter: true),
@@ -2187,6 +2380,10 @@ struct StopMirroringIntent: AppIntent {
         }
 
         guard let mirrorMaster = mirrorMaster.displays.first else {
+            if skipMissingScreen {
+                return .result()
+            }
+
             throw $mirrorMaster.needsValueError()
         }
         mirrorMaster.refreshPanel()
