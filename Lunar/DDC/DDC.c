@@ -417,7 +417,7 @@ bool DDCReadIntel(io_service_t framebuffer, struct DDCReadCommand* read)
     return result;
 }
 
-UInt32 SupportedTransactionType()
+UInt32 SupportedTransactionType(void)
 {
     kern_return_t kr;
     io_iterator_t io_objects;
@@ -580,7 +580,7 @@ bool EDIDTestIntel(io_service_t framebuffer, struct EDID* edid, uint8_t edidData
     return !sum;
 }
 
-void sleepNow() {
+void sleepNow(void) {
     io_connect_t fb = IOPMFindPowerManagement(MACH_PORT_NULL);
     if (fb != MACH_PORT_NULL) {
         IOPMSleepSystem(fb);

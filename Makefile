@@ -68,7 +68,6 @@ release: changelog
 	cat ReleaseNotes/$(VERSION).md >> /tmp/release_file_$(VERSION).md
 	gh release create v$(VERSION) -F /tmp/release_file_$(VERSION).md "Releases/Lunar-$(VERSION).dmg#Lunar.dmg"
 
-sentry: export DWARF_DSYM_FOLDER_PATH="$(shell xcodebuild -scheme $(ENV) -configuration $(ENV) -showBuildSettings -json 2>/dev/null | jq -r .[0].buildSettings.DWARF_DSYM_FOLDER_PATH)"
 sentry:
 	sentry-cli upload-dif --include-sources -o alin-panaitiu -p lunar --wait -- $(DERIVED_DATA_DIR)/Build/Products/Release/
 
@@ -76,15 +75,14 @@ print-%  : ; @echo $* = $($*)
 
 dmg: SHELL=/usr/local/bin/fish
 dmg:
-	env CODESIGNING_FOLDER_PATH=(xcdir -s '$(ENV)' -c $(ENV))/Lunar.app ./bin/make-installer dmg
+	env CODESIGNING_FOLDER_PATH=(xcdir -s 'Lunar' -c $(ENV))/Lunar.app ./bin/make-installer dmg
 
 pack: SHELL=/usr/local/bin/fish
 pack: export SPARKLE_BIN_DIR="$$PWD/Frameworks/Sparkle/bin/"
 pack:
-	env CODESIGNING_FOLDER_PATH=(xcdir -s '$(ENV)' -c $(ENV))/Lunar.app PROJECT_DIR=$$PWD ./bin/pack
+	env CODESIGNING_FOLDER_PATH=(xcdir -s 'Lunar' -c $(ENV))/Lunar.app PROJECT_DIR=$$PWD ./bin/pack
 
 appcast: export SPARKLE_BIN_DIR="$$PWD/Frameworks/Sparkle/bin/"
-appcast: VERSION=$(shell xcodebuild -scheme $(ENV) -configuration $(ENV) -workspace Lunar.xcworkspace -showBuildSettings -json 2>/dev/null | jq -r .[0].buildSettings.MARKETING_VERSION)
 appcast: Releases/Lunar-$(FULL_VERSION).html
 ifneq ($(DISABLE_APPCAST),1)
 	rm Releases/Lunar.dmg || true
@@ -104,22 +102,22 @@ endif
 endif
 
 
-setversion: OLD_VERSION=$(shell xcodebuild -scheme $(ENV) -configuration $(ENV) -workspace Lunar.xcworkspace -showBuildSettings -json 2>/dev/null | jq -r .[0].buildSettings.MARKETING_VERSION)
+setversion: OLD_VERSION=$(shell rg -o --no-filename 'MARKETING_VERSION = ([^;]+).+' -r '$$1' *.xcodeproj/project.pbxproj | head -1)
 setversion:
 ifneq (, $(FULL_VERSION))
 	rg -l 'VERSION = "?$(OLD_VERSION)"?' && sed -E -i .bkp 's/VERSION = "?$(OLD_VERSION)"?/VERSION = $(FULL_VERSION)/g' $$(rg -l 'VERSION = "?$(OLD_VERSION)"?')
 endif
 
 clean:
-	xcodebuild -scheme $(ENV) -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=NO clean
+	xcodebuild -scheme Lunar -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=NO clean
 
 build: BEAUTIFY=0
 build: ONLY_ACTIVE_ARCH=NO
 build: setversion
 ifneq ($(BEAUTIFY),0)
-	xcodebuild -scheme $(ENV) -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=$(ONLY_ACTIVE_ARCH) | xcbeautify
+	xcodebuild -scheme Lunar -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=$(ONLY_ACTIVE_ARCH) | xcbeautify
 else
-	xcodebuild -scheme $(ENV) -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=$(ONLY_ACTIVE_ARCH)
+	xcodebuild -scheme Lunar -configuration $(ENV) -workspace Lunar.xcworkspace ONLY_ACTIVE_ARCH=$(ONLY_ACTIVE_ARCH)
 endif
 ifneq ($(DISABLE_PACKING),1)
 	make pack VERSION=$(VERSION) BETA=$(BETA)

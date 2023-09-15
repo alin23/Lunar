@@ -10,30 +10,30 @@ import Foundation
 import os
 
 #if DEBUG
-    @inline(__always) func debug(_ message: @autoclosure @escaping () -> String) {
+    @inline(__always) @inlinable func debug(_ message: @autoclosure @escaping () -> String) {
         log.oslog.debug("\(message())")
     }
 
-    @inline(__always) func trace(_ message: @autoclosure @escaping () -> String) {
+    @inline(__always) @inlinable func trace(_ message: @autoclosure @escaping () -> String) {
         log.oslog.trace("\(message())")
     }
 
-    @inline(__always) func err(_ message: @autoclosure @escaping () -> String) {
+    @inline(__always) @inlinable func err(_ message: @autoclosure @escaping () -> String) {
         log.oslog.critical("\(message())")
     }
 #else
-    @inline(__always) func trace(_: @autoclosure () -> String) {}
-    @inline(__always) func debug(_: @autoclosure () -> String) {}
-    @inline(__always) func err(_: @autoclosure () -> String) {}
+    @inline(__always) @inlinable func trace(_: @autoclosure () -> String) {}
+    @inline(__always) @inlinable func debug(_: @autoclosure () -> String) {}
+    @inline(__always) @inlinable func err(_: @autoclosure () -> String) {}
 #endif
 
 // MARK: - Logger
 
-final class SwiftyLogger {
-    static let oslog = Logger(subsystem: "fyi.lunar.Lunar", category: "default")
-    static let traceLog = Logger(subsystem: "fyi.lunar.Lunar", category: "trace")
+@usableFromInline final class SwiftyLogger {
+    @usableFromInline static let oslog = Logger(subsystem: "fyi.lunar.Lunar", category: "default")
+    @usableFromInline static let traceLog = Logger(subsystem: "fyi.lunar.Lunar", category: "trace")
 
-    @inline(__always) class func verbose(_ message: String, context: Any? = "") {
+    @inline(__always) @inlinable class func verbose(_ message: String, context: Any? = "") {
         #if DEBUG
             oslog.trace("🫥 \(message, privacy: .public) \(String(describing: context ?? ""), privacy: .public)")
         #else
@@ -41,7 +41,7 @@ final class SwiftyLogger {
         #endif
     }
 
-    @inline(__always) class func debug(_ message: String, context: Any? = "") {
+    @inline(__always) @inlinable class func debug(_ message: String, context: Any? = "") {
         #if DEBUG
             oslog.debug("🌲 \(message, privacy: .public) \(String(describing: context ?? ""), privacy: .public)")
         #else
@@ -49,7 +49,7 @@ final class SwiftyLogger {
         #endif
     }
 
-    @inline(__always) class func info(_ message: String, context: Any? = "") {
+    @inline(__always) @inlinable class func info(_ message: String, context: Any? = "") {
         #if DEBUG
             oslog.info("💠 \(message, privacy: .public) \(String(describing: context ?? ""), privacy: .public)")
         #else
@@ -57,7 +57,7 @@ final class SwiftyLogger {
         #endif
     }
 
-    @inline(__always) class func warning(_ message: String, context: Any? = "") {
+    @inline(__always) @inlinable class func warning(_ message: String, context: Any? = "") {
         #if DEBUG
             oslog.warning("🦧 \(message, privacy: .public) \(String(describing: context ?? ""), privacy: .public)")
         #else
@@ -65,7 +65,7 @@ final class SwiftyLogger {
         #endif
     }
 
-    @inline(__always) class func error(_ message: String, context: Any? = "") {
+    @inline(__always) @inlinable class func error(_ message: String, context: Any? = "") {
         #if DEBUG
             oslog.fault("👹 \(message, privacy: .public) \(String(describing: context ?? ""), privacy: .public)")
         #else
@@ -73,12 +73,12 @@ final class SwiftyLogger {
         #endif
     }
 
-    @inline(__always) class func traceCalls() {
+    @inline(__always) @inlinable class func traceCalls() {
         traceLog.trace("\(Thread.callStackSymbols.joined(separator: "\n"), privacy: .public)")
     }
 }
 
-let log = SwiftyLogger.self
+@usableFromInline let log = SwiftyLogger.self
 
 import Sentry
 

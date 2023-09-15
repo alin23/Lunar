@@ -81,63 +81,63 @@ extension DispatchQueue {
 }
 
 extension BinaryInteger {
-    @inline(__always) var ns: NSNumber {
+    @inline(__always) @inlinable var ns: NSNumber {
         NSNumber(value: d)
     }
 
-    @inline(__always) var d: Double {
+    @inline(__always) @inlinable var d: Double {
         Double(self)
     }
 
-    @inline(__always) var cg: CGGammaValue {
+    @inline(__always) @inlinable var cg: CGGammaValue {
         CGGammaValue(self)
     }
 
-    @inline(__always) var f: Float {
+    @inline(__always) @inlinable var f: Float {
         Float(self)
     }
 
-    @inline(__always) var u: UInt {
+    @inline(__always) @inlinable var u: UInt {
         UInt(max(self, 0))
     }
 
-    @inline(__always) var u8: UInt8 {
+    @inline(__always) @inlinable var u8: UInt8 {
         UInt8(max(self, 0))
     }
 
-    @inline(__always) var u16: UInt16 {
+    @inline(__always) @inlinable var u16: UInt16 {
         UInt16(max(self, 0))
     }
 
-    @inline(__always) var u32: UInt32 {
+    @inline(__always) @inlinable var u32: UInt32 {
         UInt32(max(self, 0))
     }
 
-    @inline(__always) var u64: UInt64 {
+    @inline(__always) @inlinable var u64: UInt64 {
         UInt64(max(self, 0))
     }
 
-    @inline(__always) var i: Int {
+    @inline(__always) @inlinable var i: Int {
         Int(self)
     }
 
-    @inline(__always) var i8: Int8 {
+    @inline(__always) @inlinable var i8: Int8 {
         Int8(self)
     }
 
-    @inline(__always) var i16: Int16 {
+    @inline(__always) @inlinable var i16: Int16 {
         Int16(self)
     }
 
-    @inline(__always) var i32: Int32 {
+    @inline(__always) @inlinable var i32: Int32 {
         Int32(cap(Int(self), minVal: Int(Int32.min), maxVal: Int(Int32.max)))
     }
 
-    @inline(__always) var i64: Int64 {
+    @inline(__always) @inlinable var i64: Int64 {
         Int64(self)
     }
 
-    @inline(__always) var s: String {
+    @inline(__always) @inlinable var s: String {
         String(self)
     }
 
@@ -147,15 +147,15 @@ extension BinaryInteger {
 }
 
 extension Bool {
-    @inline(__always) var i: Int {
+    @inline(__always) @inlinable var i: Int {
         self ? 1 : 0
     }
 
-    @inline(__always) var s: String {
+    @inline(__always) @inlinable var s: String {
         self ? "true" : "false"
     }
 
-    @inline(__always) var state: NSControl.StateValue {
+    @inline(__always) @inlinable var state: NSControl.StateValue {
         self ? .on : .off
     }
 }
@@ -187,7 +187,7 @@ extension NSColor {
     }
 }
 
-let CHARS_NOT_STRIPPED = Set("abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLKMNOPQRSTUVWXYZ1234567890+-=().!_")
+@usableFromInline let CHARS_NOT_STRIPPED = Set("abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLKMNOPQRSTUVWXYZ1234567890+-=().!_")
 extension String {
     func parseHex(strict: Bool = false) -> Int? {
         guard !strict || starts(with: "0x") || starts(with: "x") || hasSuffix("h") else { return nil }
@@ -209,61 +209,61 @@ extension String {
         return Int(sub, radix: 16)
     }
 
-    @inline(__always) var stripped: String {
+    @inline(__always) @inlinable var stripped: String {
         filter { CHARS_NOT_STRIPPED.contains($0) }
     }
 
-    @inline(__always) var trimmed: String {
+    @inline(__always) @inlinable var trimmed: String {
         trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    @inline(__always) var d: Double? {
+    @inline(__always) @inlinable var d: Double? {
         Double(replacingOccurrences(of: ",", with: "."))
         // NumberFormatter.shared.number(from: self)?.doubleValue
     }
 
-    @inline(__always) var f: Float? {
+    @inline(__always) @inlinable var f: Float? {
         Float(replacingOccurrences(of: ",", with: "."))
         // NumberFormatter.shared.number(from: self)?.floatValue
     }
 
-    @inline(__always) var u: UInt? {
+    @inline(__always) @inlinable var u: UInt? {
         UInt(self)
     }
 
-    @inline(__always) var u8: UInt8? {
+    @inline(__always) @inlinable var u8: UInt8? {
         UInt8(self)
     }
 
-    @inline(__always) var u16: UInt16? {
+    @inline(__always) @inlinable var u16: UInt16? {
         UInt16(self)
     }
 
-    @inline(__always) var u32: UInt32? {
+    @inline(__always) @inlinable var u32: UInt32? {
         UInt32(self)
     }
 
-    @inline(__always) var u64: UInt64? {
+    @inline(__always) @inlinable var u64: UInt64? {
         UInt64(self)
     }
 
-    @inline(__always) var i: Int? {
+    @inline(__always) @inlinable var i: Int? {
         Int(self)
     }
 
-    @inline(__always) var i8: Int8? {
+    @inline(__always) @inlinable var i8: Int8? {
         Int8(self)
     }
 
-    @inline(__always) var i16: Int16? {
+    @inline(__always) @inlinable var i16: Int16? {
         Int16(self)
     }
 
-    @inline(__always) var i32: Int32? {
+    @inline(__always) @inlinable var i32: Int32? {
         Int32(self)
     }
 
-    @inline(__always) var i64: Int64? {
+    @inline(__always) @inlinable var i64: Int64? {
         Int64(self)
     }
 
@@ -289,15 +289,15 @@ extension Substring.SubSequence {
 }
 
 extension String.SubSequence {
-    @inline(__always) var u32: UInt32? {
+    @inline(__always) @inlinable var u32: UInt32? {
         UInt32(self)
     }
 
-    @inline(__always) var i32: Int32? {
+    @inline(__always) @inlinable var i32: Int32? {
         Int32(self)
     }
 
-    @inline(__always) var d: Double? {
+    @inline(__always) @inlinable var d: Double? {
         Double(self)
     }
 }
@@ -355,7 +355,7 @@ extension [UInt8] {
 }
 
 extension Double {
-    @inline(__always) func rounded(to scale: Int) -> Double {
+    @inline(__always) @inlinable func rounded(to scale: Int) -> Double {
         let behavior = NSDecimalNumberHandler(
             roundingMode: .plain,
             scale: scale.i16,
@@ -370,48 +370,48 @@ extension Double {
         return roundedValue.doubleValue
     }
 
-    @inline(__always) var ns: NSNumber {
+    @inline(__always) @inlinable var ns: NSNumber {
         NSNumber(value: self)
     }
 
-    @inline(__always) var cg: CGGammaValue {
+    @inline(__always) @inlinable var cg: CGGammaValue {
         CGGammaValue(self)
     }
 
-    @inline(__always) var f: Float {
+    @inline(__always) @inlinable var f: Float {
         get { Float(self) }
         set { self = Double(newValue) }
     }
 
-    @inline(__always) var i: Int {
+    @inline(__always) @inlinable var i: Int {
         Int(self)
     }
 
-    @inline(__always) var u8: UInt8 {
+    @inline(__always) @inlinable var u8: UInt8 {
         UInt8(cap(intround, minVal: Int(UInt8.min), maxVal: Int(UInt8.max)))
     }
 
-    @inline(__always) var u16: UInt16 {
+    @inline(__always) @inlinable var u16: UInt16 {
         UInt16(cap(intround, minVal: Int(UInt16.min), maxVal: Int(UInt16.max)))
     }
 
-    @inline(__always) var u32: UInt32 {
+    @inline(__always) @inlinable var u32: UInt32 {
         UInt32(cap(intround, minVal: Int(UInt32.min), maxVal: Int(UInt32.max)))
     }
 
-    @inline(__always) var i8: Int8 {
+    @inline(__always) @inlinable var i8: Int8 {
         Int8(cap(intround, minVal: Int(Int8.min), maxVal: Int(Int8.max)))
     }
 
-    @inline(__always) var i16: Int16 {
+    @inline(__always) @inlinable var i16: Int16 {
         Int16(cap(intround, minVal: Int(Int16.min), maxVal: Int(Int16.max)))
     }
 
-    @inline(__always) var i32: Int32 {
+    @inline(__always) @inlinable var i32: Int32 {
         Int32(cap(intround, minVal: Int(Int32.min), maxVal: Int(Int32.max)))
     }
 
-    @inline(__always) var intround: Int {
+    @inline(__always) @inlinable var intround: Int {
         rounded().i
     }
 
@@ -557,7 +557,7 @@ extension Dictionary {
 }
 
 extension Float {
-    @inline(__always) func rounded(to scale: Int) -> Float {
+    @inline(__always) @inlinable func rounded(to scale: Int) -> Float {
         let behavior = NSDecimalNumberHandler(
             roundingMode: .plain,
             scale: scale.i16,
@@ -572,31 +572,31 @@ extension Float {
         return roundedValue.floatValue
     }
 
-    @inline(__always) var ns: NSNumber {
+    @inline(__always) @inlinable var ns: NSNumber {
         NSNumber(value: self)
     }
 
-    @inline(__always) var d: Double {
+    @inline(__always) @inlinable var d: Double {
         Double(self)
     }
 
-    @inline(__always) var i: Int {
+    @inline(__always) @inlinable var i: Int {
         Int(self)
     }
 
-    @inline(__always) var u8: UInt8 {
+    @inline(__always) @inlinable var u8: UInt8 {
         UInt8(cap(intround, minVal: Int(UInt8.min), maxVal: Int(UInt8.max)))
     }
 
-    @inline(__always) var u16: UInt16 {
+    @inline(__always) @inlinable var u16: UInt16 {
         UInt16(cap(intround, minVal: Int(UInt16.min), maxVal: Int(UInt16.max)))
     }
 
-    @inline(__always) var u32: UInt32 {
+    @inline(__always) @inlinable var u32: UInt32 {
         UInt32(cap(intround, minVal: Int(UInt32.min), maxVal: Int(UInt32.max)))
     }
 
-    @inline(__always) var intround: Int {
+    @inline(__always) @inlinable var intround: Int {
         rounded().i
     }
 
@@ -610,31 +610,31 @@ extension Float {
 }
 
 extension CGFloat {
-    @inline(__always) var ns: NSNumber {
+    @inline(__always) @inlinable var ns: NSNumber {
         NSNumber(value: Float(self))
     }
 
-    @inline(__always) var d: Double {
+    @inline(__always) @inlinable var d: Double {
         Double(self)
     }
 
-    @inline(__always) var i: Int {
+    @inline(__always) @inlinable var i: Int {
         Int(self)
     }
 
-    @inline(__always) var u8: UInt8 {
+    @inline(__always) @inlinable var u8: UInt8 {
         UInt8(cap(intround, minVal: Int(UInt8.min), maxVal: Int(UInt8.max)))
     }
 
-    @inline(__always) var u16: UInt16 {
+    @inline(__always) @inlinable var u16: UInt16 {
         UInt16(cap(intround, minVal: Int(UInt16.min), maxVal: Int(UInt16.max)))
     }
 
-    @inline(__always) var u32: UInt32 {
+    @inline(__always) @inlinable var u32: UInt32 {
         UInt32(cap(intround, minVal: Int(UInt32.min), maxVal: Int(UInt32.max)))
     }
 
-    @inline(__always) var intround: Int {
+    @inline(__always) @inlinable var intround: Int {
         rounded().i
     }
 
@@ -918,13 +918,6 @@ extension MPDisplayMode {
 
     var title: String {
         "\(width)×\(height)@\(refreshStringSafe)"
-    }
-
-    @available(iOS 16, macOS 13, *)
-    var panelMode: PanelMode? {
-        guard let display, let screen = display.screen else { return nil }
-
-        return PanelMode(screen: screen, id: (screen.id << 32) + modeNumber.i, title: title, subtitle: subtitle, image: imageSystemName)
     }
 
     var subtitle: String {
@@ -1895,4 +1888,39 @@ extension Binding {
 
 extension View {
     var any: AnyView { AnyView(self) }
+}
+
+import CryptoKit
+
+public extension Data {
+    var sha512: String {
+        Data(SHA512.hash(data: self).map { $0 }).str(hex: true, separator: "")
+    }
+    var sha256: String {
+        Data(SHA256.hash(data: self).map { $0 }).str(hex: true, separator: "")
+    }
+    var sha1: String {
+        Data(Insecure.SHA1.hash(data: self).map { $0 }).str(hex: true, separator: "")
+    }
+    var sha512Data: Data {
+        Data(SHA512.hash(data: self).map { $0 })
+    }
+    var sha256Data: Data {
+        Data(SHA256.hash(data: self).map { $0 })
+    }
+    var sha1Data: Data {
+        Data(Insecure.SHA1.hash(data: self).map { $0 })
+    }
+}
+
+extension String {
+    var sha512: String {
+        data(using: .utf8)!.sha512
+    }
+    var sha256: String {
+        data(using: .utf8)!.sha256
+    }
+    var sha1: String {
+        data(using: .utf8)!.sha1
+    }
 }
