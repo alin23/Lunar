@@ -560,7 +560,9 @@ func createAndShowWindow(
                 w.setFrameOrigin(position)
             }
 
-            wc.showWindow(nil)
+            if wc.window == nil || wc.window!.canBecomeKey {
+                wc.showWindow(nil)
+            }
 
             if focus {
                 if let window = wc.window as? ModernWindow {
@@ -574,31 +576,15 @@ func createAndShowWindow(
     }
 }
 
-func sha256(data: Data) -> Data {
-    var hash = [UInt8](repeating: 0, count: CC_SHA256_DIGEST_LENGTH.i)
-    data.withUnsafeBytes {
-        _ = CC_SHA256($0.baseAddress, CC_LONG(data.count), &hash)
-    }
-    return Data(hash)
-}
-
-func sha512(data: Data) -> Data {
-    var hash = [UInt8](repeating: 0, count: CC_SHA512_DIGEST_LENGTH.i)
-    data.withUnsafeBytes {
-        _ = CC_SHA512($0.baseAddress, CC_LONG(data.count), &hash)
-    }
-    return Data(hash)
-}
-
 func shortHash(string: String, length: Int = 8) -> String {
     guard let data = string.data(using: .utf8, allowLossyConversion: true) else { return string }
-    return String(sha256(data: data).str(hex: true, separator: "").prefix(length))
+    return data.sha256.prefix(length).s
 }
 
 func generateAPIKey() -> String {
     var r = SystemRandomNumberGenerator()
     let serialNumberData = Data(r.next().toUInt8Array() + r.next().toUInt8Array() + r.next().toUInt8Array() + r.next().toUInt8Array())
-    let hash = sha256(data: serialNumberData).prefix(20).str(base64: true, separator: "").map { (c: Character) -> Character in
+    let hash = serialNumberData.sha256Data.prefix(20).str(base64: true, separator: "").map { (c: Character) -> Character in
         switch c {
         case "/": return Character(".")
         case "+": return Character(".")
@@ -625,7 +611,7 @@ func getSerialNumberHash() -> String? {
     guard let serialNumberData = serialNumber.trimmed.data(using: .utf8, allowLossyConversion: true) else {
         return nil
     }
-    let hash = sha256(data: serialNumberData).prefix(20).str(base64: true, separator: "").map { (c: Character) -> Character in
+    let hash = serialNumberData.sha256Data.prefix(20).str(base64: true, separator: "").map { (c: Character) -> Character in
         switch c {
         case "/": return Character(".")
         case "+": return Character(".")
@@ -874,9 +860,11 @@ func mainAsyncAfter(ms: Int, _ action: DispatchWorkItem) {
 }
 
 extension Double {
+    @inline(__always) @inlinable
     func map(from: (Double, Double), to: (Double, Double)) -> Double {
         lerp(invlerp(self, min: from.0, max: from.1), min: to.0, max: to.1)
     }
+    @inline(__always) @inlinable
     func map(from: (Double, Double), to: (Double, Double), gamma: Double) -> Double {
         lerp(pow(invlerp(self, min: from.0, max: from.1), 1.0 / gamma), min: to.0, max: to.1)
     }
@@ -886,88 +874,33 @@ extension Double {
     }
 }
 extension Float {
+    @inline(__always) @inlinable
     func map(from: (Float, Float), to: (Float, Float)) -> Float {
         lerp(invlerp(self, min: from.0, max: from.1), min: to.0, max: to.1)
     }
+    @inline(__always) @inlinable
     func map(from: (Float, Float), to: (Float, Float), gamma: Float) -> Float {
         lerp(pow(invlerp(self, min: from.0, max: from.1), 1.0 / gamma), min: to.0, max: to.1)
     }
-    @inline(__always)
+    @inline(__always) @inlinable
     func capped(between minVal: Float, and maxVal: Float) -> Float {
         cap(self, minVal: minVal, maxVal: maxVal)
     }
 }
 extension CGFloat {
+    @inline(__always) @inlinable
     func map(from: (CGFloat, CGFloat), to: (CGFloat, CGFloat)) -> CGFloat {
         lerp(invlerp(self, min: from.0, max: from.1), min: to.0, max: to.1)
     }
+    @inline(__always) @inlinable
     func map(from: (CGFloat, CGFloat), to: (CGFloat, CGFloat), gamma: CGFloat) -> CGFloat {
         lerp(pow(invlerp(self, min: from.0, max: from.1), 1.0 / gamma), min: to.0, max: to.1)
     }
-    @inline(__always)
+    @inline(__always) @inlinable
     func capped(between minVal: CGFloat, and maxVal: CGFloat) -> CGFloat {
         cap(self, minVal: minVal, maxVal: maxVal)
     }
 }
-
-// func mapNumber<T: Numeric & Comparable & FloatingPoint>(_ number: T, fromLow: T, fromHigh: T, toLow: T, toHigh: T) -> T {
-//     if fromLow == fromHigh {
-//         return number
-//     }
-
-//     if number >= fromHigh {
-//         return toHigh
-//     } else if number <= fromLow {
-//         return toLow
-//     } else if toLow < toHigh {
-//         let diff = toHigh - toLow
-//         let fromDiff = fromHigh - fromLow
-//         return (number - fromLow) * diff / fromDiff + toLow
-//     } else {
-//         let diff = toHigh - toLow
-//         let fromDiff = fromHigh - fromLow
-//         return (number - fromLow) * diff / fromDiff + toLow
-//     }
-// }
-
-// func mapNumberSIMD(_ number: [Double], fromLow: Double, fromHigh: Double, toLow: Double, toHigh: Double) -> [Double] {
-//    if fromLow == fromHigh {
-//        log.warning("fromLow and fromHigh are both equal to \(fromLow)")
-//        return number
-//    }
-//
-//    let resultLow = number.firstIndex(where: { $0 > fromLow }) ?? 0
-//    let resultHigh = number.lastIndex(where: { $0 < fromHigh }) ?? (number.count - 1)
-//
-//    if resultLow >= resultHigh {
-//        var result = [Double](repeating: toLow, count: number.count)
-//        if resultHigh != (number.count - 1) {
-//            result.replaceSubrange((resultHigh + 1) ..< number.count, with: repeatElement(toHigh, count: number.count - resultHigh))
-//        }
-//        return result
-//    }
-//
-//    let numbers = Array(number[resultLow ... resultHigh])
-//
-//    var value: [Double]
-//    if toLow == 0.0, fromLow == 0.0, toHigh == 1.0 {
-//        value = numbers / fromHigh
-//    } else {
-//        let diff = toHigh - toLow
-//        let fromDiff = fromHigh - fromLow
-//        value = numbers - fromLow
-//        value = value * diff
-//        value = value / fromDiff
-//        value = value + toLow
-//    }
-//
-//    var result = [Double](repeating: toLow, count: number.count)
-//    result.replaceSubrange(resultLow ... resultHigh, with: value)
-//    if resultHigh != (number.count - 1) {
-//        result.replaceSubrange((resultHigh + 1) ..< number.count, with: repeatElement(toHigh, count: number.count - (resultHigh + 1)))
-//    }
-//    return result
-// }
 
 func ramp(targetValue: Float, lastTargetValue: inout Float, samples: Int, step _: Float = 1.0) -> [Float] {
     var control = [Float](repeating: 0, count: samples)
@@ -1126,7 +1059,9 @@ func createWindow(
                 }
                 if show {
 //                    log.debug("Showing window '\(window.title)'")
-                    wc.showWindow(nil)
+                    if window.canBecomeKey {
+                        wc.showWindow(nil)
+                    }
                     window.orderFrontRegardless()
                 }
             }
@@ -1271,7 +1206,9 @@ func ask(
 
         if let wc = window.windowController {
             log.debug("Showing window '\(window.title)'")
-            wc.showWindow(nil)
+            if window.canBecomeKey {
+                wc.showWindow(nil)
+            }
             window.orderFrontRegardless()
         }
 
@@ -1417,7 +1354,9 @@ func askMultiButton(
         if let window {
             if let wc = window.windowController {
                 log.debug("Showing window '\(window.title)'")
-                wc.showWindow(nil)
+                if window.canBecomeKey {
+                    wc.showWindow(nil)
+                }
                 window.orderFrontRegardless()
             }
 
@@ -1840,6 +1779,7 @@ class PlainTextFieldCell: NSTextFieldCell {
     }
 }
 
+@inline(__always) @inlinable
 func cap<T: Comparable>(_ number: T, minVal: T, maxVal: T) -> T {
     max(min(number, maxVal), minVal)
 }

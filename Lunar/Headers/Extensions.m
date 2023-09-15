@@ -196,11 +196,11 @@
 }
 @end
 
-int pidCount() {
+int pidCount(void) {
     return proc_listallpids(NULL, 0);
 }
 
-NSArray* allProcesses(){
+NSArray* allProcesses(void) {
     static int maxArgumentSize = 0;
     if (maxArgumentSize == 0) {
         size_t size = sizeof(maxArgumentSize);

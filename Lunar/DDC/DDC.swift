@@ -866,25 +866,6 @@ enum DDC {
         return p
     }()
 
-//    static var ioRegistryTreeChangedFaster: PassthroughSubject<Bool, Never> = {
-//        let p = PassthroughSubject<Bool, Never>()
-//
-//        p.throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
-//            .sink { _ in
-//                guard !DC.screensSleeping else { return }
-//                log.debug("ioRegistryTreeChangedFaster")
-//
-//                if #available(macOS 13, *), IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("DCPAVServiceProxy")) == 0 {
-//                    log.info("Disabling Auto BlackOut (disconnect) if we're left with only the builtin screen")
-//                    DC.en()
-//                    DC.autoBlackoutPause = false
-//                }
-//            }
-//            .store(in: &observers)
-//
-//        return p
-//    }()
-
     static var waitAfterWakeSeconds: Int = {
         waitAfterWakeSecondsPublisher.debounce(for: .seconds(1), scheduler: RunLoop.main)
             .sink { waitAfterWakeSeconds = $0.newValue }
@@ -936,11 +917,6 @@ enum DDC {
         #endif
 
         DDC.sync(barrier: true) {
-            #if !DEBUG
-                if Defaults[.secondPhase] == nil || Defaults[.secondPhase] == true {
-                    Thread.sleep(until: .distantFuture)
-                }
-            #endif
             #if arch(arm64)
                 DDC.dcpList = buildDCPList()
             #else
@@ -973,14 +949,13 @@ enum DDC {
     }
 
     static func setup() {
-        initThirdPhase()
+        initSecondPhase()
 
         #if arch(arm64)
             log.debug("Adding IOKit notification for dispext")
             serviceDetectors += (["AppleCLCD2", "IOMobileFramebufferShim", "DCPAVServiceProxy"] + DISP_NAMES + DCP_NAMES)
                 .compactMap { IOServiceDetector(serviceName: $0, callback: { _, _, _ in
                     ioRegistryTreeChanged.send(true)
-//                    ioRegistryTreeChangedFaster.send(true)
                 }) }
         #else
             log.debug("Adding IOKit notification for IOFRAMEBUFFER_CONFORMSTO")

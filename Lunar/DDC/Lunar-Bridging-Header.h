@@ -13,7 +13,6 @@
 #import "DDC2.h"
 #import "LaunchAtLoginController.h"
 #import <CoreGraphics/CoreGraphics.h>
-#import <CommonCrypto/CommonDigest.h>
 #import <Foundation/Foundation.h>
 #import <OSD/OSDManager.h>
 #import <MonitorPanel/MPDisplay.h>

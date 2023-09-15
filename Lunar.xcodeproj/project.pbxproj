@@ -12,6 +12,29 @@
 		C7045DB82440DEEE002289E5 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = C7045DB72440DEEE002289E5 /* SwiftyJSON */; };
 		C7045DC12441015C002289E5 /* SwiftDate in Frameworks */ = {isa = PBXBuildFile; productRef = C7045DC02441015C002289E5 /* SwiftDate */; };
 		C705A04D268BA02E001ABBA9 /* AXSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C705A04C268BA02E001ABBA9 /* AXSwift */; };
+		C70A793D2AB471F900289426 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = C70A793C2AB471F900289426 /* SwiftUIIntrospect */; };
+		C70A79542AB4A11600289426 /* ManageButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A793F2AB4A11600289426 /* ManageButtonView.swift */; };
+		C70A79552AB4A11600289426 /* NitsTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A79402AB4A11600289426 /* NitsTextField.swift */; };
+		C70A79562AB4A11600289426 /* TextInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A79412AB4A11600289426 /* TextInputView.swift */; };
+		C70A79572AB4A11600289426 /* ViewGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A79422AB4A11600289426 /* ViewGeometry.swift */; };
+		C70A79582AB4A11600289426 /* AdvancedSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A79432AB4A11600289426 /* AdvancedSettingsView.swift */; };
+		C70A79592AB4A11600289426 /* PresetButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A79442AB4A11600289426 /* PresetButtonView.swift */; };
+		C70A795A2AB4A11600289426 /* AllDisplaysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A79452AB4A11600289426 /* AllDisplaysView.swift */; };
+		C70A795B2AB4A11600289426 /* UnmanagedDisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A79462AB4A11600289426 /* UnmanagedDisplayView.swift */; };
+		C70A795C2AB4A11600289426 /* PaddedPopoverView<Content>.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A79472AB4A11600289426 /* PaddedPopoverView<Content>.swift */; };
+		C70A795D2AB4A11600289426 /* HDRSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A79482AB4A11600289426 /* HDRSettingsView.swift */; };
+		C70A795E2AB4A11600289426 /* DisconnectedDisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A79492AB4A11600289426 /* DisconnectedDisplayView.swift */; };
+		C70A795F2AB4A11600289426 /* PowerOffButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A794A2AB4A11600289426 /* PowerOffButtonView.swift */; };
+		C70A79602AB4A11600289426 /* DisplayRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A794B2AB4A11600289426 /* DisplayRowView.swift */; };
+		C70A79612AB4A11600289426 /* QuickActionsLayoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A794C2AB4A11600289426 /* QuickActionsLayoutView.swift */; };
+		C70A79622AB4A11600289426 /* QuickActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A794D2AB4A11600289426 /* QuickActionsView.swift */; };
+		C70A79632AB4A11600289426 /* QuickActionsMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A794E2AB4A11600289426 /* QuickActionsMenuView.swift */; };
+		C70A79642AB4A11600289426 /* BlackoutPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A794F2AB4A11600289426 /* BlackoutPopoverView.swift */; };
+		C70A79652AB4A11600289426 /* BlackoutPopoverHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A79502AB4A11600289426 /* BlackoutPopoverHeaderView.swift */; };
+		C70A79662AB4A11600289426 /* RawValuesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A79512AB4A11600289426 /* RawValuesView.swift */; };
+		C70A79672AB4A11600289426 /* UsefulInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A79522AB4A11600289426 /* UsefulInfo.swift */; };
+		C70A79682AB4A11600289426 /* BlackoutPopoverRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A79532AB4A11600289426 /* BlackoutPopoverRowView.swift */; };
+		C70A796A2AB4A1EB00289426 /* NeedsLunarProView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70A79692AB4A1EB00289426 /* NeedsLunarProView.swift */; };
 		C7138D8D2634AF0500406EE3 /* KeyHolder in Frameworks */ = {isa = PBXBuildFile; productRef = C7138D8C2634AF0500406EE3 /* KeyHolder */; };
 		C7138D962634B02900406EE3 /* Paddle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7138D952634B02900406EE3 /* Paddle.framework */; };
 		C7138D982634B03400406EE3 /* Paddle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7138D952634B02900406EE3 /* Paddle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -57,12 +80,10 @@
 		C7521D34226C762B0062EC81 /* DDC.c in Sources */ = {isa = PBXBuildFile; fileRef = C7521D32226C762A0062EC81 /* DDC.c */; };
 		C7521D37226C77510062EC81 /* DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7151944224E34BA0024C6F6 /* DDC.swift */; };
 		C7545E3225B1996300383AFB /* PopUpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7545E3125B1996300383AFB /* PopUpButton.swift */; };
-		C75FFA0A266D24AA0034DDD6 /* Burritos in Frameworks */ = {isa = PBXBuildFile; productRef = C75FFA09266D24AA0034DDD6 /* Burritos */; };
 		C76168FA29B8B79F00D0A33A /* Bridge.h in Headers */ = {isa = PBXBuildFile; fileRef = C76168F929B8B79F00D0A33A /* Bridge.h */; };
 		C76168FC29B8B91C00D0A33A /* SidecarCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C76168FB29B8B91C00D0A33A /* SidecarCore.framework */; };
 		C762AAEA271F3D6200198EDA /* ColorsPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C762AAE8271F3D6200198EDA /* ColorsPopoverController.swift */; };
 		C7656C56277BBAAD00F4922A /* Swizzle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7656C55277BBAAD00F4922A /* Swizzle.swift */; };
-		C765E4FB26FF9F3500FD6463 /* CryptorECC in Frameworks */ = {isa = PBXBuildFile; productRef = C765E4FA26FF9F3500FD6463 /* CryptorECC */; };
 		C7683425245227290087946C /* DisplayName.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7683424245227290087946C /* DisplayName.swift */; };
 		C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129B20D795A7005D4BE3 /* ModernWindow.swift */; };
 		C76A129E20D8084E005D4BE3 /* NumberFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */; };
@@ -80,7 +101,6 @@
 		C77B176927BE430200B957D1 /* SimplyCoreAudio in Frameworks */ = {isa = PBXBuildFile; productRef = C77B176827BE430200B957D1 /* SimplyCoreAudio */; };
 		C77C77522811A77B006326BE /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C77C77512811A77B006326BE /* Sparkle.framework */; };
 		C77C77532811A77B006326BE /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C77C77512811A77B006326BE /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C77C77582812AA80006326BE /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = C77C77572812AA80006326BE /* Introspect */; };
 		C77CC7551FED5501009AA718 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC7541FED5501009AA718 /* SplitViewController.swift */; };
 		C77CC7591FED9ECE009AA718 /* DisplayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC7581FED9ECE009AA718 /* DisplayViewController.swift */; };
 		C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77CC75B1FEDB3A3009AA718 /* DisplayView.swift */; };
@@ -163,6 +183,7 @@
 		C7DD622F2614CBAA00B07B31 /* PaddedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD622E2614CBAA00B07B31 /* PaddedButton.swift */; };
 		C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */; };
 		C7DED369267A0663002E0188 /* LaunchAtLoginController.m in Sources */ = {isa = PBXBuildFile; fileRef = C7DED368267A0663002E0188 /* LaunchAtLoginController.m */; };
+		C7DF1A202AB609B200AF8EDC /* required.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DF1A1F2AB609B200AF8EDC /* required.swift */; };
 		C7E07373259BAC660019C9C2 /* AdaptiveMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E07372259BAC660019C9C2 /* AdaptiveMode.swift */; };
 		C7E0737A259CB2C20019C9C2 /* ManualMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E07379259CB2C20019C9C2 /* ManualMode.swift */; };
 		C7E0737C259CB2FA0019C9C2 /* LocationMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E0737B259CB2FA0019C9C2 /* LocationMode.swift */; };
@@ -216,6 +237,28 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C70A793F2AB4A11600289426 /* ManageButtonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManageButtonView.swift; sourceTree = "<group>"; };
+		C70A79402AB4A11600289426 /* NitsTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NitsTextField.swift; sourceTree = "<group>"; };
+		C70A79412AB4A11600289426 /* TextInputView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextInputView.swift; sourceTree = "<group>"; };
+		C70A79422AB4A11600289426 /* ViewGeometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewGeometry.swift; sourceTree = "<group>"; };
+		C70A79432AB4A11600289426 /* AdvancedSettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsView.swift; sourceTree = "<group>"; };
+		C70A79442AB4A11600289426 /* PresetButtonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresetButtonView.swift; sourceTree = "<group>"; };
+		C70A79452AB4A11600289426 /* AllDisplaysView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AllDisplaysView.swift; sourceTree = "<group>"; };
+		C70A79462AB4A11600289426 /* UnmanagedDisplayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnmanagedDisplayView.swift; sourceTree = "<group>"; };
+		C70A79472AB4A11600289426 /* PaddedPopoverView<Content>.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PaddedPopoverView<Content>.swift"; sourceTree = "<group>"; };
+		C70A79482AB4A11600289426 /* HDRSettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HDRSettingsView.swift; sourceTree = "<group>"; };
+		C70A79492AB4A11600289426 /* DisconnectedDisplayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisconnectedDisplayView.swift; sourceTree = "<group>"; };
+		C70A794A2AB4A11600289426 /* PowerOffButtonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PowerOffButtonView.swift; sourceTree = "<group>"; };
+		C70A794B2AB4A11600289426 /* DisplayRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayRowView.swift; sourceTree = "<group>"; };
+		C70A794C2AB4A11600289426 /* QuickActionsLayoutView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickActionsLayoutView.swift; sourceTree = "<group>"; };
+		C70A794D2AB4A11600289426 /* QuickActionsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickActionsView.swift; sourceTree = "<group>"; };
+		C70A794E2AB4A11600289426 /* QuickActionsMenuView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickActionsMenuView.swift; sourceTree = "<group>"; };
+		C70A794F2AB4A11600289426 /* BlackoutPopoverView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlackoutPopoverView.swift; sourceTree = "<group>"; };
+		C70A79502AB4A11600289426 /* BlackoutPopoverHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlackoutPopoverHeaderView.swift; sourceTree = "<group>"; };
+		C70A79512AB4A11600289426 /* RawValuesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RawValuesView.swift; sourceTree = "<group>"; };
+		C70A79522AB4A11600289426 /* UsefulInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UsefulInfo.swift; sourceTree = "<group>"; };
+		C70A79532AB4A11600289426 /* BlackoutPopoverRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlackoutPopoverRowView.swift; sourceTree = "<group>"; };
+		C70A79692AB4A1EB00289426 /* NeedsLunarProView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NeedsLunarProView.swift; sourceTree = "<group>"; };
 		C7138D952634B02900406EE3 /* Paddle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Paddle.framework; sourceTree = "<group>"; };
 		C714C997280572920061588E /* ProViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProViews.swift; sourceTree = "<group>"; };
 		C714C99A2805BDEA0061588E /* SkyLight.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SkyLight.framework; path = ../../../../../System/Library/PrivateFrameworks/SkyLight.framework; sourceTree = "<group>"; };
@@ -357,6 +400,7 @@
 		C7DE9390201A40B00017F965 /* ScrollableTextFieldCaption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTextFieldCaption.swift; sourceTree = "<group>"; };
 		C7DED367267A0639002E0188 /* LaunchAtLoginController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LaunchAtLoginController.h; sourceTree = "<group>"; };
 		C7DED368267A0663002E0188 /* LaunchAtLoginController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LaunchAtLoginController.m; sourceTree = "<group>"; };
+		C7DF1A1F2AB609B200AF8EDC /* required.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = required.swift; sourceTree = "<group>"; };
 		C7E07372259BAC660019C9C2 /* AdaptiveMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveMode.swift; sourceTree = "<group>"; };
 		C7E07379259CB2C20019C9C2 /* ManualMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualMode.swift; sourceTree = "<group>"; };
 		C7E0737B259CB2FA0019C9C2 /* LocationMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationMode.swift; sourceTree = "<group>"; };
@@ -395,6 +439,7 @@
 			files = (
 				C799C2F527BF67C4003A2FB9 /* Socket in Frameworks */,
 				C73CC6AE24616462003B2658 /* Sauce in Frameworks */,
+				C70A793D2AB471F900289426 /* SwiftUIIntrospect in Frameworks */,
 				C7045DAA24407CBC002289E5 /* Surge in Frameworks */,
 				C76168FC29B8B91C00D0A33A /* SidecarCore.framework in Frameworks */,
 				C7ECB6722750C75C00DA212D /* LDSwiftEventSourceStatic in Frameworks */,
@@ -405,7 +450,6 @@
 				C7F99AC727175E0C00FBF192 /* SwiftyMarkdown in Frameworks */,
 				C73B41EC263BE02E006F6783 /* LetsMove.framework in Frameworks */,
 				C77AB65C269A032E0046BA78 /* Magnet in Frameworks */,
-				C765E4FB26FF9F3500FD6463 /* CryptorECC in Frameworks */,
 				C705A04D268BA02E001ABBA9 /* AXSwift in Frameworks */,
 				C7138D962634B02900406EE3 /* Paddle.framework in Frameworks */,
 				C7E80E352637060F004718A4 /* libcrypto.a in Frameworks */,
@@ -427,10 +471,8 @@
 				C7E896DD2652C37E0079A328 /* CoreBrightness.framework in Frameworks */,
 				C701A23F2546C8BF004747B5 /* MediaKeyTap in Frameworks */,
 				C7B5E8592548B3F900530B47 /* Defaults in Frameworks */,
-				C75FFA0A266D24AA0034DDD6 /* Burritos in Frameworks */,
 				C7138D8D2634AF0500406EE3 /* KeyHolder in Frameworks */,
 				C714C99B2805BDEA0061588E /* SkyLight.framework in Frameworks */,
-				C77C77582812AA80006326BE /* Introspect in Frameworks */,
 				C73B9A0D25FB9AD7003184FC /* Glob in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -443,6 +485,35 @@
 			children = (
 			);
 			name = Packages;
+			sourceTree = "<group>";
+		};
+		C70A793E2AB4A11600289426 /* SwiftUIViews */ = {
+			isa = PBXGroup;
+			children = (
+				C70A79692AB4A1EB00289426 /* NeedsLunarProView.swift */,
+				C70A793F2AB4A11600289426 /* ManageButtonView.swift */,
+				C70A79402AB4A11600289426 /* NitsTextField.swift */,
+				C70A79412AB4A11600289426 /* TextInputView.swift */,
+				C70A79422AB4A11600289426 /* ViewGeometry.swift */,
+				C70A79432AB4A11600289426 /* AdvancedSettingsView.swift */,
+				C70A79442AB4A11600289426 /* PresetButtonView.swift */,
+				C70A79452AB4A11600289426 /* AllDisplaysView.swift */,
+				C70A79462AB4A11600289426 /* UnmanagedDisplayView.swift */,
+				C70A79472AB4A11600289426 /* PaddedPopoverView<Content>.swift */,
+				C70A79482AB4A11600289426 /* HDRSettingsView.swift */,
+				C70A79492AB4A11600289426 /* DisconnectedDisplayView.swift */,
+				C70A794A2AB4A11600289426 /* PowerOffButtonView.swift */,
+				C70A794B2AB4A11600289426 /* DisplayRowView.swift */,
+				C70A794C2AB4A11600289426 /* QuickActionsLayoutView.swift */,
+				C70A794D2AB4A11600289426 /* QuickActionsView.swift */,
+				C70A794E2AB4A11600289426 /* QuickActionsMenuView.swift */,
+				C70A794F2AB4A11600289426 /* BlackoutPopoverView.swift */,
+				C70A79502AB4A11600289426 /* BlackoutPopoverHeaderView.swift */,
+				C70A79512AB4A11600289426 /* RawValuesView.swift */,
+				C70A79522AB4A11600289426 /* UsefulInfo.swift */,
+				C70A79532AB4A11600289426 /* BlackoutPopoverRowView.swift */,
+			);
+			path = SwiftUIViews;
 			sourceTree = "<group>";
 		};
 		C7151945224E34BA0024C6F6 /* DDC */ = {
@@ -648,6 +719,8 @@
 		C7AEC7F71FD0B4350039B562 /* Lunar */ = {
 			isa = PBXGroup;
 			children = (
+				C7DF1A1F2AB609B200AF8EDC /* required.swift */,
+				C70A793E2AB4A11600289426 /* SwiftUIViews */,
 				C772802529AE09D900401C78 /* edid-decode */,
 				C73B41F5263E1301006F6783 /* ddcctl */,
 				C7E896D72652C0F60079A328 /* Headers */,
@@ -830,18 +903,16 @@
 				C740A1F726249176004BC1C7 /* ArgumentParser */,
 				C7138D8C2634AF0500406EE3 /* KeyHolder */,
 				C7F48C492657A258000715A8 /* DataCompression */,
-				C75FFA09266D24AA0034DDD6 /* Burritos */,
 				C705A04C268BA02E001ABBA9 /* AXSwift */,
 				C77AB65B269A032E0046BA78 /* Magnet */,
-				C765E4FA26FF9F3500FD6463 /* CryptorECC */,
 				C7F99AC627175E0C00FBF192 /* SwiftyMarkdown */,
 				C7ECB6712750C75C00DA212D /* LDSwiftEventSourceStatic */,
 				C77B176827BE430200B957D1 /* SimplyCoreAudio */,
 				C799C2F427BF67C4003A2FB9 /* Socket */,
 				C731E85D27E1E5090016B36D /* Sentry */,
-				C77C77572812AA80006326BE /* Introspect */,
 				C7BD5F84287B44130077CCB7 /* Charts */,
 				C7A7F2532913ECCA00CD450C /* FuzzyMatcher */,
+				C70A793C2AB471F900289426 /* SwiftUIIntrospect */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -853,8 +924,9 @@
 		C7AEC7ED1FD0B4350039B562 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = NO;
 				LastSwiftUpdateCheck = 1410;
-				LastUpgradeCheck = 1400;
+				LastUpgradeCheck = 1500;
 				ORGANIZATIONNAME = Alin;
 				TargetAttributes = {
 					C7AEC7F41FD0B4350039B562 = {
@@ -892,10 +964,8 @@
 				C740A1F626249176004BC1C7 /* XCRemoteSwiftPackageReference "swift-argument-parser" */,
 				C7138D8B2634AF0500406EE3 /* XCRemoteSwiftPackageReference "KeyHolder" */,
 				C7F48C482657A258000715A8 /* XCRemoteSwiftPackageReference "DataCompression" */,
-				C75FFA08266D24AA0034DDD6 /* XCRemoteSwiftPackageReference "Burritos" */,
 				C705A04B268BA02E001ABBA9 /* XCRemoteSwiftPackageReference "AXSwift" */,
 				C77AB65A269A032E0046BA78 /* XCRemoteSwiftPackageReference "Magnet" */,
-				C765E4F926FF9F3500FD6463 /* XCRemoteSwiftPackageReference "BlueECC" */,
 				C7F99AC527175E0C00FBF192 /* XCRemoteSwiftPackageReference "SwiftyMarkdown" */,
 				C7ECB6702750C75C00DA212D /* XCRemoteSwiftPackageReference "swift-eventsource" */,
 				C77B176727BE430200B957D1 /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */,
@@ -954,6 +1024,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$(CODESIGNING_FOLDER_PATH)/Contents/_MASReceipt/receipt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -966,19 +1037,27 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C70A79682AB4A11600289426 /* BlackoutPopoverRowView.swift in Sources */,
 				C7521D37226C77510062EC81 /* DDC.swift in Sources */,
 				C71F8DBA265640C400C4648A /* DDCCTLControl.swift in Sources */,
+				C70A795E2AB4A11600289426 /* DisconnectedDisplayView.swift in Sources */,
 				C7521D34226C762B0062EC81 /* DDC.c in Sources */,
+				C70A79662AB4A11600289426 /* RawValuesView.swift in Sources */,
 				C7AEC7FB1FD0B4350039B562 /* PageController.swift in Sources */,
 				C7C68F0D201D3D9800F49A2B /* SettingsView.swift in Sources */,
 				C7A82DC3261DF513004146A8 /* Pro.swift in Sources */,
 				C7C1F7031FD5FD390039507C /* Display.swift in Sources */,
 				C7E80E302637060F004718A4 /* FileAttributes.swift in Sources */,
+				C70A795B2AB4A11600289426 /* UnmanagedDisplayView.swift in Sources */,
 				C7A82D9F2618E1B9004146A8 /* InstallOutputViewController.swift in Sources */,
 				C78BD04C259B365500FC823F /* Extensions.swift in Sources */,
+				C7DF1A202AB609B200AF8EDC /* required.swift in Sources */,
+				C70A79562AB4A11600289426 /* TextInputView.swift in Sources */,
 				C78F121E27073284009A3301 /* ControlChoiceViewController.swift in Sources */,
+				C70A79612AB4A11600289426 /* QuickActionsLayoutView.swift in Sources */,
 				C77CC7551FED5501009AA718 /* SplitViewController.swift in Sources */,
 				C73A4E6429C87149006A22F3 /* Trap.swift in Sources */,
+				C70A79632AB4A11600289426 /* QuickActionsMenuView.swift in Sources */,
 				C7A9AAB62707130E0058D1B2 /* OnboardPageController.swift in Sources */,
 				C71F8DB126542E1000C4648A /* GammaViewController.swift in Sources */,
 				C7764170272139A100C7C308 /* ResetPopoverController.swift in Sources */,
@@ -994,6 +1073,7 @@
 				C7EF9535243F4E2200839A62 /* Sysctl.swift in Sources */,
 				C7520C081FD20CC200756F82 /* DisplayController.swift in Sources */,
 				C7789AE01FF9029700D326A8 /* ScrollableContrast.swift in Sources */,
+				C70A79582AB4A11600289426 /* AdvancedSettingsView.swift in Sources */,
 				C7E0737A259CB2C20019C9C2 /* ManualMode.swift in Sources */,
 				C73AAC4B22241B690063AD2A /* Hotkeys.swift in Sources */,
 				C78A1964294E700800B0410A /* DDC2.c in Sources */,
@@ -1003,6 +1083,7 @@
 				C79975D725DEEDE000C797FF /* Control.swift in Sources */,
 				C7BADA12263889CD0058974C /* ProgressViewController.swift in Sources */,
 				C72776ED201F26CB0055934F /* AppException.swift in Sources */,
+				C70A79592AB4A11600289426 /* PresetButtonView.swift in Sources */,
 				C7DD622C261240A800B07B31 /* SSHConnectionViewController.swift in Sources */,
 				C7DD622126120B7600B07B31 /* RaspberryPageController.swift in Sources */,
 				C7DE9391201A40B00017F965 /* ScrollableTextFieldCaption.swift in Sources */,
@@ -1020,6 +1101,7 @@
 				C740A1F4262490E1004BC1C7 /* CLI.swift in Sources */,
 				C7E80E2F2637060F004718A4 /* FileType.swift in Sources */,
 				C78BD055259B6BAD00FC823F /* SyncMode.swift in Sources */,
+				C70A795D2AB4A11600289426 /* HDRSettingsView.swift in Sources */,
 				C7482C3427D2874D00A12E82 /* ColorizeSwift.swift in Sources */,
 				C77CC75C1FEDB3A3009AA718 /* DisplayView.swift in Sources */,
 				C7C68F0B201D356800F49A2B /* SettingsViewController.swift in Sources */,
@@ -1027,18 +1109,22 @@
 				C790D4BE259B9DC100868689 /* NanoID.swift in Sources */,
 				C7656C56277BBAAD00F4922A /* Swizzle.swift in Sources */,
 				C77CC7591FED9ECE009AA718 /* DisplayViewController.swift in Sources */,
+				C70A795C2AB4A11600289426 /* PaddedPopoverView<Content>.swift in Sources */,
 				C7A7C248259391C200745637 /* HotkeyPopoverController.swift in Sources */,
 				C79975DB25DEEE9300C797FF /* DDCControl.swift in Sources */,
+				C70A79602AB4A11600289426 /* DisplayRowView.swift in Sources */,
 				C762AAEA271F3D6200198EDA /* ColorsPopoverController.swift in Sources */,
 				C722FB9F271AC83200ED4C94 /* Slider.swift in Sources */,
 				C72BB4B72727E03500941708 /* Extensions.m in Sources */,
 				C7E4747420CD5C1400B662A9 /* RemoveAppButton.swift in Sources */,
 				C78F121A27073278009A3301 /* ModeChoiceViewController.swift in Sources */,
 				C7DED369267A0663002E0188 /* LaunchAtLoginController.m in Sources */,
+				C70A795A2AB4A11600289426 /* AllDisplaysView.swift in Sources */,
 				C7E14F7F266BBC7500A4E2F1 /* Ciao.swift in Sources */,
 				C7A63205238C04C10005D792 /* QuickActionsViewController.swift in Sources */,
 				C7E80E2E2637060F004718A4 /* Agent.swift in Sources */,
 				C7E80E312637060F004718A4 /* SSHError.swift in Sources */,
+				C70A79622AB4A11600289426 /* QuickActionsView.swift in Sources */,
 				C714C99E2809B4FB0061588E /* ScrollViewIfNeeded.swift in Sources */,
 				C731260C22B38899001ED199 /* HelpButton.swift in Sources */,
 				C7E07373259BAC660019C9C2 /* AdaptiveMode.swift in Sources */,
@@ -1054,9 +1140,12 @@
 				C7A7C24A2593B5EA00745637 /* HotkeyButton.swift in Sources */,
 				C78AB66720F0C73900863CB1 /* SwiftyLogger.swift in Sources */,
 				C7AB59782396C4A90028E573 /* Transformers.swift in Sources */,
+				C70A796A2AB4A1EB00289426 /* NeedsLunarProView.swift in Sources */,
 				C722FBA0271AC83200ED4C94 /* Button.swift in Sources */,
+				C70A79652AB4A11600289426 /* BlackoutPopoverHeaderView.swift in Sources */,
 				C7CBEFF4238C147800031E93 /* StatusItemButtonController.swift in Sources */,
 				C7E80E322637060F004718A4 /* SSH.swift in Sources */,
+				C70A795F2AB4A11600289426 /* PowerOffButtonView.swift in Sources */,
 				C76A129E20D8084E005D4BE3 /* NumberFormatter.swift in Sources */,
 				C772BDD725E7A296006A1684 /* NetworkControl.swift in Sources */,
 				C7E80E332637060F004718A4 /* SSHAuthMethod.swift in Sources */,
@@ -1066,19 +1155,24 @@
 				C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */,
 				C7E80E342637060F004718A4 /* SFTP.swift in Sources */,
 				C784143827DDFBC400E14941 /* OSDWindow.swift in Sources */,
+				C70A79552AB4A11600289426 /* NitsTextField.swift in Sources */,
 				C7E80E2C2637060F004718A4 /* FilePermissions.swift in Sources */,
 				C7A82DB7261B779E004146A8 /* SettingsPopoverController.swift in Sources */,
 				C7CBEFFD238E81FF00031E93 /* Util.swift in Sources */,
 				C7B6EA10201B41C10090EE0E /* Theme.swift in Sources */,
+				C70A79672AB4A11600289426 /* UsefulInfo.swift in Sources */,
 				C7714AF927E4A3A9002E0B2E /* Components.swift in Sources */,
 				C7C09CD1256AC09800B4BC5B /* AdaptiveModeButton.swift in Sources */,
 				C72776E9201F1BED0055934F /* ExceptionsView.swift in Sources */,
 				C75083622222DC3C0020270E /* HotKeyViewController.swift in Sources */,
 				C7E80E292637060F004718A4 /* ReadWrite.swift in Sources */,
+				C70A79572AB4A11600289426 /* ViewGeometry.swift in Sources */,
 				C7C16321208503B000C7EA8F /* ConfigurationViewController.swift in Sources */,
 				C74820FA26DE6CFA00556EA8 /* PageNavigationControl.swift in Sources */,
 				C7AF321926F5EEDE00AC14AF /* ClockMode.swift in Sources */,
 				C728D7ED2296D81B003CAD65 /* TextButton.swift in Sources */,
+				C70A79542AB4A11600289426 /* ManageButtonView.swift in Sources */,
+				C70A79642AB4A11600289426 /* BlackoutPopoverView.swift in Sources */,
 				C7C1F7071FD6354C0039507C /* Geolocation.swift in Sources */,
 				C7A22756281C19D1005F2351 /* XDRTipView.swift in Sources */,
 				C7C1F7051FD635360039507C /* Moment.swift in Sources */,
@@ -1107,7 +1201,6 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -1152,7 +1245,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -1169,7 +1262,6 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -1208,11 +1300,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_SUPPRESS_WARNINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -1263,6 +1356,7 @@
 					"$(PROJECT_DIR)/Frameworks",
 					"$(PROJECT_DIR)/Lunar/CSSH",
 				);
+				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 6.2.6;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -1314,7 +1408,7 @@
 					"$(PROJECT_DIR)/Frameworks/Sparkle",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 				);
-				GCC_OPTIMIZATION_LEVEL = 2;
+				GCC_OPTIMIZATION_LEVEL = s;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/Frameworks/Shout/Sources/CSSH/libssh2";
 				INFOPLIST_FILE = Lunar/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Lunar;
@@ -1336,11 +1430,12 @@
 				MARKETING_VERSION = 6.2.6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
+				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Lunar/DDC/Lunar-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_OPTIMIZATION_LEVEL = "-Osize";
 				SWIFT_VERSION = 5.0;
 				SYSTEM_FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				SYSTEM_HEADER_SEARCH_PATHS = "";
@@ -1457,22 +1552,6 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		C75FFA08266D24AA0034DDD6 /* XCRemoteSwiftPackageReference "Burritos" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/alin23/Burritos";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
-		C765E4F926FF9F3500FD6463 /* XCRemoteSwiftPackageReference "BlueECC" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Kitura/BlueECC.git";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 		C77AB65A269A032E0046BA78 /* XCRemoteSwiftPackageReference "Magnet" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/alin23/Magnet";
@@ -1494,7 +1573,7 @@
 			repositoryURL = "https://github.com/siteline/SwiftUI-Introspect";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.1.4;
+				minimumVersion = 1.0.0;
 			};
 		};
 		C78BD048259B33D500FC823F /* XCRemoteSwiftPackageReference "Path" */ = {
@@ -1613,6 +1692,11 @@
 			package = C705A04B268BA02E001ABBA9 /* XCRemoteSwiftPackageReference "AXSwift" */;
 			productName = AXSwift;
 		};
+		C70A793C2AB471F900289426 /* SwiftUIIntrospect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C77C77562812AA80006326BE /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
+			productName = SwiftUIIntrospect;
+		};
 		C7138D8C2634AF0500406EE3 /* KeyHolder */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C7138D8B2634AF0500406EE3 /* XCRemoteSwiftPackageReference "KeyHolder" */;
@@ -1638,16 +1722,6 @@
 			package = C740A1F626249176004BC1C7 /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
 			productName = ArgumentParser;
 		};
-		C75FFA09266D24AA0034DDD6 /* Burritos */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C75FFA08266D24AA0034DDD6 /* XCRemoteSwiftPackageReference "Burritos" */;
-			productName = Burritos;
-		};
-		C765E4FA26FF9F3500FD6463 /* CryptorECC */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C765E4F926FF9F3500FD6463 /* XCRemoteSwiftPackageReference "BlueECC" */;
-			productName = CryptorECC;
-		};
 		C77AB65B269A032E0046BA78 /* Magnet */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C77AB65A269A032E0046BA78 /* XCRemoteSwiftPackageReference "Magnet" */;
@@ -1657,11 +1731,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C77B176727BE430200B957D1 /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */;
 			productName = SimplyCoreAudio;
-		};
-		C77C77572812AA80006326BE /* Introspect */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C77C77562812AA80006326BE /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
-			productName = Introspect;
 		};
 		C78BD049259B33D500FC823F /* Path */ = {
 			isa = XCSwiftPackageProductDependency;

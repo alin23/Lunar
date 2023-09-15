@@ -261,7 +261,9 @@ final class ModernWindow: WAYWindow {
         setAutorecalculatesContentBorderThickness(false, for: NSRectEdge.minY)
         isOpaque = false
         backgroundColor = NSColor.clear
-        makeKeyAndOrderFront(self)
+        if canBecomeKey {
+            makeKeyAndOrderFront(self)
+        }
         orderFrontRegardless()
     }
 }

@@ -219,7 +219,7 @@ extension AdaptiveMode {
 }
 
 extension [Float] {
-    @inline(__always) var d: [Double] {
+    @inline(__always) @inlinable var d: [Double] {
         vDSP.floatToDouble(self)
     }
 }

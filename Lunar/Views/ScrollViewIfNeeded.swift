@@ -246,13 +246,13 @@ func swizzleScrollWheel(scrollView: AnyObject) {
     scrollWheelSwizIMP = method_getImplementation(scrollWheelSwiz!)
 }
 
-import Introspect
+@_spi(Advanced) import SwiftUIIntrospect
 extension View {
     @ViewBuilder
     func wrappedInScrollView(when condition: Bool, pauseScrolling: Bool = false) -> some View {
         if condition {
             ScrollView(.vertical, showsIndicators: false) {
-                self.introspectScrollView { s in
+                self.introspect(.scrollView, on: .macOS(.v11...)) { s in
                     s.identifier = pauseScrolling ? SCROLL_VIEW_SWIZZLED_TAG : nil
 
                     swizzleScrollWheel(scrollView: s)

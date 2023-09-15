@@ -1800,7 +1800,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     }
 
     func applicationWillFinishLaunching(_: Notification) {
-        #if !DEBUG
+        #if !DEBUG && arch(arm64)
             PFMoveToApplicationsFolderIfNecessary()
         #endif
     }
@@ -2080,11 +2080,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             scope.setTag(value: DC.adaptiveModeString(), key: "adaptiveMode")
             scope.setTag(value: DC.adaptiveModeString(last: true), key: "lastAdaptiveMode")
             scope.setTag(value: CachedDefaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
-            if let secondPhase = Defaults[.secondPhase] {
-                scope.setTag(value: secondPhase ? "true" : "false", key: "secondPhase")
-            } else {
-                scope.setTag(value: "null", key: "secondPhase")
-            }
         }
     }
 
@@ -2188,7 +2183,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
         startTime = Date()
         lastBlackOutToggleDate = Date()
-        Defaults[.secondPhase] = initFirstPhase()
+        Defaults[.secondPhase] = initSecondPhase()
         #if arch(arm64)
             if #available(macOS 13, *) {
                 if restarted {
@@ -2277,11 +2272,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                     scope.setTag(value: DC.adaptiveModeString(), key: "adaptiveMode")
                     scope.setTag(value: DC.adaptiveModeString(last: true), key: "lastAdaptiveMode")
                     scope.setTag(value: CachedDefaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
-                    if let secondPhase = Defaults[.secondPhase] {
-                        scope.setTag(value: secondPhase ? "false" : "true", key: "secondPhase")
-                    } else {
-                        scope.setTag(value: "null", key: "secondPhase")
-                    }
                 }
                 DC.addSentryData()
                 SentrySDK.capture(message: "Launch New")

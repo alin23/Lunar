@@ -19,30 +19,12 @@
       }
     },
     {
-      "identity" : "blueecc",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Kitura/BlueECC.git",
-      "state" : {
-        "branch" : "master",
-        "revision" : "1485268a54f8135435a825a855e733f026fa6cc8"
-      }
-    },
-    {
       "identity" : "bluesocket",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/alin23/BlueSocket",
       "state" : {
         "branch" : "master",
         "revision" : "4e334a848f89c44b2348332f0996f312dc6ed0d2"
-      }
-    },
-    {
-      "identity" : "burritos",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/alin23/Burritos",
-      "state" : {
-        "branch" : "master",
-        "revision" : "3dd5867dc5b321fbd5a28d2d8b283e4252b2e4d7"
       }
     },
     {
@@ -230,8 +212,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/siteline/SwiftUI-Introspect",
       "state" : {
-        "revision" : "adb9e7a69fd75322dcdee0c20f2fb6640d6f0087",
-        "version" : "0.9.0"
+        "revision" : "3ba734dd20faada0e3234b68e78db97005315f0e",
+        "version" : "1.0.0"
       }
     },
     {

@@ -19,30 +19,12 @@
       }
     },
     {
-      "identity" : "blueecc",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Kitura/BlueECC.git",
-      "state" : {
-        "branch" : "master",
-        "revision" : "1485268a54f8135435a825a855e733f026fa6cc8"
-      }
-    },
-    {
       "identity" : "bluesocket",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/alin23/BlueSocket",
       "state" : {
         "branch" : "master",
         "revision" : "4e334a848f89c44b2348332f0996f312dc6ed0d2"
-      }
-    },
-    {
-      "identity" : "burritos",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/alin23/Burritos",
-      "state" : {
-        "branch" : "master",
-        "revision" : "3dd5867dc5b321fbd5a28d2d8b283e4252b2e4d7"
       }
     },
     {
@@ -150,7 +132,7 @@
       "location" : "https://github.com/alin23/sentry-cocoa.git",
       "state" : {
         "branch" : "master",
-        "revision" : "a890c38828010ebcdbe6b0edad84a97d06e54e0b"
+        "revision" : "04bee4ad86d74d4cb4d7101ff826d6e355301ba9"
       }
     },
     {
@@ -159,7 +141,7 @@
       "location" : "https://github.com/rnine/SimplyCoreAudio",
       "state" : {
         "branch" : "develop",
-        "revision" : "35cc0e6eac5c2ee5049431f4238b0e333cf79869"
+        "revision" : "99caee2ca2bcd33f49e4e2c0d8ba898c33421508"
       }
     },
     {
@@ -185,8 +167,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
-        "revision" : "fee6933f37fde9a5e12a1e4aeaa93fe60116ff2a",
-        "version" : "1.2.2"
+        "revision" : "8f4d2753f0e4778c76d5f05ad16c74f707390531",
+        "version" : "1.2.3"
       }
     },
     {
@@ -230,8 +212,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/siteline/SwiftUI-Introspect",
       "state" : {
-        "revision" : "adb9e7a69fd75322dcdee0c20f2fb6640d6f0087",
-        "version" : "0.9.0"
+        "revision" : "3ba734dd20faada0e3234b68e78db97005315f0e",
+        "version" : "1.0.0"
       }
     },
     {

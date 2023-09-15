@@ -474,7 +474,7 @@ enum IntentError: Swift.Error, CustomLocalizedStringResourceConvertible {
 
 @available(iOS 16, macOS 13, *)
 @discardableResult
-func controlScreen(screen: IntentParameter<Screen>, property: Display.CodingKeys, value: String, skipMissingScreen: Bool = false) throws -> some IntentResult {
+private func controlScreen(screen: IntentParameter<Screen>, property: Display.CodingKeys, value: String, skipMissingScreen: Bool = false) throws -> some IntentResult {
     let scr = screen.wrappedValue
     guard !(scr.serial + scr.name).isEmpty else {
         if skipMissingScreen {
@@ -499,7 +499,7 @@ func controlScreen(screen: IntentParameter<Screen>, property: Display.CodingKeys
 // MARK: - SetBrightnessValue
 
 @available(iOS 16, macOS 13, *)
-struct SetBrightnessIntent: AppIntent {
+private struct SetBrightnessIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Set Brightness"
@@ -529,7 +529,7 @@ struct SetBrightnessIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct SetContrastIntent: AppIntent {
+private struct SetContrastIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Set Contrast"
@@ -559,7 +559,7 @@ struct SetContrastIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct SetBrightnessContrastIntent: AppIntent {
+private struct SetBrightnessContrastIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Set Brightness & Contrast"
@@ -592,7 +592,7 @@ struct SetBrightnessContrastIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct SetSubZeroDimmingIntent: AppIntent {
+private struct SetSubZeroDimmingIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Set Sub-zero Dimming"
@@ -622,7 +622,7 @@ struct SetSubZeroDimmingIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct SetXDRBrightnessIntent: AppIntent {
+private struct SetXDRBrightnessIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Set XDR Brightness"
@@ -654,7 +654,7 @@ struct SetXDRBrightnessIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct SetVolumeIntent: AppIntent {
+private struct SetVolumeIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Set Volume"
@@ -713,7 +713,7 @@ enum ScreenToggleState: String, AppEnum, CaseDisplayRepresentable, TypeDisplayRe
 }
 
 @available(iOS 16, macOS 13, *)
-struct ToggleAudioMuteIntent: AppIntent {
+private struct ToggleAudioMuteIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Toggle Audio Mute"
@@ -743,7 +743,7 @@ struct ToggleAudioMuteIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct ToggleSystemAdaptiveBrightnessIntent: AppIntent {
+private struct ToggleSystemAdaptiveBrightnessIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Toggle System Adaptive Brightness"
@@ -773,7 +773,7 @@ struct ToggleSystemAdaptiveBrightnessIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct ToggleHDRIntent: AppIntent {
+private struct ToggleHDRIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Toggle HDR"
@@ -803,7 +803,7 @@ struct ToggleHDRIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct ToggleXDRIntent: AppIntent {
+private struct ToggleXDRIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Toggle XDR Brightness"
@@ -835,7 +835,7 @@ struct ToggleXDRIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct ToggleSubZeroIntent: AppIntent {
+private struct ToggleSubZeroIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Toggle Sub-zero Dimming"
@@ -865,7 +865,7 @@ struct ToggleSubZeroIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct ToggleFacelightIntent: AppIntent {
+private struct ToggleFacelightIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Toggle Facelight"
@@ -899,7 +899,7 @@ struct ToggleFacelightIntent: AppIntent {
 extension UnitDuration: @unchecked Sendable {}
 
 @available(iOS 16, macOS 13, *)
-struct CleaningModeIntent: AppIntent {
+private struct CleaningModeIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -939,13 +939,13 @@ Press the ⌘ Command key more than 8 times in a row to force deactivation of th
     }
 }
 
-var cleaningModeTask: DispatchWorkItem?
-var swallowKeyboardEventTap: CFMachPort?
-var swallowKeyboardRunLoopSource: CFRunLoopSource?
-var swallowKeyboardRunLoop: CFRunLoop?
-let swallowKeyboardQueue = DispatchQueue(label: "Cleaning Mode Runloop", attributes: [])
+private var cleaningModeTask: DispatchWorkItem?
+private var swallowKeyboardEventTap: CFMachPort?
+private var swallowKeyboardRunLoopSource: CFRunLoopSource?
+private var swallowKeyboardRunLoop: CFRunLoop?
+private let swallowKeyboardQueue = DispatchQueue(label: "Cleaning Mode Runloop", attributes: [])
 
-func swallowKeyboardEvents() {
+private func swallowKeyboardEvents() {
     // creates a CGEventTap that will swallow all keyboard events and makes the keyboard acts as disabled
 
     let keyMask = (1 << CGEventType.keyDown.rawValue) | (1 << CGEventType.keyUp.rawValue) | (1 << NX_SYSDEFINED) | (1 << CGEventType.flagsChanged.rawValue)
@@ -987,7 +987,7 @@ func swallowKeyboardEvents() {
     CGEvent.tapEnable(tap: swallowKeyboardEventTap, enable: true)
 }
 
-func disableSwallowKeyboardEvents() {
+private func disableSwallowKeyboardEvents() {
     if let source = swallowKeyboardRunLoopSource {
         CFRunLoopSourceInvalidate(source)
         swallowKeyboardRunLoopSource = nil
@@ -1044,7 +1044,7 @@ func activateCleaningMode(deactivateAfter: TimeInterval? = 120, withoutSettingFl
 }
 
 @available(iOS 16, macOS 13, *)
-struct PowerOffSoftwareIntent: AppIntent {
+private struct PowerOffSoftwareIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -1154,7 +1154,7 @@ Power off a screen by:
 }
 
 @available(iOS 16, macOS 13, *)
-struct PowerOnSoftwareIntent: AppIntent {
+private struct PowerOnSoftwareIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -1212,7 +1212,7 @@ struct PowerOnSoftwareIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct SleepMacIntent: AppIntent {
+private struct SleepMacIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -1236,7 +1236,7 @@ struct SleepMacIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct DisconnectScreenIntent: AppIntent {
+private struct DisconnectScreenIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -1286,7 +1286,7 @@ To bring back the screen try any one of the following:
 }
 
 @available(iOS 16, macOS 13, *)
-struct ReconnectScreenIntent: AppIntent {
+private struct ReconnectScreenIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -1350,7 +1350,7 @@ If the action fails, try any one of the following to bring back the screen:
 }
 
 @available(iOS 16, macOS 13, *)
-func connectedScreen(_ s: Screen) async throws -> Screen? {
+private func connectedScreen(_ s: Screen) async throws -> Screen? {
     for _ in 1 ... 30 {
         if let d = s.dynamicDisplay {
             return d.screen
@@ -1362,7 +1362,7 @@ func connectedScreen(_ s: Screen) async throws -> Screen? {
 }
 
 @available(iOS 16, macOS 13, *)
-struct ToggleScreenConnectionIntent: AppIntent {
+private struct ToggleScreenConnectionIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -1444,7 +1444,7 @@ If the reconnect action fails, try any one of the following to bring back the sc
 }
 
 @available(iOS 16, macOS 13, *)
-struct ToggleBlackOutIntent: AppIntent {
+private struct ToggleBlackOutIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Toggle Power (BlackOut)"
@@ -1494,7 +1494,7 @@ struct ToggleBlackOutIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-enum ScreenRotationDegrees: Int, AppEnum, CaseDisplayRepresentable, TypeDisplayRepresentable {
+private enum ScreenRotationDegrees: Int, AppEnum, CaseDisplayRepresentable, TypeDisplayRepresentable {
     case normal = 0
     case portraitToLeft = 90
     case upsideDown = 180
@@ -1511,7 +1511,7 @@ enum ScreenRotationDegrees: Int, AppEnum, CaseDisplayRepresentable, TypeDisplayR
 }
 
 @available(iOS 16, macOS 13, *)
-struct RotateScreenIntent: AppIntent {
+private struct RotateScreenIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Rotate Screen"
@@ -1541,7 +1541,7 @@ struct RotateScreenIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-enum AdaptiveModeKeyForIntent: Int, AppEnum {
+private enum AdaptiveModeKeyForIntent: Int, AppEnum {
     case location = 1
     case sync = -1
     case manual = 0
@@ -1572,7 +1572,7 @@ enum AdaptiveModeKeyForIntent: Int, AppEnum {
 }
 
 @available(iOS 16, macOS 13, *)
-struct ChangeAdaptiveModeIntent: AppIntent {
+private struct ChangeAdaptiveModeIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Change Adaptive Mode"
@@ -1598,7 +1598,7 @@ struct ChangeAdaptiveModeIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct ApplyPresetIntent: AppIntent {
+private struct ApplyPresetIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Apply Lunar Preset"
@@ -1644,7 +1644,7 @@ struct ApplyPresetIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct PowerOffIntent: AppIntent {
+private struct PowerOffIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -1677,7 +1677,7 @@ Note: a screen can't also be powered on using this method because a powered off 
 }
 
 @available(iOS 16, macOS 13, *)
-struct ResetColorGainIntent: AppIntent {
+private struct ResetColorGainIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Reset Color Adjustments (in hardware)"
@@ -1700,7 +1700,7 @@ struct ResetColorGainIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct ResetColorGammaIntent: AppIntent {
+private struct ResetColorGammaIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Reset Color Adjustments (in software)"
@@ -1724,7 +1724,7 @@ struct ResetColorGammaIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct ToggleGammaIntent: AppIntent {
+private struct ToggleGammaIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Toggle Color Adjustments (in software)"
@@ -1750,7 +1750,7 @@ struct ToggleGammaIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct SetInputIntent: AppIntent {
+private struct SetInputIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -1804,7 +1804,7 @@ Note: Not all inputs are supported by all monitors, and some monitors may use no
 }
 
 @available(iOS 16, macOS 13, *)
-struct WriteDDCIntent: AppIntent {
+private struct WriteDDCIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "DDC Write Value to Screen"
@@ -1853,7 +1853,7 @@ struct WriteDDCIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct ReadDDCIntent: AppIntent {
+private struct ReadDDCIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -1907,7 +1907,7 @@ Note: DDC reads rarely work and can return wrong values.
 }
 
 @available(iOS 16, macOS 13, *)
-struct ControlScreenValueFloatNumeric: AppIntent {
+private struct ControlScreenValueFloatNumeric: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Control a floating point Screen Value"
@@ -1946,7 +1946,7 @@ struct ControlScreenValueFloatNumeric: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct ControlScreenValueNumeric: AppIntent {
+private struct ControlScreenValueNumeric: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Control an integer Screen Value"
@@ -1985,7 +1985,7 @@ struct ControlScreenValueNumeric: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct ControlScreenValueBool: AppIntent {
+private struct ControlScreenValueBool: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Control a boolean Screen Value"
@@ -2024,7 +2024,7 @@ struct ControlScreenValueBool: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct AdjustSoftwareColorsIntent: AppIntent {
+private struct AdjustSoftwareColorsIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Adjust Colors of a Screen (in software)"
@@ -2102,7 +2102,7 @@ The blue component of the Gamma curve
 }
 
 @available(iOS 16, macOS 13, *)
-struct AdjustHardwareColorsIntent: AppIntent {
+private struct AdjustHardwareColorsIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -2191,7 +2191,7 @@ Note: not all monitors support color gain control through DDC and value effect c
 }
 
 @available(iOS 16, macOS 13, *)
-struct ReadHardwareColorsIntent: AppIntent {
+private struct ReadHardwareColorsIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -2240,7 +2240,7 @@ Note: very few monitors implement this functionality
 }
 
 @available(iOS 16, macOS 13, *)
-struct ReadSoftwareColorsIntent: AppIntent {
+private struct ReadSoftwareColorsIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Read Color Gamma Tables (in software)"
@@ -2278,7 +2278,7 @@ struct ReadSoftwareColorsIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct MirrorSetIntent: AppIntent {
+private struct MirrorSetIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Mirror Screens"
@@ -2344,7 +2344,7 @@ struct MirrorSetIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct StopMirroringIntent: AppIntent {
+private struct StopMirroringIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Stop Mirroring"
@@ -2422,7 +2422,7 @@ struct StopMirroringIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct SetPanelModeIntent: AppIntent {
+private struct SetPanelModeIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Change Screen Resolution"
@@ -2452,7 +2452,7 @@ struct SetPanelModeIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct SetPanelPresetIntent: AppIntent {
+private struct SetPanelPresetIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Change Screen Preset"
@@ -2484,7 +2484,7 @@ struct SetPanelPresetIntent: AppIntent {
     }
 }
 
-struct SortablePanelMode: Comparable, Equatable, Hashable {
+private struct SortablePanelMode: Comparable, Equatable, Hashable {
     let isHiDPI: Bool
     let refreshRate: Int32
 
@@ -2494,7 +2494,7 @@ struct SortablePanelMode: Comparable, Equatable, Hashable {
 }
 
 @available(iOS 16, macOS 13, *)
-extension MPDisplayPreset {
+private extension MPDisplayPreset {
     var panelPreset: PanelPreset? {
         guard let screen = DC.activeDisplays[displayID]?.screen else { return nil }
 
@@ -2516,7 +2516,7 @@ extension MPDisplayPreset {
 }
 
 @available(iOS 16, macOS 13, *)
-struct PanelPreset: AppEntity {
+private struct PanelPreset: AppEntity {
     struct PanelPresetQuery: EntityQuery {
         func entities(for identifiers: [Int]) async throws -> [PanelPreset] {
             await DisplayController.panelManager?.withLock { _ in
@@ -2595,7 +2595,7 @@ struct PanelPreset: AppEntity {
 }
 
 @available(iOS 16, macOS 13, *)
-extension MPDisplayMgr {
+private extension MPDisplayMgr {
     func withLock<T>(_ action: (MPDisplayMgr) -> T) async -> T? {
         while !tryLockAccess() {
             do {
@@ -2608,6 +2608,15 @@ extension MPDisplayMgr {
         unlockAccess()
 
         return result
+    }
+}
+
+private extension MPDisplayMode {
+    @available(iOS 16, macOS 13, *)
+    var panelMode: PanelMode? {
+        guard let display, let screen = display.screen else { return nil }
+
+        return PanelMode(screen: screen, id: (screen.id << 32) + modeNumber.i, title: title, subtitle: subtitle, image: imageSystemName)
     }
 }
 
@@ -2687,7 +2696,7 @@ struct PanelMode: AppEntity {
 }
 
 @available(iOS 16, macOS 13, *)
-struct SwapMonitorsIntent: AppIntent {
+private struct SwapMonitorsIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Swap Screen Positions"
@@ -2725,7 +2734,7 @@ struct SwapMonitorsIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct MakeMonitorMainIntent: AppIntent {
+private struct MakeMonitorMainIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Set Screen as Main"
@@ -2763,7 +2772,7 @@ struct MakeMonitorMainIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct VerticalMonitorLayoutIntent: AppIntent {
+private struct VerticalMonitorLayoutIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Arrange 2 Screens Vertically ■̳̲"
@@ -2815,7 +2824,7 @@ struct VerticalMonitorLayoutIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct HorizontalMonitorLayoutIntent: AppIntent {
+private struct HorizontalMonitorLayoutIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Arrange 2 Screens Horizontally ⫍⃮݄⫎⃯"
@@ -2867,7 +2876,7 @@ struct HorizontalMonitorLayoutIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct ThreeAboveOneMonitorLayoutIntent: AppIntent {
+private struct ThreeAboveOneMonitorLayoutIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Arrange 4 Screens in a 3-above-1 configuration ⫍⃮■̳̻⫎⃯"
@@ -2937,7 +2946,7 @@ struct ThreeAboveOneMonitorLayoutIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct TwoAboveOneMonitorLayoutIntent: AppIntent {
+private struct TwoAboveOneMonitorLayoutIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Arrange 3 Screens in a 2-above-1 configuration ⫍‗⫎"
@@ -3020,7 +3029,7 @@ struct TwoAboveOneMonitorLayoutIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct HorizontalMonitorThreeLayoutIntent: AppIntent {
+private struct HorizontalMonitorThreeLayoutIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Arrange 3 Screens Horizontally ⫍⃮▬̲⫎⃯"
@@ -3103,7 +3112,7 @@ struct HorizontalMonitorThreeLayoutIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-struct FixMonitorArrangementIntent: AppIntent {
+private struct FixMonitorArrangementIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Fix monitor arrangement"
@@ -3180,7 +3189,7 @@ Press `Esc` to cancel or `Enter` to partially arrange the monitors selected so f
 }
 
 @available(iOS 16, macOS 13, *)
-struct ScreenColorGain: Equatable, Hashable, AppEntity {
+private struct ScreenColorGain: Equatable, Hashable, AppEntity {
     init(red: Int, green: Int, blue: Int) {
         self.red = red
         self.green = green
@@ -3228,7 +3237,7 @@ struct ScreenColorGain: Equatable, Hashable, AppEntity {
 }
 
 @available(iOS 16, macOS 13, *)
-struct ScreenGammaTable: Equatable, Hashable, AppEntity {
+private struct ScreenGammaTable: Equatable, Hashable, AppEntity {
     init(red: Double, green: Double, blue: Double) {
         self.red = red
         self.green = green
@@ -3291,7 +3300,7 @@ extension Display.CodingKeys: EntityIdentifierConvertible {
 // MARK: - DisplayNumericPropertyQuery
 
 @available(iOS 16, macOS 13, *)
-struct DisplayFloatNumericPropertyQuery: EntityQuery {
+private struct DisplayFloatNumericPropertyQuery: EntityQuery {
     typealias Entity = DisplayProperty
 
     func suggestedEntities() async throws -> ItemCollection<DisplayProperty> {
@@ -3324,7 +3333,7 @@ struct DisplayFloatNumericPropertyQuery: EntityQuery {
 }
 
 @available(iOS 16, macOS 13, *)
-struct DisplayNumericPropertyQuery: EntityQuery {
+private struct DisplayNumericPropertyQuery: EntityQuery {
     typealias Entity = DisplayProperty
 
     func suggestedEntities() async throws -> ItemCollection<DisplayProperty> {
@@ -3361,7 +3370,7 @@ struct DisplayNumericPropertyQuery: EntityQuery {
                 items: DisplayProperty.settingsNumeric.map { .init($0, title: "\($0.name)") }
             )
             ItemSection(
-                title: "DDC dettings",
+                title: "DDC settings",
                 items: DisplayProperty.ddcSettingsNumeric.map { .init($0, title: "\($0.name)") }
             )
         }
@@ -3371,7 +3380,7 @@ struct DisplayNumericPropertyQuery: EntityQuery {
 // MARK: - DisplayBoolPropertyQuery
 
 @available(iOS 16, macOS 13, *)
-struct DisplayBoolPropertyQuery: EntityQuery {
+private struct DisplayBoolPropertyQuery: EntityQuery {
     typealias Entity = DisplayProperty
 
     func suggestedEntities() async throws -> ItemCollection<DisplayProperty> {
@@ -3409,7 +3418,7 @@ struct DisplayBoolPropertyQuery: EntityQuery {
 // MARK: - DisplayProperty
 
 @available(iOS 16, macOS 13, *)
-struct DisplayProperty: Equatable, Hashable, AppEntity, CustomStringConvertible {
+private struct DisplayProperty: Equatable, Hashable, AppEntity, CustomStringConvertible {
     static var defaultQuery = DisplayFloatNumericPropertyQuery()
     static let commonNumeric: [DisplayProperty] = [
         DisplayProperty(id: .brightness, name: "Brightness"),

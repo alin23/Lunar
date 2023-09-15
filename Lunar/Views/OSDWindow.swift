@@ -74,8 +74,10 @@ final class OSDWindow: NSWindow, NSWindowDelegate {
         }
 
         contentView?.superview?.alphaValue = 1
-        wc.showWindow(nil)
-        makeKeyAndOrderFront(nil)
+        if canBecomeKey {
+            wc.showWindow(nil)
+            makeKeyAndOrderFront(nil)
+        }
         orderFrontRegardless()
 
         endFader = nil
@@ -1064,8 +1066,10 @@ final class PanelWindow: NSWindow {
 
         guard !isVisible else { return }
 
-        wc.showWindow(nil)
-        makeKeyAndOrderFront(nil)
+        if canBecomeKey {
+            wc.showWindow(nil)
+            makeKeyAndOrderFront(nil)
+        }
         orderFrontRegardless()
         NSApp.activate(ignoringOtherApps: true)
     }

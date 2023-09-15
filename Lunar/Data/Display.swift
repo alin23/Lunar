@@ -9,7 +9,6 @@
 import AnyCodable
 import ArgumentParser
 import Atomics
-import Clamping
 import Cocoa
 import Combine
 import CoreGraphics
