@@ -1,3 +1,46 @@
+# 6.2.6
+## Features
+
+* Option to **Force keep HDR enabled** for external monitors
+
+![force keep hdr enabled checkbox](https://files.lunar.fyi/force-keep-hdr-enabled-checkbox.png)
+
+* Option to **Use static values instead of offsets** for **App Presets**
+
+![Use static values instead of offsets](https://files.lunar.fyi/app-presets-static-values_1.png)
+
+
+## Improvements
+
+* Detect possible clamshell sleep and preemptively pause adaptive brightness to avoid flickering
+* Add **Skip action if screen is missing** for Shortcuts
+
+![skip action if screen is missing checkbox](https://files.lunar.fyi/skip-action-if-screen-is-missing.png)
+
+
+## Fixes
+
+* Fix macOS Sonoma layout issues
+
+# 6.2.5
+## Features
+
+* Enhance contrast in Sub-zero Dimming
+
+![subzero dimming contrast](https://files.lunar.fyi/subzero-contrast.png)
+
+* Keyboard backlight setting for BlackOut
+
+![keyboard backlight setting](https://files.lunar.fyi/keyboard-backlight-setting.png)
+
+## Improvements
+
+* Only adjust keyboard backlight in Sub-zero Dimming when keyboard backlight was previously on
+
+## Fixes
+
+* Add missing LG specific inputs in Shortcuts
+
 # 6.2.4
 ## Features
 
