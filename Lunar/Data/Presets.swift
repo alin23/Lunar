@@ -402,17 +402,17 @@ struct DynamicKey: View {
 
     static func keyString(_ keyCode: Int) -> String {
         switch keyCode {
-        case kVK_ANSI_0: return "0"
-        case kVK_ANSI_1: return "1"
-        case kVK_ANSI_2: return "2"
-        case kVK_ANSI_3: return "3"
-        case kVK_ANSI_4: return "4"
-        case kVK_ANSI_5: return "5"
-        case kVK_ANSI_6: return "6"
-        case kVK_ANSI_7: return "7"
-        case kVK_ANSI_8: return "8"
-        case kVK_ANSI_9: return "9"
-        default: return Key(QWERTYKeyCode: keyCode.i)?.rawValue.uppercased() ?? ""
+        case kVK_ANSI_0: "0"
+        case kVK_ANSI_1: "1"
+        case kVK_ANSI_2: "2"
+        case kVK_ANSI_3: "3"
+        case kVK_ANSI_4: "4"
+        case kVK_ANSI_5: "5"
+        case kVK_ANSI_6: "6"
+        case kVK_ANSI_7: "7"
+        case kVK_ANSI_8: "8"
+        case kVK_ANSI_9: "9"
+        default: Key(QWERTYKeyCode: keyCode.i)?.rawValue.uppercased() ?? ""
         }
     }
 }

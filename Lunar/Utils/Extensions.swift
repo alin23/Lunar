@@ -484,68 +484,68 @@ extension DispatchTimeInterval {
     var ns: Int {
         switch self {
         case let .seconds(int):
-            return int * 1_000_000_000
+            int * 1_000_000_000
         case let .milliseconds(int):
-            return int * 1_000_000
+            int * 1_000_000
         case let .microseconds(int):
-            return int * 1000
+            int * 1000
         case let .nanoseconds(int):
-            return int
+            int
         case .never:
-            return 0
+            0
         default:
-            return 0
+            0
         }
     }
 
     var us: Int {
         switch self {
         case let .seconds(int):
-            return int * 1_000_000
+            int * 1_000_000
         case let .milliseconds(int):
-            return int * 1000
+            int * 1000
         case let .microseconds(int):
-            return int
+            int
         case let .nanoseconds(int):
-            return int / 1000
+            int / 1000
         case .never:
-            return 0
+            0
         default:
-            return 0
+            0
         }
     }
 
     var ms: Int {
         switch self {
         case let .seconds(int):
-            return int * 1000
+            int * 1000
         case let .milliseconds(int):
-            return int
+            int
         case let .microseconds(int):
-            return int / 1000
+            int / 1000
         case let .nanoseconds(int):
-            return int / 1_000_000
+            int / 1_000_000
         case .never:
-            return 0
+            0
         default:
-            return 0
+            0
         }
     }
 
     var s: TimeInterval {
         switch self {
         case let .seconds(int):
-            return int.d
+            int.d
         case let .milliseconds(int):
-            return int.d / 1000
+            int.d / 1000
         case let .microseconds(int):
-            return int.d / 1_000_000
+            int.d / 1_000_000
         case let .nanoseconds(int):
-            return int.d / 1_000_000_000
+            int.d / 1_000_000_000
         case .never:
-            return 0
+            0
         default:
-            return 0
+            0
         }
     }
 }
@@ -809,15 +809,15 @@ extension Collection<NSAttributedString> {
 extension NSFont {
     var weight: NSFont.Weight {
         switch NSFontManager.shared.weight(of: self) {
-        case 0: return .ultraLight
-        case 1: return .thin
-        case 2 ... 4: return .light
-        case 5: return .regular
-        case 6: return .medium
-        case 7: return .semibold
-        case 8: return .heavy
-        case 9: return .black
-        default: return .medium
+        case 0: .ultraLight
+        case 1: .thin
+        case 2 ... 4: .light
+        case 5: .regular
+        case 6: .medium
+        case 7: .semibold
+        case 8: .heavy
+        case 9: .black
+        default: .medium
         }
     }
 }
@@ -1447,9 +1447,9 @@ enum MonitorValue {
     var isContrast: Bool {
         switch self {
         case .nsBrightness, .brightness, .preciseBrightness:
-            return false
+            false
         case .nsContrast, .contrast, .preciseContrast:
-            return true
+            true
         }
     }
 }
@@ -1538,25 +1538,25 @@ extension NSFont.Weight {
     var str: String {
         switch self {
         case .ultraLight:
-            return "Ultralight"
+            "Ultralight"
         case .thin:
-            return "Thin"
+            "Thin"
         case .light:
-            return "Light"
+            "Light"
         case .regular:
-            return "Regular"
+            "Regular"
         case .medium:
-            return "Medium"
+            "Medium"
         case .semibold:
-            return "Semibold"
+            "Semibold"
         case .bold:
-            return "Bold"
+            "Bold"
         case .heavy:
-            return "Heavy"
+            "Heavy"
         case .black:
-            return "Black"
+            "Black"
         default:
-            return ""
+            ""
         }
     }
 }

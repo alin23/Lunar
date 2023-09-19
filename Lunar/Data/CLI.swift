@@ -44,27 +44,27 @@ private enum LunarCommandError: Error, CustomStringConvertible {
     var description: String {
         switch self {
         case .noDisplay:
-            return "No display available"
+            "No display available"
         case .noServer:
-            return "This command needs to be run through the client-server interface with the Lunar app already running"
+            "This command needs to be run through the client-server interface with the Lunar app already running"
         case let .displayNotFound(string):
-            return "Display Not Found: \(string)"
+            "Display Not Found: \(string)"
         case let .propertyNotValid(string):
-            return "Property Not Valid: \(string)"
+            "Property Not Valid: \(string)"
         case let .cantReadProperty(string):
-            return "Cant Read Property: \(string)"
+            "Cant Read Property: \(string)"
         case let .controlNotAvailable(string):
-            return "Control Not Available: \(string)"
+            "Control Not Available: \(string)"
         case let .serializationError(string):
-            return "Serialization Error: \(string)"
+            "Serialization Error: \(string)"
         case let .invalidValue(string):
-            return "Invalid Value: \(string)"
+            "Invalid Value: \(string)"
         case let .ddcError(string):
-            return "DDC Error: \(string)"
+            "DDC Error: \(string)"
         case let .gammaError(string):
-            return "Gamma Error: \(string)"
+            "Gamma Error: \(string)"
         case let .noUUID(cgDirectDisplayID):
-            return "No UUID for \(cgDirectDisplayID)"
+            "No UUID for \(cgDirectDisplayID)"
         }
     }
 }
@@ -187,37 +187,37 @@ enum DisplayFilter: ExpressibleByArgument, Codable, Equatable, CaseIterable {
     var screen: Screen {
         switch self {
         case .all:
-            return Screen(id: UInt32.max.u32 - 1, name: "All screens", serial: "all", isDynamicFilter: true)
+            Screen(id: UInt32.max.u32 - 1, name: "All screens", serial: "all", isDynamicFilter: true)
         case .first:
-            return Screen(id: UInt32.max.u32 - 2, name: "First screen", serial: "first", isDynamicFilter: true)
+            Screen(id: UInt32.max.u32 - 2, name: "First screen", serial: "first", isDynamicFilter: true)
         case .mainExternal:
-            return Screen(id: UInt32.max.u32 - 3, name: "Main external screen", serial: "mainExternal", isDynamicFilter: true)
+            Screen(id: UInt32.max.u32 - 3, name: "Main external screen", serial: "mainExternal", isDynamicFilter: true)
         case .external:
-            return Screen(id: UInt32.max.u32 - 4, name: "External screens", serial: "external", isDynamicFilter: true)
+            Screen(id: UInt32.max.u32 - 4, name: "External screens", serial: "external", isDynamicFilter: true)
         case .main:
-            return Screen(id: UInt32.max.u32 - 5, name: "Main screen", serial: "main", isDynamicFilter: true)
+            Screen(id: UInt32.max.u32 - 5, name: "Main screen", serial: "main", isDynamicFilter: true)
         case .nonMain:
-            return Screen(id: UInt32.max.u32 - 6, name: "Non-main screens", serial: "nonMain", isDynamicFilter: true)
+            Screen(id: UInt32.max.u32 - 6, name: "Non-main screens", serial: "nonMain", isDynamicFilter: true)
         case .cursor:
-            return Screen(id: UInt32.max.u32 - 7, name: "Screen with the cursor", serial: "cursor", isDynamicFilter: true)
+            Screen(id: UInt32.max.u32 - 7, name: "Screen with the cursor", serial: "cursor", isDynamicFilter: true)
         case .withoutCursor:
-            return Screen(id: UInt32.max.u32 - 8, name: "Screens without the cursor", serial: "withoutCursor", isDynamicFilter: true)
+            Screen(id: UInt32.max.u32 - 8, name: "Screens without the cursor", serial: "withoutCursor", isDynamicFilter: true)
         case .bestGuess:
-            return Screen(id: UInt32.max.u32 - 9, name: "Best guess", serial: "bestGuess", isDynamicFilter: true)
+            Screen(id: UInt32.max.u32 - 9, name: "Best guess", serial: "bestGuess", isDynamicFilter: true)
         case .builtin:
-            return Screen(id: UInt32.max.u32 - 10, name: "Built-in screen", serial: "builtin", isDynamicFilter: true)
+            Screen(id: UInt32.max.u32 - 10, name: "Built-in screen", serial: "builtin", isDynamicFilter: true)
         case .syncSource:
-            return Screen(id: UInt32.max.u32 - 11, name: "Sync Mode Source", serial: "syncSource", isDynamicFilter: true)
+            Screen(id: UInt32.max.u32 - 11, name: "Sync Mode Source", serial: "syncSource", isDynamicFilter: true)
         case .syncTargets:
-            return Screen(id: UInt32.max.u32 - 12, name: "Sync Mode Targets", serial: "syncTargets", isDynamicFilter: true)
+            Screen(id: UInt32.max.u32 - 12, name: "Sync Mode Targets", serial: "syncTargets", isDynamicFilter: true)
         case .none:
-            return Screen(id: UInt32.max.u32 - 13, name: "None", serial: "none", isDynamicFilter: true)
+            Screen(id: UInt32.max.u32 - 13, name: "None", serial: "none", isDynamicFilter: true)
         case let .serial(string):
-            return Screen(id: UInt32.max.u32 - 14, name: string, serial: string)
+            Screen(id: UInt32.max.u32 - 14, name: string, serial: string)
         case let .name(string):
-            return Screen(id: UInt32.max.u32 - 15, name: string, serial: string)
+            Screen(id: UInt32.max.u32 - 15, name: string, serial: string)
         case let .id(id):
-            return Screen(id: id, name: id.s, serial: id.s)
+            Screen(id: id, name: id.s, serial: id.s)
         }
     }
 

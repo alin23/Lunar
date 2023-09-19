@@ -46,32 +46,32 @@ enum DisplayControl: Int, Codable, EnumerableFlag {
     var str: String {
         switch self {
         case .network:
-            return "Network"
+            "Network"
         case .appleNative:
-            return "AppleNative"
+            "AppleNative"
         case .ddc:
-            return "DDC"
+            "DDC"
         case .gamma:
-            return "Gamma"
+            "Gamma"
         case .ddcctl:
-            return "ddcctl"
+            "ddcctl"
         }
     }
 
     static func fromstr(_ strValue: String) -> Self {
         switch strValue.lowercased().stripped {
         case "network", DisplayControl.network.rawValue.s:
-            return .network
+            .network
         case "appleNative", "coreDisplay", DisplayControl.appleNative.rawValue.s:
-            return .appleNative
+            .appleNative
         case "ddc", DisplayControl.ddc.rawValue.s:
-            return .ddc
+            .ddc
         case "gamma", DisplayControl.gamma.rawValue.s:
-            return .gamma
+            .gamma
         case "ddcctl", DisplayControl.ddcctl.rawValue.s:
-            return .ddcctl
+            .ddcctl
         default:
-            return .ddc
+            .ddc
         }
     }
 

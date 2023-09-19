@@ -470,11 +470,10 @@ final class NetworkControl: Control {
 
         manageSendingState(for: controlID, sending: true)
 
-        var fullUrl: URL
-        if smooth {
-            fullUrl = url / controlID / oldValue! / value
+        var fullUrl: URL = if smooth {
+            url / controlID / oldValue! / value
         } else {
-            fullUrl = url / controlID / value
+            url / controlID / value
         }
 
         requestsPublishers[controlID]?.send(Request(url: fullUrl, controlID: controlID, timeout: smooth ? 60.seconds : 15.seconds, value: value))

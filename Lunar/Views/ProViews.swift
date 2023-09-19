@@ -267,11 +267,11 @@ struct DetailToggleStyle: ToggleStyle {
         var sfSymbolName: String {
             switch self {
             case .empty:
-                return ""
+                ""
             case .square:
-                return ".square"
+                ".square"
             case .circle:
-                return ".circle"
+                ".circle"
             }
         }
     }

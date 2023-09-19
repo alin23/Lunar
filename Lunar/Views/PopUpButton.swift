@@ -202,21 +202,20 @@ final class PopUpButton: NSPopUpButton {
         //     return
         // }
 
-        let x: CGFloat
-        switch origin {
+        let x: CGFloat = switch origin {
         case .left, .none:
-            x = frame.minX
+            frame.minX
         case .center:
             if width > frame.width {
-                x = frame.minX - (width - frame.width) / 2
+                frame.minX - (width - frame.width) / 2
             } else {
-                x = frame.minX + (frame.width - width) / 2
+                frame.minX + (frame.width - width) / 2
             }
         case .right:
             if width > frame.width {
-                x = frame.minX - (width - frame.width)
+                frame.minX - (width - frame.width)
             } else {
-                x = frame.minX + (frame.width - width)
+                frame.minX + (frame.width - width)
             }
         }
 

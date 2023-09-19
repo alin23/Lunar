@@ -187,9 +187,9 @@ enum VideoInputSource: UInt16, Sendable, CaseIterable, Nameable, CustomStringCon
              .lgSpecificThunderbolt2,
              .lgSpecificThunderbolt3,
              .lgSpecificThunderbolt4:
-            return true
+            true
         default:
-            return false
+            false
         }
     }
 
@@ -202,17 +202,17 @@ enum VideoInputSource: UInt16, Sendable, CaseIterable, Nameable, CustomStringCon
 
     var image: String? {
         switch self {
-        case .vga1, .vga2: return "vga"
-        case .dvi1, .dvi2: return "dvi"
-        case .compositeVideo1, .compositeVideo2: return "composite"
-        case .sVideo1, .sVideo2: return "svideo"
-        case .tuner1, .tuner2, .tuner3: return "tuner"
-        case .componentVideoYPrPbYCrCb1, .componentVideoYPrPbYCrCb2, .componentVideoYPrPbYCrCb3: return "component"
-        case .displayPort1, .displayPort2, .lgSpecificDisplayPort1, .lgSpecificDisplayPort2, .lgSpecificDisplayPort3, .lgSpecificDisplayPort4: return "displayport"
-        case .hdmi1, .hdmi2, .hdmi3, .hdmi4, .lgSpecificHdmi1, .lgSpecificHdmi2, .lgSpecificHdmi3, .lgSpecificHdmi4: return "hdmi"
-        case .thunderbolt1, .thunderbolt2, .thunderbolt3, .lgSpecificThunderbolt1, .lgSpecificThunderbolt2, .lgSpecificThunderbolt3, .lgSpecificThunderbolt4: return "usbc"
-        case .unknown: return "input"
-        case .separator: return nil
+        case .vga1, .vga2: "vga"
+        case .dvi1, .dvi2: "dvi"
+        case .compositeVideo1, .compositeVideo2: "composite"
+        case .sVideo1, .sVideo2: "svideo"
+        case .tuner1, .tuner2, .tuner3: "tuner"
+        case .componentVideoYPrPbYCrCb1, .componentVideoYPrPbYCrCb2, .componentVideoYPrPbYCrCb3: "component"
+        case .displayPort1, .displayPort2, .lgSpecificDisplayPort1, .lgSpecificDisplayPort2, .lgSpecificDisplayPort3, .lgSpecificDisplayPort4: "displayport"
+        case .hdmi1, .hdmi2, .hdmi3, .hdmi4, .lgSpecificHdmi1, .lgSpecificHdmi2, .lgSpecificHdmi3, .lgSpecificHdmi4: "hdmi"
+        case .thunderbolt1, .thunderbolt2, .thunderbolt3, .lgSpecificThunderbolt1, .lgSpecificThunderbolt2, .lgSpecificThunderbolt3, .lgSpecificThunderbolt4: "usbc"
+        case .unknown: "input"
+        case .separator: nil
         }
     }
 
@@ -222,45 +222,45 @@ enum VideoInputSource: UInt16, Sendable, CaseIterable, Nameable, CustomStringCon
 
     func displayName() -> String {
         switch self {
-        case .vga1: return "VGA 1"
-        case .vga2: return "VGA 2"
-        case .dvi1: return "DVI 1"
-        case .dvi2: return "DVI 2"
-        case .compositeVideo1: return "Composite video 1"
-        case .compositeVideo2: return "Composite video 2"
-        case .sVideo1: return "S-Video 1"
-        case .sVideo2: return "S-Video 2"
-        case .tuner1: return "Tuner 1"
-        case .tuner2: return "Tuner 2"
-        case .tuner3: return "Tuner 3"
-        case .componentVideoYPrPbYCrCb1: return "Component video (YPrPb/YCrCb) 1"
-        case .componentVideoYPrPbYCrCb2: return "Component video (YPrPb/YCrCb) 2"
-        case .componentVideoYPrPbYCrCb3: return "Component video (YPrPb/YCrCb) 3"
-        case .displayPort1: return "DisplayPort 1"
-        case .displayPort2: return "DisplayPort 2"
-        case .hdmi1: return "HDMI 1"
-        case .hdmi2: return "HDMI 2"
-        case .hdmi3: return "HDMI 3"
-        case .hdmi4: return "HDMI 4"
-        case .thunderbolt1: return "USB-C 1"
-        case .thunderbolt2: return "USB-C 2"
-        case .thunderbolt3: return "USB-C 3"
+        case .vga1: "VGA 1"
+        case .vga2: "VGA 2"
+        case .dvi1: "DVI 1"
+        case .dvi2: "DVI 2"
+        case .compositeVideo1: "Composite video 1"
+        case .compositeVideo2: "Composite video 2"
+        case .sVideo1: "S-Video 1"
+        case .sVideo2: "S-Video 2"
+        case .tuner1: "Tuner 1"
+        case .tuner2: "Tuner 2"
+        case .tuner3: "Tuner 3"
+        case .componentVideoYPrPbYCrCb1: "Component video (YPrPb/YCrCb) 1"
+        case .componentVideoYPrPbYCrCb2: "Component video (YPrPb/YCrCb) 2"
+        case .componentVideoYPrPbYCrCb3: "Component video (YPrPb/YCrCb) 3"
+        case .displayPort1: "DisplayPort 1"
+        case .displayPort2: "DisplayPort 2"
+        case .hdmi1: "HDMI 1"
+        case .hdmi2: "HDMI 2"
+        case .hdmi3: "HDMI 3"
+        case .hdmi4: "HDMI 4"
+        case .thunderbolt1: "USB-C 1"
+        case .thunderbolt2: "USB-C 2"
+        case .thunderbolt3: "USB-C 3"
 
-        case .lgSpecificDisplayPort1: return "DisplayPort 1 (LG specific)"
-        case .lgSpecificDisplayPort2: return "DisplayPort 2 (LG specific)"
-        case .lgSpecificDisplayPort3: return "DisplayPort 3 (LG specific)"
-        case .lgSpecificDisplayPort4: return "DisplayPort 4 (LG specific)"
-        case .lgSpecificHdmi1: return "HDMI 1 (LG specific)"
-        case .lgSpecificHdmi2: return "HDMI 2 (LG specific)"
-        case .lgSpecificHdmi3: return "HDMI 3 (LG specific)"
-        case .lgSpecificHdmi4: return "HDMI 4 (LG specific)"
-        case .lgSpecificThunderbolt1: return "USB-C 1 (LG specific)"
-        case .lgSpecificThunderbolt2: return "USB-C 2 (LG specific)"
-        case .lgSpecificThunderbolt3: return "USB-C 3 (LG specific)"
-        case .lgSpecificThunderbolt4: return "USB-C 4 (LG specific)"
+        case .lgSpecificDisplayPort1: "DisplayPort 1 (LG specific)"
+        case .lgSpecificDisplayPort2: "DisplayPort 2 (LG specific)"
+        case .lgSpecificDisplayPort3: "DisplayPort 3 (LG specific)"
+        case .lgSpecificDisplayPort4: "DisplayPort 4 (LG specific)"
+        case .lgSpecificHdmi1: "HDMI 1 (LG specific)"
+        case .lgSpecificHdmi2: "HDMI 2 (LG specific)"
+        case .lgSpecificHdmi3: "HDMI 3 (LG specific)"
+        case .lgSpecificHdmi4: "HDMI 4 (LG specific)"
+        case .lgSpecificThunderbolt1: "USB-C 1 (LG specific)"
+        case .lgSpecificThunderbolt2: "USB-C 2 (LG specific)"
+        case .lgSpecificThunderbolt3: "USB-C 3 (LG specific)"
+        case .lgSpecificThunderbolt4: "USB-C 4 (LG specific)"
 
-        case .unknown: return "Unknown"
-        case .separator: return "------"
+        case .unknown: "Unknown"
+        case .separator: "------"
         }
     }
 }
@@ -1435,15 +1435,15 @@ enum DDC {
     static func extractDescriptorText(from edid: EDID, desType: EDIDTextType, hex: Bool = false) -> String? {
         switch desType.rawValue {
         case edid.descriptors.0.text.type:
-            return DDC.getTextData(edid.descriptors.0, hex: hex)
+            DDC.getTextData(edid.descriptors.0, hex: hex)
         case edid.descriptors.1.text.type:
-            return DDC.getTextData(edid.descriptors.1, hex: hex)
+            DDC.getTextData(edid.descriptors.1, hex: hex)
         case edid.descriptors.2.text.type:
-            return DDC.getTextData(edid.descriptors.2, hex: hex)
+            DDC.getTextData(edid.descriptors.2, hex: hex)
         case edid.descriptors.3.text.type:
-            return DDC.getTextData(edid.descriptors.3, hex: hex)
+            DDC.getTextData(edid.descriptors.3, hex: hex)
         default:
-            return nil
+            nil
         }
     }
 

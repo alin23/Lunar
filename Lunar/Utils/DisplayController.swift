@@ -2357,11 +2357,10 @@ final class DisplayController: ObservableObject {
     }
 
     func adaptiveModeString(last: Bool = false) -> String {
-        let mode: AdaptiveModeKey
-        if last {
-            mode = lastNonManualAdaptiveMode.key
+        let mode: AdaptiveModeKey = if last {
+            lastNonManualAdaptiveMode.key
         } else {
-            mode = adaptiveModeKey
+            adaptiveModeKey
         }
 
         return mode.str
@@ -2662,11 +2661,10 @@ final class DisplayController: ObservableObject {
             }
 
             if CachedDefaults[.mergeBrightnessContrast] {
-                let preciseValue: Double
-                if !display.lockedBrightness || display.hasSoftwareControl {
-                    preciseValue = value.d.map(from: (display.minBrightness.doubleValue, display.maxBrightness.doubleValue), to: (0, 100)) / 100
+                let preciseValue: Double = if !display.lockedBrightness || display.hasSoftwareControl {
+                    value.d.map(from: (display.minBrightness.doubleValue, display.maxBrightness.doubleValue), to: (0, 100)) / 100
                 } else {
-                    preciseValue = cap(display.preciseBrightnessContrast + (offset.d / 100), minVal: 0.0, maxVal: 1.0)
+                    cap(display.preciseBrightnessContrast + (offset.d / 100), minVal: 0.0, maxVal: 1.0)
                 }
 
                 withoutSlowTransition {

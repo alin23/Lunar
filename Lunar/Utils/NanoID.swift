@@ -107,10 +107,9 @@ enum NanoIDAlphabet {
     func toString() -> String {
         switch self {
         case .uppercasedLatinLetters, .lowercasedLatinLetters, .numbers:
-            return chars()
+            chars()
         case .urlSafe:
-            return
-                "\(NanoIDAlphabet.uppercasedLatinLetters.chars())\(NanoIDAlphabet.lowercasedLatinLetters.chars())\(NanoIDAlphabet.numbers.chars())~_"
+            "\(NanoIDAlphabet.uppercasedLatinLetters.chars())\(NanoIDAlphabet.lowercasedLatinLetters.chars())\(NanoIDAlphabet.numbers.chars())~_"
 
         }
     }
@@ -118,13 +117,13 @@ enum NanoIDAlphabet {
     private func chars() -> String {
         switch self {
         case .uppercasedLatinLetters:
-            return "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         case .lowercasedLatinLetters:
-            return "abcdefghijklmnopqrstuvwxyz"
+            "abcdefghijklmnopqrstuvwxyz"
         case .numbers:
-            return "1234567890"
+            "1234567890"
         default:
-            return ""
+            ""
         }
     }
 }

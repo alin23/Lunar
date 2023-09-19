@@ -406,14 +406,14 @@ struct BigSurSlider: View {
 extension NSEvent.Phase {
     var str: String {
         switch self {
-        case .mayBegin: return "mayBegin"
-        case .began: return "began"
-        case .changed: return "changed"
-        case .stationary: return "stationary"
-        case .cancelled: return "cancelled"
-        case .ended: return "ended"
+        case .mayBegin: "mayBegin"
+        case .began: "began"
+        case .changed: "changed"
+        case .stationary: "stationary"
+        case .cancelled: "cancelled"
+        case .ended: "ended"
         default:
-            return "phase(\(rawValue))"
+            "phase(\(rawValue))"
         }
     }
 }

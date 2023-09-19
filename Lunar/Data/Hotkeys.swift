@@ -260,11 +260,11 @@ final class PersistentHotkey: Codable, Hashable, Defaults.Serializable, CustomSt
         mainThread {
             let modifiers = keyCombo.keyEquivalentModifierMask.keyEquivalentStrings().map { char -> String in
                 switch char {
-                case "⌥": return "Option"
-                case "⌘": return "Command"
-                case "⌃": return "Control"
-                case "⇧": return "Shift"
-                default: return char
+                case "⌥": "Option"
+                case "⌘": "Command"
+                case "⌃": "Control"
+                case "⇧": "Shift"
+                default: char
                 }
             }
             return "\(String(modifiers.joined(by: "-")))-\(keyChar)"
@@ -775,65 +775,65 @@ enum Hotkey {
     static func handler(identifier: HotkeyIdentifier) -> Selector {
         switch identifier {
         case .toggle:
-            return #selector(AppDelegate.toggleHotkeyHandler)
+            #selector(AppDelegate.toggleHotkeyHandler)
         case .lunar:
-            return #selector(AppDelegate.lunarHotkeyHandler)
+            #selector(AppDelegate.lunarHotkeyHandler)
         case .restart:
-            return #selector(AppDelegate.restartHotkeyHandler)
+            #selector(AppDelegate.restartHotkeyHandler)
         case .percent0:
-            return #selector(AppDelegate.percent0HotkeyHandler)
+            #selector(AppDelegate.percent0HotkeyHandler)
         case .percent25:
-            return #selector(AppDelegate.percent25HotkeyHandler)
+            #selector(AppDelegate.percent25HotkeyHandler)
         case .percent50:
-            return #selector(AppDelegate.percent50HotkeyHandler)
+            #selector(AppDelegate.percent50HotkeyHandler)
         case .percent75:
-            return #selector(AppDelegate.percent75HotkeyHandler)
+            #selector(AppDelegate.percent75HotkeyHandler)
         case .percent100:
-            return #selector(AppDelegate.percent100HotkeyHandler)
+            #selector(AppDelegate.percent100HotkeyHandler)
         case .faceLight:
-            return #selector(AppDelegate.faceLightHotkeyHandler)
+            #selector(AppDelegate.faceLightHotkeyHandler)
         case .blackOut:
-            return #selector(AppDelegate.blackOutHotkeyHandler)
+            #selector(AppDelegate.blackOutHotkeyHandler)
         case .blackOutPowerOff:
-            return #selector(AppDelegate.blackOutPowerOffHotkeyHandler)
+            #selector(AppDelegate.blackOutPowerOffHotkeyHandler)
         case .blackOutNoMirroring:
-            return #selector(AppDelegate.blackOutNoMirroringHotkeyHandler)
+            #selector(AppDelegate.blackOutNoMirroringHotkeyHandler)
         case .blackOutOthers:
-            return #selector(AppDelegate.blackOutOthersHotkeyHandler)
+            #selector(AppDelegate.blackOutOthersHotkeyHandler)
         case .preciseBrightnessUp:
-            return #selector(AppDelegate.preciseBrightnessUpHotkeyHandler)
+            #selector(AppDelegate.preciseBrightnessUpHotkeyHandler)
         case .preciseBrightnessDown:
-            return #selector(AppDelegate.preciseBrightnessDownHotkeyHandler)
+            #selector(AppDelegate.preciseBrightnessDownHotkeyHandler)
         case .preciseContrastUp:
-            return #selector(AppDelegate.preciseContrastUpHotkeyHandler)
+            #selector(AppDelegate.preciseContrastUpHotkeyHandler)
         case .preciseContrastDown:
-            return #selector(AppDelegate.preciseContrastDownHotkeyHandler)
+            #selector(AppDelegate.preciseContrastDownHotkeyHandler)
         case .preciseVolumeUp:
-            return #selector(AppDelegate.preciseVolumeUpHotkeyHandler)
+            #selector(AppDelegate.preciseVolumeUpHotkeyHandler)
         case .preciseVolumeDown:
-            return #selector(AppDelegate.preciseVolumeDownHotkeyHandler)
+            #selector(AppDelegate.preciseVolumeDownHotkeyHandler)
         case .brightnessUp:
-            return #selector(AppDelegate.brightnessUpHotkeyHandler)
+            #selector(AppDelegate.brightnessUpHotkeyHandler)
         case .brightnessDown:
-            return #selector(AppDelegate.brightnessDownHotkeyHandler)
+            #selector(AppDelegate.brightnessDownHotkeyHandler)
         case .contrastUp:
-            return #selector(AppDelegate.contrastUpHotkeyHandler)
+            #selector(AppDelegate.contrastUpHotkeyHandler)
         case .contrastDown:
-            return #selector(AppDelegate.contrastDownHotkeyHandler)
+            #selector(AppDelegate.contrastDownHotkeyHandler)
         case .muteAudio:
-            return #selector(AppDelegate.muteAudioHotkeyHandler)
+            #selector(AppDelegate.muteAudioHotkeyHandler)
         case .volumeUp:
-            return #selector(AppDelegate.volumeUpHotkeyHandler)
+            #selector(AppDelegate.volumeUpHotkeyHandler)
         case .volumeDown:
-            return #selector(AppDelegate.volumeDownHotkeyHandler)
+            #selector(AppDelegate.volumeDownHotkeyHandler)
         case .orientation0:
-            return #selector(AppDelegate.orientation0Handler)
+            #selector(AppDelegate.orientation0Handler)
         case .orientation90:
-            return #selector(AppDelegate.orientation90Handler)
+            #selector(AppDelegate.orientation90Handler)
         case .orientation180:
-            return #selector(AppDelegate.orientation180Handler)
+            #selector(AppDelegate.orientation180Handler)
         case .orientation270:
-            return #selector(AppDelegate.orientation270Handler)
+            #selector(AppDelegate.orientation270Handler)
         }
     }
 
@@ -1293,9 +1293,9 @@ extension AppDelegate: MediaKeyTapDelegate {
     func isVolumeKey(_ mediaKey: MediaKey) -> Bool {
         switch mediaKey {
         case .volumeUp, .volumeDown, .mute:
-            return true
+            true
         default:
-            return false
+            false
         }
     }
 

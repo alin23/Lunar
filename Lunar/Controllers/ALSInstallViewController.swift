@@ -84,53 +84,53 @@ final class ALSInstallViewController: NSViewController {
         switch board {
         // ESP32-S2
         case "Metro ESP32 S2":
-            return "adafruit_metro_esp32s2"
+            "adafruit_metro_esp32s2"
         case "SparkFun Thing Plus ESP32 S2":
-            return "sparkfun_esp32s2_thing_plus"
+            "sparkfun_esp32s2_thing_plus"
         case "Feather ESP32 S2":
-            return "featheresp32-s2"
+            "featheresp32-s2"
         case "Feather ESP32 S2 TFT":
-            return "adafruit_feather_esp32s2_tft"
+            "adafruit_feather_esp32s2_tft"
         case "Feather ESP32 S2 Reverse TFT":
-            return "adafruit_feather_esp32s2_reversetft"
+            "adafruit_feather_esp32s2_reversetft"
         case "MagTag ESP32 S2":
-            return "adafruit_magtag29_esp32s2"
+            "adafruit_magtag29_esp32s2"
         case "Funhouse ESP32 S2":
-            return "adafruit_funhouse_esp32s2"
+            "adafruit_funhouse_esp32s2"
         case "NodeMCU ESP32 S2":
-            return "nodemcu-32s2"
+            "nodemcu-32s2"
 
         // ESP32
         case "Adafruit HUZZAH32 Feather ESP32":
-            return "featheresp32"
+            "featheresp32"
         case "WEMOS LOLIN32":
-            return "lolin32"
+            "lolin32"
         case "WEMOS LOLIN32 Lite":
-            return "lolin32_lite"
+            "lolin32_lite"
         case "NodeMCU ESP32":
-            return "nodemcu-32s"
+            "nodemcu-32s"
         case "Generic ESP32":
-            return "esp32dev"
+            "esp32dev"
 
         // ESP8266
         case "NodeMCU v2 (ESP8266)":
-            return "nodemcuv2"
+            "nodemcuv2"
         case "NodeMCU v3 (ESP8266)":
-            return "nodemcuv2"
+            "nodemcuv2"
         case "WEMOS D1 Mini (ESP8266)":
-            return "d1_mini"
+            "d1_mini"
         case "WEMOS D1 Mini Lite (ESP8266)":
-            return "d1_mini_lite"
+            "d1_mini_lite"
         case "WEMOS D1 Mini Pro (ESP8266)":
-            return "d1_mini_pro"
+            "d1_mini_pro"
         case "SparkFun Thing (ESP8266)":
-            return "thing"
+            "thing"
         case "NodeMCU v1 (ESP8266)":
-            return "nodemcu"
+            "nodemcu"
         case "Generic ESP8266":
-            return "esp_wroom_02"
+            "esp_wroom_02"
         default:
-            return "esp32dev"
+            "esp32dev"
         }
     }
 
