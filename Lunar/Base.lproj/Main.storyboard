@@ -2737,7 +2737,7 @@ CORNERS</string>
                                         <segmentedCell key="cell" refusesFirstResponder="YES" borderStyle="border" alignment="left" segmentDistribution="fillEqually" style="capsule" trackingMode="selectOne" id="d5N-Gw-uQF">
                                             <font key="font" metaFont="systemSemibold" size="12"/>
                                             <segments>
-                                                <segment label="Adjustable" toolTip="Allow brightness to be adjusted using keys or sliders" imageScaling="proportionallyUpOrDown" selected="YES"/>
+                                                <segment label="Adjustable" toolTip="Allow contrast to be adjusted using keys or sliders" imageScaling="proportionallyUpOrDown" selected="YES"/>
                                                 <segment label="Locked" toolTip="Keep contrast locked to the last set value" tag="1"/>
                                             </segments>
                                         </segmentedCell>
