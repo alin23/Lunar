@@ -1726,45 +1726,45 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     func menuItem(_ hotkeyIdentifier: HotkeyIdentifier) -> NSMenuItem? {
         switch hotkeyIdentifier {
         case .lunar:
-            return preferencesMenuItem
+            preferencesMenuItem
         case .restart:
-            return restartMenuItem
+            restartMenuItem
         case .percent0:
-            return percent0MenuItem
+            percent0MenuItem
         case .percent25:
-            return percent25MenuItem
+            percent25MenuItem
         case .percent50:
-            return percent50MenuItem
+            percent50MenuItem
         case .percent75:
-            return percent75MenuItem
+            percent75MenuItem
         case .percent100:
-            return percent100MenuItem
+            percent100MenuItem
         case .faceLight:
-            return faceLightMenuItem
+            faceLightMenuItem
         case .blackOut:
-            return blackOutMenuItem
+            blackOutMenuItem
         case .blackOutNoMirroring:
-            return blackOutNoMirroringMenuItem
+            blackOutNoMirroringMenuItem
         case .blackOutPowerOff:
-            return blackOutPowerOffMenuItem
+            blackOutPowerOffMenuItem
         case .blackOutOthers:
-            return blackOutOthersMenuItem
+            blackOutOthersMenuItem
         case .brightnessUp:
-            return brightnessUpMenuItem
+            brightnessUpMenuItem
         case .brightnessDown:
-            return brightnessDownMenuItem
+            brightnessDownMenuItem
         case .contrastUp:
-            return contrastUpMenuItem
+            contrastUpMenuItem
         case .contrastDown:
-            return contrastDownMenuItem
+            contrastDownMenuItem
         case .volumeDown:
-            return volumeDownMenuItem
+            volumeDownMenuItem
         case .volumeUp:
-            return volumeUpMenuItem
+            volumeUpMenuItem
         case .muteAudio:
-            return muteAudioMenuItem
+            muteAudioMenuItem
         default:
-            return nil
+            nil
         }
     }
 
@@ -2245,8 +2245,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             startOrRestartMediaKeyTap(checkPermissions: true)
         } else if let apps = CachedDefaults[.appExceptions], !apps.isEmpty {
             acquirePrivileges(
-                notificationTitle: "Lunar can now watch for app exceptions",
-                notificationBody: "Whenever an app in the exception list is focused or visible on a screen, Lunar will apply its offsets."
+                notificationTitle: "Lunar can now watch for app presets",
+                notificationBody: "Whenever an app in the presets list is focused or visible on a screen, Lunar will apply its configured brightness."
             )
         }
 
@@ -2298,7 +2298,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         }
 
         NotificationCenter.default.post(name: displayListChanged, object: nil)
-        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "4"
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "6"
         log.info("App finished launching v\(version)")
     }
 
