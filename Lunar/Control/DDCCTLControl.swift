@@ -33,29 +33,29 @@ struct DDCCTLControl: Control {
     func propertyArg(_ property: ControlID) -> String {
         switch property {
         case .BRIGHTNESS:
-            return "-b"
+            "-b"
         case .CONTRAST:
-            return "-c"
+            "-c"
         case .AUDIO_MUTE:
-            return "-m"
+            "-m"
         case .INPUT_SOURCE:
-            return "-i"
+            "-i"
         case .AUDIO_SPEAKER_VOLUME:
-            return "-v"
+            "-v"
         case .DPMS:
-            return "-p"
+            "-p"
         case .RESET_BRIGHTNESS_AND_CONTRAST:
-            return "-rbc"
+            "-rbc"
         case .RED_GAIN:
-            return "-rg"
+            "-rg"
         case .GREEN_GAIN:
-            return "-gg"
+            "-gg"
         case .BLUE_GAIN:
-            return "-bg"
+            "-bg"
         case .RESET_COLOR:
-            return "-rrgb"
+            "-rrgb"
         default:
-            return ""
+            ""
         }
     }
 

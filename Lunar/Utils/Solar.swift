@@ -422,13 +422,12 @@ final class Solar {
         let shouldBeYesterday = lngHour > 0 && UT > 12 && sunriseSunset == .sunrise
         let shouldBeTomorrow = lngHour < 0 && UT < 12 && sunriseSunset == .sunset
 
-        let setDate: Date
-        if shouldBeYesterday {
-            setDate = Date(timeInterval: -(60 * 60 * 24), since: date)
+        let setDate: Date = if shouldBeYesterday {
+            Date(timeInterval: -(60 * 60 * 24), since: date)
         } else if shouldBeTomorrow {
-            setDate = Date(timeInterval: 60 * 60 * 24, since: date)
+            Date(timeInterval: 60 * 60 * 24, since: date)
         } else {
-            setDate = date
+            date
         }
 
         var components = calendar.dateComponents([.day, .month, .year], from: setDate)

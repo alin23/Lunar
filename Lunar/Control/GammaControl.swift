@@ -104,11 +104,11 @@ enum NightShiftScheduleType: Equatable {
     static func == (lhs: NightShiftScheduleType, rhs: NightShiftScheduleType) -> Bool {
         switch (lhs, rhs) {
         case (.off, .off), (.solar, .solar):
-            return true
+            true
         case (let .custom(leftStart, leftEnd), let custom(rightStart, rightEnd)):
-            return leftStart == rightStart && leftEnd == rightEnd
+            leftStart == rightStart && leftEnd == rightEnd
         default:
-            return false
+            false
         }
     }
 }

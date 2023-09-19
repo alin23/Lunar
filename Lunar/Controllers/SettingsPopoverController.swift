@@ -75,15 +75,15 @@ final class SettingsPopoverController: NSViewController {
     func lunarAdaptiveTooltip(mode: AdaptiveModeKey? = nil) -> String {
         switch mode ?? DC.adaptiveModeKey {
         case .sync:
-            return "Allow Lunar to automatically sync the brightness of this display with the other monitors"
+            "Allow Lunar to automatically sync the brightness of this display with the other monitors"
         case .sensor:
-            return "Allow Lunar to automatically adapt brightness using readings from the ambient light sensor"
+            "Allow Lunar to automatically adapt brightness using readings from the ambient light sensor"
         case .location:
-            return "Allow Lunar to automatically change brightness based on sun elevation"
+            "Allow Lunar to automatically change brightness based on sun elevation"
         case .clock:
-            return "Allow Lunar to automatically change brightness based on the configured schedule"
+            "Allow Lunar to automatically change brightness based on the configured schedule"
         case .manual, .auto:
-            return "Allow Lunar to automatically adjust the brightness of this display when a non-manual mode is active"
+            "Allow Lunar to automatically adjust the brightness of this display when a non-manual mode is active"
         }
     }
 

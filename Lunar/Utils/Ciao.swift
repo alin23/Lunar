@@ -326,15 +326,15 @@ enum Level: Int {
     var description: String {
         switch self {
         case .verbose:
-            return "verbose"
+            "verbose"
         case .debug:
-            return "debug"
+            "debug"
         case .info:
-            return "info"
+            "info"
         case .warning:
-            return "warning"
+            "warning"
         case .error:
-            return "error"
+            "error"
         }
     }
 }
@@ -389,9 +389,9 @@ enum ServiceType {
     var description: String {
         switch self {
         case let .tcp(name):
-            return "_\(name)._tcp"
+            "_\(name)._tcp"
         case let .udp(name):
-            return "_\(name)._udp"
+            "_\(name)._udp"
         }
     }
 }

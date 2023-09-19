@@ -586,9 +586,9 @@ func generateAPIKey() -> String {
     let serialNumberData = Data(r.next().toUInt8Array() + r.next().toUInt8Array() + r.next().toUInt8Array() + r.next().toUInt8Array())
     let hash = serialNumberData.sha256Data.prefix(20).str(base64: true, separator: "").map { (c: Character) -> Character in
         switch c {
-        case "/": return Character(".")
-        case "+": return Character(".")
-        default: return c
+        case "/": Character(".")
+        case "+": Character(".")
+        default: c
         }
     }.str()
 //    log.info("APIKey: \(hash)")
@@ -613,9 +613,9 @@ func getSerialNumberHash() -> String? {
     }
     let hash = serialNumberData.sha256Data.prefix(20).str(base64: true, separator: "").map { (c: Character) -> Character in
         switch c {
-        case "/": return Character(".")
-        case "+": return Character(".")
-        default: return c
+        case "/": Character(".")
+        case "+": Character(".")
+        default: c
         }
     }.str()
 //    log.info("SerialNumberHash: \(hash)")
@@ -785,9 +785,9 @@ var globalObservers: [String: AnyCancellable] = Dictionary(minimumCapacity: 100)
 extension DispatchQueue {
     func syncSafe<T>(_ action: @escaping () -> T) -> T {
         if let q = DispatchQueue.current, self == q {
-            return action()
+            action()
         } else {
-            return sync { action() }
+            sync { action() }
         }
     }
     func syncSafe(execute task: DispatchWorkItem) {

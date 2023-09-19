@@ -386,11 +386,10 @@ struct ScreenQuery: EntityPropertyQuery {
             return additionalScreens.first
         }
 
-        let screens: [Screen]
-        if let filter {
-            screens = displays.filter(filter).map(\.screen)
+        let screens: [Screen] = if let filter {
+            displays.filter(filter).map(\.screen)
         } else {
-            screens = displays.map(\.screen)
+            displays.map(\.screen)
         }
 
         return screens.first ?? (sidecar ? .sidecar : nil)
@@ -401,11 +400,10 @@ struct ScreenQuery: EntityPropertyQuery {
     }
 
     func results() async throws -> [Screen] {
-        let screens: [Screen]
-        if let filter {
-            screens = displays.filter(filter).map(\.screen)
+        let screens: [Screen] = if let filter {
+            displays.filter(filter).map(\.screen)
         } else {
-            screens = displays.map(\.screen)
+            displays.map(\.screen)
         }
 
         guard !single else {
@@ -466,15 +464,15 @@ enum IntentError: Swift.Error, CustomLocalizedStringResourceConvertible {
 
     var localizedStringResource: LocalizedStringResource {
         switch self {
-        case let .message(message): return "Error: \(message)"
-        case .general: return "Error"
+        case let .message(message): "Error: \(message)"
+        case .general: "Error"
         }
     }
 }
 
 @available(iOS 16, macOS 13, *)
 @discardableResult
-private func controlScreen(screen: IntentParameter<Screen>, property: Display.CodingKeys, value: String, skipMissingScreen: Bool = false) throws -> some IntentResult {
+func controlScreen(screen: IntentParameter<Screen>, property: Display.CodingKeys, value: String, skipMissingScreen: Bool = false) throws -> some IntentResult {
     let scr = screen.wrappedValue
     guard !(scr.serial + scr.name).isEmpty else {
         if skipMissingScreen {
@@ -499,7 +497,7 @@ private func controlScreen(screen: IntentParameter<Screen>, property: Display.Co
 // MARK: - SetBrightnessValue
 
 @available(iOS 16, macOS 13, *)
-private struct SetBrightnessIntent: AppIntent {
+struct SetBrightnessIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Set Brightness"
@@ -521,7 +519,7 @@ private struct SetBrightnessIntent: AppIntent {
     var skipMissingScreen: Bool
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<Double> {
         try checkShortcutsLimit()
         try controlScreen(screen: $screen, property: .normalizedBrightness, value: value.str(decimals: 3), skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.preciseBrightness ?? value)
@@ -529,7 +527,7 @@ private struct SetBrightnessIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct SetContrastIntent: AppIntent {
+struct SetContrastIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Set Contrast"
@@ -551,7 +549,7 @@ private struct SetContrastIntent: AppIntent {
     var skipMissingScreen: Bool
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<Double> {
         try checkShortcutsLimit()
         try controlScreen(screen: $screen, property: .normalizedContrast, value: value.str(decimals: 3), skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.preciseContrast ?? value)
@@ -559,7 +557,7 @@ private struct SetContrastIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct SetBrightnessContrastIntent: AppIntent {
+struct SetBrightnessContrastIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Set Brightness & Contrast"
@@ -584,7 +582,7 @@ private struct SetBrightnessContrastIntent: AppIntent {
     var skipMissingScreen: Bool
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<Double> {
         try checkShortcutsLimit()
         try controlScreen(screen: $screen, property: .normalizedBrightnessContrast, value: value.str(decimals: 3), skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.preciseBrightnessContrast ?? value)
@@ -592,7 +590,7 @@ private struct SetBrightnessContrastIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct SetSubZeroDimmingIntent: AppIntent {
+struct SetSubZeroDimmingIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Set Sub-zero Dimming"
@@ -614,7 +612,7 @@ private struct SetSubZeroDimmingIntent: AppIntent {
     var skipMissingScreen: Bool
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<Double> {
         try checkShortcutsLimit()
         try controlScreen(screen: $screen, property: .softwareBrightness, value: value.str(decimals: 3), skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.softwareBrightness.d ?? value)
@@ -622,7 +620,7 @@ private struct SetSubZeroDimmingIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct SetXDRBrightnessIntent: AppIntent {
+struct SetXDRBrightnessIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Set XDR Brightness"
@@ -644,7 +642,7 @@ private struct SetXDRBrightnessIntent: AppIntent {
     var skipMissingScreen: Bool
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<Double> {
         guard lunarProActive else {
             throw IntentError.message("A Lunar Pro license is needed for this feature.")
         }
@@ -654,7 +652,7 @@ private struct SetXDRBrightnessIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct SetVolumeIntent: AppIntent {
+struct SetVolumeIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Set Volume"
@@ -676,7 +674,7 @@ private struct SetVolumeIntent: AppIntent {
     var skipMissingScreen: Bool
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<Double> {
         try checkShortcutsLimit()
 
         try controlScreen(screen: $screen, property: .volume, value: (value * 100).rounded().u16.s, skipMissingScreen: skipMissingScreen)
@@ -703,17 +701,17 @@ enum ScreenToggleState: String, AppEnum, CaseDisplayRepresentable, TypeDisplayRe
     var inverted: ScreenToggleState {
         switch self {
         case .on:
-            return .off
+            .off
         case .off:
-            return .on
+            .on
         case .toggle:
-            return .toggle
+            .toggle
         }
     }
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ToggleAudioMuteIntent: AppIntent {
+struct ToggleAudioMuteIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Toggle Audio Mute"
@@ -735,7 +733,7 @@ private struct ToggleAudioMuteIntent: AppIntent {
     var skipMissingScreen: Bool
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<Bool> {
         try checkShortcutsLimit()
         try controlScreen(screen: $screen, property: .mute, value: state.rawValue, skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.audioMuted ?? state.bool)
@@ -743,7 +741,7 @@ private struct ToggleAudioMuteIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ToggleSystemAdaptiveBrightnessIntent: AppIntent {
+struct ToggleSystemAdaptiveBrightnessIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Toggle System Adaptive Brightness"
@@ -765,7 +763,7 @@ private struct ToggleSystemAdaptiveBrightnessIntent: AppIntent {
     var skipMissingScreen: Bool
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<Bool> {
         try checkShortcutsLimit()
         try controlScreen(screen: $screen, property: .systemAdaptiveBrightness, value: state.rawValue, skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.systemAdaptiveBrightness ?? state.bool)
@@ -773,7 +771,7 @@ private struct ToggleSystemAdaptiveBrightnessIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ToggleHDRIntent: AppIntent {
+struct ToggleHDRIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Toggle HDR"
@@ -795,7 +793,7 @@ private struct ToggleHDRIntent: AppIntent {
     var skipMissingScreen: Bool
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<Bool> {
         try checkShortcutsLimit()
         try controlScreen(screen: $screen, property: .hdr, value: state.rawValue, skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.hdr ?? state.bool)
@@ -803,7 +801,7 @@ private struct ToggleHDRIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ToggleXDRIntent: AppIntent {
+struct ToggleXDRIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Toggle XDR Brightness"
@@ -825,7 +823,7 @@ private struct ToggleXDRIntent: AppIntent {
     var skipMissingScreen: Bool
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<Bool> {
         guard lunarProActive else {
             throw IntentError.message("A Lunar Pro license is needed for this feature.")
         }
@@ -835,7 +833,7 @@ private struct ToggleXDRIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ToggleSubZeroIntent: AppIntent {
+struct ToggleSubZeroIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Toggle Sub-zero Dimming"
@@ -857,7 +855,7 @@ private struct ToggleSubZeroIntent: AppIntent {
     var skipMissingScreen: Bool
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<Bool> {
         try checkShortcutsLimit()
         try controlScreen(screen: $screen, property: .subzero, value: state.rawValue, skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.subzero ?? state.bool)
@@ -865,7 +863,7 @@ private struct ToggleSubZeroIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ToggleFacelightIntent: AppIntent {
+struct ToggleFacelightIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Toggle Facelight"
@@ -887,7 +885,7 @@ private struct ToggleFacelightIntent: AppIntent {
     var skipMissingScreen: Bool
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<Bool> {
         guard lunarProActive else {
             throw IntentError.message("A Lunar Pro license is needed for this feature.")
         }
@@ -899,7 +897,7 @@ private struct ToggleFacelightIntent: AppIntent {
 extension UnitDuration: @unchecked Sendable {}
 
 @available(iOS 16, macOS 13, *)
-private struct CleaningModeIntent: AppIntent {
+struct CleaningModeIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -939,13 +937,13 @@ Press the ⌘ Command key more than 8 times in a row to force deactivation of th
     }
 }
 
-private var cleaningModeTask: DispatchWorkItem?
-private var swallowKeyboardEventTap: CFMachPort?
-private var swallowKeyboardRunLoopSource: CFRunLoopSource?
-private var swallowKeyboardRunLoop: CFRunLoop?
-private let swallowKeyboardQueue = DispatchQueue(label: "Cleaning Mode Runloop", attributes: [])
+var cleaningModeTask: DispatchWorkItem?
+var swallowKeyboardEventTap: CFMachPort?
+var swallowKeyboardRunLoopSource: CFRunLoopSource?
+var swallowKeyboardRunLoop: CFRunLoop?
+let swallowKeyboardQueue = DispatchQueue(label: "Cleaning Mode Runloop", attributes: [])
 
-private func swallowKeyboardEvents() {
+func swallowKeyboardEvents() {
     // creates a CGEventTap that will swallow all keyboard events and makes the keyboard acts as disabled
 
     let keyMask = (1 << CGEventType.keyDown.rawValue) | (1 << CGEventType.keyUp.rawValue) | (1 << NX_SYSDEFINED) | (1 << CGEventType.flagsChanged.rawValue)
@@ -987,7 +985,7 @@ private func swallowKeyboardEvents() {
     CGEvent.tapEnable(tap: swallowKeyboardEventTap, enable: true)
 }
 
-private func disableSwallowKeyboardEvents() {
+func disableSwallowKeyboardEvents() {
     if let source = swallowKeyboardRunLoopSource {
         CFRunLoopSourceInvalidate(source)
         swallowKeyboardRunLoopSource = nil
@@ -1044,7 +1042,7 @@ func activateCleaningMode(deactivateAfter: TimeInterval? = 120, withoutSettingFl
 }
 
 @available(iOS 16, macOS 13, *)
-private struct PowerOffSoftwareIntent: AppIntent {
+struct PowerOffSoftwareIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -1154,7 +1152,7 @@ Power off a screen by:
 }
 
 @available(iOS 16, macOS 13, *)
-private struct PowerOnSoftwareIntent: AppIntent {
+struct PowerOnSoftwareIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -1212,7 +1210,7 @@ private struct PowerOnSoftwareIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct SleepMacIntent: AppIntent {
+struct SleepMacIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -1236,7 +1234,7 @@ private struct SleepMacIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct DisconnectScreenIntent: AppIntent {
+struct DisconnectScreenIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -1286,7 +1284,7 @@ To bring back the screen try any one of the following:
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ReconnectScreenIntent: AppIntent {
+struct ReconnectScreenIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -1350,7 +1348,7 @@ If the action fails, try any one of the following to bring back the screen:
 }
 
 @available(iOS 16, macOS 13, *)
-private func connectedScreen(_ s: Screen) async throws -> Screen? {
+func connectedScreen(_ s: Screen) async throws -> Screen? {
     for _ in 1 ... 30 {
         if let d = s.dynamicDisplay {
             return d.screen
@@ -1362,7 +1360,7 @@ private func connectedScreen(_ s: Screen) async throws -> Screen? {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ToggleScreenConnectionIntent: AppIntent {
+struct ToggleScreenConnectionIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -1444,7 +1442,7 @@ If the reconnect action fails, try any one of the following to bring back the sc
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ToggleBlackOutIntent: AppIntent {
+struct ToggleBlackOutIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Toggle Power (BlackOut)"
@@ -1470,7 +1468,7 @@ private struct ToggleBlackOutIntent: AppIntent {
     var skipMissingScreen: Bool
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<Bool> {
         guard lunarProActive else {
             throw IntentError.message("A Lunar Pro license is needed for this feature.")
         }
@@ -1494,7 +1492,7 @@ private struct ToggleBlackOutIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private enum ScreenRotationDegrees: Int, AppEnum, CaseDisplayRepresentable, TypeDisplayRepresentable {
+enum ScreenRotationDegrees: Int, AppEnum, CaseDisplayRepresentable, TypeDisplayRepresentable {
     case normal = 0
     case portraitToLeft = 90
     case upsideDown = 180
@@ -1511,7 +1509,7 @@ private enum ScreenRotationDegrees: Int, AppEnum, CaseDisplayRepresentable, Type
 }
 
 @available(iOS 16, macOS 13, *)
-private struct RotateScreenIntent: AppIntent {
+struct RotateScreenIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Rotate Screen"
@@ -1533,7 +1531,7 @@ private struct RotateScreenIntent: AppIntent {
     var skipMissingScreen: Bool
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<Int> {
         try checkShortcutsLimit()
         try controlScreen(screen: $screen, property: .rotation, value: rotation.rawValue.s, skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.rotation ?? rotation.rawValue)
@@ -1541,7 +1539,7 @@ private struct RotateScreenIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private enum AdaptiveModeKeyForIntent: Int, AppEnum {
+enum AdaptiveModeKeyForIntent: Int, AppEnum {
     case location = 1
     case sync = -1
     case manual = 0
@@ -1572,7 +1570,7 @@ private enum AdaptiveModeKeyForIntent: Int, AppEnum {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ChangeAdaptiveModeIntent: AppIntent {
+struct ChangeAdaptiveModeIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Change Adaptive Mode"
@@ -1598,8 +1596,25 @@ private struct ChangeAdaptiveModeIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ApplyPresetIntent: AppIntent {
+struct ApplyPresetIntent: AppIntent {
     init() {}
+
+    struct PresetProvider: DynamicOptionsProvider {
+        func results() async throws -> ItemCollection<String> {
+            ItemCollection {
+                ItemSection(title: "Custom", items: CachedDefaults[.presets].map(
+                    { IntentItem($0.id, title: "\($0.id)") }
+                ))
+                ItemSection("Percentage") {
+                    "0%"
+                    "25%"
+                    "50%"
+                    "75%"
+                    "100%"
+                }
+            }
+        }
+    }
 
     static var title: LocalizedStringResource = "Apply Lunar Preset"
     static var description = IntentDescription("Applies a custom preset from the ones saved through the Lunar UI.", categoryName: "Global")
@@ -1625,26 +1640,10 @@ private struct ApplyPresetIntent: AppIntent {
         return .result()
     }
 
-    private struct PresetProvider: DynamicOptionsProvider {
-        func results() async throws -> ItemCollection<String> {
-            ItemCollection {
-                ItemSection(title: "Custom", items: CachedDefaults[.presets].map(
-                    { IntentItem($0.id, title: "\($0.id)") }
-                ))
-                ItemSection("Percentage") {
-                    "0%"
-                    "25%"
-                    "50%"
-                    "75%"
-                    "100%"
-                }
-            }
-        }
-    }
 }
 
 @available(iOS 16, macOS 13, *)
-private struct PowerOffIntent: AppIntent {
+struct PowerOffIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -1677,7 +1676,7 @@ Note: a screen can't also be powered on using this method because a powered off 
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ResetColorGainIntent: AppIntent {
+struct ResetColorGainIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Reset Color Adjustments (in hardware)"
@@ -1700,7 +1699,7 @@ private struct ResetColorGainIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ResetColorGammaIntent: AppIntent {
+struct ResetColorGammaIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Reset Color Adjustments (in software)"
@@ -1724,7 +1723,7 @@ private struct ResetColorGammaIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ToggleGammaIntent: AppIntent {
+struct ToggleGammaIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Toggle Color Adjustments (in software)"
@@ -1750,8 +1749,24 @@ private struct ToggleGammaIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct SetInputIntent: AppIntent {
+struct SetInputIntent: AppIntent {
     init() {}
+
+    struct InputProvider: DynamicOptionsProvider {
+        func results() async throws -> ItemCollection<Int> {
+            ItemCollection {
+                ItemSection(title: "Common", items: VideoInputSource.mostUsed.map(
+                    { IntentItem($0.rawValue.i, title: "\($0.description)", image: .init(named: $0.image ?? "input", isTemplate: true)) }
+                ))
+                ItemSection(title: "LG Specific", items: VideoInputSource.lgSpecific.map(
+                    { IntentItem($0.rawValue.i, title: "\($0.description)", image: .init(named: $0.image ?? "input", isTemplate: true)) }
+                ))
+                ItemSection(title: "Less used", items: VideoInputSource.leastUsed.map(
+                    { IntentItem($0.rawValue.i, title: "\($0.description)", image: .init(named: $0.image ?? "input", isTemplate: true)) }
+                ))
+            }
+        }
+    }
 
     // swiftformat:disable all
     static var title: LocalizedStringResource = "Change Video Input Source"
@@ -1780,32 +1795,33 @@ Note: Not all inputs are supported by all monitors, and some monitors may use no
     var skipMissingScreen: Bool
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<Int> {
         try checkShortcutsLimit()
         try controlScreen(screen: $screen, property: .input, value: input.s, skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.inputSource.rawValue.i ?? input)
     }
 
-    private struct InputProvider: DynamicOptionsProvider {
-        func results() async throws -> ItemCollection<Int> {
-            ItemCollection {
-                ItemSection(title: "Common", items: VideoInputSource.mostUsed.map(
-                    { IntentItem($0.rawValue.i, title: "\($0.description)", image: .init(named: $0.image ?? "input", isTemplate: true)) }
-                ))
-                ItemSection(title: "LG Specific", items: VideoInputSource.lgSpecific.map(
-                    { IntentItem($0.rawValue.i, title: "\($0.description)", image: .init(named: $0.image ?? "input", isTemplate: true)) }
-                ))
-                ItemSection(title: "Less used", items: VideoInputSource.leastUsed.map(
-                    { IntentItem($0.rawValue.i, title: "\($0.description)", image: .init(named: $0.image ?? "input", isTemplate: true)) }
-                ))
-            }
-        }
-    }
 }
 
 @available(iOS 16, macOS 13, *)
-private struct WriteDDCIntent: AppIntent {
+struct WriteDDCIntent: AppIntent {
     init() {}
+
+    struct VCPProvider: DynamicOptionsProvider {
+        func results() async throws -> ItemCollection<Int> {
+            ItemCollection {
+                ItemSection(title: "Common", items: ControlID.common.map { vcp in
+                    IntentItem(vcp.rawValue.i, title: .init(stringLiteral: "\(vcp)"))
+                })
+                ItemSection(title: "Reset", items: ControlID.reset.map { vcp in
+                    IntentItem(vcp.rawValue.i, title: .init(stringLiteral: "\(vcp)"))
+                })
+                ItemSection(title: "Other", items: Set(ControlID.allCases).subtracting(ControlID.common).subtracting(ControlID.reset).sorted(by: \.rawValue).map { vcp in
+                    IntentItem(vcp.rawValue.i, title: .init(stringLiteral: "\(vcp)"))
+                })
+            }
+        }
+    }
 
     static var title: LocalizedStringResource = "DDC Write Value to Screen"
     static var description = IntentDescription("Sends a DDC write command to a specific screen.", categoryName: "DDC")
@@ -1835,7 +1851,13 @@ private struct WriteDDCIntent: AppIntent {
         return .result()
     }
 
-    private struct VCPProvider: DynamicOptionsProvider {
+}
+
+@available(iOS 16, macOS 13, *)
+struct ReadDDCIntent: AppIntent {
+    init() {}
+
+    struct VCPProvider: DynamicOptionsProvider {
         func results() async throws -> ItemCollection<Int> {
             ItemCollection {
                 ItemSection(title: "Common", items: ControlID.common.map { vcp in
@@ -1850,11 +1872,6 @@ private struct WriteDDCIntent: AppIntent {
             }
         }
     }
-}
-
-@available(iOS 16, macOS 13, *)
-private struct ReadDDCIntent: AppIntent {
-    init() {}
 
     // swiftformat:disable all
     static var title: LocalizedStringResource = "DDC Read Value from Screen"
@@ -1876,7 +1893,7 @@ Note: DDC reads rarely work and can return wrong values.
     var vcp: Int
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<String> {
         try checkShortcutsLimit()
         guard let control = ControlID(rawValue: vcp.u8) else {
             throw $vcp.needsValueError()
@@ -1889,25 +1906,10 @@ Note: DDC reads rarely work and can return wrong values.
         return .result(value: (try? encoder.encode(result).s) ?? "")
     }
 
-    private struct VCPProvider: DynamicOptionsProvider {
-        func results() async throws -> ItemCollection<Int> {
-            ItemCollection {
-                ItemSection(title: "Common", items: ControlID.common.map { vcp in
-                    IntentItem(vcp.rawValue.i, title: .init(stringLiteral: "\(vcp)"))
-                })
-                ItemSection(title: "Reset", items: ControlID.reset.map { vcp in
-                    IntentItem(vcp.rawValue.i, title: .init(stringLiteral: "\(vcp)"))
-                })
-                ItemSection(title: "Other", items: Set(ControlID.allCases).subtracting(ControlID.common).subtracting(ControlID.reset).sorted(by: \.rawValue).map { vcp in
-                    IntentItem(vcp.rawValue.i, title: .init(stringLiteral: "\(vcp)"))
-                })
-            }
-        }
-    }
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ControlScreenValueFloatNumeric: AppIntent {
+struct ControlScreenValueFloatNumeric: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Control a floating point Screen Value"
@@ -1932,7 +1934,7 @@ private struct ControlScreenValueFloatNumeric: AppIntent {
     var skipMissingScreen: Bool
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<Double> {
         guard !Display.CodingKeys.needsLunarPro.contains(property.id) || lunarProActive else {
             throw IntentError.message("A Lunar Pro license is needed for controlling \"\(property.name)\".")
         }
@@ -1946,7 +1948,7 @@ private struct ControlScreenValueFloatNumeric: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ControlScreenValueNumeric: AppIntent {
+struct ControlScreenValueNumeric: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Control an integer Screen Value"
@@ -1971,7 +1973,7 @@ private struct ControlScreenValueNumeric: AppIntent {
     var skipMissingScreen: Bool
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<Int> {
         guard !Display.CodingKeys.needsLunarPro.contains(property.id) || lunarProActive else {
             throw IntentError.message("A Lunar Pro license is needed for controlling \"\(property.name)\".")
         }
@@ -1985,7 +1987,7 @@ private struct ControlScreenValueNumeric: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ControlScreenValueBool: AppIntent {
+struct ControlScreenValueBool: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Control a boolean Screen Value"
@@ -2010,7 +2012,7 @@ private struct ControlScreenValueBool: AppIntent {
     var skipMissingScreen: Bool
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<Bool> {
         guard !Display.CodingKeys.needsLunarPro.contains(property.id) || lunarProActive else {
             throw IntentError.message("A Lunar Pro license is needed for controlling \"\(property.name)\".")
         }
@@ -2024,7 +2026,7 @@ private struct ControlScreenValueBool: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct AdjustSoftwareColorsIntent: AppIntent {
+struct AdjustSoftwareColorsIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Adjust Colors of a Screen (in software)"
@@ -2102,7 +2104,7 @@ The blue component of the Gamma curve
 }
 
 @available(iOS 16, macOS 13, *)
-private struct AdjustHardwareColorsIntent: AppIntent {
+struct AdjustHardwareColorsIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -2191,7 +2193,7 @@ Note: not all monitors support color gain control through DDC and value effect c
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ReadHardwareColorsIntent: AppIntent {
+struct ReadHardwareColorsIntent: AppIntent {
     init() {}
 
     // swiftformat:disable all
@@ -2220,7 +2222,7 @@ Note: very few monitors implement this functionality
     var screen: Screen
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<ScreenColorGain> {
         try checkShortcutsLimit()
         guard let display = screen.dynamicDisplay else {
             if skipMissingScreen {
@@ -2240,7 +2242,7 @@ Note: very few monitors implement this functionality
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ReadSoftwareColorsIntent: AppIntent {
+struct ReadSoftwareColorsIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Read Color Gamma Tables (in software)"
@@ -2263,7 +2265,7 @@ private struct ReadSoftwareColorsIntent: AppIntent {
     var screen: Screen
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ReturnsValue<ScreenGammaTable> {
         try checkShortcutsLimit()
         guard let display = screen.dynamicDisplay else {
             if skipMissingScreen {
@@ -2278,7 +2280,7 @@ private struct ReadSoftwareColorsIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct MirrorSetIntent: AppIntent {
+struct MirrorSetIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Mirror Screens"
@@ -2344,7 +2346,7 @@ private struct MirrorSetIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct StopMirroringIntent: AppIntent {
+struct StopMirroringIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Stop Mirroring"
@@ -2422,7 +2424,7 @@ private struct StopMirroringIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct SetPanelModeIntent: AppIntent {
+struct SetPanelModeIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Change Screen Resolution"
@@ -2452,7 +2454,7 @@ private struct SetPanelModeIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct SetPanelPresetIntent: AppIntent {
+struct SetPanelPresetIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Change Screen Preset"
@@ -2484,7 +2486,7 @@ private struct SetPanelPresetIntent: AppIntent {
     }
 }
 
-private struct SortablePanelMode: Comparable, Equatable, Hashable {
+struct SortablePanelMode: Comparable, Equatable, Hashable {
     let isHiDPI: Bool
     let refreshRate: Int32
 
@@ -2494,7 +2496,7 @@ private struct SortablePanelMode: Comparable, Equatable, Hashable {
 }
 
 @available(iOS 16, macOS 13, *)
-private extension MPDisplayPreset {
+extension MPDisplayPreset {
     var panelPreset: PanelPreset? {
         guard let screen = DC.activeDisplays[displayID]?.screen else { return nil }
 
@@ -2504,11 +2506,11 @@ private extension MPDisplayPreset {
     static func groupName(_ group: Int64) -> String {
         switch group {
         case 1:
-            return "Default"
+            "Default"
         case 2:
-            return "Reference"
+            "Reference"
         default:
-            return "Custom"
+            "Custom"
         }
     }
 
@@ -2516,7 +2518,7 @@ private extension MPDisplayPreset {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct PanelPreset: AppEntity {
+struct PanelPreset: AppEntity {
     struct PanelPresetQuery: EntityQuery {
         func entities(for identifiers: [Int]) async throws -> [PanelPreset] {
             await DisplayController.panelManager?.withLock { _ in
@@ -2595,7 +2597,7 @@ private struct PanelPreset: AppEntity {
 }
 
 @available(iOS 16, macOS 13, *)
-private extension MPDisplayMgr {
+extension MPDisplayMgr {
     func withLock<T>(_ action: (MPDisplayMgr) -> T) async -> T? {
         while !tryLockAccess() {
             do {
@@ -2611,7 +2613,7 @@ private extension MPDisplayMgr {
     }
 }
 
-private extension MPDisplayMode {
+extension MPDisplayMode {
     @available(iOS 16, macOS 13, *)
     var panelMode: PanelMode? {
         guard let display, let screen = display.screen else { return nil }
@@ -2696,7 +2698,7 @@ struct PanelMode: AppEntity {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct SwapMonitorsIntent: AppIntent {
+struct SwapMonitorsIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Swap Screen Positions"
@@ -2734,7 +2736,7 @@ private struct SwapMonitorsIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct MakeMonitorMainIntent: AppIntent {
+struct MakeMonitorMainIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Set Screen as Main"
@@ -2772,7 +2774,7 @@ private struct MakeMonitorMainIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct VerticalMonitorLayoutIntent: AppIntent {
+struct VerticalMonitorLayoutIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Arrange 2 Screens Vertically ■̳̲"
@@ -2824,7 +2826,7 @@ private struct VerticalMonitorLayoutIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct HorizontalMonitorLayoutIntent: AppIntent {
+struct HorizontalMonitorLayoutIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Arrange 2 Screens Horizontally ⫍⃮݄⫎⃯"
@@ -2876,7 +2878,7 @@ private struct HorizontalMonitorLayoutIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ThreeAboveOneMonitorLayoutIntent: AppIntent {
+struct ThreeAboveOneMonitorLayoutIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Arrange 4 Screens in a 3-above-1 configuration ⫍⃮■̳̻⫎⃯"
@@ -2946,7 +2948,7 @@ private struct ThreeAboveOneMonitorLayoutIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct TwoAboveOneMonitorLayoutIntent: AppIntent {
+struct TwoAboveOneMonitorLayoutIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Arrange 3 Screens in a 2-above-1 configuration ⫍‗⫎"
@@ -3029,7 +3031,7 @@ private struct TwoAboveOneMonitorLayoutIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct HorizontalMonitorThreeLayoutIntent: AppIntent {
+struct HorizontalMonitorThreeLayoutIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Arrange 3 Screens Horizontally ⫍⃮▬̲⫎⃯"
@@ -3112,7 +3114,7 @@ private struct HorizontalMonitorThreeLayoutIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct FixMonitorArrangementIntent: AppIntent {
+struct FixMonitorArrangementIntent: AppIntent {
     init() {}
 
     static var title: LocalizedStringResource = "Fix monitor arrangement"
@@ -3189,7 +3191,7 @@ Press `Esc` to cancel or `Enter` to partially arrange the monitors selected so f
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ScreenColorGain: Equatable, Hashable, AppEntity {
+struct ScreenColorGain: Equatable, Hashable, AppEntity {
     init(red: Int, green: Int, blue: Int) {
         self.red = red
         self.green = green
@@ -3237,7 +3239,7 @@ private struct ScreenColorGain: Equatable, Hashable, AppEntity {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct ScreenGammaTable: Equatable, Hashable, AppEntity {
+struct ScreenGammaTable: Equatable, Hashable, AppEntity {
     init(red: Double, green: Double, blue: Double) {
         self.red = red
         self.green = green
@@ -3300,7 +3302,7 @@ extension Display.CodingKeys: EntityIdentifierConvertible {
 // MARK: - DisplayNumericPropertyQuery
 
 @available(iOS 16, macOS 13, *)
-private struct DisplayFloatNumericPropertyQuery: EntityQuery {
+struct DisplayFloatNumericPropertyQuery: EntityQuery {
     typealias Entity = DisplayProperty
 
     func suggestedEntities() async throws -> ItemCollection<DisplayProperty> {
@@ -3333,7 +3335,7 @@ private struct DisplayFloatNumericPropertyQuery: EntityQuery {
 }
 
 @available(iOS 16, macOS 13, *)
-private struct DisplayNumericPropertyQuery: EntityQuery {
+struct DisplayNumericPropertyQuery: EntityQuery {
     typealias Entity = DisplayProperty
 
     func suggestedEntities() async throws -> ItemCollection<DisplayProperty> {
@@ -3380,7 +3382,7 @@ private struct DisplayNumericPropertyQuery: EntityQuery {
 // MARK: - DisplayBoolPropertyQuery
 
 @available(iOS 16, macOS 13, *)
-private struct DisplayBoolPropertyQuery: EntityQuery {
+struct DisplayBoolPropertyQuery: EntityQuery {
     typealias Entity = DisplayProperty
 
     func suggestedEntities() async throws -> ItemCollection<DisplayProperty> {
@@ -3418,7 +3420,7 @@ private struct DisplayBoolPropertyQuery: EntityQuery {
 // MARK: - DisplayProperty
 
 @available(iOS 16, macOS 13, *)
-private struct DisplayProperty: Equatable, Hashable, AppEntity, CustomStringConvertible {
+struct DisplayProperty: Equatable, Hashable, AppEntity, CustomStringConvertible {
     static var defaultQuery = DisplayFloatNumericPropertyQuery()
     static let commonNumeric: [DisplayProperty] = [
         DisplayProperty(id: .brightness, name: "Brightness"),

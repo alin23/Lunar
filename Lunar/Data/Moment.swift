@@ -185,13 +185,13 @@ final class Moment: NSObject {
     func moment(_ key: ScheduleType) -> DateInRegion {
         switch key {
         case .sunrise:
-            return sunrise
+            sunrise
         case .sunset:
-            return sunset
+            sunset
         case .noon:
-            return solarNoon
+            solarNoon
         default:
-            return sunrise
+            sunrise
         }
     }
 

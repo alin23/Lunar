@@ -58,104 +58,104 @@ extension AdaptiveModeKey: Codable, ExpressibleByArgument, Nameable {
     var str: String {
         switch self {
         case .sensor:
-            return "Sensor"
+            "Sensor"
         case .manual:
-            return "Manual"
+            "Manual"
         case .location:
-            return "Location"
+            "Location"
         case .sync:
-            return "Sync"
+            "Sync"
         case .clock:
-            return "Clock"
+            "Clock"
         case .auto:
-            return "Auto"
+            "Auto"
         }
     }
 
     var available: Bool {
         switch self {
         case .sensor:
-            return SensorMode.shared.available
+            SensorMode.shared.available
         case .manual:
-            return ManualMode.shared.available
+            ManualMode.shared.available
         case .location:
-            return LocationMode.shared.available
+            LocationMode.shared.available
         case .sync:
-            return SyncMode.shared.available
+            SyncMode.shared.available
         case .clock:
-            return ClockMode.shared.available
+            ClockMode.shared.available
         case .auto:
-            return DisplayController.autoMode().available
+            DisplayController.autoMode().available
         }
     }
 
     var mode: AdaptiveMode {
         switch self {
         case .sensor:
-            return SensorMode.shared
+            SensorMode.shared
         case .manual:
-            return ManualMode.shared
+            ManualMode.shared
         case .location:
-            return LocationMode.shared
+            LocationMode.shared
         case .sync:
-            return SyncMode.shared
+            SyncMode.shared
         case .clock:
-            return ClockMode.shared
+            ClockMode.shared
         case .auto:
-            return DisplayController.autoMode()
+            DisplayController.autoMode()
         }
     }
 
     var helpText: String {
         switch self {
         case .sensor:
-            return SENSOR_HELP_TEXT
+            SENSOR_HELP_TEXT
         case .manual:
-            return MANUAL_HELP_TEXT
+            MANUAL_HELP_TEXT
         case .location:
-            return LOCATION_HELP_TEXT
+            LOCATION_HELP_TEXT
         case .sync:
-            return SYNC_HELP_TEXT
+            SYNC_HELP_TEXT
         case .clock:
-            return CLOCK_HELP_TEXT
+            CLOCK_HELP_TEXT
         case .auto:
-            return ""
+            ""
         }
     }
 
     var helpLink: String? {
         switch self {
         case .sensor:
-            return nil
+            nil
         case .manual:
-            return nil
+            nil
         case .location:
-            return "https://ipstack.com"
+            "https://ipstack.com"
         case .sync:
-            return nil
+            nil
         case .clock:
-            return nil
+            nil
         case .auto:
-            return nil
+            nil
         }
     }
 
     static func fromstr(_ strValue: String) -> Self {
         switch strValue.lowercased().stripped {
         case "sensor", AdaptiveModeKey.sensor.rawValue.s:
-            return .sensor
+            .sensor
         case "manual", AdaptiveModeKey.manual.rawValue.s:
-            return .manual
+            .manual
         case "location", AdaptiveModeKey.location.rawValue.s:
-            return .location
+            .location
         case "sync", AdaptiveModeKey.sync.rawValue.s:
-            return .sync
+            .sync
         case "clock", AdaptiveModeKey.clock.rawValue.s:
-            return .clock
+            .clock
         case "auto", AdaptiveModeKey.auto.rawValue.s:
-            return .auto
+            .auto
         default:
-            return .manual
+            .manual
         }
     }
 

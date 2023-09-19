@@ -37,11 +37,11 @@ enum ReadWriteProcessor {
 
     static func processWrite(result: Int, session: OpaquePointer) -> WriteResult {
         if result >= 0 {
-            return .written(result)
+            .written(result)
         } else if result == LIBSSH2_ERROR_EAGAIN {
-            return .eagain
+            .eagain
         } else {
-            return .error(SSHError.codeError(code: Int32(result), session: session))
+            .error(SSHError.codeError(code: Int32(result), session: session))
         }
     }
 }

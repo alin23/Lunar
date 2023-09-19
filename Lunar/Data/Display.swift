@@ -1383,7 +1383,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .sink { [weak self] shouldDisable in
                 guard shouldDisable, let self, !self.isInMirrorSet else { return }
                 lastBlackOutToggleDate = .distantPast
-                self.disableBlackOut()
+                disableBlackOut()
             }
             .store(in: &observers)
 
@@ -1440,13 +1440,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .sink { [weak self] run in
                 guard run, let self else { return }
 
-                if self.control is DDCControl {
-                    self.control?.resetState()
+                if control is DDCControl {
+                    control?.resetState()
                 } else {
                     DDCControl(display: self).resetState()
                 }
 
-                self.resetControl()
+                resetControl()
 
                 appDelegate?.screenWakeAdapterTask = appDelegate?.screenWakeAdapterTask ?? Repeater(every: 2, times: 3, name: "DDCResetAdapter") {
                     DC.adaptBrightness(force: true)
@@ -1461,13 +1461,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .sink { [weak self] run in
                 guard run, let self else { return }
 
-                if self.control is NetworkControl {
-                    self.control?.resetState()
+                if control is NetworkControl {
+                    control?.resetState()
                 } else {
-                    NetworkControl.resetState(serial: self.serial)
+                    NetworkControl.resetState(serial: serial)
                 }
 
-                self.resetControl()
+                resetControl()
 
                 appDelegate?.screenWakeAdapterTask = appDelegate?.screenWakeAdapterTask ?? Repeater(every: 2, times: 5, name: "NetworkResetAdapter") {
                     DC.adaptBrightness(force: true)
@@ -1938,7 +1938,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                         okButton: "Keep", cancelButton: "Revert",
                         onCompletion: { [weak self] keep in
                             if !keep, let self {
-                                self.withoutModeChangeAsk {
+                                withoutModeChangeAsk {
                                     mainThread { self.rotation = oldValue }
                                 }
                             }
@@ -1960,9 +1960,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 let onCompletion: (Bool) -> Void = { [weak self] keep in
                     guard !keep, let self else { return }
 
-                    self.modeChangeAsk = false
-                    self.setMode(oldValue)
-                    self.modeChangeAsk = true
+                    modeChangeAsk = false
+                    setMode(oldValue)
+                    modeChangeAsk = true
                 }
 
                 ask(
@@ -3206,19 +3206,19 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         static func fromTransportType(_ transportType: Int) -> ConnectionType? {
             switch transportType {
             case 0:
-                return .displayport
+                .displayport
             case 1:
-                return .usbc
+                .usbc
             case 2:
-                return .dvi
+                .dvi
             case 3:
-                return .hdmi
+                .hdmi
             case 4:
-                return .mipi
+                .mipi
             case 5:
-                return .vga
+                .vga
             default:
-                return nil
+                nil
             }
         }
     }
@@ -4437,11 +4437,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var smoothGammaQueue: DispatchQueue {
         switch control {
         case is DDCControl:
-            return smoothDDCQueue
+            smoothDDCQueue
         case is AppleNativeControl:
-            return smoothDisplayServicesQueue
+            smoothDisplayServicesQueue
         default:
-            return serialQueue
+            serialQueue
         }
     }
 
@@ -5519,23 +5519,22 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func possibleDDCBlockers() -> String {
-        let specificBlockers: String
-        switch vendor {
+        let specificBlockers: String = switch vendor {
         case .dell:
-            specificBlockers = """
+            """
             * Disable **Uniformity Compensation**
             * Set **Preset Mode** to `Custom` or `Standard`
             """
         case .acer:
-            specificBlockers = DEFAULT_DDC_BLOCKERS
+            DEFAULT_DDC_BLOCKERS
         case .lg:
-            specificBlockers = """
+            """
             * Disable **Uniformity**
             * Disable **Auto Brightness**
             * Set **Picture Mode** to `Custom` or `Standard`
             """
         case .samsung:
-            specificBlockers = """
+            """
             * Disable **Input Signal Plus**
             * Disable **Magic Bright**
             * Disable **Eye Saver Mode**
@@ -5546,17 +5545,17 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             * Disable **Dynamic Brightness**
             """
         case .benq:
-            specificBlockers = """
+            """
             * Disable **Bright Intelligence**
             * Disable **Bright Intelligence Plus** or **B.I.+**
             * Set **Picture Mode** to `Standard`
             """
         case .prism:
-            specificBlockers = """
+            """
             * Set **On-the-Fly Mode** to `Standard`
             """
         case .lenovo:
-            specificBlockers = """
+            """
             * Disable **Local Dimming**
             * Disable **HDR**
             * Disable **Dynamic Contrast**
@@ -5564,28 +5563,28 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             * Set **Scenario Modes** to `Panel Native`
             """
         case .xiaomi:
-            specificBlockers = """
+            """
             * Disable **Dynamic Brightness**
             * Set **Smart Mode** to `Standard`
             """
         case .eizo:
-            specificBlockers = DEFAULT_DDC_BLOCKERS
+            DEFAULT_DDC_BLOCKERS
         case .apple:
-            specificBlockers = DEFAULT_DDC_BLOCKERS
+            DEFAULT_DDC_BLOCKERS
         case .asus:
-            specificBlockers = DEFAULT_DDC_BLOCKERS
+            DEFAULT_DDC_BLOCKERS
         case .hp:
-            specificBlockers = DEFAULT_DDC_BLOCKERS
+            DEFAULT_DDC_BLOCKERS
         case .huawei:
-            specificBlockers = DEFAULT_DDC_BLOCKERS
+            DEFAULT_DDC_BLOCKERS
         case .philips:
-            specificBlockers = DEFAULT_DDC_BLOCKERS
+            DEFAULT_DDC_BLOCKERS
         case .sceptre:
-            specificBlockers = DEFAULT_DDC_BLOCKERS
+            DEFAULT_DDC_BLOCKERS
         case .proart:
-            specificBlockers = DEFAULT_DDC_BLOCKERS
+            DEFAULT_DDC_BLOCKERS
         default:
-            specificBlockers = DEFAULT_DDC_BLOCKERS
+            DEFAULT_DDC_BLOCKERS
         }
 
         return """

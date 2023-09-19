@@ -85,11 +85,10 @@ final class SliderCell: NSSliderCell {
             let textHeight = font.boundingRectForFont.height
             let textRect = NSRect(x: rect.minX, y: rect.midY - (textHeight / 2) + 1, width: rect.width, height: textHeight)
 
-            let str: String
-            if let valueFormatter {
-                str = valueFormatter(floatValue)
+            let str: String = if let valueFormatter {
+                valueFormatter(floatValue)
             } else {
-                str = ((minValue == 0 && maxValue == 1) ? CGFloat(floatValue * 100) : CGFloat(floatValue.intround)).str(decimals: 0)
+                ((minValue == 0 && maxValue == 1) ? CGFloat(floatValue * 100) : CGFloat(floatValue.intround)).str(decimals: 0)
             }
 
             str

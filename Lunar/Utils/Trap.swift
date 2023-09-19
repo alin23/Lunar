@@ -28,19 +28,19 @@ enum Signal {
     var osValue: Int32 {
         switch self {
         case .hangup:
-            return SIGHUP
+            SIGHUP
         case .interrupt:
-            return SIGINT
+            SIGINT
         case .illegal:
-            return SIGILL
+            SIGILL
         case .trap:
-            return SIGTRAP
+            SIGTRAP
         case .abort:
-            return SIGABRT
+            SIGABRT
         case .alarm:
-            return SIGALRM
+            SIGALRM
         case .termination:
-            return SIGTERM
+            SIGTERM
         }
     }
 }

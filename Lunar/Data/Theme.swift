@@ -40,11 +40,11 @@ let settingsDividerColor = white.withAlphaComponent(0.3)
 var darkMode: Bool {
     switch AppDelegate.colorScheme {
     case .system:
-        return (UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light") == "Dark"
+        (UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light") == "Dark"
     case .light:
-        return false
+        false
     case .dark:
-        return true
+        true
     }
 }
 

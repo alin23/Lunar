@@ -28,16 +28,16 @@ let DEFAULT_APP_BRIGHTNESS_CONTRAST = 0.8
             .debounce(for: .milliseconds(10), scheduler: RunLoop.main)
             .sink { [weak self] change in
                 guard let self else { return }
-                self.showManualValues = change.newValue == .manual || self.useStaticValuesInAdaptiveModes
-                self.hideManualValuesMerged = !self.showManualValues || !CachedDefaults[.mergeBrightnessContrast]
-                self.hideManualValuesNonMerged = !self.showManualValues || CachedDefaults[.mergeBrightnessContrast]
+                showManualValues = change.newValue == .manual || useStaticValuesInAdaptiveModes
+                hideManualValuesMerged = !showManualValues || !CachedDefaults[.mergeBrightnessContrast]
+                hideManualValuesNonMerged = !showManualValues || CachedDefaults[.mergeBrightnessContrast]
             }
         mergeBrightnessContrastObserver = mergeBrightnessContrastPublisher
             .debounce(for: .milliseconds(10), scheduler: RunLoop.main)
             .sink { [weak self] change in
                 guard let self else { return }
-                self.hideManualValuesMerged = !self.showManualValues || !change.newValue
-                self.hideManualValuesNonMerged = !self.showManualValues || change.newValue
+                hideManualValuesMerged = !showManualValues || !change.newValue
+                hideManualValuesNonMerged = !showManualValues || change.newValue
             }
     }
 
@@ -62,16 +62,16 @@ let DEFAULT_APP_BRIGHTNESS_CONTRAST = 0.8
             .debounce(for: .milliseconds(10), scheduler: RunLoop.main)
             .sink { [weak self] change in
                 guard let self else { return }
-                self.showManualValues = change.newValue == .manual || self.useStaticValuesInAdaptiveModes
-                self.hideManualValuesMerged = !self.showManualValues || !CachedDefaults[.mergeBrightnessContrast]
-                self.hideManualValuesNonMerged = !self.showManualValues || CachedDefaults[.mergeBrightnessContrast]
+                showManualValues = change.newValue == .manual || useStaticValuesInAdaptiveModes
+                hideManualValuesMerged = !showManualValues || !CachedDefaults[.mergeBrightnessContrast]
+                hideManualValuesNonMerged = !showManualValues || CachedDefaults[.mergeBrightnessContrast]
             }
         mergeBrightnessContrastObserver = mergeBrightnessContrastPublisher
             .debounce(for: .milliseconds(10), scheduler: RunLoop.main)
             .sink { [weak self] change in
                 guard let self else { return }
-                self.hideManualValuesMerged = !self.showManualValues || !change.newValue
-                self.hideManualValuesNonMerged = !self.showManualValues || change.newValue
+                hideManualValuesMerged = !showManualValues || !change.newValue
+                hideManualValuesNonMerged = !showManualValues || change.newValue
             }
     }
 

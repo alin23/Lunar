@@ -879,7 +879,7 @@ enum AppSettings {
 
     private static var infoDict: [String: Any] {
         if let dict = Bundle.main.infoDictionary {
-            return dict
+            dict
         } else {
             fatalError("Info Plist file not found")
         }

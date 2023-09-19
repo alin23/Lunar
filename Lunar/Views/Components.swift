@@ -379,9 +379,9 @@ struct CheckboxToggleStyle: ToggleStyle {
         var sfSymbolName: String {
             switch self {
             case .square:
-                return "square"
+                "square"
             case .circle:
-                return "circle"
+                "circle"
             }
         }
     }

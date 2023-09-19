@@ -253,14 +253,12 @@ enum Sysctl {
     #endif
 
     static var rosetta: Bool = processIsTranslated == EMULATED_EXECUTION
-    static var processIsTranslatedStr: String = {
-        switch processIsTranslated {
-        case NATIVE_EXECUTION:
-            return "native"
-        case EMULATED_EXECUTION:
-            return "rosetta"
-        default:
-            return "unkown"
-        }
-    }()
+    static var processIsTranslatedStr = switch processIsTranslated {
+    case NATIVE_EXECUTION:
+        "native"
+    case EMULATED_EXECUTION:
+        "rosetta"
+    default:
+        "unkown"
+    }
 }
