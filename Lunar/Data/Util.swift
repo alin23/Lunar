@@ -1749,6 +1749,9 @@ func monospace(size: CGFloat, weight: NSFont.Weight = .regular) -> NSFont {
 }
 
 func displayInfoDictionary(_ id: CGDirectDisplayID) -> NSDictionary? {
+    guard CGDisplayIsOnline(id) != 0 else {
+        return nil
+    }
     let unmanagedDict = CoreDisplay_DisplayCreateInfoDictionary(id)
     let retainedDict = unmanagedDict?.takeRetainedValue()
     guard let dict = retainedDict as NSDictionary? else {
