@@ -758,17 +758,14 @@ struct BrightnessOSDView: View {
                 .stroke(style: StrokeStyle(lineWidth: 8))
                 .foregroundColor(Color.black.opacity(0.9))
 
-                VisualEffectBlur(material: .osd, blendingMode: .behindWindow, state: .active)
-                    .if(colorScheme == .dark) { $0.colorInvert() }
-                    .overlay(osd.color ?? (colorScheme == .dark ? .white : .clear))
+                (osd.color ?? (colorScheme == .dark ? .white : .gray))
                     .clipShape(
                         Path { path in
                             path.move(to: CGPoint(x: 1, y: 0))
                             path.addLine(to: CGPoint(x: value, y: 0))
                         }
-                        .stroke(style: StrokeStyle(lineWidth: 12, dash: [9, 1]))
+                        .stroke(style: StrokeStyle(lineWidth: 6, dash: [9, 1]))
                     )
-                    .offset(y: -3)
                     .shadow(color: osd.glowRadius == 0 ? .clear : (osd.color ?? .clear), radius: osd.value.cg * osd.glowRadius, x: 0, y: 0)
                     .animation(.easeOut(duration: 0.15), value: osd.value)
             }.offset(y: NATIVE_OSD_WIDTH * 0.78)
