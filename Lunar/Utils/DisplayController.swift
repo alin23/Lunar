@@ -748,7 +748,7 @@ final class DisplayController: ObservableObject {
             else { return }
 
             guard xdrContrastEnabled, display.enhanced else {
-                setXDRContrast(0.0, now: true)
+                adaptXDRContrastInPreparation(display: display)
                 return
             }
 
