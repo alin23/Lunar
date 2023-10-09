@@ -739,9 +739,9 @@ extension UInt8 {
         if (0x20 ... 0x7E).contains(self),
            let value = NSString(bytes: [self], length: 1, encoding: String.Encoding.nonLossyASCII.rawValue) as String?
         {
-            return value
+            value
         } else {
-            return String(format: "%02x", self)
+            String(format: "%02x", self)
         }
     }
 }
@@ -787,9 +787,9 @@ extension Int8 {
         if (0x20 ... 0x7E).contains(self),
            let value = NSString(bytes: [self], length: 1, encoding: String.Encoding.nonLossyASCII.rawValue) as String?
         {
-            return value
+            value
         } else {
-            return String(format: "%02x", self)
+            String(format: "%02x", self)
         }
     }
 }
