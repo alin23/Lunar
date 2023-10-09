@@ -743,6 +743,13 @@ final class DisplayController: ObservableObject {
 
     var xdrContrastEnabled: Bool = Defaults[.xdrContrast] {
         didSet {
+            if !xdrContrastEnabled, oldValue {
+                setXDRContrast(0, now: true)
+                self.lastXdrContrast = 0
+                self.xdrContrast = 0
+                return
+            }
+
             guard activeDisplayCount == 1, let display = firstNonTestingDisplay,
                   display.control is AppleNativeControl || CachedDefaults[.allowHDREnhanceContrast]
             else { return }

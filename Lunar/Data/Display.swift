@@ -1366,14 +1366,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var noDDCOrMergedBrightnessContrast = false
 
-    @objc dynamic lazy var hasNotch: Bool = {
-        if #available(macOS 12.0, *), isMacBook {
-            return self.isBuiltin && ((self.nsScreen?.safeAreaInsets.top ?? 0) > 0 || self.panelMode?.withNotch(modes: self.panelModes) != nil)
-        } else {
-            return false
-        }
-    }()
-
     var cornerRadiusBeforeNotchDisable: NSNumber?
     var cornerRadiusApplier: Repeater?
 
@@ -1540,6 +1532,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var keepHDREnabled = false
     @objc dynamic lazy var supportsHDR: Bool = panel?.hasHDRModes ?? false
+    @objc dynamic lazy var hasNotch: Bool = if #available(macOS 12.0, *), isMacBook {
+        self.isBuiltin && ((self.nsScreen?.safeAreaInsets.top ?? 0) > 0 || self.panelMode?.withNotch(modes: self.panelModes) != nil)
+    } else {
+        false
+    }
+
     @Published @objc dynamic var blackOutEnabled = false {
         didSet {
             guard blackOutEnabled != oldValue, isMacBook, CachedDefaults[.keyboardBacklightOffBlackout] else {
@@ -3116,11 +3114,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         #if arch(arm64)
             if DC.activeDisplayCount > 1 {
-                let shouldDisconnect: Bool
-                if CachedDefaults[.newBlackOutDisconnect] {
-                    shouldDisconnect = !KM.commandKeyPressed
+                let shouldDisconnect: Bool = if CachedDefaults[.newBlackOutDisconnect] {
+                    !KM.commandKeyPressed
                 } else {
-                    shouldDisconnect = KM.commandKeyPressed
+                    KM.commandKeyPressed
                 }
 
                 if #available(macOS 13, *), !KM.shiftKeyPressed, !blackOutEnabled, DC.activeDisplayCount > 1, shouldDisconnect {

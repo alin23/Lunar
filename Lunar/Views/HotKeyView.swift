@@ -177,9 +177,9 @@ final class HotkeyView: RecordView, RecordViewDelegate {
 
     func hotkeyCheckboxTooltip(_ hk: PersistentHotkey) -> String? {
         if NSEvent.ModifierFlags(carbonModifiers: hk.modifiers).contains(.option) {
-            return fineAdjustmentDisabledBecauseOfOptionKey
+            fineAdjustmentDisabledBecauseOfOptionKey
         } else {
-            return nil
+            nil
         }
     }
 
