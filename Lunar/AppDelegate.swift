@@ -2834,7 +2834,7 @@ func acquirePrivileges(notificationTitle: String = "Lunar is now listening for m
 }
 
 var axPermissionsChecker: Repeater?
-let restarted = CommandLine.arguments[safe: 1] == "restarted"
+let restarted = CommandLine.arguments[safe: 1]?.starts(with: "restarts=") ?? false
 var restarting = false
 
 func isLidClosed() -> Bool {
@@ -2849,16 +2849,31 @@ func resetAllSettings() {
 
 func restart() {
     restarting = true
-    // deletePID()
+    // check if the app was started fresh or if was restarted with arg `restarts=timestamp:timestamp:timestamp`
+    // if it was restarted more than 3 times in 10 seconds, exit
 
-    #if arch(arm64)
-        Defaults[.possiblyDisconnectedDisplays] = Array(DC.possiblyDisconnectedDisplays.values)
-    #endif
+    guard CommandLine.arguments.count == 1 || (
+        CommandLine.arguments.count == 2 && CommandLine.arguments[1].starts(with: "restarts=")
+    ) else {
+        exit(1)
+    }
 
-    _ = shell(
-        command: "while /bin/ps -o pid -p \(ProcessInfo.processInfo.processIdentifier) >/dev/null 2>/dev/null; do /bin/sleep 0.1; done; /bin/sleep 0.5; /usr/bin/open '\(Bundle.main.path.string)' --args restarted",
-        wait: false
-    )
+    var args: [String] = []
+    if CommandLine.arguments.count == 2 {
+        let restarts = CommandLine.arguments[1].split(separator: "=")[1].split(separator: ":").map { TimeInterval($0)! }
+        let now = Date().timeIntervalSince1970
+        if restarts.filter({ now - $0 < 10 }).count > 3 {
+            exit(1)
+        } else {
+            args.append("\(CommandLine.arguments[1]):\(now)")
+        }
+    }
+
+    do {
+        try exec(arg0: Bundle.main.executablePath!, args: args)
+    } catch {
+        err("Failed to restart: \(error)")
+    }
     exit(0)
 }
 
@@ -2871,6 +2886,7 @@ public func restartOnCrash() {
     signal(SIGBUS) { _ in restart() }
     signal(SIGPIPE) { _ in restart() }
     signal(SIGTRAP) { _ in restart() }
+    signal(SIGHUP) { _ in restart() }
 }
 
 extension CGEventFlags {
