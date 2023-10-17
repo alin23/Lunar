@@ -494,10 +494,16 @@ final class DisplayController: ObservableObject {
 
     var lastBrightnessKeyEvent: KeyEvent?
 
-    @Published var possiblyDisconnectedDisplayList: [Display] = []
-
     var displaysBySerial: [String: Display] = [:]
     var unmanagedDisplays: [Display] = []
+    @Published var possiblyDisconnectedDisplayList: [Display] = [] {
+        didSet {
+            #if arch(arm64)
+                Defaults[.possiblyDisconnectedDisplays] = possiblyDisconnectedDisplayList
+            #endif
+        }
+    }
+
     var lastTimeBrightnessKeyPressed = Date.distantPast { didSet {
         lastBrightnessKeyEvent = nil
     }}
