@@ -424,7 +424,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         self.minBrightness = (isSmartBuiltin && !allowBrightnessZero && minBrightness == 0) ? 1 : minBrightness
         self.maxBrightness = maxBrightness
         minContrast = try isSmartBuiltin ? 0 : (container.decode(UInt16.self, forKey: .minContrast)).ns
-        maxContrast = try isSmartBuiltin ? 100 : (container.decode(UInt16.self, forKey: .maxContrast)).ns
+        let _maxContrast = try isSmartBuiltin ? 100 : (container.decode(UInt16.self, forKey: .maxContrast)).ns
+        maxContrast = _maxContrast
 
         defaultGammaRedMin = try (container.decodeIfPresent(Float.self, forKey: .defaultGammaRedMin)?.ns) ?? 0.ns
         defaultGammaRedMax = try (container.decodeIfPresent(Float.self, forKey: .defaultGammaRedMax)?.ns) ?? 1.ns
@@ -443,19 +444,16 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         self.defaultGammaBlueValue = defaultGammaBlueValue
         blue = Self.gammaValueToSliderValue(defaultGammaBlueValue.doubleValue)
 
-        let _maxDDCBrightness = try isSmartBuiltin ? 100 : (container.decodeIfPresent(UInt16.self, forKey: .maxDDCBrightness)?.ns) ?? 100.ns
-        let _maxDDCContrast = try isSmartBuiltin ? 100 : (container.decodeIfPresent(UInt16.self, forKey: .maxDDCContrast)?.ns) ?? 100.ns
         maxDDCVolume = try isSmartBuiltin ? 100 : (container.decodeIfPresent(UInt16.self, forKey: .maxDDCVolume)?.ns) ?? 100.ns
-        maxDDCBrightness = _maxDDCBrightness
-        maxDDCContrast = _maxDDCContrast
+        maxDDCBrightness = try isSmartBuiltin ? 100 : (container.decodeIfPresent(UInt16.self, forKey: .maxDDCBrightness)?.ns) ?? 100.ns
+        maxDDCContrast = try isSmartBuiltin ? 100 : (container.decodeIfPresent(UInt16.self, forKey: .maxDDCContrast)?.ns) ?? 100.ns
 
         minDDCBrightness = try isSmartBuiltin ? 0 : (container.decodeIfPresent(UInt16.self, forKey: .minDDCBrightness)?.ns) ?? 0.ns
         minDDCContrast = try isSmartBuiltin ? 0 : (container.decodeIfPresent(UInt16.self, forKey: .minDDCContrast)?.ns) ?? 0.ns
         minDDCVolume = try isSmartBuiltin ? 0 : (container.decodeIfPresent(UInt16.self, forKey: .minDDCVolume)?.ns) ?? 0.ns
 
-        faceLightBrightness = try (container.decodeIfPresent(UInt16.self, forKey: .faceLightBrightness)?.ns) ?? _maxDDCBrightness
-        faceLightContrast = try (container.decodeIfPresent(UInt16.self, forKey: .faceLightContrast)?.ns) ??
-            (_maxDDCContrast.doubleValue * 0.9).intround.ns
+        faceLightBrightness = try (container.decodeIfPresent(UInt16.self, forKey: .faceLightBrightness)?.ns) ?? 100.ns
+        faceLightContrast = try (container.decodeIfPresent(UInt16.self, forKey: .faceLightContrast)?.ns) ?? (_maxContrast.doubleValue * 0.9).intround.ns
 
         cornerRadius = try (container.decodeIfPresent(Int.self, forKey: .cornerRadius)?.ns) ?? 0
 
@@ -532,6 +530,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         #endif
 
         super.init()
+        maxDDCBrightness = try isSmartBuiltin ? 100 : (container.decodeIfPresent(UInt16.self, forKey: .maxDDCBrightness)?.ns) ?? defaultMaxDDCBrightness.ns
         #if arch(arm64)
             maxNits = try container.decodeIfPresent(Double.self, forKey: .maxNits) ?! getMaxNits()
             minNits = try container.decodeIfPresent(Double.self, forKey: .minNits) ?? getMinNits()
@@ -2231,7 +2230,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 connection = ConnectionType.fromTransportType(transportType) ?? ConnectionType.fromTransport(transport) ?? .unknown
                 log.info("\(description) connected through \(connection) connection")
             }
-            isLG = vendor == .lg
         }
     }
 
@@ -3439,7 +3437,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @objc dynamic var useAlternateInputSwitching = false
 
-    @objc dynamic lazy var isLG: Bool = (vendor == .lg)
+    @objc dynamic var isLG: Bool { vendor == .lg }
 
     var edidName: String {
         didSet {
@@ -3910,7 +3908,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         #if DEBUG
             if id == TEST_DISPLAY_PERSISTENT2_ID { return .lg }
         #endif
-        guard let vendorID = infoDictionary[kDisplayVendorID] as? Int64, let v = Vendor(rawValue: vendorID) else {
+        guard let vendorID = (infoDictionary[kDisplayVendorID] as? Int64) ?? (CGDisplayVendorNumber(id) as? Int64), let v = Vendor(rawValue: vendorID) else {
             return .unknown
         }
         return v
