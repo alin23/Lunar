@@ -8,6 +8,7 @@ struct QuickActionsLayoutView: View {
     @Default(.mergeBrightnessContrast) var mergeBrightnessContrast
     @Default(.showVolumeSlider) var showVolumeSlider
     @Default(.showRawValues) var showRawValues
+    @Default(.showNitsText) var showNitsText
     @Default(.showBrightnessMenuBar) var showBrightnessMenuBar
     @Default(.showOnlyExternalBrightnessMenuBar) var showOnlyExternalBrightnessMenuBar
     @Default(.showOrientationInQuickActions) var showOrientationInQuickActions
@@ -61,6 +62,11 @@ struct QuickActionsLayoutView: View {
                 }
                 Divider()
                 Group {
+                    #if arch(arm64)
+                        if dc.activeDisplayList.contains(where: \.noDDCOrMergedBrightnessContrast) {
+                            SettingsToggle(text: "Show nits limits on the slider", setting: $showNitsText.animation(.fastSpring))
+                        }
+                    #endif
                     if adaptiveBrightnessMode.hasUsefulInfo {
                         SettingsToggle(text: "Show useful adaptive info near mode selector", setting: $infoMenuShown.animation(.fastSpring))
                     }
