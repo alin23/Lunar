@@ -28,11 +28,7 @@ extension NSView {
             path.addPath(CGPath(rect: bounds, transform: nil))
         }
 
-        if #available(macOS 14.0, *) {
-            path.addPath(NSBezierPath(roundedRect: maskRect, xRadius: cornerRadius, yRadius: cornerRadius).cgPath)
-        } else {
-            path.addPath(CGPath(roundedRect: maskRect, cornerWidth: cornerRadius, cornerHeight: cornerRadius, transform: nil))
-        }
+        path.addPath(CGPath(roundedRect: maskRect, cornerWidth: cornerRadius, cornerHeight: cornerRadius, transform: nil))
 
         maskLayer.path = path
         if inverse {

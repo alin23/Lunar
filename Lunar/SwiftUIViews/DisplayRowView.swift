@@ -20,6 +20,7 @@ struct DisplayRowView: View {
     @Default(.showPowerInQuickActions) var showPowerInQuickActions
     @Default(.showXDRSelector) var showXDRSelector
     @Default(.showRawValues) var showRawValues
+    @Default(.showNitsText) var showNitsText
     @Default(.xdrTipShown) var xdrTipShown
     @Default(.autoXdr) var autoXdr
     @Default(.syncMode) var syncMode
@@ -40,6 +41,8 @@ struct DisplayRowView: View {
     @State var editingMinNits = false
 
     @State var hovering = false
+
+    @EnvironmentObject var env: EnvState
 
     var softwareSliders: some View {
         Group {
@@ -237,10 +240,12 @@ struct DisplayRowView: View {
                 get: { display.lockedBrightness && display.lockedContrast },
                 set: { display.lockedBrightness = $0 }
             )
-            HStack {
+            HStack(spacing: env.menuWidth <= MENU_CLEAN_WIDTH ? 0 : 10) {
                 #if arch(arm64)
-                    NitsTextField(nits: $display.minNits, placeholder: "min", display: display)
-                        .opacity(hovering ? 1 : 0)
+                    if showNitsText {
+                        NitsTextField(nits: $display.minNits, placeholder: "min", display: display)
+                            .opacity(hovering ? 1 : 0)
+                    }
                 #endif
                 BigSurSlider(
                     percentage: $display.preciseBrightnessContrast.f,
@@ -253,15 +258,17 @@ struct DisplayRowView: View {
                     insideText: nitsText
                 )
                 #if arch(arm64)
-                    let maxNitsBinding = Binding<Double>(
-                        get: { display.userMaxNits ?? display.maxNits },
-                        set: {
-                            display.userMaxNits = nil
-                            display.maxNits = $0
-                        }
-                    )
-                    NitsTextField(nits: maxNitsBinding, placeholder: "max", display: display)
-                        .opacity(hovering ? 1 : 0)
+                    if showNitsText {
+                        let maxNitsBinding = Binding<Double>(
+                            get: { display.userMaxNits ?? display.maxNits },
+                            set: {
+                                display.userMaxNits = nil
+                                display.maxNits = $0
+                            }
+                        )
+                        NitsTextField(nits: maxNitsBinding, placeholder: "max", display: display)
+                            .opacity(hovering ? 1 : 0)
+                    }
                 #endif
             }
             softwareSliders

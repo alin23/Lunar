@@ -79,6 +79,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .menuBarClosed,
     .showVolumeSlider,
     .showRawValues,
+    .showNitsText,
     .showStandardPresets,
     .showCustomPresets,
     .showXDRSelector,
