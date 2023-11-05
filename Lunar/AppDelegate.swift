@@ -1308,8 +1308,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             if addedDisplay, DC.screenIDs.count == 1, DC.xdrContrast > 0 {
                 log.info("Disabling XDR Contrast if we have more than 1 screen")
                 lastXDRContrastResetTime = Date()
-                DC.xdrContrast = 0
-                DC.setXDRContrast(0, now: true)
+                DC.setXDRContrast(0)
             }
 
         }, nil)
@@ -2887,6 +2886,7 @@ public func restartOnCrash() {
     signal(SIGPIPE) { _ in restart() }
     signal(SIGTRAP) { _ in restart() }
     signal(SIGHUP) { _ in restart() }
+    signal(SIGINT) { _ in NSApp.terminate(nil) }
 }
 
 extension CGEventFlags {
