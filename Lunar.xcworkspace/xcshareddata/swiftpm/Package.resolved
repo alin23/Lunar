@@ -60,7 +60,7 @@
       "location" : "https://github.com/alin23/FuzzyMatcher",
       "state" : {
         "branch" : "main",
-        "revision" : "b97b7b900faf2a3881b5536be0f50b5c904c2798"
+        "revision" : "d9d9a666bcb77b1c78fe119714faddcd788d11d1"
       }
     },
     {
@@ -87,7 +87,7 @@
       "location" : "https://github.com/alin23/Magnet",
       "state" : {
         "branch" : "dev",
-        "revision" : "fda73dc564372e98b5e5e6f5452a19f6b92a0382"
+        "revision" : "a21e6c4fd0fdb0244009e7c1fce64b31a01c39ca"
       }
     },
     {
@@ -104,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mxcl/Path.swift",
       "state" : {
-        "revision" : "9c6f807b0a76be0e27aecc908bc6f173400d839e",
-        "version" : "1.4.0"
+        "revision" : "8e355c28e9393c42e58b18c54cace2c42c98a616",
+        "version" : "1.4.1"
       }
     },
     {
@@ -132,7 +132,7 @@
       "location" : "https://github.com/alin23/sentry-cocoa.git",
       "state" : {
         "branch" : "master",
-        "revision" : "04bee4ad86d74d4cb4d7101ff826d6e355301ba9"
+        "revision" : "043c2918170b29105b96b68e88c271bea204a701"
       }
     },
     {
@@ -158,8 +158,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-algorithms",
       "state" : {
-        "revision" : "b14b7f4c528c942f121c8b860b9410b2bf57825e",
-        "version" : "1.0.0"
+        "revision" : "bcd4f369ac962bc3e5244c9df778739f8f5bdbf1",
+        "version" : "1.1.0"
       }
     },
     {
@@ -176,8 +176,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-atomics.git",
       "state" : {
-        "revision" : "6c89474e62719ddcc1e9614989fff2f68208fe10",
-        "version" : "1.1.0"
+        "revision" : "cd142fd2f64be2100422d658e7411e39489da985",
+        "version" : "1.2.0"
       }
     },
     {
@@ -212,8 +212,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/siteline/SwiftUI-Introspect",
       "state" : {
-        "revision" : "3ba734dd20faada0e3234b68e78db97005315f0e",
-        "version" : "1.0.0"
+        "revision" : "9e1cc02a65b22e09a8251261cccbccce02731fc5",
+        "version" : "1.1.1"
       }
     },
     {

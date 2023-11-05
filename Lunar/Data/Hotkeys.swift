@@ -1300,7 +1300,7 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func handle(mediaKey: MediaKey, event keyEvent: KeyEvent?, modifiers flags: NSEvent.ModifierFlags?, event: CGEvent) -> CGEvent? {
-        let flags = flags?.filterUnsupportModifiers() ?? NSEvent.ModifierFlags(rawValue: 0)
+        let flags = flags?.deviceIndependentFlags ?? NSEvent.ModifierFlags(rawValue: 0)
         guard flags != [.option] else {
             return event
         }

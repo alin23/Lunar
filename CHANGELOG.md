@@ -1,3 +1,29 @@
+# 6.3.0
+## Features
+
+- Try to use lux sensors of Apple-vendored external monitors when available
+
+## Improvements
+
+- Use window average for sensor lux when adapting Auto XDR
+- Smaller menubar icon
+- Allow hiding the nits limits from the slider
+
+## Fixes
+
+- Work around Sonoma display connection bug when fetching display info while disconnected
+- Fix OSD chiclets disappearing sometimes on Sonoma
+- Fix app hang on saving display state while restarting from a crash
+- Don't cache `isLG` to avoid not showing LG specific inputs
+- Fix UI spacing in the Clean layout
+- Fix XDR Contrast going flashing to 0 while in Sub-zero Dimming
+
+# 6.2.7
+## Fixes
+
+- Fix some Shortcuts not working
+- Fix some typos
+
 # 6.2.6
 ## Features
 
