@@ -750,9 +750,7 @@ final class DisplayController: ObservableObject {
     var xdrContrastEnabled: Bool = Defaults[.xdrContrast] {
         didSet {
             if !xdrContrastEnabled, oldValue {
-                setXDRContrast(0, now: true)
-                self.lastXdrContrast = 0
-                self.xdrContrast = 0
+                setXDRContrast(0)
                 return
             }
 
@@ -761,11 +759,11 @@ final class DisplayController: ObservableObject {
             else { return }
 
             guard xdrContrastEnabled, display.enhanced else {
-                adaptXDRContrastInPreparation(display: display)
+//                adaptXDRContrastInPreparation(display: display)
                 return
             }
 
-            setXDRContrast(xdrContrast, now: true)
+            setXDRContrast(xdrContrast)
             display.setIndependentSoftwareBrightness(display.softwareBrightness, withoutSettingContrast: true)
         }
     }
@@ -775,11 +773,11 @@ final class DisplayController: ObservableObject {
             guard activeDisplayCount == 1, let display = firstNonTestingDisplay else { return }
 
             guard subzeroContrastEnabled, display.subzero else {
-                setXDRContrast(0.0, now: true)
+                setXDRContrast(0.0)
                 return
             }
 
-            setXDRContrast(xdrContrast, now: true)
+            setXDRContrast(xdrContrast)
             display.setIndependentSoftwareBrightness(display.softwareBrightness, withoutSettingContrast: true)
         }
     }
@@ -1677,8 +1675,7 @@ final class DisplayController: ObservableObject {
         }.store(in: &observers)
         subzeroContrastFactorPublisher.sink { [self] change in
             if activeDisplayCount == 1, let d = firstNonTestingDisplay {
-                xdrContrast = d.computeXDRContrast(xdrBrightness: d.softwareBrightness, xdrContrastFactor: change.newValue, maxBrightness: 0.0)
-                setXDRContrast(xdrContrast, now: true)
+                setXDRContrast(d.computeXDRContrast(xdrBrightness: d.softwareBrightness, xdrContrastFactor: change.newValue, maxBrightness: 0.0))
             }
             subzeroContrastEnabled = CachedDefaults[.subzeroContrast]
         }.store(in: &observers)
@@ -2205,7 +2202,7 @@ final class DisplayController: ObservableObject {
             d.systemAdaptiveBrightness = true
         }
         if xdrContrastEnabled, xdrContrast > 0 {
-            setXDRContrast(0, now: true)
+            setXDRContrast(0)
         }
 
         activeDisplayList.filter(\.faceLightEnabled).forEach { display in
