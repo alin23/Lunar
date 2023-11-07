@@ -895,7 +895,7 @@ enum Hotkey {
 
         let locked = (display.control is DDCControl && (DDC.skipWritingPropertyById[display.id]?.contains(controlID) ?? false))
             || display.noControls
-            || (display.lockedBrightness && display.hasDDC)
+            || (display.lockedBrightness && display.hasDDC && osdImage == .brightness)
         let mirroredID = CGDisplayMirrorsDisplay(display.id)
         let osdID = (mirroredID != kCGNullDirectDisplay && mirroredID != UINT32_MAX) ? mirroredID : display.id
 

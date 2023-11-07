@@ -271,7 +271,7 @@ final class GammaControl: Control {
             return
         }
 
-        guard !CachedDefaults[.neverAskAboutFlux], !DC.screensSleeping,
+        guard !CachedDefaults[.neverAskAboutFlux], !DC.screensSleeping, !DC.locked,
               fluxPromptTime == nil || timeSince(fluxPromptTime!) > 10.minutes.timeInterval
         else { return }
 
@@ -360,7 +360,7 @@ final class GammaControl: Control {
     }
 
     static func fluxCheckerXDR(display: Display, fromAutoXDR: Bool = true, enableXDR: @escaping () -> Void) {
-        guard !CachedDefaults[.neverAskAboutFlux], !DC.screensSleeping,
+        guard !CachedDefaults[.neverAskAboutFlux], !DC.screensSleeping, !DC.locked,
               fluxPromptTime == nil || timeSince(fluxPromptTime!) > 10.minutes.timeInterval,
               DC.fluxRunning, let flux = fluxApp()
         else {
