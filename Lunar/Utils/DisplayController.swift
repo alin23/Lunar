@@ -496,6 +496,12 @@ final class DisplayController: ObservableObject {
 
     var displaysBySerial: [String: Display] = [:]
     var unmanagedDisplays: [Display] = []
+    @Atomic var locked = false {
+        didSet {
+            log.debug("Screen \(locked ? "locked" : "unlocked")")
+        }
+    }
+
     @Published var possiblyDisconnectedDisplayList: [Display] = [] {
         didSet {
             #if arch(arm64)
@@ -511,7 +517,7 @@ final class DisplayController: ObservableObject {
         didSet {
             if clamshell, CachedDefaults[.sleepInClamshellMode] {
                 log.info("Triggering Sleep because the lid was closed")
-                DC.screensSleeping = true
+                screensSleeping = true
                 sleepNow()
             }
         }
@@ -1035,12 +1041,12 @@ final class DisplayController: ObservableObject {
     }
 
     func recomputeAllDisplaysBrightness(activeDisplays: [Display]) {
-        guard sourceDisplay.isAllDisplays, !screensSleeping else {
+        guard sourceDisplay.isAllDisplays, !screensSleeping, !locked else {
             return
         }
 
         let recomputeAndAssign: (Display, Double) -> Void = { [self] display, brightness in
-            let (brightnessOffset, _, staticValues) = DC.appBrightnessContrastOffset(for: display) ?? (0, 0, false)
+            let (brightnessOffset, _, staticValues) = appBrightnessContrastOffset(for: display) ?? (0, 0, false)
             let sourceBrightness = staticValues ? brightnessOffset.d : SyncMode.specific.invInterpolate(brightness, display: display, offset: brightnessOffset.d)
 
 //            let sourceBrightness: Double? = (-100 ... 100)
@@ -1486,7 +1492,7 @@ final class DisplayController: ObservableObject {
 
         pausedOverrideAdaptiveModeObserver = true
         modeWatcherTask = Repeater(every: 5, name: MODE_WATCHER_TASK_KEY) { [self] in
-            guard !screensSleeping else { return }
+            guard !screensSleeping, !locked else { return }
             autoAdaptMode()
         }
         pausedOverrideAdaptiveModeObserver = false
@@ -1498,7 +1504,7 @@ final class DisplayController: ObservableObject {
         }
 
         screencaptureWatcherTask = Repeater(every: 1, name: SCREENCAPTURE_WATCHER_TASK_KEY) { [self] in
-            guard !screensSleeping,
+            guard !screensSleeping, !locked,
                   activeDisplayList.contains(where: { $0.hasSoftwareControl && !$0.supportsGamma })
             else { return }
             let pids = pidCount()
@@ -1841,7 +1847,7 @@ final class DisplayController: ObservableObject {
     }
 
     func autoAdaptMode() {
-        guard !screensSleeping else { return }
+        guard !screensSleeping, !locked else { return }
         guard !CachedDefaults[.overrideAdaptiveMode] else {
             if adaptiveMode.available {
                 adaptiveMode.watch()
@@ -2173,7 +2179,7 @@ final class DisplayController: ObservableObject {
         guard !display.neverFallbackControl, !display.isBuiltin, !AppleNativeControl.isAvailable(for: display),
               !display.isAppleDisplay() else { return false }
 
-        if !SyncMode.possibleClamshellModeSoon, !screensSleeping,
+        if !SyncMode.possibleClamshellModeSoon, !screensSleeping, !locked,
            let screen = display.nsScreen, !screen.visibleFrame.isEmpty, timeSince(display.lastConnectionTime) > 10,
            let control = display.control, !control.isResponsive()
         {
@@ -2311,7 +2317,7 @@ final class DisplayController: ObservableObject {
         }
 
         controlWatcherTask = Repeater(every: 15, name: CONTROL_WATCHER_TASK_KEY) { [self] in
-            guard !screensSleeping, completedOnboarding else { return }
+            guard !screensSleeping, !locked, completedOnboarding else { return }
             for display in activeDisplayList {
                 display.control = display.getBestControl()
                 if shouldPromptAboutFallback(display) {
@@ -2476,14 +2482,14 @@ final class DisplayController: ObservableObject {
     }
 
     func adaptBrightness(for display: Display, force: Bool = false) {
-        guard adaptiveMode.available, !screensSleeping else { return }
+        guard adaptiveMode.available, !screensSleeping, !locked else { return }
         adaptiveMode.withForce(force || display.force) {
             self.adaptiveMode.adapt(display)
         }
     }
 
     func adaptBrightness(for displays: [Display]? = nil, force: Bool = false) {
-        guard adaptiveMode.available, !screensSleeping else { return }
+        guard adaptiveMode.available, !screensSleeping, !locked else { return }
         for display in (displays ?? activeDisplayList).filter({ !$0.blackOutEnabled }) {
             adaptiveMode.withForce(force || display.force) {
                 guard !display.enhanced else {

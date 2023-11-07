@@ -1054,7 +1054,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
     func startValuesReaderThread() {
         valuesReaderThread = Repeater(every: 10, name: "DDCReader", tolerance: 5) {
-            guard !DC.screensSleeping else { return }
+            guard !DC.screensSleeping, !DC.locked else { return }
 
             if CachedDefaults[.refreshValues] {
                 DC.fetchValues()
@@ -1422,30 +1422,52 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             .publisher(for: NSWorkspace.screensDidWakeNotification, object: nil)
         let sleepPublisher = NSWorkspace.shared.notificationCenter
             .publisher(for: NSWorkspace.screensDidSleepNotification, object: nil)
+
         let logoutPublisher = NSWorkspace.shared.notificationCenter
             .publisher(for: NSWorkspace.sessionDidResignActiveNotification, object: nil)
         let loginPublisher = NSWorkspace.shared.notificationCenter
             .publisher(for: NSWorkspace.sessionDidBecomeActiveNotification, object: nil)
 
+        let lockPublisher = DistributedNotificationCenter.default()
+            .publisher(for: NSNotification.Name(rawValue: "com.apple.screenIsLocked"), object: nil)
+        let unlockPublisher = DistributedNotificationCenter.default()
+            .publisher(for: NSNotification.Name(rawValue: "com.apple.screenIsUnlocked"), object: nil)
+
+        func reapplyAfterWake() {
+            guard CachedDefaults[.reapplyValuesAfterWake] else { return }
+
+            for display in DC.activeDisplayList.filter(\.isNative) {
+                guard let control = display.control as? AppleNativeControl else { continue }
+
+                let brightness = AppleNativeControl.readBrightnessDisplayServices(id: display.id)
+                guard let lastBrightness = display.lastNativeBrightness, brightness != lastBrightness else {
+                    continue
+                }
+
+                log.debug("After wake brightness is \(brightness). Re-applying previous brightness \(lastBrightness) for \(display.description)")
+                if lastBrightness == 1.0 {
+                    _ = control.writeBrightness(0, preciseBrightness: 0.99)
+                }
+                _ = control.writeBrightness(0, preciseBrightness: lastBrightness)
+            }
+
+        }
+
+        lockPublisher.sink { _ in DC.locked = true }.store(in: &observers)
+        unlockPublisher.sink { _ in DC.locked = false }.store(in: &observers)
+        unlockPublisher
+            .debounce(for: .milliseconds(200), scheduler: RunLoop.main)
+            .sink { _ in
+                guard !DC.screensSleeping else { return }
+                reapplyAfterWake()
+            }
+            .store(in: &observers)
+
         wakePublisher
             .debounce(for: .milliseconds(200), scheduler: RunLoop.main)
             .sink { _ in
-                if CachedDefaults[.reapplyValuesAfterWake] {
-                    for display in DC.activeDisplayList.filter(\.isNative) {
-                        guard let control = display.control as? AppleNativeControl else { continue }
-
-                        let brightness = AppleNativeControl.readBrightnessDisplayServices(id: display.id)
-                        guard let lastBrightness = display.lastNativeBrightness, brightness != lastBrightness else {
-                            continue
-                        }
-
-                        log.debug("After wake brightness is \(brightness). Re-applying previous brightness \(lastBrightness) for \(display.description)")
-                        if lastBrightness == 1.0 {
-                            _ = control.writeBrightness(0, preciseBrightness: 0.99)
-                        }
-                        _ = control.writeBrightness(0, preciseBrightness: lastBrightness)
-                    }
-                }
+                guard !DC.locked else { return }
+                reapplyAfterWake()
             }.store(in: &observers)
 
         loginPublisher

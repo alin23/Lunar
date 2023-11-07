@@ -857,7 +857,7 @@ enum DDC {
 
         p.debounce(for: .seconds(1), scheduler: queue)
             .sink { _ in
-                guard !DC.screensSleeping else { return }
+                guard !DC.screensSleeping, !DC.locked else { return }
                 log.debug("ioRegistryTreeChanged")
                 IORegistryTreeChanged()
             }
@@ -1152,9 +1152,9 @@ enum DDC {
 
     static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt16, sourceAddr: UInt8? = nil) -> Bool {
         #if DEBUG
-            guard apply, !isTestID(displayID), !shouldWait, !DC.screensSleeping else { return true }
+            guard apply, !isTestID(displayID), !shouldWait, !DC.screensSleeping, !DC.locked else { return true }
         #else
-            guard apply, !shouldWait, !DC.screensSleeping else { return true }
+            guard apply, !shouldWait, !DC.screensSleeping, !DC.locked else { return true }
         #endif
 
         #if arch(arm64)
@@ -1279,7 +1279,7 @@ enum DDC {
     }
 
     static func read(displayID: CGDirectDisplayID, controlID: ControlID) -> DDCReadResult? {
-        guard !isTestID(displayID), !shouldWait, !DC.screensSleeping else { return nil }
+        guard !isTestID(displayID), !shouldWait, !DC.screensSleeping, !DC.locked else { return nil }
 
         #if arch(arm64)
             guard let dcp = DCP(displayID: displayID) else { return nil }
@@ -1342,7 +1342,7 @@ enum DDC {
     }
 
     static func sendEdidRequest(displayID: CGDirectDisplayID) -> (EDID, Data)? {
-        guard !isTestID(displayID), !DC.screensSleeping else { return nil }
+        guard !isTestID(displayID), !DC.screensSleeping, !DC.locked else { return nil }
 
         #if arch(arm64)
             guard let avService = AVService(displayID: displayID) else { return nil }
