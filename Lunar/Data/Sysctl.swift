@@ -61,11 +61,12 @@ enum Sysctl {
 
     static var modelLowercased: String = model.lowercased()
 
-    static let MACBOOK_MODELS = [2, 5, 6, 7, 9, 10].map { "Mac14,\($0)" }
+    static let MACBOOK_MODELS = [2, 5, 6, 7, 9, 10].map { "Mac14,\($0)" } + [3, 6, 7, 8, 9, 10, 11].map { "Mac15,\($0)" }
     static let MACMINI_MODELS = [3, 12].map { "Mac14,\($0)" }
+    static let IMAC_MODELS = [4, 5].map { "Mac15,\($0)" }
 
     static var isMacMini = modelLowercased.hasPrefix("macmini") || MACMINI_MODELS.contains(model)
-    static var isiMac = modelLowercased.hasPrefix("imac")
+    static var isiMac = modelLowercased.hasPrefix("imac") || IMAC_MODELS.contains(model)
     static var isMacBook = modelLowercased.hasPrefix("macbook") || MACBOOK_MODELS.contains(model)
 
     /// e.g. "MyComputer.local" (from System Preferences -> Sharing -> Computer Name) or
