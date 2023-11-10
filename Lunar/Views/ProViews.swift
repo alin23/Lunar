@@ -24,9 +24,9 @@ struct LicenseView: View {
     var body: some View {
         HStack {
             Text("Licence:")
-                .font(.system(size: 12, weight: .medium))
+                .font(.system(size: 11, weight: .medium))
             Text(lunarProOnTrial ? "trial" : (lunarProActive ? "active" : "inactive"))
-                .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                .font(.system(size: 10, weight: .semibold, design: .monospaced))
                 .padding(.horizontal, 6)
                 .padding(.vertical, 2)
                 .background(
@@ -60,11 +60,11 @@ struct LicenseView: View {
                         horizontalPadding: 6,
                         verticalPadding: 3
                     ))
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.system(size: 10, weight: .semibold))
             }
             SwiftUI.Button((lunarProActive && !lunarProOnTrial) ? "Manage" : "Activate") { showLicenseActivation() }
                 .buttonStyle(FlatButton(color: Color.fg.warm.opacity(0.9), textColor: Color.inverted, horizontalPadding: 6, verticalPadding: 3))
-                .font(.system(size: 12, weight: .semibold))
+                .font(.system(size: 10, weight: .semibold))
         }
         .foregroundColor(Color.fg.warm.opacity(0.6))
         .padding(.horizontal, 8)
@@ -98,9 +98,9 @@ struct VersionView: View {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
                 Text("Version:")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.system(size: 11, weight: .medium))
                 Text(Bundle.main.version)
-                    .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
 
                 Spacer()
 
@@ -111,13 +111,14 @@ struct VersionView: View {
                         horizontalPadding: 6,
                         verticalPadding: 3
                     ))
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.system(size: 10, weight: .semibold))
             }
             Divider().padding(.vertical, 2).opacity(0.5)
-            HStack(spacing: 3) {
-                Toggle("Check automatically", isOn: $checkForUpdates)
+            HStack(spacing: 2) {
+                Toggle("Auto update", isOn: $checkForUpdates)
                     .toggleStyle(CheckboxToggleStyle(style: .circle))
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.system(size: 11, weight: .medium))
+                    .allowsTightening(false)
 
                 Spacer()
 
@@ -131,7 +132,7 @@ struct VersionView: View {
                     enumValue: $updateCheckInterval,
                     onValue: UpdateCheckInterval.daily.rawValue
                 ))
-                .font(.system(size: 12, weight: .semibold))
+                .font(.system(size: 10, weight: .semibold))
                 .disabled(!checkForUpdates)
 
                 SwiftUI.Button("Weekly") {
@@ -144,7 +145,7 @@ struct VersionView: View {
                     enumValue: $updateCheckInterval,
                     onValue: UpdateCheckInterval.weekly.rawValue
                 ))
-                .font(.system(size: 12, weight: .semibold))
+                .font(.system(size: 10, weight: .semibold))
                 .disabled(!checkForUpdates)
 
                 SwiftUI.Button("Monthly") {
@@ -157,16 +158,16 @@ struct VersionView: View {
                     enumValue: $updateCheckInterval,
                     onValue: UpdateCheckInterval.monthly.rawValue
                 ))
-                .font(.system(size: 12, weight: .semibold))
+                .font(.system(size: 10, weight: .semibold))
                 .disabled(!checkForUpdates)
             }
             Divider().padding(.vertical, 2).opacity(0.5)
             Toggle("Update to beta builds", isOn: beta)
                 .toggleStyle(CheckboxToggleStyle(style: .circle))
-                .font(.system(size: 12, weight: .medium))
+                .font(.system(size: 11, weight: .medium))
             Toggle("Install updates silently in the background", isOn: $silentUpdate)
                 .toggleStyle(CheckboxToggleStyle(style: .circle))
-                .font(.system(size: 12, weight: .medium))
+                .font(.system(size: 11, weight: .medium))
         }
         .foregroundColor(Color.fg.warm.opacity(0.6))
         .padding(.horizontal, 8)
@@ -184,21 +185,21 @@ struct MenuDensityView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 3) {
-                Text("Menu density")
-                    .font(.system(size: 12, weight: .medium))
+                Text("UI density")
+                    .font(.system(size: 11, weight: .medium))
                 Spacer()
 
                 SwiftUI.Button("Clean") { menuDensity = .clean }
                     .buttonStyle(PickerButton(horizontalPadding: 6, verticalPadding: 3, enumValue: $menuDensity, onValue: .clean))
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.system(size: 10, weight: .semibold))
 
                 SwiftUI.Button("Comfortable") { menuDensity = .comfortable }
                     .buttonStyle(PickerButton(horizontalPadding: 6, verticalPadding: 3, enumValue: $menuDensity, onValue: .comfortable))
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.system(size: 10, weight: .semibold))
 
                 SwiftUI.Button("Dense") { menuDensity = .dense }
                     .buttonStyle(PickerButton(horizontalPadding: 6, verticalPadding: 3, enumValue: $menuDensity, onValue: .dense))
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.system(size: 10, weight: .semibold))
             }
             HStack(spacing: 3) {
                 Text("Click on")
@@ -210,8 +211,8 @@ struct MenuDensityView: View {
                 }
                 .padding(.horizontal, 4)
                 .padding(.vertical, 2)
-                .background(RoundedRectangle(cornerRadius: 4, style: .continuous).fill(Color.primary.opacity(0.15)))
-                Text("at the top for more granular settings")
+                .background(RoundedRectangle(cornerRadius: 4, style: .continuous).fill(Color.fg.warm.opacity(0.1)))
+                Text("for more granular settings")
                     .font(.system(size: 10, weight: .semibold, design: .rounded))
             }.opacity(0.7)
         }

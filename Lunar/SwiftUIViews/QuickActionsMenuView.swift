@@ -135,11 +135,11 @@ struct QuickActionsMenuView: View {
 
     var standardPresets: some View {
         HStack {
-            VStack(alignment: .center, spacing: -2) {
-                Text("Standard").font(.system(size: 10, weight: .bold))
-                Text("Presets").font(.system(size: 12, weight: .heavy))
-            }.foregroundColor(Color.fg.warm.opacity(0.65))
-            Spacer()
+//            VStack(alignment: .center, spacing: -2) {
+//                Text("Standard").font(.system(size: 10, weight: .bold))
+//                Text("Presets").font(.system(size: 12, weight: .heavy))
+//            }.foregroundColor(Color.fg.warm.opacity(0.65))
+//            Spacer()
             PresetButtonView(percent: 0)
             PresetButtonView(percent: 25)
             PresetButtonView(percent: 50)
@@ -157,7 +157,7 @@ struct QuickActionsMenuView: View {
                         Toggle(um.newVersion != nil ? "" : "App info", isOn: $showAdditionalInfo.animation(.fastSpring))
                             .toggleStyle(DetailToggleStyle(style: .circle))
                             .foregroundColor(Color.fg.warm.opacity(hoveringAppInfoToggle ? 0.8 : 0.3))
-                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .font(.system(size: 10, weight: .semibold, design: .rounded))
                             .fixedSize()
                             .onHover { hovering in
                                 withAnimation(.fastTransition) {
@@ -168,14 +168,14 @@ struct QuickActionsMenuView: View {
                         Spacer()
 
                         if let version = um.newVersion {
-                            SwiftUI.Button("v\(version) available") { appDelegate!.updater.checkForUpdates() }
+                            SwiftUI.Button("\(Image(systemName: "sparkles")) v\(version)") { appDelegate!.updater.checkForUpdates() }
                                 .buttonStyle(FlatButton(
                                     color: Color.peach,
                                     textColor: Color.blackMauve,
                                     horizontalPadding: 6,
                                     verticalPadding: 3
                                 ))
-                                .font(.system(size: 12, weight: .semibold))
+                                .font(.system(size: 10, weight: .semibold))
                                 .lineLimit(1)
                                 .minimumScaleFactor(.leastNonzeroMagnitude)
                                 .scaledToFit()
@@ -183,17 +183,17 @@ struct QuickActionsMenuView: View {
 
                         SwiftUI.Button("Display Settings") { appDelegate!.showPreferencesWindow(sender: nil) }
                             .buttonStyle(FlatButton(color: .translucid, textColor: .fg.warm.opacity(0.8)))
-                            .font(.system(size: 12, weight: .medium, design: .rounded))
+                            .font(.system(size: 10, weight: .medium, design: .rounded))
                             .fixedSize()
 
                         SwiftUI.Button("Restart") { appDelegate!.restartApp(appDelegate!) }
                             .buttonStyle(FlatButton(color: .translucid, textColor: .fg.warm.opacity(0.8)))
-                            .font(.system(size: 12, weight: .medium, design: .rounded))
+                            .font(.system(size: 10, weight: .medium, design: .rounded))
                             .fixedSize()
 
                         SwiftUI.Button("Quit") { NSApplication.shared.terminate(nil) }
                             .buttonStyle(FlatButton(color: .translucid, textColor: .fg.warm.opacity(0.8)))
-                            .font(.system(size: 12, weight: .medium, design: .rounded))
+                            .font(.system(size: 10, weight: .medium, design: .rounded))
                             .fixedSize()
                     }
                     .padding(.bottom, showAdditionalInfo ? 0 : 7)
@@ -251,7 +251,7 @@ struct QuickActionsMenuView: View {
                         Toggle("Launch at login", isOn: $startAtLogin)
                             .toggleStyle(CheckboxToggleStyle(style: .circle))
                             .foregroundColor(.fg.warm)
-                            .font(.system(size: 12, weight: .medium))
+                            .font(.system(size: 11, weight: .medium))
                         Spacer()
                         SwiftUI.Button("Contact") { NSWorkspace.shared.open("https://lunar.fyi/contact".asURL()!) }
                             .buttonStyle(OutlineButton(thickness: 1, font: .system(size: 9, weight: .medium, design: .rounded)))
@@ -263,7 +263,7 @@ struct QuickActionsMenuView: View {
                     MenuDensityView()
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 25)
+                .padding(.horizontal, 15)
                 .padding(.bottom, 10)
             }
         }
@@ -397,7 +397,7 @@ struct QuickActionsMenuView: View {
                 optionsMenu.padding(.leading, 20)
                     .matchedGeometryEffect(id: "options-menu", in: namespace)
             }
-            VStack {
+            VStack(spacing: 5) {
                 content
                 footer
             }

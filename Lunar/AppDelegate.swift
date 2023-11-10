@@ -136,7 +136,11 @@ let SWIFTUI_PREVIEW = ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PRE
 var lastXDRContrastResetTime = Date()
 
 final class UpdateManager: ObservableObject {
-    @Published var newVersion: String? = nil
+    #if DEBUG
+        @Published var newVersion: String? = nil // "6.4.0"
+    #else
+        @Published var newVersion: String? = nil
+    #endif
 }
 
 final class KeysManager: ObservableObject {
@@ -2017,7 +2021,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                     if let response = try (socket.readString())?.trimmed, !response.isEmpty {
                         print(response)
                     }
-                    if argList.contains("listen") {
+                    if argList.contains("listen") || argList.contains("--listen") {
                         var line = try socket.readString()
                         while let currentLine = line, !currentLine.isEmpty {
                             print(currentLine.trimmed)

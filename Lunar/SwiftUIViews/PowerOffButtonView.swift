@@ -104,6 +104,7 @@ struct PowerOffButtonView: View {
 
             .buttonStyle(FlatButton(
                 color: color,
+                textColor: .black,
                 circle: true,
                 horizontalPadding: 3,
                 verticalPadding: 3

@@ -186,85 +186,113 @@ struct CustomPresetsView: View {
 
     @Default(.presets) var presets
 
+    @State var adding = false
+
+    let size: CGFloat = 12
+
+    var editPopover: some View {
+        PaddedPopoverView(background: Color.warmBlack.any) {
+            VStack {
+                HStack {
+                    HStack(spacing: 2) {
+                        Text("⌃")
+                            .font(.system(size: size, weight: .bold, design: .monospaced))
+                            .offset(x: 0, y: 2)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 3)
+                            .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.warmWhite.opacity(0.05)))
+                            .foregroundColor(Color.warmWhite.opacity(0.4))
+                        Text("⌘")
+                            .font(.system(size: size, weight: .bold, design: .monospaced))
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 3)
+                            .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.warmWhite.opacity(0.05)))
+                            .foregroundColor(Color.warmWhite.opacity(0.4))
+                        DynamicKey(keyCode: $presetKey, color: .warmWhite.opacity(0.1), textColor: Color.warmWhite, fontSize: size)
+                    }.frame(minWidth: 90, alignment: .center)
+                    TextField("Preset Name", text: $presetName)
+                        .onReceive(Just(presetName)) { name in
+                            limitText(10)
+                            if !presetKeyChanged, let char = name.first(
+                                where: { $0.isASCII && CharacterSet.alphanumerics.contains($0.unicodeScalars.first!) }
+                            ), let key = Key(character: String(char), virtualKeyCode: nil) {
+                                presetKey = key.QWERTYKeyCode.i
+                            }
+                        }
+                        .textFieldStyle(PaddedTextFieldStyle(backgroundColor: Color.warmWhite.opacity(0.05)))
+                        .frame(width: 100)
+                        .foregroundColor(.warmWhite.opacity(0.7))
+                        .font(.system(size: size, weight: .medium, design: .rounded))
+
+                    SwiftUI.Button("Save") { save() }
+                        .buttonStyle(FlatButton(color: Color.warmWhite.opacity(0.05), textColor: Color.warmWhite))
+                        .font(.system(size: size, weight: .medium, design: .rounded))
+                }
+                .frame(maxWidth: .infinity)
+                .onChange(of: env.recording) { newRecording in
+                    if !newRecording { presetKeyChanged = true }
+                }
+
+                if !error.isEmpty {
+                    Text(error).font(.system(size: 11, weight: .medium))
+                        .foregroundColor(.pinkishRed.opacity(0.7))
+                        .frame(width: 240)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(3)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+    }
+
     var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                VStack(alignment: .center, spacing: -2) {
-                    Text("Custom").font(.system(size: 12, weight: .bold))
-                    Text("Presets").font(.system(size: 12, weight: .heavy))
-                }.foregroundColor(Color.fg.warm.opacity(0.65))
-
-                Spacer()
-                HStack(spacing: 1) {
-                    Text("⌃")
-                        .font(.system(size: 14, weight: .bold, design: .monospaced))
-                        .offset(x: 0, y: 2)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 3)
-                        .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.translucid))
-                        .foregroundColor(Color.gray)
-                    Text("⌘")
-                        .font(.system(size: 14, weight: .bold, design: .monospaced))
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 3)
-                        .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.translucid))
-                        .foregroundColor(Color.gray)
-                    DynamicKey(keyCode: $presetKey)
-                }.frame(minWidth: 90, alignment: .trailing)
-                TextField("Preset Name", text: $presetName)
-                    .onReceive(Just(presetName)) { name in
-                        limitText(10)
-                        if !presetKeyChanged, let char = name.first(
-                            where: { $0.isASCII && CharacterSet.alphanumerics.contains($0.unicodeScalars.first!) }
-                        ), let key = Key(character: String(char), virtualKeyCode: nil) {
-                            presetKey = key.QWERTYKeyCode.i
-                        }
+        if presets.isEmpty {
+            addButton
+        } else {
+            presetsGrid
+        }
+    }
+    var addButton: some View {
+        SwiftUI.Button("\(Image(systemName: "plus.square.fill")) \(presets.isEmpty ? "Create " : "")Preset") {
+            adding = true
+        }
+        .buttonStyle(FlatButton(color: Color.translucid, textColor: Color.fg.warm.opacity(0.6), stretch: !presets.isEmpty))
+        .font(.system(size: 10, weight: .medium, design: .rounded))
+        .lineLimit(1)
+        .popover(isPresented: $adding) { editPopover }
+    }
+    var presetsGrid: some View {
+        LazyVGrid(columns: [.init(), .init(), .init()]) {
+            ForEach(presets) { preset in
+                ZStack(alignment: .topLeading) {
+                    SwiftUI.Button(preset.id) {
+                        preset.apply()
                     }
-                    .textFieldStyle(PaddedTextFieldStyle(backgroundColor: Color.translucid))
-                    .frame(width: 100)
+                    .buttonStyle(FlatButton(color: Color.translucid, textColor: Color.fg.warm.opacity(0.9), stretch: true))
+                    .font(.system(size: 10, weight: .medium, design: .rounded))
 
-                SwiftUI.Button("Save") { save() }
-                    .buttonStyle(FlatButton(color: Color.translucid, textColor: Color.fg.warm))
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
-                    .popover(isPresented: $showError) { ErrorPopoverView(error: $error) }
-                    .onChange(of: error, perform: onError(_:))
-            }.frame(maxWidth: .infinity)
+                    SwiftUI.Button(action: { preset.delete() }) {
+                        Image(systemName: "xmark.circle.fill").font(.system(size: 12, weight: .bold))
+                    }
+                    .buttonStyle(FlatButton(color: .clear, textColor: .red, circle: true))
+                    .opacity(hoveringPreset == preset.id ? 1.0 : 0.0)
+                    .offset(x: -15, y: -10)
 
-            if !presets.isEmpty {
-                LazyVGrid(columns: [.init(), .init(), .init()]) {
-                    ForEach(presets) { preset in
-                        ZStack(alignment: .topLeading) {
-                            SwiftUI.Button(preset.id) {
-                                preset.apply()
-                            }
-                            .buttonStyle(FlatButton(color: Color.translucid, textColor: .primary, stretch: true))
-                            .font(.system(size: 12, weight: .medium, design: .monospaced))
-
-                            SwiftUI.Button(action: { preset.delete() }) {
-                                Image(systemName: "xmark.circle.fill").font(.system(size: 14, weight: .bold))
-                            }
-                            .buttonStyle(FlatButton(color: .clear, textColor: .red, circle: true))
-                            .opacity(hoveringPreset == preset.id ? 1.0 : 0.0)
-                            .offset(x: -15, y: -10)
-
-                            Text(DynamicKey.keyString(preset.key))
-                                .font(.system(size: 10, weight: .heavy, design: .monospaced))
-                                .padding(.horizontal, 4)
-                                .padding(.vertical, 2)
-                                .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.bg.warm))
-                                .foregroundColor(Color.bg.gray)
-                                .offset(x: -6, y: -6)
-                                .opacity(hoveringPreset == preset.id ? 0.0 : 1.0)
-                        }.onHover { hovering in
-                            withAnimation(.fastTransition) {
-                                hoveringPreset = hovering ? preset.id : ""
-                            }
-                        }
+                    Text(DynamicKey.keyString(preset.key))
+                        .font(.system(size: 10, weight: .heavy, design: .rounded))
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 2)
+                        .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.bg.warm))
+                        .foregroundColor(Color.bg.gray)
+                        .offset(x: -6, y: -6)
+                        .opacity(hoveringPreset == preset.id ? 0.0 : 1.0)
+                }.onHover { hovering in
+                    withAnimation(.fastTransition) {
+                        hoveringPreset = hovering ? preset.id : ""
                     }
                 }
             }
-        }.onChange(of: env.recording) { newRecording in
-            if !newRecording { presetKeyChanged = true }
+            addButton
         }
     }
 
@@ -296,31 +324,17 @@ struct CustomPresetsView: View {
             }
         ))
 
+        error = ""
         presetName = ""
         presetKey = Key.p.QWERTYKeyCode.i
         presetKeyChanged = false
+        adding = false
     }
 
     func limitText(_ upper: Int) {
         if presetName.count > upper {
             error = "Preset name should contain a maximum of \(upper) characters"
             presetName = String(presetName.prefix(upper))
-        }
-    }
-
-    func onError(_ error: String) {
-        if !error.isEmpty {
-            showPopover()
-        } else {
-            showError = false
-        }
-    }
-
-    func showPopover() {
-        showError = true
-        CustomPresetsView.errorCloser = mainAsyncAfter(ms: 4000) {
-            showError = false
-            error = ""
         }
     }
 }
@@ -340,20 +354,20 @@ import Sauce
 // MARK: - DynamicKey
 
 struct DynamicKey: View {
-    static let darkHoverColor = Color.peach
-    static let lightHoverColor = Color.lunarYellow
-
     @EnvironmentObject var env: EnvState
-    @Environment(\.colorScheme) var colorScheme
 
     @Binding var keyCode: Int
-    @State var recordingColor = Color.white
-    @State var color = Color.translucid
-    @State var textColor = Color.primary
+
+    var recordingColor = Color.red
+    var color = Color.translucid
+    var textColor = Color.fg.warm.opacity(0.9)
+    var hoverColor = Color.dynamicYellow
+    var fontSize: CGFloat = 13
+    var width: CGFloat? = nil
+
     @State var recording = false
-    @State var hoverColor = Self.darkHoverColor
-    @State var fontSize: CGFloat = 13
-    @State var width: CGFloat? = nil
+    @State var hovering = false
+
     @Default(.menuBarClosed) var menuBarClosed
 
     var body: some View {
@@ -362,32 +376,30 @@ struct DynamicKey: View {
                 env.recording = false
                 return
             }
-            recording.toggle()
+            withAnimation(.fastTransition) {
+                recording.toggle()
+            }
         }.buttonStyle(
-            FlatButton(colorBinding: $color, textColorBinding: $textColor, hoverColorBinding: $hoverColor, width: width)
+            FlatButton(
+                color: recording ? .white.opacity(0.2) : color,
+                textColor: recording ? .white : textColor,
+                hoverColor: recording ? .white : hoverColor,
+                width: width
+            )
         )
         .font(.system(size: fontSize, weight: .bold, design: .monospaced))
-        .colorMultiply(recordingColor)
+        .colorMultiply(recording ? recordingColor : .white)
         .background(recording ? KeyEventHandling(recording: $recording, key: $keyCode) : nil)
         .cornerRadius(6)
         .onHover { hovering in
             guard !recording else { return }
             withAnimation(.fastTransition) {
-                textColor = hovering ? (colorScheme == .dark ? .white : .gray) : Color.primary
-                color = hovering ? .white.opacity(0.2) : Color.translucid
+                self.hovering = hovering
             }
         }
-        .onAppear { hoverColor = colorScheme == .dark ? Self.darkHoverColor : Self.lightHoverColor }
         .onChange(of: recording) { newRecording in
             env.recording = newRecording
-            hoverColor = newRecording ? .white : (colorScheme == .dark ? Self.darkHoverColor : Self.lightHoverColor)
-            textColor = newRecording ? .white : Color.fg.warm
-            color = newRecording ? .white.opacity(0.2) : Color.translucid
-            withAnimation(.fastTransition) {
-                recordingColor = newRecording ? Color.red : .white
-            }
         }
-        .onChange(of: colorScheme) { hoverColor = $0 == .dark ? Self.darkHoverColor : Self.lightHoverColor }
         .onChange(of: menuBarClosed) { if $0 { recording = false } }
         .onChange(of: env.recording) { newRecording in
             if recording, !newRecording {

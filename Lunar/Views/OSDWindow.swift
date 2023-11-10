@@ -947,7 +947,16 @@ final class PanelWindow: NSPanel {
         isMovableByWindowBackground = false
     }
 
-//    override var canBecomeKey: Bool { true }
+    var shouldBecomeKey = false {
+        didSet {
+            if shouldBecomeKey, !oldValue {
+                NSApp.activate(ignoringOtherApps: true)
+                makeKeyAndOrderFront(nil)
+            }
+        }
+    }
+
+    override var canBecomeKey: Bool { shouldBecomeKey }
 
     func forceClose() {
         wc.close()
