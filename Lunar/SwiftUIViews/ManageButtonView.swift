@@ -14,7 +14,7 @@ struct ManageButtonView: View {
                 Image(systemName: "power").font(.system(size: 10, weight: .heavy))
             }
             .buttonStyle(FlatButton(
-                color: off ? Color.gray : Colors.red,
+                color: off ? Color.gray : Color.red,
                 circle: true,
                 horizontalPadding: 3,
                 verticalPadding: 3

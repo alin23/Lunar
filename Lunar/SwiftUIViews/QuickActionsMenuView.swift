@@ -3,7 +3,7 @@ import SwiftUI
 
 struct QuickActionsMenuView: View {
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.colors) var colors
+
     @EnvironmentObject var env: EnvState
     @ObservedObject var dc: DisplayController = DC
     @ObservedObject var um = UM
@@ -18,6 +18,7 @@ struct QuickActionsMenuView: View {
 
     @Default(.menuBarClosed) var menuBarClosed
     @Default(.menuDensity) var menuDensity
+    @Default(.dimNonEssentialUI) var dimNonEssentialUI
 
     @Default(.showBrightnessMenuBar) var showBrightnessMenuBar
     @Default(.showOnlyExternalBrightnessMenuBar) var showOnlyExternalBrightnessMenuBar
@@ -47,6 +48,12 @@ struct QuickActionsMenuView: View {
     @ObservedObject var km = KM
     @ObservedObject var wm = WM
 
+    @State var hoveringFooter = false
+    @State var hoveringPresets = false
+    @State var hoveringHeader = false
+
+    @State var hoveringAppInfoToggle = false
+
     var modeSelector: some View {
         let titleBinding = Binding<String>(
             get: { overrideAdaptiveMode ? "⁣\(dc.adaptiveModeKey.name)⁣" : "Auto: \(dc.adaptiveModeKey.str)" }, set: { _ in }
@@ -73,9 +80,10 @@ struct QuickActionsMenuView: View {
             RoundedRectangle(
                 cornerRadius: 8,
                 style: .continuous
-            ).fill(Color.primary.opacity(0.15))
+            ).fill(Color.translucid)
         )
-        .colorMultiply(colors.accent.blended(withFraction: 0.7, of: .white))
+        .colorMultiply(Color.accent.blended(withFraction: 0.7, of: .white))
+        .foregroundColor(Color.fg.warm)
     }
 
     var topRightButtons: some View {
@@ -84,12 +92,12 @@ struct QuickActionsMenuView: View {
                 action: { showOptionsMenu.toggle() },
                 label: {
                     HStack(spacing: 2) {
-                        Image(systemName: "gear.circle.fill").font(.system(size: 12, weight: .semibold))
-                        Text("Settings").font(.system(size: 13, weight: .semibold))
+                        Image(systemName: "gear.circle.fill").font(.system(size: 12, weight: .semibold, design: .rounded))
+                        Text("Settings").font(.system(size: 12, weight: .semibold, design: .rounded))
                     }
                 }
             )
-            .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+            .buttonStyle(FlatButton(color: .translucid, textColor: .fg.warm.opacity(0.8)))
             .onChange(of: showBrightnessMenuBar) { _ in
                 let old = showOptionsMenu
                 showOptionsMenu = false
@@ -128,9 +136,9 @@ struct QuickActionsMenuView: View {
     var standardPresets: some View {
         HStack {
             VStack(alignment: .center, spacing: -2) {
-                Text("Standard").font(.system(size: 10, weight: .bold)).opacity(0.7)
-                Text("Presets").font(.system(size: 12, weight: .heavy)).opacity(0.7)
-            }
+                Text("Standard").font(.system(size: 10, weight: .bold))
+                Text("Presets").font(.system(size: 12, weight: .heavy))
+            }.foregroundColor(Color.fg.warm.opacity(0.65))
             Spacer()
             PresetButtonView(percent: 0)
             PresetButtonView(percent: 25)
@@ -148,17 +156,22 @@ struct QuickActionsMenuView: View {
                     HStack {
                         Toggle(um.newVersion != nil ? "" : "App info", isOn: $showAdditionalInfo.animation(.fastSpring))
                             .toggleStyle(DetailToggleStyle(style: .circle))
-                            .foregroundColor(Color.secondary)
-                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(Color.fg.warm.opacity(hoveringAppInfoToggle ? 0.8 : 0.3))
+                            .font(.system(size: 11, weight: .semibold, design: .rounded))
                             .fixedSize()
+                            .onHover { hovering in
+                                withAnimation(.fastTransition) {
+                                    hoveringAppInfoToggle = hovering
+                                }
+                            }
 
                         Spacer()
 
                         if let version = um.newVersion {
                             SwiftUI.Button("v\(version) available") { appDelegate!.updater.checkForUpdates() }
                                 .buttonStyle(FlatButton(
-                                    color: Colors.peach,
-                                    textColor: Colors.blackMauve,
+                                    color: Color.peach,
+                                    textColor: Color.blackMauve,
                                     horizontalPadding: 6,
                                     verticalPadding: 3
                                 ))
@@ -169,24 +182,24 @@ struct QuickActionsMenuView: View {
                         }
 
                         SwiftUI.Button("Display Settings") { appDelegate!.showPreferencesWindow(sender: nil) }
-                            .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                            .buttonStyle(FlatButton(color: .translucid, textColor: .fg.warm.opacity(0.8)))
                             .font(.system(size: 12, weight: .medium, design: .rounded))
                             .fixedSize()
 
                         SwiftUI.Button("Restart") { appDelegate!.restartApp(appDelegate!) }
-                            .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                            .buttonStyle(FlatButton(color: .translucid, textColor: .fg.warm.opacity(0.8)))
                             .font(.system(size: 12, weight: .medium, design: .rounded))
                             .fixedSize()
 
                         SwiftUI.Button("Quit") { NSApplication.shared.terminate(nil) }
-                            .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                            .buttonStyle(FlatButton(color: .translucid, textColor: .fg.warm.opacity(0.8)))
                             .font(.system(size: 12, weight: .medium, design: .rounded))
                             .fixedSize()
                     }
                     .padding(.bottom, showAdditionalInfo ? 0 : 7)
                 }
                 .padding(.horizontal, MENU_HORIZONTAL_PADDING / 2)
-                .opacity(showFooterOnHover ? footerOpacity : 1.0)
+                .opacity(showFooterOnHover ? footerOpacity : (hoveringFooter || !dimNonEssentialUI ? 1.0 : 0.15))
                 .contentShape(Rectangle())
                 .onChange(of: showFooterOnHover) { showOnHover in
                     withAnimation(.fastTransition) { footerOpacity = showOnHover ? 0.0 : 1.0 }
@@ -208,6 +221,9 @@ struct QuickActionsMenuView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: footerOpacity == 0.0 ? 8 : nil)
             .onHover { hovering in
+                withAnimation(.fastTransition) {
+                    hoveringFooter = hovering
+                }
                 guard showFooterOnHover else {
                     footerShowHideTask = nil
                     footerOpacity = 1.0
@@ -234,7 +250,7 @@ struct QuickActionsMenuView: View {
                     HStack {
                         Toggle("Launch at login", isOn: $startAtLogin)
                             .toggleStyle(CheckboxToggleStyle(style: .circle))
-                            .foregroundColor(.primary)
+                            .foregroundColor(.fg.warm)
                             .font(.system(size: 12, weight: .medium))
                         Spacer()
                         SwiftUI.Button("Contact") { NSWorkspace.shared.open("https://lunar.fyi/contact".asURL()!) }
@@ -304,12 +320,17 @@ struct QuickActionsMenuView: View {
                     }
                 }.offset(x: 0, y: -6)
         }
-        .background(Color.primary.opacity((colorScheme == .dark ? 0.03 : 0.05) * op))
+        .background(Color.fg.warm.opacity((colorScheme == .dark ? 0.03 : 0.05) * op))
         .padding(.bottom, 10 * op)
-        .onHover(perform: handleHeaderTransition(hovering:))
         .onChange(of: showOptionsMenu, perform: handleHeaderTransition(hovering:))
+        .opacity(hoveringHeader || !dimNonEssentialUI ? 1.0 : 0.15)
+        .onHover { hovering in
+            withAnimation(.fastTransition) {
+                hoveringHeader = hovering
+            }
+            handleHeaderTransition(hovering: hovering)
+        }
     }
-
     var content: some View {
         Group {
             header
@@ -358,12 +379,17 @@ struct QuickActionsMenuView: View {
                 }
                 .padding(.vertical, 6)
                 .padding(.horizontal, 10)
-                .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.05)))
+                .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.fg.warm.opacity(0.03)))
                 .padding(.horizontal, MENU_HORIZONTAL_PADDING)
+                .opacity(hoveringPresets || !dimNonEssentialUI ? 1.0 : 0.15)
+                .onHover { hovering in
+                    withAnimation(.fastTransition) {
+                        hoveringPresets = hovering
+                    }
+                }
             }
         }
     }
-
     var body: some View {
         let optionsMenuOverflow = showOptionsMenu ? isOptionsMenuOverflowing() : false
         HStack(alignment: .top, spacing: 1) {
@@ -428,10 +454,10 @@ struct QuickActionsMenuView: View {
         }
         .frame(width: MENU_WIDTH + FULL_OPTIONS_MENU_WIDTH, height: env.menuMaxHeight, alignment: .top)
         .padding(.horizontal, showOptionsMenu ? MENU_HORIZONTAL_PADDING * 2 : 0)
-        .contrast(wm.focused ? 1.0 : 0.8)
-        .brightness(wm.focused ? 0.0 : -0.1)
-        .saturation(wm.focused ? 1.0 : 0.7)
-        .allowsHitTesting(wm.focused)
+//        .contrast(wm.focused ? 1.0 : 0.8)
+//        .brightness(wm.focused ? 0.0 : -0.1)
+//        .saturation(wm.focused ? 1.0 : 0.7)
+//        .allowsHitTesting(wm.focused)
     }
 
     @ViewBuilder var optionsMenu: some View {
@@ -441,10 +467,10 @@ struct QuickActionsMenuView: View {
                     withAnimation(.fastSpring) { env.optionsTab = .layout }
                 }
                 .buttonStyle(PickerButton(
-                    color: Colors.blackMauve.opacity(0.1),
-                    onColor: Colors.blackMauve.opacity(0.4),
+                    color: Color.blackMauve.opacity(0.1),
+                    onColor: Color.blackMauve.opacity(0.4),
                     onTextColor: .white,
-                    offTextColor: Colors.darkGray,
+                    offTextColor: Color.darkGray,
                     enumValue: $env.optionsTab,
                     onValue: .layout
                 ))
@@ -454,10 +480,10 @@ struct QuickActionsMenuView: View {
                     withAnimation(.fastSpring) { env.optionsTab = .advanced }
                 }
                 .buttonStyle(PickerButton(
-                    color: Colors.blackMauve.opacity(0.1),
-                    onColor: Colors.blackMauve.opacity(0.4),
+                    color: Color.blackMauve.opacity(0.1),
+                    onColor: Color.blackMauve.opacity(0.4),
                     onTextColor: .white,
-                    offTextColor: Colors.darkGray,
+                    offTextColor: Color.darkGray,
                     enumValue: $env.optionsTab,
                     onValue: .advanced
                 ))
@@ -467,10 +493,10 @@ struct QuickActionsMenuView: View {
                     withAnimation(.fastSpring) { env.optionsTab = .hdr }
                 }
                 .buttonStyle(PickerButton(
-                    color: Colors.blackMauve.opacity(0.1),
-                    onColor: Colors.blackMauve.opacity(0.4),
+                    color: Color.blackMauve.opacity(0.1),
+                    onColor: Color.blackMauve.opacity(0.4),
                     onTextColor: .white,
-                    offTextColor: Colors.darkGray,
+                    offTextColor: Color.darkGray,
                     enumValue: $env.optionsTab,
                     onValue: .hdr
                 ))
@@ -479,11 +505,11 @@ struct QuickActionsMenuView: View {
 
             switch env.optionsTab {
             case .layout:
-                QuickActionsLayoutView().padding(10).foregroundColor(Colors.blackMauve)
+                QuickActionsLayoutView().padding(10).foregroundColor(Color.blackMauve)
             case .advanced:
-                AdvancedSettingsView().padding(10).foregroundColor(Colors.blackMauve)
+                AdvancedSettingsView().padding(10).foregroundColor(Color.blackMauve)
             case .hdr:
-                HDRSettingsView().padding(10).foregroundColor(Colors.blackMauve)
+                HDRSettingsView().padding(10).foregroundColor(Color.blackMauve)
             }
 
             SwiftUI.Button("Reset \(km.optionKeyPressed ? "global" : (km.commandKeyPressed ? "display-specific" : "ALL")) settings") {
@@ -510,21 +536,25 @@ struct QuickActionsMenuView: View {
         .fixedSize()
         .background(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(colorScheme == .dark ? Colors.sunYellow : Colors.lunarYellow)
-                .shadow(color: Colors.blackMauve.opacity(colorScheme == .dark ? 0.5 : 0.2), radius: 8, x: 0, y: 6)
+                .fill(colorScheme == .dark ? Color.peach : Color.sunYellow)
+                .shadow(color: Color.blackMauve.opacity(colorScheme == .dark ? 0.5 : 0.2), radius: 8, x: 0, y: 6)
         )
         .padding(.bottom, 20)
-        .foregroundColor(Colors.blackMauve)
+        .foregroundColor(Color.blackMauve)
     }
 
     func bg(optionsMenuOverflow _: Bool) -> some View {
         ZStack {
-            VisualEffectBlur(material: .hudWindow, blendingMode: .behindWindow, state: .followsWindowActiveState)
-                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            VisualEffectBlur(
+                material: .hudWindow,
+                blendingMode: .behindWindow,
+                state: .active
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(colorScheme == .dark ? Colors.blackMauve.opacity(0.4) : Color.white.opacity(0.6))
+                .fill(colorScheme == .dark ? Color.blackMauve.opacity(0.4) : Color.white.opacity(0.6))
         }
-        .shadow(color: Colors.blackMauve.opacity(colorScheme == .dark ? 0.5 : 0.2), radius: 8, x: 0, y: 6)
+        .shadow(color: Color.blackMauve.opacity(colorScheme == .dark ? 0.5 : 0.2), radius: 8, x: 0, y: 6)
     }
 
     func isOptionsMenuOverflowing() -> Bool {

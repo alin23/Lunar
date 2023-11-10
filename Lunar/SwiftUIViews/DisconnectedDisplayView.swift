@@ -18,7 +18,7 @@
                     Image(systemName: "power").font(.system(size: 10, weight: .heavy))
                 }
                 .buttonStyle(FlatButton(
-                    color: off ? Color.gray : Colors.red,
+                    color: off ? Color.gray : Color.red,
                     circle: true,
                     horizontalPadding: 3,
                     verticalPadding: 3
@@ -34,8 +34,6 @@
 
     @available(macOS 13, *)
     struct DisconnectedDisplayView: View {
-        @Environment(\.colors) var colors
-
         @State var id: CGDirectDisplayID
         @State var name: String
         @State var possibly = false
@@ -49,7 +47,7 @@
                     Text(name)
                         .font(.system(size: 22, weight: .black))
                         .padding(6)
-                        .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(colors.bg.primary.opacity(0.5)))
+                        .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.bg.primary.opacity(0.5)))
 
                     ReconnectButtonView(display: id)
                         .offset(y: -8)

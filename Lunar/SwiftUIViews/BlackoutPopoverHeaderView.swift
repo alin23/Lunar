@@ -18,7 +18,7 @@ struct BlackoutPopoverHeaderView: View {
                 SwiftUI.Button("Needs Lunar Pro") {
                     showCheckout()
                     appDelegate?.windowController?.window?.makeKeyAndOrderFront(nil)
-                }.buttonStyle(FlatButton(color: Colors.red, textColor: .white))
+                }.buttonStyle(FlatButton(color: Color.red, textColor: .white))
             }
         }
     }

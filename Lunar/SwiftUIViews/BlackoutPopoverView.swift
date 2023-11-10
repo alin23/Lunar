@@ -58,11 +58,11 @@ struct BlackoutPopoverView: View {
                         hotkeyText: hotkeyText(id: .blackOutPowerOff),
                         actionInfo: "(uses DDC)"
                     )
-                    .colorMultiply(Colors.red)
+                    .colorMultiply(Color.red)
                 }
                 Divider().background(Color.white.opacity(0.2))
                 BlackoutPopoverRowView(modifiers: ["Control"], action: "Show this help menu")
-                    .colorMultiply(Colors.peach)
+                    .colorMultiply(Color.peach)
 
                 HStack(spacing: 7) {
                     Text("Press")
@@ -78,7 +78,7 @@ struct BlackoutPopoverView: View {
                 .padding(.vertical, 6)
                 .padding(.horizontal, 12)
                 .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.white.opacity(0.1)))
-                .colorMultiply(Colors.peach)
+                .colorMultiply(Color.peach)
                 .padding(.top)
             }
             .padding()

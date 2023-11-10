@@ -2,7 +2,7 @@ import SwiftUI
 
 struct NeedsLunarProView: View {
     var body: some View {
-        PaddedPopoverView(background: Colors.red.brightness(0.1).any) {
+        PaddedPopoverView(background: Color.red.brightness(0.1).any) {
             HStack(spacing: 4) {
                 Text("Needs a")
                     .foregroundColor(.black.opacity(0.8))

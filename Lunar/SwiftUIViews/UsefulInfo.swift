@@ -38,11 +38,11 @@ struct UsefulInfo: View {
         if let (t1, t2) = usefulInfoText {
             VStack(alignment: .leading, spacing: -2) {
                 Text(t1)
-                    .font(.system(size: 10, weight: .bold, design: .monospaced).leading(.tight))
+                    .font(.system(size: 10, weight: .bold, design: .rounded).leading(.tight))
                 Text(t2)
                     .font(.system(size: 9, weight: .semibold, design: .rounded).leading(.tight))
             }
-            .foregroundColor(.secondary)
+            .foregroundColor(.fg.warm.opacity(0.4))
         }
     }
 }

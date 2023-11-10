@@ -12,6 +12,7 @@ struct QuickActionsLayoutView: View {
     @Default(.showBrightnessMenuBar) var showBrightnessMenuBar
     @Default(.showOnlyExternalBrightnessMenuBar) var showOnlyExternalBrightnessMenuBar
     @Default(.showOrientationInQuickActions) var showOrientationInQuickActions
+    @Default(.showOrientationForBuiltinInQuickActions) var showOrientationForBuiltinInQuickActions
     @Default(.showInputInQuickActions) var showInputInQuickActions
     @Default(.showPowerInQuickActions) var showPowerInQuickActions
     @Default(.showStandardPresets) var showStandardPresets
@@ -27,6 +28,7 @@ struct QuickActionsLayoutView: View {
     @Default(.moreGraphData) var moreGraphData
     @Default(.infoMenuShown) var infoMenuShown
     @Default(.adaptiveBrightnessMode) var adaptiveBrightnessMode
+    @Default(.dimNonEssentialUI) var dimNonEssentialUI
 
     var body: some View {
         ZStack {
@@ -36,17 +38,21 @@ struct QuickActionsLayoutView: View {
                     Group {
                         SettingsToggle(text: "Only show top buttons on hover", setting: $showHeaderOnHover.animation(.fastSpring))
                         SettingsToggle(text: "Only show bottom buttons on hover", setting: $showFooterOnHover.animation(.fastSpring))
+                        SettingsToggle(text: "Dim non-essential UI elements", setting: $dimNonEssentialUI.animation(.timingCurve(0.68, -0.55, 0.265, 1.55, duration: 0.8)))
                         SettingsToggle(text: "Save open-state for this menu", setting: $keepOptionsMenu.animation(.fastSpring))
                     }
                     Divider()
                     Group {
                         SettingsToggle(text: "Show slider values", setting: $showSliderValues.animation(.fastSpring))
+                        SettingsToggle(text: "Show power button", setting: $showPowerInQuickActions.animation(.fastSpring))
                         if dc.activeDisplayList.contains(where: \.hasDDC) {
                             SettingsToggle(text: "Show volume slider", setting: $showVolumeSlider.animation(.fastSpring))
                             SettingsToggle(text: "Show input source selector", setting: $showInputInQuickActions.animation(.fastSpring))
                         }
                         SettingsToggle(text: "Show rotation selector", setting: $showOrientationInQuickActions.animation(.fastSpring))
-                        SettingsToggle(text: "Show power button", setting: $showPowerInQuickActions.animation(.fastSpring))
+                        SettingsToggle(text: "Show rotation for built-in screen", setting: $showOrientationForBuiltinInQuickActions.animation(.fastSpring))
+                            .padding(.leading)
+                            .disabled(!showOrientationInQuickActions)
                     }
                     Divider()
                     Group {
@@ -64,7 +70,7 @@ struct QuickActionsLayoutView: View {
                 Group {
                     #if arch(arm64)
                         if dc.activeDisplayList.contains(where: \.noDDCOrMergedBrightnessContrast) {
-                            SettingsToggle(text: "Show nits limits on the slider", setting: $showNitsText.animation(.fastSpring))
+                            SettingsToggle(text: "Show nits limits when hovering on the slider", setting: $showNitsText.animation(.fastSpring))
                         }
                     #endif
                     if adaptiveBrightnessMode.hasUsefulInfo {

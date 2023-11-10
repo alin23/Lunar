@@ -10,7 +10,7 @@ struct DisplayRowView: View {
 
     @ObservedObject var display: Display
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.colors) var colors
+
     @Default(.showSliderValues) var showSliderValues
     #if arch(arm64)
         @Default(.syncNits) var syncNits
@@ -24,23 +24,23 @@ struct DisplayRowView: View {
     @Default(.xdrTipShown) var xdrTipShown
     @Default(.autoXdr) var autoXdr
     @Default(.syncMode) var syncMode
-
-    @State var showNeedsLunarPro = false
-    @State var showXDRTip = false
-    @State var showSubzero = false
-    @State var showXDR = false
-
-    @State var hoveringVolumeSlider = false
-
+    @Default(.dimNonEssentialUI) var dimNonEssentialUI
     @Default(.autoBlackoutBuiltin) var autoBlackoutBuiltin
 
-    @State var adaptiveStateText = ""
-    @State var adaptivePausedText = "Adaptive brightness paused"
+    @State private var showNeedsLunarPro = false
+    @State private var showXDRTip = false
+    @State private var showSubzero = false
+    @State private var showXDR = false
 
-    @State var editingMaxNits = false
-    @State var editingMinNits = false
+    @State private var adaptiveStateText = ""
+    @State private var adaptivePausedText = "Adaptive brightness paused"
+    @State private var editingMaxNits = false
+    @State private var editingMinNits = false
+    @State private var hovering = false
 
-    @State var hovering = false
+    @State private var hoveringVolumeSlider = false
+    @State private var hoveringVideoInput = false
+    @State private var hoveringXDRSelector = false
 
     @EnvironmentObject var env: EnvState
 
@@ -50,9 +50,9 @@ struct DisplayRowView: View {
                 BigSurSlider(
                     percentage: $display.xdrBrightness,
                     image: "sun.max.circle.fill",
-                    color: Colors.xdr.opacity(0.7),
-                    backgroundColor: Colors.xdr.opacity(colorScheme == .dark ? 0.1 : 0.2),
-                    knobColor: Colors.xdr,
+                    color: Color.xdr.opacity(0.7),
+                    backgroundColor: Color.xdr.opacity(colorScheme == .dark ? 0.1 : 0.2),
+                    knobColor: Color.xdr,
                     showValue: $showSliderValues,
                     beforeSettingPercentage: { _ in display.forceHideSoftwareOSD = true }
                 )
@@ -61,9 +61,9 @@ struct DisplayRowView: View {
                 BigSurSlider(
                     percentage: $display.softwareBrightness,
                     image: "moon.circle.fill",
-                    color: Colors.subzero.opacity(0.7),
-                    backgroundColor: Colors.subzero.opacity(colorScheme == .dark ? 0.1 : 0.2),
-                    knobColor: Colors.subzero,
+                    color: Color.subzero.opacity(0.7),
+                    backgroundColor: Color.subzero.opacity(colorScheme == .dark ? 0.1 : 0.2),
+                    knobColor: Color.subzero,
                     showValue: $showSliderValues,
                     beforeSettingPercentage: { _ in display.forceHideSoftwareOSD = true }
                 ) { _ in
@@ -76,16 +76,17 @@ struct DisplayRowView: View {
         }
     }
 
-    var sdrXdrSelector: some View {
+    @ViewBuilder var sdrXdrSelector: some View {
+        let color = Color.bg.warm.opacity(colorScheme == .dark ? 0.8 : 0.4)
         HStack(spacing: 2) {
             SwiftUI.Button("SDR") {
                 guard display.enhanced else { return }
                 withAnimation(.fastSpring) { display.enhanced = false }
             }
             .buttonStyle(PickerButton(
-                onColor: Color.black, offColor: .oneway { colors.invertedGray }, enumValue: $display.enhanced, onValue: false
+                onColor: Color.warmBlack.opacity(hoveringXDRSelector || !dimNonEssentialUI ? 1.0 : 0.2), offColor: color.opacity(0.4), enumValue: $display.enhanced, onValue: false
             ))
-            .font(.system(size: 11, weight: display.enhanced ? .semibold : .bold, design: .monospaced))
+            .font(.system(size: 10, weight: display.enhanced ? .semibold : .bold, design: .monospaced))
 
             SwiftUI.Button("XDR") {
                 guard lunarProActive || lunarProOnTrial else {
@@ -102,15 +103,21 @@ struct DisplayRowView: View {
                 }
             }
             .buttonStyle(PickerButton(
-                onColor: Color.black, offColor: .oneway { colors.invertedGray }, enumValue: $display.enhanced, onValue: true
+                onColor: Color.warmBlack.opacity(hoveringXDRSelector || !dimNonEssentialUI ? 1.0 : 0.2), offColor: color.opacity(0.4), enumValue: $display.enhanced, onValue: true
             ))
-            .font(.system(size: 11, weight: display.enhanced ? .bold : .semibold, design: .monospaced))
+            .font(.system(size: 10, weight: display.enhanced ? .bold : .semibold, design: .monospaced))
             .popover(isPresented: $showNeedsLunarPro) { NeedsLunarProView() }
             .popover(isPresented: $showXDRTip) { XDRTipView() }
         }
         .padding(2)
-        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(colors.invertedGray))
-        .padding(.bottom, 4)
+        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(color))
+        .padding(.bottom, 2)
+        .opacity(hoveringXDRSelector || !dimNonEssentialUI ? 1 : 0.15)
+        .onHover { hovering in
+            withAnimation(.fastTransition) {
+                hoveringXDRSelector = hovering
+            }
+        }
     }
 
     var inputSelector: some View {
@@ -129,9 +136,9 @@ struct DisplayRowView: View {
             RoundedRectangle(
                 cornerRadius: 8,
                 style: .continuous
-            ).fill(Color.primary.opacity(0.15))
+            ).fill(Color.translucid)
         )
-        .colorMultiply(colors.accent.blended(withFraction: 0.7, of: .white))
+        .colorMultiply(Color.accent.blended(withFraction: 0.7, of: .white))
     }
 
     var rotationSelector: some View {
@@ -158,44 +165,54 @@ struct DisplayRowView: View {
     }
 
     @ViewBuilder var appPresetAdaptivePaused: some View {
-        if (display.hasDDC && showInputInQuickActions)
-            || display.showOrientation
-            || display.appPreset != nil
-            || display.adaptivePaused
-            || showRawValues && (display.lastRawBrightness != nil || display.lastRawContrast != nil || display.lastRawVolume != nil)
-            || SWIFTUI_PREVIEW
-        {
-            VStack {
-                if (display.hasDDC && showInputInQuickActions) || SWIFTUI_PREVIEW { inputSelector }
-                if display.showOrientation || SWIFTUI_PREVIEW { rotationSelector }
-                if let app = display.appPreset {
-                    SwiftUI.Button("App Preset: \(app.name)") {
-                        app.runningApps?.first?.activate()
-                    }
-                    .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .secondary.opacity(0.8)))
-                    .font(.system(size: 9, weight: .semibold))
-                }
-                if display.adaptivePaused || SWIFTUI_PREVIEW {
-                    SwiftUI.Button(adaptivePausedText) { display.adaptivePaused.toggle() }
+        VStack(spacing: 2) {
+            let showInput = display.hasDDC && showInputInQuickActions
+            let showAdditionalUI = display.showOrientation || display.appPreset != nil || display.adaptivePaused
+                || showRawValues && (display.lastRawBrightness != nil || display.lastRawContrast != nil || display.lastRawVolume != nil)
+                || SWIFTUI_PREVIEW
+
+            if showInput, !showAdditionalUI {
+                inputSelector
+            }
+            if showAdditionalUI {
+                VStack {
+                    if showInput { inputSelector }
+                    if display.showOrientation || SWIFTUI_PREVIEW { rotationSelector }
+                    if let app = display.appPreset {
+                        SwiftUI.Button("App Preset: \(app.name)") {
+                            app.runningApps?.first?.activate()
+                        }
                         .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .secondary.opacity(0.8)))
                         .font(.system(size: 9, weight: .semibold))
-                        .onHover { hovering in
-                            adaptivePausedText = hovering ? "Resume adaptive brightness" : "Adaptive brightness paused"
-                        }
-                }
+                    }
+                    if display.adaptivePaused || SWIFTUI_PREVIEW {
+                        SwiftUI.Button(adaptivePausedText) { display.adaptivePaused.toggle() }
+                            .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .secondary.opacity(0.8)))
+                            .font(.system(size: 9, weight: .semibold))
+                            .onHover { hovering in
+                                adaptivePausedText = hovering ? "Resume adaptive brightness" : "Adaptive brightness paused"
+                            }
+                    }
 
-                if showRawValues {
-                    RawValuesView(display: display).frame(width: 220).padding(.vertical, 3)
+                    if showRawValues {
+                        RawValuesView(display: display).frame(width: 220).padding(.vertical, 3)
+                    }
                 }
+                .padding(8)
+                .background(
+                    RoundedRectangle(
+                        cornerRadius: 10,
+                        style: .continuous
+                    ).fill(Color.primary.opacity(hoveringVideoInput || !dimNonEssentialUI ? 0.05 : 0.0))
+                )
+                .padding(.vertical, 2)
             }
-            .padding(8)
-            .background(
-                RoundedRectangle(
-                    cornerRadius: 10,
-                    style: .continuous
-                ).fill(Color.primary.opacity(0.05))
-            )
-            .padding(.vertical, 3)
+        }
+        .opacity(hoveringVideoInput || !dimNonEssentialUI ? 0.9 : 0.15)
+        .onHover { hovering in
+            withAnimation(.fastTransition) {
+                hoveringVideoInput = hovering
+            }
         }
     }
 
@@ -205,8 +222,8 @@ struct DisplayRowView: View {
                 BigSurSlider(
                     percentage: $display.preciseVolume.f,
                     imageBinding: .oneway { display.audioMuted ? "speaker.slash.fill" : "speaker.2.fill" },
-                    colorBinding: .constant(colors.accent),
-                    backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                    colorBinding: .constant(Color.accent),
+                    backgroundColorBinding: .constant(Color.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
                     showValue: $showSliderValues,
                     disabled: $display.audioMuted,
                     enableText: "Unmute"
@@ -216,7 +233,7 @@ struct DisplayRowView: View {
                         display.audioMuted = true
                     }
                     .buttonStyle(FlatButton(
-                        color: Colors.red.opacity(0.7),
+                        color: Color.red.opacity(0.7),
                         textColor: .white,
                         horizontalPadding: 6,
                         verticalPadding: 2
@@ -250,8 +267,8 @@ struct DisplayRowView: View {
                 BigSurSlider(
                     percentage: $display.preciseBrightnessContrast.f,
                     image: "sun.max.fill",
-                    colorBinding: .constant(colors.accent),
-                    backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                    colorBinding: .constant(Color.accent),
+                    backgroundColorBinding: .constant(Color.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
                     showValue: $showSliderValues,
                     disabled: mergedLockBinding,
                     enableText: "Unlock",
@@ -276,8 +293,8 @@ struct DisplayRowView: View {
             BigSurSlider(
                 percentage: $display.preciseBrightness.f,
                 image: "sun.max.fill",
-                colorBinding: .constant(colors.accent),
-                backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                colorBinding: .constant(Color.accent),
+                backgroundColorBinding: .constant(Color.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
                 showValue: $showSliderValues,
                 disabled: $display.lockedBrightness,
                 enableText: "Unlock",
@@ -295,8 +312,8 @@ struct DisplayRowView: View {
             BigSurSlider(
                 percentage: contrastBinding,
                 image: "circle.righthalf.fill",
-                colorBinding: .constant(colors.accent),
-                backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                colorBinding: .constant(Color.accent),
+                backgroundColorBinding: .constant(Color.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
                 showValue: $showSliderValues
             )
         }
@@ -310,8 +327,8 @@ struct DisplayRowView: View {
                     Text(display.name)
                         .font(.system(size: 22, weight: .black))
                         .padding(6)
-                        .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(colors.bg.primary.opacity(0.5)))
-                        .padding(.bottom, xdrSelectorShown ? 0 : 6)
+                        .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.bg.warm.opacity(colorScheme == .dark ? 0.5 : 0.2)))
+//                        .padding(.bottom, xdrSelectorShown ? 0 : 6)
 
                     PowerOffButtonView(display: display)
                         .offset(y: -8)
@@ -320,7 +337,7 @@ struct DisplayRowView: View {
             } else {
                 Text(display.name ?! "Unknown")
                     .font(.system(size: 22, weight: .black))
-                    .padding(.bottom, xdrSelectorShown ? 0 : 6)
+//                    .padding(.bottom, xdrSelectorShown ? 0 : 6)
             }
 
             if let disabledReason {
@@ -358,11 +375,10 @@ struct DisplayRowView: View {
                     .padding(.vertical, 3)
                 }
             } else {
-                if xdrSelectorShown { sdrXdrSelector }
-
                 sliders
                 adaptiveState
                 volumeSlider
+                if xdrSelectorShown { sdrXdrSelector }
                 appPresetAdaptivePaused
             }
         }.onHover { h in withAnimation { hovering = h } }
@@ -375,8 +391,8 @@ struct DisplayRowView: View {
             SwiftUI.Button(adaptiveStateText.isEmpty ? (systemAdaptive ? "Adapted by the system" : "Adaptive brightness disabled") : adaptiveStateText) {
                 display.adaptive = true
             }
-            .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .secondary.opacity(0.8)))
-            .font(.system(size: 9, weight: .semibold))
+            .buttonStyle(FlatButton(color: .translucid, textColor: .fg.warm.opacity(0.4)))
+            .font(.system(size: 9, weight: .semibold, design: .rounded))
             .onHover { hovering in
                 adaptiveStateText = hovering ? "Adapt brightness with Lunar" : ""
             }
@@ -393,7 +409,7 @@ struct DisplayRowView: View {
                 Text("nits")
             }
             .font(.system(size: 8, weight: .bold, design: .rounded).leading(.tight))
-            .foregroundColor((display.preciseBrightnessContrast < 0.25 && colorScheme == .dark) ? Colors.lightGray.opacity(0.6) : Colors.grayMauve.opacity(0.7))
+            .foregroundColor((display.preciseBrightnessContrast < 0.25 && colorScheme == .dark) ? Color.lightGray.opacity(0.6) : Color.grayMauve.opacity(0.7))
             .any
         #else
             EmptyView().any
@@ -404,7 +420,7 @@ struct DisplayRowView: View {
         SwiftUI.Button("\(degrees)°") {
             display.rotation = degrees
         }
-        .buttonStyle(PickerButton(enumValue: $display.rotation, onValue: degrees))
+        .buttonStyle(PickerButton(onColor: Color.fg.warm.opacity(colorScheme == .dark ? 0.15 : 0.9).opacity(hoveringVideoInput || !dimNonEssentialUI ? 1.0 : 0.2), enumValue: $display.rotation, onValue: degrees))
         .font(.system(size: 12, weight: display.rotation == degrees ? .bold : .semibold, design: .monospaced))
         .help("No rotation")
     }

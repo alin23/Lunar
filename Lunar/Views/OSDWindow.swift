@@ -177,8 +177,6 @@ struct BigSurSlider: View {
         _knobTextColor = .constant(knobTextColor)
 
         _percentage = percentage
-        _sliderWidth = sliderWidth.state
-        _sliderHeight = sliderHeight.state
         _image = imageBinding ?? .constant(image)
         _color = colorBinding ?? .constant(color)
         _showValue = showValue ?? .constant(false)
@@ -189,8 +187,11 @@ struct BigSurSlider: View {
         _enableText = State(initialValue: enableText)
         _mark = mark ?? .constant(0)
 
-        _knobColor = knobColorBinding ?? colorBinding ?? .constant(knobColor ?? colors.accent)
-        _knobTextColor = knobTextColorBinding ?? .constant(knobTextColor ?? ((color ?? Colors.peach).textColor))
+        _knobColor = knobColorBinding ?? colorBinding ?? .constant(knobColor ?? Color.accent)
+        _knobTextColor = knobTextColorBinding ?? .constant(knobTextColor ?? ((color ?? Color.peach).textColor))
+
+        self.sliderWidth = sliderWidth
+        self.sliderHeight = sliderHeight
         self.beforeSettingPercentage = beforeSettingPercentage
         self.onSettingPercentage = onSettingPercentage
         self.insideText = insideText?()
@@ -199,12 +200,10 @@ struct BigSurSlider: View {
     var insideText: AnyView?
 
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.colors) var colors
+
     @EnvironmentObject var env: EnvState
 
     @Binding var percentage: Float
-    @State var sliderWidth: CGFloat = 200
-    @State var sliderHeight: CGFloat = 22
     @Binding var image: String?
     @Binding var color: Color?
     @Binding var backgroundColor: Color
@@ -225,6 +224,8 @@ struct BigSurSlider: View {
     var beforeSettingPercentage: ((Float) -> Void)?
     var onSettingPercentage: ((Float) -> Void)?
 
+    @State var clickedKnob = false
+
     var body: some View {
         GeometryReader { geometry in
             let w = geometry.size.width - sliderHeight
@@ -235,7 +236,7 @@ struct BigSurSlider: View {
                     .foregroundColor(backgroundColor)
                 ZStack(alignment: .leading) {
                     Rectangle()
-                        .foregroundColor(color ?? colors.accent)
+                        .foregroundColor(color ?? Color.accent)
                         .frame(width: cgPercentage == 1 ? geometry.size.width : w * cgPercentage + sliderHeight / 2)
                     if let image {
                         Image(systemName: image)
@@ -247,8 +248,8 @@ struct BigSurSlider: View {
                             .offset(x: 3, y: 0)
                     }
 
-                    knob(cgPercentage: cgPercentage)
-                        .offset(x: cgPercentage * w, y: 0)
+                    // knob(cgPercentage: cgPercentage)
+                    //     .offset(x: cgPercentage * w, y: 0)
 
                     if mark > 0 {
                         RoundedRectangle(cornerRadius: 1, style: .continuous)
@@ -269,7 +270,7 @@ struct BigSurSlider: View {
                         disabled = false
                     }
                     .buttonStyle(FlatButton(
-                        color: Colors.red.opacity(0.7),
+                        color: Color.red.opacity(0.7),
                         textColor: .white,
                         horizontalPadding: 6,
                         verticalPadding: 2
@@ -297,19 +298,24 @@ struct BigSurSlider: View {
                         }
 
                         beforeSettingPercentage?(percentage)
-                        percentage = cap(Float(value.location.x / geometry.size.width), minVal: 0, maxVal: 1)
+                        let x = value.location.x
+                        let w = geometry.size.width
+                        let h = sliderHeight / 2
+                        percentage = Float(x.map(from: (h, w - h), to: (0, 1))).capped(between: 0, and: 1)
                         onSettingPercentage?(percentage)
                     }
                     .onEnded { value in
                         guard acceptsMouseEvents, !disabled else { return }
                         draggingSliderSetter = nil
                         beforeSettingPercentage?(percentage)
-                        percentage = cap(Float(value.location.x / geometry.size.width), minVal: 0, maxVal: 1)
+                        let x = value.location.x
+                        let w = geometry.size.width
+                        let h = sliderHeight / 2
+                        percentage = Float(x.map(from: (h, w - h), to: (0, 1))).capped(between: 0, and: 1)
                         onSettingPercentage?(percentage)
                         env.draggingSlider = false
                     }
             )
-            #if os(macOS)
             .onHover { hov in
                 withAnimation { hovering = hov }
                 guard acceptsMouseEvents, !disabled else { return }
@@ -326,22 +332,31 @@ struct BigSurSlider: View {
                     env.hoveringSlider = false
                 }
             }
-            #endif
+            .overlay(knob(cgPercentage: cgPercentage).offset(x: (cgPercentage - 0.5) * w, y: 0), alignment: .center)
         }
         .frame(width: sliderWidth, height: sliderHeight)
         .onChange(of: env.draggingSlider) { tracking in
             AppleNativeControl.sliderTracking = tracking || hovering
             GammaControl.sliderTracking = tracking || hovering
             DDCControl.sliderTracking = tracking || hovering
+            withAnimation(.easeIn(duration: 0.2)) {
+                clickedKnob = tracking && hovering
+            }
         }
         .onChange(of: hovering) { tracking in
             AppleNativeControl.sliderTracking = tracking || env.draggingSlider
             GammaControl.sliderTracking = tracking || env.draggingSlider
             DDCControl.sliderTracking = tracking || env.draggingSlider
+            withAnimation(.easeIn(duration: 0.2)) {
+                clickedKnob = tracking && env.draggingSlider
+            }
         }
     }
 
-    func knob(cgPercentage: CGFloat) -> some View {
+    private var sliderWidth: CGFloat = 200
+    private var sliderHeight: CGFloat = 22
+
+    @ViewBuilder private func knob(cgPercentage: CGFloat) -> some View {
         ZStack {
             if showValue, let insideText {
                 insideText
@@ -350,57 +365,55 @@ struct BigSurSlider: View {
             }
             Circle()
                 .foregroundColor(knobColor)
-                .shadow(color: Colors.blackMauve.opacity(percentage > 0.3 ? 0.3 : percentage.d), radius: 5, x: -1, y: 0)
-                .frame(width: sliderHeight, height: sliderHeight, alignment: .trailing)
-                .brightness(env.draggingSlider && hovering ? -0.2 : 0)
+                .shadow(color: Color.black.opacity((percentage > 0.3 ? 0.3 : percentage.d) * (clickedKnob ? 1 : 0.3)), radius: clickedKnob ? 6 : 4, x: -1, y: clickedKnob ? 2 : 0)
+                .frame(width: sliderHeight, height: sliderHeight, alignment: .center)
+                .brightness(clickedKnob ? 0.05 : 0)
             if showValue {
                 Text((shownValue?.f ?? (percentage * 100)).str(decimals: 0))
                     .foregroundColor(knobTextColor)
                     .font(.system(size: 8, weight: .medium, design: .monospaced))
                     .allowsHitTesting(false)
             }
-        }
+        }.allowsHitTesting(false)
     }
 
-    #if os(macOS)
-        func trackScrollWheel() {
-            guard scrollWheelListener == nil else { return }
-            scrollWheelListener = NSApp.publisher(for: \.currentEvent)
-                .filter { event in event?.type == .scrollWheel }
-                .throttle(for: .milliseconds(20), scheduler: DispatchQueue.main, latest: true)
-                .sink { event in
-                    guard hovering, env.hoveringSlider, let event, event.momentumPhase.rawValue == 0 else {
-                        if let event, event.scrollingDeltaX + event.scrollingDeltaY == 0, event.phase.rawValue == 0,
-                           env.draggingSlider
-                        {
-                            env.draggingSlider = false
-                        }
-                        return
+    private func trackScrollWheel() {
+        guard scrollWheelListener == nil else { return }
+        scrollWheelListener = NSApp.publisher(for: \.currentEvent)
+            .filter { event in event?.type == .scrollWheel }
+            .throttle(for: .milliseconds(20), scheduler: DispatchQueue.main, latest: true)
+            .sink { event in
+                guard hovering, env.hoveringSlider, let event, event.momentumPhase.rawValue == 0 else {
+                    if let event, event.scrollingDeltaX + event.scrollingDeltaY == 0, event.phase.rawValue == 0,
+                       env.draggingSlider
+                    {
+                        env.draggingSlider = false
                     }
-
-                    let delta = Float(event.scrollingDeltaX) * (event.isDirectionInvertedFromDevice ? -1 : 1)
-                        + Float(event.scrollingDeltaY) * (event.isDirectionInvertedFromDevice ? 1 : -1)
-
-                    switch event.phase {
-                    case .changed, .began, .mayBegin:
-                        if !env.draggingSlider {
-                            env.draggingSlider = true
-                        }
-                    case .ended, .cancelled, .stationary:
-                        if env.draggingSlider {
-                            env.draggingSlider = false
-                        }
-                    default:
-                        if delta == 0, env.draggingSlider {
-                            env.draggingSlider = false
-                        }
-                    }
-                    beforeSettingPercentage?(percentage)
-                    percentage = cap(percentage - (delta / 100), minVal: 0, maxVal: 1)
-                    onSettingPercentage?(percentage)
+                    return
                 }
-        }
-    #endif
+
+                let delta = Float(event.scrollingDeltaX) * (event.isDirectionInvertedFromDevice ? -1 : 1)
+                    + Float(event.scrollingDeltaY) * (event.isDirectionInvertedFromDevice ? 1 : -1)
+
+                switch event.phase {
+                case .changed, .began, .mayBegin:
+                    if !env.draggingSlider {
+                        env.draggingSlider = true
+                    }
+                case .ended, .cancelled, .stationary:
+                    if env.draggingSlider {
+                        env.draggingSlider = false
+                    }
+                default:
+                    if delta == 0, env.draggingSlider {
+                        env.draggingSlider = false
+                    }
+                }
+                beforeSettingPercentage?(percentage)
+                percentage = cap(percentage - (delta / 100), minVal: 0, maxVal: 1)
+                onSettingPercentage?(percentage)
+            }
+    }
 }
 
 extension NSEvent.Phase {
@@ -425,98 +438,6 @@ var hoveringSliderSetter: DispatchWorkItem? {
 var draggingSliderSetter: DispatchWorkItem? {
     didSet { oldValue?.cancel() }
 }
-
-// MARK: - Colors
-
-struct Colors {
-    init(_ colorScheme: SwiftUI.ColorScheme = .light, accent: Color) {
-        self.accent = accent
-        self.colorScheme = colorScheme
-        bg = BG(colorScheme: colorScheme)
-        fg = FG(colorScheme: colorScheme)
-    }
-
-    struct FG {
-        var colorScheme: SwiftUI.ColorScheme
-
-        var isDark: Bool { colorScheme == .dark }
-        var isLight: Bool { colorScheme == .light }
-
-        var gray: Color { isDark ? Colors.lightGray : Colors.darkGray }
-        var primary: Color { isDark ? .white : .black }
-    }
-
-    struct BG {
-        var colorScheme: SwiftUI.ColorScheme
-
-        var isDark: Bool { colorScheme == .dark }
-        var isLight: Bool { colorScheme == .light }
-
-        var gray: Color { isDark ? Colors.darkGray : Colors.lightGray }
-        var primary: Color { isDark ? .black : .white }
-    }
-
-    static var light = Colors(.light, accent: Colors.lunarYellow)
-    static var dark = Colors(.dark, accent: Colors.peach)
-
-    static let darkGray = Color(hue: 0, saturation: 0.01, brightness: 0.22)
-    static let blackGray = Color(hue: 0.03, saturation: 0.12, brightness: 0.18)
-    static let lightGray = Color(hue: 0, saturation: 0.0, brightness: 0.92)
-
-    static let red = Color(hue: 0.98, saturation: 0.82, brightness: 1.00)
-    static let lightGold = Color(hue: 0.09, saturation: 0.28, brightness: 0.94)
-    static let grayMauve = Color(hue: 252 / 360, saturation: 0.29, brightness: 0.43)
-    static let mauve = Color(hue: 252 / 360, saturation: 0.29, brightness: 0.23)
-    static let pinkMauve = Color(hue: 0.95, saturation: 0.76, brightness: 0.42)
-    static let blackMauve = Color(
-        hue: 252 / 360,
-        saturation: 0.08,
-        brightness:
-        0.12
-    )
-    static let yellow = Color(hue: 39 / 360, saturation: 1.0, brightness: 0.64)
-    static let lunarYellow = Color(hue: 0.11, saturation: 0.47, brightness: 1.00)
-    static let sunYellow = Color(hue: 0.1, saturation: 0.57, brightness: 1.00)
-    static let peach = Color(hue: 0.08, saturation: 0.42, brightness: 1.00)
-    static let blue = Color(hue: 214 / 360, saturation: 1.0, brightness: 0.54)
-    static let green = Color(hue: 141 / 360, saturation: 0.59, brightness: 0.58)
-    static let lightGreen = Color(hue: 141 / 360, saturation: 0.50, brightness: 0.83)
-
-    static let xdr = Color(hue: 0.61, saturation: 0.26, brightness: 0.78)
-    static let subzero = Color(hue: 0.98, saturation: 0.56, brightness: 1.00)
-
-    var accent: Color
-    var colorScheme: SwiftUI.ColorScheme
-
-    var bg: BG
-    var fg: FG
-
-    var isDark: Bool { colorScheme == .dark }
-    var isLight: Bool { colorScheme == .light }
-    var inverted: Color { isDark ? .black : .white }
-    var invertedGray: Color { isDark ? Colors.darkGray : Colors.lightGray }
-    var gray: Color { isDark ? Colors.lightGray : Colors.darkGray }
-}
-
-// MARK: - ColorsKey
-
-private struct ColorsKey: EnvironmentKey {
-    static let defaultValue = Colors.light
-}
-
-extension EnvironmentValues {
-    var colors: Colors {
-        get { self[ColorsKey.self] }
-        set { self[ColorsKey.self] = newValue }
-    }
-}
-
-extension View {
-    func colors(_ colors: Colors) -> some View {
-        environment(\.colors, colors)
-    }
-}
-
 struct CheckerView: View {
     var white: Int
     var squareSize: CGFloat
@@ -698,7 +619,6 @@ let AM = ArrangementManager()
 
 struct ArrangementOSDView: View {
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.colors) var colors
 
     @ObservedObject var am = AM
     @State var displayID: CGDirectDisplayID
@@ -708,7 +628,7 @@ struct ArrangementOSDView: View {
         let selected = am.idsOrderedLeftToRight.contains(displayID)
         ZStack {
             Text(number.s).font(.system(size: 60, weight: .black, design: .monospaced))
-                .foregroundColor(selected ? Colors.blackMauve : .primary.opacity(0.75))
+                .foregroundColor(selected ? Color.blackMauve : .primary.opacity(0.75))
         }
         .padding(.vertical, 20)
         .padding(.horizontal, 30)
@@ -716,20 +636,18 @@ struct ArrangementOSDView: View {
             ZStack {
                 VisualEffectBlur(material: .osd, blendingMode: .behindWindow, state: .active)
                 if selected {
-                    Colors.peach.opacity(0.8)
+                    Color.peach.opacity(0.8)
                 }
             }
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         )
         .frame(width: NATIVE_OSD_WIDTH, height: NATIVE_OSD_WIDTH, alignment: .center)
         .fixedSize()
-        .colors(colorScheme == .dark ? .dark : .light)
     }
 }
 
 struct BrightnessOSDView: View {
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.colors) var colors
 
     @ObservedObject var osd: OSDState
 
@@ -779,7 +697,6 @@ struct BrightnessOSDView: View {
         )
         .frame(width: NATIVE_OSD_WIDTH, height: NATIVE_OSD_WIDTH, alignment: .center)
         .fixedSize()
-        .colors(colorScheme == .dark ? .dark : .light)
     }
 }
 
@@ -787,7 +704,7 @@ struct BrightnessOSDView: View {
 
 struct AutoOSDView: View {
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.colors) var colors
+
     @ObservedObject var display: Display
     @Binding var done: Bool
     @State var title: String
@@ -845,16 +762,15 @@ struct AutoOSDView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                     .padding(.horizontal, 24)
                     .padding(.vertical, 20)
-                    .shadow(color: Colors.blackMauve.opacity(0.2), radius: 8, x: 0, y: 4)
+                    .shadow(color: Color.blackMauve.opacity(0.2), radius: 8, x: 0, y: 4)
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill((colorScheme == .dark ? Colors.blackMauve : Color.white).opacity(0.4))
+                    .fill((colorScheme == .dark ? Color.blackMauve : Color.white).opacity(0.4))
                     .padding(.horizontal, 24)
                     .padding(.vertical, 20)
             }
         )
         .padding(.horizontal, 10)
         .padding(.vertical, 30)
-        .colors(colorScheme == .dark ? .dark : .light)
         .onAppear {
             let step = 0.01 / (AUTO_OSD_DEBOUNCE_SECONDS - 0.5).f
             timer = Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) { t in
@@ -966,10 +882,9 @@ extension Display {
                         done: .oneway { [weak self] in self?.blackOutEnabled ?? true },
                         title: "Turning off",
                         subtitle: name,
-                        color: Colors.red,
+                        color: Color.red,
                         icon: "power.circle.fill"
                     )
-                    .colors(darkMode ? .dark : .light)
                     .environmentObject(EnvState())
                 ),
                 display: self, releaseWhenClosed: true
@@ -993,10 +908,9 @@ extension Display {
                         done: .oneway { [weak self] in (self?.enhanced ?? xdrEnabled) == xdrEnabled },
                         title: xdrEnabled ? "Activating XDR" : "Disabling XDR",
                         subtitle: reason,
-                        color: Colors.xdr,
+                        color: Color.xdr,
                         icon: "sun.max.circle.fill"
                     )
-                    .colors(darkMode ? .dark : .light)
                     .environmentObject(EnvState())
                 ),
                 display: self, releaseWhenClosed: true
@@ -1015,7 +929,7 @@ import SwiftUI
 
 // MARK: - PanelWindow
 
-final class PanelWindow: NSWindow {
+final class PanelWindow: NSPanel {
     convenience init(swiftuiView: AnyView, level: NSWindow.Level = .floating) {
         self.init(contentViewController: NSHostingController(rootView: swiftuiView))
 
@@ -1028,12 +942,12 @@ final class PanelWindow: NSWindow {
         contentView?.layer?.masksToBounds = false
         isOpaque = false
         hasShadow = false
-        styleMask = [.fullSizeContentView]
+        styleMask = [.fullSizeContentView, .nonactivatingPanel]
         hidesOnDeactivate = false
         isMovableByWindowBackground = false
     }
 
-    override var canBecomeKey: Bool { true }
+//    override var canBecomeKey: Bool { true }
 
     func forceClose() {
         wc.close()

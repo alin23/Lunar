@@ -170,6 +170,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .refreshValues,
     .sensorPollingSeconds,
     .showQuickActions,
+    .dimNonEssentialUI,
     .smoothTransition,
     .brightnessTransition,
     .scheduleTransition,
@@ -178,6 +179,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .showBrightnessMenuBar,
     .showOnlyExternalBrightnessMenuBar,
     .showOrientationInQuickActions,
+    .showOrientationForBuiltinInQuickActions,
     .showInputInQuickActions,
     .sunrise,
     .sunset,
@@ -793,11 +795,13 @@ func initCache() {
     cacheKey(.scheduleTransition)
     cacheKey(.refreshValues)
     cacheKey(.showQuickActions)
+    cacheKey(.dimNonEssentialUI)
     cacheKey(.manualLocation)
     cacheKey(.startAtLogin)
     cacheKey(.showBrightnessMenuBar)
     cacheKey(.showOnlyExternalBrightnessMenuBar)
     cacheKey(.showOrientationInQuickActions)
+    cacheKey(.showOrientationForBuiltinInQuickActions)
     cacheKey(.showInputInQuickActions)
     cacheKey(.clamshellModeDetection)
     cacheKey(.sleepInClamshellMode)
@@ -898,6 +902,7 @@ let startAtLoginPublisher = pub(.startAtLogin)
 let showBrightnessMenuBarPublisher = pub(.showBrightnessMenuBar)
 let showOnlyExternalBrightnessMenuBarPublisher = pub(.showOnlyExternalBrightnessMenuBar)
 let showOrientationInQuickActionsPublisher = pub(.showOrientationInQuickActions)
+let showOrientationForBuiltinInQuickActionsPublisher = pub(.showOrientationForBuiltinInQuickActions)
 let autoBlackoutBuiltinPublisher = pub(.autoBlackoutBuiltin)
 let autoSubzeroPublisher = pub(.autoSubzero)
 let autoXdrPublisher = pub(.autoXdr)

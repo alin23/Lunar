@@ -549,7 +549,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             supportsEnhance = getSupportsEnhance()
             showVolumeSlider = canChangeVolume && CachedDefaults[.showVolumeSlider]
             noDDCOrMergedBrightnessContrast = !hasDDC || CachedDefaults[.mergeBrightnessContrast]
-            showOrientation = canRotate && CachedDefaults[.showOrientationInQuickActions]
+            showOrientation = canRotate && CachedDefaults[.showOrientationInQuickActions] && (!isBuiltin || CachedDefaults[.showOrientationForBuiltinInQuickActions])
             withoutModeChangeAsk {
                 withoutApply {
                     rotation = CGDisplayRotation(id).intround
@@ -693,7 +693,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             supportsEnhance = getSupportsEnhance()
             showVolumeSlider = canChangeVolume && CachedDefaults[.showVolumeSlider]
             noDDCOrMergedBrightnessContrast = !hasDDC || CachedDefaults[.mergeBrightnessContrast]
-            showOrientation = canRotate && CachedDefaults[.showOrientationInQuickActions]
+            showOrientation = canRotate && CachedDefaults[.showOrientationInQuickActions] && (!isBuiltin || CachedDefaults[.showOrientationForBuiltinInQuickActions])
             withoutModeChangeAsk {
                 withoutApply {
                     rotation = CGDisplayRotation(id).intround
@@ -1909,9 +1909,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         didSet {
             rotationTooltip = canRotate ? nil : "This monitor doesn't support rotation"
             #if DEBUG
-                showOrientation = CachedDefaults[.showOrientationInQuickActions]
+                showOrientation = CachedDefaults[.showOrientationInQuickActions] && (!isBuiltin || CachedDefaults[.showOrientationForBuiltinInQuickActions])
             #else
-                showOrientation = canRotate && CachedDefaults[.showOrientationInQuickActions]
+                showOrientation = canRotate && CachedDefaults[.showOrientationInQuickActions] && (!isBuiltin || CachedDefaults[.showOrientationForBuiltinInQuickActions])
             #endif
         }
     }
@@ -2988,186 +2988,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     #endif
 
-    var isActiveSyncSource: Bool { DC.sourceDisplay.serial == serial }
-    func resetSendingValues() {
-        mainAsync { [weak self] in
-            self?.sendingBrightness = false
-            self?.sendingContrast = false
-            self?.sendingInput = false
-            self?.sendingVolume = false
-        }
-    }
-
-    func refetchScreens() {
-        nsScreen = getScreen()
-    }
-
-    func getPowerOffEnabled(hasDDC: Bool? = nil) -> Bool {
-        guard active else { return false }
-        if blackOutEnabled { return true }
-
-        return (
-            DC.activeDisplays.count > 1 ||
-                CachedDefaults[.allowBlackOutOnSingleScreen] ||
-                (hasDDC ?? self.hasDDC)
-        ) && !isDummy
-    }
-
-    func getPowerOffTooltip(hasDDC: Bool? = nil) -> String {
-        #if arch(arm64)
-            let disconnect: Bool
-            if #available(macOS 13, *) {
-                disconnect = CachedDefaults[.newBlackOutDisconnect]
-            } else {
-                disconnect = false
-            }
-        #else
-            let disconnect = false
-        #endif
-
-        guard !(hasDDC ?? self.hasDDC) else {
-            return """
-            \(
-                disconnect
-                    ? "BlackOut disconnects a monitor in software, freeing up GPU resources and removing it from the screen arrangement."
-                    : "BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0."
-            )
-
-            Can also be toggled with the keyboard using Ctrl-Cmd-6.
-
-            Hold the following keys while clicking the button (or while pressing the hotkey) to change BlackOut behaviour:
-            - Shift: make the screen black without \(disconnect ? "disconnecting" : "mirroring")
-            - Option: turn off monitor completely using DDC
-            - Option and Shift: BlackOut other monitors and keep this one visible
-
-            Caveats for DDC power off:
-              • works only if the monitor can be controlled through DDC
-              • can't be used to power on the monitor
-              • when a monitor is turned off or in standby, it does not accept commands from a connected device
-              • remember to keep holding the Option key for 2 seconds after you pressed the button to account for possible DDC delays
-
-            Emergency Kill Switch: press the ⌘ Command key more than 8 times in a row to force disable BlackOut.
-            """
-        }
-        guard DC.activeDisplays.count > 1 || CachedDefaults[.allowBlackOutOnSingleScreen] else {
-            return """
-            At least 2 screens need to be visible for this to work.
-
-            The option can also be enabled for a single screen in Advanced settings.
-            """
-        }
-
-        return """
-        \(
-            disconnect
-                ? "BlackOut disconnects a monitor in software, freeing up GPU resources and removing it from the screen arrangement."
-                : "BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0."
-        )
-
-        Can also be toggled with the keyboard using Ctrl-Cmd-6.
-
-        Hold the following keys while clicking the button (or while pressing the hotkey) to change BlackOut behaviour:
-        - Shift: make the screen black without \(disconnect ? "disconnecting" : "mirroring")
-        - Option and Shift: BlackOut other monitors and keep this one visible
-
-        Emergency Kill Switch: press the ⌘ Command key more than 8 times in a row to force disable BlackOut.
-        """
-    }
-
-    func powerOn() {
-        DC.blackOut(
-            display: id,
-            state: .off,
-            mirroringAllowed: blackOutMirroringAllowed
-        )
-    }
-
-    func powerOff() {
-        guard DC.activeDisplays.count > 1 || CachedDefaults[.allowBlackOutOnSingleScreen] else { return }
-
-        if hasDDC, KM.optionKeyPressed, !KM.shiftKeyPressed {
-            _ = control?.setPower(.off)
-            return
-        }
-
-        guard lunarProOnTrial || lunarProActive else {
-            if let url = URL(string: "https://lunar.fyi/#blackout") {
-                NSWorkspace.shared.open(url)
-            }
-            return
-        }
-
-        if KM.optionKeyPressed, KM.shiftKeyPressed, DC.activeDisplayCount > 1 {
-            let blackOutEnabled = otherDisplays.contains(where: \.blackOutEnabled)
-            otherDisplays.forEach {
-                lastBlackOutToggleDate = .distantPast
-                DC.blackOut(
-                    display: $0.id,
-                    state: blackOutEnabled ? .off : .on,
-                    mirroringAllowed: false
-                )
-            }
-            return
-        }
-
-        #if arch(arm64)
-            if DC.activeDisplayCount > 1 {
-                let shouldDisconnect: Bool = if CachedDefaults[.newBlackOutDisconnect] {
-                    !KM.commandKeyPressed
-                } else {
-                    KM.commandKeyPressed
-                }
-
-                if #available(macOS 13, *), !KM.shiftKeyPressed, !blackOutEnabled, DC.activeDisplayCount > 1, shouldDisconnect {
-                    DC.dis(id)
-                    return
-                }
-            }
-        #endif
-
-        DC.blackOut(
-            display: id,
-            state: blackOutEnabled ? .off : .on,
-            mirroringAllowed: !KM.shiftKeyPressed && blackOutMirroringAllowed && DC.activeDisplayCount > 1
-        )
-    }
-
-    func setAudioIdentifier(from dict: NSDictionary) {
-        #if !arch(arm64)
-            guard let prefsKey = dict["IODisplayPrefsKey"] as? String,
-                  let match = AUDIO_IDENTIFIER_UUID_PATTERN.findFirst(in: prefsKey),
-                  let g1 = match.group(at: 1), let g2 = match.group(at: 2), let g3 = match.group(at: 3)
-            else { return }
-            audioIdentifier = "\(g2)\(g1)-\(g3)".uppercased()
-        #endif
-    }
-
-    func initHotkeyPopoverController() -> HotkeyPopoverController? {
-        mainThread {
-            guard let popover = _hotkeyPopover else {
-                _hotkeyPopover = NSPopover()
-                if let popover = _hotkeyPopover, popover.contentViewController == nil, let stb = NSStoryboard.main,
-                   let controller = stb.instantiateController(
-                       withIdentifier: NSStoryboard.SceneIdentifier("HotkeyPopoverController")
-                   ) as? HotkeyPopoverController
-                {
-                    INPUT_HOTKEY_POPOVERS[serial] = _hotkeyPopover
-                    popover.contentViewController = controller
-                    popover.contentViewController!.loadView()
-                }
-
-                return _hotkeyPopover?.contentViewController as? HotkeyPopoverController
-            }
-            return popover.contentViewController as? HotkeyPopoverController
-        }
-    }
-
-    #if DEBUG
-        @Published @objc dynamic var showOrientation = false
-    #else
-        @Published @objc dynamic var showOrientation = false
-    #endif
-
     enum ConnectionType: String, DefaultsSerializable, Codable {
         case displayport
         case usbc
@@ -3221,6 +3041,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     static var ddcWorkingCount: [String: Int] = [:]
     static var ddcNotWorkingCount: [String: Int] = [:]
 
+    @Published @objc dynamic var showOrientation = false
+
     @Published @objc dynamic var showVolumeSlider = false
     lazy var preciseBrightnessKey = "setPreciseBrightness-\(serial)"
     lazy var preciseContrastKey = "setPreciseContrast-\(serial)"
@@ -3241,6 +3063,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     #endif
     @objc dynamic lazy var otherDisplays: [Display] = DC.activeDisplayList.filter { $0.serial != serial }
 
+    @Published var userVolume = 0.5
+
+    @objc dynamic var useAlternateInputSwitching = false
+
     @Atomic var userAdjusting = false {
         didSet {
             mainAsync { [weak self] in
@@ -3255,187 +3081,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc dynamic var isTV: Bool {
         (panel?.isTV ?? false) && edidName.contains("TV")
     }
-
-    @discardableResult
-    static func configure(_ action: (CGDisplayConfigRef) -> Bool) -> Bool {
-        var configRef: CGDisplayConfigRef?
-        var err = CGBeginDisplayConfiguration(&configRef)
-        guard err == .success, let config = configRef else {
-            log.error("Error with CGBeginDisplayConfiguration: \(err)")
-            return false
-        }
-
-        guard action(config) else {
-            _ = CGCancelDisplayConfiguration(config)
-            return false
-        }
-
-        err = CGCompleteDisplayConfiguration(config, .permanently)
-        guard err == .success else {
-            log.error("Error with CGCompleteDisplayConfiguration")
-            _ = CGCancelDisplayConfiguration(config)
-            return false
-        }
-
-        return true
-    }
-
-    func setNotchState() {
-        mainAsync {
-            if #available(macOS 12.0, *), self.isMacBook {
-                self.hasNotch = (self.nsScreen?.safeAreaInsets.top ?? 0) > 0 || self.panelMode?.withNotch(modes: self.panelModes) != nil
-            } else {
-                self.hasNotch = false
-            }
-
-            guard self.isMacBook, self.hasNotch, let mode = self.panelMode else { return }
-
-            self.withoutApply {
-                self.notchEnabled = mode.withoutNotch(modes: self.panelModes) != nil
-            }
-        }
-    }
-
-    func observeBrightnessChangeDS() -> Bool {
-        Self.observeBrightnessChangeDS(id)
-    }
-
-    func sliderValueToBrightness(_ brightness: PreciseBrightness) -> NSNumber {
-        (cap(brightness, minVal: 0.0, maxVal: 1.0).map(from: (0.0, 1.0), to: (minBrightness.doubleValue / 100.0, maxBrightness.doubleValue / 100.0)) * 100).intround.ns
-    }
-
-    func sliderValueToContrast(_ contrast: PreciseContrast) -> NSNumber {
-        (cap(contrast, minVal: 0.0, maxVal: 1.0).map(from: (0.0, 1.0), to: (minContrast.doubleValue / 100.0, maxContrast.doubleValue / 100.0)) * 100).intround.ns
-    }
-
-    func brightnessToSliderValue(_ brightness: NSNumber) -> PreciseBrightness {
-        cap(brightness.doubleValue, minVal: 0, maxVal: 100).map(from: (minBrightness.doubleValue, maxBrightness.doubleValue), to: (0, 100)) / 100.0
-    }
-
-    func contrastToSliderValue(_ contrast: NSNumber, merged: Bool = true) -> PreciseContrast {
-        let c = cap(contrast.doubleValue, minVal: 0, maxVal: 100).map(from: (minContrast.doubleValue, maxContrast.doubleValue), to: (0, 100)) / 100.0
-
-        return merged ? pow(c, 2) : c
-    }
-
-    func sliderValueToBrightnessContrast(_ value: Double) -> (Brightness, Contrast) {
-        var br = brightness.uint16Value
-        var cr = contrast.uint16Value
-
-        if !lockedBrightness || hasSoftwareControl {
-            let brd = (cap(value, minVal: 0.0, maxVal: 1.0).map(from: (0.0, 1.0), to: (minBrightness.doubleValue / 100.0, maxBrightness.doubleValue / 100.0)) * 100)
-            br = brd.isNaN ? br : brd.intround.u16
-        }
-        if !lockedContrast {
-            let crd = (pow(cap(value, minVal: 0.0, maxVal: 1.0), 0.5).map(from: (0.0, 1.0), to: (minContrast.doubleValue / 100.0, maxContrast.doubleValue / 100.0)) * 100)
-            cr = crd.isNaN ? cr : crd.intround.u16
-        }
-
-        return (br, cr)
-    }
-
-    func updateCornerWindow() {
-        mainThread {
-            guard cornerRadius.intValue > 0, active, !isInHardwareMirrorSet,
-                  !isIndependentDummy, let screen = nsScreen ?? primaryMirrorScreen
-            else {
-                cornerWindowControllerTopLeft?.close()
-                cornerWindowControllerTopRight?.close()
-                cornerWindowControllerBottomLeft?.close()
-                cornerWindowControllerBottomRight?.close()
-                cornerWindowControllerTopLeft = nil
-                cornerWindowControllerTopRight = nil
-                cornerWindowControllerBottomLeft = nil
-                cornerWindowControllerBottomRight = nil
-                return
-            }
-
-            let create: (inout NSWindowController?, ScreenCorner) -> Void = { wc, corner in
-                createWindow(
-                    "cornerWindowController",
-                    controller: &wc,
-                    screen: screen,
-                    show: true,
-                    backgroundColor: .clear,
-                    level: .hud,
-                    stationary: true,
-                    corner: corner,
-                    size: NSSize(width: 50, height: 50)
-                )
-                if let wc = wc as? CornerWindowController {
-                    wc.corner = corner
-                    wc.display = self
-                }
-            }
-
-            create(&cornerWindowControllerTopLeft, .topLeft)
-            create(&cornerWindowControllerTopRight, .topRight)
-            create(&cornerWindowControllerBottomLeft, .bottomLeft)
-            create(&cornerWindowControllerBottomRight, .bottomRight)
-        }
-    }
-
-    #if arch(arm64)
-        var disconnected: Bool { DC.possiblyDisconnectedDisplays[id]?.serial == serial }
-    #endif
-
-    static let LUX_TO_NITS: [Double: Double] = [
-        0: 40,
-        13: 54,
-        23: 61,
-        39: 76,
-        71: 87,
-        80: 100,
-        100: 105,
-        135: 120,
-        160: 134,
-        190: 147,
-        224: 160,
-        313: 193,
-        565: 289,
-        702: 340,
-        800: 400,
-        1000: 500,
-    ]
-
-    lazy var syncSourcePriority: Int = {
-        if isBuiltin {
-            return 1
-        }
-        if panel?.isAppleProDisplay ?? false {
-            return 2
-        }
-        if isProDisplayXDR() {
-            return 3
-        }
-        if isStudioDisplay() {
-            return 4
-        }
-        if isUltraFine() {
-            return 5
-        }
-        if isThunderbolt() {
-            return 6
-        }
-        if isLEDCinema() {
-            return 7
-        }
-        return 100
-    }()
-
-    @Published var percentage: Double? = 0.5
-
-    var previousBrightnessMapping: ExpiringOptional<[AutoLearnMapping]> = nil
-    var previousContrastMapping: ExpiringOptional<[AutoLearnMapping]> = nil
-    var previousNitsBrightnessMapping: ExpiringOptional<[AutoLearnMapping]> = nil
-    var previousNitsContrastMapping: ExpiringOptional<[AutoLearnMapping]> = nil
-
-    @Published var fullRangeBrightness = 0.5
-    @Published var fullRangeUserBrightness = 0.5
-    @Published var userContrast = 0.5
-    @Published var userVolume = 0.5
-
-    @objc dynamic var useAlternateInputSwitching = false
 
     @objc dynamic var isLG: Bool { vendor == .lg }
 
@@ -4440,6 +4085,30 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
+    @discardableResult
+    static func configure(_ action: (CGDisplayConfigRef) -> Bool) -> Bool {
+        var configRef: CGDisplayConfigRef?
+        var err = CGBeginDisplayConfiguration(&configRef)
+        guard err == .success, let config = configRef else {
+            log.error("Error with CGBeginDisplayConfiguration: \(err)")
+            return false
+        }
+
+        guard action(config) else {
+            _ = CGCancelDisplayConfiguration(config)
+            return false
+        }
+
+        err = CGCompleteDisplayConfiguration(config, .permanently)
+        guard err == .success else {
+            log.error("Error with CGCompleteDisplayConfiguration")
+            _ = CGCancelDisplayConfiguration(config)
+            return false
+        }
+
+        return true
+    }
+
     static func insertElevationDataPoint(_ mapping: AutoLearnMapping, in values: [AutoLearnMapping]) -> [AutoLearnMapping]? {
         guard let solar = LocationMode.specific.geolocation?.solar,
               let noon = solar.solarNoonPosition?.elevation,
@@ -4458,6 +4127,335 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         return values
+    }
+
+    func setNotchState() {
+        mainAsync {
+            if #available(macOS 12.0, *), self.isMacBook {
+                self.hasNotch = (self.nsScreen?.safeAreaInsets.top ?? 0) > 0 || self.panelMode?.withNotch(modes: self.panelModes) != nil
+            } else {
+                self.hasNotch = false
+            }
+
+            guard self.isMacBook, self.hasNotch, let mode = self.panelMode else { return }
+
+            self.withoutApply {
+                self.notchEnabled = mode.withoutNotch(modes: self.panelModes) != nil
+            }
+        }
+    }
+
+    func observeBrightnessChangeDS() -> Bool {
+        Self.observeBrightnessChangeDS(id)
+    }
+
+    func sliderValueToBrightness(_ brightness: PreciseBrightness) -> NSNumber {
+        (cap(brightness, minVal: 0.0, maxVal: 1.0).map(from: (0.0, 1.0), to: (minBrightness.doubleValue / 100.0, maxBrightness.doubleValue / 100.0)) * 100).intround.ns
+    }
+
+    func sliderValueToContrast(_ contrast: PreciseContrast) -> NSNumber {
+        (cap(contrast, minVal: 0.0, maxVal: 1.0).map(from: (0.0, 1.0), to: (minContrast.doubleValue / 100.0, maxContrast.doubleValue / 100.0)) * 100).intround.ns
+    }
+
+    func brightnessToSliderValue(_ brightness: NSNumber) -> PreciseBrightness {
+        cap(brightness.doubleValue, minVal: 0, maxVal: 100).map(from: (minBrightness.doubleValue, maxBrightness.doubleValue), to: (0, 100)) / 100.0
+    }
+
+    func contrastToSliderValue(_ contrast: NSNumber, merged: Bool = true) -> PreciseContrast {
+        let c = cap(contrast.doubleValue, minVal: 0, maxVal: 100).map(from: (minContrast.doubleValue, maxContrast.doubleValue), to: (0, 100)) / 100.0
+
+        return merged ? pow(c, 2) : c
+    }
+
+    func sliderValueToBrightnessContrast(_ value: Double) -> (Brightness, Contrast) {
+        var br = brightness.uint16Value
+        var cr = contrast.uint16Value
+
+        if !lockedBrightness || hasSoftwareControl {
+            let brd = (cap(value, minVal: 0.0, maxVal: 1.0).map(from: (0.0, 1.0), to: (minBrightness.doubleValue / 100.0, maxBrightness.doubleValue / 100.0)) * 100)
+            br = brd.isNaN ? br : brd.intround.u16
+        }
+        if !lockedContrast {
+            let crd = (pow(cap(value, minVal: 0.0, maxVal: 1.0), 0.5).map(from: (0.0, 1.0), to: (minContrast.doubleValue / 100.0, maxContrast.doubleValue / 100.0)) * 100)
+            cr = crd.isNaN ? cr : crd.intround.u16
+        }
+
+        return (br, cr)
+    }
+
+    func updateCornerWindow() {
+        mainThread {
+            guard cornerRadius.intValue > 0, active, !isInHardwareMirrorSet,
+                  !isIndependentDummy, let screen = nsScreen ?? primaryMirrorScreen
+            else {
+                cornerWindowControllerTopLeft?.close()
+                cornerWindowControllerTopRight?.close()
+                cornerWindowControllerBottomLeft?.close()
+                cornerWindowControllerBottomRight?.close()
+                cornerWindowControllerTopLeft = nil
+                cornerWindowControllerTopRight = nil
+                cornerWindowControllerBottomLeft = nil
+                cornerWindowControllerBottomRight = nil
+                return
+            }
+
+            let create: (inout NSWindowController?, ScreenCorner) -> Void = { wc, corner in
+                createWindow(
+                    "cornerWindowController",
+                    controller: &wc,
+                    screen: screen,
+                    show: true,
+                    backgroundColor: .clear,
+                    level: .hud,
+                    stationary: true,
+                    corner: corner,
+                    size: NSSize(width: 50, height: 50)
+                )
+                if let wc = wc as? CornerWindowController {
+                    wc.corner = corner
+                    wc.display = self
+                }
+            }
+
+            create(&cornerWindowControllerTopLeft, .topLeft)
+            create(&cornerWindowControllerTopRight, .topRight)
+            create(&cornerWindowControllerBottomLeft, .bottomLeft)
+            create(&cornerWindowControllerBottomRight, .bottomRight)
+        }
+    }
+
+    #if arch(arm64)
+        var disconnected: Bool { DC.possiblyDisconnectedDisplays[id]?.serial == serial }
+    #endif
+
+    static let LUX_TO_NITS: [Double: Double] = [
+        0: 40,
+        13: 54,
+        23: 61,
+        39: 76,
+        71: 87,
+        80: 100,
+        100: 105,
+        135: 120,
+        160: 134,
+        190: 147,
+        224: 160,
+        313: 193,
+        565: 289,
+        702: 340,
+        800: 400,
+        1000: 500,
+    ]
+
+    lazy var syncSourcePriority: Int = {
+        if isBuiltin {
+            return 1
+        }
+        if panel?.isAppleProDisplay ?? false {
+            return 2
+        }
+        if isProDisplayXDR() {
+            return 3
+        }
+        if isStudioDisplay() {
+            return 4
+        }
+        if isUltraFine() {
+            return 5
+        }
+        if isThunderbolt() {
+            return 6
+        }
+        if isLEDCinema() {
+            return 7
+        }
+        return 100
+    }()
+
+    @Published var percentage: Double? = 0.5
+
+    var previousBrightnessMapping: ExpiringOptional<[AutoLearnMapping]> = nil
+    var previousContrastMapping: ExpiringOptional<[AutoLearnMapping]> = nil
+    var previousNitsBrightnessMapping: ExpiringOptional<[AutoLearnMapping]> = nil
+    var previousNitsContrastMapping: ExpiringOptional<[AutoLearnMapping]> = nil
+
+    @Published var fullRangeBrightness = 0.5
+    @Published var fullRangeUserBrightness = 0.5
+    @Published var userContrast = 0.5
+
+    var isActiveSyncSource: Bool { DC.sourceDisplay.serial == serial }
+
+    func resetSendingValues() {
+        mainAsync { [weak self] in
+            self?.sendingBrightness = false
+            self?.sendingContrast = false
+            self?.sendingInput = false
+            self?.sendingVolume = false
+        }
+    }
+
+    func refetchScreens() {
+        nsScreen = getScreen()
+    }
+
+    func getPowerOffEnabled(hasDDC: Bool? = nil) -> Bool {
+        guard active else { return false }
+        if blackOutEnabled { return true }
+
+        return (
+            DC.activeDisplays.count > 1 ||
+                CachedDefaults[.allowBlackOutOnSingleScreen] ||
+                (hasDDC ?? self.hasDDC)
+        ) && !isDummy
+    }
+
+    func getPowerOffTooltip(hasDDC: Bool? = nil) -> String {
+        #if arch(arm64)
+            let disconnect: Bool
+            if #available(macOS 13, *) {
+                disconnect = CachedDefaults[.newBlackOutDisconnect]
+            } else {
+                disconnect = false
+            }
+        #else
+            let disconnect = false
+        #endif
+
+        guard !(hasDDC ?? self.hasDDC) else {
+            return """
+            \(
+                disconnect
+                    ? "BlackOut disconnects a monitor in software, freeing up GPU resources and removing it from the screen arrangement."
+                    : "BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0."
+            )
+
+            Can also be toggled with the keyboard using Ctrl-Cmd-6.
+
+            Hold the following keys while clicking the button (or while pressing the hotkey) to change BlackOut behaviour:
+            - Shift: make the screen black without \(disconnect ? "disconnecting" : "mirroring")
+            - Option: turn off monitor completely using DDC
+            - Option and Shift: BlackOut other monitors and keep this one visible
+
+            Caveats for DDC power off:
+              • works only if the monitor can be controlled through DDC
+              • can't be used to power on the monitor
+              • when a monitor is turned off or in standby, it does not accept commands from a connected device
+              • remember to keep holding the Option key for 2 seconds after you pressed the button to account for possible DDC delays
+
+            Emergency Kill Switch: press the ⌘ Command key more than 8 times in a row to force disable BlackOut.
+            """
+        }
+        guard DC.activeDisplays.count > 1 || CachedDefaults[.allowBlackOutOnSingleScreen] else {
+            return """
+            At least 2 screens need to be visible for this to work.
+
+            The option can also be enabled for a single screen in Advanced settings.
+            """
+        }
+
+        return """
+        \(
+            disconnect
+                ? "BlackOut disconnects a monitor in software, freeing up GPU resources and removing it from the screen arrangement."
+                : "BlackOut simulates a monitor power off by mirroring the contents of the other visible screen to this one and setting this monitor's brightness to absolute 0."
+        )
+
+        Can also be toggled with the keyboard using Ctrl-Cmd-6.
+
+        Hold the following keys while clicking the button (or while pressing the hotkey) to change BlackOut behaviour:
+        - Shift: make the screen black without \(disconnect ? "disconnecting" : "mirroring")
+        - Option and Shift: BlackOut other monitors and keep this one visible
+
+        Emergency Kill Switch: press the ⌘ Command key more than 8 times in a row to force disable BlackOut.
+        """
+    }
+
+    func powerOn() {
+        DC.blackOut(
+            display: id,
+            state: .off,
+            mirroringAllowed: blackOutMirroringAllowed
+        )
+    }
+
+    func powerOff() {
+        guard DC.activeDisplays.count > 1 || CachedDefaults[.allowBlackOutOnSingleScreen] else { return }
+
+        if hasDDC, KM.optionKeyPressed, !KM.shiftKeyPressed {
+            _ = control?.setPower(.off)
+            return
+        }
+
+        guard lunarProOnTrial || lunarProActive else {
+            if let url = URL(string: "https://lunar.fyi/#blackout") {
+                NSWorkspace.shared.open(url)
+            }
+            return
+        }
+
+        if KM.optionKeyPressed, KM.shiftKeyPressed, DC.activeDisplayCount > 1 {
+            let blackOutEnabled = otherDisplays.contains(where: \.blackOutEnabled)
+            otherDisplays.forEach {
+                lastBlackOutToggleDate = .distantPast
+                DC.blackOut(
+                    display: $0.id,
+                    state: blackOutEnabled ? .off : .on,
+                    mirroringAllowed: false
+                )
+            }
+            return
+        }
+
+        #if arch(arm64)
+            if DC.activeDisplayCount > 1 {
+                let shouldDisconnect: Bool = if CachedDefaults[.newBlackOutDisconnect] {
+                    !KM.commandKeyPressed
+                } else {
+                    KM.commandKeyPressed
+                }
+
+                if #available(macOS 13, *), !KM.shiftKeyPressed, !blackOutEnabled, DC.activeDisplayCount > 1, shouldDisconnect {
+                    DC.dis(id)
+                    return
+                }
+            }
+        #endif
+
+        DC.blackOut(
+            display: id,
+            state: blackOutEnabled ? .off : .on,
+            mirroringAllowed: !KM.shiftKeyPressed && blackOutMirroringAllowed && DC.activeDisplayCount > 1
+        )
+    }
+
+    func setAudioIdentifier(from dict: NSDictionary) {
+        #if !arch(arm64)
+            guard let prefsKey = dict["IODisplayPrefsKey"] as? String,
+                  let match = AUDIO_IDENTIFIER_UUID_PATTERN.findFirst(in: prefsKey),
+                  let g1 = match.group(at: 1), let g2 = match.group(at: 2), let g3 = match.group(at: 3)
+            else { return }
+            audioIdentifier = "\(g2)\(g1)-\(g3)".uppercased()
+        #endif
+    }
+
+    func initHotkeyPopoverController() -> HotkeyPopoverController? {
+        mainThread {
+            guard let popover = _hotkeyPopover else {
+                _hotkeyPopover = NSPopover()
+                if let popover = _hotkeyPopover, popover.contentViewController == nil, let stb = NSStoryboard.main,
+                   let controller = stb.instantiateController(
+                       withIdentifier: NSStoryboard.SceneIdentifier("HotkeyPopoverController")
+                   ) as? HotkeyPopoverController
+                {
+                    INPUT_HOTKEY_POPOVERS[serial] = _hotkeyPopover
+                    popover.contentViewController = controller
+                    popover.contentViewController!.loadView()
+                }
+
+                return _hotkeyPopover?.contentViewController as? HotkeyPopoverController
+            }
+            return popover.contentViewController as? HotkeyPopoverController
+        }
     }
 
     func computeFullRangeBrightness() -> Double {
