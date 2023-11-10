@@ -50,7 +50,6 @@ enum MenuDensity: String, Codable, Defaults.Serializable {
 }
 
 final class EnvState: ObservableObject {
-    @Published var recording = false
     @Published var menuWidth: CGFloat = MENU_WIDTH
     @Published var menuHeight: CGFloat = 100
     @Published var menuMaxHeight: CGFloat = (NSScreen.main?.visibleFrame.height ?? 600) - 50
@@ -58,6 +57,8 @@ final class EnvState: ObservableObject {
     @Published var hoveringSlider = false
     @Published var draggingSlider = false
     @Published var optionsTab: OptionsTab = .layout
+
+    @Published var recording = false
 }
 
 enum OptionsTab: String, DefaultsSerializable {
@@ -92,7 +93,7 @@ extension Defaults.Keys {
     static let showAdditionalInfo = Key<Bool>("showAdditionalInfo", default: false)
 }
 
-let MENU_WIDTH: CGFloat = 380
+let MENU_WIDTH: CGFloat = 320
 let OPTIONS_MENU_WIDTH: CGFloat = 390
 let FULL_OPTIONS_MENU_WIDTH: CGFloat = 412
 let MENU_CLEAN_WIDTH: CGFloat = 300

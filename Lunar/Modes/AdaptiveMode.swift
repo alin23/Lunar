@@ -242,6 +242,8 @@ final class AdaptiveModeInfo: ObservableObject {
     init() {}
 
     @Published var lux: Double?
+    @Published var luxWindowAverage: Double?
+
     @Published var nits: Double?
     @Published var sunElevation: Double?
 }

@@ -257,10 +257,10 @@ struct DisplayRowView: View {
                 get: { display.lockedBrightness && display.lockedContrast },
                 set: { display.lockedBrightness = $0 }
             )
-            HStack(spacing: env.menuWidth <= MENU_CLEAN_WIDTH ? 0 : 10) {
+            HStack(spacing: 2) {
                 #if arch(arm64)
                     if showNitsText {
-                        NitsTextField(nits: $display.minNits, placeholder: "min", display: display)
+                        NitsTextField(placeholder: "min", display: display)
                             .opacity(hovering ? 1 : 0)
                     }
                 #endif
@@ -276,14 +276,7 @@ struct DisplayRowView: View {
                 )
                 #if arch(arm64)
                     if showNitsText {
-                        let maxNitsBinding = Binding<Double>(
-                            get: { display.userMaxNits ?? display.maxNits },
-                            set: {
-                                display.userMaxNits = nil
-                                display.maxNits = $0
-                            }
-                        )
-                        NitsTextField(nits: maxNitsBinding, placeholder: "max", display: display)
+                        NitsTextField(placeholder: "max", display: display)
                             .opacity(hovering ? 1 : 0)
                     }
                 #endif

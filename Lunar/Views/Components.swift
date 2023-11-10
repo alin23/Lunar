@@ -195,53 +195,35 @@ struct OutlineButton: ButtonStyle {
 // MARK: - FlatButton
 
 struct FlatButton: ButtonStyle {
-    init(
-        color: Color? = nil,
-        textColor: Color? = nil,
-        hoverColor: Color? = nil,
-        colorBinding: Binding<Color>? = nil,
-        textColorBinding: Binding<Color>? = nil,
-        hoverColorBinding: Binding<Color>? = nil,
-        width: CGFloat? = nil,
-        height: CGFloat? = nil,
-        circle: Bool = false,
-        radius: CGFloat = 8,
-        pressedBinding: Binding<Bool>? = nil,
-        horizontalPadding: CGFloat = 8,
-        verticalPadding: CGFloat = 4,
-        stretch: Bool = false
-    ) {
-        _color = colorBinding ?? .constant(color ?? Color.lightGold)
-        _textColor = textColorBinding ?? .constant(textColor ?? Color.blackGray)
-        _hoverColor = hoverColorBinding ?? .constant(hoverColor ?? Color.lightGold)
-        _width = .constant(width)
-        _height = .constant(height)
-        _circle = .constant(circle)
-        _radius = .constant(radius)
-        _pressed = pressedBinding ?? .constant(false)
-        _horizontalPadding = horizontalPadding.state
-        _verticalPadding = verticalPadding.state
-        _stretch = State(initialValue: stretch)
-    }
-
     @Environment(\.isEnabled) var isEnabled
 
-    @Binding var color: Color
-    @Binding var textColor: Color
-    @State var colorMultiply: Color = .white
-    @State var scale: CGFloat = 1.0
-    @Binding var hoverColor: Color
-    @State var pressedColor: Color = .white
-    @Binding var width: CGFloat?
-    @Binding var height: CGFloat?
-    @Binding var circle: Bool
-    @Binding var radius: CGFloat
-    @Binding var pressed: Bool
-    @State var horizontalPadding: CGFloat = 8
-    @State var verticalPadding: CGFloat = 4
-    @State var stretch = false
+    var color: Color = .translucid
+    var textColor: Color = .fg.warm
+    var hoverColor: Color = .lightGold
+    var width: CGFloat? = nil
+    var height: CGFloat? = nil
+    var circle = false
+    var radius: CGFloat = 8
+    var horizontalPadding: CGFloat = 8
+    var verticalPadding: CGFloat = 4
+    var stretch = false
+
+    @State private var pressedColor: Color = .white
 
     func makeBody(configuration: Configuration) -> some View {
+        var scale: CGFloat {
+            guard isEnabled else { return 1.0 }
+            if configuration.isPressed { return 1.02 }
+            if hovering { return 1.07 }
+            return 1.0
+        }
+        var tint: Color {
+            guard isEnabled else { return .white }
+            if configuration.isPressed { return pressedColor }
+            if hovering { return hoverColor }
+            return .white
+        }
+
         configuration
             .label
             .foregroundColor(textColor)
@@ -283,33 +265,20 @@ struct FlatButton: ButtonStyle {
                         )
                     )
             )
-            .scaleEffect(configuration.isPressed && isEnabled ? 1.02 : scale)
-            .colorMultiply(configuration.isPressed && isEnabled ? pressedColor : colorMultiply)
+            .scaleEffect(scale)
+            .colorMultiply(tint)
             .onAppear {
                 pressedColor = hoverColor.blended(withFraction: 0.5, of: .white)
-            }
-            .onChange(of: pressed) { newPressed in
-                if newPressed {
-                    withAnimation(.interactiveSpring()) {
-                        colorMultiply = hoverColor
-                        scale = 1.05
-                    }
-                } else {
-                    withAnimation(.interactiveSpring()) {
-                        colorMultiply = .white
-                        scale = 1.0
-                    }
-                }
             }
             .onHover(perform: { hover in
                 guard isEnabled else { return }
                 withAnimation(.easeOut(duration: 0.2)) {
-                    colorMultiply = hover ? hoverColor : .white
-                    scale = hover ? 1.07 : 1
+                    hovering = hover
                 }
             })
             .contrast(!isEnabled ? 0.3 : 1.0)
     }
+    @State var hovering = false
 
 }
 

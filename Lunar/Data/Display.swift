@@ -2947,7 +2947,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             didSet {
                 guard initialised else { return }
                 guard maxNits > minNits, maxNits > 0, maxNits <= 3000 else {
-                    maxNits = maxNits > 3000 ? 3000 : (getMaxNits() ?! minNits + 1)
+                    maxNits = maxNits > 3000 ? 3000 : oldValue
                     return
                 }
 

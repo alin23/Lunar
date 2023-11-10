@@ -440,13 +440,31 @@ struct Lunar: ParsableCommand {
 
         @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
-        func run() throws {
-            if SensorMode.specific.externalSensorAvailable, let lux = SensorMode.specific.lastAmbientLight {
-                cliPrint(lux)
-            } else {
-                cliPrint(SensorMode.getInternalSensorLux() ?? -1)
+        @Flag(name: .shortAndLong, help: "Listen for changes in ambient light and output the lux values")
+        var listen = false
+
+        @Flag(name: .shortAndLong, help: "Get the window average of the last 15 lux readings instead of the last instant reading (can be used with `--listen` as well)")
+        var average = false
+
+        @MainActor func run() throws {
+            guard listen else {
+                if SensorMode.specific.externalSensorAvailable, let lux = SensorMode.specific.lastAmbientLight {
+                    cliPrint(lux)
+                } else {
+                    cliPrint(average ? (SensorMode.computeLuxWindowAverage() ?? -1.0) : (SensorMode.getInternalSensorLux() ?? -1.0))
+                }
+                return cliExit(0)
             }
-            return cliExit(0)
+            guard isServer, let server = appDelegate?.server else {
+                throw LunarCommandError.noServer
+            }
+            let socketFd = server.currentSocketFD
+
+            let property = average ? AMI.$luxWindowAverage : AMI.$lux
+            property.removeDuplicates().sink { lux in
+                guard let lux else { return }
+                server.write(lux, to: socketFd)
+            }.store(in: &server.luxListeners, for: socketFd)
         }
     }
 
@@ -1121,14 +1139,10 @@ struct Lunar: ParsableCommand {
         )
         var display: DisplayFilter = .all
 
-        func run() throws {
-            guard isServer, let server = appDelegate?.server else {
-                throw LunarCommandError.noServer
-            }
-
-            let displays = getFilteredDisplays(displays: DC.activeDisplayList, filter: display)
+        static func startListener(for displays: [Display], filter: DisplayFilter, onlyUserAdjustments: Bool, server: LunarServer, json: Bool) throws {
+            let displays = getFilteredDisplays(displays: displays, filter: filter)
             guard !displays.isEmpty else {
-                throw LunarCommandError.displayNotFound(display.s)
+                throw LunarCommandError.displayNotFound(filter.s)
             }
             let socketFd = server.currentSocketFD
 
@@ -1161,7 +1175,29 @@ struct Lunar: ParsableCommand {
                         return
                     }
                     server.write(db, to: socketFd, json: json)
-                }.store(in: &server.brightnessListeners, for: socketFd)
+                }
+                .store(in: &server.brightnessListeners, for: socketFd)
+        }
+
+        func run() throws {
+            guard isServer, let server = appDelegate?.server else {
+                throw LunarCommandError.noServer
+            }
+
+            try Self.startListener(for: DC.activeDisplayList, filter: display, onlyUserAdjustments: onlyUserAdjustments, server: server, json: json)
+            let socketFd = server.currentSocketFD
+            DC.$activeDisplayList
+                .sink { displays in
+                    guard let server = appDelegate?.server else {
+                        return
+                    }
+                    do {
+                        try Self.startListener(for: displays, filter: display, onlyUserAdjustments: onlyUserAdjustments, server: server, json: json)
+                    } catch {
+                        log.error("CLI Error listening for brightness changes: \(error.localizedDescription)")
+                    }
+                }
+                .store(in: &server.displayListeners, for: socketFd)
         }
     }
 
@@ -2432,7 +2468,9 @@ final class LunarServer {
 
     var listenSocket: Socket?
     var connectedSockets = [Int32: Socket]()
+    var luxListeners: [Int32: AnyCancellable] = [:]
     var brightnessListeners: [Int32: AnyCancellable] = [:]
+    var displayListeners: [Int32: AnyCancellable] = [:]
     let socketLockQueue = DispatchQueue(label: "com.kitura.serverSwift.socketLockQueue")
 
     var currentSocketFD: Int32 = 0
@@ -2538,11 +2576,25 @@ final class LunarServer {
         }
     }
 
-    func write(_ change: DisplayStateChange, to socketFd: Int32, json: Bool) {
+    func write(_ lux: Double, to socketFd: Int32) {
         socketLockQueue.async { [weak self] in
             guard let self, let socket = connectedSockets[socketFd] else {
                 _ = storeLock.around {
+                    self?.luxListeners.removeValue(forKey: socketFd)
+                }
+                return
+            }
+            let val = String(format: "%.3f", lux)
+            _ = try? socket.write(from: "\(val)\n")
+        }
+    }
+
+    func write(_ change: DisplayStateChange, to socketFd: Int32, json: Bool) {
+        socketLockQueue.async { [weak self] in
+            guard let self, let socket = connectedSockets[socketFd] else {
+                storeLock.around {
                     self?.brightnessListeners.removeValue(forKey: socketFd)
+                    self?.displayListeners.removeValue(forKey: socketFd)
                 }
                 return
             }
@@ -2595,7 +2647,7 @@ final class LunarServer {
                     readData.removeAll(keepingCapacity: true)
                 } while shouldKeepRunning
 
-                guard storeLock.around({ brightnessListeners[socket.socketfd] }) == nil else {
+                guard storeLock.around({ brightnessListeners[socket.socketfd] ?? luxListeners[socket.socketfd] }) == nil else {
                     return
                 }
                 #if DEBUG

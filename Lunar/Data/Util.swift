@@ -2424,3 +2424,7 @@ private final class CStringArray {
     public let cArray: [UnsafeMutablePointer<Int8>?]
 
 }
+
+func mainActor(_ action: @escaping @MainActor () -> Void) {
+    Task.init { await MainActor.run { action() }}
+}

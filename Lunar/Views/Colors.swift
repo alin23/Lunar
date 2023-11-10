@@ -139,6 +139,13 @@ public extension Color {
             NSAppearance.currentDrawing().isDark ? Color.lightMauve : Color.pinkMauve
         }
     }
+    static var dynamicYellow: Color {
+        if #available(macOS 12.0, *) {
+            Color(light: .lunarYellow, dark: .peach)
+        } else {
+            NSAppearance.currentDrawing().isDark ? Color.peach : Color.lunarYellow
+        }
+    }
 }
 
 @available(macOS 12.0, *)
