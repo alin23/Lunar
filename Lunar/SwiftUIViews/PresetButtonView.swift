@@ -7,7 +7,7 @@ struct PresetButtonView: View {
         SwiftUI.Button("\(percent)%") {
             appDelegate!.setLightPercent(percent: percent)
         }
-        .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+        .buttonStyle(FlatButton(color: Color.fg.warm.opacity(0.05), textColor: Color.fg.warm))
         .font(.system(size: 12, weight: .medium, design: .monospaced))
     }
 }

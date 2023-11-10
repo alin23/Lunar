@@ -21,8 +21,6 @@ struct LicenseView: View {
     @Default(.lunarProActive) var lunarProActive
     @Default(.lunarProOnTrial) var lunarProOnTrial
 
-    @Environment(\.colors) var colors
-
     var body: some View {
         HStack {
             Text("Licence:")
@@ -33,7 +31,7 @@ struct LicenseView: View {
                 .padding(.vertical, 2)
                 .background(
                     RoundedRectangle(cornerRadius: 5, style: .continuous)
-                        .fill(lunarProOnTrial ? Colors.peach : (lunarProActive ? Colors.lightGreen : Colors.red))
+                        .fill(lunarProOnTrial ? Color.peach : (lunarProActive ? Color.lightGreen : Color.red))
                 )
                 .foregroundColor(lunarProOnTrial ? .black : (lunarProActive ? .black : .white))
 
@@ -48,7 +46,7 @@ struct LicenseView: View {
                 .padding(.vertical, 1)
                 .background(
                     RoundedRectangle(cornerRadius: 5, style: .continuous)
-                        .fill(days.intValue > 7 ? Colors.lightGreen : (days.intValue > 3 ? Colors.peach : Colors.red))
+                        .fill(days.intValue > 7 ? Color.lightGreen : (days.intValue > 3 ? Color.peach : Color.red))
                 )
                 .foregroundColor(days.intValue > 7 ? .black : (days.intValue > 3 ? .black : .white))
             }
@@ -57,21 +55,21 @@ struct LicenseView: View {
             if lunarProOnTrial {
                 SwiftUI.Button("Buy") { showCheckout() }
                     .buttonStyle(FlatButton(
-                        color: .primary.opacity(0.9),
-                        textColor: colors.inverted,
+                        color: Color.fg.warm.opacity(0.9),
+                        textColor: Color.inverted,
                         horizontalPadding: 6,
                         verticalPadding: 3
                     ))
                     .font(.system(size: 12, weight: .semibold))
             }
             SwiftUI.Button((lunarProActive && !lunarProOnTrial) ? "Manage" : "Activate") { showLicenseActivation() }
-                .buttonStyle(FlatButton(color: .primary.opacity(0.9), textColor: colors.inverted, horizontalPadding: 6, verticalPadding: 3))
+                .buttonStyle(FlatButton(color: Color.fg.warm.opacity(0.9), textColor: Color.inverted, horizontalPadding: 6, verticalPadding: 3))
                 .font(.system(size: 12, weight: .semibold))
         }
-        .foregroundColor(.secondary)
+        .foregroundColor(Color.fg.warm.opacity(0.6))
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
-        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.05)))
+        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.fg.warm.opacity(0.03)))
         .onAppear { product = lunarProProduct }
     }
 
@@ -95,7 +93,6 @@ struct VersionView: View {
     @Default(.silentUpdate) var silentUpdate
 
     @ObservedObject var updater: SPUUpdater
-    @Environment(\.colors) var colors
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
@@ -109,8 +106,8 @@ struct VersionView: View {
 
                 SwiftUI.Button("Check for updates") { updater.checkForUpdates() }
                     .buttonStyle(FlatButton(
-                        color: .primary.opacity(0.9),
-                        textColor: colors.inverted,
+                        color: Color.fg.warm.opacity(0.9),
+                        textColor: Color.inverted,
                         horizontalPadding: 6,
                         verticalPadding: 3
                     ))
@@ -171,10 +168,10 @@ struct VersionView: View {
                 .toggleStyle(CheckboxToggleStyle(style: .circle))
                 .font(.system(size: 12, weight: .medium))
         }
-        .foregroundColor(.secondary)
+        .foregroundColor(Color.fg.warm.opacity(0.6))
         .padding(.horizontal, 8)
         .padding(.vertical, 8)
-        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.05)))
+        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.fg.warm.opacity(0.03)))
     }
 
 }
@@ -183,7 +180,6 @@ struct VersionView: View {
 
 struct MenuDensityView: View {
     @Default(.menuDensity) var menuDensity
-    @Environment(\.colors) var colors
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -219,10 +215,10 @@ struct MenuDensityView: View {
                     .font(.system(size: 10, weight: .semibold, design: .rounded))
             }.opacity(0.7)
         }
-        .foregroundColor(.secondary)
+        .foregroundColor(Color.fg.warm.opacity(0.6))
         .padding(.horizontal, 8)
         .padding(.vertical, 8)
-        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.05)))
+        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.fg.warm.opacity(0.03)))
         .onChange(of: menuDensity) { density in
             let dense = density == .dense
             let comfy = density == .comfortable

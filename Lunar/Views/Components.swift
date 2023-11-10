@@ -16,7 +16,7 @@ import SwiftUI
 struct SettingsToggle: View {
     @State var text: String
     @Binding var setting: Bool
-    @State var color: Color? = Colors.blackMauve
+    @State var color: Color? = Color.blackMauve
     @State var help: String?
     @State var helpShown = false
     @State var mode: AdaptiveModeKey? = nil
@@ -26,17 +26,17 @@ struct SettingsToggle: View {
 
         switch mode {
         case .sync:
-            return Colors.green
+            return Color.green
         case .sensor:
-            return Colors.blue
+            return Color.blue
         case .location:
-            return Colors.lunarYellow
+            return Color.lunarYellow
         case .clock:
             return Color.orange
         case .manual:
-            return Colors.red
+            return Color.red
         case .auto:
-            return Colors.blackMauve
+            return Color.blackMauve
         }
     }
 
@@ -134,29 +134,22 @@ extension View {
 
 struct OutlineButton: ButtonStyle {
     init(
-        color: Color = Color.primary.opacity(0.8),
-        hoverColor: Color = Color.primary,
+        color: Color = Color.fg.warm.opacity(0.8),
+        hoverColor: Color = Color.fg.warm,
         multiplyColor: Color = Color.white,
         scale: CGFloat = 1,
         thickness: CGFloat = 2,
         font: Font = .body.bold()
     ) {
-        _color = State(initialValue: color)
-        _hoverColor = State(initialValue: hoverColor)
         _multiplyColor = State(initialValue: multiplyColor)
         _scale = State(initialValue: scale)
-        _thickness = State(initialValue: thickness)
-        _font = State(initialValue: font)
+        self.color = color
+        self.hoverColor = hoverColor
+        self.thickness = thickness
+        self.font = font
     }
 
     @Environment(\.isEnabled) var isEnabled
-
-    @State var color = Color.primary.opacity(0.8)
-    @State var hoverColor: Color = .primary
-    @State var multiplyColor: Color = .white
-    @State var scale: CGFloat = 1
-    @State var thickness: CGFloat = 2
-    @State var font: Font = .body.bold()
 
     func makeBody(configuration: Configuration) -> some View {
         configuration
@@ -189,6 +182,14 @@ struct OutlineButton: ButtonStyle {
             }
     }
 
+    private var color = Color.fg.warm.opacity(0.8)
+    private var hoverColor: Color = .fg.warm
+    private var thickness: CGFloat = 2
+    private var font: Font = .body.bold()
+
+    @State private var multiplyColor: Color = .white
+    @State private var scale: CGFloat = 1
+
 }
 
 // MARK: - FlatButton
@@ -210,9 +211,9 @@ struct FlatButton: ButtonStyle {
         verticalPadding: CGFloat = 4,
         stretch: Bool = false
     ) {
-        _color = colorBinding ?? .constant(color ?? Colors.lightGold)
-        _textColor = textColorBinding ?? .constant(textColor ?? Colors.blackGray)
-        _hoverColor = hoverColorBinding ?? .constant(hoverColor ?? Colors.lightGold)
+        _color = colorBinding ?? .constant(color ?? Color.lightGold)
+        _textColor = textColorBinding ?? .constant(textColor ?? Color.blackGray)
+        _hoverColor = hoverColorBinding ?? .constant(hoverColor ?? Color.lightGold)
         _width = .constant(width)
         _height = .constant(height)
         _circle = .constant(circle)
@@ -223,7 +224,6 @@ struct FlatButton: ButtonStyle {
         _stretch = State(initialValue: stretch)
     }
 
-    @Environment(\.colors) var colors
     @Environment(\.isEnabled) var isEnabled
 
     @Binding var color: Color
@@ -317,28 +317,27 @@ struct FlatButton: ButtonStyle {
 
 struct PickerButton<T: Equatable>: ButtonStyle {
     @Environment(\.isEnabled) var isEnabled
-    @Environment(\.colors) var colors
     @Environment(\.colorScheme) var colorScheme
 
-    @State var color = Color.primary.opacity(0.15)
-    @State var onColor: Color? = nil
-    var offColor: Binding<Color>?
-    @State var onTextColor: Color? = nil
-    @State var offTextColor = Color.secondary
-    @State var horizontalPadding: CGFloat = 8
-    @State var verticalPadding: CGFloat = 4
-    @State var brightness = 0.0
+    var color = Color.translucid
+    var onColor: Color? = nil
+    var offColor: Color? = nil
+    var onTextColor: Color? = nil
+    var offTextColor = Color.secondary
+    var horizontalPadding: CGFloat = 8
+    var verticalPadding: CGFloat = 4
+    var brightness = 0.0
     @State var scale: CGFloat = 1
     @State var hoverColor = Color.white
     @Binding var enumValue: T
-    @State var onValue: T
+    var onValue: T
 
     func makeBody(configuration: Configuration) -> some View {
         configuration
             .label
             .foregroundColor(
                 enumValue == onValue
-                    ? (onTextColor ?? (colorScheme == .dark ? colors.accent : Color.white))
+                    ? (onTextColor ?? (colorScheme == .dark ? Color.accent : Color.white))
                     : offTextColor
             )
             .padding(.vertical, verticalPadding)
@@ -347,8 +346,8 @@ struct PickerButton<T: Equatable>: ButtonStyle {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .fill(
                         enumValue == onValue
-                            ? (onColor ?? Color.primary.opacity(colorScheme == .dark ? 0.15 : 0.9))
-                            : (offColor?.wrappedValue ?? color.opacity(colorScheme == .dark ? 0.5 : 0.8))
+                            ? (onColor ?? Color.fg.warm.opacity(colorScheme == .dark ? 0.15 : 0.9))
+                            : (offColor ?? color.opacity(colorScheme == .dark ? 0.5 : 0.8))
                     )
 
             ).scaleEffect(scale).colorMultiply(hoverColor)
@@ -361,7 +360,7 @@ struct PickerButton<T: Equatable>: ButtonStyle {
                     return
                 }
                 withAnimation(.easeOut(duration: 0.1)) {
-                    hoverColor = hover ? colors.accent : .white
+                    hoverColor = hover ? Color.accent : .white
                     scale = hover ? 1.05 : 1.0
                 }
             })
@@ -508,7 +507,8 @@ struct Dropdown<T: Nameable>: NSViewRepresentable {
         button.usesSingleLineMode = true
         button.autoenablesItems = false
         button.alignment = .center
-        button.font = .monospacedSystemFont(ofSize: 12, weight: .semibold)
+        button.font = .systemFont(ofSize: 11, weight: .bold)
+        button.contentTintColor = Color.fg.warm.ns.withAlphaComponent(0.8)
         button.isBordered = false
 
         let menu = NSMenu()

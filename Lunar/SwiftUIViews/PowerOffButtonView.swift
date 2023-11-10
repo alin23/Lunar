@@ -59,17 +59,17 @@ struct PowerOffButtonView: View {
         }
 
         if km.controlKeyPressed {
-            return Color.orange
+            return Color.peach
         }
 
         if DC.activeDisplayCount == 1 {
-            return Colors.red
+            return Color.dynamicRed
         }
 
         if km.optionKeyPressed, !km.shiftKeyPressed, !display.hasDDC {
             return Color.gray
         }
-        return Colors.red
+        return Color.dynamicRed
     }
 
     var body: some View {

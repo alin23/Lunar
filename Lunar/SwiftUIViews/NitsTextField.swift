@@ -12,7 +12,7 @@
         @Default(.syncMode) var syncMode
 
         var editPopover: some View {
-            PaddedPopoverView(background: Colors.peach.any) {
+            PaddedPopoverView(background: Color.peach.any) {
                 VStack {
                     Text("\(placeholder.titleCase())imum nits")
                         .font(.title.bold())
@@ -22,7 +22,7 @@
                         .onReceive(Just(nits)) { _ in
                             display.nitsEditPublisher.send(true)
                         }
-                        .textFieldStyle(PaddedTextFieldStyle(backgroundColor: .primary.opacity(0.1)))
+                        .textFieldStyle(PaddedTextFieldStyle(backgroundColor: Color.translucid))
                         .font(.system(size: 20, weight: .bold, design: .monospaced).leading(.tight))
                         .lineLimit(1)
                         .frame(width: 70)
@@ -31,7 +31,7 @@
 
                     Text("Value estimated from monitor\nfirmware data and user input")
                         .font(.system(size: 12, weight: .medium, design: .rounded).leading(.tight))
-                        .foregroundColor(Colors.grayMauve.opacity(0.8))
+                        .foregroundColor(Color.grayMauve.opacity(0.8))
                         .multilineTextAlignment(.center)
                 }
             }
@@ -48,7 +48,7 @@
                             .font(.system(size: 8, weight: .semibold, design: .rounded).leading(.tight))
                     }
                 }
-                .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                .buttonStyle(FlatButton(color: Color.translucid, textColor: .fg.warm.opacity(0.6)))
                 .frame(width: 50)
                 .popover(isPresented: $editing) { editPopover }
                 .disabled(disabled)

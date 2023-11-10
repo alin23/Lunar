@@ -176,7 +176,6 @@ struct CustomPresetsView: View {
     }
 
     @EnvironmentObject var env: EnvState
-    @Environment(\.colors) var colors
 
     @State var error = ""
     @State var showError = false
@@ -191,9 +190,9 @@ struct CustomPresetsView: View {
         VStack(alignment: .leading) {
             HStack {
                 VStack(alignment: .center, spacing: -2) {
-                    Text("Custom").font(.system(size: 12, weight: .bold)).opacity(0.7)
-                    Text("Presets").font(.system(size: 12, weight: .heavy)).opacity(0.7)
-                }
+                    Text("Custom").font(.system(size: 12, weight: .bold))
+                    Text("Presets").font(.system(size: 12, weight: .heavy))
+                }.foregroundColor(Color.fg.warm.opacity(0.65))
 
                 Spacer()
                 HStack(spacing: 1) {
@@ -202,13 +201,13 @@ struct CustomPresetsView: View {
                         .offset(x: 0, y: 2)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 3)
-                        .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.primary.opacity(0.1)))
+                        .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.translucid))
                         .foregroundColor(Color.gray)
                     Text("⌘")
                         .font(.system(size: 14, weight: .bold, design: .monospaced))
                         .padding(.horizontal, 6)
                         .padding(.vertical, 3)
-                        .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.primary.opacity(0.1)))
+                        .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.translucid))
                         .foregroundColor(Color.gray)
                     DynamicKey(keyCode: $presetKey)
                 }.frame(minWidth: 90, alignment: .trailing)
@@ -221,11 +220,11 @@ struct CustomPresetsView: View {
                             presetKey = key.QWERTYKeyCode.i
                         }
                     }
-                    .textFieldStyle(PaddedTextFieldStyle(backgroundColor: .primary.opacity(0.1)))
+                    .textFieldStyle(PaddedTextFieldStyle(backgroundColor: Color.translucid))
                     .frame(width: 100)
 
                 SwiftUI.Button("Save") { save() }
-                    .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary))
+                    .buttonStyle(FlatButton(color: Color.translucid, textColor: Color.fg.warm))
                     .font(.system(size: 12, weight: .medium, design: .monospaced))
                     .popover(isPresented: $showError) { ErrorPopoverView(error: $error) }
                     .onChange(of: error, perform: onError(_:))
@@ -238,7 +237,7 @@ struct CustomPresetsView: View {
                             SwiftUI.Button(preset.id) {
                                 preset.apply()
                             }
-                            .buttonStyle(FlatButton(color: .primary.opacity(0.1), textColor: .primary, stretch: true))
+                            .buttonStyle(FlatButton(color: Color.translucid, textColor: .primary, stretch: true))
                             .font(.system(size: 12, weight: .medium, design: .monospaced))
 
                             SwiftUI.Button(action: { preset.delete() }) {
@@ -252,8 +251,8 @@ struct CustomPresetsView: View {
                                 .font(.system(size: 10, weight: .heavy, design: .monospaced))
                                 .padding(.horizontal, 4)
                                 .padding(.vertical, 2)
-                                .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(colors.fg.gray))
-                                .foregroundColor(colors.bg.gray)
+                                .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.bg.warm))
+                                .foregroundColor(Color.bg.gray)
                                 .offset(x: -6, y: -6)
                                 .opacity(hoveringPreset == preset.id ? 0.0 : 1.0)
                         }.onHover { hovering in
@@ -341,16 +340,15 @@ import Sauce
 // MARK: - DynamicKey
 
 struct DynamicKey: View {
-    static let darkHoverColor = Colors.peach
-    static let lightHoverColor = Colors.lunarYellow
+    static let darkHoverColor = Color.peach
+    static let lightHoverColor = Color.lunarYellow
 
     @EnvironmentObject var env: EnvState
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.colors) var colors
 
     @Binding var keyCode: Int
     @State var recordingColor = Color.white
-    @State var color = Color.primary.opacity(0.1)
+    @State var color = Color.translucid
     @State var textColor = Color.primary
     @State var recording = false
     @State var hoverColor = Self.darkHoverColor
@@ -376,17 +374,17 @@ struct DynamicKey: View {
             guard !recording else { return }
             withAnimation(.fastTransition) {
                 textColor = hovering ? (colorScheme == .dark ? .white : .gray) : Color.primary
-                color = hovering ? .white.opacity(0.2) : Color.primary.opacity(0.1)
+                color = hovering ? .white.opacity(0.2) : Color.translucid
             }
         }
         .onAppear { hoverColor = colorScheme == .dark ? Self.darkHoverColor : Self.lightHoverColor }
         .onChange(of: recording) { newRecording in
             env.recording = newRecording
             hoverColor = newRecording ? .white : (colorScheme == .dark ? Self.darkHoverColor : Self.lightHoverColor)
-            textColor = newRecording ? .white : Color.primary
-            color = newRecording ? .white.opacity(0.2) : Color.primary.opacity(0.1)
+            textColor = newRecording ? .white : Color.fg.warm
+            color = newRecording ? .white.opacity(0.2) : Color.translucid
             withAnimation(.fastTransition) {
-                recordingColor = newRecording ? Colors.red : .white
+                recordingColor = newRecording ? Color.red : .white
             }
         }
         .onChange(of: colorScheme) { hoverColor = $0 == .dark ? Self.darkHoverColor : Self.lightHoverColor }

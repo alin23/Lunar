@@ -4,7 +4,7 @@ import SwiftUI
 struct AllDisplaysView: View {
     @ObservedObject var display: Display = ALL_DISPLAYS
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.colors) var colors
+
     @Default(.showSliderValues) var showSliderValues
     @Default(.mergeBrightnessContrast) var mergeBrightnessContrast
 
@@ -13,9 +13,9 @@ struct AllDisplaysView: View {
             BigSurSlider(
                 percentage: $display.softwareBrightness,
                 image: "moon.circle.fill",
-                color: Colors.subzero.opacity(0.7),
-                backgroundColor: Colors.subzero.opacity(colorScheme == .dark ? 0.1 : 0.2),
-                knobColor: Colors.subzero,
+                color: Color.subzero.opacity(0.7),
+                backgroundColor: Color.subzero.opacity(colorScheme == .dark ? 0.1 : 0.2),
+                knobColor: Color.subzero,
                 showValue: $showSliderValues
             )
         }
@@ -31,8 +31,8 @@ struct AllDisplaysView: View {
                 BigSurSlider(
                     percentage: $display.preciseBrightnessContrast.f,
                     image: "sun.max.fill",
-                    colorBinding: .constant(colors.accent),
-                    backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                    colorBinding: .constant(Color.accent),
+                    backgroundColorBinding: .constant(Color.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
                     showValue: $showSliderValues
                 )
                 softwareSliders
@@ -40,16 +40,16 @@ struct AllDisplaysView: View {
                 BigSurSlider(
                     percentage: $display.preciseBrightness.f,
                     image: "sun.max.fill",
-                    colorBinding: .constant(colors.accent),
-                    backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                    colorBinding: .constant(Color.accent),
+                    backgroundColorBinding: .constant(Color.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
                     showValue: $showSliderValues
                 )
                 softwareSliders
                 BigSurSlider(
                     percentage: $display.preciseContrast.f,
                     image: "circle.righthalf.fill",
-                    colorBinding: .constant(colors.accent),
-                    backgroundColorBinding: .constant(colors.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                    colorBinding: .constant(Color.accent),
+                    backgroundColorBinding: .constant(Color.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
                     showValue: $showSliderValues
                 )
             }

@@ -56,6 +56,7 @@
 		C731260C22B38899001ED199 /* HelpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C731260B22B38899001ED199 /* HelpButton.swift */; };
 		C731260F22B3A9CD001ED199 /* HelpPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C731260E22B3A9CD001ED199 /* HelpPopoverController.swift */; };
 		C731E85E27E1E5090016B36D /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = C731E85D27E1E5090016B36D /* Sentry */; };
+		C735D9F62AFCD0B5001DCAA8 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = C735D9F52AFCD0B5001DCAA8 /* Colors.swift */; };
 		C73716A526DE1F22008EEE53 /* CBTrueToneClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C737169E26DE1F22008EEE53 /* CBTrueToneClient.h */; };
 		C73716A726DE1F22008EEE53 /* CBAdaptationClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C73716A426DE1F22008EEE53 /* CBAdaptationClient.h */; };
 		C73A4E6229C5EAFC006A22F3 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = C73A4E6129C5EAFC006A22F3 /* Localizable.stringsdict */; };
@@ -280,6 +281,7 @@
 		C730421E2407E92C0016E591 /* Headers */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Headers; path = OSD.framework/Headers; sourceTree = "<group>"; };
 		C731260B22B38899001ED199 /* HelpButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpButton.swift; sourceTree = "<group>"; };
 		C731260E22B3A9CD001ED199 /* HelpPopoverController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpPopoverController.swift; sourceTree = "<group>"; };
+		C735D9F52AFCD0B5001DCAA8 /* Colors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		C735DD791FD5C04D00FBD16F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		C737169E26DE1F22008EEE53 /* CBTrueToneClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBTrueToneClient.h; sourceTree = "<group>"; };
 		C73716A426DE1F22008EEE53 /* CBAdaptationClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBAdaptationClient.h; sourceTree = "<group>"; };
@@ -606,6 +608,7 @@
 		C77CC75A1FEDB367009AA718 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C735D9F52AFCD0B5001DCAA8 /* Colors.swift */,
 				C7714AF827E4A3A9002E0B2E /* Components.swift */,
 				C722FB9E271AC83200ED4C94 /* Button.swift */,
 				C722FB9C271AC83200ED4C94 /* Slider.swift */,
@@ -1046,6 +1049,7 @@
 				C7C68F0D201D3D9800F49A2B /* SettingsView.swift in Sources */,
 				C7A82DC3261DF513004146A8 /* Pro.swift in Sources */,
 				C7C1F7031FD5FD390039507C /* Display.swift in Sources */,
+				C735D9F62AFCD0B5001DCAA8 /* Colors.swift in Sources */,
 				C7E80E302637060F004718A4 /* FileAttributes.swift in Sources */,
 				C70A795B2AB4A11600289426 /* UnmanagedDisplayView.swift in Sources */,
 				C7A82D9F2618E1B9004146A8 /* InstallOutputViewController.swift in Sources */,

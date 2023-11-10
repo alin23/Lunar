@@ -20,7 +20,7 @@ final class StatusItemButtonControllerDelegate: NSObject, NSWindowDelegate {
 }
 
 class MenuWindowManager: ObservableObject {
-    @Published var focused = false
+    @Published var focused = true
 }
 
 let WM = MenuWindowManager()
@@ -74,6 +74,7 @@ final class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObje
     }
 
     func windowWillClose(_ notification: Notification) {
+        postEndMenuTrackingNotification()
         willCloseTask = mainAsyncAfter(ms: 50) {
             Defaults[.menuBarClosed] = true
             if Defaults[.showOptionsMenu], !Defaults[.keepOptionsMenu] {
@@ -82,12 +83,12 @@ final class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObje
         }
     }
 
-    func windowDidResignKey(_ notification: Notification) {
-        WM.focused = false
-    }
-    func windowDidBecomeKey(_ notification: Notification) {
-        WM.focused = true
-    }
+//    func windowDidResignKey(_ notification: Notification) {
+//        WM.focused = false
+//    }
+//    func windowDidBecomeKey(_ notification: Notification) {
+//        WM.focused = true
+//    }
 
     func windowDidBecomeMain(_ notification: Notification) {
         willCloseTask = nil
@@ -114,7 +115,8 @@ final class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObje
     }
 
     func showMenuBar() {
-        WM.focused = true
+        postBeginMenuTrackingNotification()
+//        WM.focused = true
         willCloseTask = nil
         displayHideTask?.cancel()
         displayHideTask = nil
@@ -158,4 +160,14 @@ final class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObje
         toggleMenuBar()
         super.mouseDown(with: event)
     }
+}
+
+/// Posting this notification causes the system Menu Bar to stay put when the cursor leaves its area while over a full screen app.
+private func postBeginMenuTrackingNotification() {
+    DistributedNotificationCenter.default().post(name: .init("com.apple.HIToolbox.beginMenuTrackingNotification"), object: nil)
+}
+
+/// Posting this notification reverses the effect of the notification above.
+private func postEndMenuTrackingNotification() {
+    DistributedNotificationCenter.default().post(name: .init("com.apple.HIToolbox.endMenuTrackingNotification"), object: nil)
 }

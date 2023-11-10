@@ -1,8 +1,6 @@
 import SwiftUI
 
 struct UnmanagedDisplayView: View {
-    @Environment(\.colors) var colors
-
     @ObservedObject var display: Display
 
     var body: some View {
@@ -11,7 +9,7 @@ struct UnmanagedDisplayView: View {
                 Text(display.name)
                     .font(.system(size: 22, weight: .black))
                     .padding(6)
-                    .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(colors.bg.primary.opacity(0.5)))
+                    .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.bg.primary.opacity(0.5)))
 
                 ManageButtonView(display: display)
                     .offset(y: -8)

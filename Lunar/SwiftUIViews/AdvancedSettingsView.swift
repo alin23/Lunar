@@ -181,10 +181,10 @@ struct AdvancedSettingsView: View {
                     Divider()
                     Group {
                         Text("EXPERIMENTAL!")
-                            .foregroundColor(Colors.red)
+                            .foregroundColor(Color.red)
                             .bold()
                         Text("Don't use unless really needed or asked by the developer")
-                            .foregroundColor(Colors.red)
+                            .foregroundColor(Color.red)
                             .font(.caption)
                         SettingsToggle(
                             text: "Disable usage of Gamma API completely", setting: $gammaDisabledCompletely,
@@ -250,9 +250,9 @@ struct AdvancedSettingsView: View {
                                 BigSurSlider(
                                     percentage: secondsBinding,
                                     image: "clock.circle",
-                                    color: Colors.lightGray,
-                                    backgroundColor: Colors.grayMauve.opacity(0.1),
-                                    knobColor: Colors.lightGray,
+                                    color: Color.lightGray,
+                                    backgroundColor: Color.grayMauve.opacity(0.1),
+                                    knobColor: Color.lightGray,
                                     showValue: .constant(true),
                                     disabled: !$delayDDCAfterWake
                                 )
@@ -260,8 +260,8 @@ struct AdvancedSettingsView: View {
 
                                 SwiftUI.Button("Reset") { waitAfterWakeSeconds = 30 }
                                     .buttonStyle(FlatButton(
-                                        color: Colors.lightGray,
-                                        textColor: Colors.darkGray,
+                                        color: Color.lightGray,
+                                        textColor: Color.darkGray,
                                         radius: 10,
                                         verticalPadding: 3
                                     ))

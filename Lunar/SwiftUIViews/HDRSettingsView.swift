@@ -65,9 +65,9 @@ struct HDRSettingsView: View {
                             BigSurSlider(
                                 percentage: $xdrContrastFactor,
                                 image: "circle.lefthalf.filled",
-                                color: Colors.lightGray,
-                                backgroundColor: Colors.grayMauve.opacity(0.1),
-                                knobColor: Colors.lightGray,
+                                color: Color.lightGray,
+                                backgroundColor: Color.grayMauve.opacity(0.1),
+                                knobColor: Color.lightGray,
                                 showValue: .constant(false),
                                 disabled: !$xdrContrast
                             )
@@ -75,8 +75,8 @@ struct HDRSettingsView: View {
 
                             SwiftUI.Button("Reset") { xdrContrastFactor = 0.3 }
                                 .buttonStyle(FlatButton(
-                                    color: Colors.lightGray,
-                                    textColor: Colors.darkGray,
+                                    color: Color.lightGray,
+                                    textColor: Color.darkGray,
                                     radius: 10,
                                     verticalPadding: 3
                                 ))
@@ -105,9 +105,9 @@ struct HDRSettingsView: View {
                             BigSurSlider(
                                 percentage: binding,
                                 image: "circle.lefthalf.filled",
-                                color: Colors.lightGray,
-                                backgroundColor: Colors.grayMauve.opacity(0.1),
-                                knobColor: Colors.lightGray,
+                                color: Color.lightGray,
+                                backgroundColor: Color.grayMauve.opacity(0.1),
+                                knobColor: Color.lightGray,
                                 showValue: .constant(false),
                                 disabled: !$subzeroContrast
                             )
@@ -115,8 +115,8 @@ struct HDRSettingsView: View {
 
                             SwiftUI.Button("Reset") { subzeroContrastFactor = 1.75 }
                                 .buttonStyle(FlatButton(
-                                    color: Colors.lightGray,
-                                    textColor: Colors.darkGray,
+                                    color: Color.lightGray,
+                                    textColor: Color.darkGray,
                                     radius: 10,
                                     verticalPadding: 3
                                 ))
@@ -173,9 +173,9 @@ struct HDRSettingsView: View {
                     BigSurSlider(
                         percentage: luxBinding,
                         image: "sun.dust.fill",
-                        color: Colors.lightGray,
-                        backgroundColor: Colors.grayMauve.opacity(0.1),
-                        knobColor: Colors.lightGray,
+                        color: Color.lightGray,
+                        backgroundColor: Color.grayMauve.opacity(0.1),
+                        knobColor: Color.lightGray,
                         showValue: .constant(false),
                         disabled: !$autoXdrSensor,
                         mark: .oneway { powf(max(dc.internalSensorLux - XDR_LUX_LEAST_NONZERO, 0) / XDR_MAX_LUX, 0.25) }
@@ -184,8 +184,8 @@ struct HDRSettingsView: View {
 
                     SwiftUI.Button("Reset") { autoXdrSensorLuxThreshold = XDR_DEFAULT_LUX }
                         .buttonStyle(FlatButton(
-                            color: Colors.lightGray,
-                            textColor: Colors.darkGray,
+                            color: Color.lightGray,
+                            textColor: Color.darkGray,
                             radius: 10,
                             verticalPadding: 3
                         ))

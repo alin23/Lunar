@@ -1604,9 +1604,21 @@ final class DisplayController: ObservableObject {
             .sink { [self] change in
                 displayList.forEach {
                     #if DEBUG
-                        $0.showOrientation = change.newValue
+                        $0.showOrientation = change.newValue && (!$0.isBuiltin || CachedDefaults[.showOrientationForBuiltinInQuickActions])
                     #else
-                        $0.showOrientation = $0.canRotate && change.newValue
+                        $0.showOrientation = $0.canRotate && change.newValue && (!$0.isBuiltin || CachedDefaults[.showOrientationForBuiltinInQuickActions])
+                    #endif
+                }
+            }.store(in: &observers)
+
+        showOrientationForBuiltinInQuickActionsPublisher
+            .debounce(for: .milliseconds(50), scheduler: RunLoop.main)
+            .sink { [self] change in
+                displayList.forEach {
+                    #if DEBUG
+                        $0.showOrientation = CachedDefaults[.showOrientationInQuickActions] && (!$0.isBuiltin || change.newValue)
+                    #else
+                        $0.showOrientation = $0.canRotate && CachedDefaults[.showOrientationInQuickActions] && (!$0.isBuiltin || change.newValue)
                     #endif
                 }
             }.store(in: &observers)
