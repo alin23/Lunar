@@ -121,13 +121,13 @@ final class ExceptionsViewController: NSViewController, NSTableViewDelegate, NST
             NSWorkspace.shared.open("https://lunar.fyi/pro".asURL()!)
             // } else if lunarProBadSignature {
             //     NSWorkspace.shared.open("https://lunar.fyi/download/latest".asURL()!)
-        } else if let paddle, let lunarProProduct {
-            if lunarProProduct.licenseCode != nil {
+        } else if let paddle, let producct {
+            if producct.licenseCode != nil {
                 deactivateLicense {
-                    paddle.showProductAccessDialog(with: lunarProProduct)
+                    paddle.showProductAccessDialog(with: producct)
                 }
             } else {
-                paddle.showProductAccessDialog(with: lunarProProduct)
+                paddle.showProductAccessDialog(with: producct)
             }
         }
     }

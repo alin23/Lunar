@@ -2096,10 +2096,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         let user = User(userId: SERIAL_NUMBER_HASH)
 
         if CachedDefaults[.paddleConsent] {
-            user.email = lunarProProduct?.activationEmail
+            user.email = producct?.activationEmail
         }
 
-        user.username = lunarProProduct?.activationID
+        user.username = producct?.activationID
         SentrySDK.configureScope { scope in
             scope.setUser(user)
             scope.setTag(value: DC.adaptiveModeString(), key: "adaptiveMode")
@@ -2289,9 +2289,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
                 let user = User(userId: SERIAL_NUMBER_HASH)
                 if CachedDefaults[.paddleConsent] {
-                    user.email = lunarProProduct?.activationEmail
+                    user.email = producct?.activationEmail
                 }
-                user.username = lunarProProduct?.activationID
+                user.username = producct?.activationID
                 SentrySDK.configureScope { scope in
                     scope.setUser(user)
                     scope.setTag(value: DC.adaptiveModeString(), key: "adaptiveMode")

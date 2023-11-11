@@ -16,7 +16,7 @@ import Paddle
 // MARK: - LicenseView
 
 struct LicenseView: View {
-    @State var product: PADProduct? = lunarProProduct
+    @State var product: PADProduct? = producct
 
     @Default(.lunarProActive) var lunarProActive
     @Default(.lunarProOnTrial) var lunarProOnTrial
@@ -70,7 +70,7 @@ struct LicenseView: View {
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
         .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.fg.warm.opacity(0.03)))
-        .onAppear { product = lunarProProduct }
+        .onAppear { product = producct }
     }
 
 }
