@@ -2239,11 +2239,11 @@ func contactURL() -> URL {
     }
     urlBuilder.queryItems = [URLQueryItem(name: "userid", value: SERIAL_NUMBER_HASH)]
 
-    if let licenseCode = lunarProProduct?.licenseCode {
+    if let licenseCode = producct?.licenseCode {
         urlBuilder.queryItems?.append(URLQueryItem(name: "code", value: licenseCode))
     }
 
-    if let email = lunarProProduct?.activationEmail {
+    if let email = producct?.activationEmail {
         urlBuilder.queryItems?.append(URLQueryItem(name: "email", value: email))
     }
 
