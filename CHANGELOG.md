@@ -1,3 +1,33 @@
+# 6.4.0
+## Features
+
+- Support for the new **M3 MacBook Pro** and **M3 iMac**
+- **Cleanup UI**
+    - Use a warmer color palette
+    - Make the menubar UI less wide
+    - Add option to *Dim non-essential UI* elements
+
+<video autoplay controls loop muted playsinline disablepictureinpicture width=460 height=686>
+    <source src="https://files.lunar.fyi/dim-ui-elements-h265.mp4" type="video/mp4; codecs=hvc1">
+    <source src="https://files.lunar.fyi/dim-ui-elements-h264.mp4" type="video/mp4">
+</video>
+
+- Add `lunar lux --listen` command for automations based on readings from the internal ambient light sensor
+
+## Improvements
+
+- Disable Lunar adjustments when screen is locked
+- Add new identifiers for the M3 MacBook Pro and iMac
+- Make cursor cling to the middle of the slider knob instead of lagging behind
+- Enable `lunar listen` to react to display connection changes
+- Disable `autoRestartOnFailedDDC` and make it opt-in by default
+    - New macOS updates have fixed most of the issues that created the need for it
+
+## Fixes
+
+- Fix Auto XDR appearing erroneously in non-Pro builds
+- Fix locked volume OSD when locking brightness
+
 # 6.3.0
 ## Features
 
