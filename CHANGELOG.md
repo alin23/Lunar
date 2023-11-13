@@ -1,3 +1,8 @@
+# 6.4.2
+## Hotfix
+
+- Fix a crash introduced in 6.4.1 related to presets
+
 # 6.4.1
 ## Fixes
 
