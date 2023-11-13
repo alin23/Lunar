@@ -1,3 +1,9 @@
+# 6.4.1
+## Fixes
+
+- Fix custom preset not being applied correctly if saved with the same name as a previously deleted preset
+- Allow saving the preset by pressing `Enter` in the text field
+
 # 6.4.0
 ## Features
 
