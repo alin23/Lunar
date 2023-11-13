@@ -77,7 +77,8 @@ struct Preset: Codable, Defaults.Serializable, Hashable, Equatable, Identifiable
 
     func apply() {
         DC.disable()
-        for config in configs {
+        let preset = CachedDefaults[.presets].first(where: { $0.id == id }) ?? self
+        for config in preset.configs {
             guard let display = DC.activeDisplaysBySerial[config.id] else { continue }
             display.preciseBrightness = config.brightness
             display.preciseContrast = config.contrast
@@ -166,6 +167,19 @@ struct ErrorPopoverView: View {
     }
 }
 
+extension View {
+    func placeholder(
+        when shouldShow: Bool,
+        alignment: Alignment = .leading,
+        @ViewBuilder placeholder: () -> some View
+    ) -> some View {
+        ZStack(alignment: alignment) {
+            placeholder().opacity(shouldShow ? 1 : 0)
+            self
+        }
+    }
+}
+
 // MARK: - CustomPresetsView
 
 struct CustomPresetsView: View {
@@ -210,7 +224,7 @@ struct CustomPresetsView: View {
                             .foregroundColor(Color.warmWhite.opacity(0.4))
                         DynamicKey(keyCode: $presetKey, color: .warmWhite.opacity(0.1), textColor: Color.warmWhite, fontSize: size)
                     }.frame(minWidth: 90, alignment: .center)
-                    TextField("Preset Name", text: $presetName)
+                    TextField("", text: $presetName, onCommit: { save() })
                         .onReceive(Just(presetName)) { name in
                             limitText(10)
                             if !presetKeyChanged, let char = name.first(
@@ -223,6 +237,12 @@ struct CustomPresetsView: View {
                         .frame(width: 100)
                         .foregroundColor(.warmWhite.opacity(0.7))
                         .font(.system(size: size, weight: .medium, design: .rounded))
+                        .placeholder(when: presetName.isEmpty) {
+                            Text("Preset name")
+                                .font(.system(size: size, weight: .medium, design: .rounded))
+                                .foregroundColor(Color.warmWhite.opacity(0.4))
+                                .padding(.leading, 8)
+                        }
 
                     SwiftUI.Button("Save") { save() }
                         .buttonStyle(FlatButton(color: Color.warmWhite.opacity(0.05), textColor: Color.warmWhite))
@@ -254,6 +274,7 @@ struct CustomPresetsView: View {
     }
     var addButton: some View {
         SwiftUI.Button("\(Image(systemName: "plus.square.fill")) \(presets.isEmpty ? "Create " : "")Preset") {
+            presetName = ""
             adding = true
         }
         .buttonStyle(FlatButton(color: Color.translucid, textColor: Color.fg.warm.opacity(0.6), stretch: !presets.isEmpty))
@@ -293,6 +314,11 @@ struct CustomPresetsView: View {
                 }
             }
             addButton
+        }
+        .onChange(of: presets) { presets in
+            for preset in presets {
+                log.debug("Preset \(preset.id) -> \(preset.configs.first(where: { $0.id == DC.builtinDisplay!.serial })!.brightness)")
+            }
         }
     }
 
