@@ -315,11 +315,6 @@ struct CustomPresetsView: View {
             }
             addButton
         }
-        .onChange(of: presets) { presets in
-            for preset in presets {
-                log.debug("Preset \(preset.id) -> \(preset.configs.first(where: { $0.id == DC.builtinDisplay!.serial })!.brightness)")
-            }
-        }
     }
 
     func save() {
