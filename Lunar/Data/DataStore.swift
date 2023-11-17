@@ -679,7 +679,7 @@ func cacheKey(_ key: Defaults.Key<some Any>, load: Bool = true) {
     }
     CachedDefaults.locks[key.name] = NSRecursiveLock()
     if key == .secondPhase {
-        initSecondPhase()
+        initThirdPhase()
     }
     Defaults.publisher(key).dropFirst().sink { change in
         // log.debug("Caching \(key.name) = \(change.newValue)")
