@@ -1,3 +1,8 @@
+# 6.4.3
+## Hotfix
+
+- **DDC** and **Sync Mode** responsiveness fix
+
 # 6.4.2
 ## Hotfix
 
