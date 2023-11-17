@@ -949,7 +949,7 @@ enum DDC {
     }
 
     static func setup() {
-        initSecondPhase()
+        initFirstPhase()
 
         #if arch(arm64)
             log.debug("Adding IOKit notification for dispext")
