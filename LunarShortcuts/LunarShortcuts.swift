@@ -2104,6 +2104,76 @@ The blue component of the Gamma curve
 }
 
 @available(iOS 16, macOS 13, *)
+struct AdjustSoftwareColorsAdvancesIntent: AppIntent {
+    init() {}
+
+    static var title: LocalizedStringResource = "Adjust Advanced Colors of a Screen (in software)"
+    static var description =
+        IntentDescription(
+            "Adjusts screen colors by changing the min, max and Gamma factor values for Red, Green and Blue. The adjustments stick as long as Lunar is running (not persistent), but they are re-applied when Lunar is relaunched.",
+            categoryName: "Colors"
+        )
+
+    static var parameterSummary: some ParameterSummary {
+        Summary(
+            "Adjust Gamma to（\(\.$minRed) Min Red｜\(\.$minGreen) Min Green｜\(\.$minBlue) Min Blue,（\(\.$maxRed) Max Red｜\(\.$maxGreen) Max Green｜\(\.$maxBlue) Max Blue）and（\(\.$redFactor) Red Factor｜\(\.$greenFactor) Green Factor｜\(\.$blueFactor) Blue Factor）for \(\.$screen)"
+        )
+    }
+
+    @Parameter(title: "Screen", optionsProvider: ScreenQuery(filter: { $0.supportsGammaByDefault }))
+    var screen: Screen
+
+    // swiftformat:disable all
+    @Parameter( title: "Min Red", default: 0.0, controlStyle: .field, inclusiveRange: (0.0, 0.95) )
+    var minRed: Double
+
+    @Parameter( title: "Min Green", default: 0.0, controlStyle: .field, inclusiveRange: (0.0, 0.95) )
+    var minGreen: Double
+
+    @Parameter( title: "Min Blue", default: 0.0, controlStyle: .field, inclusiveRange: (0.0, 0.95) )
+    var minBlue: Double
+
+    @Parameter( title: "Max Red", default: 1.0, controlStyle: .field, inclusiveRange: (0.05, 1.0) )
+    var maxRed: Double
+
+    @Parameter( title: "Max Green", default: 1.0, controlStyle: .field, inclusiveRange: (0.05, 1.0) )
+    var maxGreen: Double
+
+    @Parameter( title: "Max Blue", default: 1.0, controlStyle: .field, inclusiveRange: (0.05, 1.0) )
+    var maxBlue: Double
+
+    @Parameter( title: "Red Factor", default: 1.0, controlStyle: .field, inclusiveRange: (0.05, 3.0) )
+    var redFactor: Double
+
+    @Parameter( title: "Green Factor", default: 1.0, controlStyle: .field, inclusiveRange: (0.05, 3.0) )
+    var greenFactor: Double
+
+    @Parameter( title: "Blue Factor", default: 1.0, controlStyle: .field, inclusiveRange: (0.05, 3.0) )
+    var blueFactor: Double
+
+    // swiftformat:enable all
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        try checkShortcutsLimit()
+        screen.displays.forEach { display in
+            display.applyGamma = true
+            display.defaultGammaRedMin = minRed.ns
+            display.defaultGammaRedMax = maxRed.ns
+            display.defaultGammaRedValue = redFactor.ns
+            display.defaultGammaGreenMin = minGreen.ns
+            display.defaultGammaGreenMax = maxGreen.ns
+            display.defaultGammaGreenValue = greenFactor.ns
+            display.defaultGammaBlueMin = minBlue.ns
+            display.defaultGammaBlueMax = maxBlue.ns
+            display.defaultGammaBlueValue = blueFactor.ns
+        }
+
+        return .result()
+    }
+}
+
+@available(iOS 16, macOS 13, *)
 struct AdjustHardwareColorsIntent: AppIntent {
     init() {}
 
@@ -3306,12 +3376,7 @@ struct DisplayFloatNumericPropertyQuery: EntityQuery {
     typealias Entity = DisplayProperty
 
     func suggestedEntities() async throws -> ItemCollection<DisplayProperty> {
-        ItemCollection {
-            ItemSection(
-                title: "Common",
-                items: DisplayProperty.commonFloat.map { .init($0, title: "\($0.name)") }
-            )
-        }
+        try await results()
     }
 
     func defaultResult() async -> Entity? {
@@ -3329,6 +3394,10 @@ struct DisplayFloatNumericPropertyQuery: EntityQuery {
             ItemSection(
                 title: "Common",
                 items: DisplayProperty.commonFloat.map { .init($0, title: "\($0.name)") }
+            )
+            ItemSection(
+                title: "Colors",
+                items: DisplayProperty.colorFloat.map { .init($0, title: "\($0.name)") }
             )
         }
     }
@@ -3458,6 +3527,17 @@ struct DisplayProperty: Equatable, Hashable, AppEntity, CustomStringConvertible 
         DisplayProperty(id: .subzeroDimming, name: "Sub-zero Dimming"),
         DisplayProperty(id: .xdrBrightness, name: "XDR Brightness"),
     ]
+    static let colorFloat: [DisplayProperty] = [
+        DisplayProperty(id: .defaultGammaRedMin, name: "Gamma Red Min"),
+        DisplayProperty(id: .defaultGammaRedMax, name: "Gamma Red Max"),
+        DisplayProperty(id: .defaultGammaRedValue, name: "Gamma Red Factor"),
+        DisplayProperty(id: .defaultGammaGreenMin, name: "Gamma Green Min"),
+        DisplayProperty(id: .defaultGammaGreenMax, name: "Gamma Green Max"),
+        DisplayProperty(id: .defaultGammaGreenValue, name: "Gamma Green Factor"),
+        DisplayProperty(id: .defaultGammaBlueMin, name: "Gamma Blue Min"),
+        DisplayProperty(id: .defaultGammaBlueMax, name: "Gamma Blue Max"),
+        DisplayProperty(id: .defaultGammaBlueValue, name: "Gamma Blue Factor"),
+    ]
     static let commonBool: [DisplayProperty] = [
         DisplayProperty(id: .subzero, name: "Sub-zero Dimming"),
         DisplayProperty(id: .blackout, name: "BlackOut"),
@@ -3483,7 +3563,7 @@ struct DisplayProperty: Equatable, Hashable, AppEntity, CustomStringConvertible 
         DisplayProperty(id: .applyGamma, name: "Apply Gamma Color Adjustments"),
     ]
 
-    static let all = commonFloat + commonBool + lessCommonBool + settingsBool + commonNumeric + lessCommonNumeric + settingsNumeric + ddcSettingsNumeric
+    static let all = commonFloat + commonBool + lessCommonBool + settingsBool + commonNumeric + lessCommonNumeric + settingsNumeric + ddcSettingsNumeric + colorFloat
     static let allByID = all.dict { ($0.id, $0) }
 
     static var typeDisplayRepresentation: TypeDisplayRepresentation = "Screen Property"
