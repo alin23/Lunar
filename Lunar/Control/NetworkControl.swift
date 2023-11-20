@@ -470,7 +470,7 @@ final class NetworkControl: Control {
 
         manageSendingState(for: controlID, sending: true)
 
-        var fullUrl: URL = if smooth {
+        let fullUrl: URL = if smooth {
             url / controlID / oldValue! / value
         } else {
             url / controlID / value
