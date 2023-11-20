@@ -2429,8 +2429,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         if locationManager == nil {
             locationManager = CLLocationManager()
             locationManager!.delegate = self
-            locationManager!.desiredAccuracy = kCLLocationAccuracyThreeKilometers
-            locationManager!.distanceFilter = 10000
+            locationManager!.desiredAccuracy = kCLLocationAccuracyReduced
         }
 
         guard let locationManager, locationManager.authorizationStatus != .denied else {
@@ -2883,19 +2882,23 @@ func restart() {
         exit(1)
     }
 
-    var args: [String] = []
+    var restartArg = "restarts=\(Date().timeIntervalSince1970)"
     if CommandLine.arguments.count == 2 {
         let restarts = CommandLine.arguments[1].split(separator: "=")[1].split(separator: ":").map { TimeInterval($0)! }
         let now = Date().timeIntervalSince1970
         if restarts.filter({ now - $0 < 10 }).count > 3 {
             exit(1)
         } else {
-            args.append("\(CommandLine.arguments[1]):\(now)")
+            restartArg = "\(CommandLine.arguments[1]):\(now)"
         }
     }
 
     do {
-        try exec(arg0: Bundle.main.executablePath!, args: args)
+        _ = shell(
+            command: "while /bin/ps -o pid -p \(ProcessInfo.processInfo.processIdentifier) >/dev/null 2>/dev/null; do /bin/sleep 0.1; done; /bin/sleep 0.5; /usr/bin/open '\(Bundle.main.path.string)' --args '\(restartArg)'",
+            wait: false
+        )
+        // try exec(arg0: Bundle.main.executablePath!, args: args)
     } catch {
         err("Failed to restart: \(error)")
     }

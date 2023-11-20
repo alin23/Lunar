@@ -3553,7 +3553,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         #if DEBUG
             if id == TEST_DISPLAY_PERSISTENT2_ID { return .lg }
         #endif
-        guard let vendorID = (infoDictionary[kDisplayVendorID] as? Int64) ?? (CGDisplayVendorNumber(id) as? Int64), let v = Vendor(rawValue: vendorID) else {
+        let vendorID = (infoDictionary[kDisplayVendorID] as? Int64) ?? (CGDisplayVendorNumber(id).i64)
+        guard let v = Vendor(rawValue: vendorID) else {
             return .unknown
         }
         return v
