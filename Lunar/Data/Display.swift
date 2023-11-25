@@ -2760,26 +2760,26 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     func brightnessCurveMapping(_ modeKey: AdaptiveModeKey? = nil) -> [AutoLearnMapping] {
         switch modeKey ?? DC.adaptiveModeKey {
         case .sync:
-            return syncBrightnessMapping[DC.sourceDisplay.serial] ?? []
+            syncBrightnessMapping[DC.sourceDisplay.serial] ?? []
         case .sensor:
-            return sensorBrightnessMapping
+            sensorBrightnessMapping
         case .location:
-            return locationBrightnessMapping
+            locationBrightnessMapping
         default:
-            return []
+            []
         }
     }
 
     func contrastCurveMapping(_ modeKey: AdaptiveModeKey? = nil) -> [AutoLearnMapping] {
         switch modeKey ?? DC.adaptiveModeKey {
         case .sync:
-            return syncContrastMapping[DC.sourceDisplay.serial] ?? []
+            syncContrastMapping[DC.sourceDisplay.serial] ?? []
         case .sensor:
-            return sensorContrastMapping
+            sensorContrastMapping
         case .location:
-            return locationContrastMapping
+            locationContrastMapping
         default:
-            return []
+            []
         }
     }
 
@@ -4312,11 +4312,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func getPowerOffTooltip(hasDDC: Bool? = nil) -> String {
         #if arch(arm64)
-            let disconnect: Bool
-            if #available(macOS 13, *) {
-                disconnect = CachedDefaults[.newBlackOutDisconnect]
+            let disconnect: Bool = if #available(macOS 13, *) {
+                CachedDefaults[.newBlackOutDisconnect]
             } else {
-                disconnect = false
+                false
             }
         #else
             let disconnect = false

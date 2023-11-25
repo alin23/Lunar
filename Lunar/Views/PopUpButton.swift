@@ -146,23 +146,23 @@ final class PopUpButton: NSPopUpButton {
 
     var bgColor: NSColor {
         if !isEnabled {
-            return (offStateButtonColor[hoverState]![page] ?? offStateButtonColor[hoverState]![.display]!)
+            (offStateButtonColor[hoverState]![page] ?? offStateButtonColor[hoverState]![.display]!)
                 .with(saturation: -0.2, brightness: -0.1)
         } else if state == .off {
-            return onStateButtonColor[hoverState]![page] ?? onStateButtonColor[hoverState]![.display]!
+            onStateButtonColor[hoverState]![page] ?? onStateButtonColor[hoverState]![.display]!
         } else {
-            return offStateButtonColor[hoverState]![page] ?? offStateButtonColor[hoverState]![.display]!
+            offStateButtonColor[hoverState]![page] ?? offStateButtonColor[hoverState]![.display]!
         }
     }
 
     var labelColor: NSColor {
         if !isEnabled {
-            return (offStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!)
+            (offStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!)
                 .highlight(withLevel: 0.3)!.with(alpha: -0.4)
         } else if state == .off {
-            return onStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!
+            onStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!
         } else {
-            return offStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!
+            offStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!
         }
     }
 

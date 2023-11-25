@@ -1895,13 +1895,11 @@ struct Lunar: ParsableCommand {
     #endif
 
     #if arch(arm64)
-        static let ARCH_SPECIFIC_COMMANDS: [ParsableCommand.Type] = {
-            if #available(macOS 13, *) {
-                return [Disconnect.self, Connect.self, ToggleConnection.self, Nits.self]
-            } else {
-                return [Nits.self]
-            }
-        }()
+        static let ARCH_SPECIFIC_COMMANDS: [ParsableCommand.Type] = if #available(macOS 13, *) {
+            [Disconnect.self, Connect.self, ToggleConnection.self, Nits.self]
+        } else {
+            [Nits.self]
+        }
     #else
         static let ARCH_SPECIFIC_COMMANDS: [ParsableCommand.Type] = []
     #endif

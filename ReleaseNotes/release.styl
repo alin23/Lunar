@@ -1,16 +1,34 @@
-codeColor = #fda43a
-boldColor = #fda43a
-emColor = #FBAB7E
+codeColor = #7c698e
+boldColor = #b47b36
+emColor = #de8377
 linkColor = #1DA1F2
+
+codeColorDark = #bfa2d9
+boldColorDark = #e7ad66
+emColorDark = #f59f94
+linkColorDark = #85b3f4
 
 headingColors = {
   hotfix: #FF2F3C,
-  features: #EDB44B,
+  features: #b97900,
   improvements: #616187,
   fixes: #E14283,
 }
+headingColorsDark = {
+  hotfix: #ff2f5c,
+  features: #ffc455,
+  improvements: #c4c4ff,
+  fixes: #fdc0d9,
+}
 mono = ui-monospace, Menlo, monospace
 sansSerif = ui-sans-serif, system-ui, sans-serif
+
+html, body
+  background: rgb(245 245 244)
+  color: #111
+  @media screen and (prefers-color-scheme: dark)
+    background: rgb(30 29 28)
+    color: #eee
 
 body
   margin: auto
@@ -36,18 +54,26 @@ video
 code, pre
   font-family: mono
   color: codeColor
+  @media screen and (prefers-color-scheme: dark)
+    color: codeColorDark
 
 strong
   color: boldColor
+  @media screen and (prefers-color-scheme: dark)
+    color: boldColorDark
 
 em
   color: emColor
+  @media screen and (prefers-color-scheme: dark)
+    color: emColorDark
 
 code
   font-weight: bold
 
 a
   color: linkColor
+  @media screen and (prefers-color-scheme: dark)
+    color: linkColorDark
   &:hover
     color: darken(linkColor, 20%)
 
@@ -91,8 +117,14 @@ for heading in hotfix features improvements fixes
   h1#{heading}, h2#{heading}, h3#{heading}
     color: headingColors[heading]
     opacity: 0.7
+    @media screen and (prefers-color-scheme: dark)
+      color: headingColorsDark[heading]
+      opacity: 1.0
 
   for num in (1..10)
     h1#{heading}-{num}, h2#{heading}-{num}, h3#{heading}-{num}
       color: headingColors[heading]
       opacity: 0.7
+      @media screen and (prefers-color-scheme: dark)
+        color: headingColorsDark[heading]
+        opacity: 1.0

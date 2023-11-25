@@ -1984,11 +1984,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         configureSentry()
         asyncNow { [self] in
             #if DEBUG
-                let argList: [String]
-                if CommandLine.arguments.contains("-NSDocumentRevisionsDebugMode"), CommandLine.arguments.last == "YES" {
-                    argList = Array(CommandLine.arguments[idx + 1 ..< CommandLine.arguments.count - 2])
+                let argList: [String] = if CommandLine.arguments.contains("-NSDocumentRevisionsDebugMode"), CommandLine.arguments.last == "YES" {
+                    Array(CommandLine.arguments[idx + 1 ..< CommandLine.arguments.count - 2])
                 } else {
-                    argList = Array(CommandLine.arguments[idx + 1 ..< CommandLine.arguments.count])
+                    Array(CommandLine.arguments[idx + 1 ..< CommandLine.arguments.count])
                 }
             #else
                 let argList = Array(CommandLine.arguments[idx + 1 ..< CommandLine.arguments.count])

@@ -47,14 +47,26 @@
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
-		<key>NSAllowsLocalNetworking</key>
-		<true/>
 		<key>NSExceptionDomains</key>
 		<dict>
 			<key>ipstack.com</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<false/>
+				<key>NSIncludesSubdomains</key>
 				<true/>
+			</dict>
+			<key>paddle.com</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<false/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+			<key>sentry.io</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<false/>
 				<key>NSIncludesSubdomains</key>
 				<true/>
 			</dict>
@@ -69,7 +81,7 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2017 Alin. All rights reserved.</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Lunar uses the local network to find devices that can send DDC messages to your monitor when this Mac device doesn't have this ability</string>
+	<string>Lunar uses the local network to find devices that can send DDC messages to your monitor when this Mac device doesn&apos;t have this ability</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Lunar needs location data to get sunrise and sunset times</string>
 	<key>NSLocationAlwaysUsageDescription</key>

@@ -59,7 +59,7 @@ upload: ReleaseNotes/release.css
 	rsync -avz Releases/*.html ReleaseNotes/*.css darkwoods:/static/Lunar/ReleaseNotes/
 	rsync -avzP Releases/appcast*.xml darkwoods:/static/Lunar/
 	cfcli -d lunar.fyi purge
-	$(MAKE) sentry
+	op run -- $(MAKE) sentry
 
 release: changelog
 	echo "$(VERSION)" > /tmp/release_file_$(VERSION).md

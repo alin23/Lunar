@@ -782,7 +782,12 @@ final class IOServiceDetector {
 // MARK: - DDC
 
 enum DDC {
-    static let queue = DispatchQueue(label: "DDC", qos: .userInteractive, autoreleaseFrequency: .workItem)
+    static let queueKey = DispatchSpecificKey<String>()
+    static let queue: DispatchQueue = {
+        let q = DispatchQueue(label: "DDC", qos: .userInteractive, autoreleaseFrequency: .workItem)
+        q.setSpecific(key: queueKey, value: "DDC")
+        return q
+    }()
     @Atomic static var apply = true
     @Atomic static var applyLimits = true
     static let requestDelay: useconds_t = 20000
@@ -807,6 +812,9 @@ enum DDC {
         }
 
         if let q = DispatchQueue.current, q == queue {
+            return action()
+        }
+        if let q = DispatchQueue.getSpecific(key: queueKey), q == "DDC" {
             return action()
         }
         return queue.sync(flags: barrier ? [.barrier] : [], execute: action)

@@ -358,9 +358,9 @@ extension Collection {
         sorted(by: { e1, e2 in
             switch order {
             case .forward:
-                return e1[keyPath: keyPath] < e2[keyPath: keyPath]
+                e1[keyPath: keyPath] < e2[keyPath: keyPath]
             case .reverse:
-                return e1[keyPath: keyPath] > e2[keyPath: keyPath]
+                e1[keyPath: keyPath] > e2[keyPath: keyPath]
             }
         })
     }
