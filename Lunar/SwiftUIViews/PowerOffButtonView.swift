@@ -3,6 +3,7 @@ import SwiftUI
 
 struct PowerOffButtonView: View {
     @ObservedObject var display: Display
+    @ObservedObject var dc: DisplayController = DC
     @ObservedObject var km = KM
     @State var showPopover = false
     @Default(.newBlackOutDisconnect) var newBlackOutDisconnect
@@ -44,10 +45,10 @@ struct PowerOffButtonView: View {
 
         #if arch(arm64)
             if #available(macOS 13, *), km.commandKeyPressed {
-                return newBlackOutDisconnect ? "BlackOut" : "Disconnect"
+                return newBlackOutDisconnect && !dc.displayLinkRunning ? "BlackOut" : "Disconnect"
             }
 
-            return newBlackOutDisconnect ? "Disconnect" : "BlackOut"
+            return newBlackOutDisconnect && !dc.displayLinkRunning ? "Disconnect" : "BlackOut"
         #else
             return "BlackOut"
         #endif

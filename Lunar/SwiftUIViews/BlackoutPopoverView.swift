@@ -5,6 +5,7 @@ struct BlackoutPopoverView: View {
     @State var hasDDC: Bool
     @Default(.hotkeys) var hotkeys
     @Default(.newBlackOutDisconnect) var newBlackOutDisconnect
+    @ObservedObject var dc: DisplayController = DC
 
     var body: some View {
         ZStack {
@@ -14,7 +15,7 @@ struct BlackoutPopoverView: View {
                 if DC.activeDisplayCount == 1 {
                     BlackoutPopoverRowView(action: "Make screen black", hotkeyText: hotkeyText(id: .blackOut), actionInfo: "(without disabling it)")
                 } else {
-                    if newBlackOutDisconnect, #available(macOS 13, *) {
+                    if newBlackOutDisconnect, #available(macOS 13, *), !dc.displayLinkRunning {
                         BlackoutPopoverRowView(action: "Disconnect screen", hotkeyText: hotkeyText(id: .blackOut), actionInfo: "(free up GPU)")
                     } else {
                         BlackoutPopoverRowView(action: "Soft power off", hotkeyText: hotkeyText(id: .blackOut), actionInfo: "(disables screen by mirroring)")
@@ -35,7 +36,7 @@ struct BlackoutPopoverView: View {
                     #if arch(arm64)
                         if #available(macOS 13, *) {
                             Divider().background(Color.white.opacity(0.2))
-                            if newBlackOutDisconnect {
+                            if newBlackOutDisconnect, !dc.displayLinkRunning {
                                 BlackoutPopoverRowView(modifiers: ["Command"], action: "Soft power off", hotkeyText: "", actionInfo: "(disables screen by mirroring)")
                                     .colorMultiply(Color.orange)
                             } else {

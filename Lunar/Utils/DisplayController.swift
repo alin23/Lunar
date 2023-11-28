@@ -1199,7 +1199,7 @@ final class DisplayController: ObservableObject {
                 guard shouldBlackout, let d = self.builtinDisplay, !self.calibrating else { return }
                 lastBlackOutToggleDate = .distantPast
                 #if arch(arm64)
-                    if CachedDefaults[.newBlackOutDisconnect], #available(macOS 13, *) {
+                    if CachedDefaults[.newBlackOutDisconnect], !DC.displayLinkRunning, #available(macOS 13, *) {
                         self.dis(d.id)
                     } else {
                         self.blackOut(display: d.id, state: .on)
@@ -1266,6 +1266,8 @@ final class DisplayController: ObservableObject {
 
     lazy var keyboardAutoBrightnessEnabledByUser = kbc.isAutoBrightnessEnabled(forKeyboard: 1)
 
+    @Atomic var displayLinkRunning = isDisplayLinkRunning()
+
     var targetDisplays: [Display] {
         activeDisplayList.filter { !$0.isSource }
     }
@@ -1282,15 +1284,6 @@ final class DisplayController: ObservableObject {
                 xdrSensorTask = getSensorTask()
             }
             sourceDisplay = getSourceDisplay()
-        }
-    }
-    @Atomic var displayLinkRunning = isDisplayLinkRunning() {
-        didSet {
-            #if arch(arm64)
-                if #available(macOS 13, *) {
-                    CachedDefaults[.newBlackOutDisconnect] = !displayLinkRunning
-                }
-            #endif
         }
     }
     @Atomic var fluxRunning = isFluxRunning() {
@@ -2434,11 +2427,6 @@ final class DisplayController: ObservableObject {
         runningAppExceptions = datastore.appExceptions(identifiers: appIdentifiers) ?? []
         adaptBrightness()
 
-        #if arch(arm64)
-            if #available(macOS 13, *) {
-                CachedDefaults[.newBlackOutDisconnect] = !displayLinkRunning
-            }
-        #endif
         NSWorkspace.shared.publisher(for: \.runningApplications, options: [.new])
             .debounce(for: .seconds(1), scheduler: RunLoop.main)
             .sink { [self] change in

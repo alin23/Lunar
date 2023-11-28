@@ -4313,7 +4313,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     func getPowerOffTooltip(hasDDC: Bool? = nil) -> String {
         #if arch(arm64)
             let disconnect: Bool = if #available(macOS 13, *) {
-                CachedDefaults[.newBlackOutDisconnect]
+                CachedDefaults[.newBlackOutDisconnect] && !DC.displayLinkRunning
             } else {
                 false
             }
@@ -4408,7 +4408,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         #if arch(arm64)
             if DC.activeDisplayCount > 1 {
-                let shouldDisconnect: Bool = if CachedDefaults[.newBlackOutDisconnect] {
+                let shouldDisconnect: Bool = if CachedDefaults[.newBlackOutDisconnect], !DC.displayLinkRunning {
                     !KM.commandKeyPressed
                 } else {
                     KM.commandKeyPressed

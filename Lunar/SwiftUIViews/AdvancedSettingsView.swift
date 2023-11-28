@@ -40,7 +40,7 @@ struct AdvancedSettingsView: View {
                             SettingsToggle(
                                 text: "Disable the Disconnect API in BlackOut", setting: !$newBlackOutDisconnect,
                                 help: """
-                                BlackOut can use a hidden macOS API to disconnect the display entirely,
+                                \(dc.displayLinkRunning ? "NOTE: Disconnect API is disabled when DisplayLink is running\n\n" : "")BlackOut can use a hidden macOS API to disconnect the display entirely,
                                 freeing up GPU resources and allowing for an easy reconnection when needed.
 
                                 If you're having trouble with how this works, you can switch to the old
@@ -53,7 +53,7 @@ struct AdvancedSettingsView: View {
 
                                 For external displays, disconnect and reconnect the cable to fix any issue.
                                 """
-                            )
+                            ).disabled(DC.displayLinkRunning)
                         }
                     #endif
 
