@@ -1152,8 +1152,6 @@ final class DisplayController: ObservableObject {
         case disabledAutomatically
     }
 
-    static var nonZeroBuiltinMinBrightness: NSNumber = -1
-
     static var serials: [CGDirectDisplayID: String] = [:]
 
     static var observers: Set<AnyCancellable> = []
@@ -2616,7 +2614,7 @@ final class DisplayController: ObservableObject {
             )
 
             if autoSubzero || display.softwareBrightness < 1.0,
-               !display.hasSoftwareControl,
+               !display.hasSoftwareControl, !display.subzeroDimmingDisabled,
                (value == minBrightness && value == oldValue && timeSince(lastTimeBrightnessKeyPressed) < 3) ||
                (oldValue == minBrightness && display.softwareBrightness < 1.0)
             {

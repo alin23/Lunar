@@ -933,7 +933,7 @@ final class DisplayViewController: NSViewController {
             }.store(in: &observers)
 
         minBrightnessField?.integerValue = display.minBrightness.intValue
-        minBrightnessField?.lowerLimit = display.allowBrightnessZero ? 0 : 1
+        minBrightnessField?.lowerLimit = 0
         minBrightnessField?.upperLimit = (display.maxBrightness.intValue - 1).d
 
         maxBrightnessField?.integerValue = display.maxBrightness.intValue
@@ -1496,11 +1496,6 @@ final class DisplayViewController: NSViewController {
                 self.minBrightnessField?.integerValue = value.intValue
                 self.maxBrightnessField?.lowerLimit = value.doubleValue + 1
             }.store(in: &displayObservers, for: "minBrightness")
-        display?.$allowBrightnessZero
-            .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
-            .sink { [weak self] value in
-                self?.minBrightnessField?.lowerLimit = value ? 0 : 1
-            }.store(in: &displayObservers, for: "allowBrightnessZero")
     }
 
     func listenForDisplayBoolChange() {

@@ -60,7 +60,7 @@ enum TerminalStyle {
 
 extension String {
     /// Enable/disable colorization
-    static var isColorizationEnabled = true
+    static var isColorizationEnabled = isatty(1) == 1
 
     func bold() -> String {
         applyStyle(TerminalStyle.bold)

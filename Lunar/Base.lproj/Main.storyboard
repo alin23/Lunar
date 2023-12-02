@@ -3992,6 +3992,22 @@ enabled</string>
                                     </binding>
                                 </connections>
                             </imageView>
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.40000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="Ic0-QS-JH9">
+                                <rect key="frame" x="91" y="371" width="158" height="15"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Sub-zero dimming disabled" id="gTk-Jg-kXb">
+                                    <font key="font" metaFont="systemSemibold" size="9"/>
+                                    <color key="textColor" name="Caption Tertiary"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.subzeroDimmingDisabled" id="MCd-VY-gi6">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </textField>
                         </subviews>
                     </view>
                     <connections>
