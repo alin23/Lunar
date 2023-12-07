@@ -2136,7 +2136,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
         do {
             try installCLIBinary()
-            print("Lunar CLI installed")
+            print("Lunar CLI installed at \(CLI_BIN_DIR)")
         } catch let error as InstallCLIError {
             print(error.message)
             print(error.info)
