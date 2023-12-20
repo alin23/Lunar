@@ -55,7 +55,6 @@
 		C730421F2407E92C0016E591 /* Headers in Resources */ = {isa = PBXBuildFile; fileRef = C730421E2407E92C0016E591 /* Headers */; };
 		C731260C22B38899001ED199 /* HelpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C731260B22B38899001ED199 /* HelpButton.swift */; };
 		C731260F22B3A9CD001ED199 /* HelpPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C731260E22B3A9CD001ED199 /* HelpPopoverController.swift */; };
-		C731E85E27E1E5090016B36D /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = C731E85D27E1E5090016B36D /* Sentry */; };
 		C735D9F62AFCD0B5001DCAA8 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = C735D9F52AFCD0B5001DCAA8 /* Colors.swift */; };
 		C73716A526DE1F22008EEE53 /* CBTrueToneClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C737169E26DE1F22008EEE53 /* CBTrueToneClient.h */; };
 		C73716A726DE1F22008EEE53 /* CBAdaptationClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C73716A426DE1F22008EEE53 /* CBAdaptationClient.h */; };
@@ -70,6 +69,7 @@
 		C740A1F4262490E1004BC1C7 /* CLI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C740A1F3262490E1004BC1C7 /* CLI.swift */; };
 		C740A1F826249176004BC1C7 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = C740A1F726249176004BC1C7 /* ArgumentParser */; };
 		C743892C29474597004C5D9B /* WAYWindow.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7B2EB212947458300D02BCB /* WAYWindow.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C744D07C2B434605003D77DE /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = C744D07B2B434605003D77DE /* Sentry */; };
 		C74820FA26DE6CFA00556EA8 /* PageNavigationControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74820F926DE6CFA00556EA8 /* PageNavigationControl.swift */; };
 		C7482C3427D2874D00A12E82 /* ColorizeSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7482C3227D2874D00A12E82 /* ColorizeSwift.swift */; };
 		C749B34020DB9D2C0086AF97 /* SettingsPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C749B33F20DB9D2C0086AF97 /* SettingsPageController.swift */; };
@@ -463,8 +463,8 @@
 				C7045DC12441015C002289E5 /* SwiftDate in Frameworks */,
 				C7E80E392637060F004718A4 /* libssl.a in Frameworks */,
 				C7BD5F85287B44130077CCB7 /* Charts in Frameworks */,
+				C744D07C2B434605003D77DE /* Sentry in Frameworks */,
 				C7F48C4A2657A258000715A8 /* DataCompression in Frameworks */,
-				C731E85E27E1E5090016B36D /* Sentry in Frameworks */,
 				C7DA10F7259B8979006DD876 /* Regex in Frameworks */,
 				C7C5AD9E26C5AD5400D68B7F /* MonitorPanel.framework in Frameworks */,
 				C7045DB82440DEEE002289E5 /* SwiftyJSON in Frameworks */,
@@ -912,10 +912,10 @@
 				C7ECB6712750C75C00DA212D /* LDSwiftEventSourceStatic */,
 				C77B176827BE430200B957D1 /* SimplyCoreAudio */,
 				C799C2F427BF67C4003A2FB9 /* Socket */,
-				C731E85D27E1E5090016B36D /* Sentry */,
 				C7BD5F84287B44130077CCB7 /* Charts */,
 				C7A7F2532913ECCA00CD450C /* FuzzyMatcher */,
 				C70A793C2AB471F900289426 /* SwiftUIIntrospect */,
+				C744D07B2B434605003D77DE /* Sentry */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -972,10 +972,10 @@
 				C7ECB6702750C75C00DA212D /* XCRemoteSwiftPackageReference "swift-eventsource" */,
 				C77B176727BE430200B957D1 /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */,
 				C799C2F327BF67C4003A2FB9 /* XCRemoteSwiftPackageReference "BlueSocket" */,
-				C731E85C27E1E5090016B36D /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 				C77C77562812AA80006326BE /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
 				C7BD5F83287B44130077CCB7 /* XCRemoteSwiftPackageReference "Charts" */,
 				C7A7F2522913ECCA00CD450C /* XCRemoteSwiftPackageReference "FuzzyMatcher" */,
+				C744D07A2B434605003D77DE /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -1327,7 +1327,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 6.5.0b4;
+				CURRENT_PROJECT_VERSION = 6.5.0;
 				DEAD_CODE_STRIPPING = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -1360,7 +1360,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 6.5.0b4;
+				MARKETING_VERSION = 6.5.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1395,7 +1395,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 6.5.0b4;
+				CURRENT_PROJECT_VERSION = 6.5.0;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1427,7 +1427,7 @@
 				);
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 6.5.0b4;
+				MARKETING_VERSION = 6.5.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1519,14 +1519,6 @@
 				kind = branch;
 			};
 		};
-		C731E85C27E1E5090016B36D /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/alin23/sentry-cocoa.git";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 		C73B9A0B25FB9AD7003184FC /* XCRemoteSwiftPackageReference "Glob" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Bouke/Glob";
@@ -1549,6 +1541,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.0.0;
+			};
+		};
+		C744D07A2B434605003D77DE /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/getsentry/sentry-cocoa";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.17.2;
 			};
 		};
 		C77AB65A269A032E0046BA78 /* XCRemoteSwiftPackageReference "Magnet" */ = {
@@ -1701,11 +1701,6 @@
 			package = C7138D8B2634AF0500406EE3 /* XCRemoteSwiftPackageReference "KeyHolder" */;
 			productName = KeyHolder;
 		};
-		C731E85D27E1E5090016B36D /* Sentry */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C731E85C27E1E5090016B36D /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
-			productName = Sentry;
-		};
 		C73B9A0C25FB9AD7003184FC /* Glob */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C73B9A0B25FB9AD7003184FC /* XCRemoteSwiftPackageReference "Glob" */;
@@ -1720,6 +1715,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C740A1F626249176004BC1C7 /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
 			productName = ArgumentParser;
+		};
+		C744D07B2B434605003D77DE /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C744D07A2B434605003D77DE /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
 		};
 		C77AB65B269A032E0046BA78 /* Magnet */ = {
 			isa = XCSwiftPackageProductDependency;

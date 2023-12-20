@@ -950,7 +950,7 @@ extension AppDelegate: MediaKeyTapDelegate {
             if !self.mediaKeyTapAudioStarting {
                 self.mediaKeyTapAudioStarting = true
 
-                if volumeKeysEnabled ?? CachedDefaults[.volumeKeysEnabled], let audioDevice = simplyCA.defaultOutputDevice, !audioDevice.canSetVirtualMainVolume(scope: .output) {
+                if volumeKeysEnabled ?? CachedDefaults[.volumeKeysEnabled], let audioDevice = simplyCA?.defaultOutputDevice, !audioDevice.canSetVirtualMainVolume(scope: .output) {
                     mediaKeyTapAudio.restart()
                 } else {
                     mediaKeyTapAudio.stop()
@@ -1481,14 +1481,14 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     @objc func faceLightHotkeyHandler() {
-        guard lunarProActive else { return }
+        guard proactive else { return }
         cancelScreenWakeAdapterTask()
         faceLight(self)
         log.debug("FaceLight Hotkey pressed")
     }
 
     @objc func blackOutHotkeyHandler() {
-        guard lunarProActive else { return }
+        guard proactive else { return }
         cancelScreenWakeAdapterTask()
         blackOut(self)
         log.debug("BlackOut Hotkey pressed")
@@ -1501,14 +1501,14 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     @objc func blackOutNoMirroringHotkeyHandler() {
-        guard lunarProActive else { return }
+        guard proactive else { return }
         cancelScreenWakeAdapterTask()
         blackOutNoMirroring(self)
         log.debug("BlackOut No Mirroring Hotkey pressed")
     }
 
     @objc func blackOutOthersHotkeyHandler() {
-        guard lunarProActive else { return }
+        guard proactive else { return }
         cancelScreenWakeAdapterTask()
         blackOutOthers(self)
         log.debug("BlackOut Other Displays Hotkey pressed")

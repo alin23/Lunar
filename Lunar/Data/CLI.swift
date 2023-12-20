@@ -1082,11 +1082,51 @@ struct Lunar: ParsableCommand {
         var state: PowerState
 
         func run() throws {
+            if state == .toggle {
+                if appDelegate!.cleaningMode {
+                    deactivateCleaningMode()
+                } else {
+                    activateCleaningMode(deactivateAfter: keepActive ? nil : deactivateAfter.d)
+                }
+                return cliExit(0)
+            }
+
             if state == .off {
                 deactivateCleaningMode()
                 return cliExit(0)
             }
+
             activateCleaningMode(deactivateAfter: keepActive ? nil : deactivateAfter.d)
+            return cliExit(0)
+        }
+    }
+
+    struct NightMode: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Lower white point and increase contrast to reduce eye strain at night.",
+            discussion: """
+            Activates "Night Mode" to reduce eye strain at night.
+
+            This will lower the white point and increase the contrast of all screens,
+            making white regions appear less bright while still preserving most colors.
+            """
+        )
+
+        @OptionGroup(visibility: .hidden) var globals: GlobalOptions
+
+        @Argument(help: "Whether Night Mode should be `on` or `off`")
+        var state: PowerState
+
+        func run() throws {
+            if state == .toggle {
+                DC.nightMode.toggle()
+                return cliExit(0)
+            }
+            if state == .off {
+                DC.nightMode = false
+                return cliExit(0)
+            }
+            DC.nightMode = true
             return cliExit(0)
         }
     }
@@ -1930,6 +1970,7 @@ struct Lunar: ParsableCommand {
             Edid.self,
             Listen.self,
             CleaningMode.self,
+            NightMode.self,
         ] + ARCH_SPECIFIC_COMMANDS
     )
 
@@ -2000,6 +2041,8 @@ struct Lunar: ParsableCommand {
         case let cmd as DisplayUuid:
             return cmd.globals
         case let cmd as CleaningMode:
+            return cmd.globals
+        case let cmd as NightMode:
             return cmd.globals
         #if arch(arm64)
             case let cmd as Nits:

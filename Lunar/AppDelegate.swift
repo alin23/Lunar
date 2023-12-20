@@ -35,8 +35,29 @@ import SwiftUI
 
 import ServiceManagement
 
+func withTimeout<T>(_ timeout: DateComponents, name: String, _ block: @escaping () throws -> T) -> T? {
+    var value: T?
+    let workItem = DispatchWorkItem(name: name) {
+        do {
+            value = try block()
+        } catch {
+            log.error("\(name) failed: \(error.localizedDescription)")
+        }
+    }
+    DispatchQueue.global().async(execute: workItem.workItem)
+    let result = workItem.wait(for: timeout)
+    if result == .timedOut {
+        log.error("\(name) timed out")
+        workItem.cancel()
+    }
+
+    return value
+}
+
 let fm = FileManager()
-let simplyCA = SimplyCoreAudio()
+let simplyCA: SimplyCoreAudio? = withTimeout(5.seconds, name: "simplyCA") {
+    SimplyCoreAudio()
+}
 var brightnessTransition = BrightnessTransition.instant
 let SCREEN_WAKE_ADAPTER_TASK_KEY = "screenWakeAdapter"
 let CONTACT_URL = "https://lunar.fyi/contact".asURL()!
@@ -324,6 +345,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     @Atomic @objc dynamic var cleaningMode = false {
         didSet {
             log.debug("Cleaning Mode: \(cleaningMode)")
+        }
+    }
+
+    @Atomic @objc dynamic var nightMode = false {
+        didSet {
+            guard nightMode != oldValue else { return }
+            log.debug("Night Mode: \(nightMode)")
+            DC.nightMode = nightMode
         }
     }
 
@@ -828,14 +857,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             let appDir = (try? appPath.parent.realpath()) ?? appPath.parent
             guard appDir.components.starts(with: self.APP_DIR) || appDir.components.starts(with: self.SVAPP_DIR) else { return }
 
-            if #available(macOS 13.0, *) {
-                if shouldStartAtLogin {
-                    try? SMAppService.mainApp.register()
-                } else {
-                    try? SMAppService.mainApp.unregister()
-                }
+            if #available(macOS 13.0, *),
+               withTimeout(5.seconds, name: "SMAppService", {
+                   if shouldStartAtLogin {
+                       try SMAppService.mainApp.register()
+                   } else {
+                       try SMAppService.mainApp.unregister()
+                   }
+                   return true
+               }) == true
+            {
+                log.debug("SMAppService registered")
             } else {
                 LaunchAtLoginController().setLaunchAtLogin(shouldStartAtLogin, for: appPath.url)
+                log.debug("LaunchAtLoginController registered")
             }
         }
 
@@ -2298,7 +2333,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                     scope.setTag(value: CachedDefaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
                 }
                 DC.addSentryData()
-                SentrySDK.capture(message: "Launch New")
+
+                guard let release = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String),
+                      Defaults[.lastLaunchVersion] != release
+                else { return }
+                Defaults[.lastLaunchVersion] = release
+
+                SentrySDK.capture(message: "Launch")
             }
         #endif
 
@@ -2718,7 +2759,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     func installCLIAndShowDialog() {
         do {
             try installCLIBinary()
-            dialog(message: "Lunar CLI installed", info: "", cancelButton: nil).runModal()
+            dialog(message: "Lunar CLI installed at \(CLI_BIN_DIR)", info: "", cancelButton: nil).runModal()
         } catch let error as InstallCLIError {
             dialog(message: error.message, info: error.info, cancelButton: nil).runModal()
         } catch {
@@ -2727,7 +2768,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     }
 
     @IBAction func installCLI(_: Any) {
-        let shouldInstall: Bool = ask(
+        let shouldInstall: Bool = askBool(
             message: "Lunar CLI",
             info: "This will install the `lunar` script into `\(CLI_BIN_DIR)`.\n\nDo you want to proceed?",
             okButton: "Yes",

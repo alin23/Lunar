@@ -21,6 +21,7 @@ enum FeatureState: String, ExpressibleByArgument {
 enum PowerState: String, ExpressibleByArgument {
     case on
     case off
+    case toggle
 }
 
 // MARK: - DisplayControl

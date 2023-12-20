@@ -761,7 +761,7 @@ final class DisplayViewController: NSViewController {
             guard let button = self.proButton else { return }
 
             let width = button.frame.width
-            if lunarProActive {
+            if proactive {
                 button.bg = red
                 button.attributedTitle = "Pro".withAttribute(.textColor(white))
                 button.setFrameSize(NSSize(width: 50, height: button.frame.height))
@@ -1416,7 +1416,7 @@ final class DisplayViewController: NSViewController {
         }
 
         if display.hasSoftwareControl {
-            guard ask(message: "Monitor Reset", info: """
+            guard askBool(message: "Monitor Reset", info: """
             This will reset the following settings for this display:
 
             * The *algorithm curve* that Lunar learned from your adjustments
@@ -1427,7 +1427,7 @@ final class DisplayViewController: NSViewController {
             """, okButton: "Ok", cancelButton: "Cancel", window: view.window, onCompletion: resetHandler, wide: true, markdown: true)
             else { return }
         } else {
-            guard ask(message: "Monitor Reset", info: """
+            guard askBool(message: "Monitor Reset", info: """
             This will reset the following settings for this display:
 
             * Everything you have manually adjusted using the monitor's physical buttons/controls
@@ -1613,7 +1613,7 @@ final class DisplayViewController: NSViewController {
     }
 
     @IBAction func autoBlackout(_: Any) {
-        guard lunarProOnTrial || lunarProActive || openedBlackoutPage else {
+        guard proactive || openedBlackoutPage else {
             openedBlackoutPage = true
             if let url = URL(string: "https://lunar.fyi/#blackout") {
                 NSWorkspace.shared.open(url)
@@ -1623,7 +1623,7 @@ final class DisplayViewController: NSViewController {
     }
 
     @IBAction func xdrBrightness(_: Any) {
-        guard lunarProOnTrial || lunarProActive || openedXDRPage else {
+        guard proactive || openedXDRPage else {
             openedXDRPage = true
             if let url = URL(string: "https://lunar.fyi/#xdr") {
                 NSWorkspace.shared.open(url)

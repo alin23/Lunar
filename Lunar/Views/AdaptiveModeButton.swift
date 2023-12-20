@@ -81,7 +81,7 @@ final class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
         guard mode.available else {
             switch mode {
             case .location:
-                if lunarProActive || lunarProOnTrial {
+                if proactive {
                     menuItem
                         .toolTip =
                         "Disabled because location can't be requested.\nCheck if Lunar has access to Location Services in System Preferences -> Security & Privacy"
@@ -91,7 +91,7 @@ final class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
                     menuItem.toolTip = "Only available with a Lunar Pro license"
                 }
             case .sensor:
-                if lunarProActive || lunarProOnTrial {
+                if proactive {
                     menuItem.toolTip = "Disabled because there is no light sensor connected to this \(Sysctl.device)"
                     menuItem.attributedTitle = disabledString(menuItem, reason: "no sensor available")
                 } else {
@@ -99,7 +99,7 @@ final class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
                     menuItem.toolTip = "Only available with a Lunar Pro license"
                 }
             case .sync:
-                if lunarProActive || lunarProOnTrial {
+                if proactive {
                     menuItem
                         .toolTip =
                         "Disabled because no source display was found"

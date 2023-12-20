@@ -48,7 +48,7 @@ extension AdaptiveModeKey: Codable, ExpressibleByArgument, Nameable {
 
     var tag: Int? { rawValue }
     var enabled: Bool {
-        lunarProActive || lunarProOnTrial || self == .manual || self == .auto
+        proactive || self == .manual || self == .auto
     }
 
     var image: String? {

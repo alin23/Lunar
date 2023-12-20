@@ -67,6 +67,8 @@ let CLI_ARG_SEPARATOR = "\u{01}"
 extension Defaults.Keys {
     static let firstRun = Key<Bool?>("firstRun", default: nil)
     static let launchCount = Key<Int>("launchCount", default: 0)
+    static let lastLaunchVersion = Key<String>("lastLaunchVersion", default: "")
+
     static let secondPhase = Key<Bool?>("secondPhase", default: nil)
     static let firstRunAfterLunar4Upgrade = Key<Bool?>("firstRunAfterLunar4Upgrade", default: nil)
     static let firstRunAfterLunar6Upgrade = Key<Bool?>("firstRunAfterLunar6Upgrade", default: nil)

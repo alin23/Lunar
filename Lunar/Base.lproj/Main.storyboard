@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22155" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22155"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -751,6 +751,28 @@ the ⌘ Command key more than 8 times in a row</string>
                                                 <fragment>
                                                     <string key="content">Disables screens, keys and clicks to help cleaning up
 (press ⌘ Command key 10 times to deactivate)</string>
+                                                    <attributes>
+                                                        <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                        <font key="NSFont" metaFont="systemMedium" size="10"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
+                                                    </attributes>
+                                                </fragment>
+                                            </attributedString>
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        </menuItem>
+                                        <menuItem title="Night Mode" id="6g5-zn-Bqq">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <binding destination="Voe-Tx-rLC" name="value" keyPath="self.nightMode" id="8o6-xA-uZX"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem enabled="NO" id="POk-EN-unL">
+                                            <string key="title">Reduces eye strain when reading at night by lowering
+white point, using warmer colors and increasing contrast.</string>
+                                            <attributedString key="attributedTitle">
+                                                <fragment>
+                                                    <string key="content">Reduces eye strain when reading at night by lowering
+white point, using warmer colors and increasing contrast.</string>
                                                     <attributes>
                                                         <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                         <font key="NSFont" metaFont="systemMedium" size="10"/>
@@ -4101,14 +4123,14 @@ enabled</string>
                                             <buttonCell key="cell" type="bevel" title="Listen for brightness keys" bezelStyle="regularSquare" imagePosition="trailing" alignment="left" state="on" inset="2" id="3rc-5l-2Pq">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" size="14" name="Menlo-Bold"/>
-                                                <imageReference key="image" image="sun.max.circle" catalog="system" symbolScale="default" renderingMode="hierarchical-single">
+                                                <imageReference key="image" image="circle" catalog="system" symbolScale="default" renderingMode="hierarchical-single">
                                                     <hierarchicalColors>
-                                                        <color red="0.87843137979999997" green="0.87843137979999997" blue="0.87843137979999997" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                                        <color red="0.91764706370000004" green="0.91764706370000004" blue="0.91764706370000004" alpha="0.39533319536423839" colorSpace="custom" customColorSpace="displayP3"/>
                                                         <color name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                                         <color name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
                                                     </hierarchicalColors>
                                                 </imageReference>
-                                                <imageReference key="alternateImage" image="sun.max.circle.fill" catalog="system" symbolScale="default" renderingMode="original"/>
+                                                <imageReference key="alternateImage" image="checkmark.circle.fill" catalog="system" symbolScale="default" renderingMode="original"/>
                                             </buttonCell>
                                             <color key="contentTintColor" red="0.91764706370000004" green="0.91764706370000004" blue="0.91764706370000004" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                             <connections>
@@ -4496,14 +4518,14 @@ enabled</string>
                                             <buttonCell key="cell" type="bevel" title="Listen for volume keys" bezelStyle="regularSquare" imagePosition="right" alignment="left" state="on" inset="2" id="uTy-73-2cK">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" size="14" name="Menlo-Bold"/>
-                                                <imageReference key="image" image="speaker.slash.circle" catalog="system" symbolScale="default" renderingMode="hierarchical-single">
+                                                <imageReference key="image" image="circle" catalog="system" symbolScale="default" renderingMode="hierarchical-single">
                                                     <hierarchicalColors>
-                                                        <color red="0.87843137979999997" green="0.87843137979999997" blue="0.87843137979999997" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                                        <color red="0.91764706370000004" green="0.91764706370000004" blue="0.91764706370000004" alpha="0.39533319536423839" colorSpace="custom" customColorSpace="displayP3"/>
                                                         <color name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                                         <color name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
                                                     </hierarchicalColors>
                                                 </imageReference>
-                                                <imageReference key="alternateImage" image="speaker.circle.fill" catalog="system" symbolScale="default" renderingMode="original"/>
+                                                <imageReference key="alternateImage" image="checkmark.circle.fill" catalog="system" symbolScale="default" renderingMode="original"/>
                                             </buttonCell>
                                             <color key="contentTintColor" red="0.91764706370000004" green="0.91764706370000004" blue="0.91764706370000004" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                             <connections>
@@ -6764,7 +6786,7 @@ control automatically</string>
                                 <connections>
                                     <binding destination="nX7-a1-Ggz" name="enabled" keyPath="self.display.applyGamma" id="pVj-yj-BxH"/>
                                     <binding destination="nX7-a1-Ggz" name="value" keyPath="self.display.blacks" previousBinding="7gX-NH-Lfl" id="Z6T-6e-Igb"/>
-                                    <binding destination="nX7-a1-Ggz" name="maxValue" keyPath="self.display.whites" id="7gX-NH-Lfl"/>
+                                    <binding destination="nX7-a1-Ggz" name="maxValue" keyPath="self.display.blacksLimit" id="7gX-NH-Lfl"/>
                                 </connections>
                             </slider>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="88B-o4-DdE">
@@ -6804,8 +6826,8 @@ control automatically</string>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
                                     <binding destination="nX7-a1-Ggz" name="enabled" keyPath="self.display.applyGamma" id="Qea-j8-OBS"/>
-                                    <binding destination="nX7-a1-Ggz" name="minValue" keyPath="self.display.blacks" id="xmv-EE-ngF"/>
                                     <binding destination="nX7-a1-Ggz" name="value" keyPath="self.display.whites" previousBinding="xmv-EE-ngF" id="bVh-io-s7n"/>
+                                    <binding destination="nX7-a1-Ggz" name="minValue" keyPath="self.display.whitesLimit" id="xmv-EE-ngF"/>
                                 </connections>
                             </slider>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hlP-z7-qa1">
@@ -6888,9 +6910,9 @@ Keep this disabled when using f.lux</string>
                                 </textFieldCell>
                             </textField>
                             <box boxType="custom" cornerRadius="4" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3WS-M3-Uq4" customClass="Box" customModule="Lunar" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="39" width="321" height="131"/>
+                                <rect key="frame" x="0.0" y="38" width="321" height="132"/>
                                 <view key="contentView" id="lze-8q-n95">
-                                    <rect key="frame" x="1" y="1" width="319" height="129"/>
+                                    <rect key="frame" x="1" y="1" width="319" height="130"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NNs-XH-c30">
@@ -7141,7 +7163,6 @@ when FaceLight is activated</string>
                             <constraint firstItem="GhA-MN-iPc" firstAttribute="centerX" secondItem="eOP-NJ-wxV" secondAttribute="centerX" id="qIH-mo-z5p"/>
                             <constraint firstItem="qWx-Pr-1FV" firstAttribute="leading" secondItem="OwA-0Z-pPX" secondAttribute="trailing" constant="5" id="qXh-pd-1f9"/>
                             <constraint firstAttribute="bottom" secondItem="wIA-fS-IuI" secondAttribute="bottom" constant="15" id="umY-HI-Z4y"/>
-                            <constraint firstItem="wIA-fS-IuI" firstAttribute="top" secondItem="3WS-M3-Uq4" secondAttribute="bottom" constant="10" id="unT-iT-loc"/>
                             <constraint firstItem="hlP-z7-qa1" firstAttribute="centerY" secondItem="dqJ-Ws-iFA" secondAttribute="centerY" id="xTH-9V-peQ"/>
                             <constraint firstItem="zsO-49-UWV" firstAttribute="top" secondItem="Ium-k3-3BT" secondAttribute="bottom" constant="-1" id="xyP-zC-RTd"/>
                             <constraint firstItem="3WS-M3-Uq4" firstAttribute="top" secondItem="dqJ-Ws-iFA" secondAttribute="bottom" constant="15" id="ymF-gu-pcj"/>
@@ -10461,10 +10482,6 @@ settings for this monitor.</string>
         <image name="reset" width="24" height="24"/>
         <image name="sensormode" width="14" height="14"/>
         <image name="settings" width="24" height="24"/>
-        <image name="speaker.circle.fill" catalog="system" width="15" height="15"/>
-        <image name="speaker.slash.circle" catalog="system" width="15" height="15"/>
-        <image name="sun.max.circle" catalog="system" width="15" height="15"/>
-        <image name="sun.max.circle.fill" catalog="system" width="15" height="15"/>
         <image name="svideo" width="14" height="14"/>
         <image name="syncmode" width="14" height="14"/>
         <image name="tuner" width="14" height="14"/>

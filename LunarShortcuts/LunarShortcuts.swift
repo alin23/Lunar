@@ -643,7 +643,7 @@ struct SetXDRBrightnessIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<Double> {
-        guard lunarProActive else {
+        guard proactive else {
             throw IntentError.message("A Lunar Pro license is needed for this feature.")
         }
         try controlScreen(screen: $screen, property: .xdrBrightness, value: value.str(decimals: 3), skipMissingScreen: skipMissingScreen)
@@ -824,7 +824,7 @@ struct ToggleXDRIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<Bool> {
-        guard lunarProActive else {
+        guard proactive else {
             throw IntentError.message("A Lunar Pro license is needed for this feature.")
         }
         try controlScreen(screen: $screen, property: .xdr, value: state.rawValue, skipMissingScreen: skipMissingScreen)
@@ -886,11 +886,52 @@ struct ToggleFacelightIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<Bool> {
-        guard lunarProActive else {
+        guard proactive else {
             throw IntentError.message("A Lunar Pro license is needed for this feature.")
         }
         try controlScreen(screen: $screen, property: .facelight, value: state.rawValue, skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.facelight ?? state.bool)
+    }
+}
+
+@available(iOS 16, macOS 13, *)
+struct NightModeIntent: AppIntent {
+    init() {}
+
+    // swiftformat:disable all
+    static var title: LocalizedStringResource = "Night Mode"
+    static var description = IntentDescription(
+    """
+Activates "Night Mode" to reduce eye strain at night.
+
+This will lower the white point and increase the contrast of all screens,
+making white regions on dark backgrounds appear less bright while still
+preserving most colors.
+""", categoryName: "Toggles")
+
+    // swiftformat:enable all
+    static var parameterSummary: some ParameterSummary {
+        When(\.$toggle, .equalTo, true, {
+            Summary("\(\.$toggle) Night Mode")
+        }, otherwise: {
+            Summary("\(\.$toggle) Night Mode \(\.$state)")
+        })
+    }
+
+    @Parameter(title: "State", default: true, displayName: .init(true: "On", false: "Off"))
+    var state: Bool
+
+    @Parameter(title: "ToggleState", default: false, displayName: .init(true: "Toggle", false: "Turn"))
+    var toggle: Bool
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        if toggle {
+            DC.nightMode.toggle()
+        } else {
+            DC.nightMode = state
+        }
+        return .result()
     }
 }
 
@@ -1085,7 +1126,7 @@ Power off a screen by:
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        guard lunarProActive else {
+        guard proactive else {
             throw IntentError.message("A Lunar Pro license is needed for this feature.")
         }
 
@@ -1268,7 +1309,7 @@ To bring back the screen try any one of the following:
         #if !arch(arm64)
             throw IntentError.message("This action is only available on Apple Silicon")
         #else
-            guard lunarProActive else {
+            guard proactive else {
                 throw IntentError.message("A Lunar Pro license is needed for this feature.")
             }
 
@@ -1403,7 +1444,7 @@ If the reconnect action fails, try any one of the following to bring back the sc
     #if arch(arm64)
         func handleScreen() async throws -> String {
             if let display = screen.dynamicDisplay, display.active {
-                guard lunarProActive else {
+                guard proactive else {
                     throw IntentError.message("A Lunar Pro license is needed for this feature.")
                 }
                 DC.dis(display.id)
@@ -1469,7 +1510,7 @@ struct ToggleBlackOutIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<Bool> {
-        guard lunarProActive else {
+        guard proactive else {
             throw IntentError.message("A Lunar Pro license is needed for this feature.")
         }
 
@@ -1583,7 +1624,7 @@ struct ChangeAdaptiveModeIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        guard mode == .manual || mode == .auto || lunarProActive else {
+        guard mode == .manual || mode == .auto || proactive else {
             throw IntentError.message("A Lunar Pro license is needed for \(mode.description).")
         }
 
@@ -1935,7 +1976,7 @@ struct ControlScreenValueFloatNumeric: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<Double> {
-        guard !Display.CodingKeys.needsLunarPro.contains(property.id) || lunarProActive else {
+        guard !Display.CodingKeys.needsLunarPro.contains(property.id) || proactive else {
             throw IntentError.message("A Lunar Pro license is needed for controlling \"\(property.name)\".")
         }
         try checkShortcutsLimit()
@@ -1974,7 +2015,7 @@ struct ControlScreenValueNumeric: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<Int> {
-        guard !Display.CodingKeys.needsLunarPro.contains(property.id) || lunarProActive else {
+        guard !Display.CodingKeys.needsLunarPro.contains(property.id) || proactive else {
             throw IntentError.message("A Lunar Pro license is needed for controlling \"\(property.name)\".")
         }
         try checkShortcutsLimit()
@@ -2013,7 +2054,7 @@ struct ControlScreenValueBool: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<Bool> {
-        guard !Display.CodingKeys.needsLunarPro.contains(property.id) || lunarProActive else {
+        guard !Display.CodingKeys.needsLunarPro.contains(property.id) || proactive else {
             throw IntentError.message("A Lunar Pro license is needed for controlling \"\(property.name)\".")
         }
         try checkShortcutsLimit()

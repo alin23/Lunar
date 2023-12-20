@@ -974,7 +974,7 @@ enum DDC {
         #endif
 
         let rootDomain = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceNameMatching("IOPMrootDomain"))
-        lidClosedObserver = IOServicePropertyObserver(service: rootDomain, property: "AppleClamshellState", throttle: .milliseconds(100)) {
+        lidClosedObserver = IOServicePropertyObserver(service: rootDomain, property: "AppleClamshellState") {
             DC.lidClosed = isLidClosed()
         }
 

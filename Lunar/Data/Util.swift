@@ -1269,7 +1269,7 @@ func askAndHandle(
     }
 }
 
-func ask(
+func askBool(
     message: String,
     info: String,
     okButton: String = "OK",
@@ -2427,4 +2427,23 @@ private final class CStringArray {
 
 func mainActor(_ action: @escaping @MainActor () -> Void) {
     Task.init { await MainActor.run { action() }}
+}
+
+let FLUX_IDENTIFIER = "org.herf.Flux"
+let LUNAR_IDENTIFIER = "com.lowtechguys.GammaDimmer"
+let MC_IDENTIFIER = "me.guillaumeb.MonitorControl"
+let GAMMA_CONTROL_IDENTIFIER = #"ca.michelf.GammaControl.\d+"#
+let BLACK_LIGHT_IDENTIFIER = #"ca.michelf.BlackLight.\d+"#
+let LUNAR_LITE_IDENTIFIER = "fyi.lunar.LunarLite"
+let MC_LITE_IDENTIFIER = "app.monitorcontrol.MonitorControlLite"
+let BETTERDISPLAY_IDENTIFIER = "pro.betterdisplay.BetterDisplay"
+let GAMMA_APPS_PATTERN =
+    try! Regex(
+        pattern: #"^(?:\#(GAMMA_CONTROL_IDENTIFIER)|\#(BLACK_LIGHT_IDENTIFIER)|\#(FLUX_IDENTIFIER)|\#(LUNAR_IDENTIFIER)|\#(MC_IDENTIFIER)|\#(GAMMA_CONTROL_IDENTIFIER)|\#(LUNAR_LITE_IDENTIFIER)|\#(MC_LITE_IDENTIFIER)|\#(BETTERDISPLAY_IDENTIFIER))$"#
+    )
+
+func runningGammaApp(_ apps: [NSRunningApplication]? = nil) -> NSRunningApplication? {
+    (apps ?? NSWorkspace.shared.runningApplications).first { app in
+        GAMMA_APPS_PATTERN.matches(app.bundleIdentifier ?? "")
+    }
 }

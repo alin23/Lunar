@@ -11,8 +11,6 @@ import Defaults
 import Foundation
 import SwiftDate
 
-let FLUX_IDENTIFIER = "org.herf.Flux"
-
 let NIGHT_SHIFT_TAB_SCRIPT =
     """
     tell application "System Preferences"

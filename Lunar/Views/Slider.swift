@@ -88,7 +88,7 @@ final class SliderCell: NSSliderCell {
             let str: String = if let valueFormatter {
                 valueFormatter(floatValue)
             } else {
-                ((minValue == 0 && maxValue == 1) ? CGFloat(floatValue * 100) : CGFloat(floatValue.intround)).str(decimals: 0)
+                ((minValue >= 0 && minValue <= 1 && maxValue <= 1 && maxValue >= 0) ? CGFloat(floatValue * 100) : CGFloat(floatValue.intround)).str(decimals: 0)
             }
 
             str

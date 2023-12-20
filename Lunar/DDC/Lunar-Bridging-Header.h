@@ -77,3 +77,8 @@ void SLSSetAppearanceThemeLegacy(BOOL);
 BOOL SLSGetAppearanceThemeLegacy();
 
 void sleepNow(void);
+
+typedef int		CGSConnection;
+typedef long	CGSWindow;
+typedef int		CGSValue;
+extern OSStatus CGSSetWindowListBrightness(const CGSConnection cid, CGSWindow *wids, float *brightness, int count);

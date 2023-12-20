@@ -939,7 +939,7 @@ final class ControlChoiceViewController: NSViewController {
 
                 guard let w = self?.view.window else { return }
 
-                _ = ask(
+                _ = askBool(
                     message: "Display list changed",
                     info: """
                         The list of connected displays has changed

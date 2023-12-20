@@ -81,9 +81,7 @@ struct PowerOffButtonView: View {
                     return
                 }
 
-                guard !KM.controlKeyPressed,
-                      lunarProActive || lunarProOnTrial || (KM.optionKeyPressed && !KM.shiftKeyPressed)
-                else {
+                guard !KM.controlKeyPressed, proactive || (KM.optionKeyPressed && !KM.shiftKeyPressed) else {
                     showPopover = true
                     return
                 }

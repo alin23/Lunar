@@ -569,6 +569,95 @@ final class DisplayController: ObservableObject {
             }
         }
     }
+    var nightMode = false {
+        didSet {
+            guard nightMode != oldValue else { return }
+
+            if nightMode, let gammaApp = runningGammaApp(), let name = gammaApp.localizedName ?? gammaApp.bundleIdentifier {
+                log.warning("Night mode can't be turned on because \(name) is running")
+
+                if shouldDisableNightModeBecauseOfGammaApp(name: name) {
+                    mainAsyncAfter(ms: 500) { appDelegate!.nightMode = false }
+                    nightMode = false
+                    return
+                }
+                gammaApp.terminate()
+            }
+
+            appDelegate!.nightMode = nightMode
+            log.info("Night mode changed", context: ["old": oldValue ? "on" : "off", "new": nightMode ? "on" : "off"])
+            let NIGHT_WHITE = 0.65
+            if nightMode {
+                NightShift.darkMode = true
+                for d in activeDisplayList where !d.blackOutEnabled && d.supportsGamma {
+                    if d.enhanced {
+                        d.enhanced = false
+                    }
+                    d.applyTemporaryGamma = true
+                    d.gammaSetterTask = DispatchWorkItem(name: "gammaSetter: \(d.description)", flags: .barrier) {
+                        d.settingGamma = true
+                        defer { d.settingGamma = false }
+                        d.gammaChanged = true
+                        for white in stride(from: 1.0, through: NIGHT_WHITE, by: -0.01) {
+                            d.lunarGammaTable = GammaTable(
+                                redMin: d.defaultGammaRedMin.floatValue,
+                                redMax: white.f,
+                                redValue: d.defaultGammaRedValue.floatValue,
+                                greenMin: d.defaultGammaGreenMin.floatValue,
+                                greenMax: powf(white.f * 0.8, (1.0 - white.f).map(from: (0.0, 1.0 - NIGHT_WHITE.f), to: (0.0, 1.0))),
+                                greenValue: d.defaultGammaGreenValue.floatValue,
+                                blueMin: d.defaultGammaBlueMin.floatValue,
+                                blueMax: powf(white.f * 0.65, (1.0 - white.f).map(from: (0.0, 1.0 - NIGHT_WHITE.f), to: (0.0, 1.0))),
+                                blueValue: d.defaultGammaBlueValue.floatValue
+                            )
+                            d.apply(gamma: d.lunarGammaTable!)
+                            d.lastGammaTable = d.lunarGammaTable
+
+                            Thread.sleep(forTimeInterval: 0.025)
+                        }
+                        lastColorSyncReset = Date()
+                    }
+                    d.smoothGammaQueue.asyncAfter(deadline: DispatchTime.now(), execute: d.gammaSetterTask!.workItem)
+                }
+                if supportsSubzeroContrast, let d = firstNonTestingDisplay {
+                    setXDRContrast(d.computeXDRContrast(xdrBrightness: d.softwareBrightness, xdrContrastFactor: CachedDefaults[.subzeroContrastFactor], maxBrightness: 0.0), smooth: true)
+                } else {
+                    setXDRContrast(0.1, smooth: true)
+                }
+            } else if activeDisplayList.contains(where: { d in !d.blackOutEnabled && d.supportsGamma && d.applyTemporaryGamma }) {
+                for d in activeDisplayList where !d.blackOutEnabled && d.supportsGamma {
+                    d.gammaSetterTask = DispatchWorkItem(name: "gammaSetter: \(d.description)", flags: .barrier) {
+                        d.settingGamma = true
+                        defer { d.settingGamma = false }
+                        for white in stride(from: NIGHT_WHITE, through: 1.0, by: 0.01) {
+                            d.lunarGammaTable = GammaTable(
+                                redMin: d.defaultGammaRedMin.floatValue,
+                                redMax: white.f,
+                                redValue: d.defaultGammaRedValue.floatValue,
+                                greenMin: d.defaultGammaGreenMin.floatValue,
+                                greenMax: powf(white.f * 0.8, (1.0 - white.f).map(from: (0.0, 1.0 - NIGHT_WHITE.f), to: (0.0, 1.0))),
+                                greenValue: d.defaultGammaGreenValue.floatValue,
+                                blueMin: d.defaultGammaBlueMin.floatValue,
+                                blueMax: powf(white.f * 0.65, (1.0 - white.f).map(from: (0.0, 1.0 - NIGHT_WHITE.f), to: (0.0, 1.0))),
+                                blueValue: d.defaultGammaBlueValue.floatValue
+                            )
+                            d.apply(gamma: d.lunarGammaTable!)
+                            d.lastGammaTable = d.lunarGammaTable
+
+                            Thread.sleep(forTimeInterval: 0.025)
+                        }
+                        d.applyTemporaryGamma = false
+                    }
+                    d.smoothGammaQueue.asyncAfter(deadline: DispatchTime.now(), execute: d.gammaSetterTask!.workItem)
+                }
+                if supportsSubzeroContrast, let d = firstNonTestingDisplay {
+                    setXDRContrast(d.computeXDRContrast(xdrBrightness: d.softwareBrightness, xdrContrastFactor: CachedDefaults[.subzeroContrastFactor], maxBrightness: 0.0), smooth: true)
+                } else {
+                    setXDRContrast(0.0, smooth: true)
+                }
+            }
+        }
+    }
 
     @Atomic var lidClosed: Bool = isLidClosed() {
         didSet {
@@ -1009,7 +1098,7 @@ final class DisplayController: ObservableObject {
     }
 
     static func autoMode() -> AdaptiveMode {
-        guard lunarProActive || lunarProOnTrial else { return ManualMode.shared }
+        guard proactive else { return ManualMode.shared }
 
         if let mode = SensorMode.specific.ifExternalSensorAvailable() {
             return mode
@@ -1038,6 +1127,22 @@ final class DisplayController: ObservableObject {
             return d
         }
         return ALL_DISPLAYS
+    }
+
+    func shouldDisableNightModeBecauseOfGammaApp(name: String) -> Bool {
+        askBool(
+            message: "Exclusive Gamma API access required",
+            info: """
+            Detected another running app that uses the Gamma API: \(name).
+
+            Lunar's Night Mode needs exclusive access to the Gamma API in order to function.
+            """,
+            okButton: "Cancel",
+            cancelButton: "Quit \(name)",
+            screen: cursorDisplay?.nsScreen,
+            window: nil,
+            unique: true
+        )
     }
 
     func recomputeAllDisplaysBrightness(activeDisplays: [Display]) {
@@ -1820,7 +1925,7 @@ final class DisplayController: ObservableObject {
         //     return externalActiveDisplays.first
         // #endif
 
-        guard let audioDevice = simplyCA.defaultOutputDevice,
+        guard let audioDevice = simplyCA?.defaultOutputDevice,
               !audioDevice.canSetVirtualMainVolume(scope: .output),
               volumeHotkeysEnabled
         else {
@@ -1838,8 +1943,8 @@ final class DisplayController: ObservableObject {
             log.info("Audio Display UID \(activeDisplayList.map { ($0.name, $0.audioIdentifier ?? "nil") })")
         }
 
-        let audioDeviceName = audioDevice.name
-        guard !audioDeviceName.isEmpty else { return nil }
+        let audioDeviceName = withTimeout(5.seconds, name: "getCurrentAudioDisplay") { audioDevice.name }
+        guard let audioDeviceName, !audioDeviceName.isEmpty else { return nil }
 
         guard let name = activeDisplayList.map(\.name).fuzzyFind(audioDeviceName)
         else {
@@ -1885,7 +1990,7 @@ final class DisplayController: ObservableObject {
     }
 
     func appBrightnessContrastOffset(for display: Display) -> (br: Int, cr: Int, staticValues: Bool)? {
-        guard lunarProActive, !display.enhanced, let exceptions = runningAppExceptions, !exceptions.isEmpty,
+        guard proactive, !display.enhanced, let exceptions = runningAppExceptions, !exceptions.isEmpty,
               let screen = display.nsScreen
         else {
 //            #if DEBUG
@@ -2106,7 +2211,7 @@ final class DisplayController: ObservableObject {
             }
         #endif
 
-        guard let autoBlackOut, autoBlackOut, lunarProOnTrial || lunarProActive, !self.autoBlackoutPause else {
+        guard let autoBlackOut, autoBlackOut, proactive, !self.autoBlackoutPause else {
             if autoBlackoutPause {
                 autoBlackoutPause = false
             }
@@ -2210,7 +2315,7 @@ final class DisplayController: ObservableObject {
         activeDisplayList.filter(\.ambientLightCompensationEnabledByUser).forEach { d in
             d.systemAdaptiveBrightness = true
         }
-        if xdrContrastEnabled, xdrContrast > 0 {
+        if xdrContrast > 0 {
             setXDRContrast(0)
         }
 
@@ -2401,21 +2506,21 @@ final class DisplayController: ObservableObject {
 
     func manageAdaptiveInClamshellMode() {
         SyncMode.refresh()
-        log.info("Lid closed: \(lidClosed)")
         if CachedDefaults[.enableSentry] {
             SentrySDK.configureScope { [self] scope in
                 scope.setTag(value: String(describing: clamshell), key: "clamshellMode")
             }
         }
 
-        guard Sysctl.isMacBook, CachedDefaults[.clamshellModeDetection], sourceDisplay.isBuiltin
-        else {
+        guard Sysctl.isMacBook, CachedDefaults[.clamshellModeDetection] else {
             return
         }
 
         if clamshell {
+            log.info("Clamshell mode enabled - switching to Manual Mode")
             disableAdaptiveInClamshellMode()
         } else if disabledAdaptiveInClamshellMode {
+            log.info("Clamshell mode disabled - switching to Sync Mode")
             reenableAdaptiveOutOfClamshellMode()
         }
     }
@@ -2646,7 +2751,7 @@ final class DisplayController: ObservableObject {
                display.supportsEnhance, !xdrPausedBecauseOfFlux,
                (value == maxBrightness && value == oldValue && timeSince(lastTimeBrightnessKeyPressed) < 3) ||
                (oldValue == maxBrightness && display.softwareBrightness > Display.MIN_SOFTWARE_BRIGHTNESS),
-               lunarProActive || lunarProOnTrial
+               proactive
             {
                 GammaControl.fluxCheckerXDR(display: display) {
                     if !display.enhanced {

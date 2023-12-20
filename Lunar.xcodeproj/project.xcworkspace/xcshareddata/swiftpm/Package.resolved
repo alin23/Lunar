@@ -129,10 +129,10 @@
     {
       "identity" : "sentry-cocoa",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/alin23/sentry-cocoa.git",
+      "location" : "https://github.com/getsentry/sentry-cocoa",
       "state" : {
-        "branch" : "master",
-        "revision" : "a890c38828010ebcdbe6b0edad84a97d06e54e0b"
+        "revision" : "f5dafd7449be2f1778f2ddb87d57347b96461003",
+        "version" : "8.17.2"
       }
     },
     {

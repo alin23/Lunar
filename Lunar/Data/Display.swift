@@ -1539,6 +1539,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 return
             }
             if DC.keyboardAutoBrightnessEnabledByUser {
+                log.debug("\(!blackOutEnabled ? "Enabling" : "Disabling") keyboard backlight auto-brightness")
                 DC.kbc.enableAutoBrightness(!blackOutEnabled, forKeyboard: 1)
             }
             log.debug("Setting keyboard backlight to \(blackOutEnabled ? 0.0 : 0.5)")
@@ -2547,7 +2548,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 }
 
                 let id = CGDirectDisplayID(UInt(bitPattern: observer))
-                guard let display = DC.activeDisplays[id], !display.inSmoothTransition else {
+                guard let display = DC.activeDisplays[id], !display.inSmoothTransition, !display.isBuiltin || !DC.lidClosed else {
                     return
                 }
 
@@ -3057,7 +3058,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     #else
         @objc dynamic lazy var isFakeDummy: Bool = (Self.notDummyNamePattern.matches(name) && vendor == .dummy)
     #endif
-    @objc dynamic lazy var subzeroDimmingDisabled = isBuiltin && minBrightness.intValue == 0
+    @objc dynamic lazy var subzeroDimmingDisabled = isBuiltin && minBrightness.intValue == 0 && softwareBrightness > 0
 
     @Published @objc dynamic var isSource: Bool {
         didSet {
@@ -3316,6 +3317,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published var fullRangeBrightness = 0.5
     @Published var fullRangeUserBrightness = 0.5
     @Published var userContrast = 0.5
+
+    @objc dynamic var whitesLimit = 0.05
+    @objc dynamic var blacksLimit = 0.95
+
+    @Published @objc dynamic var applyTemporaryGamma = false
 
     @Atomic var userAdjusting = false {
         didSet {
@@ -4072,6 +4078,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             defaultGammaRedMin = blacks.ns
             defaultGammaGreenMin = blacks.ns
             defaultGammaBlueMin = blacks.ns
+            whitesLimit = 1.0 - ((1.0 - blacks) * 0.95)
         }
     }
 
@@ -4080,6 +4087,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             defaultGammaRedMax = whites.ns
             defaultGammaGreenMax = whites.ns
             defaultGammaBlueMax = whites.ns
+            blacksLimit = whites * 0.95
         }
     }
 
@@ -4224,7 +4232,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var minBrightness: NSNumber = DEFAULT_MIN_BRIGHTNESS.ns {
         didSet {
-            subzeroDimmingDisabled = isBuiltin && minBrightness.intValue == 0
+            subzeroDimmingDisabled = isBuiltin && minBrightness.intValue == 0 && softwareBrightness > 0
             save()
             preciseMinBrightness = minBrightness.doubleValue / 100
             readapt(newValue: minBrightness, oldValue: oldValue)
@@ -4378,7 +4386,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             return
         }
 
-        guard lunarProOnTrial || lunarProActive else {
+        guard proactive else {
             if let url = URL(string: "https://lunar.fyi/#blackout") {
                 NSWorkspace.shared.open(url)
             }
@@ -4603,7 +4611,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func reapplyGamma() {
-        if defaultGammaChanged, applyGamma {
+        if defaultGammaChanged, applyGamma || applyTemporaryGamma {
             refreshGamma()
         } else {
             lunarGammaTable = nil
@@ -4611,7 +4619,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         if hasSoftwareControl {
             setGamma(transition: inSmoothTransition ? brightnessTransition : .instant)
-        } else if applyGamma, !blackOutEnabled {
+        } else if applyGamma || applyTemporaryGamma, !blackOutEnabled {
             resetSoftwareControl()
         }
     }
@@ -4666,7 +4674,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         if appleNativeEnabled {
             let appleNativeControl = AppleNativeControl(display: self)
             if appleNativeControl.isAvailable() {
-                if reapply, softwareBrightness == 1.0, applyGamma || gammaChanged, gammaEnabled {
+                if reapply, softwareBrightness == 1.0, applyGamma || applyTemporaryGamma || gammaChanged, gammaEnabled {
                     if !blackOutEnabled, !faceLightEnabled, !settingGamma, !settingShade, !inSmoothTransition {
                         resetSoftwareControl()
                     }
@@ -4694,7 +4702,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         if !isBuiltin, networkEnabled {
             let networkControl = NetworkControl(display: self)
             if networkControl.isAvailable() {
-                if reapply, softwareBrightness == 1.0, applyGamma || gammaChanged, gammaEnabled {
+                if reapply, softwareBrightness == 1.0, applyGamma || applyTemporaryGamma || gammaChanged, gammaEnabled {
                     if !blackOutEnabled, !faceLightEnabled, !settingGamma, !settingShade, !inSmoothTransition {
                         resetSoftwareControl()
                     }
@@ -4989,7 +4997,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             onControlChange(control)
         }
 
-        if !gammaEnabled, applyGamma || gammaChanged || !supportsGamma {
+        if !gammaEnabled, applyGamma || applyTemporaryGamma || gammaChanged || !supportsGamma {
             resetSoftwareControl()
         }
 
@@ -5826,7 +5834,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
               !DC.screensSleeping, !DC.locked
         else { return }
 
-        guard !defaultGammaChanged || !applyGamma else {
+        if defaultGammaChanged, applyGamma || applyTemporaryGamma {
             lunarGammaTable = GammaTable(
                 redMin: defaultGammaRedMin.floatValue,
                 redMax: defaultGammaRedMax.floatValue,

@@ -89,7 +89,7 @@ struct DisplayRowView: View {
             .font(.system(size: 10, weight: display.enhanced ? .semibold : .bold, design: .monospaced))
 
             SwiftUI.Button("XDR") {
-                guard lunarProActive || lunarProOnTrial else {
+                guard proactive else {
                     showNeedsLunarPro = true
                     return
                 }
