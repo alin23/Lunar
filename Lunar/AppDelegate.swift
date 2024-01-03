@@ -2472,9 +2472,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             locationManager!.desiredAccuracy = kCLLocationAccuracyReduced
         }
 
-        guard let locationManager, locationManager.authorizationStatus != .denied else {
-            log.warning("Location authStatus denied")
-            locationManager?.stopUpdatingLocation()
+        let locationManager: CLLocationManager? = withTimeout(5.seconds, name: "locationManager") {
+            guard let loc = self.locationManager, loc.authorizationStatus != .denied else {
+                log.warning("Location authStatus denied")
+                self.locationManager?.stopUpdatingLocation()
+                throw "Location authStatus denied".err
+            }
+            return loc
+        }
+
+        guard let locationManager else {
             return
         }
 

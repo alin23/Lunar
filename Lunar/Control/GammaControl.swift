@@ -294,18 +294,24 @@ final class GammaControl: Control {
                 }
 
                 if NightShift.isSupported {
-                    NightShift.enable(mode: 1, strength: 0.5)
+                    NightShift.enable(mode: 1, strength: 1.0)
                 }
 
                 if let url = URL(string: "https://shifty.natethompson.io") {
                     NSWorkspace.shared.open(url)
                 }
 
-                guard let script = NSAppleScript(source: NIGHT_SHIFT_TAB_SCRIPT) else { return }
-                var errorInfo: NSDictionary?
-                script.executeAndReturnError(&errorInfo)
-                if let errors = errorInfo as? [String: Any], errors.count > 0 {
-                    log.error("Error while executing Night Shift Tab script", context: errors)
+                if #available(macOS 13, *) {
+                    if let url = URL(string: "x-apple.systempreferences:com.apple.Displays-Settings.extension?nightShiftSection") {
+                        NSWorkspace.shared.open(url)
+                    }
+                } else {
+                    guard let script = NSAppleScript(source: NIGHT_SHIFT_TAB_SCRIPT) else { return }
+                    var errorInfo: NSDictionary?
+                    script.executeAndReturnError(&errorInfo)
+                    if let errors = errorInfo as? [String: Any], errors.count > 0 {
+                        log.error("Error while executing Night Shift Tab script", context: errors)
+                    }
                 }
             case .alertThirdButtonReturn:
                 return

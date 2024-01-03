@@ -1923,4 +1923,7 @@ extension String {
     var sha1: String {
         data(using: .utf8)!.sha1
     }
+    var err: NSError {
+        NSError(domain: self, code: 1)
+    }
 }
