@@ -1598,6 +1598,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                             for display in DC.activeDisplayList.filter({ $0.keepHDREnabled && !$0.hdr }) {
                                 display.hdr = true
                             }
+
+                            if Defaults[.jitterBrightnessOnWake] {
+                                for display in DC.externalActiveDisplays.filter(\.isNative) {
+                                    guard let br = display.lastNativeBrightness, let control = display.control as? AppleNativeControl else {
+                                        continue
+                                    }
+
+                                    log.debug("Jittering brightness for \(display.description)")
+                                    let brDown = (br - 0.01).capped(between: 0.0, and: 1.0)
+                                    let brUp = (br + 0.01).capped(between: 0.0, and: 1.0)
+
+                                    log.debug("  Writing brightness \(brDown) for \(display.description)")
+                                    _ = control.writeBrightness(0, preciseBrightness: brDown)
+                                    log.debug("  Writing brightness \(br) for \(display.description)")
+                                    _ = control.writeBrightness(0, preciseBrightness: br)
+                                    log.debug("  Writing brightness \(brUp) for \(display.description)")
+                                    _ = control.writeBrightness(0, preciseBrightness: brUp)
+                                    log.debug("  Writing brightness \(br) for \(display.description)")
+                                    _ = control.writeBrightness(0, preciseBrightness: br)
+                                }
+                            }
                         }
                     }
                     serve(host: CachedDefaults[.listenForRemoteCommands] ? "0.0.0.0" : "127.0.0.1")
@@ -2106,24 +2127,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 options.appHangTimeoutInterval = 60
             #endif
 
-            options.beforeSend = { event in
-                if let exc = event.exceptions?.first, let mech = exc.mechanism, mech.type == "AppHang", let stack = exc.stacktrace {
-                    log.warning("App Hanging: \(stack)")
-                    concurrentQueue.asyncAfter(ms: 5000) { restart() }
+            if Defaults[.autoRestartOnHang] {
+                options.beforeSend = { event in
+                    if let exc = event.exceptions?.first, let mech = exc.mechanism, mech.type == "AppHang", let stack = exc.stacktrace {
+                        log.warning("App Hanging: \(stack)")
+                        concurrentQueue.asyncAfter(ms: 5000) { restart() }
+                        if event.tags == nil {
+                            event.tags = ["restarted": "true"]
+                        } else {
+                            event.tags!["restarted"] = "true"
+                        }
+                        return event
+                    }
+
                     if event.tags == nil {
-                        event.tags = ["restarted": "true"]
+                        event.tags = ["restarted": restarted ? "true" : "false"]
                     } else {
-                        event.tags!["restarted"] = "true"
+                        event.tags!["restarted"] = restarted ? "true" : "false"
                     }
                     return event
                 }
-
-                if event.tags == nil {
-                    event.tags = ["restarted": restarted ? "true" : "false"]
-                } else {
-                    event.tags!["restarted"] = restarted ? "true" : "false"
-                }
-                return event
             }
         }
 
@@ -2921,7 +2944,7 @@ func resetAllSettings() {
 func restart() {
     restarting = true
     // check if the app was started fresh or if was restarted with arg `restarts=timestamp:timestamp:timestamp`
-    // if it was restarted more than 3 times in 10 seconds, exit
+    // if it was restarted more than 3 times in 1 minute, exit
 
     guard CommandLine.arguments.count == 1 || (
         CommandLine.arguments.count == 2 && CommandLine.arguments[1].starts(with: "restarts=")
@@ -2933,7 +2956,7 @@ func restart() {
     if CommandLine.arguments.count == 2 {
         let restarts = CommandLine.arguments[1].split(separator: "=")[1].split(separator: ":").map { TimeInterval($0)! }
         let now = Date().timeIntervalSince1970
-        if restarts.filter({ now - $0 < 10 }).count > 3 {
+        if restarts.filter({ now - $0 < 60 }).count > 3 {
             exit(1)
         } else {
             restartArg = "\(CommandLine.arguments[1]):\(now)"
@@ -2953,14 +2976,16 @@ func restart() {
 }
 
 public func restartOnCrash() {
-    NSSetUncaughtExceptionHandler { _ in restart() }
-    signal(SIGABRT) { _ in restart() }
-    signal(SIGILL) { _ in restart() }
-    signal(SIGSEGV) { _ in restart() }
-    signal(SIGFPE) { _ in restart() }
-    signal(SIGBUS) { _ in restart() }
-    signal(SIGPIPE) { _ in restart() }
-    signal(SIGTRAP) { _ in restart() }
+    if Defaults[.autoRestartOnCrash] {
+        NSSetUncaughtExceptionHandler { _ in restart() }
+        signal(SIGABRT) { _ in restart() }
+        signal(SIGILL) { _ in restart() }
+        signal(SIGSEGV) { _ in restart() }
+        signal(SIGFPE) { _ in restart() }
+        signal(SIGBUS) { _ in restart() }
+        signal(SIGPIPE) { _ in restart() }
+        signal(SIGTRAP) { _ in restart() }
+    }
     signal(SIGHUP) { _ in restart() }
     signal(SIGINT) { _ in NSApp.terminate(nil) }
 }

@@ -1,248 +1,241 @@
 {
-  "pins" : [
-    {
-      "identity" : "anycodable",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Flight-School/AnyCodable",
-      "state" : {
-        "revision" : "862808b2070cd908cb04f9aafe7de83d35f81b05",
-        "version" : "0.6.7"
+  "object": {
+    "pins": [
+      {
+        "package": "AnyCodable",
+        "repositoryURL": "https://github.com/Flight-School/AnyCodable",
+        "state": {
+          "branch": null,
+          "revision": "862808b2070cd908cb04f9aafe7de83d35f81b05",
+          "version": "0.6.7"
+        }
+      },
+      {
+        "package": "AXSwift",
+        "repositoryURL": "https://github.com/alin23/AXSwift",
+        "state": {
+          "branch": "main",
+          "revision": "055c6abb49bb86c8d700da74d834523b03b4d702",
+          "version": null
+        }
+      },
+      {
+        "package": "Socket",
+        "repositoryURL": "https://github.com/alin23/BlueSocket",
+        "state": {
+          "branch": "master",
+          "revision": "4e334a848f89c44b2348332f0996f312dc6ed0d2",
+          "version": null
+        }
+      },
+      {
+        "package": "Charts",
+        "repositoryURL": "https://github.com/alin23/Charts/",
+        "state": {
+          "branch": "master",
+          "revision": "203700608a6e956e591e7387d77423fa3fea6947",
+          "version": null
+        }
+      },
+      {
+        "package": "DataCompression",
+        "repositoryURL": "https://github.com/mw99/DataCompression/",
+        "state": {
+          "branch": null,
+          "revision": "5ab15951321b08b74511601cbd0497667649d70b",
+          "version": "3.8.0"
+        }
+      },
+      {
+        "package": "Defaults",
+        "repositoryURL": "https://github.com/sindresorhus/Defaults",
+        "state": {
+          "branch": null,
+          "revision": "981ccb0a01c54abbe3c12ccb8226108527bbf115",
+          "version": "6.3.0"
+        }
+      },
+      {
+        "package": "FuzzyMatcher",
+        "repositoryURL": "https://github.com/alin23/FuzzyMatcher",
+        "state": {
+          "branch": "main",
+          "revision": "b97b7b900faf2a3881b5536be0f50b5c904c2798",
+          "version": null
+        }
+      },
+      {
+        "package": "Glob",
+        "repositoryURL": "https://github.com/Bouke/Glob",
+        "state": {
+          "branch": null,
+          "revision": "deda6e163d2ff2a8d7e138e2c3326dbd71157faf",
+          "version": "1.0.5"
+        }
+      },
+      {
+        "package": "KeyHolder",
+        "repositoryURL": "https://github.com/alin23/KeyHolder",
+        "state": {
+          "branch": "master",
+          "revision": "4cbb7eaa0b9ba245d33e9cf176f2b70c778f2784",
+          "version": null
+        }
+      },
+      {
+        "package": "Magnet",
+        "repositoryURL": "https://github.com/alin23/Magnet",
+        "state": {
+          "branch": "dev",
+          "revision": "fda73dc564372e98b5e5e6f5452a19f6b92a0382",
+          "version": null
+        }
+      },
+      {
+        "package": "Path.swift",
+        "repositoryURL": "https://github.com/mxcl/Path.swift",
+        "state": {
+          "branch": null,
+          "revision": "9c6f807b0a76be0e27aecc908bc6f173400d839e",
+          "version": "1.4.0"
+        }
+      },
+      {
+        "package": "Regex",
+        "repositoryURL": "https://github.com/crossroadlabs/Regex",
+        "state": {
+          "branch": null,
+          "revision": "166728756082a9cac6e4aed3ebbce8e41cb3a945",
+          "version": "1.2.0"
+        }
+      },
+      {
+        "package": "Sauce",
+        "repositoryURL": "https://github.com/Clipy/Sauce",
+        "state": {
+          "branch": null,
+          "revision": "2fcf7e43a242b183fdea3f2275ebec0d773b65f5",
+          "version": "2.2.0"
+        }
+      },
+      {
+        "package": "Sentry",
+        "repositoryURL": "https://github.com/getsentry/sentry-cocoa",
+        "state": {
+          "branch": null,
+          "revision": "f5dafd7449be2f1778f2ddb87d57347b96461003",
+          "version": "8.17.2"
+        }
+      },
+      {
+        "package": "SimplyCoreAudio",
+        "repositoryURL": "https://github.com/rnine/SimplyCoreAudio",
+        "state": {
+          "branch": "develop",
+          "revision": "35cc0e6eac5c2ee5049431f4238b0e333cf79869",
+          "version": null
+        }
+      },
+      {
+        "package": "Surge",
+        "repositoryURL": "https://github.com/Jounce/Surge",
+        "state": {
+          "branch": null,
+          "revision": "6e4a47e63da8801afe6188cf039e9f04eb577721",
+          "version": "2.3.2"
+        }
+      },
+      {
+        "package": "swift-algorithms",
+        "repositoryURL": "https://github.com/apple/swift-algorithms",
+        "state": {
+          "branch": null,
+          "revision": "b14b7f4c528c942f121c8b860b9410b2bf57825e",
+          "version": "1.0.0"
+        }
+      },
+      {
+        "package": "swift-argument-parser",
+        "repositoryURL": "https://github.com/apple/swift-argument-parser",
+        "state": {
+          "branch": null,
+          "revision": "fee6933f37fde9a5e12a1e4aeaa93fe60116ff2a",
+          "version": "1.2.2"
+        }
+      },
+      {
+        "package": "swift-atomics",
+        "repositoryURL": "https://github.com/apple/swift-atomics.git",
+        "state": {
+          "branch": null,
+          "revision": "6c89474e62719ddcc1e9614989fff2f68208fe10",
+          "version": "1.1.0"
+        }
+      },
+      {
+        "package": "LDSwiftEventSource",
+        "repositoryURL": "https://github.com/alin23/swift-eventsource",
+        "state": {
+          "branch": "master",
+          "revision": "8b5c55b6fa9706c12a3f6b42ba55ebff46348829",
+          "version": null
+        }
+      },
+      {
+        "package": "swift-numerics",
+        "repositoryURL": "https://github.com/apple/swift-numerics",
+        "state": {
+          "branch": null,
+          "revision": "0a5bc04095a675662cf24757cc0640aa2204253b",
+          "version": "1.0.2"
+        }
+      },
+      {
+        "package": "SwiftDate",
+        "repositoryURL": "https://github.com/malcommac/SwiftDate",
+        "state": {
+          "branch": null,
+          "revision": "6190d0cefff3013e77ed567e6b074f324e5c5bf5",
+          "version": "6.3.1"
+        }
+      },
+      {
+        "package": "swiftui-introspect",
+        "repositoryURL": "https://github.com/siteline/SwiftUI-Introspect",
+        "state": {
+          "branch": null,
+          "revision": "3ba734dd20faada0e3234b68e78db97005315f0e",
+          "version": "1.0.0"
+        }
+      },
+      {
+        "package": "SwiftyAttributes",
+        "repositoryURL": "https://github.com/eddiekaiger/SwiftyAttributes",
+        "state": {
+          "branch": null,
+          "revision": "7b39078c0920b46e0967573eedb7a8811a80e7b9",
+          "version": "5.4.0"
+        }
+      },
+      {
+        "package": "SwiftyJSON",
+        "repositoryURL": "https://github.com/SwiftyJSON/SwiftyJSON",
+        "state": {
+          "branch": null,
+          "revision": "b3dcd7dbd0d488e1a7077cb33b00f2083e382f07",
+          "version": "5.0.1"
+        }
+      },
+      {
+        "package": "SwiftyMarkdown",
+        "repositoryURL": "https://github.com/alin23/SwiftyMarkdown",
+        "state": {
+          "branch": "master",
+          "revision": "5f302725676a13cfbb92b5348c8fa96d89c6aed4",
+          "version": null
+        }
       }
-    },
-    {
-      "identity" : "axswift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/alin23/AXSwift",
-      "state" : {
-        "branch" : "main",
-        "revision" : "055c6abb49bb86c8d700da74d834523b03b4d702"
-      }
-    },
-    {
-      "identity" : "bluesocket",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/alin23/BlueSocket",
-      "state" : {
-        "branch" : "master",
-        "revision" : "4e334a848f89c44b2348332f0996f312dc6ed0d2"
-      }
-    },
-    {
-      "identity" : "charts",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/alin23/Charts/",
-      "state" : {
-        "branch" : "master",
-        "revision" : "203700608a6e956e591e7387d77423fa3fea6947"
-      }
-    },
-    {
-      "identity" : "datacompression",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/mw99/DataCompression/",
-      "state" : {
-        "revision" : "5ab15951321b08b74511601cbd0497667649d70b",
-        "version" : "3.8.0"
-      }
-    },
-    {
-      "identity" : "defaults",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/sindresorhus/Defaults",
-      "state" : {
-        "revision" : "981ccb0a01c54abbe3c12ccb8226108527bbf115",
-        "version" : "6.3.0"
-      }
-    },
-    {
-      "identity" : "fuzzymatcher",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/alin23/FuzzyMatcher",
-      "state" : {
-        "branch" : "main",
-        "revision" : "b97b7b900faf2a3881b5536be0f50b5c904c2798"
-      }
-    },
-    {
-      "identity" : "glob",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Bouke/Glob",
-      "state" : {
-        "revision" : "deda6e163d2ff2a8d7e138e2c3326dbd71157faf",
-        "version" : "1.0.5"
-      }
-    },
-    {
-      "identity" : "keyholder",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/alin23/KeyHolder",
-      "state" : {
-        "branch" : "master",
-        "revision" : "4cbb7eaa0b9ba245d33e9cf176f2b70c778f2784"
-      }
-    },
-    {
-      "identity" : "magnet",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/alin23/Magnet",
-      "state" : {
-        "branch" : "dev",
-        "revision" : "fda73dc564372e98b5e5e6f5452a19f6b92a0382"
-      }
-    },
-    {
-      "identity" : "mediakeytap",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/alin23/MediaKeyTap",
-      "state" : {
-        "branch" : "dev",
-        "revision" : "09f9d1627fc7516ec940791c449e028373545bd9"
-      }
-    },
-    {
-      "identity" : "path.swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/mxcl/Path.swift",
-      "state" : {
-        "revision" : "9c6f807b0a76be0e27aecc908bc6f173400d839e",
-        "version" : "1.4.0"
-      }
-    },
-    {
-      "identity" : "regex",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/crossroadlabs/Regex",
-      "state" : {
-        "revision" : "166728756082a9cac6e4aed3ebbce8e41cb3a945",
-        "version" : "1.2.0"
-      }
-    },
-    {
-      "identity" : "sauce",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Clipy/Sauce",
-      "state" : {
-        "revision" : "2fcf7e43a242b183fdea3f2275ebec0d773b65f5",
-        "version" : "2.2.0"
-      }
-    },
-    {
-      "identity" : "sentry-cocoa",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/getsentry/sentry-cocoa",
-      "state" : {
-        "revision" : "f5dafd7449be2f1778f2ddb87d57347b96461003",
-        "version" : "8.17.2"
-      }
-    },
-    {
-      "identity" : "simplycoreaudio",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/rnine/SimplyCoreAudio",
-      "state" : {
-        "branch" : "develop",
-        "revision" : "35cc0e6eac5c2ee5049431f4238b0e333cf79869"
-      }
-    },
-    {
-      "identity" : "surge",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Jounce/Surge",
-      "state" : {
-        "revision" : "6e4a47e63da8801afe6188cf039e9f04eb577721",
-        "version" : "2.3.2"
-      }
-    },
-    {
-      "identity" : "swift-algorithms",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-algorithms",
-      "state" : {
-        "revision" : "b14b7f4c528c942f121c8b860b9410b2bf57825e",
-        "version" : "1.0.0"
-      }
-    },
-    {
-      "identity" : "swift-argument-parser",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-argument-parser",
-      "state" : {
-        "revision" : "fee6933f37fde9a5e12a1e4aeaa93fe60116ff2a",
-        "version" : "1.2.2"
-      }
-    },
-    {
-      "identity" : "swift-atomics",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-atomics.git",
-      "state" : {
-        "revision" : "6c89474e62719ddcc1e9614989fff2f68208fe10",
-        "version" : "1.1.0"
-      }
-    },
-    {
-      "identity" : "swift-eventsource",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/alin23/swift-eventsource",
-      "state" : {
-        "branch" : "master",
-        "revision" : "8b5c55b6fa9706c12a3f6b42ba55ebff46348829"
-      }
-    },
-    {
-      "identity" : "swift-numerics",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-numerics",
-      "state" : {
-        "revision" : "0a5bc04095a675662cf24757cc0640aa2204253b",
-        "version" : "1.0.2"
-      }
-    },
-    {
-      "identity" : "swiftdate",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/malcommac/SwiftDate",
-      "state" : {
-        "revision" : "6190d0cefff3013e77ed567e6b074f324e5c5bf5",
-        "version" : "6.3.1"
-      }
-    },
-    {
-      "identity" : "swiftui-introspect",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/siteline/SwiftUI-Introspect",
-      "state" : {
-        "revision" : "3ba734dd20faada0e3234b68e78db97005315f0e",
-        "version" : "1.0.0"
-      }
-    },
-    {
-      "identity" : "swiftyattributes",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/eddiekaiger/SwiftyAttributes",
-      "state" : {
-        "revision" : "7b39078c0920b46e0967573eedb7a8811a80e7b9",
-        "version" : "5.4.0"
-      }
-    },
-    {
-      "identity" : "swiftyjson",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SwiftyJSON/SwiftyJSON",
-      "state" : {
-        "revision" : "b3dcd7dbd0d488e1a7077cb33b00f2083e382f07",
-        "version" : "5.0.1"
-      }
-    },
-    {
-      "identity" : "swiftymarkdown",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/alin23/SwiftyMarkdown",
-      "state" : {
-        "branch" : "master",
-        "revision" : "5f302725676a13cfbb92b5348c8fa96d89c6aed4"
-      }
-    }
-  ],
-  "version" : 2
+    ]
+  },
+  "version": 1
 }

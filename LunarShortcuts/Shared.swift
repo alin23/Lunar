@@ -272,10 +272,13 @@ extension Defaults.Keys {
     static let listenForRemoteCommands = Key<Bool>("listenForRemoteCommands", default: false)
     static let neverAskAboutXDR = Key<Bool>("neverAskAboutXDR", default: false)
 
+    static let autoRestartOnCrash = Key<Bool>("autoRestartOnCrash", default: true)
+    static let autoRestartOnHang = Key<Bool>("autoRestartOnHang", default: true)
     static let autoRestartOnFailedDDC = Key<Bool>("autoRestartOnFailedDDC", default: false)
     static let autoRestartOnFailedDDCSooner = Key<Bool>("autoRestartOnFailedDDCSooner", default: false)
     static let sleepInClamshellMode = Key<Bool>("sleepInClamshellMode", default: false)
     static let disableCliffDetection = Key<Bool>("disableCliffDetection", default: false)
+    static let jitterBrightnessOnWake = Key<Bool>("jitterBrightnessOnWake", default: false)
 
     static let sensorHostname = Key<String>("sensorHostname", default: "lunarsensor.local")
     static let sensorPort = Key<Int>("sensorPort", default: 80)
