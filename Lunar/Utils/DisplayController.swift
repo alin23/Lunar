@@ -624,7 +624,8 @@ final class DisplayController: ObservableObject {
                 } else {
                     setXDRContrast(0.1, smooth: true)
                 }
-            } else if activeDisplayList.contains(where: { d in !d.blackOutEnabled && d.supportsGamma && d.applyTemporaryGamma }) {
+            } else {
+                NightShift.darkMode = false
                 for d in activeDisplayList where !d.blackOutEnabled && d.supportsGamma {
                     d.gammaSetterTask = DispatchWorkItem(name: "gammaSetter: \(d.description)", flags: .barrier) {
                         d.settingGamma = true

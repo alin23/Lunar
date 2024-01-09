@@ -35,6 +35,14 @@ import SwiftUI
 
 import ServiceManagement
 
+extension CLLocationManager {
+    var auth: CLAuthorizationStatus? {
+        withTimeout(5.seconds, name: "locationAuth") {
+            self.authorizationStatus
+        }
+    }
+}
+
 func withTimeout<T>(_ timeout: DateComponents, name: String, _ block: @escaping () throws -> T) -> T? {
     var value: T?
     let workItem = DispatchWorkItem(name: name) {
@@ -899,7 +907,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         guard let w = notification.object as? ModernWindow, w.isVisible, w.title == "Settings",
               let locationManager else { return }
 
-        switch locationManager.authorizationStatus {
+        switch locationManager.auth {
         case .notDetermined, .restricted:
             if !CachedDefaults[.manualLocation] {
                 log.debug("Requesting location permissions")
@@ -2433,11 +2441,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     func locationManager(_ lm: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard !CachedDefaults[.manualLocation] else { return }
 
-        guard lm.authorizationStatus != .denied, let location = locations.last ?? lm.location,
+        guard lm.auth != .denied, let location = locations.last ?? lm.location,
               let geolocation = Geolocation(location: location)
         else {
             log.debug("Zero LocationManager coordinates")
-            if lm.authorizationStatus != .denied {
+            if lm.auth != .denied {
                 geolocationFallback()
             }
             return
@@ -2453,10 +2461,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         log.error("Location manager failed with error \(error)")
         guard !CachedDefaults[.manualLocation] else { return }
 
-        guard lm.authorizationStatus != .denied, let location = lm.location, let geolocation = Geolocation(location: location)
+        guard lm.auth != .denied, let location = lm.location, let geolocation = Geolocation(location: location)
         else {
             log.debug("Zero LocationManager coordinates")
-            if lm.authorizationStatus != .denied {
+            if lm.auth != .denied {
                 geolocationFallback()
             }
             return
@@ -2513,7 +2521,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             locationManager.startUpdatingLocation()
         }
 
-        switch locationManager.authorizationStatus {
+        switch locationManager.auth {
         case .authorizedAlways:
             log.debug("Location authStatus authorizedAlways")
         case .denied:

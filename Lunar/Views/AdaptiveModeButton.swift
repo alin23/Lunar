@@ -118,7 +118,7 @@ final class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
         }
 
         if mode == .location {
-            if let lm = appDelegate?.locationManager, lm.authorizationStatus == .denied || lm.authorizationStatus == .notDetermined || lm.authorizationStatus == .restricted {
+            if let lm = appDelegate?.locationManager, let auth = lm.auth, auth == .denied || auth == .notDetermined || auth == .restricted {
                 menuItem.toolTip =
                     "Location can't be requested.\nCheck if Lunar has access to Location Services in System Preferences -> Security & Privacy"
                 menuItem.attributedTitle = enabledString(menuItem, reason: "missing permissions")
