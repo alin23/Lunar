@@ -106,7 +106,7 @@ final class ScrollableContrast: NSView {
 
     func addObserver(_ display: Display) {
         display.$contrast
-            .throttle(for: .milliseconds(50), scheduler: DDC.queue, latest: true)
+            .throttle(for: .milliseconds(50), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] newContrast in
                 mainAsync {
                     guard let display = self?.display, display.id != GENERIC_DISPLAY_ID else { return }

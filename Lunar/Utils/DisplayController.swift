@@ -563,10 +563,6 @@ final class DisplayController: ObservableObject {
                     self.recomputeAllDisplaysBrightness(activeDisplays: self.activeDisplayList)
                 }
             }
-
-            DDC.sync {
-                Self.serials = newValue.mapValues(\.serial)
-            }
         }
     }
     var nightMode = false {
@@ -963,7 +959,7 @@ final class DisplayController: ObservableObject {
     @Published var activeDisplayList: [Display] = [] {
         didSet {
             #if arch(arm64)
-                DDC.rebuildDCPList()
+                Task.init { await DDC.rebuildDCPList() }
             #endif
         }
     }
@@ -1258,8 +1254,6 @@ final class DisplayController: ObservableObject {
         case disabledAutomatically
     }
 
-    static var serials: [CGDirectDisplayID: String] = [:]
-
     static var observers: Set<AnyCancellable> = []
     static var ddcSleepFactor: DDCSleepFactor = {
         ddcSleepFactorPublisher.sink { change in
@@ -1417,7 +1411,7 @@ final class DisplayController: ObservableObject {
         includeProjector: Bool = false,
         includeDummy: Bool = false
     ) -> [CGDirectDisplayID: Display] {
-        var ids = DDC.findExternalDisplays(
+        var ids = DDCActor.findExternalDisplays(
             includeVirtual: includeVirtual,
             includeAirplay: includeAirplay,
             includeProjector: includeProjector,
@@ -2137,7 +2131,7 @@ final class DisplayController: ObservableObject {
             self.resetDisplayListTask = nil
             self.getDisplaysLock.around {
                 Self.panelManager = MPDisplayMgr.shared() ?? MPDisplayMgr()
-                DDC.reset()
+                Task.init { await DDC.reset() }
 
                 let activeOldDisplays = self.displayList.filter(\.active)
                 self.displays = DisplayController.getDisplays(

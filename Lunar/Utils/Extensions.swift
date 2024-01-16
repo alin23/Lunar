@@ -59,7 +59,7 @@ extension DispatchQueue {
             .global(qos: .utility),
             concurrentQueue,
             serialQueue,
-            DDC.queue,
+//            DDC.queue,
             CachedDefaults.cache.accessQueue,
             serviceBrowserQueue,
             windowControllerQueue,
@@ -1193,7 +1193,7 @@ extension NSScreen {
     }
 
     static var builtinDisplayID: CGDirectDisplayID? {
-        onlineDisplayIDs.first(where: { DDC.isBuiltinDisplay($0) })
+        onlineDisplayIDs.first(where: { DDCActor.isBuiltinDisplay($0) })
     }
 
     var displayID: CGDirectDisplayID? {
@@ -1208,11 +1208,11 @@ extension NSScreen {
     }
 
     var isBuiltin: Bool {
-        displayID != nil && DDC.isBuiltinDisplay(displayID!)
+        displayID != nil && DDCActor.isBuiltinDisplay(displayID!)
     }
 
     var isVirtual: Bool {
-        displayID != nil && DDC.isVirtualDisplay(displayID!)
+        displayID != nil && DDCActor.isVirtualDisplay(displayID!)
     }
 
     var isDummy: Bool {
@@ -1868,6 +1868,15 @@ import SwiftUI
 extension Sequence {
     func dict<K: Hashable, V>(uniqueByLast: Bool = false, _ transformer: (Element) -> (K, V)?) -> [K: V] {
         Dictionary(compactMap(transformer), uniquingKeysWith: uniqueByLast ? last(this:other:) : first(this:other:))
+    }
+    func dict<K: Hashable, V>(uniqueByLast: Bool = false, _ transformer: (Element) async -> (K, V)?) async -> [K: V] {
+        var results = [K: V]()
+        for element in self {
+            if let (key, value) = await transformer(element) {
+                results[key] = value
+            }
+        }
+        return results
     }
 }
 

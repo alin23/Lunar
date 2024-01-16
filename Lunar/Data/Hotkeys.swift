@@ -878,22 +878,23 @@ enum Hotkey {
             log.warning("No OSDManager available")
             return
         }
-        var controlID = ControlID.BRIGHTNESS
+        
+        var ddcFailed = false
         switch osdImage {
         case .brightness:
-            controlID = .BRIGHTNESS
+            ddcFailed = display.ddcBrightnessFailed
             display.fullRangeUserBrightness = value.d.map(from: (0, 100), to: (0, 1))
         case .volume:
             display.userVolume = value.d.map(from: (0, 100), to: (0, 1))
             guard display.showVolumeOSD else { return }
-            controlID = .AUDIO_SPEAKER_VOLUME
+            ddcFailed = display.ddcVolumeFailed
         case .muted:
             guard display.showVolumeOSD else { return }
         default:
             return
         }
 
-        let locked = (display.control is DDCControl && (DDC.skipWritingPropertyById[display.id]?.contains(controlID) ?? false))
+        let locked = (display.control is DDCControl && ddcFailed)
             || display.noControls
             || (display.lockedBrightness && display.hasDDC && osdImage == .brightness)
         let mirroredID = CGDisplayMirrorsDisplay(display.id)

@@ -38,7 +38,7 @@ final class DDCControl: Control, ObservableObject {
 
     lazy var brightnessPublisher: PassthroughSubject<ValueRange, Never> = {
         let p = PassthroughSubject<ValueRange, Never>()
-        p.throttle(for: .milliseconds(50), scheduler: DDC.queue, latest: true)
+        p.throttle(for: .milliseconds(50), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] range in
                 guard let self else {
                     if let display = DC.activeDisplays[range.displayID], let control = display.control as? DDCControl {
@@ -54,7 +54,7 @@ final class DDCControl: Control, ObservableObject {
 
     lazy var contrastPublisher: PassthroughSubject<ValueRange, Never> = {
         let p = PassthroughSubject<ValueRange, Never>()
-        p.throttle(for: .milliseconds(50), scheduler: DDC.queue, latest: true)
+        p.throttle(for: .milliseconds(50), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] range in
                 guard let self else {
                     if let display = DC.activeDisplays[range.displayID], let control = display.control as? DDCControl {
@@ -84,11 +84,11 @@ final class DDCControl: Control, ObservableObject {
     var isDDC: Bool { true }
 
     static func resetState(display: Display? = nil) {
+        let id = display?.id
+        Task.init {
+            await DDC.resetFaults(id: id)
+        }
         if let display {
-            DDC.skipWritingPropertyById[display.id]?.removeAll()
-            DDC.skipReadingPropertyById[display.id]?.removeAll()
-            DDC.writeFaults[display.id]?.removeAll()
-            DDC.readFaults[display.id]?.removeAll()
             mainAsync {
                 display.responsiveDDC = true
                 display.startI2CDetection()
@@ -97,10 +97,6 @@ final class DDCControl: Control, ObservableObject {
                 }
             }
         } else {
-            DDC.skipWritingPropertyById.removeAll()
-            DDC.skipReadingPropertyById.removeAll()
-            DDC.writeFaults.removeAll()
-            DDC.readFaults.removeAll()
             mainAsync {
                 for display in DC.activeDisplays.values {
                     display.responsiveDDC = true
@@ -141,31 +137,26 @@ final class DDCControl: Control, ObservableObject {
 
     func resetState() {
         guard let display else { return }
-
         Self.resetState(display: display)
     }
 
     func setPower(_ power: PowerState) -> Bool {
         guard let display else { return false }
-
         return DDC.setPower(for: display.id, power: power == .on)
     }
 
     func setRedGain(_ gain: UInt16) -> Bool {
         guard let display else { return false }
-
         return DDC.setRedGain(for: display.id, redGain: gain)
     }
 
     func setGreenGain(_ gain: UInt16) -> Bool {
         guard let display else { return false }
-
         return DDC.setGreenGain(for: display.id, greenGain: gain)
     }
 
     func setBlueGain(_ gain: UInt16) -> Bool {
         guard let display else { return false }
-
         return DDC.setBlueGain(for: display.id, blueGain: gain)
     }
 
@@ -347,7 +338,6 @@ final class DDCControl: Control, ObservableObject {
 
     func setInput(_ input: VideoInputSource) -> Bool {
         guard let display else { return false }
-
         return DDC.setInput(for: display.id, input: input)
     }
 

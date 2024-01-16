@@ -74,10 +74,13 @@ void sharedFileListDidChange(LSSharedFileListRef inList, void *context)
         UInt32 resolutionFlags = kLSSharedFileListNoUserInteraction | kLSSharedFileListDoNotMountVolumes;
         CFURLRef currentItemURL = NULL;
         LSSharedFileListItemResolve(item, resolutionFlags, &currentItemURL, NULL);
-        if (currentItemURL && CFEqual(currentItemURL, CFBridgingRetain(wantedURL))) {
+        CFURLRef urlRef = CFBridgingRetain(wantedURL);
+        if (currentItemURL && CFEqual(currentItemURL, urlRef)) {
             CFRelease(currentItemURL);
+            CFBridgingRelease(urlRef);
             return item;
         }
+        CFBridgingRelease(urlRef);
         if (currentItemURL)
             CFRelease(currentItemURL);
     }
@@ -94,8 +97,12 @@ void sharedFileListDidChange(LSSharedFileListRef inList, void *context)
 {
     LSSharedFileListItemRef appItem = [self findItemWithURL:itemURL inFileList:loginItems];
     if (enabled && !appItem) {
-        LSSharedFileListInsertItemURL(loginItems, nil,
-                                      NULL, NULL, (CFURLRef)CFBridgingRetain(itemURL), NULL, NULL);
+        CFURLRef urlRef = (CFURLRef)CFBridgingRetain(itemURL);
+        LSSharedFileListItemRef ref = LSSharedFileListInsertItemURL(loginItems, nil,
+                                      NULL, NULL, urlRef, NULL, NULL);
+        CFBridgingRelease(urlRef);
+        if (ref)
+            CFRelease(ref);
     } else if (!enabled && appItem)
         LSSharedFileListItemRemove(loginItems, appItem);
 }

@@ -781,195 +781,198 @@ final class IOServiceDetector {
 
 // MARK: - DDC
 
-enum DDC {
-    static let queueKey = DispatchSpecificKey<String>()
-    static let queue: DispatchQueue = {
-        let q = DispatchQueue(label: "DDC", qos: .userInteractive, autoreleaseFrequency: .workItem)
-        q.setSpecific(key: queueKey, value: "DDC")
-        return q
-    }()
+let DDC = DDCActor.shared
+
+@globalActor
+actor DDCActor {
+    static var shared = DDCActor()
+
+    let queueKey = DispatchSpecificKey<String>()
+//    let queue: DispatchQueue = {
+//        let q = DispatchQueue(label: "DDC", qos: .userInteractive, autoreleaseFrequency: .workItem)
+//        q.setSpecific(key: queueKey, value: "DDC")
+//        return q
+//    }()
     @Atomic static var apply = true
     @Atomic static var applyLimits = true
-    static let requestDelay: useconds_t = 20000
-    static let recoveryDelay: useconds_t = 40000
-    static var displayPortByUUID = [CFUUID: io_service_t]()
-    static var displayUUIDByEDID = [Data: CFUUID]()
-    static var skipReadingPropertyById = [CGDirectDisplayID: Set<ControlID>]()
-    static var skipWritingPropertyById = [CGDirectDisplayID: Set<ControlID>]()
-    static var readFaults: ThreadSafeDictionary<CGDirectDisplayID, ThreadSafeDictionary<ControlID, Int>> = ThreadSafeDictionary()
-    static var writeFaults: ThreadSafeDictionary<CGDirectDisplayID, ThreadSafeDictionary<ControlID, Int>> = ThreadSafeDictionary()
-    static let lock = NSRecursiveLock()
+    let requestDelay: useconds_t = 20000
+    let recoveryDelay: useconds_t = 40000
+    var displayPortByUUID = [CFUUID: io_service_t]()
+    var displayUUIDByEDID = [Data: CFUUID]()
+    var skipReadingPropertyById = [CGDirectDisplayID: Set<ControlID>]()
+    var skipWritingPropertyById = [CGDirectDisplayID: Set<ControlID>]()
+    var readFaults: ThreadSafeDictionary<CGDirectDisplayID, ThreadSafeDictionary<ControlID, Int>> = ThreadSafeDictionary()
+    var writeFaults: ThreadSafeDictionary<CGDirectDisplayID, ThreadSafeDictionary<ControlID, Int>> = ThreadSafeDictionary()
+    let lock = NSRecursiveLock()
 
-    static var lastKnownBuiltinDisplayID: CGDirectDisplayID = GENERIC_DISPLAY_ID
+    @Atomic static var lastKnownBuiltinDisplayID: CGDirectDisplayID = GENERIC_DISPLAY_ID
 
-    static func extractSerialNumber(from edid: EDID, hex: Bool = false) -> String? {
+    func extractSerialNumber(from edid: EDID, hex: Bool = false) -> String? {
         extractDescriptorText(from: edid, desType: EDIDTextType.serial, hex: hex)
     }
 
-    static func sync<T>(barrier: Bool = false, _ action: () -> T) -> T {
-        guard !Thread.isMainThread else {
-            return action()
-        }
+    // func sync<T>(barrier: Bool = false, _ action: () -> T) -> T {
+    //     guard !Thread.isMainThread else {
+    //         return action()
+    //     }
 
-        if let q = DispatchQueue.current, q == queue {
-            return action()
-        }
-        if let q = DispatchQueue.getSpecific(key: queueKey), q == "DDC" {
-            return action()
-        }
-        return queue.sync(flags: barrier ? [.barrier] : [], execute: action)
-    }
+    //     if let q = DispatchQueue.current, q == queue {
+    //         return action()
+    //     }
+    //     if let q = DispatchQueue.getSpecific(key: queueKey), q == "DDC" {
+    //         return action()
+    //     }
+    //     return queue.sync(flags: barrier ? [.barrier] : [], execute: action)
+    // }
 
     #if arch(arm64)
-        static func hasAVService(displayID: CGDirectDisplayID, ignoreCache: Bool = false) -> Bool {
-            guard !isTestID(displayID) else { return false }
-            return AVService(displayID: displayID, ignoreCache: ignoreCache) != nil
+        func hasAVService(displayID: CGDirectDisplayID, ignoreCache: Bool = false) -> Bool {
+            AVService(displayID: displayID, ignoreCache: ignoreCache) != nil
         }
 
-        static func DCP(displayID: CGDirectDisplayID, ignoreCache: Bool = false) -> DCP? {
-            guard !isTestID(displayID) else { return nil }
-
-            return sync(barrier: true) {
-                if !ignoreCache, let dcp = dcpMapping[displayID] {
-                    return dcp
-                }
-
-                dcpList = buildDCPList()
-
-                return dcpMapping[displayID]
+        func DCP(displayID: CGDirectDisplayID, ignoreCache: Bool = false) -> DCP? {
+            // sync(barrier: true) {
+            if !ignoreCache, let dcp = dcpMapping[displayID] {
+                return dcp
             }
+
+            dcpList = buildDCPList()
+
+            return dcpMapping[displayID]
+            // }
         }
 
-        static func AVService(displayID: CGDirectDisplayID, ignoreCache: Bool = false) -> IOAVService? {
+        func AVService(displayID: CGDirectDisplayID, ignoreCache: Bool = false) -> IOAVService? {
             DCP(displayID: displayID, ignoreCache: ignoreCache)?.avService
         }
 
-        static var rebuildDCPTask: DispatchWorkItem? {
+        var rebuildDCPTask: DispatchWorkItem? {
             didSet {
                 oldValue?.cancel()
             }
         }
-        static func rebuildDCPList() {
-            rebuildDCPTask = DDC.asyncAfter(ms: 200) {
-                DDC.dcpList = buildDCPList()
-            }
+        func rebuildDCPList() {
+            dcpList = buildDCPList()
+//            rebuildDCPTask = asyncAfter(ms: 200) {
+//                dcpList = buildDCPList()
+//            }
         }
     #endif
 
-    static var i2cControllerCache: ThreadSafeDictionary<CGDirectDisplayID, io_service_t?> = ThreadSafeDictionary()
+    var i2cControllerCache: ThreadSafeDictionary<CGDirectDisplayID, io_service_t?> = ThreadSafeDictionary()
 
-    static var serviceDetectors = [IOServiceDetector]()
-    static var observers: Set<AnyCancellable> = []
-    static var ioRegistryTreeChanged: PassthroughSubject<Bool, Never> = {
+    var serviceDetectors = [IOServiceDetector]()
+    var observers: Set<AnyCancellable> = []
+    lazy var ioRegistryTreeChanged: PassthroughSubject<Bool, Never> = {
         let p = PassthroughSubject<Bool, Never>()
 
-        p.debounce(for: .seconds(1), scheduler: queue)
+        p.debounce(for: .seconds(1), scheduler: RunLoop.main)
             .sink { _ in
                 guard !DC.screensSleeping, !DC.locked else { return }
                 log.debug("ioRegistryTreeChanged")
-                IORegistryTreeChanged()
+                self.IORegistryTreeChanged()
             }
             .store(in: &observers)
 
         return p
     }()
 
-    static var waitAfterWakeSeconds: Int = {
+    lazy var waitAfterWakeSeconds: Int = {
         waitAfterWakeSecondsPublisher.debounce(for: .seconds(1), scheduler: RunLoop.main)
-            .sink { waitAfterWakeSeconds = $0.newValue }
+            .sink { self.waitAfterWakeSeconds = $0.newValue }
             .store(in: &observers)
 
         return CachedDefaults[.waitAfterWakeSeconds]
     }()
 
-    static var delayDDCAfterWake: Bool = CachedDefaults[.delayDDCAfterWake]
+    var delayDDCAfterWake: Bool = CachedDefaults[.delayDDCAfterWake]
 
-    static var shouldWait: Bool {
+    var shouldWait: Bool {
         delayDDCAfterWake && waitAfterWakeSeconds > 0 && wakeTime != startTime && timeSince(wakeTime) > waitAfterWakeSeconds.d
     }
 
-    @discardableResult
-    static func asyncAfter(ms: Int, _ action: @escaping () -> Void) -> DispatchWorkItem {
-        let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
-
-        let workItem = DispatchWorkItem(name: "DDC Async After") {
-            action()
-        }
-        queue.asyncAfter(deadline: deadline, execute: workItem.workItem)
-
-        return workItem
-    }
+//    @discardableResult
+//    func asyncAfter(ms: Int, _ action: @escaping () -> Void) -> DispatchWorkItem {
+//        let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
+//
+//        let workItem = DispatchWorkItem(name: "DDC Async After") {
+//            action()
+//        }
+//        queue.asyncAfter(deadline: deadline, execute: workItem.workItem)
+//
+//        return workItem
+//    }
 
     #if arch(arm64)
-        static var dcpList: [DCP] = buildDCPList() {
+        var dcpList: [DCP] = buildDCPList() {
             didSet {
                 dcpScores = buildDCPScoreMapping(dcpList: dcpList, displays: DC.externalHardwareActiveDisplays)
             }
         }
-        static var dcpScores: [DCP: [CGDirectDisplayID: Int]] = buildDCPScoreMapping(dcpList: dcpList, displays: DC.externalHardwareActiveDisplays) {
+        lazy var dcpScores: [DCP: [CGDirectDisplayID: Int]] = buildDCPScoreMapping(dcpList: dcpList, displays: DC.externalHardwareActiveDisplays) {
             didSet {
                 dcpMapping = matchDisplayToDCP(dcpScores: dcpScores)
             }
         }
-        static var dcpMapping: [CGDirectDisplayID: DCP] = matchDisplayToDCP(dcpScores: dcpScores)
+        lazy var dcpMapping: [CGDirectDisplayID: DCP] = matchDisplayToDCP(dcpScores: dcpScores)
     #endif
 
-    static var lidClosedObserver: IOServicePropertyObserver?
+    var lidClosedObserver: IOServicePropertyObserver?
 
-    // static var lidClosedNotifyPort: IONotificationPortRef?
-    // static var lidClosedNotificationHandle: io_object_t = 0
+    // var lidClosedNotifyPort: IONotificationPortRef?
+    // var lidClosedNotificationHandle: io_object_t = 0
 
-    static func IORegistryTreeChanged() {
+    func IORegistryTreeChanged() {
         #if DEBUG
             print("IORegistryTreeChanged")
         #endif
 
-        DDC.sync(barrier: true) {
-            #if arch(arm64)
-                DDC.dcpList = buildDCPList()
-            #else
-                DDC.i2cControllerCache.removeAll()
-            #endif
+        // DDC.sync(barrier: true) {
+        #if arch(arm64)
+            dcpList = buildDCPList()
+        #else
+            i2cControllerCache.removeAll()
+        #endif
 
-            DC.activeDisplays.values.forEach { display in
-                display.nsScreen = display.getScreen()
-                display.detectI2C()
-                display.startI2CDetection()
-            }
-
-            #if arch(arm64)
-                mainAsync {
-                    DC.possiblyDisconnectedDisplays = DC.possiblyDisconnectedDisplayList.dict { d in
-                        if d.isBuiltin, !DCPAVServiceExists(location: .embedded) { return (d.id, d) }
-
-                        guard DDC.dcpList.contains(where: { $0.dcpName == d.dcpName }) else { return nil }
-                        return (d.id, d)
-                    }
-
-                    if #available(macOS 13, *), IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("DCPAVServiceProxy")) == 0 {
-                        log.info("Disabling AutoBlackOut (disconnect) if we're left with only the builtin screen")
-                        DC.en()
-                        DC.autoBlackoutPause = false
-                    }
-                }
-            #endif
+        DC.activeDisplays.values.forEach { display in
+            display.nsScreen = display.getScreen()
+            display.detectI2C()
+            display.startI2CDetection()
         }
+
+        #if arch(arm64)
+            mainAsync {
+                DC.possiblyDisconnectedDisplays = DC.possiblyDisconnectedDisplayList.dict { d in
+                    if d.isBuiltin, !DCPAVServiceExists(location: .embedded) { return (d.id, d) }
+
+                    guard self.dcpList.contains(where: { $0.dcpName == d.dcpName }) else { return nil }
+                    return (d.id, d)
+                }
+
+                if #available(macOS 13, *), IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("DCPAVServiceProxy")) == 0 {
+                    log.info("Disabling AutoBlackOut (disconnect) if we're left with only the builtin screen")
+                    DC.en()
+                    DC.autoBlackoutPause = false
+                }
+            }
+        #endif
+        // }
     }
 
-    static func setup() {
+    func setup() {
         initFirstPhase()
 
         #if arch(arm64)
             log.debug("Adding IOKit notification for dispext")
             serviceDetectors += (["AppleCLCD2", "IOMobileFramebufferShim", "DCPAVServiceProxy"] + DISP_NAMES + DCP_NAMES)
                 .compactMap { IOServiceDetector(serviceName: $0, callback: { _, _, _ in
-                    ioRegistryTreeChanged.send(true)
+                    self.ioRegistryTreeChanged.send(true)
                 }) }
         #else
             log.debug("Adding IOKit notification for IOFRAMEBUFFER_CONFORMSTO")
             serviceDetectors += [IOFRAMEBUFFER_CONFORMSTO]
                 .compactMap { IOServiceDetector(serviceClass: $0, callback: { _, _, _ in
-                    ioRegistryTreeChanged.send(true)
+                    self.ioRegistryTreeChanged.send(true)
                 }) }
         #endif
 
@@ -985,20 +988,51 @@ enum DDC {
         #endif
 
     }
-    static func reset() {
-        sync(barrier: true) {
-            DDC.displayPortByUUID.removeAll()
-            DDC.displayUUIDByEDID.removeAll()
-            DDC.skipReadingPropertyById.removeAll()
-            DDC.skipWritingPropertyById.removeAll()
-            DDC.readFaults.removeAll()
-            DDC.writeFaults.removeAll()
-            #if arch(arm64)
-                DDC.dcpList = buildDCPList()
-            #else
-                DDC.i2cControllerCache.removeAll()
-            #endif
+    func resetFaults(id: CGDirectDisplayID? = nil) {
+        if let id {
+            skipWritingPropertyById[id]?.removeAll()
+            skipReadingPropertyById[id]?.removeAll()
+            writeFaults[id]?.removeAll()
+            readFaults[id]?.removeAll()
+            mainActor {
+                if let display = DC.activeDisplays[id] {
+                    display.ddcBrightnessFailed = false
+                    display.ddcVolumeFailed = false
+                }
+            }
+        } else {
+            skipWritingPropertyById.removeAll()
+            skipReadingPropertyById.removeAll()
+            writeFaults.removeAll()
+            readFaults.removeAll()
+            mainActor {
+                DC.activeDisplayList.forEach { display in
+                    display.ddcBrightnessFailed = false
+                    display.ddcVolumeFailed = false
+                }
+            }
         }
+    }
+    func reset() {
+        // sync(barrier: true) {
+        displayPortByUUID.removeAll()
+        displayUUIDByEDID.removeAll()
+        skipReadingPropertyById.removeAll()
+        skipWritingPropertyById.removeAll()
+        readFaults.removeAll()
+        writeFaults.removeAll()
+        #if arch(arm64)
+            dcpList = buildDCPList()
+        #else
+            i2cControllerCache.removeAll()
+        #endif
+        mainActor {
+            DC.activeDisplayList.forEach { display in
+                display.ddcBrightnessFailed = false
+                display.ddcVolumeFailed = false
+            }
+        }
+        // }
     }
 
     static func findExternalDisplays(
@@ -1009,11 +1043,11 @@ enum DDC {
     ) -> [CGDirectDisplayID] {
         var displayIDs = NSScreen.onlineDisplayIDs.filter { id in
             let name = Display.printableName(id)
-            return !isBuiltinDisplay(id) &&
-                (includeVirtual || !isVirtualDisplay(id, name: name)) &&
-                (includeProjector || !isProjectorDisplay(id, name: name)) &&
-                (includeDummy || !isDummyDisplay(id, name: name)) &&
-                (includeAirplay || !(isSidecarDisplay(id, name: name) || isAirplayDisplay(id, name: name)))
+            return !Self.isBuiltinDisplay(id) &&
+                (includeVirtual || !Self.isVirtualDisplay(id, name: name)) &&
+                (includeProjector || !Self.isProjectorDisplay(id, name: name)) &&
+                (includeDummy || !Self.isDummyDisplay(id, name: name)) &&
+                (includeAirplay || !(Self.isSidecarDisplay(id, name: name) || Self.isAirplayDisplay(id, name: name)))
         }
 
         #if DEBUG
@@ -1158,12 +1192,8 @@ enum DDC {
 
     }
 
-    static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt16, sourceAddr: UInt8? = nil) -> Bool {
-        #if DEBUG
-            guard apply, !isTestID(displayID), !shouldWait, !DC.screensSleeping, !DC.locked else { return true }
-        #else
-            guard apply, !shouldWait, !DC.screensSleeping, !DC.locked else { return true }
-        #endif
+    func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt16, sourceAddr: UInt8? = nil) -> Bool {
+        guard DDCActor.apply, !shouldWait, !DC.screensSleeping, !DC.locked else { return true }
 
         #if arch(arm64)
             guard let dcp = DCP(displayID: displayID) else { return false }
@@ -1171,109 +1201,109 @@ enum DDC {
             guard let fb = I2CController(displayID: displayID) else { return false }
         #endif
 
-        return sync(barrier: true) {
-            if let propertiesToSkip = DDC.skipWritingPropertyById[displayID], propertiesToSkip.contains(controlID) {
-                log.debug("Skipping write for \(controlID)", context: displayID)
-                return false
-            }
-
-            var localControlID = controlID
-            var localSourceAddr = sourceAddr ?? 0x51
-            if controlID == .INPUT_SOURCE, let input = VideoInputSource(rawValue: newValue), input.isLGSpecific, sourceAddr == nil {
-                localSourceAddr = 0x50
-                localControlID = .MANUFACTURER_SPECIFIC_F4
-            }
-
-            var command = DDCWriteCommand(
-                control_id: localControlID.rawValue,
-                new_value: newValue
-            )
-
-            let writeStartedAt = DispatchTime.now()
-
-            #if arch(arm64)
-                let result = DDCWrite(avService: dcp.avService, command: &command, displayID: displayID, isMCDP: dcp.isMCDP, sourceAddr: localSourceAddr)
-            #else
-                let result = DDCWrite(fb: fb, command: &command, sourceAddr: localSourceAddr)
-            #endif
-
-            let writeNs = DispatchTime.now().rawValue - writeStartedAt.rawValue
-            let writeMs = writeNs / 1_000_000
-            if writeMs > MAX_WRITE_DURATION_MS {
-                log.debug("Writing \(controlID) took too long: \(writeMs)ms", context: displayID)
-                writeFault(severity: 4, displayID: displayID, controlID: controlID)
-            }
-
-            guard result else {
-                log.debug("Error writing \(controlID)", context: displayID)
-                writeFault(severity: 1, displayID: displayID, controlID: controlID)
-                return false
-            }
-
-            if writeNs > 0 {
-                DC.averageDDCWriteNanoseconds(for: displayID, ns: writeNs)
-            }
-            if let display = DC.displays[displayID], !display.responsiveDDC {
-                display.responsiveDDC = true
-            }
-
-            if let propertyFaults = DDC.writeFaults[displayID], let faults = propertyFaults[controlID] {
-                DDC.writeFaults[displayID]![controlID] = max(faults - 1, 0)
-            }
-
-            return result
+        // return sync(barrier: true) {
+        if let propertiesToSkip = skipWritingPropertyById[displayID], propertiesToSkip.contains(controlID) {
+            log.debug("Skipping write for \(controlID)", context: displayID)
+            return false
         }
+
+        var localControlID = controlID
+        var localSourceAddr = sourceAddr ?? 0x51
+        if controlID == .INPUT_SOURCE, let input = VideoInputSource(rawValue: newValue), input.isLGSpecific, sourceAddr == nil {
+            localSourceAddr = 0x50
+            localControlID = .MANUFACTURER_SPECIFIC_F4
+        }
+
+        var command = DDCWriteCommand(
+            control_id: localControlID.rawValue,
+            new_value: newValue
+        )
+
+        let writeStartedAt = DispatchTime.now()
+
+        #if arch(arm64)
+            let result = DDCWrite(avService: dcp.avService, command: &command, displayID: displayID, isMCDP: dcp.isMCDP, sourceAddr: localSourceAddr)
+        #else
+            let result = DDCWrite(fb: fb, command: &command, sourceAddr: localSourceAddr)
+        #endif
+
+        let writeNs = DispatchTime.now().rawValue - writeStartedAt.rawValue
+        let writeMs = writeNs / 1_000_000
+        if writeMs > MAX_WRITE_DURATION_MS {
+            log.debug("Writing \(controlID) took too long: \(writeMs)ms", context: displayID)
+            writeFault(severity: 4, displayID: displayID, controlID: controlID)
+        }
+
+        guard result else {
+            log.debug("Error writing \(controlID)", context: displayID)
+            writeFault(severity: 1, displayID: displayID, controlID: controlID)
+            return false
+        }
+
+        if writeNs > 0 {
+            DC.averageDDCWriteNanoseconds(for: displayID, ns: writeNs)
+        }
+        if let display = DC.displays[displayID], !display.responsiveDDC {
+            display.responsiveDDC = true
+        }
+
+        if let propertyFaults = writeFaults[displayID], let faults = propertyFaults[controlID] {
+            writeFaults[displayID]![controlID] = max(faults - 1, 0)
+        }
+
+        return result
+        // }
     }
 
-    static func readFault(severity: Int, displayID: CGDirectDisplayID, controlID: ControlID) {
-        guard let propertyFaults = DDC.readFaults[displayID] else {
-            DDC.readFaults[displayID] = ThreadSafeDictionary(dict: [controlID: severity])
+    func readFault(severity: Int, displayID: CGDirectDisplayID, controlID: ControlID) {
+        guard let propertyFaults = readFaults[displayID] else {
+            readFaults[displayID] = ThreadSafeDictionary(dict: [controlID: severity])
             return
         }
         guard var faults = propertyFaults[controlID] else {
-            DDC.readFaults[displayID]![controlID] = severity
+            readFaults[displayID]![controlID] = severity
             return
         }
         faults = min(severity + faults, MAX_READ_FAULTS + 1)
-        DDC.readFaults[displayID]![controlID] = faults
+        readFaults[displayID]![controlID] = faults
 
         if faults > MAX_READ_FAULTS {
-            DDC.skipReadingProperty(displayID: displayID, controlID: controlID)
+            skipReadingProperty(displayID: displayID, controlID: controlID)
         }
     }
 
-    static func writeFault(severity: Int, displayID: CGDirectDisplayID, controlID: ControlID) {
-        guard let propertyFaults = DDC.writeFaults[displayID] else {
-            DDC.writeFaults[displayID] = ThreadSafeDictionary(dict: [controlID: severity])
+    func writeFault(severity: Int, displayID: CGDirectDisplayID, controlID: ControlID) {
+        guard let propertyFaults = writeFaults[displayID] else {
+            writeFaults[displayID] = ThreadSafeDictionary(dict: [controlID: severity])
             return
         }
         guard var faults = propertyFaults[controlID] else {
-            DDC.writeFaults[displayID]![controlID] = severity
+            writeFaults[displayID]![controlID] = severity
             return
         }
         faults = min(severity + faults, MAX_WRITE_FAULTS + 1)
-        DDC.writeFaults[displayID]![controlID] = faults
+        writeFaults[displayID]![controlID] = faults
 
         if faults > MAX_WRITE_FAULTS {
-            DDC.skipWritingProperty(displayID: displayID, controlID: controlID)
+            skipWritingProperty(displayID: displayID, controlID: controlID)
         }
     }
 
-    static func skipReadingProperty(displayID: CGDirectDisplayID, controlID: ControlID) {
-        if var propertiesToSkip = DDC.skipReadingPropertyById[displayID] {
+    func skipReadingProperty(displayID: CGDirectDisplayID, controlID: ControlID) {
+        if var propertiesToSkip = skipReadingPropertyById[displayID] {
             propertiesToSkip.insert(controlID)
-            DDC.skipReadingPropertyById[displayID] = propertiesToSkip
+            skipReadingPropertyById[displayID] = propertiesToSkip
         } else {
-            DDC.skipReadingPropertyById[displayID] = Set([controlID])
+            skipReadingPropertyById[displayID] = Set([controlID])
         }
     }
 
-    static func skipWritingProperty(displayID: CGDirectDisplayID, controlID: ControlID) {
-        if var propertiesToSkip = DDC.skipWritingPropertyById[displayID] {
+    func skipWritingProperty(displayID: CGDirectDisplayID, controlID: ControlID) {
+        if var propertiesToSkip = skipWritingPropertyById[displayID] {
             propertiesToSkip.insert(controlID)
-            DDC.skipWritingPropertyById[displayID] = propertiesToSkip
+            skipWritingPropertyById[displayID] = propertiesToSkip
         } else {
-            DDC.skipWritingPropertyById[displayID] = Set([controlID])
+            skipWritingPropertyById[displayID] = Set([controlID])
         }
         if controlID == ControlID.BRIGHTNESS, CachedDefaults[.detectResponsiveness] {
             mainAsyncAfter(ms: 100) {
@@ -1284,10 +1314,20 @@ enum DDC {
                 #endif
             }
         }
+        mainActor {
+            switch controlID {
+            case .BRIGHTNESS:
+                DC.activeDisplays[displayID]?.ddcBrightnessFailed = true
+            case .AUDIO_SPEAKER_VOLUME:
+                DC.activeDisplays[displayID]?.ddcVolumeFailed = true
+            default:
+                break
+            }
+        }
     }
 
-    static func read(displayID: CGDirectDisplayID, controlID: ControlID) -> DDCReadResult? {
-        guard !isTestID(displayID), !shouldWait, !DC.screensSleeping, !DC.locked else { return nil }
+    func read(displayID: CGDirectDisplayID, controlID: ControlID) -> DDCReadResult? {
+        guard !shouldWait, !DC.screensSleeping, !DC.locked else { return nil }
 
         #if arch(arm64)
             guard let dcp = DCP(displayID: displayID) else { return nil }
@@ -1295,62 +1335,62 @@ enum DDC {
             guard let fb = I2CController(displayID: displayID) else { return nil }
         #endif
 
-        return sync(barrier: true) {
-            if let propertiesToSkip = DDC.skipReadingPropertyById[displayID], propertiesToSkip.contains(controlID) {
-                log.debug("Skipping read for \(controlID)", context: displayID)
-                return nil
-            }
-
-            var command = DDCReadCommand(
-                control_id: controlID.rawValue,
-                success: false,
-                max_value: 0,
-                current_value: 0
-            )
-
-            let readStartedAt = DispatchTime.now()
-
-            #if arch(arm64)
-                _ = DDCRead(avService: dcp.avService, command: &command, displayID: displayID, isMCDP: dcp.isMCDP)
-            #else
-                _ = DDCRead(fb: fb, command: &command)
-            #endif
-
-            let readNs = DispatchTime.now().rawValue - readStartedAt.rawValue
-            let readMs = readNs / 1_000_000
-            if readMs > MAX_READ_DURATION_MS {
-                log.debug("Reading \(controlID) took too long: \(readMs)ms", context: displayID)
-                readFault(severity: 4, displayID: displayID, controlID: controlID)
-            }
-
-            guard command.success else {
-                log.debug("Error reading \(controlID)", context: displayID)
-                readFault(severity: 1, displayID: displayID, controlID: controlID)
-
-                return nil
-            }
-
-            if readNs > 0 {
-                DC.averageDDCReadNanoseconds(for: displayID, ns: readNs)
-            }
-            if let display = DC.displays[displayID], !display.responsiveDDC {
-                display.responsiveDDC = true
-            }
-
-            if let propertyFaults = DDC.readFaults[displayID], let faults = propertyFaults[controlID] {
-                DDC.readFaults[displayID]![controlID] = max(faults - 1, 0)
-            }
-
-            return DDCReadResult(
-                controlID: controlID,
-                maxValue: command.max_value,
-                currentValue: command.current_value
-            )
+        // return sync(barrier: true) {
+        if let propertiesToSkip = skipReadingPropertyById[displayID], propertiesToSkip.contains(controlID) {
+            log.debug("Skipping read for \(controlID)", context: displayID)
+            return nil
         }
+
+        var command = DDCReadCommand(
+            control_id: controlID.rawValue,
+            success: false,
+            max_value: 0,
+            current_value: 0
+        )
+
+        let readStartedAt = DispatchTime.now()
+
+        #if arch(arm64)
+            _ = DDCRead(avService: dcp.avService, command: &command, displayID: displayID, isMCDP: dcp.isMCDP)
+        #else
+            _ = DDCRead(fb: fb, command: &command)
+        #endif
+
+        let readNs = DispatchTime.now().rawValue - readStartedAt.rawValue
+        let readMs = readNs / 1_000_000
+        if readMs > MAX_READ_DURATION_MS {
+            log.debug("Reading \(controlID) took too long: \(readMs)ms", context: displayID)
+            readFault(severity: 4, displayID: displayID, controlID: controlID)
+        }
+
+        guard command.success else {
+            log.debug("Error reading \(controlID)", context: displayID)
+            readFault(severity: 1, displayID: displayID, controlID: controlID)
+
+            return nil
+        }
+
+        if readNs > 0 {
+            DC.averageDDCReadNanoseconds(for: displayID, ns: readNs)
+        }
+        if let display = DC.displays[displayID], !display.responsiveDDC {
+            display.responsiveDDC = true
+        }
+
+        if let propertyFaults = readFaults[displayID], let faults = propertyFaults[controlID] {
+            readFaults[displayID]![controlID] = max(faults - 1, 0)
+        }
+
+        return DDCReadResult(
+            controlID: controlID,
+            maxValue: command.max_value,
+            currentValue: command.current_value
+        )
+        // }
     }
 
-    static func sendEdidRequest(displayID: CGDirectDisplayID) -> (EDID, Data)? {
-        guard !isTestID(displayID), !DC.screensSleeping, !DC.locked else { return nil }
+    func sendEdidRequest(displayID: CGDirectDisplayID) -> (EDID, Data)? {
+        guard !DC.screensSleeping, !DC.locked else { return nil }
 
         #if arch(arm64)
             guard let avService = AVService(displayID: displayID) else { return nil }
@@ -1358,35 +1398,35 @@ enum DDC {
             guard let fb = I2CController(displayID: displayID) else { return nil }
         #endif
 
-        return sync(barrier: true) {
-            var edidData = [UInt8](repeating: 0, count: 256)
-            var edid = EDID()
+        // return sync(barrier: true) {
+        var edidData = [UInt8](repeating: 0, count: 256)
+        var edid = EDID()
 
-            #if arch(arm64)
-                _ = EDIDTest(avService: avService, edid: &edid, data: &edidData)
-            #else
-                _ = EDIDTest(fb: fb, edid: &edid, data: &edidData)
-            #endif
+        #if arch(arm64)
+            _ = EDIDTest(avService: avService, edid: &edid, data: &edidData)
+        #else
+            _ = EDIDTest(fb: fb, edid: &edid, data: &edidData)
+        #endif
 
-            return (edid, Data(bytes: &edidData, count: 256))
-        }
+        return (edid, Data(bytes: &edidData, count: 256))
+        // }
     }
 
-    static func getEdid(displayID: CGDirectDisplayID) -> EDID? {
-        guard let (edid, _) = DDC.sendEdidRequest(displayID: displayID) else {
+    func getEdid(displayID: CGDirectDisplayID) -> EDID? {
+        guard let (edid, _) = sendEdidRequest(displayID: displayID) else {
             return nil
         }
         return edid
     }
 
-    static func getEdidData(displayID: CGDirectDisplayID) -> Data? {
-        guard let (_, data) = DDC.sendEdidRequest(displayID: displayID) else {
+    func getEdidData(displayID: CGDirectDisplayID) -> Data? {
+        guard let (_, data) = sendEdidRequest(displayID: displayID) else {
             return nil
         }
         return data
     }
 
-    static func getEdidData() -> [Data] {
+    func getEdidData() -> [Data] {
         var result = [Data]()
         var object: io_object_t
         var serialPortIterator = io_iterator_t()
@@ -1416,14 +1456,14 @@ enum DDC {
         return result
     }
 
-    static func getDisplayIdentificationData(displayID: CGDirectDisplayID) -> String {
-        guard let edid = DDC.getEdid(displayID: displayID) else {
+    func getDisplayIdentificationData(displayID: CGDirectDisplayID) -> String {
+        guard let edid = getEdid(displayID: displayID) else {
             return ""
         }
         return "\(edid.eisaid.str())-\(edid.productcode.str())-\(edid.serial.str()) \(edid.week.str())/\(edid.year.str()) \(edid.versionmajor.str()).\(edid.versionminor.str())"
     }
 
-    static func getTextData(_ descriptor: descriptor, hex: Bool = false) -> String? {
+    func getTextData(_ descriptor: descriptor, hex: Bool = false) -> String? {
         let tmp = descriptor.text.data
         let nameChars = [
             tmp.0, tmp.1, tmp.2, tmp.3,
@@ -1440,26 +1480,26 @@ enum DDC {
         return nil
     }
 
-    static func extractDescriptorText(from edid: EDID, desType: EDIDTextType, hex: Bool = false) -> String? {
+    func extractDescriptorText(from edid: EDID, desType: EDIDTextType, hex: Bool = false) -> String? {
         switch desType.rawValue {
         case edid.descriptors.0.text.type:
-            DDC.getTextData(edid.descriptors.0, hex: hex)
+            getTextData(edid.descriptors.0, hex: hex)
         case edid.descriptors.1.text.type:
-            DDC.getTextData(edid.descriptors.1, hex: hex)
+            getTextData(edid.descriptors.1, hex: hex)
         case edid.descriptors.2.text.type:
-            DDC.getTextData(edid.descriptors.2, hex: hex)
+            getTextData(edid.descriptors.2, hex: hex)
         case edid.descriptors.3.text.type:
-            DDC.getTextData(edid.descriptors.3, hex: hex)
+            getTextData(edid.descriptors.3, hex: hex)
         default:
             nil
         }
     }
 
-    static func addObservers() {
+    func addObservers() {
         delayDDCAfterWake = CachedDefaults[.delayDDCAfterWake]
         delayDDCAfterWakePublisher.debounce(for: .seconds(2), scheduler: RunLoop.main)
             .sink { change in
-                delayDDCAfterWake = change.newValue
+                self.delayDDCAfterWake = change.newValue
 
                 guard change.newValue else {
                     if let oldVal = CachedDefaults[.oldReapplyValuesAfterWake] { CachedDefaults[.reapplyValuesAfterWake] = oldVal }
@@ -1483,29 +1523,26 @@ enum DDC {
             .store(in: &observers)
     }
 
-    static func extractName(from edid: EDID, hex: Bool = false) -> String? {
+    func extractName(from edid: EDID, hex: Bool = false) -> String? {
         extractDescriptorText(from: edid, desType: EDIDTextType.name, hex: hex)
     }
 
-    static func hasI2CController(displayID: CGDirectDisplayID, ignoreCache: Bool = false) -> Bool {
-        guard !isTestID(displayID) else { return false }
-        return I2CController(displayID: displayID, ignoreCache: ignoreCache) != nil
+    func hasI2CController(displayID: CGDirectDisplayID, ignoreCache: Bool = false) -> Bool {
+        I2CController(displayID: displayID, ignoreCache: ignoreCache) != nil
     }
 
-    static func I2CController(displayID: CGDirectDisplayID, ignoreCache: Bool = false) -> io_service_t? {
-        sync(barrier: true) {
-            if !ignoreCache, let controllerTemp = i2cControllerCache[displayID], let controller = controllerTemp {
-                return controller
-            }
-            let controller = I2CController(displayID)
-            i2cControllerCache[displayID] = controller
+    func I2CController(displayID: CGDirectDisplayID, ignoreCache: Bool = false) -> io_service_t? {
+        // sync(barrier: true) {
+        if !ignoreCache, let controllerTemp = i2cControllerCache[displayID], let controller = controllerTemp {
             return controller
         }
+        let controller = I2CController(displayID)
+        i2cControllerCache[displayID] = controller
+        return controller
+        // }
     }
 
-    static func I2CController(_ displayID: CGDirectDisplayID) -> io_service_t? {
-        guard !isTestID(displayID) else { return nil }
-
+    func I2CController(_ displayID: CGDirectDisplayID) -> io_service_t? {
         let activeIDs = NSScreen.onlineDisplayIDs
 
         #if !DEBUG
@@ -1555,15 +1592,15 @@ enum DDC {
         return fb
     }
 
-    static func getDisplayName(for displayID: CGDirectDisplayID) -> String? {
-        guard let edid = DDC.getEdid(displayID: displayID) else {
+    func getDisplayName(for displayID: CGDirectDisplayID) -> String? {
+        guard let edid = getEdid(displayID: displayID) else {
             return nil
         }
         return extractName(from: edid)
     }
 
-    static func getDisplaySerial(for displayID: CGDirectDisplayID) -> String? {
-        guard let edid = DDC.getEdid(displayID: displayID) else {
+    func getDisplaySerial(for displayID: CGDirectDisplayID) -> String? {
+        guard let edid = getEdid(displayID: displayID) else {
             return nil
         }
 
@@ -1572,8 +1609,8 @@ enum DDC {
         return "\(name)-\(serialNumber)-\(edid.serial)-\(edid.productcode)-\(edid.year)-\(edid.week)"
     }
 
-    static func getDisplaySerialAndName(for displayID: CGDirectDisplayID) -> (String?, String?) {
-        guard let edid = DDC.getEdid(displayID: displayID) else {
+    func getDisplaySerialAndName(for displayID: CGDirectDisplayID) -> (String?, String?) {
+        guard let edid = getEdid(displayID: displayID) else {
             return (nil, nil)
         }
 
@@ -1582,65 +1619,65 @@ enum DDC {
         return ("\(name)-\(serialNumber)-\(edid.serial)-\(edid.productcode)-\(edid.year)-\(edid.week)", name)
     }
 
-    static func setInput(for displayID: CGDirectDisplayID, input: VideoInputSource) -> Bool {
+    func setInput(for displayID: CGDirectDisplayID, input: VideoInputSource) -> Bool {
         if input == .unknown {
             return false
         }
         return write(displayID: displayID, controlID: ControlID.INPUT_SOURCE, newValue: input.rawValue)
     }
 
-    static func readInput(for displayID: CGDirectDisplayID) -> DDCReadResult? {
+    func readInput(for displayID: CGDirectDisplayID) -> DDCReadResult? {
         read(displayID: displayID, controlID: ControlID.INPUT_SOURCE)
     }
 
-    static func setBrightness(for displayID: CGDirectDisplayID, brightness: UInt16) -> Bool {
+    func setBrightness(for displayID: CGDirectDisplayID, brightness: UInt16) -> Bool {
         write(displayID: displayID, controlID: ControlID.BRIGHTNESS, newValue: brightness)
     }
 
-    static func readBrightness(for displayID: CGDirectDisplayID) -> DDCReadResult? {
+    func readBrightness(for displayID: CGDirectDisplayID) -> DDCReadResult? {
         read(displayID: displayID, controlID: ControlID.BRIGHTNESS)
     }
 
-    static func readContrast(for displayID: CGDirectDisplayID) -> DDCReadResult? {
+    func readContrast(for displayID: CGDirectDisplayID) -> DDCReadResult? {
         read(displayID: displayID, controlID: ControlID.CONTRAST)
     }
 
-    static func setContrast(for displayID: CGDirectDisplayID, contrast: UInt16) -> Bool {
+    func setContrast(for displayID: CGDirectDisplayID, contrast: UInt16) -> Bool {
         write(displayID: displayID, controlID: ControlID.CONTRAST, newValue: contrast)
     }
 
-    static func setRedGain(for displayID: CGDirectDisplayID, redGain: UInt16) -> Bool {
+    func setRedGain(for displayID: CGDirectDisplayID, redGain: UInt16) -> Bool {
         write(displayID: displayID, controlID: ControlID.RED_GAIN, newValue: redGain)
     }
 
-    static func setGreenGain(for displayID: CGDirectDisplayID, greenGain: UInt16) -> Bool {
+    func setGreenGain(for displayID: CGDirectDisplayID, greenGain: UInt16) -> Bool {
         write(displayID: displayID, controlID: ControlID.GREEN_GAIN, newValue: greenGain)
     }
 
-    static func setBlueGain(for displayID: CGDirectDisplayID, blueGain: UInt16) -> Bool {
+    func setBlueGain(for displayID: CGDirectDisplayID, blueGain: UInt16) -> Bool {
         write(displayID: displayID, controlID: ControlID.BLUE_GAIN, newValue: blueGain)
     }
 
-    static func setAudioSpeakerVolume(for displayID: CGDirectDisplayID, audioSpeakerVolume: UInt16) -> Bool {
+    func setAudioSpeakerVolume(for displayID: CGDirectDisplayID, audioSpeakerVolume: UInt16) -> Bool {
         write(displayID: displayID, controlID: ControlID.AUDIO_SPEAKER_VOLUME, newValue: audioSpeakerVolume)
     }
 
-    static func setAudioMuted(for displayID: CGDirectDisplayID, audioMuted: Bool) -> Bool {
+    func setAudioMuted(for displayID: CGDirectDisplayID, audioMuted: Bool) -> Bool {
         write(displayID: displayID, controlID: ControlID.AUDIO_MUTE, newValue: audioMuted ? 1 : 2)
     }
 
-    static func setPower(for displayID: CGDirectDisplayID, power: Bool) -> Bool {
+    func setPower(for displayID: CGDirectDisplayID, power: Bool) -> Bool {
         write(displayID: displayID, controlID: ControlID.DPMS, newValue: power ? 1 : 5)
     }
 
-    static func reset(displayID: CGDirectDisplayID) -> Bool {
+    func reset(displayID: CGDirectDisplayID) -> Bool {
         write(displayID: displayID, controlID: ControlID.RESET, newValue: 100)
     }
 
-    static func getValue(for displayID: CGDirectDisplayID, controlID: ControlID) -> UInt16? {
+    func getValue(for displayID: CGDirectDisplayID, controlID: ControlID) -> UInt16? {
         log.debug("DDC reading \(controlID) for \(displayID)")
 
-        guard let result = DDC.read(displayID: displayID, controlID: controlID) else {
+        guard let result = read(displayID: displayID, controlID: controlID) else {
             #if DEBUG
                 log.debug("DDC read \(controlID) nil for \(displayID)")
             #endif
@@ -1652,54 +1689,54 @@ enum DDC {
         return result.currentValue
     }
 
-    static func getMaxValue(for displayID: CGDirectDisplayID, controlID: ControlID) -> UInt16? {
-        guard let result = DDC.read(displayID: displayID, controlID: controlID) else {
+    func getMaxValue(for displayID: CGDirectDisplayID, controlID: ControlID) -> UInt16? {
+        guard let result = read(displayID: displayID, controlID: controlID) else {
             return nil
         }
         return result.maxValue
     }
 
-    static func getRedGain(for displayID: CGDirectDisplayID) -> UInt16? {
-        DDC.getValue(for: displayID, controlID: ControlID.RED_GAIN)
+    func getRedGain(for displayID: CGDirectDisplayID) -> UInt16? {
+        getValue(for: displayID, controlID: ControlID.RED_GAIN)
     }
 
-    static func getGreenGain(for displayID: CGDirectDisplayID) -> UInt16? {
-        DDC.getValue(for: displayID, controlID: ControlID.GREEN_GAIN)
+    func getGreenGain(for displayID: CGDirectDisplayID) -> UInt16? {
+        getValue(for: displayID, controlID: ControlID.GREEN_GAIN)
     }
 
-    static func getBlueGain(for displayID: CGDirectDisplayID) -> UInt16? {
-        DDC.getValue(for: displayID, controlID: ControlID.BLUE_GAIN)
+    func getBlueGain(for displayID: CGDirectDisplayID) -> UInt16? {
+        getValue(for: displayID, controlID: ControlID.BLUE_GAIN)
     }
 
-    static func getAudioSpeakerVolume(for displayID: CGDirectDisplayID) -> UInt16? {
-        DDC.getValue(for: displayID, controlID: ControlID.AUDIO_SPEAKER_VOLUME)
+    func getAudioSpeakerVolume(for displayID: CGDirectDisplayID) -> UInt16? {
+        getValue(for: displayID, controlID: ControlID.AUDIO_SPEAKER_VOLUME)
     }
 
-    static func isAudioMuted(for displayID: CGDirectDisplayID) -> Bool? {
-        guard let mute = DDC.getValue(for: displayID, controlID: ControlID.AUDIO_MUTE) else {
+    func isAudioMuted(for displayID: CGDirectDisplayID) -> Bool? {
+        guard let mute = getValue(for: displayID, controlID: ControlID.AUDIO_MUTE) else {
             return nil
         }
         return mute != 2
     }
 
-    static func getContrast(for displayID: CGDirectDisplayID) -> UInt16? {
-        DDC.getValue(for: displayID, controlID: ControlID.CONTRAST)
+    func getContrast(for displayID: CGDirectDisplayID) -> UInt16? {
+        getValue(for: displayID, controlID: ControlID.CONTRAST)
     }
 
-    static func getInput(for displayID: CGDirectDisplayID) -> UInt16? {
-        DDC.readInput(for: displayID)?.currentValue
+    func getInput(for displayID: CGDirectDisplayID) -> UInt16? {
+        readInput(for: displayID)?.currentValue
     }
 
-    static func getBrightness(for id: CGDirectDisplayID) -> UInt16? {
+    func getBrightness(for id: CGDirectDisplayID) -> UInt16? {
         log.debug("DDC reading brightness for \(id)")
-        return DDC.getValue(for: id, controlID: ControlID.BRIGHTNESS)
+        return getValue(for: id, controlID: ControlID.BRIGHTNESS)
     }
 
-    static func resetBrightnessAndContrast(for displayID: CGDirectDisplayID) -> Bool {
-        DDC.write(displayID: displayID, controlID: .RESET_BRIGHTNESS_AND_CONTRAST, newValue: 1)
+    func resetBrightnessAndContrast(for displayID: CGDirectDisplayID) -> Bool {
+        write(displayID: displayID, controlID: .RESET_BRIGHTNESS_AND_CONTRAST, newValue: 1)
     }
 
-    static func resetColors(for displayID: CGDirectDisplayID) -> Bool {
-        DDC.write(displayID: displayID, controlID: .RESET_COLOR, newValue: 1)
+    func resetColors(for displayID: CGDirectDisplayID) -> Bool {
+        write(displayID: displayID, controlID: .RESET_COLOR, newValue: 1)
     }
 }

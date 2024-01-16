@@ -457,7 +457,7 @@ final class NetworkControl: Control {
 
         guard let service = NetworkControl.controllersForDisplay[display.serial],
               let url = smooth ? service.smoothTransitionUrl : service.url,
-              DDC.apply
+              DDCActor.apply
         else {
             manageSendingState(for: controlID, sending: true)
             mainAsyncAfter(ms: 1000) { [weak self] in self?.manageSendingState(for: controlID, sending: false) }
