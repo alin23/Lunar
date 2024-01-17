@@ -371,7 +371,7 @@ struct Lunar: ParsableCommand {
             abstract: "Prints API Key for controlling Lunar remotely using `lunar --remote`."
         )
 
-        func run() async throws {
+        func run() throws {
             guard !CachedDefaults[.apiKey].isEmpty else {
                 CachedDefaults[.apiKey] = SERIAL_NUMBER_HASH
                 cliPrint(CachedDefaults[.apiKey])
@@ -392,7 +392,7 @@ struct Lunar: ParsableCommand {
         @Flag(help: "If the output should be printed as hex.")
         var hex = false
 
-        func run() async throws {
+        func run() throws {
             guard let sig = getCodeSignature(hex: hex) else {
                 return cliExit(1)
             }
@@ -408,7 +408,7 @@ struct Lunar: ParsableCommand {
 
         @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
-        func run() async throws {
+        func run() throws {
             if isLidClosed() {
                 cliPrint("closed")
             } else {
@@ -425,7 +425,7 @@ struct Lunar: ParsableCommand {
 
         @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
-        func run() async throws {
+        func run() throws {
             DC.resetDisplayList()
             appDelegate!.startOrRestartMediaKeyTap()
 
@@ -446,7 +446,7 @@ struct Lunar: ParsableCommand {
         @Flag(name: .shortAndLong, help: "Get the window average of the last 15 lux readings instead of the last instant reading (can be used with `--listen` as well)")
         var average = false
 
-        @MainActor func run() async throws {
+        @MainActor func run() throws {
             guard listen else {
                 if SensorMode.specific.externalSensorAvailable, let lux = SensorMode.specific.lastAmbientLight {
                     cliPrint(lux)
@@ -482,7 +482,7 @@ struct Lunar: ParsableCommand {
         )
         var display: DisplayFilter = .all
 
-        func run() async throws {
+        func run() throws {
             cliGetDisplays(
                 includeVirtual: false,
                 includeAirplay: false,
@@ -526,7 +526,7 @@ struct Lunar: ParsableCommand {
 
             @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
-            func run() async throws {
+            func run() throws {
                 DC.activeDisplayList.forEach { d in
                     cliPrint("""
                     \(d.name)
@@ -551,7 +551,7 @@ struct Lunar: ParsableCommand {
 
         @Argument var args: [String] = []
 
-        func run() async throws {
+        func run() throws {
             cliExit(0)
         }
     }
@@ -563,7 +563,7 @@ struct Lunar: ParsableCommand {
 
         @Argument var args: [String] = []
 
-        func run() async throws {
+        func run() throws {
             cliExit(0)
         }
     }
@@ -596,7 +596,7 @@ struct Lunar: ParsableCommand {
         @Argument(help: "Value for the method's second argument")
         var value = 1.0
 
-        func run() async throws {
+        func run() throws {
             cliGetDisplays(
                 includeVirtual: false,
                 includeAirplay: false,
@@ -684,7 +684,7 @@ struct Lunar: ParsableCommand {
         @Argument(help: "Value for the method's third argument")
         var value2: Double = 0
 
-        func run() async throws {
+        func run() throws {
             cliGetDisplays(
                 includeVirtual: false,
                 includeAirplay: false,
@@ -825,7 +825,7 @@ struct Lunar: ParsableCommand {
         )
         var values: [String]
 
-        func run() async throws {
+        func run() throws {
             cliGetDisplays(
                 includeVirtual: false,
                 includeAirplay: false,
@@ -841,7 +841,7 @@ struct Lunar: ParsableCommand {
             if values.isEmpty || values.first!.lowercased() =~ "(read|get|fetch)-?(max|val)?" {
                 let max = values.first?.lowercased().hasSuffix("max") ?? false
                 for display in displays {
-                    if let result = await DDC.read(displayID: display.id, controlID: control) {
+                    if let result = DDC.read(displayID: display.id, controlID: control) {
                         if displays.count == 1 {
                             cliPrint(max ? result.maxValue : result.currentValue)
                         } else {
@@ -876,7 +876,7 @@ struct Lunar: ParsableCommand {
                     }
 
                     cliPrint("\(display): Writing \(value) for \(control)", terminator: ": ")
-                    if await DDC.write(displayID: display.id, controlID: localControl, newValue: value.u16, sourceAddr: localSourceAddr) {
+                    if DDC.write(displayID: display.id, controlID: localControl, newValue: value.u16, sourceAddr: localSourceAddr) {
                         cliPrint("Ok")
                     } else {
                         cliPrint("Error")
@@ -898,7 +898,7 @@ struct Lunar: ParsableCommand {
         @Flag(name: .shortAndLong, help: "Print response as JSON.")
         var json = false
 
-        func run() async throws {
+        func run() throws {
             guard !json else {
                 cliPrint((try! prettyEncoder.encode(CachedDefaults[.hotkeys])).str())
                 return cliExit(0)
@@ -925,7 +925,7 @@ struct Lunar: ParsableCommand {
         @Argument(help: "Display ID")
         var id: CGDirectDisplayID
 
-        func run() async throws {
+        func run() throws {
             if let uuid = CGDisplayCreateUUIDFromDisplayID(id) {
                 let uuidValue = uuid.takeRetainedValue()
                 let uuidString = CFUUIDCreateString(kCFAllocatorDefault, uuidValue) as String
@@ -972,7 +972,7 @@ struct Lunar: ParsableCommand {
             }
         }
 
-        func run() async throws {
+        func run() throws {
             cliGetDisplays()
             DC.disable()
             if !isServer {
@@ -1021,7 +1021,7 @@ struct Lunar: ParsableCommand {
             }.joined(separator: "\n\t")
         }
 
-        func run() async throws {
+        func run() throws {
             if printMapping {
                 DC.activeDisplayList.forEach { d in
                     cliPrint("\(d.name) [ID: \(d.id)] [UUID: \(d.serial)]")
@@ -1081,7 +1081,7 @@ struct Lunar: ParsableCommand {
         @Argument(help: "Whether Cleaning Mode should be `on` or `off`")
         var state: PowerState
 
-        func run() async throws {
+        func run() throws {
             if state == .toggle {
                 if appDelegate!.cleaningMode {
                     deactivateCleaningMode()
@@ -1117,7 +1117,7 @@ struct Lunar: ParsableCommand {
         @Argument(help: "Whether Night Mode should be `on` or `off`")
         var state: PowerState
 
-        func run() async throws {
+        func run() throws {
             if state == .toggle {
                 DC.nightMode.toggle()
                 return cliExit(0)
@@ -1219,7 +1219,7 @@ struct Lunar: ParsableCommand {
                 .store(in: &server.brightnessListeners, for: socketFd)
         }
 
-        func run() async throws {
+        func run() throws {
             guard isServer, let server = appDelegate?.server else {
                 throw LunarCommandError.noServer
             }
@@ -1307,7 +1307,7 @@ struct Lunar: ParsableCommand {
         @Argument(help: "Display property value to set")
         var value: String?
 
-        func run() async throws {
+        func run() throws {
             let property = property == .mute ? .audioMuted : property
 
             cliGetDisplays(
@@ -1321,7 +1321,7 @@ struct Lunar: ParsableCommand {
 
             if let displayFilter = display {
                 do {
-                    try await handleDisplays(
+                    try handleDisplays(
                         displayFilter,
                         displays: displays,
                         property: property,
@@ -1346,7 +1346,7 @@ struct Lunar: ParsableCommand {
 
             for (i, display) in displays.enumerated() {
                 if json {
-                    try await printDisplay(
+                    try printDisplay(
                         display,
                         json: json,
                         terminator: (i == displays.count - 1) ? "\n" : ",\n",
@@ -1358,7 +1358,7 @@ struct Lunar: ParsableCommand {
                     )
                 } else {
                     cliPrint("\(i): \(display.name)")
-                    try await printDisplay(
+                    try printDisplay(
                         display,
                         json: json,
                         prefix: "\t",
@@ -1401,7 +1401,7 @@ struct Lunar: ParsableCommand {
         )
         var property: Display.CodingKeys
 
-        func run() async throws {
+        func run() throws {
             let property = property == .mute ? .audioMuted : property
 
             cliGetDisplays(
@@ -1411,7 +1411,7 @@ struct Lunar: ParsableCommand {
                 includeDummy: CachedDefaults[.showDummyDisplays]
             )
 
-            try await handleDisplays(
+            try handleDisplays(
                 .bestGuess,
                 displays: DC.activeDisplayList,
                 property: property,
@@ -1456,7 +1456,7 @@ struct Lunar: ParsableCommand {
             }
         }
 
-        func run() async throws {
+        func run() throws {
             let property = property == .mute ? .audioMuted : property
 
             cliGetDisplays(
@@ -1470,7 +1470,7 @@ struct Lunar: ParsableCommand {
                 setupNetworkControls(displays: DC.activeDisplayList, waitms: waitms)
             }
 
-            try await handleDisplays(
+            try handleDisplays(
                 .bestGuess,
                 displays: DC.activeDisplayList,
                 property: property,
@@ -1554,7 +1554,7 @@ struct Lunar: ParsableCommand {
             // }
         }
 
-        func run() async throws {
+        func run() throws {
             let displays = getFilteredDisplays(displays: DC.activeDisplayList, filter: display)
             guard !displays.isEmpty else {
                 throw LunarCommandError.displayNotFound(display.s)
@@ -1651,7 +1651,7 @@ struct Lunar: ParsableCommand {
         @Argument(help: "Whether Facelight should be enabled or disabled")
         var state: FeatureState = .enable
 
-        func run() async throws {
+        func run() throws {
             cliGetDisplays(
                 includeVirtual: CachedDefaults[.showVirtualDisplays],
                 includeAirplay: CachedDefaults[.showAirplayDisplays],
@@ -1700,7 +1700,7 @@ struct Lunar: ParsableCommand {
         @Argument(help: "Whether Blackout should be enabled (monitor turned off) or disabled (turn monitor back on)")
         var state: FeatureState = .enable
 
-        func run() async throws {
+        func run() throws {
             cliGetDisplays(
                 includeVirtual: CachedDefaults[.showVirtualDisplays],
                 includeAirplay: CachedDefaults[.showAirplayDisplays],
@@ -1752,7 +1752,7 @@ struct Lunar: ParsableCommand {
             @Flag(name: .shortAndLong, help: "Force disconnect in single screen scenarios.")
             var force = false
 
-            func run() async throws {
+            func run() throws {
                 cliGetDisplays(
                     includeVirtual: CachedDefaults[.showVirtualDisplays],
                     includeAirplay: CachedDefaults[.showAirplayDisplays],
@@ -1801,7 +1801,7 @@ struct Lunar: ParsableCommand {
             )
             var display = DisplayFilter.builtin
 
-            func run() async throws {
+            func run() throws {
                 guard display != .all else {
                     DC.en()
                     cliExit(0)
@@ -1865,7 +1865,7 @@ struct Lunar: ParsableCommand {
             )
             var display = DisplayFilter.builtin
 
-            func run() async throws {
+            func run() throws {
                 cliGetDisplays(
                     includeVirtual: CachedDefaults[.showVirtualDisplays],
                     includeAirplay: CachedDefaults[.showAirplayDisplays],
@@ -2094,10 +2094,10 @@ private func printDisplay(
     panelData: Bool = false,
     panelDataAllResolutions: Bool = false,
     edid: Bool = false
-) async throws {
+) throws {
     var edidStr = ""
     if edid {
-        let data = await DDC.getEdidData(displayID: display.id)
+        let data = DDC.getEdidData(displayID: display.id)
         if data == nil || data!.allSatisfy({ $0 == 0 }) {
             edidStr = "Can't read EDID"
         } else {
@@ -2167,7 +2167,7 @@ private func printDisplay(
     cliPrint("\(prefix)\(s("Blue Gamma"))\(display.blueMin) - \(display.blueGamma) - \(display.blueMax)")
 
     #if arch(arm64)
-        let avService = await DDC.AVService(displayID: display.id, ignoreCache: true)
+        let avService = DDC.AVService(displayID: display.id, ignoreCache: true)
         cliPrint("\(prefix)\(s("AVService"))\(avService == nil ? "NONE" : CFCopyDescription(avService!) as String)")
     #else
         let i2c = DDC.I2CController(displayID: display.id, ignoreCache: true)
@@ -2192,7 +2192,7 @@ private func handleDisplays(
     panelData: Bool = false,
     panelDataAllResolutions: Bool = false,
     edid: Bool = false
-) async throws {
+) throws {
     let property = property == .mute ? .audioMuted : property
     let displays = getFilteredDisplays(displays: displays, filter: displayFilter)
     guard !displays.isEmpty else {
@@ -2212,7 +2212,7 @@ private func handleDisplays(
         do {
             guard let property else {
                 if json {
-                    try await printDisplay(
+                    try printDisplay(
                         display,
                         json: json,
                         terminator: (i == displays.count - 1) ? "\n" : ",\n",
@@ -2224,7 +2224,7 @@ private func handleDisplays(
                     )
                 } else {
                     cliPrint("\(i): \(display.name)")
-                    try await printDisplay(display, json: json, prefix: "\t", systemInfo: systemInfo, edid: edid)
+                    try printDisplay(display, json: json, prefix: "\t", systemInfo: systemInfo, edid: edid)
                     if i < displays.count - 1 {
                         cliPrint("")
                     }

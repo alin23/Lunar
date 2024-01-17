@@ -1885,8 +1885,8 @@ struct WriteDDCIntent: AppIntent {
             throw $vcp.needsValueError()
         }
 
-        for display in screen.displays.filter(\.hasDDC) {
-            let _ = await DDC.write(displayID: display.id, controlID: control, newValue: value.u16)
+        screen.displays.filter(\.hasDDC).forEach { display in
+            let _ = DDC.write(displayID: display.id, controlID: control, newValue: value.u16)
         }
 
         return .result()
@@ -1940,9 +1940,8 @@ Note: DDC reads rarely work and can return wrong values.
             throw $vcp.needsValueError()
         }
 
-        let result = await screen.displays.filter(\.hasDDC).dict { display in
-            let val = await DDC.read(displayID: display.id, controlID: control)?.currentValue
-            return (display.serial, val)
+        let result = screen.displays.filter(\.hasDDC).dict { display in
+            (display.serial, DDC.read(displayID: display.id, controlID: control)?.currentValue)
         }
 
         return .result(value: (try? encoder.encode(result).s) ?? "")
@@ -3268,8 +3267,8 @@ Press `Esc` to cancel or `Enter` to partially arrange the monitors selected so f
         var idsToRearrange = DC.externalActiveDisplays.map(\.id).sorted()
         if onlySameUUID {
             #if arch(arm64)
-                let displayIDsWithEDIDUUIDs: [CGDirectDisplayID: String] = await DC.externalActiveDisplays.dict { d in
-                    guard let edidUUID = await DDC.DCP(displayID: d.id)?.edidUUID else {
+                let displayIDsWithEDIDUUIDs: [CGDirectDisplayID: String] = DC.externalActiveDisplays.dict { d in
+                    guard let edidUUID = DDC.DCP(displayID: d.id)?.edidUUID else {
                         return nil
                     }
                     return (d.id, edidUUID)

@@ -1433,9 +1433,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 log.info("\(notification.name)")
 
                 #if arch(arm64)
-                    Task.init {
-                        await DDC.rebuildDCPList()
-                    }
+                    DDC.rebuildDCPList()
                 #endif
 
                 DC.activeDisplays.values.filter { !$0.isForTesting }.forEach { d in
@@ -2302,9 +2300,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         setupValueTransformers()
         configureSentry()
         terminateOtherLunarInstances()
-        Task.init {
-            await DDC.setup()
-        }
+        DDC.setup()
 
         try? updater.start()
         updater.automaticallyDownloadsUpdates = Defaults[.silentUpdate]

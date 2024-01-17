@@ -154,7 +154,7 @@ struct DisplayRowView: View {
         if display.noControls {
             return "No controls available"
         } else if display.useOverlay {
-            if display.isInHardwareMirrorSet {
+            if display.isInNonWirelessHardwareMirrorSet {
                 return "Overlay dimming disabled while mirroring"
             } else if display.isIndependentDummy {
                 return "Overlay dimming disabled for dummy"
