@@ -38,7 +38,7 @@ final class OnboardWindowController: ModernWindowController, NSWindowDelegate {
     }
 
     func windowWillClose(_: Notification) {
-        DC.displays.values.forEach { d in
+        for d in DC.displays.values {
             d.testWindowController?.close()
             d.testWindowController = nil
         }
@@ -132,7 +132,7 @@ final class OnboardPageController: NSPageController {
 
             CachedDefaults[.overrideAdaptiveMode] = DisplayController.autoMode().key != .sync
             DC.enable(mode: .sync)
-            DC.externalActiveDisplays.forEach { d in
+            for d in DC.externalActiveDisplays {
                 d.resetControl()
             }
 

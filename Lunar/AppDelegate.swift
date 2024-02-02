@@ -499,7 +499,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         NetworkControl.resetState()
         DDCControl.resetState()
         startOrRestartMediaKeyTap()
-        DC.activeDisplays.values.forEach { d in
+        for d in DC.activeDisplays.values {
             d.updateCornerWindow()
         }
     }
@@ -1414,7 +1414,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
             .sink { _ in
                 lastColorSyncReset = Date()
-                DC.activeDisplayList.forEach { d in
+                for d in DC.activeDisplayList {
                     d.hdrOn = d.potentialEDR > 2 && d.edr > 1
                 }
                 #if DEBUG
@@ -1459,7 +1459,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             .sink { _ in
                 log.info("Screen configuration changed")
 
-                DC.activeDisplays.values.forEach { d in
+                for d in DC.activeDisplays.values {
                     d.updateCornerWindow()
                 }
                 DC.screenIDs = Set(NSScreen.onlineDisplayIDs)
@@ -1543,7 +1543,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 case NSWorkspace.screensDidSleepNotification:
                     DC.screensSleeping = true
                     DC.resetDisplayListTask?.cancel()
-                    DC.activeDisplayList.forEach { display in
+                    for display in DC.activeDisplayList {
                         display.resetScheduledTransition()
                     }
                     ClockMode.specific.readaptTask = nil

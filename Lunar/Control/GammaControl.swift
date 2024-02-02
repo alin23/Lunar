@@ -283,13 +283,13 @@ final class GammaControl: Control {
 
             switch keepFlux {
             case .alertFirstButtonReturn:
-                gammaDisplays.forEach { display in
+                for display in gammaDisplays {
                     display.useOverlay = true
                     display.gammaEnabled = true
                 }
             case .alertSecondButtonReturn:
                 flux.terminate()
-                gammaDisplays.forEach { display in
+                for display in gammaDisplays {
                     display.gammaEnabled = true
                 }
 
@@ -322,7 +322,7 @@ final class GammaControl: Control {
 
         let window = mainThread { appDelegate!.windowController?.window }
 
-        gammaDisplays.forEach { display in
+        for display in gammaDisplays {
             display.gammaEnabled = false
         }
 

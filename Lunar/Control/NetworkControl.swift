@@ -389,8 +389,8 @@ final class NetworkControl: Control {
     }
 
     func listenForRequests() {
-        requestsPublishers.values.forEach {
-            $0.removeDuplicates()
+        for item in requestsPublishers.values {
+            item.removeDuplicates()
                 .throttle(for: .milliseconds(500), scheduler: RunLoop.main, latest: true)
                 .sink { [weak self] request in
                     guard let self, !DC.screensSleeping, !DC.locked else { return }

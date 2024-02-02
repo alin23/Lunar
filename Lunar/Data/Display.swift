@@ -4415,10 +4415,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         if KM.optionKeyPressed, KM.shiftKeyPressed, DC.activeDisplayCount > 1 {
             let blackOutEnabled = otherDisplays.contains(where: \.blackOutEnabled)
-            otherDisplays.forEach {
+            for otherDisplay in otherDisplays {
                 lastBlackOutToggleDate = .distantPast
                 DC.blackOut(
-                    display: $0.id,
+                    display: otherDisplay.id,
                     state: blackOutEnabled ? .off : .on,
                     mirroringAllowed: false
                 )

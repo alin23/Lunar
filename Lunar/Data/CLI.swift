@@ -527,7 +527,7 @@ struct Lunar: ParsableCommand {
             @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
             func run() throws {
-                DC.activeDisplayList.forEach { d in
+                for d in DC.activeDisplayList {
                     cliPrint("""
                     \(d.name)
                       ID:\t\t\(d.id)
@@ -1023,7 +1023,7 @@ struct Lunar: ParsableCommand {
 
         func run() throws {
             if printMapping {
-                DC.activeDisplayList.forEach { d in
+                for d in DC.activeDisplayList {
                     cliPrint("\(d.name) [ID: \(d.id)] [UUID: \(d.serial)]")
 
                     switch mode {

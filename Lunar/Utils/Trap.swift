@@ -77,8 +77,8 @@ extension Trap {
      - parameter action:  Code to execute when any of the signals is fired.
      */
     static func handle(signals: [Signal], action: SignalHandler) {
-        signals.forEach {
-            handle(signal: $0, action: action)
+        for item in signals {
+            handle(signal: item, action: action)
         }
     }
 }

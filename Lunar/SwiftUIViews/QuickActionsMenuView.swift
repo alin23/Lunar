@@ -429,7 +429,6 @@ struct QuickActionsMenuView: View {
             }
             .frame(maxWidth: .infinity, alignment: .center)
             .onTapGesture { env.recording = false }
-
             .onChange(of: showStandardPresets, perform: setMenuWidth)
             .onChange(of: showCustomPresets, perform: setMenuWidth)
             .onChange(of: showHeaderOnHover, perform: setMenuWidth)

@@ -753,8 +753,8 @@ final class IOServiceDetector {
     func stopDetection() {
         guard !iterators.isEmpty else { return }
 
-        iterators.keys.forEach {
-            IOObjectRelease($0)
+        for key in iterators.keys {
+            IOObjectRelease(key)
         }
         iterators = [:]
     }
@@ -931,7 +931,7 @@ enum DDC {
                 DDC.i2cControllerCache.removeAll()
             #endif
 
-            DC.activeDisplays.values.forEach { display in
+            for display in DC.activeDisplays.values {
                 display.nsScreen = display.getScreen()
                 display.detectI2C()
                 display.startI2CDetection()
@@ -1476,7 +1476,7 @@ enum DDC {
                 CachedDefaults[.reapplyValuesAfterWake] = false
                 CachedDefaults[.brightnessTransition] = .instant
 
-                DC.displays.values.forEach { d in
+                for d in DC.displays.values {
                     d.reapplyColorGain = false
                 }
             }

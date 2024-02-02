@@ -525,7 +525,7 @@ final class DisplayController: ObservableObject {
 
     @Published var sourceDisplay: Display = ALL_DISPLAYS {
         didSet {
-            activeDisplayList.forEach { d in
+            for d in activeDisplayList {
                 d.previousBrightnessMapping.expire()
             }
         }
@@ -552,7 +552,7 @@ final class DisplayController: ObservableObject {
                 CachedDefaults[.hasActiveExternalDisplays] = _activeDisplays.values.contains(where: \.isExternal)
                 CachedDefaults[.hasBuiltin] = _activeDisplays.values.contains(where: \.isBuiltin)
                 onActiveDisplaysChange?()
-                newValue.values.forEach { d in
+                for d in newValue.values {
                     d.updateCornerWindow()
                 }
 
@@ -739,7 +739,7 @@ final class DisplayController: ObservableObject {
             }
             if adaptiveMode.available {
                 adaptiveMode.watch()
-                activeDisplayList.forEach { d in
+                for d in activeDisplayList {
                     adaptiveMode.adapt(d)
                 }
             }
@@ -749,7 +749,7 @@ final class DisplayController: ObservableObject {
     @Published var adaptiveModeKey: AdaptiveModeKey = DisplayController.getAdaptiveMode().key {
         didSet {
             if adaptiveModeKey != oldValue {
-                activeDisplayList.forEach { d in
+                for d in activeDisplayList {
                     d.previousBrightnessMapping.expire()
                 }
             }
@@ -1506,7 +1506,7 @@ final class DisplayController: ObservableObject {
     }
 
     func forceDeactivateBlackOut() {
-        activeDisplayList.map(\.id).enumerated().forEach { i, id in
+        for (i, id) in activeDisplayList.map(\.id).enumerated() {
             mainAsyncAfter(ms: i * 1000) {
                 guard let d = self.activeDisplays[id] else { return }
                 log.warning("Disabling BlackOut forcefully for \(d.description)")
@@ -1664,8 +1664,8 @@ final class DisplayController: ObservableObject {
                     return
                 }
 
-                displayList.forEach {
-                    $0.gammaEnabled = false
+                for item in displayList {
+                    item.gammaEnabled = false
                 }
 
                 CachedDefaults[.oldHdrWorkaround] = CachedDefaults[.hdrWorkaround]
@@ -1691,19 +1691,19 @@ final class DisplayController: ObservableObject {
             .debounce(for: .milliseconds(50), scheduler: RunLoop.main)
             .sink { [self] change in
                 mergeBrightnessContrast = change.newValue
-                displayList.forEach {
-                    $0.noDDCOrMergedBrightnessContrast = !$0.hasDDC || change.newValue
+                for item in displayList {
+                    item.noDDCOrMergedBrightnessContrast = !item.hasDDC || change.newValue
                 }
             }.store(in: &observers)
 
         showOrientationInQuickActionsPublisher
             .debounce(for: .milliseconds(50), scheduler: RunLoop.main)
             .sink { [self] change in
-                displayList.forEach {
+                for item in displayList {
                     #if DEBUG
-                        $0.showOrientation = change.newValue && (!$0.isBuiltin || CachedDefaults[.showOrientationForBuiltinInQuickActions])
+                        item.showOrientation = change.newValue && (!item.isBuiltin || CachedDefaults[.showOrientationForBuiltinInQuickActions])
                     #else
-                        $0.showOrientation = $0.canRotate && change.newValue && (!$0.isBuiltin || CachedDefaults[.showOrientationForBuiltinInQuickActions])
+                        item.showOrientation = item.canRotate && change.newValue && (!item.isBuiltin || CachedDefaults[.showOrientationForBuiltinInQuickActions])
                     #endif
                 }
             }.store(in: &observers)
@@ -1711,11 +1711,11 @@ final class DisplayController: ObservableObject {
         showOrientationForBuiltinInQuickActionsPublisher
             .debounce(for: .milliseconds(50), scheduler: RunLoop.main)
             .sink { [self] change in
-                displayList.forEach {
+                for item in displayList {
                     #if DEBUG
-                        $0.showOrientation = CachedDefaults[.showOrientationInQuickActions] && (!$0.isBuiltin || change.newValue)
+                        item.showOrientation = CachedDefaults[.showOrientationInQuickActions] && (!item.isBuiltin || change.newValue)
                     #else
-                        $0.showOrientation = $0.canRotate && CachedDefaults[.showOrientationInQuickActions] && (!$0.isBuiltin || change.newValue)
+                        item.showOrientation = item.canRotate && CachedDefaults[.showOrientationInQuickActions] && (!item.isBuiltin || change.newValue)
                     #endif
                 }
             }.store(in: &observers)
@@ -1723,8 +1723,8 @@ final class DisplayController: ObservableObject {
         showVolumeSliderPublisher
             .debounce(for: .milliseconds(50), scheduler: RunLoop.main)
             .sink { [self] change in
-                displayList.forEach {
-                    $0.showVolumeSlider = $0.canChangeVolume && change.newValue
+                for item in displayList {
+                    item.showVolumeSlider = item.canChangeVolume && change.newValue
                 }
             }.store(in: &observers)
 
@@ -1766,7 +1766,7 @@ final class DisplayController: ObservableObject {
         }.store(in: &observers)
 
         scheduleTransitionPublisher.sink { [self] change in
-            activeDisplayList.forEach { d in
+            for d in activeDisplayList {
                 d.resetScheduledTransition()
             }
         }.store(in: &observers)
@@ -2242,7 +2242,7 @@ final class DisplayController: ObservableObject {
         guard adaptiveMode.available else { return }
         reconfigureTask = Repeater(every: 1, times: 3, name: "DisplayControllerReconfigure") { [self] in
             adaptiveMode.withForce {
-                activeDisplayList.forEach { d in
+                for d in activeDisplayList {
                     d.updateCornerWindow()
                     if d.softwareBrightness == 1.0, !d.hasSoftwareControl || d.preciseBrightness == 1.0 {
                         d.resetSoftwareControl()
@@ -2313,7 +2313,7 @@ final class DisplayController: ObservableObject {
         Defaults[.showOptionsMenu] = false
 
         appDelegate?.valuesReaderThread = nil
-        activeDisplayList.filter(\.ambientLightCompensationEnabledByUser).forEach { d in
+        for d in activeDisplayList.filter(\.ambientLightCompensationEnabledByUser) {
             d.systemAdaptiveBrightness = true
         }
         if xdrContrast > 0 {
@@ -2321,10 +2321,10 @@ final class DisplayController: ObservableObject {
         }
         resetXDRBrightness()
 
-        activeDisplayList.filter(\.faceLightEnabled).forEach { display in
+        for display in activeDisplayList.filter(\.faceLightEnabled) {
             display.disableFaceLight(smooth: false)
         }
-        activeDisplayList.filter(\.blackOutEnabled).forEach { display in
+        for display in activeDisplayList.filter(\.blackOutEnabled) {
             display.disableBlackOut()
         }
 
@@ -2894,15 +2894,15 @@ final class DisplayController: ObservableObject {
                 setValue(display)
             }
         } else if nonMainDisplays {
-            self.nonMainDisplays.forEach { display in
+            for display in self.nonMainDisplays {
                 setValue(display)
             }
         } else if let displays {
-            displays.forEach { display in
+            for display in displays {
                 setValue(display)
             }
         } else {
-            activeDisplayList.forEach { display in
+            for display in activeDisplayList {
                 setValue(display)
             }
         }

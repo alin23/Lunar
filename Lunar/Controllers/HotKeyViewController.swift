@@ -65,9 +65,9 @@ final class HotkeyViewController: NSViewController {
         CachedDefaults.reset(.shiftBrightnessKeysControl)
 
         mainAsyncAfter(ms: 100) { [weak self] in
-            CachedDefaults[.hotkeys].forEach {
-                $0.unregister()
-                if $0.isEnabled { $0.register() }
+            for CachedDefault in CachedDefaults[.hotkeys] {
+                CachedDefault.unregister()
+                if CachedDefault.isEnabled { CachedDefault.register() }
             }
             self?.setHotkeys()
             appDelegate!.setKeyEquivalents(CachedDefaults[.hotkeys])
@@ -108,9 +108,9 @@ final class HotkeyViewController: NSViewController {
         })
 
         mainAsyncAfter(ms: 100) { [weak self] in
-            CachedDefaults[.hotkeys].forEach {
-                $0.unregister()
-                if $0.isEnabled { $0.register() }
+            for CachedDefault in CachedDefaults[.hotkeys] {
+                CachedDefault.unregister()
+                if CachedDefault.isEnabled { CachedDefault.register() }
             }
             self?.setHotkeys()
             appDelegate!.setKeyEquivalents(CachedDefaults[.hotkeys])

@@ -1332,7 +1332,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                     toggleAudioMuted(for: mutedDisplays, currentAudioDisplay: false)
                 }
 
-                displays.forEach { display in
+                for display in displays {
                     Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, display: display)
                 }
 
@@ -1369,7 +1369,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                     toggleAudioMuted(for: mutedDisplays, currentAudioDisplay: false)
                 }
 
-                displays.forEach { display in
+                for display in displays {
                     Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, display: display)
                 }
 
@@ -1401,7 +1401,7 @@ extension AppDelegate: MediaKeyTapDelegate {
 
                 toggleAudioMuted(for: displays, currentAudioDisplay: false)
 
-                displays.forEach { display in
+                for display in displays {
                     Hotkey.showOsd(osdImage: volumeOsdImage(), value: display.volume.uint32Value, display: display)
                 }
 
@@ -1433,8 +1433,8 @@ extension AppDelegate: MediaKeyTapDelegate {
     @objc func toggleHotkeyHandler() {
         DC.toggle()
         if DC.adaptiveModeKey != .manual, DC.activeDisplayList.contains(where: \.adaptivePaused) {
-            DC.activeDisplayList.filter(\.adaptivePaused).forEach {
-                $0.adaptivePaused = false
+            for item in DC.activeDisplayList.filter(\.adaptivePaused) {
+                item.adaptivePaused = false
             }
         }
         log.debug("Toggle Hotkey pressed")
@@ -1640,7 +1640,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                 toggleAudioMuted(for: muted, currentAudioDisplay: false)
             }
 
-            DC.externalActiveDisplays.forEach { d in
+            for d in DC.externalActiveDisplays {
                 Hotkey.showOsd(osdImage: volumeOsdImage(display: d), value: d.volume.uint32Value, display: d)
             }
         } else if let display = DC.currentAudioDisplay ?? DC.cursorDisplay, !display.isBuiltin {
@@ -1663,7 +1663,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                 toggleAudioMuted(for: muted, currentAudioDisplay: false)
             }
 
-            DC.externalActiveDisplays.forEach { d in
+            for d in DC.externalActiveDisplays {
                 Hotkey.showOsd(osdImage: volumeOsdImage(display: d), value: d.volume.uint32Value, display: d)
             }
         } else if let display = DC.currentAudioDisplay ?? DC.cursorDisplay, !display.isBuiltin {
@@ -1681,7 +1681,7 @@ extension AppDelegate: MediaKeyTapDelegate {
         toggleAudioMuted(currentDisplay: !allMonitors && !hasAudioDisplay, currentAudioDisplay: !allMonitors && hasAudioDisplay)
 
         if allMonitors {
-            DC.externalActiveDisplays.forEach { d in
+            for d in DC.externalActiveDisplays {
                 Hotkey.showOsd(osdImage: volumeOsdImage(display: d), value: d.volume.uint32Value, display: d)
             }
         } else if let display = DC.currentAudioDisplay ?? DC.cursorDisplay, !display.isBuiltin {

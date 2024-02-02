@@ -1072,6 +1072,7 @@ func createWindow(
 var alertsByMessageSemaphore = DispatchSemaphore(value: 1, name: "alertsByMessageSemaphore")
 var alertsByMessage = [String: Bool]()
 import Regex
+
 let WHITESPACE_REGEX = "\\s+".r!
 
 let LEFT_ALIGNED_ALERT_TAG = 18665

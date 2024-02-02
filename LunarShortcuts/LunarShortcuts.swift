@@ -1068,7 +1068,7 @@ func activateCleaningMode(deactivateAfter: TimeInterval? = 120, withoutSettingFl
         }
 
         #if !DEBUG
-            DC.activeDisplayList.filter(!\.blackOutEnabled).forEach { display in
+            for display in DC.activeDisplayList.filter(!\.blackOutEnabled) {
                 lastBlackOutToggleDate = .distantPast
                 DC.blackOut(display: display.secondaryMirrorScreenID ?? display.id, state: .on, mirroringAllowed: false)
             }
@@ -1517,8 +1517,8 @@ struct ToggleBlackOutIntent: AppIntent {
         let displays = screen.displays
 
         let oldAllowMirroring = displays.map(\.blackOutMirroringAllowed)
-        displays.forEach {
-            $0.blackOutMirroringAllowed = allowMirroring
+        for display in displays {
+            display.blackOutMirroringAllowed = allowMirroring
         }
 
         defer {
@@ -1731,8 +1731,8 @@ struct ResetColorGainIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        screen.displays.forEach {
-            $0.resetColors()
+        for display in screen.displays {
+            display.resetColors()
         }
 
         return .result()
@@ -1754,9 +1754,9 @@ struct ResetColorGammaIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        screen.displays.forEach {
-            $0.resetDefaultGamma()
-            $0.applyGamma = false
+        for display in screen.displays {
+            display.resetDefaultGamma()
+            display.applyGamma = false
         }
 
         return .result()
@@ -1781,8 +1781,8 @@ struct ToggleGammaIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        screen.displays.forEach {
-            $0.applyGamma = state == .toggle ? (!$0.applyGamma) : (state == .on)
+        for display in screen.displays {
+            display.applyGamma = state == .toggle ? (!display.applyGamma) : (state == .on)
         }
 
         return .result()
@@ -1885,7 +1885,7 @@ struct WriteDDCIntent: AppIntent {
             throw $vcp.needsValueError()
         }
 
-        screen.displays.filter(\.hasDDC).forEach { display in
+        for display in screen.displays.filter(\.hasDDC) {
             let _ = DDC.write(displayID: display.id, controlID: control, newValue: value.u16)
         }
 
@@ -2133,7 +2133,7 @@ The blue component of the Gamma curve
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        screen.displays.forEach { display in
+        for display in screen.displays {
             display.applyGamma = true
             display.red = red
             display.green = green
@@ -2197,7 +2197,7 @@ struct AdjustSoftwareColorsAdvancesIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        screen.displays.forEach { display in
+        for display in screen.displays {
             display.applyGamma = true
             display.defaultGammaRedMin = minRed.ns
             display.defaultGammaRedMax = maxRed.ns
@@ -2275,12 +2275,12 @@ Note: not all monitors support color gain control through DDC and value effect c
     @MainActor
     func perform() async throws -> some IntentResult {
         try checkShortcutsLimit()
-        screen.displays.forEach { display in
+        for display in screen.displays {
             display.redGain = red.ns
             guard delayBetween else {
                 display.greenGain = green.ns
                 display.blueGain = blue.ns
-                return
+                continue
             }
 
             let id = display.id

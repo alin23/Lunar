@@ -50,7 +50,7 @@ final class LunarTestViewController: NSViewController {
 
     override func viewDidAppear() {
         let end = {
-            DC.displays.values.forEach { d in
+            for d in DC.displays.values {
                 d.testWindowController?.close()
                 d.testWindowController = nil
             }
@@ -963,7 +963,7 @@ final class ControlChoiceViewController: NSViewController {
                         w.close()
                         wc.close()
 
-                        DC.displays.values.forEach { d in
+                        for d in DC.displays.values {
                             d.testWindowController?.close()
                             d.testWindowController = nil
                         }
@@ -996,7 +996,7 @@ final class ControlChoiceViewController: NSViewController {
         if let wc = view.window?.windowController as? OnboardWindowController {
             wc.setupSkipButton(skipButton, text: useOnboardingForDiagnostics ? "Stop Diagnostics" : nil) { [weak self] in
                 self?.cancelled = true
-                DC.displays.values.forEach { d in
+                for d in DC.displays.values {
                     d.testWindowController?.close()
                     d.testWindowController = nil
                 }
@@ -1040,8 +1040,8 @@ final class ControlChoiceViewController: NSViewController {
             ) {}
 
             displayProgressStep = 1.0 / displays.count.d
-            displays.enumerated().forEach { i, d in
-                self.testDisplay(d, index: i)
+            for (i, d) in displays.enumerated() {
+                testDisplay(d, index: i)
             }
 
             queueChange {
@@ -1049,7 +1049,7 @@ final class ControlChoiceViewController: NSViewController {
             }
 
             mainThread {
-                DC.displays.values.forEach { d in
+                for d in DC.displays.values {
                     d.testWindowController?.close()
                     d.testWindowController = nil
                 }
@@ -1060,7 +1060,7 @@ final class ControlChoiceViewController: NSViewController {
     }
 
     func testDisplay(_ d: Display, index: Int) {
-        DC.displays.values.forEach { d in
+        for d in DC.displays.values {
             d.testWindowController?.close()
             d.testWindowController = nil
         }
