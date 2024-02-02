@@ -114,7 +114,31 @@ enum NightShiftScheduleType: Equatable {
 // MARK: - NightShift
 
 enum NightShift {
+    enum SystemAppearance: String {
+        case light = "Light"
+        case dark = "Dark"
+        case autoLight = "AutoLight"
+        case autoDark = "AutoDark"
+
+        var isDark: Bool {
+            self == .dark || self == .autoDark
+        }
+        var isLight: Bool {
+            self == .light || self == .autoLight
+        }
+        var isAuto: Bool {
+            self == .autoLight || self == .autoDark
+        }
+    }
+
     static let client = CBBlueLightClient()
+    static var initialAppearance = currentAppearance
+
+    static var currentAppearance: SystemAppearance { getCurrentSystemAppearance() }
+    static var shouldBeDark: Bool { currentAppearance.isAuto
+        ? status.active.boolValue && status.enabled.boolValue
+        : initialAppearance.isDark
+    }
 
     static var darkMode: Bool {
         get { SLSGetAppearanceThemeLegacy() }
@@ -212,6 +236,19 @@ enum NightShift {
                 scheduledState = now >= sunset && now <= sunrise
             }
             return scheduledState
+        }
+    }
+
+    static func getCurrentSystemAppearance() -> SystemAppearance {
+        let appleInterfaceStyle = UserDefaults.standard.string(forKey: "AppleInterfaceStyle")
+        let appleInterfaceStyleSwitchesAutomatically = UserDefaults.standard.bool(forKey: "AppleInterfaceStyleSwitchesAutomatically")
+
+        if appleInterfaceStyleSwitchesAutomatically {
+            return appleInterfaceStyle == "Dark" ? .autoDark : .autoLight
+        } else if let style = appleInterfaceStyle, style == "Dark" {
+            return .dark
+        } else {
+            return .light
         }
     }
 

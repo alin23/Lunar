@@ -625,7 +625,9 @@ final class DisplayController: ObservableObject {
                     setXDRContrast(0.1, smooth: true)
                 }
             } else {
-                NightShift.darkMode = false
+                if !NightShift.shouldBeDark {
+                    NightShift.darkMode = false
+                }
                 for d in activeDisplayList where !d.blackOutEnabled && d.supportsGamma {
                     d.gammaSetterTask = DispatchWorkItem(name: "gammaSetter: \(d.description)", flags: .barrier) {
                         d.settingGamma = true
@@ -647,7 +649,7 @@ final class DisplayController: ObservableObject {
 
                             Thread.sleep(forTimeInterval: 0.025)
                         }
-                        d.applyTemporaryGamma = false
+                        mainAsync { d.applyTemporaryGamma = false }
                     }
                     d.smoothGammaQueue.asyncAfter(deadline: DispatchTime.now(), execute: d.gammaSetterTask!.workItem)
                 }

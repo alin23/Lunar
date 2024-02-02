@@ -2301,6 +2301,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         configureSentry()
         terminateOtherLunarInstances()
         DDC.setup()
+        NightShift.initialAppearance = NightShift.currentAppearance
 
         try? updater.start()
         updater.automaticallyDownloadsUpdates = Defaults[.silentUpdate]
