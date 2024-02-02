@@ -104,7 +104,7 @@ func stderr(of process: Process) -> Data? {
     }
 }
 
-func shellProc(_ launchPath: String = "/bin/zsh", args: [String], env: [String: String]? = nil, devnull: Bool = false) -> Process? {
+func shellProc(_ launchPath: String = "/bin/sh", args: [String], env: [String: String]? = nil, devnull: Bool = false) -> Process? {
     guard !devnull else {
         let task = Process()
         task.launchPath = launchPath
@@ -163,7 +163,7 @@ func shellProc(_ launchPath: String = "/bin/zsh", args: [String], env: [String: 
 }
 
 func shell(
-    _ launchPath: String = "/bin/zsh",
+    _ launchPath: String = "/bin/sh",
     command: String,
     timeout: DateComponents? = nil,
     env: [String: String]? = nil,
@@ -173,7 +173,7 @@ func shell(
 }
 
 func shell(
-    _ launchPath: String = "/bin/zsh",
+    _ launchPath: String = "/bin/sh",
     args: [String],
     timeout: DateComponents? = nil,
     env: [String: String]? = nil,
