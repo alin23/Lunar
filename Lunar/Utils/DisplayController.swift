@@ -439,6 +439,7 @@ final class DisplayController: ObservableObject {
         initObservers()
         setupXdrTask()
         Self.initialized = true
+        keyboardAutoBrightnessEnabledByUser = kbc.isAutoBrightnessEnabled(forKeyboard: 1)
         adaptiveMode = DisplayController.getAdaptiveMode()
     }
 

@@ -2389,13 +2389,15 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 if ambientLightCompensationEnabledByUser {
                     systemAdaptiveBrightness = true
                 }
-                if isMacBook, DC.kbc.brightness(forKeyboard: 1) == 0.01 {
-                    if DC.keyboardAutoBrightnessEnabledByUser {
-                        DC.kbc.enableAutoBrightness(true, forKeyboard: 1)
-                    }
-                    log.debug("Setting keyboard backlight to \(0.3)")
-                    DC.kbc.setBrightness(0.3, forKeyboard: 1)
-                }
+                // if isMacBook, DC.kbc.brightness(forKeyboard: 1) == 0.01 {
+                //     if DC.keyboardAutoBrightnessEnabledByUser {
+                //         log.debug("Enabling keyboard backlight auto-brightness")
+                //         DC.kbc.enableAutoBrightness(true, forKeyboard: 1)
+                //     }
+
+                //     log.debug("Setting keyboard backlight to \(0.3)")
+                //     DC.kbc.setBrightness(0.3, forKeyboard: 1)
+                // }
             }
 
             log.info("\(name) SOFT BRIGHTNESS: \(softwareBrightness.str(decimals: 2))")
