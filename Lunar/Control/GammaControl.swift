@@ -134,7 +134,8 @@ enum NightShift {
     static let client = CBBlueLightClient()
     static var initialAppearance = currentAppearance
 
-    static var currentAppearance: SystemAppearance { getCurrentSystemAppearance() }
+    static var currentAppearance = getCurrentSystemAppearance()
+
     static var shouldBeDark: Bool { currentAppearance.isAuto
         ? status.active.boolValue && status.enabled.boolValue
         : initialAppearance.isDark
@@ -240,8 +241,8 @@ enum NightShift {
     }
 
     static func getCurrentSystemAppearance() -> SystemAppearance {
-        let appleInterfaceStyle = UserDefaults.standard.string(forKey: "AppleInterfaceStyle")
-        let appleInterfaceStyleSwitchesAutomatically = UserDefaults.standard.bool(forKey: "AppleInterfaceStyleSwitchesAutomatically")
+        let appleInterfaceStyle = UserDefaults.standard.string(forKey: kAppleInterfaceStyle)
+        let appleInterfaceStyleSwitchesAutomatically = UserDefaults.standard.bool(forKey: kAppleInterfaceStyleSwitchesAutomatically)
 
         if appleInterfaceStyleSwitchesAutomatically {
             return appleInterfaceStyle == "Dark" ? .autoDark : .autoLight

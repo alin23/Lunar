@@ -1213,6 +1213,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             .sink { [self] notification in
                 log.info("\(notification.name)")
                 mainAsync { [self] in
+                    NightShift.currentAppearance = NightShift.getCurrentSystemAppearance()
                     initMenuItems()
                     for (key, popover) in POPOVERS {
                         guard let popover else { continue }

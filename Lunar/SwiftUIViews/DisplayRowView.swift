@@ -22,12 +22,14 @@ struct DisplayRowView: View {
     @Default(.showRawValues) var showRawValues
     @Default(.showNitsText) var showNitsText
     @Default(.xdrTipShown) var xdrTipShown
+    @Default(.fullRangeTipShown) var fullRangeTipShown
     @Default(.autoXdr) var autoXdr
     @Default(.syncMode) var syncMode
     @Default(.dimNonEssentialUI) var dimNonEssentialUI
     @Default(.autoBlackoutBuiltin) var autoBlackoutBuiltin
 
     @State private var showNeedsLunarPro = false
+    @State private var showFullRangeTip = false
     @State private var showXDRTip = false
     @State private var showSubzero = false
     @State private var showXDR = false
@@ -84,14 +86,44 @@ struct DisplayRowView: View {
                 withAnimation(.fastSpring) { display.enhanced = false }
             }
             .buttonStyle(PickerButton(
-                onColor: Color.warmBlack.opacity(hoveringXDRSelector || !dimNonEssentialUI ? 1.0 : 0.2), offColor: color.opacity(0.4), enumValue: $display.enhanced, onValue: false
+                onColor: Color.warmBlack.opacity(hoveringXDRSelector || !dimNonEssentialUI ? 1.0 : 0.2), offColor: color.opacity(0.4), enumValue: .oneway { display.enhanced || display.fullRange }, onValue: false
             ))
             .font(.system(size: 10, weight: display.enhanced ? .semibold : .bold, design: .monospaced))
+
+            if display.supportsFullRangeXDR {
+                SwiftUI.Button("Full Range") {
+                    guard proactive else {
+                        showNeedsLunarPro = true
+                        return
+                    }
+                    guard fullRangeTipShown else {
+                        fullRangeTipShown = true
+                        showFullRangeTip = true
+                        return
+                    }
+
+                    if display.enhanced {
+                        display.enhanced = false
+                    }
+
+                    withAnimation(.easeInOut(duration: 0.3)) { display.fullRange.toggle() }
+                }
+                .buttonStyle(PickerButton(
+                    onColor: Color.fg.warm.opacity(hoveringXDRSelector || !dimNonEssentialUI ? 1.0 : 0.2),
+                    offColor: color.opacity(0.4), onTextColor: .bg.primary, enumValue: $display.fullRange, onValue: true
+                ))
+                .font(.system(size: 10, weight: display.fullRange ? .bold : .semibold, design: .rounded))
+                .popover(isPresented: $showNeedsLunarPro) { NeedsLunarProView() }
+                .popover(isPresented: $showFullRangeTip) { FullRangeTipView() }
+            }
 
             SwiftUI.Button("XDR") {
                 guard proactive else {
                     showNeedsLunarPro = true
                     return
+                }
+                if display.fullRange {
+                    display.fullRange = false
                 }
                 guard !display.enhanced else { return }
                 withAnimation(.fastSpring) { display.enhanced = true }
@@ -103,7 +135,8 @@ struct DisplayRowView: View {
                 }
             }
             .buttonStyle(PickerButton(
-                onColor: Color.warmBlack.opacity(hoveringXDRSelector || !dimNonEssentialUI ? 1.0 : 0.2), offColor: color.opacity(0.4), enumValue: $display.enhanced, onValue: true
+                onColor: Color.warmBlack.opacity(hoveringXDRSelector || !dimNonEssentialUI ? 1.0 : 0.2),
+                offColor: color.opacity(0.4), enumValue: $display.enhanced, onValue: true
             ))
             .font(.system(size: 10, weight: display.enhanced ? .bold : .semibold, design: .monospaced))
             .popover(isPresented: $showNeedsLunarPro) { NeedsLunarProView() }
@@ -111,6 +144,12 @@ struct DisplayRowView: View {
         }
         .padding(2)
         .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(color))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .trim(from: 0.0, to: display.fullRange ? 1.0 : 0.0)
+                .stroke(Color.fg.warm.opacity(1.0), lineWidth: 3)
+                .scaleEffect(x: 0.98, y: 0.95, anchor: .center)
+        )
         .padding(.bottom, 2)
         .opacity(hoveringXDRSelector || !dimNonEssentialUI ? 1 : 0.15)
         .onHover { hovering in

@@ -1133,6 +1133,10 @@ final class DisplayController: ObservableObject {
         return ALL_DISPLAYS
     }
 
+    func display(withDispName dispName: String) -> Display? {
+        activeDisplayList.first { $0.dispName == dispName }
+    }
+
     func shouldDisableNightModeBecauseOfGammaApp(name: String) -> Bool {
         askBool(
             message: "Exclusive Gamma API access required",
@@ -1391,6 +1395,11 @@ final class DisplayController: ObservableObject {
                 xdrSensorTask = getSensorTask()
             }
             sourceDisplay = getSourceDisplay()
+
+            let oldDisplayIDs = oldValue.keys
+            for display in displays.values where !oldDisplayIDs.contains(display.id) && display.fullRange {
+                let _ = display.handleFullRange(true)
+            }
         }
     }
     @Atomic var fluxRunning = isFluxRunning() {
@@ -2753,7 +2762,7 @@ final class DisplayController: ObservableObject {
             let ignoreHoldingKey = display.enhanced ? false : (lastBrightnessKeyEvent?.keyRepeat ?? false)
 
             if autoXdr || display.softwareBrightness > 1.0 || display.enhanced, !ignoreHoldingKey,
-               display.supportsEnhance, !xdrPausedBecauseOfFlux,
+               !display.fullRange, display.supportsEnhance, !xdrPausedBecauseOfFlux,
                (value == maxBrightness && value == oldValue && timeSince(lastTimeBrightnessKeyPressed) < 3) ||
                (oldValue == maxBrightness && display.softwareBrightness > Display.MIN_SOFTWARE_BRIGHTNESS),
                proactive

@@ -139,6 +139,7 @@ extension Defaults.Keys {
 
     static let xdrWarningShown = Key<Bool>("xdrWarningShown", default: false)
     static let xdrTipShown = Key<Bool>("xdrTipShown", default: false)
+    static let fullRangeTipShown = Key<Bool>("fullRangeTipShown", default: false)
     static let autoXdrTipShown = Key<Bool>("autoXdrTipShown", default: false)
     static let autoBlackoutBuiltin = Key<Bool>("autoBlackoutBuiltin", default: false)
     static let workaroundBuiltinDisplay = Key<Bool>("workaroundBuiltinDisplay", default: false)

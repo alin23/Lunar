@@ -2618,7 +2618,7 @@ final class LunarServer {
     }
 
     func write(_ lux: Double, to socketFd: Int32) {
-        socketLockQueue.async { [weak self] in
+        socketLockQueue.async(flags: .barrier) { [weak self] in
             guard let self, let socket = connectedSockets[socketFd] else {
                 _ = storeLock.around {
                     self?.luxListeners.removeValue(forKey: socketFd)
@@ -2631,7 +2631,7 @@ final class LunarServer {
     }
 
     func write(_ change: DisplayStateChange, to socketFd: Int32, json: Bool) {
-        socketLockQueue.async { [weak self] in
+        socketLockQueue.async(flags: .barrier) { [weak self] in
             guard let self, let socket = connectedSockets[socketFd] else {
                 storeLock.around {
                     self?.brightnessListeners.removeValue(forKey: socketFd)
@@ -2650,12 +2650,12 @@ final class LunarServer {
     }
 
     func addNewConnection(socket: Socket) {
-        socketLockQueue.sync { [unowned self, socket] in
+        socketLockQueue.sync { [socket] in
             currentSocketFD = socket.socketfd
             connectedSockets[socket.socketfd] = socket
         }
 
-        DispatchQueue.global(qos: .default).async { [unowned self, socket] in
+        DispatchQueue.global(qos: .default).async { [weak self, socket] in
             var shouldKeepRunning = true
             var readData = Data(capacity: Self.bufferSize)
 
@@ -2672,6 +2672,7 @@ final class LunarServer {
                         #if DEBUG
                             log.info("Server received from connection at \(socket.remoteHostname):\(socket.remotePort): \(response) ")
                         #endif
+                        guard let self else { return }
                         try onResponse(response, socket: socket)
                     case 0:
                         #if DEBUG
@@ -2688,7 +2689,10 @@ final class LunarServer {
                     readData.removeAll(keepingCapacity: true)
                 } while shouldKeepRunning
 
-                guard storeLock.around({ brightnessListeners[socket.socketfd] ?? luxListeners[socket.socketfd] }) == nil else {
+                guard let self else {
+                    return
+                }
+                guard storeLock.around({ self.brightnessListeners[socket.socketfd] ?? self.luxListeners[socket.socketfd] }) == nil else {
                     return
                 }
                 #if DEBUG
@@ -2696,15 +2700,15 @@ final class LunarServer {
                 #endif
                 socket.close()
 
-                socketLockQueue.sync { [unowned self, socket] in
-                    connectedSockets[socket.socketfd] = nil
+                socketLockQueue.sync { [socket] in
+                    self.connectedSockets[socket.socketfd] = nil
                 }
             } catch {
                 guard let socketError = error as? Socket.Error else {
                     log.error("Unexpected error by connection at \(socket.remoteHostname):\(socket.remotePort)...")
                     return
                 }
-                if continueRunning {
+                if let self, continueRunning {
                     log.error("Error reported by connection at \(socket.remoteHostname):\(socket.remotePort):\n \(socketError.description)")
                 }
             }
@@ -2712,7 +2716,7 @@ final class LunarServer {
     }
 
     func closeOldSockets() {
-        socketLockQueue.sync { [unowned self] in
+        socketLockQueue.sync {
             for socket in connectedSockets.values.filter({ $0.socketfd != self.currentSocketFD }) {
                 connectedSockets.removeValue(forKey: socket.socketfd)
                 socket.close()
@@ -2725,7 +2729,7 @@ final class LunarServer {
         continueRunning = false
 
         for socket in connectedSockets.values {
-            socketLockQueue.sync { [unowned self, socket] in
+            socketLockQueue.sync { [socket] in
                 connectedSockets[socket.socketfd] = nil
                 socket.close()
             }
@@ -2737,7 +2741,7 @@ final class LunarServer {
 
     func stopAsync() {
         log.info("CLI Server shutdown in progress...")
-        socketLockQueue.async {
+        socketLockQueue.async(flags: .barrier) {
             self.continueRunning = false
 
             for socket in self.connectedSockets.values {

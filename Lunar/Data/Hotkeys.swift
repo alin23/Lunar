@@ -872,9 +872,26 @@ enum Hotkey {
             )
             return
         }
-        guard !display.blackOutEnabled, osdImage != .brightness || display.softwareBrightness == 1.0,
-              let manager = OSDManager.sharedManager() as? OSDManager
-        else {
+
+        guard !display.blackOutEnabled, osdImage != .brightness || display.softwareBrightness == 1.0 else {
+            return
+        }
+        if osdImage == .brightness, display.fullRange {
+            let text = if let nits = display.nits {
+                "\(nits.str(decimals: 0)) nits"
+            } else {
+                value.s
+            }
+            display.showSoftwareOSD(
+                image: "sun.max",
+                value: value.f / 100,
+                text: text,
+                color: nil
+            )
+            return
+        }
+
+        guard let manager = OSDManager.sharedManager() as? OSDManager else {
             log.warning("No OSDManager available")
             return
         }

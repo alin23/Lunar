@@ -38,6 +38,7 @@
 		C7138D8D2634AF0500406EE3 /* KeyHolder in Frameworks */ = {isa = PBXBuildFile; productRef = C7138D8C2634AF0500406EE3 /* KeyHolder */; };
 		C7138D962634B02900406EE3 /* Paddle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7138D952634B02900406EE3 /* Paddle.framework */; };
 		C7138D982634B03400406EE3 /* Paddle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7138D952634B02900406EE3 /* Paddle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C714142B2B6F9C1000A16CF3 /* FullRangeTipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C714142A2B6F9C1000A16CF3 /* FullRangeTipView.swift */; };
 		C714C998280572920061588E /* ProViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C714C997280572920061588E /* ProViews.swift */; };
 		C714C99B2805BDEA0061588E /* SkyLight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C714C99A2805BDEA0061588E /* SkyLight.framework */; };
 		C714C99E2809B4FB0061588E /* ScrollViewIfNeeded.swift in Sources */ = {isa = PBXBuildFile; fileRef = C714C99D2809B4FB0061588E /* ScrollViewIfNeeded.swift */; };
@@ -261,6 +262,7 @@
 		C70A79532AB4A11600289426 /* BlackoutPopoverRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlackoutPopoverRowView.swift; sourceTree = "<group>"; };
 		C70A79692AB4A1EB00289426 /* NeedsLunarProView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NeedsLunarProView.swift; sourceTree = "<group>"; };
 		C7138D952634B02900406EE3 /* Paddle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Paddle.framework; sourceTree = "<group>"; };
+		C714142A2B6F9C1000A16CF3 /* FullRangeTipView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FullRangeTipView.swift; sourceTree = "<group>"; };
 		C714C997280572920061588E /* ProViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProViews.swift; sourceTree = "<group>"; };
 		C714C99A2805BDEA0061588E /* SkyLight.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SkyLight.framework; path = ../../../../../System/Library/PrivateFrameworks/SkyLight.framework; sourceTree = "<group>"; };
 		C714C99D2809B4FB0061588E /* ScrollViewIfNeeded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewIfNeeded.swift; sourceTree = "<group>"; };
@@ -609,6 +611,7 @@
 		C77CC75A1FEDB367009AA718 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C714142A2B6F9C1000A16CF3 /* FullRangeTipView.swift */,
 				C735D9F52AFCD0B5001DCAA8 /* Colors.swift */,
 				C7714AF827E4A3A9002E0B2E /* Components.swift */,
 				C722FB9E271AC83200ED4C94 /* Button.swift */,
@@ -1159,6 +1162,7 @@
 				C7DD62292612331700B07B31 /* PaddedTextField.swift in Sources */,
 				C78BD044259B2FB100FC823F /* SensorMode.swift in Sources */,
 				C76A129C20D795A7005D4BE3 /* ModernWindow.swift in Sources */,
+				C714142B2B6F9C1000A16CF3 /* FullRangeTipView.swift in Sources */,
 				C7E80E342637060F004718A4 /* SFTP.swift in Sources */,
 				C784143827DDFBC400E14941 /* OSDWindow.swift in Sources */,
 				C70A79552AB4A11600289426 /* NitsTextField.swift in Sources */,

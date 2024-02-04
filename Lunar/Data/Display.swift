@@ -494,6 +494,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         unmanaged = try container.decodeIfPresent(Bool.self, forKey: .unmanaged) ?? false
         keepDisconnected = try container.decodeIfPresent(Bool.self, forKey: .keepDisconnected) ?? false
         keepHDREnabled = try container.decodeIfPresent(Bool.self, forKey: .keepHDREnabled) ?? false
+        fullRange = try container.decodeIfPresent(Bool.self, forKey: .fullRange) ?? false
 
         hotkeyInput1 = try (
             (container.decodeIfPresent(UInt16.self, forKey: .hotkeyInput1))?
@@ -883,6 +884,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case rotation
         case adaptiveController
         case subzero
+        case fullRange
         case xdr
         case hdr
         case softwareBrightness
@@ -903,6 +905,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .blackout,
             .xdr,
             .xdrBrightness,
+            .fullRange,
         ]
 
         static var double: Set<CodingKeys> = [
@@ -952,6 +955,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .blackOutMirroringAllowed,
             .mirroredBeforeBlackOut,
             .subzero,
+            .fullRange,
             .xdr,
             .hdr,
             .applyBrightnessOnInputChange1,
@@ -1085,6 +1089,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .rotation,
             .adaptiveController,
             .subzero,
+            .fullRange,
             .xdr,
             .hdr,
             .softwareBrightness,
@@ -1355,6 +1360,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var lastConnectionTime = Date()
 
     @Published @objc dynamic var supportsEnhance = false
+    lazy var supportsFullRangeXDR = getSupportsFullRangeXDR()
+
     @Published var lastSoftwareBrightness: Float = 1.0
 
     @Atomic var hasSoftwareControl = false
@@ -1505,7 +1512,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var connection: ConnectionType = .unknown
 
     @Atomic var lastGammaBrightness: Brightness = 100
-
     @Atomic var isNative = false
 
     lazy var isMacBook: Bool = isBuiltin && Sysctl.isMacBook
@@ -3910,6 +3916,15 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
+    @Published @objc dynamic var fullRange = false {
+        didSet {
+            guard apply, supportsFullRangeXDR else { return }
+            if handleFullRange(fullRange) {
+                save()
+            }
+        }
+    }
+
     var schedulesToConsider: Int {
         if CachedDefaults[.showFiveSchedules] { return 5 }
         if CachedDefaults[.showFourSchedules] { return 4 }
@@ -3954,6 +3969,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             #else
                 canRotate = panel?.canChangeOrientation() ?? false
             #endif
+            fullRange = panel?.xdrEnabled ?? false
         }
     }
 
@@ -5212,6 +5228,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try container.encode(subzero, forKey: .subzero)
             try container.encode(hdr, forKey: .hdr)
             try container.encode(xdr, forKey: .xdr)
+            try container.encode(fullRange, forKey: .fullRange)
             try container.encode(softwareBrightness, forKey: .softwareBrightness)
             try container.encode(subzeroDimming, forKey: .subzeroDimming)
             try container.encode(xdrBrightness, forKey: .xdrBrightness)

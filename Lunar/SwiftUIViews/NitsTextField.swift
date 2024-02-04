@@ -9,6 +9,7 @@
 
         @State var nits: Double = 0
         @State var editing = false
+        @State var hovering = false
 
         @Default(.syncMode) var syncMode
 
@@ -50,7 +51,13 @@
                 .frame(width: 50)
                 .popover(isPresented: $editing) { editPopover }
                 .disabled(disabled)
-                .help(disabled ? "Managed by the system" : "")
+                .helpTag(
+                    isPresented: .oneway { hovering && disabled && placeholder == "max" },
+                    alignment: .trailing,
+                    offset: CGSize(width: -50, height: 0),
+                    "Adapted by the system\nbased on ambient light"
+                )
+                .onHover { hovering = $0 }
                 .onChange(of: nits) { nits in
                     self.nits = nits
                 }

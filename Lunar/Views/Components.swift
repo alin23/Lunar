@@ -521,3 +521,75 @@ struct Dropdown<T: Nameable>: NSViewRepresentable {
         setTitleAndImage(button)
     }
 }
+
+func roundRect(_ radius: CGFloat, fill: Color) -> some View {
+    RoundedRectangle(cornerRadius: radius, style: .continuous)
+        .fill(fill)
+}
+
+func roundRect(_ radius: CGFloat, stroke: Color) -> some View {
+    RoundedRectangle(cornerRadius: radius, style: .continuous)
+        .stroke(stroke)
+}
+
+struct RoundBG: ViewModifier {
+    @Environment(\.colorScheme) var colorScheme
+
+    var radius: CGFloat
+    var verticalPadding: CGFloat?
+    var horizontalPadding: CGFloat?
+    var color: Color
+    var shadowSize: CGFloat
+
+    func body(content: Content) -> some View {
+        let verticalPadding = verticalPadding ?? radius / 2
+        content
+            .padding(.horizontal, horizontalPadding ?? verticalPadding * 2.2)
+            .padding(.vertical, verticalPadding)
+            .background(
+                roundRect(radius, fill: color)
+                    .shadow(color: .black.opacity(colorScheme == .dark ? 0.75 : 0.25), radius: shadowSize, x: 0, y: shadowSize / 2)
+            )
+    }
+
+}
+
+// MARK: - HelpTag
+
+struct HelpTag: View {
+    @Binding var isPresented: Bool
+
+    var text: String
+    var offset: CGSize
+
+    var body: some View {
+        if isPresented {
+            Text(text)
+                .font(.system(size: 9, weight: .medium, design: .rounded))
+                .modifier(RoundBG(radius: 4, verticalPadding: 2.5, horizontalPadding: 6, color: .bg.primary, shadowSize: 2))
+                .foregroundColor(.fg.warm)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 4)
+                        .stroke(Color.black.opacity(0.1), lineWidth: 1)
+                )
+                .fixedSize()
+                .offset(offset)
+                .zIndex(100)
+        }
+    }
+
+}
+
+extension View {
+    func helpTag(isPresented: Binding<Bool>, alignment: Alignment = .center, offset: CGSize = .zero, _ text: String) -> some View {
+        overlay(HelpTag(isPresented: isPresented, text: text, offset: offset), alignment: alignment)
+    }
+
+    func bottomHelpTag(isPresented: Binding<Bool>, _ text: String) -> some View {
+        helpTag(isPresented: isPresented, alignment: .bottom, offset: CGSize(width: 0, height: 15), text)
+    }
+
+    func topHelpTag(isPresented: Binding<Bool>, _ text: String) -> some View {
+        helpTag(isPresented: isPresented, alignment: .top, offset: CGSize(width: 0, height: -15), text)
+    }
+}
