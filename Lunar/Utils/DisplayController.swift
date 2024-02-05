@@ -1133,9 +1133,11 @@ final class DisplayController: ObservableObject {
         return ALL_DISPLAYS
     }
 
-    func display(withDispName dispName: String) -> Display? {
-        activeDisplayList.first { $0.dispName == dispName }
-    }
+    #if arch(arm64)
+        func display(withDispName dispName: String) -> Display? {
+            activeDisplayList.first { $0.dispName == dispName }
+        }
+    #endif
 
     func shouldDisableNightModeBecauseOfGammaApp(name: String) -> Bool {
         askBool(

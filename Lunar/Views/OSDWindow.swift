@@ -674,19 +674,30 @@ struct BrightnessOSDView: View {
                     path.addLine(to: CGPoint(x: 161, y: 0))
                 }
                 .stroke(style: StrokeStyle(lineWidth: 8))
-                .foregroundColor(Color.black.opacity(0.9))
+                .foregroundColor(Color.black)
 
-                (osd.color ?? (colorScheme == .dark ? .white : .gray))
-                    .clipShape(
-                        Path { path in
-                            path.move(to: CGPoint(x: 1, y: 0))
-                            path.addLine(to: CGPoint(x: value, y: 0))
-                        }
-                        .stroke(style: StrokeStyle(lineWidth: 6, dash: [9, 1]))
-                    )
-                    .shadow(color: osd.glowRadius == 0 ? .clear : (osd.color ?? .clear), radius: osd.value.cg * osd.glowRadius, x: 0, y: 0)
-                    .animation(.easeOut(duration: 0.15), value: osd.value)
-            }.offset(y: NATIVE_OSD_WIDTH * 0.78)
+                Path { path in
+                    path.move(to: CGPoint(x: 1, y: 0))
+                    path.addLine(to: CGPoint(x: value, y: 0))
+                }
+                .stroke(.black, style: StrokeStyle(lineWidth: 6, dash: [9, 1]))
+                .blendMode(.destinationOut)
+
+                if let color = osd.color ?? (colorScheme == .dark ? .primary.opacity(0.75) : nil) {
+                    color
+                        .clipShape(
+                            Path { path in
+                                path.move(to: CGPoint(x: 1, y: 0))
+                                path.addLine(to: CGPoint(x: value, y: 0))
+                            }
+                            .stroke(style: StrokeStyle(lineWidth: 6, dash: [9, 1]))
+                        )
+                        .shadow(color: osd.glowRadius == 0 ? .clear : (osd.color ?? .clear), radius: osd.value.cg * osd.glowRadius, x: 0, y: 0)
+                        .animation(.easeOut(duration: 0.15), value: osd.value)
+                }
+            }
+            .compositingGroup()
+            .offset(y: NATIVE_OSD_WIDTH * 0.78)
         }
         .padding(.horizontal, 20)
         .padding(.bottom, 40)

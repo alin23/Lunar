@@ -296,6 +296,7 @@ struct PickerButton<T: Equatable>: ButtonStyle {
     var horizontalPadding: CGFloat = 8
     var verticalPadding: CGFloat = 4
     var brightness = 0.0
+    var radius: CGFloat = 8
     @State var scale: CGFloat = 1
     @State var hoverColor = Color.white
     @Binding var enumValue: T
@@ -312,7 +313,7 @@ struct PickerButton<T: Equatable>: ButtonStyle {
             .padding(.vertical, verticalPadding)
             .padding(.horizontal, horizontalPadding)
             .background(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                RoundedRectangle(cornerRadius: radius, style: .continuous)
                     .fill(
                         enumValue == onValue
                             ? (onColor ?? Color.fg.warm.opacity(colorScheme == .dark ? 0.15 : 0.9))

@@ -9,6 +9,7 @@ struct DisplayRowView: View {
     }
 
     @ObservedObject var display: Display
+    @ObservedObject var km = KM
     @Environment(\.colorScheme) var colorScheme
 
     @Default(.showSliderValues) var showSliderValues
@@ -102,6 +103,11 @@ struct DisplayRowView: View {
                         return
                     }
 
+                    guard !km.controlKeyPressed else {
+                        showFullRangeTip = true
+                        return
+                    }
+
                     if display.enhanced {
                         display.enhanced = false
                     }
@@ -109,8 +115,8 @@ struct DisplayRowView: View {
                     withAnimation(.easeInOut(duration: 0.3)) { display.fullRange.toggle() }
                 }
                 .buttonStyle(PickerButton(
-                    onColor: Color.fg.warm.opacity(hoveringXDRSelector || !dimNonEssentialUI ? 1.0 : 0.2),
-                    offColor: color.opacity(0.4), onTextColor: .bg.primary, enumValue: $display.fullRange, onValue: true
+                    onColor: Color.fg.primary.opacity(hoveringXDRSelector || !dimNonEssentialUI ? 0.7 : 0.2),
+                    offColor: color.opacity(0.4), onTextColor: .bg.primary, radius: 6, enumValue: $display.fullRange, onValue: true
                 ))
                 .font(.system(size: 10, weight: display.fullRange ? .bold : .semibold, design: .rounded))
                 .popover(isPresented: $showNeedsLunarPro) { NeedsLunarProView() }
@@ -147,7 +153,7 @@ struct DisplayRowView: View {
         .overlay(
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .trim(from: 0.0, to: display.fullRange ? 1.0 : 0.0)
-                .stroke(Color.fg.warm.opacity(1.0), lineWidth: 3)
+                .stroke(Color.fg.primary.opacity(0.7), lineWidth: 3)
                 .scaleEffect(x: 0.98, y: 0.95, anchor: .center)
         )
         .padding(.bottom, 2)

@@ -14,29 +14,35 @@ import SwiftUI
 struct FullRangeTipView: View {
     var body: some View {
         PaddedPopoverView(background: AnyView(Color.white.brightness(0.05))) {
-            HStack(spacing: 10) {
-                VStack(spacing: 6) {
-                    Image(systemName: "sun.max")
-                        .foregroundColor(.white)
-                        .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    Text("F2")
-                        .foregroundColor(.white)
-                        .font(.system(size: 10, weight: .medium))
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 6)
-                .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.black.opacity(0.9)))
-                .shadow(color: .black.opacity(0.4), radius: 5, x: 0, y: 3)
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("You can also enable XDR by pressing the Brightness Up key")
-                        .foregroundColor(.black)
-                        .font(.system(size: 14, weight: .regular))
+            Text("Full Range XDR Brightness")
+                .font(.title.bold())
+            Text("""
+            This option unlocks the full range of brightness so you can take advantage
+            of the high power LEDs in your screen.
 
-                    Text("one more time after already reaching 100% brightness")
-                        .foregroundColor(.black)
-                        .font(.system(size: 14, weight: .regular))
-                }
-            }
+            It uses a different approach than the one used by the **XDR** button,
+            with the following key differences:
+
+              - It doesn't clip colors in HDR content
+              - The system adaptive brightness keeps working
+              - There's no lag when going from SDR to XDR brightness
+
+            Downsides:
+
+              - It only works on Apple XDR screens
+              - The screen will flash one or two times when toggling it
+            """)
+
+            Text("""
+            The system will still adapt the maximum nits of brightness based on the ambient
+            light, so you might get a max of 800 nits in a dark room and 1600 nits in sunlight.
+
+            Disabling the system adaptive brightness will turn off this behaviour.
+            """)
+            .font(.system(size: 11, weight: .medium, design: .rounded))
+            .modifier(RoundBG(radius: 8, color: .black.opacity(0.1), shadowSize: 0))
+
+            Text("*Note: you can always Ctrl-click this button to see this tip again*")
         }
     }
 }
