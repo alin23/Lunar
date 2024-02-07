@@ -1015,12 +1015,19 @@ extension AppDelegate: MediaKeyTapDelegate {
             )
         case .brightnessUp where allDisplays:
             DC.pressedBrightnessKey.true(for: 0.5)
+            if timeSince(DC.lastTimeBrightnessUpKeyPressed) < 0.2 {
+                DC.doublePressedBrightnessUpKey.true(for: 0.2)
+            }
+
             if builtinDisplay {
                 increaseBrightness(by: value, builtinDisplay: builtinDisplay)
             }
             increaseBrightness(by: value)
         case .brightnessUp:
             DC.pressedBrightnessKey.true(for: 0.5)
+            if timeSince(DC.lastTimeBrightnessUpKeyPressed) < 0.2 {
+                DC.doublePressedBrightnessUpKey.true(for: 0.2)
+            }
             increaseBrightness(
                 by: value,
                 currentDisplay: currentDisplay,
@@ -1040,12 +1047,20 @@ extension AppDelegate: MediaKeyTapDelegate {
             )
         case .brightnessDown where allDisplays:
             DC.pressedBrightnessKey.true(for: 0.5)
+            if timeSince(DC.lastTimeBrightnessDownKeyPressed) < 0.2 {
+                DC.doublePressedBrightnessDownKey.true(for: 0.2)
+            }
+
             if builtinDisplay {
                 decreaseBrightness(by: value, builtinDisplay: builtinDisplay)
             }
             decreaseBrightness(by: value)
         case .brightnessDown:
             DC.pressedBrightnessKey.true(for: 0.5)
+            if timeSince(DC.lastTimeBrightnessDownKeyPressed) < 0.2 {
+                DC.doublePressedBrightnessDownKey.true(for: 0.2)
+            }
+
             decreaseBrightness(
                 by: value,
                 currentDisplay: currentDisplay,
@@ -1327,7 +1342,14 @@ extension AppDelegate: MediaKeyTapDelegate {
             let lidClosed = DC.lidClosed || DC.builtinDisplay == nil
             let event = handleBrightnessKeys(withLidClosed: lidClosed, mediaKey: mediaKey, modifiers: flags, event: event)
             if event != nil { log.debug("Forwarding brightness key event to the system") }
+
             DC.lastTimeBrightnessKeyPressed = Date()
+            if mediaKey == .brightnessUp {
+                DC.lastTimeBrightnessUpKeyPressed = DC.lastTimeBrightnessKeyPressed
+            } else if mediaKey == .brightnessDown {
+                DC.lastTimeBrightnessDownKeyPressed = DC.lastTimeBrightnessKeyPressed
+            }
+
             DC.lastBrightnessKeyEvent = keyEvent
             return event
         }
@@ -1565,7 +1587,10 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func brightnessUpAction(offset: Int? = nil) {
-        defer { DC.lastTimeBrightnessKeyPressed = Date() }
+        defer {
+            DC.lastTimeBrightnessKeyPressed = Date()
+            DC.lastTimeBrightnessUpKeyPressed = DC.lastTimeBrightnessKeyPressed
+        }
 
         let allMonitors = CachedDefaults[.brightnessHotkeysControlAllMonitors]
         cancelScreenWakeAdapterTask()
@@ -1587,7 +1612,10 @@ extension AppDelegate: MediaKeyTapDelegate {
     }
 
     func brightnessDownAction(offset: Int? = nil) {
-        defer { DC.lastTimeBrightnessKeyPressed = Date() }
+        defer {
+            DC.lastTimeBrightnessKeyPressed = Date()
+            DC.lastTimeBrightnessDownKeyPressed = DC.lastTimeBrightnessKeyPressed
+        }
 
         let allMonitors = CachedDefaults[.brightnessHotkeysControlAllMonitors]
         cancelScreenWakeAdapterTask()

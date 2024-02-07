@@ -98,6 +98,9 @@ extension Defaults.Keys {
     static let showProjectorDisplays = Key<Bool>("showProjectorDisplays", default: true)
     static let showDisconnectedDisplays = Key<Bool>("showDisconnectedDisplays", default: false)
     static let autoSubzero = Key<Bool>("autoSubzero", default: true)
+
+    static let fullRangeMaxOnDoublePress = Key<Bool>("fullRangeMaxOnDoublePress", default: false)
+
     static let autoXdr = Key<Bool>("autoXdr", default: true)
     static let autoXdrSensor = Key<Bool>("autoXdrSensor", default: false)
     static let autoXdrSensorShowOSD = Key<Bool>("autoXdrSensorShowOSD", default: true)

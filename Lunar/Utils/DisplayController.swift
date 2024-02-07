@@ -18,6 +18,7 @@ import MediaKeyTap
 import Sentry
 import Surge
 import SwiftDate
+import SwiftUI
 import SwiftyJSON
 
 func IOServiceFirstMatchingWhere(_ matching: CFDictionary, where predicate: (io_service_t) -> Bool) -> io_service_t? {
@@ -447,6 +448,9 @@ final class DisplayController: ObservableObject {
     static var manualModeFromSyncMode = false
 
     static var initialized = false
+
+    var doublePressedBrightnessUpKey: ExpiringBool = false
+    var doublePressedBrightnessDownKey: ExpiringBool = false
     var pressedBrightnessKey: ExpiringBool = false
     var pressedContrastKey: ExpiringBool = false
     var averageDDCWriteNanoseconds: ThreadSafeDictionary<CGDirectDisplayID, UInt64> = ThreadSafeDictionary()
@@ -497,6 +501,8 @@ final class DisplayController: ObservableObject {
 
     var displaysBySerial: [String: Display] = [:]
     var unmanagedDisplays: [Display] = []
+    var lastTimeBrightnessUpKeyPressed = Date.distantPast
+    var lastTimeBrightnessDownKeyPressed = Date.distantPast
     @Atomic var locked = false {
         didSet {
             log.debug("Screen \(locked ? "locked" : "unlocked")")
@@ -1666,28 +1672,27 @@ final class DisplayController: ObservableObject {
                 }
 
                 gammaDisabledCompletely = change.newValue
+                for display in activeDisplayList {
+                    display.supportsEnhance = display.getSupportsEnhance()
+                }
                 guard change.newValue else {
                     if let oldVal = CachedDefaults[.oldHdrWorkaround] { CachedDefaults[.hdrWorkaround] = oldVal }
                     if let oldVal = CachedDefaults[.oldAutoXdr] { CachedDefaults[.autoXdr] = oldVal }
                     if let oldVal = CachedDefaults[.oldAutoXdrSensor] { CachedDefaults[.autoXdrSensor] = oldVal }
                     if let oldVal = CachedDefaults[.oldAutoSubzero] { CachedDefaults[.autoSubzero] = oldVal }
-                    if let oldVal = CachedDefaults[.oldXdrContrast] { CachedDefaults[.xdrContrast] = oldVal }
-                    if let oldVal = CachedDefaults[.oldShowXDRSelector] { CachedDefaults[.showXDRSelector] = oldVal }
                     if let oldVal = CachedDefaults[.oldAllowHDREnhanceBrightness] { CachedDefaults[.allowHDREnhanceBrightness] = oldVal }
                     if let oldVal = CachedDefaults[.oldAllowHDREnhanceContrast] { CachedDefaults[.allowHDREnhanceContrast] = oldVal }
                     return
                 }
 
-                for item in displayList {
-                    item.gammaEnabled = false
+                for display in displayList {
+                    display.gammaEnabled = false
                 }
 
                 CachedDefaults[.oldHdrWorkaround] = CachedDefaults[.hdrWorkaround]
                 CachedDefaults[.oldAutoXdr] = CachedDefaults[.autoXdr]
                 CachedDefaults[.oldAutoXdrSensor] = CachedDefaults[.autoXdrSensor]
                 CachedDefaults[.oldAutoSubzero] = CachedDefaults[.autoSubzero]
-                CachedDefaults[.oldXdrContrast] = CachedDefaults[.xdrContrast]
-                CachedDefaults[.oldShowXDRSelector] = CachedDefaults[.showXDRSelector]
                 CachedDefaults[.oldAllowHDREnhanceBrightness] = CachedDefaults[.allowHDREnhanceBrightness]
                 CachedDefaults[.oldAllowHDREnhanceContrast] = CachedDefaults[.allowHDREnhanceContrast]
 
@@ -1695,8 +1700,6 @@ final class DisplayController: ObservableObject {
                 CachedDefaults[.autoXdr] = false
                 CachedDefaults[.autoXdrSensor] = false
                 CachedDefaults[.autoSubzero] = false
-                CachedDefaults[.xdrContrast] = false
-                CachedDefaults[.showXDRSelector] = false
                 CachedDefaults[.allowHDREnhanceBrightness] = false
                 CachedDefaults[.allowHDREnhanceContrast] = false
             }.store(in: &observers)
@@ -2734,9 +2737,13 @@ final class DisplayController: ObservableObject {
                 maxVal: maxBrightness
             )
 
+            if display.adaptiveBrightnessEnablerTask != nil {
+                display.adaptiveBrightnessEnablerTask = nil
+            }
+
             if autoSubzero || display.softwareBrightness < 1.0,
                !display.hasSoftwareControl, !display.subzeroDimmingDisabled,
-               (value == minBrightness && value == oldValue && timeSince(lastTimeBrightnessKeyPressed) < 3) ||
+               (value == minBrightness && value == oldValue && timeSince(lastTimeBrightnessDownKeyPressed) < 3) ||
                (oldValue == minBrightness && display.softwareBrightness < 1.0)
             {
                 display.forceShowSoftwareOSD = true
@@ -2765,7 +2772,7 @@ final class DisplayController: ObservableObject {
 
             if autoXdr || display.softwareBrightness > 1.0 || display.enhanced, !ignoreHoldingKey,
                !display.fullRange, display.supportsEnhance, !xdrPausedBecauseOfFlux,
-               (value == maxBrightness && value == oldValue && timeSince(lastTimeBrightnessKeyPressed) < 3) ||
+               (value == maxBrightness && value == oldValue && timeSince(lastTimeBrightnessUpKeyPressed) < 3) ||
                (oldValue == maxBrightness && display.softwareBrightness > Display.MIN_SOFTWARE_BRIGHTNESS),
                proactive
             {
@@ -2794,6 +2801,26 @@ final class DisplayController: ObservableObject {
                 }
                 return
             }
+
+            #if arch(arm64)
+                if CachedDefaults[.fullRangeMaxOnDoublePress], display.fullRange, let maxNits = display.possibleMaxNits, let nits = display.nits, nits < maxNits {
+                    if display.systemAdaptiveBrightness, value == maxBrightness, value == oldValue {
+                        if doublePressedBrightnessUpKey.value, !ignoreHoldingKey {
+                            display.osdState.tip = nil
+                            display.systemAdaptiveBrightness = false
+                        } else {
+                            display.osdState.tip = Text("\(Image(systemName: "sun.max.fill")) Double press Brightness Up to unlock \(maxNits.str(decimals: 0)) nits")
+                        }
+                    } else if !display.systemAdaptiveBrightness, display.ambientLightCompensationEnabledByUser, value < maxBrightness, value < oldValue, nits < maxNits / 2 {
+                        let id = display.id
+                        display.adaptiveBrightnessEnablerTask = mainAsyncAfter(ms: 2000, name: "Adaptive brightness enabler") {
+                            DC.displays[id]?.systemAdaptiveBrightness = true
+                        }
+                    } else {
+                        display.osdState.tip = nil
+                    }
+                }
+            #endif
 
             if CachedDefaults[.mergeBrightnessContrast] {
                 let preciseValue: Double = if !display.lockedBrightness || display.hasSoftwareControl {

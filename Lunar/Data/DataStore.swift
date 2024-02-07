@@ -48,6 +48,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .colorScheme,
     .autoSubzero,
     .customOSDVerticalOffset,
+    .fullRangeMaxOnDoublePress,
     .autoXdr,
     .autoXdrSensor,
     .autoXdrSensorShowOSD,
@@ -712,6 +713,7 @@ func initCache() {
     cacheKey(.showProjectorDisplays)
     cacheKey(.showDisconnectedDisplays)
 
+    cacheKey(.fullRangeMaxOnDoublePress)
     cacheKey(.autoSubzero)
     cacheKey(.autoXdr)
     cacheKey(.autoXdrSensor)

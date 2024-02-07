@@ -661,7 +661,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         isSource = isSmartBuiltin
 
-        self.minBrightness = isSmartBuiltin ? 0 : minBrightness.ns
+        self.minBrightness = isSmartBuiltin ? (Sysctl.isMacBook ? 1 : 0) : minBrightness.ns
         self.maxBrightness = isSmartBuiltin ? 100 : maxBrightness.ns
         self.minContrast = isSmartBuiltin || DisplayServicesCanChangeBrightness(id) ? 0 : minContrast.ns
         self.maxContrast = isSmartBuiltin || DisplayServicesCanChangeBrightness(id) ? 100 : maxContrast.ns
@@ -1757,7 +1757,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             var brightness = cap(brightness.uint16Value, minVal: minBrightness.uint16Value, maxVal: maxBrightness.uint16Value)
             var oldBrightness = cap(oldValue.uint16Value, minVal: minBrightness.uint16Value, maxVal: maxBrightness.uint16Value)
 
-            if (brightness > minBrightness.uint16Value && brightness < maxBrightness.uint16Value) || softwareBrightness == Self
+            if !fullRange, (brightness > minBrightness.uint16Value && brightness < maxBrightness.uint16Value) || softwareBrightness == Self
                 .MIN_SOFTWARE_BRIGHTNESS
             {
                 hideSoftwareOSD()
@@ -2488,6 +2488,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         return false
     }
 
+    var softwareOSDTask: DispatchWorkItem? {
+        didSet { oldValue?.cancel() }
+    }
+    var adaptiveBrightnessEnablerTask: DispatchWorkItem? {
+        didSet { oldValue?.cancel() }
+    }
     var zeroGammaTask: Repeater? {
         get { Self.getThreadDictValue(id, type: "zero-gamma") as? Repeater }
         set { Self.setThreadDictValue(id, type: "zero-gamma", value: newValue) }
@@ -2819,93 +2825,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     #endif
 
-    var scheduledContrastTask: Repeater? = nil
-
-    @Atomic var inSchedule = false
-
-    @Published @objc dynamic var preciseBrightnessContrast = 0.5 {
-        didSet {
-            checkNaN(preciseBrightnessContrast)
-
-            guard initialised, applyPreciseValue else {
-                return
-            }
-            resetScheduledTransition()
-
-            if subzero, preciseBrightnessContrast > 0 {
-                withoutApply {
-                    if subzero { subzero = false }
-                    if adaptivePaused { adaptivePaused = false }
-                }
-                if softwareBrightness != 1 { softwareBrightness = 1 }
-            } else if !subzero, preciseBrightnessContrast == 0, isAllDisplays || (!hasSoftwareControl && !noControls) {
-                withoutApply { subzero = true }
-            }
-
-            let (brightness, contrast) = sliderValueToBrightnessContrast(preciseBrightnessContrast)
-            guard !isAllDisplays else {
-                mainThread {
-                    withoutReapplyPreciseValue {
-                        self.brightness = brightness.ns
-                        self.contrast = contrast.ns
-                    }
-                }
-                return
-            }
-
-            var smallDiff = abs(brightness.i - self.brightness.doubleValue.intround) < 5
-            if !lockedBrightness || hasSoftwareControl {
-                withBrightnessTransition(smallDiff && !inSmoothTransition ? .instant : brightnessTransition) {
-                    mainThread {
-                        withoutReapplyPreciseValue {
-                            self.brightness = brightness.ns
-                        }
-                        self.insertBrightnessUserDataPoint(
-                            DC.adaptiveMode.brightnessDataPoint.last,
-                            brightness.d, modeKey: DC.adaptiveModeKey
-                        )
-                    }
-                }
-            }
-
-            if !lockedContrast || DC.calibrating {
-                smallDiff = abs(contrast.i - self.contrast.doubleValue.intround) < 5
-                withBrightnessTransition(smallDiff && !inSmoothTransition ? .instant : brightnessTransition) {
-                    mainThread {
-                        withoutReapplyPreciseValue {
-                            self.contrast = contrast.ns
-                        }
-                        self.insertContrastUserDataPoint(
-                            DC.adaptiveMode.contrastDataPoint.last,
-                            contrast.d, modeKey: DC.adaptiveModeKey
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    func saveSyncMapping() {
-        syncMappingSaver = mainAsyncAfter(ms: 200) { [weak self] in
-            self?.save()
-            self?.syncMappingSaver = nil
-        }
-    }
-
-    func saveSensorMapping() {
-        sensorMappingSaver = mainAsyncAfter(ms: 1000) { [weak self] in
-            self?.save()
-            self?.sensorMappingSaver = nil
-        }
-    }
-
-    func saveLocationMapping() {
-        locationMappingSaver = mainAsyncAfter(ms: 2000) { [weak self] in
-            self?.save()
-            self?.locationMappingSaver = nil
-        }
-    }
-
+    @Published var possibleMaxNits: Double? = nil
     #if arch(arm64)
         var dispName = ""
         var dcpName = ""
@@ -3284,6 +3204,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         1000: 500,
     ]
 
+    var scheduledContrastTask: Repeater? = nil
+
+    @Atomic var inSchedule = false
+
     @objc dynamic lazy var otherDisplays: [Display] = DC.activeDisplayList.filter { $0.serial != serial }
 
     @Published var userVolume = 0.5
@@ -3330,6 +3254,68 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc dynamic var blacksLimit = 0.95
 
     @Published @objc dynamic var applyTemporaryGamma = false
+
+    @Published @objc dynamic var preciseBrightnessContrast = 0.5 {
+        didSet {
+            checkNaN(preciseBrightnessContrast)
+
+            guard initialised, applyPreciseValue else {
+                return
+            }
+            resetScheduledTransition()
+
+            if subzero, preciseBrightnessContrast > 0 {
+                withoutApply {
+                    if subzero { subzero = false }
+                    if adaptivePaused { adaptivePaused = false }
+                }
+                if softwareBrightness != 1 { softwareBrightness = 1 }
+            } else if !subzero, preciseBrightnessContrast == 0, isAllDisplays || (!hasSoftwareControl && !noControls) {
+                withoutApply { subzero = true }
+            }
+
+            let (brightness, contrast) = sliderValueToBrightnessContrast(preciseBrightnessContrast)
+            guard !isAllDisplays else {
+                mainThread {
+                    withoutReapplyPreciseValue {
+                        self.brightness = brightness.ns
+                        self.contrast = contrast.ns
+                    }
+                }
+                return
+            }
+
+            var smallDiff = abs(brightness.i - self.brightness.doubleValue.intround) < 5
+            if !lockedBrightness || hasSoftwareControl {
+                withBrightnessTransition(smallDiff && !inSmoothTransition ? .instant : brightnessTransition) {
+                    mainThread {
+                        withoutReapplyPreciseValue {
+                            self.brightness = brightness.ns
+                        }
+                        self.insertBrightnessUserDataPoint(
+                            DC.adaptiveMode.brightnessDataPoint.last,
+                            brightness.d, modeKey: DC.adaptiveModeKey
+                        )
+                    }
+                }
+            }
+
+            if !lockedContrast || DC.calibrating {
+                smallDiff = abs(contrast.i - self.contrast.doubleValue.intround) < 5
+                withBrightnessTransition(smallDiff && !inSmoothTransition ? .instant : brightnessTransition) {
+                    mainThread {
+                        withoutReapplyPreciseValue {
+                            self.contrast = contrast.ns
+                        }
+                        self.insertContrastUserDataPoint(
+                            DC.adaptiveMode.contrastDataPoint.last,
+                            contrast.d, modeKey: DC.adaptiveModeKey
+                        )
+                    }
+                }
+            }
+        }
+    }
 
     @Atomic var userAdjusting = false {
         didSet {
@@ -4323,6 +4309,27 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     var isActiveSyncSource: Bool { DC.sourceDisplay.serial == serial }
+
+    func saveSyncMapping() {
+        syncMappingSaver = mainAsyncAfter(ms: 200) { [weak self] in
+            self?.save()
+            self?.syncMappingSaver = nil
+        }
+    }
+
+    func saveSensorMapping() {
+        sensorMappingSaver = mainAsyncAfter(ms: 1000) { [weak self] in
+            self?.save()
+            self?.sensorMappingSaver = nil
+        }
+    }
+
+    func saveLocationMapping() {
+        locationMappingSaver = mainAsyncAfter(ms: 2000) { [weak self] in
+            self?.save()
+            self?.locationMappingSaver = nil
+        }
+    }
 
     func resetSendingValues() {
         mainAsync { [weak self] in

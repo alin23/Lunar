@@ -83,8 +83,15 @@ struct DisplayRowView: View {
         let color = Color.bg.warm.opacity(colorScheme == .dark ? 0.8 : 0.4)
         HStack(spacing: 2) {
             SwiftUI.Button("SDR") {
-                guard display.enhanced else { return }
-                withAnimation(.fastSpring) { display.enhanced = false }
+                guard display.enhanced || display.fullRange else { return }
+                withAnimation(.fastSpring) {
+                    if display.enhanced {
+                        display.enhanced = false
+                    }
+                    if display.fullRange {
+                        display.fullRange = false
+                    }
+                }
             }
             .buttonStyle(PickerButton(
                 onColor: Color.warmBlack.opacity(hoveringXDRSelector || !dimNonEssentialUI ? 1.0 : 0.2), offColor: color.opacity(0.4), enumValue: .oneway { display.enhanced || display.fullRange }, onValue: false
@@ -123,30 +130,32 @@ struct DisplayRowView: View {
                 .popover(isPresented: $showFullRangeTip) { FullRangeTipView() }
             }
 
-            SwiftUI.Button("XDR") {
-                guard proactive else {
-                    showNeedsLunarPro = true
-                    return
-                }
-                if display.fullRange {
-                    display.fullRange = false
-                }
-                guard !display.enhanced else { return }
-                withAnimation(.fastSpring) { display.enhanced = true }
-                if !xdrTipShown, autoXdr {
-                    xdrTipShown = true
-                    mainAsyncAfter(ms: 2000) {
-                        showXDRTip = true
+            if display.supportsEnhance {
+                SwiftUI.Button("XDR") {
+                    guard proactive else {
+                        showNeedsLunarPro = true
+                        return
+                    }
+                    if display.fullRange {
+                        display.fullRange = false
+                    }
+                    guard !display.enhanced else { return }
+                    withAnimation(.fastSpring) { display.enhanced = true }
+                    if !xdrTipShown, autoXdr {
+                        xdrTipShown = true
+                        mainAsyncAfter(ms: 2000) {
+                            showXDRTip = true
+                        }
                     }
                 }
+                .buttonStyle(PickerButton(
+                    onColor: Color.warmBlack.opacity(hoveringXDRSelector || !dimNonEssentialUI ? 1.0 : 0.2),
+                    offColor: color.opacity(0.4), enumValue: $display.enhanced, onValue: true
+                ))
+                .font(.system(size: 10, weight: display.enhanced ? .bold : .semibold, design: .monospaced))
+                .popover(isPresented: $showNeedsLunarPro) { NeedsLunarProView() }
+                .popover(isPresented: $showXDRTip) { XDRTipView() }
             }
-            .buttonStyle(PickerButton(
-                onColor: Color.warmBlack.opacity(hoveringXDRSelector || !dimNonEssentialUI ? 1.0 : 0.2),
-                offColor: color.opacity(0.4), enumValue: $display.enhanced, onValue: true
-            ))
-            .font(.system(size: 10, weight: display.enhanced ? .bold : .semibold, design: .monospaced))
-            .popover(isPresented: $showNeedsLunarPro) { NeedsLunarProView() }
-            .popover(isPresented: $showXDRTip) { XDRTipView() }
         }
         .padding(2)
         .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(color))
@@ -359,7 +368,7 @@ struct DisplayRowView: View {
 
     var body: some View {
         VStack(spacing: 4) {
-            let xdrSelectorShown = display.supportsEnhance && showXDRSelector && !display.blackOutEnabled
+            let xdrSelectorShown = (display.supportsEnhance || display.supportsFullRangeXDR) && showXDRSelector && !display.blackOutEnabled
             if showPowerInQuickActions, display.getPowerOffEnabled() {
                 HStack(alignment: .top, spacing: -10) {
                     Text(display.name)

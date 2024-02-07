@@ -651,7 +651,37 @@ struct BrightnessOSDView: View {
 
     @ObservedObject var osd: OSDState
 
+    var value: CGFloat {
+        let v = osd.value.map(from: (0, 1), to: (0, 160))
+        if v.remainderDistance(16) < 0.13 {
+            return ((v / 16).rounded() * 16).cg
+        }
+        return v.cg
+    }
+
     var body: some View {
+        VStack(spacing: 16) {
+            square.animation(.fastSpring, value: osd.tip)
+            tip.transition(.scale.animation(.fastSpring))
+        }.frame(alignment: .center)
+    }
+
+    @ViewBuilder var tip: some View {
+        (osd.tip ?? Text("TIP"))
+            .font(.system(size: 10, weight: .medium))
+            .foregroundColor(.primary)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 10)
+            .frame(height: 24)
+            .background(
+                VisualEffectBlur(material: .sidebar, blendingMode: .behindWindow, state: .active)
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            )
+            .fixedSize()
+            .opacity(osd.tip == nil ? 0 : 1)
+    }
+
+    var square: some View {
         ZStack {
             VStack {
                 Image(systemName: osd.image)
@@ -659,14 +689,12 @@ struct BrightnessOSDView: View {
                     .scaledToFit()
                     .frame(width: NATIVE_OSD_WIDTH * 0.42, height: NATIVE_OSD_WIDTH * 0.42)
                     .font(.system(size: 48, weight: .medium, design: .rounded))
-                    .foregroundColor(.primary.opacity(0.75))
+                    .foregroundColor(.primary)
                     .padding(NATIVE_OSD_WIDTH * 0.05)
 
                 Text(osd.text).font(.system(size: 12, weight: .medium))
                     .foregroundColor(.primary.opacity(0.75))
             }
-
-            let value = osd.value.map(from: (0, 1), to: (0, 160)).cg
 
             ZStack {
                 Path { path in
@@ -708,7 +736,15 @@ struct BrightnessOSDView: View {
         )
         .frame(width: NATIVE_OSD_WIDTH, height: NATIVE_OSD_WIDTH, alignment: .center)
         .fixedSize()
+        .padding(.horizontal, 100)
     }
+}
+
+#Preview {
+    var osdState = OSDState()
+    osdState.value = 0.5
+    osdState.tip = Text("\(Image(systemName: "sun.max.fill")) Double press Brightness Up to unlock 1600 nits")
+    return BrightnessOSDView(osd: osdState).padding()
 }
 
 // MARK: - AutoOSDView
@@ -814,20 +850,22 @@ final class OSDState: ObservableObject {
     @Published var text = ""
     @Published var color: Color? = nil
     @Published var glowRadius: CGFloat = 5
+    @Published var tip: Text? = nil
 }
 
 extension Display {
     func hideSoftwareOSD() {
-        mainAsync { [weak self] in
+        softwareOSDTask = mainAsync { [weak self] in
             guard let osd = self?.osdWindowController?.window as? OSDWindow else { return }
             osd.hide()
+            self?.osdState.tip = nil
             self?.osdWindowController = nil
         }
     }
 
     func showSoftwareOSD(image: String, value: Float, text: String, color: Color?, glowRadius: CGFloat = 5) {
         guard !isAllDisplays, !isForTesting, !CachedDefaults[.hideOSD] else { return }
-        mainAsync { [weak self] in
+        softwareOSDTask = mainAsync { [weak self] in
             guard let self else { return }
 
             osdState.image = image
@@ -847,7 +885,7 @@ extension Display {
 
             guard let osd = osdWindowController?.window as? OSDWindow else { return }
 
-            osd.show(verticalOffset: 140)
+            osd.show(verticalOffset: 100)
         }
     }
 

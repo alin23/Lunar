@@ -12,6 +12,7 @@ struct HDRSettingsView: View {
     @Default(.allowHDREnhanceBrightness) var allowHDREnhanceBrightness
     @Default(.allowHDREnhanceContrast) var allowHDREnhanceContrast
 
+    @Default(.fullRangeMaxOnDoublePress) var fullRangeMaxOnDoublePress
     @Default(.autoXdr) var autoXdr
     @Default(.autoSubzero) var autoSubzero
     @Default(.disableNightShiftXDR) var disableNightShiftXDR
@@ -51,7 +52,7 @@ struct HDRSettingsView: View {
                         """
                     )
 
-                    if DC.activeDisplayList.contains(where: \.supportsEnhance) {
+                    if dc.activeDisplayList.contains(where: \.supportsEnhance) {
                         SettingsToggle(
                             text: "Enhance contrast in XDR Brightness", setting: $xdrContrast,
                             help: """
@@ -87,7 +88,7 @@ struct HDRSettingsView: View {
                             .padding(.leading)
                             .disabled(!xdrContrast)
                     }
-                    if DC.activeDisplayList.contains(where: \.supportsGammaByDefault) {
+                    if dc.activeDisplayList.contains(where: \.supportsGammaByDefault) {
                         SettingsToggle(
                             text: "Enhance contrast in Sub-zero Dimming", setting: $subzeroContrast,
                             help: """
@@ -144,13 +145,19 @@ struct HDRSettingsView: View {
                 This works best in combination with the "Enhance contrast in XDR Brightness" setting.
                 """
             )
-            SettingsToggle(text: "Toggle XDR Brightness when going over 100%", setting: $autoXdr.animation(.fastSpring))
+            Divider()
+            if dc.fullRangeAPIAvailable {
+                SettingsToggle(text: "Unlock full nits range when going over 100%", setting: $fullRangeMaxOnDoublePress.animation(.fastSpring))
+            }
+            if dc.xdrAPIAvailable {
+                SettingsToggle(text: "Toggle XDR Brightness when going over 100%", setting: $autoXdr.animation(.fastSpring))
+            }
             SettingsToggle(
                 text: "Toggle Sub-zero Dimming when going below 0%",
                 setting: $autoSubzero.animation(.fastSpring)
             )
 
-            if Sysctl.isMacBook, DC.builtinDisplay?.supportsEnhance ?? false {
+            if Sysctl.isMacBook, dc.builtinDisplay?.supportsEnhance ?? false {
                 Divider().padding(.horizontal)
                 VStack(alignment: .leading, spacing: 2) {
                     SettingsToggle(text: "Toggle XDR Brightness based on ambient light", setting: $autoXdrSensor)

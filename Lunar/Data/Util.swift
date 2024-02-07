@@ -641,12 +641,14 @@ let SERIAL_NUMBER_HASH = getSerialNumberHash() ?? generateAPIKey()
     return DispatchQueue.main.sync { action() }
 }
 
-@inline(__always) func mainAsync(_ action: @escaping () -> Void) {
+@inline(__always) @discardableResult func mainAsync(_ action: @escaping () -> Void) -> DispatchWorkItem? {
     guard !Thread.isMainThread else {
         action()
-        return
+        return nil
     }
-    DispatchQueue.main.async { action() }
+    let workItem = DispatchWorkItem(name: "mainAsync") { action() }
+    DispatchQueue.main.async(execute: workItem.workItem)
+    return workItem
 }
 
 func stringRepresentation(forAddress address: Data) -> String? {
@@ -872,6 +874,10 @@ extension Double {
     func capped(between minVal: Double, and maxVal: Double) -> Double {
         cap(self, minVal: minVal, maxVal: maxVal)
     }
+    @inline(__always)
+    func remainderDistance(_ x: Double) -> Double {
+        abs(self / x - (self / x).rounded())
+    }
 }
 extension Float {
     @inline(__always) @inlinable
@@ -885,6 +891,10 @@ extension Float {
     @inline(__always) @inlinable
     func capped(between minVal: Float, and maxVal: Float) -> Float {
         cap(self, minVal: minVal, maxVal: maxVal)
+    }
+    @inline(__always)
+    func remainderDistance(_ x: Float) -> Float {
+        abs(self / x - (self / x).rounded())
     }
 }
 extension CGFloat {

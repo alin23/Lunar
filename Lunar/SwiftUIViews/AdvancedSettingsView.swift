@@ -189,17 +189,26 @@ struct AdvancedSettingsView: View {
                         SettingsToggle(
                             text: "Disable usage of Gamma API completely", setting: $gammaDisabledCompletely,
                             help: """
-                            Experimental: for people running into macOS bugs like the color profile
-                            being constantly reset, display turning to monochrome or HDR being disabled,
-                            this could be a safe measure to ensure Lunar never touches the Gamma API of macOS.
+                            Experimental: This is a safe measure for people running into macOS bugs like:
 
-                            This will disable or cripple the following features:
+                            • washed out or too bright colors
+                            • color profile being constantly reset
+                            • display turning to monochrome or HDR being disabled
 
-                            • XDR Brightness
-                            • Facelight
-                            • Blackout
+                            This will make the following features use an overlay instead of the Gamma API:
+
+                            • Facelight\(!dc.disconnectAPIAvailable ? "\n• Blackout" : "")
                             • Software Dimming
                             • Sub-zero Dimming
+                            \(
+                                dc.displaysWithXDRInUse.isEmpty
+                                    ? ""
+                                    : """
+
+                                    This will also disable XDR Brightness for the following displays:
+                                    \(dc.displaysWithXDRInUse.map { "• \($0.name)" }.joined(separator: "\n"))
+                                    """
+                            )
                             """
                         )
                         if dc.activeDisplayList.contains(where: \.hasDDC) {

@@ -74,7 +74,15 @@ import os
     }
 
     @inline(__always) @inlinable class func traceCalls() {
-        traceLog.trace("\(Thread.callStackSymbols.joined(separator: "\n"), privacy: .public)")
+        #if !DEBUG
+            traceLog.trace("\(Thread.callStackSymbols.joined(separator: "\n"), privacy: .public)")
+        #endif
+    }
+
+    @inline(__always) @inlinable class func traceCallsDebug() {
+        #if DEBUG
+            traceLog.trace("\(Thread.callStackSymbols.joined(separator: "\n"), privacy: .public)")
+        #endif
     }
 }
 
