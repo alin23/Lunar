@@ -640,6 +640,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         if let dict = displayInfoDictionary(id) {
             infoDictionary = dict
         }
+        cornerRadiusApplier = Repeater(every: 0.5, times: 5, name: "cornerRadiusApplier") { [weak self] in
+            self?.updateCornerWindow()
+        }
     }
 
     init(
@@ -723,7 +726,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         } else if !supportsGammaByDefault, hasSoftwareControl {
             shade(amount: 1.0 - preciseBrightness)
         }
-        updateCornerWindow()
+        cornerRadiusApplier = Repeater(every: 0.5, times: 5, name: "cornerRadiusApplier") { [weak self] in
+            self?.updateCornerWindow()
+        }
     }
 
     deinit {

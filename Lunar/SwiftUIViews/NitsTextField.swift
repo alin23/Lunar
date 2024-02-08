@@ -55,7 +55,7 @@
                     isPresented: .oneway { hovering && disabled && placeholder == "max" },
                     alignment: .trailing,
                     offset: CGSize(width: -50, height: 0),
-                    "Adapted by the system\nbased on ambient light"
+                    display.systemAdaptiveBrightness ? "Adapted by the system\nbased on ambient light" : "Managed by the system"
                 )
                 .onHover { hovering = $0 }
                 .onChange(of: nits) { nits in

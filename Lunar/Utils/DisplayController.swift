@@ -863,13 +863,16 @@ final class DisplayController: ObservableObject {
                   display.control is AppleNativeControl || CachedDefaults[.allowHDREnhanceContrast]
             else { return }
 
-            guard xdrContrastEnabled, display.enhanced else {
+            guard xdrContrastEnabled, display.enhanced || display.fullRange else {
 //                adaptXDRContrastInPreparation(display: display)
                 return
             }
 
+            display.recomputeXDRContrast()
             setXDRContrast(xdrContrast)
-            display.setIndependentSoftwareBrightness(display.softwareBrightness, withoutSettingContrast: true)
+            if display.enhanced {
+                display.setIndependentSoftwareBrightness(display.softwareBrightness, withoutSettingContrast: true)
+            }
         }
     }
 

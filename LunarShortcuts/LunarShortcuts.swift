@@ -2571,13 +2571,47 @@ struct SetPanelPresetIntent: AppIntent {
     static var title: LocalizedStringResource = "Change Screen Preset"
     static var description =
         IntentDescription(
-            "Change the current preset of a specific screen.",
+            "Change the current preset of a specific screen (with possibility of unlocking brightness control, Night Shift and True Tone for reference presets).",
             categoryName: "Global"
         )
 
     static var parameterSummary: some ParameterSummary {
-        Summary("Change preset to \(\.$preset)")
+        When(\.$unlockBrightnessControl, .equalTo, true, {
+            Summary("Change preset to \(\.$preset)") {
+                \.$unlockBrightnessControl
+                \.$minBrightness
+                \.$maxBrightness
+                \.$unlockAdaptiveBrightness
+
+                \.$unlockNightShift
+                \.$unlockTrueTone
+            }
+        }, otherwise: {
+            Summary("Change preset to \(\.$preset)") {
+                \.$unlockBrightnessControl
+                \.$unlockNightShift
+                \.$unlockTrueTone
+            }
+        })
     }
+
+    @Parameter(title: "Unlock brightness control")
+    var unlockBrightnessControl: Bool
+
+    @Parameter(title: "Unlock Adaptive Brightness")
+    var unlockAdaptiveBrightness: Bool
+
+    @Parameter(title: "Unlock Night Shift")
+    var unlockNightShift: Bool
+
+    @Parameter(title: "Unlock True Tone")
+    var unlockTrueTone: Bool
+
+    @Parameter(title: "Min brightness (in nits)", default: 4, inclusiveRange: (1, 500))
+    var minBrightness: Int
+
+    @Parameter(title: "Max brightness (in nits)", default: 500, inclusiveRange: (50, 500))
+    var maxBrightness: Int
 
     @Parameter(title: "Screen Preset")
     var preset: PanelPreset
@@ -2590,8 +2624,23 @@ struct SetPanelPresetIntent: AppIntent {
         guard let display = preset.screen.dynamicDisplay,
               let preset = display.panelPresets.first(where: { $0.presetIndex == presetIndex })
         else { return .result() }
+
+        let unlock = unlockBrightnessControl || unlockNightShift || unlockTrueTone
+
         display.reconfigure { panel in
-            panel.setActivePreset(preset)
+            guard unlock, !preset.isUnlocked, preset.unlock(
+                activate: true,
+                brightnessControl: unlockBrightnessControl,
+                adaptiveBrightness: unlockAdaptiveBrightness,
+                nightShift: unlockNightShift,
+                trueTone: unlockTrueTone,
+                minBrightness: minBrightness.d.capped(between: 1, and: maxBrightness.d).i,
+                maxBrightness: maxBrightness.d.capped(between: minBrightness.d, and: 500).i
+            ) else {
+                if display.fullRange { display.fullRange = false }
+                panel.setActivePreset(preset)
+                return
+            }
         }
         return .result()
     }
@@ -2661,6 +2710,7 @@ struct PanelPreset: AppEntity {
                     DC.activeDisplayList
                         .filter { $0.panel?.hasPresets ?? false }
                         .map { d in
+                            d.panel?.buildPresetsList()
                             let modes = Set(d.panelPresets.filter(\.isValid).map(\.presetGroup)).sorted()
                             return modes.map { p in (d, p) }
                         }.joined()
