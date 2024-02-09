@@ -1,3 +1,62 @@
+# 6.6.0
+## Security
+
+- Fix a possible vulnerability in the restart logic
+
+*A rogue application could have exploited the restart logic to gain Accessibility Permissions.*
+
+---
+
+## Features
+
+### Full Range XDR Brightness
+
+This is a new approach for unlocking the 1600nits of brightness in Apple's XDR displays, developed in collaboration with Istvan from [BetterDisplay](https://betterdisplay.pro/).
+
+![full range activation](https://files.lunar.fyi/full-range-activation.gif)
+
+It has the following key differences from the previous XDR Brightness method:
+
+- It doesn't clip colors in HDR content - no more washed out colors
+- The system adaptive brightness keeps working and uses the full range
+- There's no lag when going from SDR to XDR brightness
+- Can work in tandem with f.lux
+
+Downsides:
+
+- It only works on Apple XDR screens
+- The screen will flash one or two times when toggling Full Range
+
+*The system will still adapt the maximum nits of brightness based on the ambient light, so you might get a max of 800 nits in a dark room and 1600 nits in sunlight.*
+
+*Disabling the system adaptive brightness will turn off this behaviour.*
+
+### Preset unlocking
+
+The **Change Screen Preset** Shortcut now allows you to unlock various functions that are locked by macOS when using reference presets:
+
+- Brightness Control
+- Adaptive Brightness
+- Night Shift
+- True Tone
+
+![unlock preset shortcut](https://files.lunar.fyi/unlock-preset-shortcut.png)
+
+## Improvements
+
+- Allow overlay dimming to work on Airplay screens when the MacBook is in Blackout
+- Automatically use the mirroring method for Blackout when the MacBook is connected to an wireless display
+
+## Fixes
+
+- Disable Dark Mode after disabling Night Mode
+- Ensure Night Mode does disable after unchecking it
+- Fix app hanging when initializing Location Services in some cases
+- Fix Dark Mode being disabled erroneously
+- Make sure to re-enable keyboard backlight after disabling Blackout
+- Fix CLI not working after a few standby cycles
+- Fix rounded corners not being applied on app launch
+
 # 6.5.0
 ## Features
 
@@ -13,6 +72,15 @@ If you pay attention to the hand that is scrolling, you'll notice that the flash
 <video src="https://files.lunar.fyi/night-mode-lunar.mp4" controls title="Night Mode vs Dark Mode"></video>
 
 *The technique is quite similar to what f.lux does, but with the added benefit of enhancing contrast for readability.*
+
+**How to activate Night Mode:**
+
+- using the CLI: `lunar night-mode toggle`
+- using the *Night Mode* Shortcuts action
+- from the Right Click menubar icon menu
+
+![activating night mode from the menubar](https://files.lunar.fyi/activating-night-mode-menubar.jpeg)
+
 
 ## Fixes
 
