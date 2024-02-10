@@ -2905,6 +2905,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             self.readapt(newValue: false, oldValue: true)
         }
 
+        @Published var userNits: Double? = nil
         @Published var nits: Double? = nil {
             didSet {
                 guard isActiveSyncSource else { return }

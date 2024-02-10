@@ -1186,27 +1186,41 @@ struct Lunar: ParsableCommand {
             }
             let socketFd = server.currentSocketFD
 
-            let brightnessPublishers = displays.map { d in
+            let brightnessPublishers: [AnyPublisher<DisplayStateChange, Never>] = displays.map { d in
                 (onlyUserAdjustments ? d.$fullRangeUserBrightness : d.$fullRangeBrightness)
                     .map { val in DisplayStateChange(property: "brightness", value: val, display: d.id) }
                     .dropFirst(onlyUserAdjustments ? 1 : 0)
+                    .eraseToAnyPublisher()
             }
-            let contrastPublishers = displays.map { d in
+            #if arch(arm64)
+                let nitsPublishers: [AnyPublisher<DisplayStateChange, Never>] = displays.map { d in
+                    (onlyUserAdjustments ? d.$userNits : d.$nits)
+                        .debounce(for: .milliseconds(onlyUserAdjustments ? 100 : 5), scheduler: RunLoop.main)
+                        .compactMap { val in val != nil ? DisplayStateChange(property: "nits", value: val!, display: d.id) : nil }
+                        .eraseToAnyPublisher()
+                }
+            #else
+                let nitsPublishers = [AnyPublisher<DisplayStateChange, Never>]()
+            #endif
+            let contrastPublishers: [AnyPublisher<DisplayStateChange, Never>] = displays.map { d in
                 (onlyUserAdjustments ? d.$userContrast : d.$preciseContrast)
                     .map { val in DisplayStateChange(property: "contrast", value: val, display: d.id) }
                     .dropFirst(onlyUserAdjustments ? 1 : 0)
+                    .eraseToAnyPublisher()
             }
-            let volumePublishers = displays.map { d in
+            let volumePublishers: [AnyPublisher<DisplayStateChange, Never>] = displays.map { d in
                 (onlyUserAdjustments ? d.$userVolume : d.$preciseVolume)
                     .map { val in DisplayStateChange(property: "volume", value: val, display: d.id) }
                     .dropFirst(onlyUserAdjustments ? 1 : 0)
+                    .eraseToAnyPublisher()
             }
-            let mutePublishers = displays.map { d in
+            let mutePublishers: [AnyPublisher<DisplayStateChange, Never>] = displays.map { d in
                 d.$userMute
                     .map { val in DisplayStateChange(property: "mute", value: val, display: d.id) }
                     .dropFirst(onlyUserAdjustments ? 1 : 0)
+                    .eraseToAnyPublisher()
             }
-            let mergedPublisher = Publishers.MergeMany(brightnessPublishers + contrastPublishers + volumePublishers + mutePublishers)
+            let mergedPublisher = Publishers.MergeMany(brightnessPublishers + contrastPublishers + volumePublishers + mutePublishers + nitsPublishers)
 
             mergedPublisher
                 .removeDuplicates()
@@ -1666,7 +1680,7 @@ struct Lunar: ParsableCommand {
 
             for (i, display) in displays.enumerated() {
                 mainAsyncAfter(ms: i * 1000) {
-                    log.info("\(state == .enable ? "Enabling" : "Disabling") Facelight for \(display)")
+                    log.info("CLI: \(state == .enable ? "Enabling" : "Disabling") Facelight for \(display)")
                     if state == .enable {
                         display.enableFaceLight()
                     } else {
@@ -1720,7 +1734,7 @@ struct Lunar: ParsableCommand {
 
             for (i, display) in displays.enumerated() {
                 mainAsyncAfter(ms: i * 3000) {
-                    log.info("Turning \(state == .enable ? "off" : "on") \(display)")
+                    log.info("CLI: Turning \(state == .enable ? "off" : "on") \(display)")
                     lastBlackOutToggleDate = .distantPast
                     DC.blackOut(
                         display: display.id,
@@ -1843,7 +1857,7 @@ struct Lunar: ParsableCommand {
 
                 for (i, display) in displays.enumerated() {
                     mainAsyncAfter(ms: i * 1000) {
-                        log.info("Reconnecting \(display)")
+                        log.info("CLI: Reconnecting \(display)")
                         DC.en(display.id)
                     }
                 }
@@ -1922,7 +1936,7 @@ struct Lunar: ParsableCommand {
                 } else {
                     for (i, display) in displays.enumerated() {
                         mainAsyncAfter(ms: i * 1000) {
-                            log.info("Reconnecting \(display)")
+                            log.info("CLI: Reconnecting \(display)")
                             DC.en(display.id)
                         }
                     }
@@ -2256,13 +2270,13 @@ private func handleDisplays(
 
             guard var value else {
                 if !read {
-                    log.debug("Fetching value for \(property.rawValue)")
+                    log.debug("CLI: Fetching value for \(property.rawValue)")
                     cliPrint("\(i): \(display.name)")
                     cliPrint("\t\(property.stringValue): \(encodedValue(key: property, value: propertyValue))")
                     continue
                 }
 
-                log.debug("Reading value for \(property.rawValue)")
+                log.debug("CLI: Reading value for \(property.rawValue)")
                 guard let readValue = display.control?.read(property) else {
                     throw LunarCommandError.cantReadProperty(property.rawValue)
                 }
@@ -2272,7 +2286,7 @@ private func handleDisplays(
                 continue
             }
 
-            log.debug("Changing \(property.rawValue) from \(propertyValue) to \(value)")
+            log.debug("CLI: Changing \(property.rawValue) from \(propertyValue) to \(value)")
             switch propertyValue {
             case is String:
                 display.withForce {
@@ -2528,19 +2542,19 @@ final class LunarServer {
                 do {
                     self?.listenSocket = try Socket.create(family: .inet)
                     guard let socket = self?.listenSocket else {
-                        log.info("Unable to unwrap socket...")
+                        log.info("CLI: Unable to unwrap socket...")
                         return
                     }
 
                     try socket.listen(on: LUNAR_CLI_PORT.i, node: host)
-                    log.info("Listening on port \(socket.listeningPort)")
+                    log.info("CLI: Listening on port \(socket.listeningPort)")
 
                     repeat {
                         let newSocket = try socket.acceptClientConnection()
 
                         #if DEBUG
-                            log.info("Accepted connection from \(newSocket.remoteHostname) on port \(newSocket.remotePort)")
-                            log.info("Socket Signature \(String(describing: newSocket.signature?.description))")
+                            log.info("CLI: Accepted connection from \(newSocket.remoteHostname) on port \(newSocket.remotePort)")
+                            log.info("CLI: Socket Signature \(String(describing: newSocket.signature?.description))")
                         #endif
 
                         self?.addNewConnection(socket: newSocket)
@@ -2548,12 +2562,12 @@ final class LunarServer {
                     } while self?.continueRunning ?? false
                 } catch {
                     guard let socketError = error as? Socket.Error else {
-                        log.error("Unexpected error \(error)")
+                        log.error("CLI: Unexpected error \(error)")
                         return
                     }
 
                     if let self, continueRunning {
-                        log.error("Error reported\n\t\(socketError.description)")
+                        log.error("CLI: Error reported\n\t\(socketError.description)")
                     }
                 }
             }
@@ -2626,6 +2640,9 @@ final class LunarServer {
                 return
             }
             let val = String(format: "%.3f", lux)
+            #if DEBUG
+                log.debug("CLI: Writing \(val) to \(socketFd)")
+            #endif
             _ = try? socket.write(from: "\(val)\n")
         }
     }
@@ -2642,8 +2659,14 @@ final class LunarServer {
             let val = change.property == "mute" ? (change.value == 1 ? "true" : "false") : String(format: "%.3f", change.value)
 
             if json {
+                #if DEBUG
+                    log.debug("CLI: Writing {\"\(change.property)\": \(val), \"display\": \(change.display)}\n to \(socketFd)")
+                #endif
                 _ = try? socket.write(from: "{\"\(change.property)\": \(val), \"display\": \(change.display)}\n")
             } else {
+                #if DEBUG
+                    log.debug("CLI: Writing \(change.property) \(val) \(change.display) to \(socketFd)")
+                #endif
                 _ = try? socket.write(from: "\(change.property) \(val) \(change.display)\n")
             }
         }
@@ -2670,18 +2693,18 @@ final class LunarServer {
                         }
 
                         #if DEBUG
-                            log.info("Server received from connection at \(socket.remoteHostname):\(socket.remotePort): \(response) ")
+                            log.info("CLI: Server received from connection at \(socket.remoteHostname):\(socket.remotePort): \(response) ")
                         #endif
                         guard let self else { return }
                         try onResponse(response, socket: socket)
                     case 0:
                         #if DEBUG
-                            log.info("Read 0 bytes, closing socket")
+                            log.info("CLI: Read 0 bytes, closing socket")
                         #endif
                         shouldKeepRunning = false
                         break readLoop
                     default:
-                        log.warning("Read too many bytes!")
+                        log.warning("CLI: Read too many bytes!")
                         readData.removeAll(keepingCapacity: true)
                         break readLoop
                     }
@@ -2696,7 +2719,7 @@ final class LunarServer {
                     return
                 }
                 #if DEBUG
-                    log.info("Socket \(socket.remoteHostname):\(socket.remotePort) closed...")
+                    log.info("CLI: Socket \(socket.remoteHostname):\(socket.remotePort) closed...")
                 #endif
                 socket.close()
 
@@ -2705,11 +2728,11 @@ final class LunarServer {
                 }
             } catch {
                 guard let socketError = error as? Socket.Error else {
-                    log.error("Unexpected error by connection at \(socket.remoteHostname):\(socket.remotePort)...")
+                    log.error("CLI: Unexpected error by connection at \(socket.remoteHostname):\(socket.remotePort)...")
                     return
                 }
                 if let self, continueRunning {
-                    log.error("Error reported by connection at \(socket.remoteHostname):\(socket.remotePort):\n \(socketError.description)")
+                    log.error("CLI: Error reported by connection at \(socket.remoteHostname):\(socket.remotePort):\n \(socketError.description)")
                 }
             }
         }
@@ -2780,6 +2803,9 @@ func cliExit(_ code: Int32) {
 
 func cliPrint(_ s: Any, terminator: String = "\n") {
     guard !isServer || isShortcut else {
+        #if DEBUG
+            log.debug("CLI: \(s)\(terminator)")
+        #endif
         serverOutput += "\(s)\(terminator)"
         return
     }
