@@ -238,10 +238,20 @@ final class ALSInstallViewController: NSViewController {
 
     func startFirmwareInstallation() {
         guard let ssid, let password,
-              let installScript = (try? Bundle.main.path(forResource: "install", ofType: "sh")?.realpath())?.string,
+              let installScript = (try? Bundle.main.path(forResource: "install", ofType: "sh")?.realpath()),
               let process = shellProc(
-                  args: [installScript],
-                  env: ["WIFI_SSID": ssid, "WIFI_PASSWORD": password, "ESP_DEVICE": device, "BOARD": boardID, "LOG_PATH": INSTALL_LOG_PATH, "SENSOR": sensor.lowercased(), "SDA": sda, "SCL": scl]
+                  args: [installScript.string],
+                  env: [
+                      "DIR": installScript.parent.string,
+                      "WIFI_SSID": ssid,
+                      "WIFI_PASSWORD": password,
+                      "ESP_DEVICE": device,
+                      "BOARD": boardID,
+                      "LOG_PATH": INSTALL_LOG_PATH,
+                      "SENSOR": sensor.lowercased(),
+                      "SDA": sda,
+                      "SCL": scl,
+                  ]
               )
         else {
             mainThread {

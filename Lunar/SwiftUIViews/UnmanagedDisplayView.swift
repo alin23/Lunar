@@ -10,6 +10,9 @@ struct UnmanagedDisplayView: View {
                     .font(.system(size: 22, weight: .black))
                     .padding(6)
                     .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.bg.primary.opacity(0.5)))
+                    .contextMenu {
+                        Toggle("Ignore this display", isOn: $display.unmanaged)
+                    }
 
                 ManageButtonView(display: display)
                     .offset(y: -8)

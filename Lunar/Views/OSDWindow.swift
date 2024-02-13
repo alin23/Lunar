@@ -187,7 +187,7 @@ struct BigSurSlider: View {
         _enableText = State(initialValue: enableText)
         _mark = mark ?? .constant(0)
 
-        _knobColor = knobColorBinding ?? colorBinding ?? .constant(knobColor ?? Color.accent)
+        _knobColor = knobColorBinding ?? colorBinding ?? .constant(knobColor ?? Color.peach)
         _knobTextColor = knobTextColorBinding ?? .constant(knobTextColor ?? ((color ?? Color.peach).textColor))
 
         self.sliderWidth = sliderWidth
@@ -236,7 +236,7 @@ struct BigSurSlider: View {
                     .foregroundColor(backgroundColor)
                 ZStack(alignment: .leading) {
                     Rectangle()
-                        .foregroundColor(color ?? Color.accent)
+                        .foregroundColor(color ?? Color.peach)
                         .frame(width: cgPercentage == 1 ? geometry.size.width : w * cgPercentage + sliderHeight / 2)
                     if let image {
                         Image(systemName: image)
@@ -741,7 +741,7 @@ struct BrightnessOSDView: View {
 }
 
 #Preview {
-    var osdState = OSDState()
+    let osdState = OSDState()
     osdState.value = 0.5
     osdState.tip = Text("\(Image(systemName: "sun.max.fill")) Double press Brightness Up to unlock 1600 nits")
     return BrightnessOSDView(osd: osdState).padding()

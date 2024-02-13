@@ -1,6 +1,96 @@
 import Defaults
 import SwiftUI
 
+struct DisplayContextMenu: View {
+    @ObservedObject var display: Display
+
+    @ViewBuilder var resolutionMenu: some View {
+        if let panel = display.panel, panel.modes.count > 1 {
+            let modes = panel.groupedModes
+            let refreshRates: [RefreshRate] = Array(modes.keys.map { $0 }.sorted().reversed())
+
+            Menu("Resolution") {
+                ForEach(refreshRates) { refreshRate in
+                    Menu(refreshRate.description) {
+                        let keys = modes[refreshRate]!.keys
+                        let tags = [MPDisplayMode.Tag.hidpi, .lodpi, .unsafe].filter { keys.contains($0) }
+                        ForEach(tags) { tag in
+                            resolutionPicker(modes: modes[refreshRate]![tag]!, tag: tag)
+                        }
+                    }
+                }
+            }.onAppear {
+                if display.observableResolution == nil {
+                    display.observableResolution = panel.currentMode
+                }
+            }
+        }
+    }
+
+    #if arch(arm64)
+        var nightShiftOverrideBinding: Binding<Bool> {
+            Binding(
+                get: { isOverridden(displayID: display.id) },
+                set: { overriden in
+                    let result = if overriden {
+                        disableTVMode(displayID: display.id)
+                    } else {
+                        resetOverride(displayID: display.id)
+                    }
+
+                    switch result {
+                    case .needsRestart:
+                        notify(identifier: "restart", title: "Restart needed", body: "The override will take effect after a system restart.")
+                    case .success:
+                        break
+                    case .error:
+                        notify(identifier: "error", title: "Override error", body: "An error occurred while trying to override Night Shift and True Tone.")
+                    }
+                }
+            )
+        }
+    #endif
+
+    var facelightBinding: Binding<Bool> {
+        Binding(
+            get: { display.facelight },
+            set: { display.facelight = $0 }
+        )
+    }
+
+    var systemAdaptiveBrightnessBinding: Binding<Bool> {
+        Binding(
+            get: { display.systemAdaptiveBrightness },
+            set: { display.systemAdaptiveBrightness = $0 }
+        )
+    }
+
+    var body: some View {
+        Toggle("FaceLight", isOn: facelightBinding)
+        if display.hasAmbientLightAdaptiveBrightness {
+            Toggle("System Adaptive Brightness", isOn: systemAdaptiveBrightnessBinding)
+        }
+
+        Divider()
+
+        Toggle("Ignore this display", isOn: $display.unmanaged)
+        #if arch(arm64)
+            if !display.isBuiltin, (display.panel?.isTV ?? false) || isOverridden(displayID: display.id) {
+                Toggle("Force enable Night Shift and True Tone", isOn: nightShiftOverrideBinding)
+            }
+        #endif
+//        resolutionMenu
+    }
+
+    @ViewBuilder func resolutionPicker(modes: [MPDisplayMode], tag: MPDisplayMode.Tag) -> some View {
+        Picker(tag.rawValue, selection: $display.observableResolution) {
+            ForEach(modes, id: \.modeNumber) { mode in
+                Text(mode.swiftUIString).tag(mode as MPDisplayMode?)
+            }
+        }
+    }
+}
+
 struct DisplayRowView: View {
     static var hoveringVolumeSliderTask: DispatchWorkItem? {
         didSet {
@@ -192,7 +282,7 @@ struct DisplayRowView: View {
                 style: .continuous
             ).fill(Color.translucid)
         )
-        .colorMultiply(Color.accent.blended(withFraction: 0.7, of: .white))
+        .colorMultiply(Color.peach.blended(withFraction: 0.7, of: .white))
     }
 
     var rotationSelector: some View {
@@ -276,8 +366,8 @@ struct DisplayRowView: View {
                 BigSurSlider(
                     percentage: $display.preciseVolume.f,
                     imageBinding: .oneway { display.audioMuted ? "speaker.slash.fill" : "speaker.2.fill" },
-                    colorBinding: .constant(Color.accent),
-                    backgroundColorBinding: .constant(Color.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                    colorBinding: .constant(Color.peach),
+                    backgroundColorBinding: .constant(Color.peach.opacity(colorScheme == .dark ? 0.1 : 0.4)),
                     showValue: $showSliderValues,
                     disabled: $display.audioMuted,
                     enableText: "Unmute"
@@ -321,8 +411,8 @@ struct DisplayRowView: View {
                 BigSurSlider(
                     percentage: $display.preciseBrightnessContrast.f,
                     image: "sun.max.fill",
-                    colorBinding: .constant(Color.accent),
-                    backgroundColorBinding: .constant(Color.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                    colorBinding: .constant(Color.peach),
+                    backgroundColorBinding: .constant(Color.peach.opacity(colorScheme == .dark ? 0.1 : 0.4)),
                     showValue: $showSliderValues,
                     disabled: mergedLockBinding,
                     enableText: "Unlock",
@@ -340,8 +430,8 @@ struct DisplayRowView: View {
             BigSurSlider(
                 percentage: $display.preciseBrightness.f,
                 image: "sun.max.fill",
-                colorBinding: .constant(Color.accent),
-                backgroundColorBinding: .constant(Color.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                colorBinding: .constant(Color.peach),
+                backgroundColorBinding: .constant(Color.peach.opacity(colorScheme == .dark ? 0.1 : 0.4)),
                 showValue: $showSliderValues,
                 disabled: $display.lockedBrightness,
                 enableText: "Unlock",
@@ -359,33 +449,36 @@ struct DisplayRowView: View {
             BigSurSlider(
                 percentage: contrastBinding,
                 image: "circle.righthalf.fill",
-                colorBinding: .constant(Color.accent),
-                backgroundColorBinding: .constant(Color.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                colorBinding: .constant(Color.peach),
+                backgroundColorBinding: .constant(Color.peach.opacity(colorScheme == .dark ? 0.1 : 0.4)),
                 showValue: $showSliderValues
             )
+        }
+    }
+
+    @ViewBuilder var name: some View {
+        if showPowerInQuickActions, display.getPowerOffEnabled() {
+            HStack(alignment: .top, spacing: -10) {
+                Text(display.name)
+                    .font(.system(size: 22, weight: .black))
+                    .padding(6)
+                    .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.bg.warm.opacity(colorScheme == .dark ? 0.5 : 0.2)))
+
+                PowerOffButtonView(display: display)
+                    .offset(y: -8)
+            }.offset(x: 45)
+
+        } else {
+            Text(display.name ?! "Unknown")
+                .font(.system(size: 22, weight: .black))
         }
     }
 
     var body: some View {
         VStack(spacing: 4) {
             let xdrSelectorShown = (display.supportsEnhance || display.supportsFullRangeXDR) && showXDRSelector && !display.blackOutEnabled
-            if showPowerInQuickActions, display.getPowerOffEnabled() {
-                HStack(alignment: .top, spacing: -10) {
-                    Text(display.name)
-                        .font(.system(size: 22, weight: .black))
-                        .padding(6)
-                        .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.bg.warm.opacity(colorScheme == .dark ? 0.5 : 0.2)))
-//                        .padding(.bottom, xdrSelectorShown ? 0 : 6)
 
-                    PowerOffButtonView(display: display)
-                        .offset(y: -8)
-                }.offset(x: 45)
-
-            } else {
-                Text(display.name ?! "Unknown")
-                    .font(.system(size: 22, weight: .black))
-//                    .padding(.bottom, xdrSelectorShown ? 0 : 6)
-            }
+            name
 
             if let disabledReason {
                 Text(disabledReason).font(.system(size: 10, weight: .semibold, design: .rounded))

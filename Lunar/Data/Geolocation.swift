@@ -57,6 +57,8 @@ final class Geolocation: NSObject, Codable, Defaults.Serializable {
         case altitude
     }
 
+    @Atomic static var coreLocationTimedOut = false
+
     var altitude: Double
     var latitude: Double
     var longitude: Double

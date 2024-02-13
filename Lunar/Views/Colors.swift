@@ -82,7 +82,6 @@ public extension Color {
     static let pinkMauve = Color(hue: 0.95, saturation: 0.76, brightness: 0.42)
     static let blackMauve = Color(hue: 252 / 360, saturation: 0.08, brightness: 0.12)
     static let golden = Color(hue: 39 / 360, saturation: 1.0, brightness: 0.64)
-    static let lunarYellow = Color(hue: 0.11, saturation: 0.47, brightness: 1.00)
     static let sunYellow = Color(hue: 0.1, saturation: 0.57, brightness: 1.00)
     static let peach = Color(hue: 0.08, saturation: 0.42, brightness: 1.00)
     static let calmBlue = Color(hue: 214 / 360, saturation: 0.7, brightness: 0.84)
@@ -92,8 +91,6 @@ public extension Color {
     static let xdr = Color(hue: 0.61, saturation: 0.26, brightness: 0.78)
     static let subzero = Color(hue: 0.98, saturation: 0.56, brightness: 1.00)
 
-    static var accent = Color.peach
-
     static let bg = BG()
     static let fg = FG()
 
@@ -102,13 +99,6 @@ public extension Color {
             Color(light: Color.hotRed, dark: Color.pinkishRed)
         } else {
             NSAppearance.currentDrawing().isDark ? Color.pinkishRed : Color.hotRed
-        }
-    }
-    static var inverted: Color {
-        if #available(macOS 12.0, *) {
-            Color(light: Color.white, dark: Color.black)
-        } else {
-            NSAppearance.currentDrawing().isDark ? Color.black : Color.white
         }
     }
     static var highContrast: Color {

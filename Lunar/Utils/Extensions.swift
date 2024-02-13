@@ -20,18 +20,20 @@ extension String {
 extension NSView {
     func bringSubviewToFront(_ view: NSView) {
         var theView = view
-        sortSubviews({ viewA, viewB, rawPointer in
-            let view = rawPointer?.load(as: NSView.self)
+        withUnsafeMutablePointer(to: &theView) { rawPointer in
+            sortSubviews({ viewA, viewB, rawPointer in
+                let view = rawPointer?.load(as: NSView.self)
 
-            switch view {
-            case viewA:
-                return ComparisonResult.orderedDescending
-            case viewB:
-                return ComparisonResult.orderedAscending
-            default:
-                return ComparisonResult.orderedSame
-            }
-        }, context: &theView)
+                switch view {
+                case viewA:
+                    return ComparisonResult.orderedDescending
+                case viewB:
+                    return ComparisonResult.orderedAscending
+                default:
+                    return ComparisonResult.orderedSame
+                }
+            }, context: rawPointer)
+        }
     }
 }
 
@@ -827,8 +829,99 @@ let MODE_HIDPI_TAG_COLOR = #colorLiteral(red: 0.4922937925, green: 0.273587038, 
 let MODE_RETINA_TAG_COLOR = #colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1)
 let MODE_UNSAFE_TAG_COLOR = #colorLiteral(red: 0.7450980544, green: 0.1568627506, blue: 0.07450980693, alpha: 1)
 
+var MPDISPLAY_MODE_CACHE: [String: [MPDisplayMode]] = [:]
+var MPDISPLAY_GROUPED_MODES_CACHE: [String: [RefreshRate: [MPDisplayMode.Tag: [MPDisplayMode]]]] = [:]
+
+struct RefreshRate: CustomStringConvertible, Hashable, Equatable, Comparable, Identifiable {
+    init(value: Int) {
+        self.value = value
+        description = "\(value)Hz"
+    }
+
+    let value: Int
+    let description: String
+
+    var id: String { description }
+
+    static func < (lhs: RefreshRate, rhs: RefreshRate) -> Bool {
+        lhs.value < rhs.value
+    }
+
+    static func == (lhs: RefreshRate, rhs: RefreshRate) -> Bool {
+        lhs.value == rhs.value
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(value)
+    }
+}
+
 extension MPDisplay {
-    var modes: [MPDisplayMode] { (allModes() as? [MPDisplayMode]) ?? [] }
+    var modes: [MPDisplayMode] {
+        mainThread {
+            guard let key = uuid?.uuidString ?? titleName ?? displayName, let cachedModes = MPDISPLAY_MODE_CACHE[key] else {
+                let modes = allModes() ?? []
+                MPDISPLAY_MODE_CACHE[uuid?.uuidString ?? titleName ?? displayName] = modes
+                return modes
+            }
+            return cachedModes
+        }
+    }
+
+    // Modes grouped as following:
+    // refresh rate
+    //  -> hidpi, lodpi, unsafe
+    //      -> width x height (tags)
+    //
+    // Example:
+    // 120Hz
+    //  -> HiDPI
+    //      -> 3840 x 2160 (Retina, Native)
+    //  -> LoDPI
+    //      -> 1920 x 1080 (Native)
+    // 60Hz
+    //  -> HiDPI
+    //      -> 3840 x 2160 (Retina, Native)
+
+    var groupedModes: [RefreshRate: [MPDisplayMode.Tag: [MPDisplayMode]]] {
+        guard let key = uuid?.uuidString ?? titleName ?? displayName, let cachedModes = MPDISPLAY_GROUPED_MODES_CACHE[key] else {
+            var groups: [RefreshRate: [MPDisplayMode.Tag: [MPDisplayMode]]] = modes.reduce(into: [:]) { dict, mode in
+                let key = RefreshRate(value: mode.refreshRate != 0 ? mode.refreshRate.i : 60)
+                if dict[key] == nil {
+                    dict[key] = [:]
+                }
+
+                if dict[key]![.hidpi] == nil {
+                    dict[key]![.hidpi] = []
+                }
+                if dict[key]![.lodpi] == nil {
+                    dict[key]![.lodpi] = []
+                }
+                if dict[key]![.unsafe] == nil {
+                    dict[key]![.unsafe] = []
+                }
+
+                if !mode.isSafeMode {
+                    dict[key]![.unsafe]!.append(mode)
+                } else if mode.isHiDPI {
+                    dict[key]![.hidpi]!.append(mode)
+                } else {
+                    dict[key]![.lodpi]!.append(mode)
+                }
+            }
+
+            for (key, value) in groups {
+                for (tag, modes) in value {
+                    groups[key]![tag] = modes.sorted { $0.width * $0.height > $1.width * $1.height }
+                }
+            }
+
+            MPDISPLAY_GROUPED_MODES_CACHE[uuid?.uuidString ?? titleName ?? displayName] = groups
+            return groups
+        }
+        return cachedModes
+
+    }
 }
 
 extension MPDisplayMode {
@@ -852,7 +945,7 @@ extension MPDisplayMode {
 }
 
 extension MPDisplayMode {
-    enum Tag: String {
+    enum Tag: String, Identifiable {
         case retina
         case hidpi
         case native
@@ -861,6 +954,10 @@ extension MPDisplayMode {
         case unsafe
         case simulscan
         case interlaced
+        case lodpi
+
+        var id: String { rawValue }
+
     }
 
     var depth: Int32 {
@@ -874,7 +971,7 @@ extension MPDisplayMode {
             isNativeMode ? Tag.native : nil,
             isDefaultMode ? Tag.defaultMode : nil,
             isRetina ? Tag.retina : nil,
-            isHiDPI ? Tag.hidpi : nil,
+            isHiDPI ? Tag.hidpi : Tag.lodpi,
             (isTVMode && tvMode != 0) ? Tag.tv : nil,
             isSafeMode ? nil : Tag.unsafe,
             isSimulscan ? Tag.simulscan : nil,
@@ -937,7 +1034,7 @@ extension MPDisplayMode {
         } else if width > 3800 {
             return NSImage(systemSymbolName: "4k.tv", accessibilityDescription: "Retina Mode")?.withSymbolConfiguration(symbol)
         } else if isNativeMode {
-            return NSImage(systemSymbolName: "laptopcomputer", accessibilityDescription: "Native Mode")?
+            return NSImage(systemSymbolName: "sparkles.tv", accessibilityDescription: "Native Mode")?
                 .withSymbolConfiguration(symbol)
         }
 
@@ -952,7 +1049,7 @@ extension MPDisplayMode {
         } else if width > 3800 {
             return "4k.tv"
         } else if isNativeMode {
-            return "laptopcomputer"
+            return "sparkles.tv"
         }
 
         return "display"
@@ -962,6 +1059,28 @@ extension MPDisplayMode {
         let dpi = "\(dotsPerInch)DPI"
 
         return "\(resolutionStringSafe)@\(refreshStringSafe) [\(dpi)] [\(depth)bit]\(tagsString)"
+    }
+
+    var swiftUITagStrings: [String] {
+        [
+            isNativeMode ? Tag.native : nil,
+            isDefaultMode ? Tag.defaultMode : nil,
+            isRetina ? Tag.retina : nil,
+            (isTVMode && tvMode != 0) ? Tag.tv : nil,
+            isSimulscan ? Tag.simulscan : nil,
+            isInterlaced ? Tag.interlaced : nil,
+        ].compactMap { $0?.rawValue }
+    }
+
+    var swiftUITagsString: String {
+        let tags = swiftUITagStrings
+        return tags.isEmpty ? "" : " (\(tags.joined(separator: ", ")))"
+    }
+
+    var swiftUIString: String {
+        let depth = depth == 8 ? "" : " [\(depth)bit]"
+
+        return "\(resolutionStringSafe)\(depth)\(swiftUITagsString)"
     }
 
     var refreshStringSafe: String {
@@ -1406,6 +1525,7 @@ extension NSView {
         }
         set {
             wantsLayer = true
+            layer?.cornerCurve = .continuous
             layer?.cornerRadius = CGFloat(newValue?.floatValue ?? 0.0)
         }
     }

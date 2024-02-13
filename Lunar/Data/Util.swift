@@ -52,6 +52,14 @@ func displayIsInHardwareMirrorSet(_ id: CGDirectDisplayID) -> Bool {
     #endif
 }
 
+@inline(__always) func isTestSerial(_ serial: String) -> Bool {
+    #if DEBUG
+        return TEST_SERIALS.contains(serial)
+    #else
+        return serial == GENERIC_DISPLAY.serial || serial == ALL_DISPLAYS.serial
+    #endif
+}
+
 // MARK: - RequestTimeoutError
 
 final class RequestTimeoutError: Error {}
@@ -1086,6 +1094,7 @@ import Regex
 let WHITESPACE_REGEX = "\\s+".r!
 
 let LEFT_ALIGNED_ALERT_TAG = 18665
+var NS_ALERT_SWIZZLED = false
 
 func dialog(
     message: String,
@@ -1101,7 +1110,7 @@ func dialog(
     markdown: Bool = false
 ) -> NSAlert {
     mainThread {
-        let nsAlertSwizzled = NSAlert.classMethod
+        NS_ALERT_SWIZZLED = NSAlert.classMethod
         let alert = NSAlert()
         alert.messageText = message
         alert.informativeText = info
@@ -2188,7 +2197,7 @@ func getMonitorPanelDataJSON(
         "name": (display.displayName ?? "") as Any,
         "orientation": display.orientation,
         "modes": [String: Any](
-            (includeModes ? ((display.allModes() as? [MPDisplayMode]) ?? []) : [])
+            (includeModes ? (display.allModes() ?? []) : [])
                 .filter(modeFilter ?? { _ in true })
                 .compactMap { mode in
                     guard let modeJSON = getModeDetailsJSON(mode) else { return nil }
@@ -2237,7 +2246,7 @@ func getMonitorPanelData(_ display: MPDisplay) -> String {
 
     All modes:
     \(
-        (display.allModes() as? [MPDisplayMode])?
+        display.allModes()?
             .map { "\t\($0.description.replacingOccurrences(of: "\n", with: ", ")):\n\(getModeDetails($0, prefix: "\t\t"))" }
             .joined(separator: "\n\n") ?? "nil"
     )

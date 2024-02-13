@@ -37,13 +37,17 @@ import ServiceManagement
 
 extension CLLocationManager {
     var auth: CLAuthorizationStatus? {
-        withTimeout(5.seconds, name: "locationAuth") {
+        guard !Geolocation.coreLocationTimedOut else { return nil }
+
+        return withTimeout(5.seconds, name: "locationAuth") {
             self.authorizationStatus
+        } onTimeout: {
+            Geolocation.coreLocationTimedOut = true
         }
     }
 }
 
-func withTimeout<T>(_ timeout: DateComponents, name: String, _ block: @escaping () throws -> T) -> T? {
+func withTimeout<T>(_ timeout: DateComponents, name: String, _ block: @escaping () throws -> T, onTimeout: (() -> Void)? = nil) -> T? {
     var value: T?
     let workItem = DispatchWorkItem(name: name) {
         do {
@@ -57,6 +61,7 @@ func withTimeout<T>(_ timeout: DateComponents, name: String, _ block: @escaping 
     if result == .timedOut {
         log.error("\(name) timed out")
         workItem.cancel()
+        onTimeout?()
     }
 
     return value
@@ -904,25 +909,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
     func windowDidBecomeMain(_ notification: Notification) {
         log.debug("windowDidBecomeMain")
-        guard let w = notification.object as? ModernWindow, w.isVisible, w.title == "Settings",
-              let locationManager else { return }
 
-        switch locationManager.auth {
-        case .notDetermined, .restricted:
-            if !CachedDefaults[.manualLocation] {
-                log.debug("Requesting location permissions")
-                locationManager.requestAlwaysAuthorization()
-            }
-        case .authorizedAlways:
-            log.debug("Location authorized")
-        case .denied:
-            log.debug("Location denied")
-        @unknown default:
-            log.debug("Location status unknown")
-        }
+        guard let w = notification.object as? ModernWindow, w.isVisible, w.title == "Settings" else { return }
+
         goToPage(ignoreUIElement: true)
         mainAsyncAfter(ms: 500) { [self] in
             goToPage()
+        }
+
+        if !CachedDefaults[.manualLocation], let locationManager {
+            switch locationManager.auth {
+            case .notDetermined, .restricted:
+                log.debug("Requesting location permissions")
+                locationManager.requestAlwaysAuthorization()
+            case .authorizedAlways:
+                log.debug("Location authorized")
+            case .denied:
+                log.debug("Location denied")
+            case .none:
+                log.debug("Location auth none")
+            @unknown default:
+                log.debug("Location status unknown")
+            }
         }
     }
 
@@ -1223,14 +1231,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                     }
 
                     for (key, popover) in INPUT_HOTKEY_POPOVERS {
-                        log.debug("Adapting \(key) input hotkey popover")
+                        if !isTestSerial(key) {
+                            log.debug("Adapting \(key) input hotkey popover")
+                        }
 
                         guard let backingView = popover?.contentViewController?.view.subviews
                             .first(where: { $0.identifier == POPOVER_BACKING_VIEW_ID }),
                             let blurView = popover?.contentViewController?.view.subviews
                             .first(where: { $0.identifier == POPOVER_BLUR_VIEW_ID })
                         else {
-                            log.debug("Can't find input hotkey popover for \(key)")
+                            if !isTestSerial(key) {
+                                log.debug("Can't find input hotkey popover for \(key)")
+                            }
                             continue
                         }
 
@@ -1252,7 +1264,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         zeroGammaChecker = Repeater(every: 3, name: "zeroGammaChecker", tolerance: 10) {
             DC.activeDisplayList
                 .filter { d in
-                    !d.isForTesting && !d.settingGamma && !d.blackOutEnabled &&
+                    !DC.screensSleeping && timeSince(wakeTime) > 5 && !d.isForTesting && !d.settingGamma && !d.blackOutEnabled &&
                         (d.hasSoftwareControl || CachedDefaults[.hdrWorkaround] || d.enhanced || d.subzero || d.applyGamma) &&
                         GammaTable(for: d.id, allowZero: true).isZero
                 }
@@ -1300,13 +1312,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
         CGDisplayRegisterReconfigurationCallback({ displayID, flags, _ in
             guard !flags.isSubset(of: [.beginConfigurationFlag, .desktopShapeChangedFlag, .movedFlag, .setMainFlag]) else {
+                log.debug("Skipping CGDisplayRegisterReconfigurationCallback flags [\(flags)] for display ID \(displayID)")
                 return
             }
 
-            log.debug("CGDisplayRegisterReconfigurationCallback \(flags) \(displayID)")
+            log.debug("CGDisplayRegisterReconfigurationCallback flags [\(flags)] for display ID \(displayID)")
 
             let removedDisplay: Bool = flags.has(someOf: [.removeFlag, .disabledFlag])
             let addedDisplay: Bool = flags.has(someOf: [.addFlag, .enabledFlag])
+
+            if removedDisplay {
+                DC.cachedOnlineDisplayIDs.remove(displayID.u32)
+            } else if addedDisplay {
+                DC.cachedOnlineDisplayIDs.insert(displayID.u32)
+            }
+            log.debug("Cached online display IDs: \(DC.cachedOnlineDisplayIDs)")
 
             if removedDisplay {
                 let wcs: [(String, NSWindowController)] = ["corner", "gamma", "shade", "faceLight"].compactMap { wt in
@@ -1319,6 +1339,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 for (windowType, wc) in wcs {
                     wc.close()
                     Display.setWindowController(displayID, type: windowType, windowController: nil)
+                }
+                if let d = DC.displaysBySerial[Display.uuid(id: displayID)] {
+                    d.active = false
                 }
             }
 
@@ -1335,20 +1358,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
             #if arch(arm64)
                 if #available(macOS 13, *) {
-                    if addedDisplay, let d = DC.displaysBySerial[Display.uuid(id: displayID)], !d.active, d.keepDisconnected {
-                        mainAsyncAfter(ms: 10) {
-                            DC.dis(displayID, display: d, force: true)
+                    if addedDisplay, let d = DC.displaysBySerial[Display.uuid(id: displayID)] {
+                        if !d.active, d.keepDisconnected {
+                            mainAsyncAfter(ms: 10) { DC.dis(displayID, display: d, force: true) }
+                        } else {
+                            d.lastConnectionTime = Date()
+                            mainAsyncAfter(ms: 1000) {
+                                DC.activeDisplays[displayID]?.refetchPanelProps()
+                            }
                         }
                         return
+                    }
+                    log.verbose("addedDisplay: \(addedDisplay)")
+                    if let d = DC.displaysBySerial[Display.uuid(id: displayID)] {
+                        log.verbose("storedDisplay: \(d)")
+                        log.verbose("storedDisplay.active: \(d.active)")
+                        log.verbose("storedDisplay.keepDisconnected: \(d.keepDisconnected)")
                     } else {
-                        log.verbose("addedDisplay: \(addedDisplay)")
-                        if let d = DC.displaysBySerial[Display.uuid(id: displayID)] {
-                            log.verbose("storedDisplay: \(d)")
-                            log.verbose("storedDisplay.active: \(d.active)")
-                            log.verbose("storedDisplay.keepDisconnected: \(d.keepDisconnected)")
-                        } else {
-                            log.verbose("storedDisplay: \(Display.uuid(id: displayID))")
-                        }
+                        log.verbose("storedDisplay: \(Display.uuid(id: displayID))")
                     }
                 }
             #endif
@@ -1506,6 +1533,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         unlockPublisher
             .debounce(for: .milliseconds(200), scheduler: RunLoop.main)
             .sink { _ in
+                wakeTime = Date()
                 guard !DC.screensSleeping else { return }
                 reapplyAfterWake()
             }
@@ -1514,6 +1542,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         wakePublisher
             .debounce(for: .milliseconds(200), scheduler: RunLoop.main)
             .sink { _ in
+                wakeTime = Date()
                 guard !DC.locked else { return }
                 reapplyAfterWake()
             }.store(in: &observers)
@@ -1525,6 +1554,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 log.info(notif.name.rawValue)
                 switch notif.name {
                 case NSWorkspace.sessionDidBecomeActiveNotification:
+                    wakeTime = Date()
                     DC.loggedOut = false
                     log.info("SESSION: Log in")
                 case NSWorkspace.sessionDidResignActiveNotification:
@@ -2085,7 +2115,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                     if let response = try (socket.readString())?.trimmed, !response.isEmpty {
                         print(response)
                     }
-                    if argList.contains("listen") || argList.contains("--listen") {
+                    if !Set(argList).intersection(["listen", "--listen", "RegisterForBrightnessChangeNotifications", "RegisterForAmbientLightCompensationNotifications"]).isEmpty {
                         var line = try socket.readString()
                         while let currentLine = line, !currentLine.isEmpty {
                             print(currentLine.trimmed)
@@ -2534,6 +2564,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             log.debug("Location authStatus restricted")
         case .authorized:
             log.debug("Location authStatus authorized")
+        case .none:
+            log.debug("Location authStatus none")
         @unknown default:
             log.debug("Location authStatus unknown??")
         }
@@ -2973,15 +3005,15 @@ func restart() {
         }
     }
 
-    do {
-        _ = shell(
-            command: "while /bin/ps -o pid -p \(ProcessInfo.processInfo.processIdentifier) >/dev/null 2>/dev/null; do /bin/sleep 0.1; done; /bin/sleep 0.5; /usr/bin/open '\(Bundle.main.path.string)' --args '\(restartArg)'",
-            wait: false
-        )
-        // try exec(arg0: Bundle.main.executablePath!, args: args)
-    } catch {
-        err("Failed to restart: \(error)")
-    }
+//    do {
+    _ = shell(
+        command: "while /bin/ps -o pid -p \(ProcessInfo.processInfo.processIdentifier) >/dev/null 2>/dev/null; do /bin/sleep 0.1; done; /bin/sleep 0.5; /usr/bin/open '\(Bundle.main.path.string)' --args '\(restartArg)'",
+        wait: false
+    )
+    // try exec(arg0: Bundle.main.executablePath!, args: args)
+//    } catch {
+//        err("Failed to restart: \(error)")
+//    }
     exit(0)
 }
 

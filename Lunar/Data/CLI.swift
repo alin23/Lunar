@@ -463,7 +463,7 @@ struct Lunar: ParsableCommand {
             let property = average ? AMI.$luxWindowAverage : AMI.$lux
             property.removeDuplicates().sink { lux in
                 guard let lux else { return }
-                server.write(lux, to: socketFd)
+                server.write(lux: lux, to: socketFd)
             }.store(in: &server.luxListeners, for: socketFd)
         }
     }
@@ -670,11 +670,11 @@ struct Lunar: ParsableCommand {
 
         @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
-        @Argument(help: "Method to call. One of (\(DisplayServicesMethod.allCases.map(\.rawValue).joined(separator: ", ")))")
+        @Argument(help: "Method to call")
         var method: DisplayServicesMethod
 
         @Argument(
-            help: "Display serial or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
+            help: "Display serial or name (without spaces) or one of the following special values"
         )
         var display: DisplayFilter
 
@@ -698,6 +698,7 @@ struct Lunar: ParsableCommand {
             let displayIDs = displays.map(\.id)
 
             let resultString = { v in v == KERN_SUCCESS ? "Success" : "Failed" }
+            var listening = false
             for id in displayIDs {
                 var brightness: Float = value.f
                 let type: UInt32 = value2.u32
@@ -760,9 +761,28 @@ struct Lunar: ParsableCommand {
                     guard let table = DisplayServicesCreateBrightnessTable(id, value.i32) as? [Int] else { return cliExit(0) }
                     cliPrint(table)
                 case .RegisterForBrightnessChangeNotifications:
+                    let socketFd = appDelegate?.server.currentSocketFD
                     let result = DisplayServicesRegisterForBrightnessChangeNotifications(id, id) { _, observer, _, _, userInfo in
                         guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let id = observer else { return }
                         let displayID = CGDirectDisplayID(UInt(bitPattern: id))
+                        log.verbose("DisplayServicesRegisterForBrightnessChangeNotifications \(displayID) -> \(value)")
+
+                        if isServer, let server = appDelegate?.server {
+                            let socketFds = storeLock.around {
+                                if Swift.Set(server.rawBrightnessListeners.keys).intersection(Swift.Set(server.connectedSockets.keys)).isEmpty {
+                                    for id in server.rawBrightnessListeners.values {
+                                        DisplayServicesUnregisterForBrightnessChangeNotifications(id, id)
+                                    }
+                                    server.rawBrightnessListeners.removeAll()
+                                }
+                                return server.rawBrightnessListeners.filter { $0.value == displayID }.keys
+                            }
+                            let state = DisplayStateChange(property: "brightness", value: value, display: displayID)
+                            for socketFd in socketFds {
+                                server.write(state, to: socketFd, json: false)
+                            }
+                            return
+                        }
 
                         if let display = DC.activeDisplays[displayID] {
                             cliPrint("\(display) => \(value)")
@@ -770,11 +790,38 @@ struct Lunar: ParsableCommand {
                             cliPrint("\(displayID) => \(value)")
                         }
                     }
-                    cliPrint("RegisterForBrightnessChangeNotifications result: \(result)")
+                    guard result == 0 else {
+                        cliPrint("RegisterForBrightnessChangeNotifications for \(DC.activeDisplays[id]?.description ?? id.s) error: \(result)")
+                        continue
+                    }
+                    listening = true
+                    if isServer, let server = appDelegate?.server, let socketFd {
+                        storeLock.around { server.rawBrightnessListeners[socketFd] = id }
+                    }
                 case .RegisterForAmbientLightCompensationNotifications:
+                    let socketFd = appDelegate?.server.currentSocketFD
                     let result = DisplayServicesRegisterForAmbientLightCompensationNotifications(id, id) { _, observer, _, _, userInfo in
                         guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let id = observer else { return }
                         let displayID = CGDirectDisplayID(UInt(bitPattern: id))
+                        log.verbose("DisplayServicesRegisterForAmbientLightCompensationNotifications \(displayID) -> \(value)")
+
+                        if isServer, let server = appDelegate?.server {
+                            let socketFds = storeLock.around {
+                                if Swift.Set(server.rawLuxListeners.keys).intersection(Swift.Set(server.connectedSockets.keys)).isEmpty {
+                                    for id in server.rawLuxListeners.values {
+                                        DisplayServicesUnregisterForBrightnessChangeNotifications(id, id)
+                                    }
+                                    server.rawLuxListeners.removeAll()
+                                }
+
+                                return server.rawLuxListeners.filter { $0.value == displayID }.keys
+                            }
+                            let state = DisplayStateChange(property: "lux", value: value, display: displayID)
+                            for socketFd in socketFds {
+                                server.write(state, to: socketFd, json: false)
+                            }
+                            return
+                        }
 
                         if let display = DC.activeDisplays[displayID] {
                             cliPrint("\(display) => \(value)")
@@ -782,14 +829,18 @@ struct Lunar: ParsableCommand {
                             cliPrint("\(displayID) => \(value)")
                         }
                     }
-                    cliPrint("RegisterForAmbientLightCompensationNotifications result: \(result)")
+                    guard result == 0 else {
+                        cliPrint("RegisterForAmbientLightCompensationNotifications for \(DC.activeDisplays[id]?.description ?? id.s) error: \(result)")
+                        continue
+                    }
+                    listening = true
+                    if isServer, let server = appDelegate?.server, let socketFd {
+                        storeLock.around { server.rawLuxListeners[socketFd] = id }
+                    }
                 }
             }
-            guard method != .RegisterForAmbientLightCompensationNotifications,
-                  method != .RegisterForBrightnessChangeNotifications
-            else {
-                return
-            }
+
+            guard !listening else { return }
             return cliExit(0)
         }
     }
@@ -1927,6 +1978,7 @@ struct Lunar: ParsableCommand {
                 let connectedDisplays = getFilteredDisplays(displays: DC.activeDisplayList, filter: display)
                 if !connectedDisplays.isEmpty {
                     DC.dis(connectedDisplays.map(\.id))
+                    cliExit(0)
                     return
                 }
 
@@ -2529,6 +2581,8 @@ final class LunarServer {
     var connectedSockets = [Int32: Socket]()
     var luxListeners: [Int32: AnyCancellable] = [:]
     var brightnessListeners: [Int32: AnyCancellable] = [:]
+    var rawBrightnessListeners: [Int32: CGDirectDisplayID] = [:]
+    var rawLuxListeners: [Int32: CGDirectDisplayID] = [:]
     var displayListeners: [Int32: AnyCancellable] = [:]
     let socketLockQueue = DispatchQueue(label: "com.kitura.serverSwift.socketLockQueue")
 
@@ -2635,7 +2689,7 @@ final class LunarServer {
         }
     }
 
-    func write(_ lux: Double, to socketFd: Int32) {
+    func write(lux: Double, to socketFd: Int32) {
         socketLockQueue.async(flags: .barrier) { [weak self] in
             guard let self, let socket = connectedSockets[socketFd] else {
                 _ = storeLock.around {
@@ -2657,21 +2711,34 @@ final class LunarServer {
                 storeLock.around {
                     self?.brightnessListeners.removeValue(forKey: socketFd)
                     self?.displayListeners.removeValue(forKey: socketFd)
+                    if let id = self?.rawBrightnessListeners[socketFd] {
+                        DisplayServicesUnregisterForBrightnessChangeNotifications(id, id)
+                        self?.rawBrightnessListeners.removeValue(forKey: socketFd)
+                    }
+                    if let id = self?.rawLuxListeners[socketFd] {
+                        DisplayServicesUnregisterForAmbientLightCompensationNotifications(id, id)
+                        self?.rawLuxListeners.removeValue(forKey: socketFd)
+                    }
                 }
                 return
             }
             let val = change.property == "mute" ? (change.value == 1 ? "true" : "false") : String(format: "%.3f", change.value)
 
-            if json {
-                #if DEBUG
-                    log.debug("CLI: Writing {\"\(change.property)\": \(val), \"display\": \(change.display)}\n to \(socketFd)")
-                #endif
-                _ = try? socket.write(from: "{\"\(change.property)\": \(val), \"display\": \(change.display)}\n")
-            } else {
-                #if DEBUG
-                    log.debug("CLI: Writing \(change.property) \(val) \(change.display) to \(socketFd)")
-                #endif
-                _ = try? socket.write(from: "\(change.property) \(val) \(change.display)\n")
+            do {
+                if json {
+                    #if DEBUG
+                        log.debug("CLI: Writing {\"\(change.property)\": \(val), \"display\": \(change.display)}\n to \(socketFd)")
+                    #endif
+                    _ = try socket.write(from: "{\"\(change.property)\": \(val), \"display\": \(change.display)}\n")
+                } else {
+                    #if DEBUG
+                        log.debug("CLI: Writing \(change.property) \(val) \(change.display) to \(socketFd)")
+                    #endif
+                    _ = try socket.write(from: "\(change.property) \(val) \(change.display)\n")
+                }
+            } catch {
+                log.error("CLI: Error writing to socket \(socketFd): \(error)")
+                connectedSockets.removeValue(forKey: socketFd)
             }
         }
     }
@@ -2691,20 +2758,16 @@ final class LunarServer {
                     switch try socket.read(into: &readData) {
                     case 1 ... Self.bufferSize:
                         guard let response = String(data: readData, encoding: .utf8)?.trimmed else {
-                            log.error("Error decoding response...")
+                            log.error("CLI: Error decoding response...")
                             readData.removeAll(keepingCapacity: true)
                             break readLoop
                         }
 
-                        #if DEBUG
-                            log.info("CLI: Server received from connection at \(socket.remoteHostname):\(socket.remotePort): \(response) ")
-                        #endif
+                        log.info("CLI: Server received from connection at \(socket.remoteHostname):\(socket.remotePort): \(response) ")
                         guard let self else { return }
                         try onResponse(response, socket: socket)
                     case 0:
-                        #if DEBUG
-                            log.info("CLI: Read 0 bytes, closing socket")
-                        #endif
+                        log.info("CLI: Read 0 bytes, closing socket")
                         shouldKeepRunning = false
                         break readLoop
                     default:
@@ -2719,12 +2782,13 @@ final class LunarServer {
                 guard let self else {
                     return
                 }
-                guard storeLock.around({ self.brightnessListeners[socket.socketfd] ?? self.luxListeners[socket.socketfd] }) == nil else {
+                if storeLock.around({ self.brightnessListeners[socket.socketfd] ?? self.luxListeners[socket.socketfd] }) != nil ||
+                    storeLock.around({ self.rawBrightnessListeners[socket.socketfd] ?? self.rawLuxListeners[socket.socketfd] }) != nil
+                {
+                    log.info("CLI: Socket \(socket.remoteHostname):\(socket.remotePort) still has listeners, not closing...")
                     return
                 }
-                #if DEBUG
-                    log.info("CLI: Socket \(socket.remoteHostname):\(socket.remotePort) closed...")
-                #endif
+                log.info("CLI: Socket \(socket.remoteHostname):\(socket.remotePort) closed...")
                 socket.close()
 
                 socketLockQueue.sync { [socket] in

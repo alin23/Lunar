@@ -82,7 +82,7 @@ struct QuickActionsMenuView: View {
                 style: .continuous
             ).fill(Color.translucid)
         )
-        .colorMultiply(Color.accent.blended(withFraction: 0.7, of: .white))
+        .colorMultiply(Color.peach.blended(withFraction: 0.7, of: .white))
         .foregroundColor(Color.fg.warm)
     }
 
@@ -341,10 +341,12 @@ struct QuickActionsMenuView: View {
 
             if let d = cursorDisplay, !SWIFTUI_PREVIEW {
                 DisplayRowView(display: d).padding(.bottom)
+                    .contextMenu { DisplayContextMenu(display: d) }
             }
 
             ForEach(displays) { d in
                 DisplayRowView(display: d).padding(.bottom)
+                    .contextMenu { DisplayContextMenu(display: d) }
             }
 
             #if arch(arm64)

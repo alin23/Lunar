@@ -31,8 +31,8 @@ struct AllDisplaysView: View {
                 BigSurSlider(
                     percentage: $display.preciseBrightnessContrast.f,
                     image: "sun.max.fill",
-                    colorBinding: .constant(Color.accent),
-                    backgroundColorBinding: .constant(Color.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                    colorBinding: .constant(Color.peach),
+                    backgroundColorBinding: .constant(Color.peach.opacity(colorScheme == .dark ? 0.1 : 0.4)),
                     showValue: $showSliderValues
                 )
                 softwareSliders
@@ -40,16 +40,16 @@ struct AllDisplaysView: View {
                 BigSurSlider(
                     percentage: $display.preciseBrightness.f,
                     image: "sun.max.fill",
-                    colorBinding: .constant(Color.accent),
-                    backgroundColorBinding: .constant(Color.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                    colorBinding: .constant(Color.peach),
+                    backgroundColorBinding: .constant(Color.peach.opacity(colorScheme == .dark ? 0.1 : 0.4)),
                     showValue: $showSliderValues
                 )
                 softwareSliders
                 BigSurSlider(
                     percentage: $display.preciseContrast.f,
                     image: "circle.righthalf.fill",
-                    colorBinding: .constant(Color.accent),
-                    backgroundColorBinding: .constant(Color.accent.opacity(colorScheme == .dark ? 0.1 : 0.4)),
+                    colorBinding: .constant(Color.peach),
+                    backgroundColorBinding: .constant(Color.peach.opacity(colorScheme == .dark ? 0.1 : 0.4)),
                     showValue: $showSliderValues
                 )
             }

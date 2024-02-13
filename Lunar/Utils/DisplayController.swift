@@ -441,6 +441,7 @@ final class DisplayController: ObservableObject {
         setupXdrTask()
         Self.initialized = true
         keyboardAutoBrightnessEnabledByUser = kbc.isAutoBrightnessEnabled(forKeyboard: 1)
+        keyboardBrightnessAtStart = kbc.brightness(forKeyboard: 1)
         adaptiveMode = DisplayController.getAdaptiveMode()
     }
 
@@ -503,6 +504,9 @@ final class DisplayController: ObservableObject {
     var unmanagedDisplays: [Display] = []
     var lastTimeBrightnessUpKeyPressed = Date.distantPast
     var lastTimeBrightnessDownKeyPressed = Date.distantPast
+
+    var cachedOnlineDisplayIDs: Set<CGDirectDisplayID> = Set(NSScreen.onlineDisplayIDs)
+
     @Atomic var locked = false {
         didSet {
             log.debug("Screen \(locked ? "locked" : "unlocked")")
@@ -785,8 +789,9 @@ final class DisplayController: ObservableObject {
         } else {
             #if DEBUG
                 return TEST_DISPLAY
+            #else
+                return GENERIC_DISPLAY
             #endif
-            return GENERIC_DISPLAY
         }
     }
 
@@ -1107,15 +1112,15 @@ final class DisplayController: ObservableObject {
             return nil
         }
         defer { mgr.unlockAccess() }
-        return mgr.display(withID: id.i32) as? MPDisplay
+        return mgr.display(withID: id.i32)
     }
-
     static func autoMode() -> AdaptiveMode {
         guard proactive else { return ManualMode.shared }
+        let sourceDisplay = getSourceDisplay()
 
         if let mode = SensorMode.specific.ifExternalSensorAvailable() {
             return mode
-        } else if getSourceDisplay().hasAmbientLightAdaptiveBrightness {
+        } else if !sourceDisplay.disconnected, sourceDisplay.hasAmbientLightAdaptiveBrightness {
             return SyncMode.shared
         } else if let mode = SensorMode.specific.ifInternalSensorAvailable() {
             return mode
@@ -1387,6 +1392,7 @@ final class DisplayController: ObservableObject {
     let kbc = KeyboardBrightnessClient()
 
     lazy var keyboardAutoBrightnessEnabledByUser = kbc.isAutoBrightnessEnabled(forKeyboard: 1)
+    lazy var keyboardBrightnessAtStart = kbc.brightness(forKeyboard: 1)
 
     @Atomic var displayLinkRunning = isDisplayLinkRunning()
 
@@ -1522,7 +1528,7 @@ final class DisplayController: ObservableObject {
     }
 
     static func printMirrors(_ displays: [Display]) {
-        for d in displays {
+        for d in displays where !d.isForTesting && !d.isAllDisplays {
             log.debug("Primary mirror for \(d): \(String(describing: d.primaryMirrorScreen))")
             log.debug("Secondary mirror for \(d): \(String(describing: d.secondaryMirrorScreenID))")
         }
@@ -1624,7 +1630,7 @@ final class DisplayController: ObservableObject {
         }
 
         screencaptureWatcherTask = Repeater(every: 1, name: SCREENCAPTURE_WATCHER_TASK_KEY) { [self] in
-            guard !screensSleeping, !locked,
+            guard !screensSleeping, !locked, timeSince(wakeTime) > 10,
                   activeDisplayList.contains(where: { $0.hasSoftwareControl && !$0.supportsGamma })
             else { return }
             let pids = pidCount()
@@ -2240,12 +2246,15 @@ final class DisplayController: ObservableObject {
         }
 
         let idsCount = NSScreen.onlineDisplayIDs.count
-        guard activeOldDisplays.count == 1, activeNewDisplays.count > 1, idsCount > 1,
-              !activeOldDisplays[0].blackOutEnabled,
+        let onlyBuiltinWasOn = activeOldDisplays.count == 1 && activeOldDisplays[0].isBuiltin && !activeOldDisplays[0].blackOutEnabled
+        let builtinCameOnRecently = activeOldDisplays.count >= 1 && timeSince(activeOldDisplays.first(where: { $0.isBuiltin && !$0.blackOutEnabled })?.lastConnectionTime ?? .distantPast) < 10
+        guard onlyBuiltinWasOn || builtinCameOnRecently,
+              activeNewDisplays.count > 1, idsCount > 1,
               activeNewDisplays.contains(where: { !$0.isBuiltin && !$0.isSidecar && !$0.isAirplay }),
               !calibrating
         else {
-            let stats = "activeOldDisplays.count=\(activeOldDisplays.count) activeNewDisplays.count=\(activeNewDisplays.count) idsCount=\(idsCount)"
+            let stats =
+                "activeOldDisplays.count=\(activeOldDisplays.count) activeNewDisplays.count=\(activeNewDisplays.count) idsCount=\(idsCount) timeSinceBuiltinCameOn=\(timeSince(activeOldDisplays.first(where: { $0.isBuiltin && !$0.blackOutEnabled })?.lastConnectionTime ?? .distantPast)) builtinBlackout=\(String(describing: activeOldDisplays.first(where: \.isBuiltin)?.blackOutEnabled))"
             log.info("Not activating AutoBlackout: \(stats)")
             return
         }
@@ -2607,14 +2616,14 @@ final class DisplayController: ObservableObject {
     }
 
     func adaptBrightness(for display: Display, force: Bool = false) {
-        guard adaptiveMode.available, !screensSleeping, !locked else { return }
+        guard adaptiveMode.available, !screensSleeping, !locked, DDC.shouldWait else { return }
         adaptiveMode.withForce(force || display.force) {
             self.adaptiveMode.adapt(display)
         }
     }
 
     func adaptBrightness(for displays: [Display]? = nil, force: Bool = false) {
-        guard adaptiveMode.available, !screensSleeping, !locked else { return }
+        guard adaptiveMode.available, !screensSleeping, !locked, DDC.shouldWait else { return }
         for display in (displays ?? activeDisplayList).filter({ !$0.blackOutEnabled }) {
             adaptiveMode.withForce(force || display.force) {
                 guard !display.enhanced else {

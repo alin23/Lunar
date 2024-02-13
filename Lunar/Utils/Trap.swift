@@ -65,7 +65,7 @@ extension Trap {
 
         // Instead of using just `signal` we can use the more powerful `sigaction`
         var signalAction = SignalAction(__sigaction_u: unsafeBitCast(action, to: __sigaction_u.self), sa_mask: 0, sa_flags: 0)
-        withUnsafePointer(to: &signalAction) { actionPointer in
+        _ = withUnsafePointer(to: &signalAction) { actionPointer in
             sigaction(signal.osValue, actionPointer, nil)
         }
     }

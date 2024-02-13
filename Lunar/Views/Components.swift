@@ -307,7 +307,7 @@ struct PickerButton<T: Equatable>: ButtonStyle {
             .label
             .foregroundColor(
                 enumValue == onValue
-                    ? (onTextColor ?? (colorScheme == .dark ? Color.accent : Color.white))
+                    ? (onTextColor ?? (colorScheme == .dark ? Color.peach : Color.white))
                     : offTextColor
             )
             .padding(.vertical, verticalPadding)
@@ -330,7 +330,7 @@ struct PickerButton<T: Equatable>: ButtonStyle {
                     return
                 }
                 withAnimation(.easeOut(duration: 0.1)) {
-                    hoverColor = hover ? Color.accent : .white
+                    hoverColor = hover ? Color.peach : .white
                     scale = hover ? 1.05 : 1.0
                 }
             })

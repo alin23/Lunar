@@ -1067,12 +1067,10 @@ func activateCleaningMode(deactivateAfter: TimeInterval? = 120, withoutSettingFl
             appDelegate!.cleaningMode = true
         }
 
-        #if !DEBUG
-            for display in DC.activeDisplayList.filter(!\.blackOutEnabled) {
-                lastBlackOutToggleDate = .distantPast
-                DC.blackOut(display: display.secondaryMirrorScreenID ?? display.id, state: .on, mirroringAllowed: false)
-            }
-        #endif
+        for display in DC.activeDisplayList.filter(!\.blackOutEnabled) {
+            lastBlackOutToggleDate = .distantPast
+            DC.blackOut(display: display.secondaryMirrorScreenID ?? display.id, state: .on, mirroringAllowed: false)
+        }
         swallowKeyboardEvents()
 
         guard let deactivateAfter else { return }
@@ -2508,7 +2506,7 @@ struct StopMirroringIntent: AppIntent {
         mirrorMaster.resolutionBlackoutResetterTask = nil
         let mode = panel.currentMode
         Display.reconfigure { mgr in
-            if panel.isMirrorMaster, let mirrors = mgr.mirrorSet(forDisplay: panel) as? [MPDisplay] {
+            if panel.isMirrorMaster, let mirrors = mgr.mirrorSet(forDisplay: panel) {
                 for mirror in mirrors {
                     mgr.stopMirroring(forDisplay: mirror)
                 }
@@ -2691,7 +2689,7 @@ struct PanelPreset: AppEntity {
                     }
 
                     let index = id & ((1 << 32) - 1)
-                    guard let preset = (panel.presets as? [MPDisplayPreset])?.first(where: { $0.presetIndex == index }) else {
+                    guard let preset = panel.presets?.first(where: { $0.presetIndex == index }) else {
                         return nil
                     }
 
@@ -2797,7 +2795,7 @@ struct PanelMode: AppEntity {
                     }
 
                     let modeID = id & ((1 << 32) - 1)
-                    guard let mode = panel.mode(withNumber: modeID.i32) as? MPDisplayMode else {
+                    guard let mode = panel.mode(withNumber: modeID.i32) else {
                         return nil
                     }
 

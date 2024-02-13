@@ -865,6 +865,7 @@ enum DDC {
 
         p.debounce(for: .seconds(1), scheduler: queue)
             .sink { _ in
+                checkDisconnectedDisplays()
                 guard !DC.screensSleeping, !DC.locked else { return }
                 log.debug("ioRegistryTreeChanged")
                 IORegistryTreeChanged()
@@ -936,24 +937,30 @@ enum DDC {
                 display.detectI2C()
                 display.startI2CDetection()
             }
-
-            #if arch(arm64)
-                mainAsync {
-                    DC.possiblyDisconnectedDisplays = DC.possiblyDisconnectedDisplayList.dict { d in
-                        if d.isBuiltin, !DCPAVServiceExists(location: .embedded) { return (d.id, d) }
-
-                        guard DDC.dcpList.contains(where: { $0.dcpName == d.dcpName }) else { return nil }
-                        return (d.id, d)
-                    }
-
-                    if #available(macOS 13, *), IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("DCPAVServiceProxy")) == 0 {
-                        log.info("Disabling AutoBlackOut (disconnect) if we're left with only the builtin screen")
-                        DC.en()
-                        DC.autoBlackoutPause = false
-                    }
-                }
-            #endif
+            checkDisconnectedDisplays()
         }
+    }
+
+    static func checkDisconnectedDisplays() {
+        #if arch(arm64)
+            mainAsync {
+                log.debug("checkDisconnectedDisplays")
+                DC.possiblyDisconnectedDisplays = DC.possiblyDisconnectedDisplayList.dict { d in
+                    if d.isBuiltin, !DCPAVServiceExists(location: .embedded) || !NSScreen.onlineDisplayIDs.contains(1) { return (d.id, d) }
+
+                    guard DDC.dcpList.contains(where: { $0.dcpName == d.dcpName }) else { return nil }
+                    return (d.id, d)
+                }
+
+                if #available(macOS 13, *), IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("DCPAVServiceProxy")) == 0
+                    || (!DCPAVServiceExists(location: .external) && !NSScreen.onlineDisplayIDs.contains(1))
+                {
+                    log.info("Disabling AutoBlackOut (disconnect) if we're left with only the builtin screen")
+                    DC.en()
+                    DC.autoBlackoutPause = false
+                }
+            }
+        #endif
     }
 
     static func setup() {
@@ -1017,7 +1024,7 @@ enum DDC {
         }
 
         #if DEBUG
-//            return displayIDs
+            return displayIDs
             if !displayIDs.isEmpty {
                 // displayIDs.append(TEST_DISPLAY_PERSISTENT_ID)
                 return displayIDs
@@ -1035,7 +1042,7 @@ enum DDC {
     }
 
     static func isProjectorDisplay(_ id: CGDirectDisplayID, name: String? = nil, checkName: Bool = true) -> Bool {
-        guard !isGeneric(id) else {
+        guard !isGeneric(id), !isTestID(id) else {
             return false
         }
 
@@ -1080,7 +1087,7 @@ enum DDC {
 
     static func isVirtualDisplay(_ id: CGDirectDisplayID, name: String? = nil, checkName: Bool = true) -> Bool {
         var result = false
-        guard !isGeneric(id) else {
+        guard !isGeneric(id), !isTestID(id), id != ALL_DISPLAYS_ID else {
             return result
         }
 
@@ -1100,31 +1107,38 @@ enum DDC {
     }
 
     static func isAirplayDisplay(_ id: CGDirectDisplayID, name: String? = nil, checkName: Bool = true) -> Bool {
-        var result = false
-        guard !isGeneric(id) else {
-            return result
+        guard !isGeneric(id), !isTestID(id), id != ALL_DISPLAYS_ID else {
+            return false
         }
 
         if let panel = DisplayController.panel(with: id), panel.isAirPlayDisplay {
+            if checkName, let name = name ?? panel.displayName {
+                let isAirplay = name.lowercased().contains("airplay")
+                if isAirplay {
+                    log.verbose("Airplay display from panel id \(id) and name \(name)")
+                }
+                return isAirplay
+            }
             return true
         }
 
-        if checkName {
-            let realName = (name ?? Display.printableName(id)).lowercased()
-            result = realName.contains("airplay")
+        if checkName, (name ?? Display.printableName(id)).lowercased().contains("airplay") {
+            return true
         }
 
-        guard !result else { return result }
-        guard let infoDictionary = displayInfoDictionary(id) else {
-            log.debug("No info dict for id \(id)")
-            return result
+        guard let infoDictionary = displayInfoDictionary(id), let isAirplay = infoDictionary["kCGDisplayIsAirPlay"] as? Bool else {
+            log.debug("No info dict for id \(id) when checking Airplay")
+            return false
+        }
+        if isAirplay {
+            log.debug("Airplay display from info dictionary: \(id)")
         }
 
-        return (infoDictionary["kCGDisplayIsAirPlay"] as? Bool) ?? false
+        return isAirplay
     }
 
     static func isSidecarDisplay(_ id: CGDirectDisplayID, name: String? = nil, checkName: Bool = true) -> Bool {
-        guard !isGeneric(id) else {
+        guard !isGeneric(id), !isTestID(id), id != ALL_DISPLAYS_ID else {
             return false
         }
 
@@ -1142,7 +1156,7 @@ enum DDC {
     }
 
     static func isBuiltinDisplay(_ id: CGDirectDisplayID, checkName: Bool = true) -> Bool {
-        guard !isGeneric(id) else { return false }
+        guard !isGeneric(id), !isTestID(id), id != ALL_DISPLAYS_ID else { return false }
         if let panel = DisplayController.panel(with: id) {
             return panel.isBuiltIn || panel.isBuiltInRetina
         }

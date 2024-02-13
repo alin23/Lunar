@@ -5,9 +5,12 @@ set -xe
 LOG_PATH=${LOG_PATH:-/tmp/lunar-sensor-install.log}
 echo "" > "$LOG_PATH"
 
-DIR="${0:a:h}"
+if [[ -z "$DIR" ]]; then
+    DIR="${0:A:h}"
+fi
 BOARD_DIR="/tmp/lunarsensor/$BOARD"
 SENSOR="${SENSOR:-tsl2591}"
+echo "Installing $SENSOR sensor on $BOARD board from inside directory $DIR" >> "$LOG_PATH"
 
 mkdir -p "$BOARD_DIR" || true
 cp -RL "$DIR/install.sh" "$BOARD_DIR/" || true
@@ -22,7 +25,7 @@ echo /usr/bin/python3 -c "open('$BOARD_DIR/lunar.yaml', 'w')\
         open('$DIR/lunar.yaml')\
         .read()\
         .replace('SENSOR_DEFINITION', open('$DIR/$SENSOR.yaml').read())\
-    )"
+    )" >> "$LOG_PATH"
 cd "$BOARD_DIR"
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 

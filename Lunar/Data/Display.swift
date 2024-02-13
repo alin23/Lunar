@@ -170,6 +170,15 @@ let ALL_DISPLAYS: Display = {
         BWqRBb9WWpPF.hasI2C = true
         return BWqRBb9WWpPF
     }()
+    let TEST_SERIALS: Set<String> = [
+        TEST_DISPLAY.serial,
+        TEST_DISPLAY_PERSISTENT.serial,
+        TEST_DISPLAY_PERSISTENT2.serial,
+        TEST_DISPLAY_PERSISTENT3.serial,
+        TEST_DISPLAY_PERSISTENT4.serial,
+        GENERIC_DISPLAY.serial,
+        ALL_DISPLAYS.serial,
+    ]
 #endif
 
 let MAX_SMOOTH_STEP_TIME_NS: UInt64 = 90 * 1_000_000 // 90ms
@@ -1319,7 +1328,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc dynamic lazy var panelModeTitles: [NSAttributedString] = panelModes.map(\.attributedString)
 
     @objc dynamic lazy var panelModes: [MPDisplayMode] = {
-        let modes = ((panel?.allModes() as? [MPDisplayMode]) ?? []).filter {
+        let modes = ((panel?.allModes()) ?? []).filter {
             (panel?.isTV ?? false) || !($0.isTVMode && $0.tvMode != 0)
         }
         guard !modes.isEmpty else { return modes }
@@ -1550,7 +1559,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var blackOutEnabled = false {
         didSet {
-            guard blackOutEnabled != oldValue, isMacBook, CachedDefaults[.keyboardBacklightOffBlackout] else {
+            guard blackOutEnabled != oldValue, isMacBook, CachedDefaults[.keyboardBacklightOffBlackout], DC.keyboardBrightnessAtStart > 0 else {
                 return
             }
             if DC.keyboardAutoBrightnessEnabledByUser {
@@ -1596,7 +1605,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     if subzero { subzero = false }
                     if adaptivePaused { adaptivePaused = false }
                 }
-                if softwareBrightness != 1 { softwareBrightness = 1 }
+                if softwareBrightness != 1, softwareBrightness != -1 { softwareBrightness = 1 }
             } else if !subzero, preciseBrightness == 0, isAllDisplays || (!hasSoftwareControl && !noControls) {
                 withoutApply { subzero = true }
             }
@@ -1736,7 +1745,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                         if subzero { subzero = false }
                         if adaptivePaused { adaptivePaused = false }
                     }
-                    if softwareBrightness != 1 { softwareBrightness = 1 }
+                    if softwareBrightness != 1, softwareBrightness != -1 { softwareBrightness = 1 }
                 } else if !subzero, preciseBrightness == 0, isAllDisplays || (!hasSoftwareControl && !noControls) {
                     withoutApply { subzero = true }
                 }
@@ -1772,7 +1781,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 hideSoftwareOSD()
             }
 
-            if brightness > minBrightness.uint16Value, softwareBrightness < 1 {
+            if brightness > minBrightness.uint16Value, softwareBrightness < 1, softwareBrightness != -1 {
                 softwareBrightness = 1
             } else if brightness < maxBrightness.uint16Value, softwareBrightness > 1 {
                 softwareBrightness = 1
@@ -1961,9 +1970,22 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
         }
     }
+
+    @Published var observableResolution: MPDisplayMode? = nil {
+        didSet {
+            guard apply else { return }
+            panelMode = observableResolution
+        }
+    }
+
     @objc dynamic lazy var panelMode: MPDisplayMode? = panel?.currentMode {
         didSet {
             guard DDC.apply, modeChangeAsk, let window = appDelegate!.windowController?.window else { return }
+
+            withoutApply {
+                observableResolution = panelMode
+            }
+
             modeNumber = panelMode?.modeNumber ?? -1
             if modeNumber != -1 {
                 let onCompletion: (Bool) -> Void = { [weak self] keep in
@@ -2114,7 +2136,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             if !active, let controller = hotkeyPopoverController {
                 #if DEBUG
-                    log.info("Display \(description) is now inactive, disabling hotkeys")
+                    if !isForTesting, !isAllDisplays {
+                        log.info("Display \(description) is now inactive, disabling hotkeys")
+                    }
                 #endif
 
                 controller.hotkey1?.unregister()
@@ -2404,15 +2428,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 if ambientLightCompensationEnabledByUser {
                     systemAdaptiveBrightness = true
                 }
-                // if isMacBook, DC.kbc.brightness(forKeyboard: 1) == 0.01 {
-                //     if DC.keyboardAutoBrightnessEnabledByUser {
-                //         log.debug("Enabling keyboard backlight auto-brightness")
-                //         DC.kbc.enableAutoBrightness(true, forKeyboard: 1)
-                //     }
-
-                //     log.debug("Setting keyboard backlight to \(0.3)")
-                //     DC.kbc.setBrightness(0.3, forKeyboard: 1)
-                // }
             }
 
             log.info("\(name) SOFT BRIGHTNESS: \(softwareBrightness.str(decimals: 2))")
@@ -2557,30 +2572,54 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     static func observeBrightnessChangeDS(_ id: CGDirectDisplayID) -> Bool {
         guard !isGeneric(id), DisplayServicesCanChangeBrightness(id), !isObservingBrightnessChangeDS(id), !CachedDefaults[.disableBrightnessObservers] else {
+            let reason = if isGeneric(id) {
+                "generic"
+            } else if !DisplayServicesCanChangeBrightness(id) {
+                "cannot change brightness"
+            } else if isObservingBrightnessChangeDS(id) {
+                "already observing"
+            } else {
+                "brightness observers disabled"
+            }
+            DS_LOGGER.debug("Ignoring brightness change observer for \(id, privacy: .public). Reason: \(reason, privacy: .public)")
             return true
         }
 
         let result = DisplayServicesRegisterForBrightnessChangeNotifications(id, id) { _, observer, _, _, userInfo in
             guard !DC.screensSleeping, !DC.locked, !AppleNativeControl.sliderTracking else {
+                let reason = DC.screensSleeping ? "screens sleeping" : DC.locked ? "locked" : "dragging slider"
+                DS_LOGGER.debug("Ignoring brightness change notification. Reason: \(reason, privacy: .public)")
                 return
             }
 
             OperationQueue.main.addOperation {
                 guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let observer else {
+                    DS_LOGGER.debug("Invalid brightness change notification: \(userInfo as NSDictionary?, privacy: .public) observer: \(String(describing: observer), privacy: .public)")
                     return
                 }
 
                 let id = CGDirectDisplayID(UInt(bitPattern: observer))
                 guard let display = DC.activeDisplays[id], !display.inSmoothTransition, !display.isBuiltin || !DC.lidClosed else {
+                    let reason = if DC.activeDisplays[id] == nil {
+                        "display not found"
+                    } else if DC.activeDisplays[id]?.inSmoothTransition ?? false {
+                        "in smooth transition"
+                    } else if DC.activeDisplays[id]?.isBuiltin ?? false {
+                        "lid closed"
+                    } else {
+                        "not builtin"
+                    }
+                    DS_LOGGER.debug("Ignoring brightness change notification. Reason: \(reason, privacy: .public)")
                     return
                 }
 
                 let newBrightness = (value * 100).u16
                 guard display.brightnessU16 != newBrightness else {
+                    DS_LOGGER.debug("Ignoring brightness change notification. Reason: same brightness (\(newBrightness, privacy: .public))")
                     return
                 }
 
-                log.verbose("newBrightness: \(newBrightness) display.isUserAdjusting: \(display.isUserAdjusting())")
+                DS_LOGGER.debug("newBrightness: \(newBrightness, privacy: .public) display.isUserAdjusting: \(display.isUserAdjusting(), privacy: .public)")
                 display.lastNativeBrightness = value
                 display.withoutDisplayServices {
                     display.brightness = newBrightness.ns
@@ -2590,7 +2629,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                         display.subzero = false
                         if display.adaptivePaused { display.adaptivePaused = false }
                     }
-                    if display.softwareBrightness != 1 { display.softwareBrightness = 1 }
+                    if display.softwareBrightness != 1, display.softwareBrightness != -1 { display.softwareBrightness = 1 }
                 }
             }
         }
@@ -2768,6 +2807,16 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         action(panel)
         manager.notifyReconfigure()
         manager.unlockAccess()
+    }
+
+    func refetchPanelProps() {
+        isSidecar = DDC.isSidecarDisplay(id, name: edidName)
+        isAirplay = DDC.isAirplayDisplay(id, name: edidName)
+        isVirtual = DDC.isVirtualDisplay(id, name: edidName)
+        isProjector = DDC.isProjectorDisplay(id, name: edidName)
+        supportsGamma = supportsGammaByDefault && !useOverlay
+        supportsGammaByDefault = !isSidecar && !isAirplay && !isVirtual && !isProjector && !isLunaDisplay()
+        supportsFullRangeXDR = getSupportsFullRangeXDR()
     }
 
     func setMode(_ mode: MPDisplayMode?) {
@@ -3193,6 +3242,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     #if arch(arm64)
         var disconnected: Bool { DC.possiblyDisconnectedDisplays[id]?.serial == serial }
+    #else
+        var disconnected = false
     #endif
 
     static let LUX_TO_NITS: [Double: Double] = [
@@ -3279,7 +3330,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     if subzero { subzero = false }
                     if adaptivePaused { adaptivePaused = false }
                 }
-                if softwareBrightness != 1 { softwareBrightness = 1 }
+                if softwareBrightness != 1, softwareBrightness != -1 { softwareBrightness = 1 }
             } else if !subzero, preciseBrightnessContrast == 0, isAllDisplays || (!hasSoftwareControl && !noControls) {
                 withoutApply { subzero = true }
             }
@@ -3387,7 +3438,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             resetScheduledTransition()
             readapt(newValue: adaptiveSubzero, oldValue: oldValue)
-            if !adaptiveSubzero, DC.adaptiveModeKey != .manual, softwareBrightness < 1 {
+            if !adaptiveSubzero, DC.adaptiveModeKey != .manual, softwareBrightness < 1, softwareBrightness != -1 {
                 softwareBrightness = 1
             }
         }
@@ -3399,7 +3450,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @available(iOS 16, macOS 13, *)
     @objc dynamic var panelPresets: [MPDisplayPreset] {
-        (panel?.presets as? [MPDisplayPreset]) ?? []
+        panel?.presets ?? []
     }
 
     @objc dynamic var facelight: Bool {
@@ -4530,7 +4581,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func resetSubZero() {
-        if softwareBrightness < 1 {
+        if softwareBrightness < 1, softwareBrightness != -1 {
             forceHideSoftwareOSD = true
             softwareBrightness = 1
         }
@@ -4560,7 +4611,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 rotation = CGDisplayRotation(id).intround
 
                 guard let mgr = DisplayController.panelManager else { return }
-                panel = mgr.display(withID: id.i32) as? MPDisplay
+                panel = mgr.display(withID: id.i32)
 
                 panelMode = panel?.currentMode
                 modeNumber = panel?.currentMode?.modeNumber ?? -1
@@ -6329,3 +6380,5 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         return adaptive ? .lunar : .system
     }
 }
+
+let DS_LOGGER = Logger(subsystem: "fyi.lunar.Lunar.DisplayServices", category: "default")
