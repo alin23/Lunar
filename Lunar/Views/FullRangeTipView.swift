@@ -29,7 +29,7 @@ struct FullRangeTipView: View {
 
             Downsides:
 
-              - It only works on Apple XDR screens
+              - It only works on MacBook Pro XDR screens
               - The screen will flash one or two times when toggling it
             """)
 

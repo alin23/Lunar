@@ -2347,10 +2347,14 @@ private func handleDisplays(
                 switch operation {
                 case "+" where !Display.CodingKeys.double.contains(property):
                     value = (currentValue.uint16Value + min(value.uint16Value, UINT16_MAX.u16 - currentValue.uint16Value)).ns
+                case "+" where [.defaultGammaBlueValue, .defaultGammaGreenValue, .defaultGammaRedValue].contains(property):
+                    value = (currentValue.doubleValue + min(value.doubleValue, 3.0 - currentValue.doubleValue)).ns
                 case "+" where Display.CodingKeys.double.contains(property):
                     value = (currentValue.doubleValue + min(value.doubleValue, 1.0 - currentValue.doubleValue)).ns
                 case "-" where !Display.CodingKeys.double.contains(property):
                     value = (currentValue.uint16Value - min(value.uint16Value, currentValue.uint16Value)).ns
+                case "-" where [.defaultGammaBlueValue, .defaultGammaGreenValue, .defaultGammaRedValue].contains(property):
+                    value = max(currentValue.doubleValue - value.doubleValue, 0.01).ns
                 case "-" where Display.CodingKeys.double.contains(property):
                     value = (currentValue.doubleValue - min(value.doubleValue, currentValue.doubleValue)).ns
                 case "":

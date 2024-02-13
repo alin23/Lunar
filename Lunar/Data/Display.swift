@@ -529,6 +529,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         #endif
 
         super.init()
+
+        blacks = (defaultGammaRedMin.doubleValue + defaultGammaGreenMin.doubleValue + defaultGammaBlueMin.doubleValue) / 3
+        whites = (defaultGammaRedMax.doubleValue + defaultGammaGreenMax.doubleValue + defaultGammaBlueMax.doubleValue) / 3
+
         maxDDCBrightness = try isSmartBuiltin ? 100 : (container.decodeIfPresent(UInt16.self, forKey: .maxDDCBrightness)?.ns) ?? defaultMaxDDCBrightness.ns
         #if arch(arm64)
             maxNits = try container.decodeIfPresent(Double.self, forKey: .maxNits) ?! getMaxNits()
