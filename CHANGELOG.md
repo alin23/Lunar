@@ -1,3 +1,19 @@
+# 6.6.2
+## Fixes
+
+- Disable **Full Range XDR** on Pro Display XDR screens since it is not working there
+
+# 6.6.1
+## Improvements
+
+- Add `nits` output to the `lunar listen` CLI command
+
+## Fixes
+
+- Fix MediaMate integration on Full Range XDR Brightness
+- Fix external sensor disconnecting every 5 seconds in specific cases
+- Fix **Whites** and **Blacks** not being re-applied after app restart
+
 # 6.6.0
 ## Security
 
@@ -11,7 +27,7 @@
 
 ### Full Range XDR Brightness
 
-This is a new approach for unlocking the 1600nits of brightness in Apple's XDR displays, developed in collaboration with Istvan from [BetterDisplay](https://betterdisplay.pro/).
+This is a new approach for unlocking the 1600nits of brightness in Apple's XDR displays, developed in collaboration with [@waydabber](https://github.com/waydabber) from [BetterDisplay](https://betterdisplay.pro/).
 
 ![full range activation](https://files.lunar.fyi/full-range-activation.gif)
 
@@ -20,6 +36,7 @@ It has the following key differences from the previous XDR Brightness method:
 - It doesn't clip colors in HDR content - no more washed out colors
 - The system adaptive brightness keeps working and uses the full range
 - There's no lag when going from SDR to XDR brightness
+- Can be kept on all the time without any downsides
 - Can work in tandem with f.lux
 
 Downsides:
@@ -459,7 +476,7 @@ Also if the system wakes within 30 minutes of a passed schedule, the brightness 
 # 6.0.3
 ## Features
 
-* `Watchdog`: restart Lunar when it hangs
+* `Watchdog`: restart Lunar when it hangs 
 * **Trigger Sleep when the lid is closed** feature
     * for those people that want the Mac to sleep when closing the lid while connected to a monitor and charging
 
@@ -492,7 +509,7 @@ Also if the system wakes within 30 minutes of a passed schedule, the brightness 
 ## Improvements
 
 * Better performance and lower CPU usage when the menu is not visible
-* Show **"Possibly disconnected"** displays:
+* Show **"Possibly disconnected"** displays: 
     * these are displays that have **Auto Disconnect** enabled but can't be detected as having the cable connected or not
     * they are always shown until connected to make sure there's always a way to disable Auto Disconnect
 
@@ -651,7 +668,7 @@ Both Thunderbolt/DP and HDMI connections on M2 Pro/Max should support DDC in thi
 
 ### Disconnect screens
 
-You'll notice two new actions in macOS Shortcuts: **Disconnect screen** and **Reconnect screen**.
+You'll notice two new actions in macOS Shortcuts: **Disconnect screen** and **Reconnect screen**. 
 
 ![disconnect screen shortcuts](https://files.lunar.fyi/disconnect-screen-shortcuts.png)
 
@@ -682,7 +699,7 @@ I'm planning to integrate them into BlackOut eventually but there's a lot more t
 * Volume slider was not showing for network controlled monitors
 * Lock the panel manager when using resolution/preset Shortcuts
 # 5.9.3
-Sorry for the fast paced updates.
+Sorry for the fast paced updates. 
 
 Here's a reminder of how you can switch to checking for updates less often:
 
@@ -695,7 +712,7 @@ Here's a reminder of how you can switch to checking for updates less often:
 * Fix Sync Mode polling interval 0 not working on Apple external displays
 * Fix Apple displays brightness value not getting updated inside Lunar
 * Fix Network Control not working
-* Fix "Find Screen" Shortcut comparators
+* Fix "Find Screen" Shortcut comparators 
 * Fix "Set Resolution" Shortcut
 * Fix dragging Sub-zero Brightness slider not triggering the auto learning algorithm in adaptive modes
 # 5.9.2
@@ -1015,7 +1032,7 @@ for Sub-zero dimming, XDR Brightness and Contrast adjustments
 ### Improvements
 
 * Automatically set Curve Slope to middle point on target monitors identical to the source
-* Print single property on multiple displays when using the `displays` CLI command
+* Print single property on multiple displays when using the `displays` CLI command 
 * Add **Hide Menubar Icon** setting on the [Configuration page](lunar://configuration)
 
 ## Fixes
@@ -1092,7 +1109,7 @@ for Sub-zero dimming, XDR Brightness and Contrast adjustments
 
 ## Licensing model
 
-**Some clarifications are needed after the last change:**
+**Some clarifications are needed after the last change:** 
 
 * I don't have any plans on releasing a major version this year
 * If for some reason I have to do that, everyone who paid for the 1-year of free updates before the change will receive the update for free if it's within their update period
@@ -1112,7 +1129,7 @@ The contrast slider allows adjusting the pixel value formula for the brightest/d
 Developed in collaboration with the creator of [BetterDummy](https://github.com/waydabber/BetterDummy), using a more native approach to provide:
 
 * Stable experience when toggling XDR
-* Compatibility with higher brightness non-Apple HDR monitors
+* Compatibility with higher brightness non-Apple HDR monitors  
 * Dynamic EDR pixel values to maximise the nits allowance based on the current brightness
 
 ![XDR option for HDR monitors](https://files.lunar.fyi/xdr-hdr-monitors.png)
@@ -1152,7 +1169,7 @@ Developed in collaboration with the creator of [BetterDummy](https://github.com/
 # 5.6.2
 ## Licensing model
 
-**Some clarifications are needed after the last change:**
+**Some clarifications are needed after the last change:** 
 
 * I don't have any plans on releasing a major version this year
 * If for some reason I have to do that, everyone who paid for the 1-year of free updates before the change will receive the update for free if it's within their update period
@@ -1172,7 +1189,7 @@ The contrast slider allows adjusting the pixel value formula for the brightest/d
 Developed in collaboration with the creator of [BetterDummy](https://github.com/waydabber/BetterDummy), using a more native approach to provide:
 
 * Stable experience when toggling XDR
-* Compatibility with higher brightness non-Apple HDR monitors
+* Compatibility with higher brightness non-Apple HDR monitors  
 * Dynamic EDR pixel values to maximise the nits allowance based on the current brightness
 
 ![XDR option for HDR monitors](https://files.lunar.fyi/xdr-hdr-monitors.png)
@@ -1707,7 +1724,7 @@ Added **BlackOut without mirroring** on holding `Shift`.
 ## Features
 
 * Add back the Adaptive Mode dropdown in the QuickActions menu
-* Add more useful buttons at the bottom of the QuickActions menu:
+* Add more useful buttons at the bottom of the QuickActions menu: 
     * **Preferences**
     * **Restart**
     * **Quit**
@@ -1715,7 +1732,7 @@ Added **BlackOut without mirroring** on holding `Shift`.
 ## Improvements
 
 * Add menu item to **Relaunch the onboarding process**
-* Improve QuickActions menu height formula
+* Improve QuickActions menu height formula 
 * Add notice about how to relaunch onboarding if needed
 * Improve brightness slider for built-in display
 
@@ -1735,7 +1752,7 @@ Added **BlackOut without mirroring** on holding `Shift`.
 # 5.0.4
 ## Fixes
 
-* Fix issue where adjusting brightness with keys would double the change for external displays
+* Fix issue where adjusting brightness with keys would double the change for external displays 
 
 # 5.0.3
 ## Features
@@ -1864,7 +1881,7 @@ Using the sliders for changing the built-in brightness will still have the rever
 
 ## Improvements
 
-* Enable the power button in the Lunar window to also work when the **Allow BlackOut on single screen** option is enabled
+* Enable the power button in the Lunar window to also work when the **Allow BlackOut on single screen** option is enabled 
 * Add high memory usage checker to aid in fixing memory errors in the future
 * Smooth transitions can now happen in parallel if there are multiple displays with different controls
 * Cut the memory usage in half by replacing large images in the UI with vector-drawn bezier paths
@@ -1881,7 +1898,7 @@ Using the sliders for changing the built-in brightness will still have the rever
 
 * **Useful Info** menu item in menu bar that can also be hidden
 * **Allow BlackOut on single screen** advanced setting for people that:
-    * mostly use BlackOut from the keyboard
+    * mostly use BlackOut from the keyboard 
     * have the need to turn off the external monitor while the MacBook is in clamshell mode
 * Option to show brightness and contrast of the active display beside the menu bar icon
 * Option to hide the orientation switcher in the QuickActions menu
@@ -1917,7 +1934,7 @@ Using the sliders for changing the built-in brightness will still have the rever
 ## Improvements
 
 * Improve dynamic gain on the TSL2591 external light sensor by checking for overflows
-    * You will need to reinstall the ambient light sensor firmware to get this improvement
+    * You will need to reinstall the ambient light sensor firmware to get this improvement 
 * Improve Gamma smooth transitions by removing unnecessary animations and allowing it to appear on Mission Control
     * Thanks to [@waydabber](https://github.com/waydabber) for finding out this edge case and for suggesting that the window needs to be set as `stationary` to fix it
 * Recover Facelight state after screen sleep/wake
@@ -2078,7 +2095,7 @@ Using the sliders for changing the built-in brightness will still have the rever
 * Pin `TSL2591` library to a known working version
 * Fix DDC limits not being applied correctly in Manual Mode
 * Fix data race crash when iterating some dictionaries
-* Allow brightness 0 in Sync Mode on iMacs
+* Allow brightness 0 in Sync Mode on iMacs 
 
 # 4.7.2
 ## Improvements
@@ -2100,7 +2117,7 @@ Using the sliders for changing the built-in brightness will still have the rever
 
 * Remove the need for a yellow dot in Gamma and Network control
 * Add **Show virtual displays** checkbox in [Advanced settings](lunar://advanced)
-    * Turns out DisplayLink monitors show up as virtual and you need this checked if you want Lunar to see the monitor
+    * Turns out DisplayLink monitors show up as virtual and you need this checked if you want Lunar to see the monitor 
 * Fix Gamma **(Software Controls)** curve calculation being skewed in the 0% to 10% range
     * The zero point (no gamma changes) is now when BRIGHTNESS=100 and CONTRAST=75
     * Lightness change between brightness values should be more consistent with the human eye response to light
@@ -2164,7 +2181,7 @@ Using the sliders for changing the built-in brightness will still have the rever
 * Curve factors separated by display and mode
     * The curve factors are now found in the gear icon menu and are stored on a per-monitor and per-mode basis
     * If you set some curve factors while Lunar is in Sync Mode and then change to Location Mode for example, there will be different curve factor values
-
+    
 ## Improvements
 
 * Re-apply brightness and contrast when the display control changes
@@ -2240,7 +2257,7 @@ Using the sliders for changing the built-in brightness will still have the rever
 * Fix brightness flickering caused by Gamma controls kicking in faster than DDC/CoreDisplay/Network by adding a 5 second delay to the Gamma setter after:
     * App launch
     * System startup
-    * Login
+    * Login 
     * Wake from standby
     * Display connection/reconnection
 
@@ -2300,7 +2317,7 @@ Using the sliders for changing the built-in brightness will still have the rever
 
 ## Improvements
 
-* Show why Sync/Location/Sensor modes are disabled when Lunar Pro is not active
+* Show why Sync/Location/Sensor modes are disabled when Lunar Pro is not active 
 * Add **Join the community** menu item
 
 # 4.1.3
@@ -2502,9 +2519,9 @@ Head over to [the official website](https://lunar.fyi) for more details.
 - Show native OSD when changing monitor brightness, contrast and volume
 - Implement listeners for media keys
     * Lunar will ask for accessibility permissions to enable this functionality
-    * Instructions:
-        * Press keyboard brightness keys while the cursor is on an external monitor to change the brightness on that monitor
-        * Press Control + keyboard brightness keys to adjust contrast
+    * Instructions: 
+        * Press keyboard brightness keys while the cursor is on an external monitor to change the brightness on that monitor 
+        * Press Control + keyboard brightness keys to adjust contrast 
         * Press keyboard volume/mute keys while the audio output is set to the monitor audio device to adjust volume/mute
         * In multi-monitor setups, Lunar can't detect which monitor audio device is selected so it will change the volume of the display that the cursor is on
 - Many thanks to Hongfeng Xu (@Mic238) for helping me with extensive testing on these features!
@@ -2515,7 +2532,7 @@ Head over to [the official website](https://lunar.fyi) for more details.
 - Detect non-responsive monitors and show that in the Quick Actions popover
 - Automatic detection of GPU for adaptive DDC reply delay
     - This should minimize kernel panics and system freezes when reading values from the monitor
-- Add special brightness implementation for **LED Cinema** monitors
+- Add special brightness implementation for **LED Cinema** monitors 
 
 ## Fixes
 - Fixed a typo that was preventing smooth transition to be disabled for contrast
