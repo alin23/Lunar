@@ -939,7 +939,7 @@ final class DisplayController: ObservableObject {
 
     var possiblyDisconnectedDisplays: [CGDirectDisplayID: Display] = [:] {
         didSet {
-            debug("possiblyDisconnectedDisplays: \(possiblyDisconnectedDisplays.keys.sorted())")
+            debug("possiblyDisconnectedDisplays: \(self.possiblyDisconnectedDisplays.keys.sorted())")
             possiblyDisconnectedDisplayList = possiblyDisconnectedDisplays.values.sorted(by: \.id)
         }
     }

@@ -1141,7 +1141,7 @@ Power off a screen by:
         let displayIDs = Set(displays.map(\.id))
 
         if disableScreen {
-            if let master = screen.dynamicDisplay {
+            if let master = visibleScreen?.dynamicDisplay {
                 if displays.contains(master) {
                     if skipMissingScreen {
                         return .result()
@@ -1165,9 +1165,11 @@ Power off a screen by:
         }
 
         var master: Display?
-        if disableScreen, let masterD = screen.dynamicDisplay ?? DC.activeDisplayList.filter(
-            { !displayIDs.contains($0.id) && !$0.blackOutEnabled }
-        ).first {
+        if disableScreen, let masterD = visibleScreen?
+            .dynamicDisplay ?? DC.activeDisplayList.filter(
+                { !displayIDs.contains($0.id) && !$0.blackOutEnabled }
+            ).first
+        {
             master = masterD
         }
 
