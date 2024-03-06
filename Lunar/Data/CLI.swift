@@ -478,7 +478,7 @@ struct Lunar: ParsableCommand {
         @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
         @Argument(
-            help: "Display serial or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
+            help: "Display serial or name (without spaces) or one of the following"
         )
         var display: DisplayFilter = .all
 
@@ -585,11 +585,11 @@ struct Lunar: ParsableCommand {
 
         @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
-        @Argument(help: "Method to call. One of (\(AppleNativeMethod.allCases.map(\.rawValue).joined(separator: ", ")))")
+        @Argument(help: "Method to call")
         var method: AppleNativeMethod
 
         @Argument(
-            help: "Display serial or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
+            help: "Display serial or name (without spaces) or one of the following"
         )
         var display: DisplayFilter
 
@@ -674,7 +674,7 @@ struct Lunar: ParsableCommand {
         var method: DisplayServicesMethod
 
         @Argument(
-            help: "Display serial or name (without spaces) or one of the following special values"
+            help: "Display serial or name (without spaces) or one of the following"
         )
         var display: DisplayFilter
 
@@ -859,7 +859,7 @@ struct Lunar: ParsableCommand {
         var sourceAddress = "0x51"
 
         @Argument(
-            help: "Display serial or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
+            help: "Display serial or name (without spaces) or one of the following"
         )
         var display: DisplayFilter
 
@@ -1226,7 +1226,7 @@ struct Lunar: ParsableCommand {
         var onlyUserAdjustments = false
 
         @Argument(
-            help: "Display serial or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
+            help: "Display serial or name (without spaces) or one of the following"
         )
         var display: DisplayFilter = .all
 
@@ -1360,7 +1360,7 @@ struct Lunar: ParsableCommand {
         var controls: [DisplayControl] = [.appleNative, .ddc, .network]
 
         @Argument(
-            help: "Display serial or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
+            help: "Display serial or name (without spaces) or one of the following"
         )
         var display: DisplayFilter?
 
@@ -1565,7 +1565,7 @@ struct Lunar: ParsableCommand {
 
         @Option(
             name: .long,
-            help: "Display serial or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
+            help: "Display serial or name (without spaces) or one of the following"
         )
         var display: DisplayFilter = .bestGuess
 
@@ -1709,7 +1709,7 @@ struct Lunar: ParsableCommand {
         @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
         @Argument(
-            help: "Display serial or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
+            help: "Display serial or name (without spaces) or one of the following"
         )
         var display = DisplayFilter.bestGuess
 
@@ -1758,7 +1758,7 @@ struct Lunar: ParsableCommand {
         var master: DisplayFilter = .none
 
         @Argument(
-            help: "Display serial or name (without spaces) or one of the following special values (\(DisplayFilter.allValueStrings.joined(separator: ", ")))"
+            help: "Display serial or name (without spaces) or one of the following"
         )
         var display = DisplayFilter.bestGuess
 
@@ -1810,7 +1810,7 @@ struct Lunar: ParsableCommand {
             @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
             @Argument(
-                help: "Display serial, ID or name (without spaces) or one of the following special values (sidecar, \(DisplayFilter.allValueStrings.joined(separator: ", ")))"
+                help: "Display serial, ID or name (without spaces) or one of the following: sidecar or"
             )
             var display = DisplayFilter.builtin
 
@@ -1862,7 +1862,7 @@ struct Lunar: ParsableCommand {
             @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
             @Argument(
-                help: "Display serial, ID or name (without spaces) or one of the following special values (sidecar, \(DisplayFilter.allValueStrings.joined(separator: ", ")))"
+                help: "Display serial, ID or name (without spaces) or one of the following: sidecar or"
             )
             var display = DisplayFilter.builtin
 
@@ -1926,7 +1926,7 @@ struct Lunar: ParsableCommand {
             @OptionGroup(visibility: .hidden) var globals: GlobalOptions
 
             @Argument(
-                help: "Display serial, ID or name (without spaces) or one of the following special values (sidecar, \(DisplayFilter.allValueStrings.joined(separator: ", ")))"
+                help: "Display serial, ID or name (without spaces) or one of the following: sidecar or"
             )
             var display = DisplayFilter.builtin
 
