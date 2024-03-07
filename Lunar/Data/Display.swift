@@ -1328,10 +1328,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @objc dynamic lazy var panelModeTitles: [NSAttributedString] = panelModes.map(\.attributedString)
 
     @objc dynamic lazy var panelModes: [MPDisplayMode] = {
-        let modes = ((panel?.allModes()) ?? []).filter {
-            (panel?.isTV ?? false) || !($0.isTVMode && $0.tvMode != 0)
+        //  ?? []
+        // .filter {
+        //     (panel?.isTV ?? false) || !($0.isTVMode && $0.tvMode != 0)
+        // }
+        guard let modes = panel?.allModes(), !modes.isEmpty else {
+            return []
         }
-        guard !modes.isEmpty else { return modes }
 
         let grouped = Dictionary(grouping: modes, by: \.refreshRate).sorted(by: { $0.key >= $1.key })
         return Array(grouped.map { $0.value.sorted(by: { $0.dotsPerInch <= $1.dotsPerInch }).reversed() }.joined())
