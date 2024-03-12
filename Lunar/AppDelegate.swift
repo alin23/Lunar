@@ -2165,6 +2165,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 options.environment = "production"
                 options.appHangTimeoutInterval = 60
             #endif
+            options.enableNetworkTracking = false
 
             if Defaults[.autoRestartOnHang] {
                 options.beforeSend = { event in

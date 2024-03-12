@@ -123,8 +123,8 @@
         "repositoryURL": "https://github.com/getsentry/sentry-cocoa",
         "state": {
           "branch": null,
-          "revision": "b847a202a517a90763e8fd0656d8028aeee7b78d",
-          "version": "8.20.0"
+          "revision": "38f4f70d07117b9f958a76b1bff278c2f29ffe0e",
+          "version": "8.21.0"
         }
       },
       {
@@ -132,7 +132,7 @@
         "repositoryURL": "https://github.com/rnine/SimplyCoreAudio",
         "state": {
           "branch": "develop",
-          "revision": "99caee2ca2bcd33f49e4e2c0d8ba898c33421508",
+          "revision": "b5430564b1d55adab3c331fb7574445a84bd4ceb",
           "version": null
         }
       },
@@ -204,8 +204,8 @@
         "repositoryURL": "https://github.com/siteline/SwiftUI-Introspect",
         "state": {
           "branch": null,
-          "revision": "18e965f867e37a558ad13c12d330dbe047099180",
-          "version": "1.1.2"
+          "revision": "0cd2a5a5895306bc21d54a2254302d24a9a571e4",
+          "version": "1.1.3"
         }
       },
       {

@@ -1533,11 +1533,11 @@ struct ToggleBlackOutIntent: AppIntent {
 }
 
 @available(iOS 16, macOS 13, *)
-enum ScreenRotationDegrees: Int, AppEnum, CaseDisplayRepresentable, TypeDisplayRepresentable {
-    case normal = 0
-    case portraitToLeft = 90
-    case upsideDown = 180
-    case portraitToRight = 270
+enum ScreenRotationDegrees: String, AppEnum, CaseDisplayRepresentable, TypeDisplayRepresentable {
+    case normal // 0
+    case portraitToLeft // 90
+    case upsideDown // 180
+    case portraitToRight // 270
 
     static var caseDisplayRepresentations: [ScreenRotationDegrees: DisplayRepresentation] = [
         .normal: "No rotation (0°)",
@@ -1547,6 +1547,16 @@ enum ScreenRotationDegrees: Int, AppEnum, CaseDisplayRepresentable, TypeDisplayR
     ]
 
     static var typeDisplayRepresentation: TypeDisplayRepresentation { TypeDisplayRepresentation(name: "Rotation Degrees") }
+
+    var degrees: Int {
+        switch self {
+        case .normal: 0
+        case .portraitToLeft: 90
+        case .upsideDown: 180
+        case .portraitToRight: 270
+        }
+    }
+
 }
 
 @available(iOS 16, macOS 13, *)
@@ -1574,19 +1584,19 @@ struct RotateScreenIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<Int> {
         try checkShortcutsLimit()
-        try controlScreen(screen: $screen, property: .rotation, value: rotation.rawValue.s, skipMissingScreen: skipMissingScreen)
-        return .result(value: screen.display?.rotation ?? rotation.rawValue)
+        try controlScreen(screen: $screen, property: .rotation, value: rotation.degrees.s, skipMissingScreen: skipMissingScreen)
+        return .result(value: screen.display?.rotation ?? rotation.degrees)
     }
 }
 
 @available(iOS 16, macOS 13, *)
-enum AdaptiveModeKeyForIntent: Int, AppEnum {
-    case location = 1
-    case sync = -1
-    case manual = 0
-    case sensor = 2
-    case clock = 3
-    case auto = 99
+enum AdaptiveModeKeyForIntent: String, AppEnum {
+    case location // 1
+    case sync // -1
+    case manual // 0
+    case sensor // 2
+    case clock // 3
+    case auto // 99
 
     static var typeDisplayRepresentation: TypeDisplayRepresentation {
         TypeDisplayRepresentation(name: "Adaptive Mode")
@@ -1606,7 +1616,14 @@ enum AdaptiveModeKeyForIntent: Int, AppEnum {
     var description: String { AdaptiveModeKeyForIntent.caseDisplayRepresentations[self]!.title.key }
 
     var adaptiveModeKey: AdaptiveModeKey {
-        AdaptiveModeKey(rawValue: rawValue)!
+        switch self {
+        case .manual: .manual
+        case .sync: .sync
+        case .sensor: .sensor
+        case .location: .location
+        case .clock: .clock
+        case .auto: .auto
+        }
     }
 }
 
