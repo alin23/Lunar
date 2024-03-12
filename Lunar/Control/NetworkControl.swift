@@ -393,7 +393,7 @@ final class NetworkControl: Control {
             item.removeDuplicates()
                 .throttle(for: .milliseconds(500), scheduler: RunLoop.main, latest: true)
                 .sink { [weak self] request in
-                    guard let self, !DC.screensSleeping, !DC.locked else { return }
+                    guard let self, !DC.screensSleeping, !DC.locked || DC.allowAdjustmentsWhileLocked else { return }
 
                     serviceBrowserQueue.async { [weak self] in
                         guard let self else { return }
@@ -484,7 +484,7 @@ final class NetworkControl: Control {
     func get(_ controlID: ControlID, max: Bool = false) -> UInt16? {
         guard let display else { return nil }
 
-        guard !DC.screensSleeping, !DC.locked else { return nil }
+        guard !DC.screensSleeping, !DC.locked || DC.allowAdjustmentsWhileLocked else { return nil }
 
         _ = getterTasksSemaphore.wait(for: 5.seconds)
         defer { getterTasksSemaphore.signal() }

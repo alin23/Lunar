@@ -1668,6 +1668,48 @@ class ExpiringOptional<T>: ExpressibleByNilLiteral, CustomStringConvertible, Obs
     }
 }
 
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+@propertyWrapper
+public class Setting<Value: Defaults.Serializable> {
+    public init(_ key: Defaults.Key<Value>) {
+        self.key = key
+        storage = Storage(initialValue: Defaults[key])
+        observer = Defaults.publisher(key)
+            .debounce(for: .milliseconds(10), scheduler: RunLoop.main)
+            .sink { [weak self] in
+                guard let self else { return }
+                storage.value = $0.newValue
+                storage.oldValue = $0.oldValue
+            }
+    }
+
+    public typealias Publisher = AnyPublisher<Defaults.KeyChange<Value>, Never>
+
+    public var wrappedValue: Value {
+        get { storage.value }
+        set {
+            storage.oldValue = storage.value
+            storage.value = newValue
+            Defaults.withoutPropagation {
+                Defaults[key] = newValue
+            }
+        }
+    }
+
+    private class Storage {
+        init(initialValue: Value) {
+            value = initialValue
+        }
+
+        var value: Value
+        var oldValue: Value?
+    }
+
+    private var observer: Cancellable?
+    private var storage: Storage
+    private let key: Defaults.Key<Value>
+}
+
 // MARK: - AtomicLock
 
 @propertyWrapper

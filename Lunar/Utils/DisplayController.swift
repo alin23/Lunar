@@ -507,6 +507,7 @@ final class DisplayController: ObservableObject {
 
     var cachedOnlineDisplayIDs: Set<CGDirectDisplayID> = Set(NSScreen.onlineDisplayIDs)
 
+    @Setting(.allowAdjustmentsWhileLocked) var allowAdjustmentsWhileLocked: Bool
     @Atomic var locked = false {
         didSet {
             log.debug("Screen \(locked ? "locked" : "unlocked")")
@@ -2616,14 +2617,14 @@ final class DisplayController: ObservableObject {
     }
 
     func adaptBrightness(for display: Display, force: Bool = false) {
-        guard adaptiveMode.available, !screensSleeping, !locked, DDC.shouldWait else { return }
+        guard adaptiveMode.available, !screensSleeping, !locked || allowAdjustmentsWhileLocked, DDC.shouldWait else { return }
         adaptiveMode.withForce(force || display.force) {
             self.adaptiveMode.adapt(display)
         }
     }
 
     func adaptBrightness(for displays: [Display]? = nil, force: Bool = false) {
-        guard adaptiveMode.available, !screensSleeping, !locked, DDC.shouldWait else { return }
+        guard adaptiveMode.available, !screensSleeping, !locked || allowAdjustmentsWhileLocked, DDC.shouldWait else { return }
         for display in (displays ?? activeDisplayList).filter({ !$0.blackOutEnabled }) {
             adaptiveMode.withForce(force || display.force) {
                 guard !display.enhanced else {

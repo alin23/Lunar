@@ -2589,7 +2589,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         let result = DisplayServicesRegisterForBrightnessChangeNotifications(id, id) { _, observer, _, _, userInfo in
-            guard !DC.screensSleeping, !DC.locked, !AppleNativeControl.sliderTracking else {
+            guard !DC.screensSleeping, !DC.locked || DC.allowAdjustmentsWhileLocked, !AppleNativeControl.sliderTracking else {
                 let reason = DC.screensSleeping ? "screens sleeping" : DC.locked ? "locked" : "dragging slider"
                 DS_LOGGER.debug("Ignoring brightness change notification. Reason: \(reason, privacy: .public)")
                 return
@@ -4081,7 +4081,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-    var shouldAdapt: Bool { adaptive && !adaptivePaused && !systemAdaptiveBrightness && !noControls && !DC.screensSleeping && !DC.locked }
+    var shouldAdapt: Bool { adaptive && !adaptivePaused && !systemAdaptiveBrightness && !noControls && !DC.screensSleeping && (!DC.locked || DC.allowAdjustmentsWhileLocked) }
     @Published @objc dynamic var adaptive: Bool {
         didSet {
             save()
@@ -5498,7 +5498,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         log.debug("Starting slow brightness transition until \(period.fromNow): \(currentValue) -> \(value)")
         scheduledBrightnessTask = Repeater(every: period.timeInterval / steps.count.d, times: steps.count, name: "scheduledBrightnessSlowTransition", onFinish: { [weak self] in self?.scheduledBrightnessTask = nil }) { [weak self] in
-            guard !DC.screensSleeping, !DC.locked, let self, !steps.isEmpty else { return }
+            guard !DC.screensSleeping, !DC.locked || DC.allowAdjustmentsWhileLocked, let self, !steps.isEmpty else { return }
 
             self.inSchedule = true
             adjust(self, steps.removeFirst())
@@ -5513,7 +5513,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         log.debug("Starting slow contrast transition until \(period.fromNow): \(currentValue) -> \(value)")
         scheduledContrastTask = Repeater(every: period.timeInterval / steps.count.d, times: steps.count, name: "scheduledContrastSlowTransition", onFinish: { [weak self] in self?.scheduledContrastTask = nil }) { [weak self] in
-            guard !DC.screensSleeping, !DC.locked, let self, !steps.isEmpty else { return }
+            guard !DC.screensSleeping, !DC.locked || DC.allowAdjustmentsWhileLocked, let self, !steps.isEmpty else { return }
 
             self.inSchedule = true
             adjust(self, steps.removeFirst())

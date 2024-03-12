@@ -1543,7 +1543,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             .debounce(for: .milliseconds(200), scheduler: RunLoop.main)
             .sink { _ in
                 wakeTime = Date()
-                guard !DC.locked else { return }
+                guard !DC.locked || DC.allowAdjustmentsWhileLocked else { return }
                 reapplyAfterWake()
             }.store(in: &observers)
 

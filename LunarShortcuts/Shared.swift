@@ -232,6 +232,7 @@ extension Defaults.Keys {
     static let syncMode = Key<Bool>("syncMode", default: false)
     static let overrideAdaptiveMode = Key<Bool>("overrideAdaptiveMode", default: false)
     static let reapplyValuesAfterWake = Key<Bool>("reapplyValuesAfterWake", default: true)
+    static let allowAdjustmentsWhileLocked = Key<Bool>("allowAdjustmentsWhileLocked", default: false)
     static let waitAfterWakeSeconds = Key<Int>("waitAfterWakeSeconds", default: 30)
     static let delayDDCAfterWake = Key<Bool>("delayDDCAfterWake", default: false)
     static let wakeReapplyTries = Key<Int>("wakeReapplyTries", default: 5)

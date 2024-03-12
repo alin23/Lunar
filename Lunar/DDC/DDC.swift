@@ -1174,9 +1174,9 @@ enum DDC {
 
     static func write(displayID: CGDirectDisplayID, controlID: ControlID, newValue: UInt16, sourceAddr: UInt8? = nil) -> Bool {
         #if DEBUG
-            guard apply, !isTestID(displayID), !shouldWait, !DC.screensSleeping, !DC.locked else { return true }
+            guard apply, !isTestID(displayID), !shouldWait, !DC.screensSleeping, !DC.locked || DC.allowAdjustmentsWhileLocked else { return true }
         #else
-            guard apply, !shouldWait, !DC.screensSleeping, !DC.locked else { return true }
+            guard apply, !shouldWait, !DC.screensSleeping, !DC.locked || DC.allowAdjustmentsWhileLocked else { return true }
         #endif
 
         #if arch(arm64)
