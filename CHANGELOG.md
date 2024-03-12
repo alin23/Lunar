@@ -1,3 +1,16 @@
+# 6.6.4
+## Improvements
+
+- Add support for **MacBook Air M3** models
+
+## Fixes
+
+- Fix **Power off screen (in software)** Shortcut
+- Fix BlackOut not being able to re-apply previous resolution
+- Fix missing resolutions from the list
+- Add hidden setting `allowAdjustmentsWhileLocked` for who may need it
+- Fix "Change Adaptive Mode" and "Rotate Screen" shortcuts not working on some systems
+
 # 6.6.3
 ## Fixes
 
