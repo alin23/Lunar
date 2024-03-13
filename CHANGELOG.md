@@ -1,3 +1,8 @@
+# 6.6.5
+## Fixes
+
+- Remove leftover usage of a non-standard command-line tool that was prompting unnecessary installation of Xcode Command Line Tools
+
 # 6.6.4
 ## Improvements
 
