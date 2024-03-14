@@ -67,6 +67,7 @@
 		C73B41F6263E1301006F6783 /* ddcctl in Resources */ = {isa = PBXBuildFile; fileRef = C73B41F5263E1301006F6783 /* ddcctl */; };
 		C73B9A0D25FB9AD7003184FC /* Glob in Frameworks */ = {isa = PBXBuildFile; productRef = C73B9A0C25FB9AD7003184FC /* Glob */; };
 		C73CC6AE24616462003B2658 /* Sauce in Frameworks */ = {isa = PBXBuildFile; productRef = C73CC6AD24616462003B2658 /* Sauce */; };
+		C73F56222BA38DF700343E5A /* BezelServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C73F56212BA38DF700343E5A /* BezelServices.framework */; };
 		C740A1F4262490E1004BC1C7 /* CLI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C740A1F3262490E1004BC1C7 /* CLI.swift */; };
 		C740A1F826249176004BC1C7 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = C740A1F726249176004BC1C7 /* ArgumentParser */; };
 		C743892C29474597004C5D9B /* WAYWindow.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7B2EB212947458300D02BCB /* WAYWindow.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -293,6 +294,7 @@
 		C73AAC4A22241B690063AD2A /* Hotkeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hotkeys.swift; sourceTree = "<group>"; };
 		C73B41EA263BE01F006F6783 /* LetsMove.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = LetsMove.framework; sourceTree = "<group>"; };
 		C73B41F5263E1301006F6783 /* ddcctl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ddcctl; path = bin/ddcctl; sourceTree = SOURCE_ROOT; };
+		C73F56212BA38DF700343E5A /* BezelServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BezelServices.framework; path = ../../../../../System/Library/PrivateFrameworks/BezelServices.framework; sourceTree = "<group>"; };
 		C740A1F3262490E1004BC1C7 /* CLI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLI.swift; sourceTree = "<group>"; };
 		C74820F926DE6CFA00556EA8 /* PageNavigationControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageNavigationControl.swift; sourceTree = "<group>"; };
 		C7482C3227D2874D00A12E82 /* ColorizeSwift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorizeSwift.swift; sourceTree = "<group>"; };
@@ -445,6 +447,7 @@
 				C799C2F527BF67C4003A2FB9 /* Socket in Frameworks */,
 				C73CC6AE24616462003B2658 /* Sauce in Frameworks */,
 				C70A793D2AB471F900289426 /* SwiftUIIntrospect in Frameworks */,
+				C73F56222BA38DF700343E5A /* BezelServices.framework in Frameworks */,
 				C7045DAA24407CBC002289E5 /* Surge in Frameworks */,
 				C76168FC29B8B91C00D0A33A /* SidecarCore.framework in Frameworks */,
 				C7ECB6722750C75C00DA212D /* LDSwiftEventSourceStatic in Frameworks */,
@@ -780,6 +783,7 @@
 		C7CFEA241FD3787B000AC4A6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C73F56212BA38DF700343E5A /* BezelServices.framework */,
 				C76168FB29B8B91C00D0A33A /* SidecarCore.framework */,
 				C7B2EB212947458300D02BCB /* WAYWindow.framework */,
 				C77C77512811A77B006326BE /* Sparkle.framework */,
@@ -1337,7 +1341,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 6.6.5;
+				CURRENT_PROJECT_VERSION = 6.7.0b1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1369,7 +1373,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 6.6.5;
+				MARKETING_VERSION = 6.7.0b1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1403,7 +1407,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 6.6.5;
+				CURRENT_PROJECT_VERSION = 6.7.0b1;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = RDDXV84A73;
@@ -1434,7 +1438,7 @@
 				);
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 6.6.5;
+				MARKETING_VERSION = 6.7.0b1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;

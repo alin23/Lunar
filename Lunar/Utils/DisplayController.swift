@@ -2568,7 +2568,9 @@ final class DisplayController: ObservableObject {
                 let identifiers = change.compactMap(\.bundleIdentifier)
 
                 runningAppExceptions = datastore.appExceptions(identifiers: Array(identifiers.uniqued())) ?? []
-                log.info("Running app presets: \(runningAppExceptions.map(\.name))")
+                if !runningAppExceptions.isEmpty {
+                    log.info("Running app presets: \(runningAppExceptions.map(\.name))")
+                }
                 displayLinkRunning = isDisplayLinkRunning()
 
                 guard adaptiveModeKey != .manual else {

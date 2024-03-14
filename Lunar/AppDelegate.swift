@@ -2076,7 +2076,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
         guard let idx = CommandLine.arguments.firstIndex(of: "@") else { return false }
 
-        configureSentry()
+        if isServer { configureSentry() }
         asyncNow { [self] in
             #if DEBUG
                 let argList: [String] = if CommandLine.arguments.contains("-NSDocumentRevisionsDebugMode"), CommandLine.arguments.last == "YES" {

@@ -221,7 +221,7 @@ extension Defaults.Keys {
 
     static let ddcSleepLonger = Key<Bool>("ddcSleeplonger", default: false)
 
-    static let sensorPollingSeconds = Key<Int>("sensorPollingSeconds", default: 1)
+    static let sensorPollingSeconds = Key<Double>("sensorPollingSeconds", default: 1)
     static let adaptiveBrightnessMode = Key<AdaptiveModeKey>("adaptiveBrightnessMode", default: .sync)
 
     static let hasBuiltin = Key<Bool>("hasBuiltin", default: Sysctl.isMacBook || Sysctl.isiMac)

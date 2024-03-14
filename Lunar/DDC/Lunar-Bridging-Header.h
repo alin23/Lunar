@@ -21,6 +21,8 @@
 #import <MonitorPanel/MPDisplayPreset.h>
 #import <MonitorPanel/CDStructures.h>
 #import "Bridge.h"
+#import <IOKit/IOKitLib.h>
+#import <IOKit/hidsystem/IOHIDServiceClient.h>
 
 #include "libssh2.h"
 #include "libssh2_sftp.h"
@@ -82,3 +84,12 @@ typedef int		CGSConnection;
 typedef long	CGSWindow;
 typedef int		CGSValue;
 extern OSStatus CGSSetWindowListBrightness(const CGSConnection cid, CGSWindow *wids, float *brightness, int count);
+
+
+typedef struct __IOHIDEvent *IOHIDEventRef;
+
+
+IOHIDEventRef IOHIDServiceClientCopyEvent(IOHIDServiceClientRef, int64_t, int32_t, int64_t);
+double IOHIDEventGetFloatValue(IOHIDEventRef, int32_t);
+
+IOHIDServiceClientRef ALCALSCopyALSServiceClient(void);

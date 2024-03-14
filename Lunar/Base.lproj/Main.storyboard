@@ -1319,9 +1319,9 @@ white point, using warmer colors and increasing contrast.</string>
                                 </textFieldCell>
                             </textField>
                             <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" alphaValue="0.59999999999999998" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ptg-bU-WRA">
-                                <rect key="frame" x="30" y="366" width="195" height="30"/>
+                                <rect key="frame" x="30" y="366" width="245" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Polling interval" id="2Zp-Qy-xtN">
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Lux update interval" id="2Zp-Qy-xtN">
                                     <font key="font" size="19" name="Menlo-Bold"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" red="0.19215686269999999" green="0.1647058824" blue="0.29803921570000003" alpha="0.0" colorSpace="calibratedRGB"/>

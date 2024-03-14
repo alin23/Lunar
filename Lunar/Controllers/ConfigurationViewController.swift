@@ -253,10 +253,13 @@ final class ConfigurationViewController: NSViewController {
     func setupSensorPollingInterval() {
         guard let field = sensorPollingIntervalField, let caption = sensorPollingIntervalCaption else { return }
 
+        field.decimalPoints = 1
+        field.step = 0.1
+
         setupScrollableTextField(
             field, caption: caption,
-            settingKeyInt: Defaults.Keys.sensorPollingSeconds,
-            lowerLimit: 1, upperLimit: 300,
+            settingKeyDouble: Defaults.Keys.sensorPollingSeconds,
+            lowerLimit: 0.1, upperLimit: 60,
             onMouseEnter: nil
         )
     }

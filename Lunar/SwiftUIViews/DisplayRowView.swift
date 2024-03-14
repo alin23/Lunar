@@ -120,6 +120,7 @@ struct DisplayRowView: View {
     @Default(.autoBlackoutBuiltin) var autoBlackoutBuiltin
 
     @State private var showNeedsLunarPro = false
+    @State private var showNeedsLunarProForFullRange = false
     @State private var showFullRangeTip = false
     @State private var showXDRTip = false
     @State private var showSubzero = false
@@ -191,7 +192,7 @@ struct DisplayRowView: View {
             if display.supportsFullRangeXDR {
                 SwiftUI.Button("Full Range") {
                     guard proactive else {
-                        showNeedsLunarPro = true
+                        showNeedsLunarProForFullRange = true
                         return
                     }
                     guard fullRangeTipShown else {
@@ -216,7 +217,7 @@ struct DisplayRowView: View {
                     offColor: color.opacity(0.4), onTextColor: .bg.primary, radius: 6, enumValue: $display.fullRange, onValue: true
                 ))
                 .font(.system(size: 10, weight: display.fullRange ? .bold : .semibold, design: .rounded))
-                .popover(isPresented: $showNeedsLunarPro) { NeedsLunarProView() }
+                .popover(isPresented: $showNeedsLunarProForFullRange) { NeedsLunarProView() }
                 .popover(isPresented: $showFullRangeTip) { FullRangeTipView() }
             }
 

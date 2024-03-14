@@ -2280,6 +2280,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     lazy var hdrOn: Bool = potentialEDR > 2 && edr > 1 {
         didSet {
+            guard hdrOn != oldValue else { return }
             log.debug("\(name) HDR: \(hdrOn)")
         }
     }
