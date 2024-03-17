@@ -2141,6 +2141,9 @@ private func setupNetworkControls(displays: [Display], waitms: Int = 2000) {
     }
 
     DispatchQueue.global().async {
+        //  print("Starting setupNetworkControls")
+//          defer { print("Finished setupNetworkControls")}
+
         NetworkControl.browser = CiaoBrowser()
         NetworkControl.listenForDDCUtilControllers()
     }
@@ -2750,6 +2753,9 @@ final class LunarServer {
         }
 
         DispatchQueue.global(qos: .default).async { [weak self, socket] in
+            //  print("Starting addNewConnection")
+//              defer { print("Finished addNewConnection")}
+
             var shouldKeepRunning = true
             var readData = Data(capacity: Self.bufferSize)
 

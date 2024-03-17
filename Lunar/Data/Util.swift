@@ -209,6 +209,7 @@ func shell(
     }
 
     let result = asyncNow(timeout: timeout) {
+        print("Waiting for \(launchPath) \(args) to exit")
         task.waitUntilExit()
     }
     if result == .timedOut {

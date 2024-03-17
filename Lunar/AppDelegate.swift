@@ -50,6 +50,8 @@ extension CLLocationManager {
 func withTimeout<T>(_ timeout: DateComponents, name: String, _ block: @escaping () throws -> T, onTimeout: (() -> Void)? = nil) -> T? {
     var value: T?
     let workItem = DispatchWorkItem(name: name) {
+        //  print("Starting \(name)")
+//          defer { print("Finished \(name)")}
         do {
             value = try block()
         } catch {
@@ -2984,26 +2986,33 @@ func resetAllSettings() {
     UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
 }
 
+func tooManyRestarts() -> Bool {
+    guard CommandLine.arguments.count == 2, CommandLine.arguments[1].starts(with: "restarts=") else {
+        return false
+    }
+    let restarts = CommandLine.arguments[1].split(separator: "=")[1].split(separator: ":").map { TimeInterval($0)! }
+    let now = Date().timeIntervalSince1970
+    return restarts.filter { now - $0 < 60 }.count > 3
+}
+
 func restart() {
     restarting = true
     // check if the app was started fresh or if was restarted with arg `restarts=timestamp:timestamp:timestamp`
     // if it was restarted more than 3 times in 1 minute, exit
 
+    guard !tooManyRestarts() else {
+        exit(1)
+    }
     guard CommandLine.arguments.count == 1 || (
         CommandLine.arguments.count == 2 && CommandLine.arguments[1].starts(with: "restarts=")
     ) else {
         exit(1)
     }
 
-    var restartArg = "restarts=\(Date().timeIntervalSince1970)"
-    if CommandLine.arguments.count == 2 {
-        let restarts = CommandLine.arguments[1].split(separator: "=")[1].split(separator: ":").map { TimeInterval($0)! }
-        let now = Date().timeIntervalSince1970
-        if restarts.filter({ now - $0 < 60 }).count > 3 {
-            exit(1)
-        } else {
-            restartArg = "\(CommandLine.arguments[1]):\(now)"
-        }
+    let restartArg = if CommandLine.arguments.count == 2 {
+        "\(CommandLine.arguments[1]):\(Date().timeIntervalSince1970)"
+    } else {
+        "restarts=\(Date().timeIntervalSince1970)"
     }
 
 //    do {
@@ -3019,7 +3028,7 @@ func restart() {
 }
 
 public func restartOnCrash() {
-    if Defaults[.autoRestartOnCrash] {
+    if Defaults[.autoRestartOnCrash], !tooManyRestarts() {
         NSSetUncaughtExceptionHandler { _ in restart() }
         signal(SIGABRT) { _ in restart() }
         signal(SIGILL) { _ in restart() }

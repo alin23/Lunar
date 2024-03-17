@@ -439,10 +439,14 @@ final class DisplayController: ObservableObject {
         watchScreencaptureProcess()
         initObservers()
         setupXdrTask()
-        Self.initialized = true
+
         keyboardAutoBrightnessEnabledByUser = kbc.isAutoBrightnessEnabled(forKeyboard: 1)
         keyboardBrightnessAtStart = kbc.brightness(forKeyboard: 1)
-        adaptiveMode = DisplayController.getAdaptiveMode()
+        mainAsyncAfter(ms: 100) { [self] in
+            adaptiveMode = DisplayController.getAdaptiveMode()
+        }
+
+        Self.initialized = true
     }
 
     static var panelManager: MPDisplayMgr? = MPDisplayMgr.shared() ?? MPDisplayMgr()
@@ -751,7 +755,7 @@ final class DisplayController: ObservableObject {
             if adaptiveMode.key == .sync {
                 recomputeAllDisplaysBrightness(activeDisplays: activeDisplayList)
             }
-            if adaptiveMode.available {
+            if Self.initialized, adaptiveMode.available {
                 adaptiveMode.watch()
                 for d in activeDisplayList {
                     adaptiveMode.adapt(d)
@@ -983,6 +987,10 @@ final class DisplayController: ObservableObject {
             #if arch(arm64)
                 DDC.rebuildDCPList()
             #endif
+            let oldDisplayIDs = oldValue.map(\.id)
+            for display in activeDisplayList where !oldDisplayIDs.contains(display.id) && display.fullRange {
+                let _ = display.handleFullRange(true)
+            }
         }
     }
 
@@ -1413,11 +1421,6 @@ final class DisplayController: ObservableObject {
                 xdrSensorTask = getSensorTask()
             }
             sourceDisplay = getSourceDisplay()
-
-            let oldDisplayIDs = oldValue.keys
-            for display in displays.values where !oldDisplayIDs.contains(display.id) && display.fullRange {
-                let _ = display.handleFullRange(true)
-            }
         }
     }
     @Atomic var fluxRunning = isFluxRunning() {
