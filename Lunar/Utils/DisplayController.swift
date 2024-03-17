@@ -1107,6 +1107,8 @@ final class DisplayController: ObservableObject {
     }
 
     static func getAdaptiveMode() -> AdaptiveMode {
+        guard DisplayController.initialized else { return ManualMode.shared }
+
         if CachedDefaults[.overrideAdaptiveMode] {
             return CachedDefaults[.adaptiveBrightnessMode].mode
         } else {

@@ -478,21 +478,21 @@
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>97</integer>
+			<integer>103</integer>
 		</dict>
 		<key>Playground (Playground) 16.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>98</integer>
+			<integer>104</integer>
 		</dict>
 		<key>Playground (Playground) 17.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>99</integer>
+			<integer>105</integer>
 		</dict>
 		<key>Playground (Playground) 18.xcscheme</key>
 		<dict>
@@ -877,21 +877,21 @@
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>100</integer>
+			<integer>97</integer>
 		</dict>
 		<key>PlaygroundChart (Playground) 16.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>101</integer>
+			<integer>98</integer>
 		</dict>
 		<key>PlaygroundChart (Playground) 17.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>102</integer>
+			<integer>99</integer>
 		</dict>
 		<key>PlaygroundChart (Playground) 18.xcscheme</key>
 		<dict>
@@ -1675,21 +1675,21 @@
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>103</integer>
+			<integer>106</integer>
 		</dict>
 		<key>SwiftDate (Playground) 16.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>104</integer>
+			<integer>107</integer>
 		</dict>
 		<key>SwiftDate (Playground) 17.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>105</integer>
+			<integer>108</integer>
 		</dict>
 		<key>SwiftDate (Playground) 18.xcscheme</key>
 		<dict>
@@ -2074,21 +2074,21 @@
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>106</integer>
+			<integer>100</integer>
 		</dict>
 		<key>SwiftyMarkdown (Playground) 16.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>107</integer>
+			<integer>101</integer>
 		</dict>
 		<key>SwiftyMarkdown (Playground) 17.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>108</integer>
+			<integer>102</integer>
 		</dict>
 		<key>SwiftyMarkdown (Playground) 18.xcscheme</key>
 		<dict>
