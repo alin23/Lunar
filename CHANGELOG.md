@@ -1,5 +1,22 @@
-# 6.6.5
+# 6.7.0
+## Features
+
+- Ambient Light Sensor support for Intel Macs
+- Faster event based lux reading *(up to 100ms between reads)*
+
+## Improvements
+
+- Improve launch time of the app
+- Faster CLI launches
+
 ## Fixes
+
+- Fix not showing Lunar Pro popover correctly when clicking on XDR or Full Range
+- Fix **Full Range XDR** not being re-enabled automatically after wake/connect/launch
+- Go back to Xcode 15.2: some Shortcuts stopped working when compiled with the latest Xcode 15.3
+
+# 6.6.5
+## Hotfix
 
 - Remove leftover usage of a non-standard command-line tool that was prompting unnecessary installation of Xcode Command Line Tools
 
