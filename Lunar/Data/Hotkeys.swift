@@ -877,13 +877,14 @@ enum Hotkey {
             return
         }
         #if arch(arm64)
-            if osdImage == .brightness, display.fullRange, let nits = display.nits {
+            if osdImage == .brightness {
                 display.fullRangeUserBrightness = value.d.map(from: (0, 100), to: (0, 1))
                 display.showSoftwareOSD(
                     image: "sun.max",
                     value: value.f / 100,
-                    text: "\(nits.str(decimals: 0)) nits",
-                    color: nil
+                    text: display.possibleMaxNits != nil && display.nits != nil ? "\(display.nits!.str(decimals: 0)) nits" : "",
+                    color: nil,
+                    locked: !display.presetSupportsBrightnessControl
                 )
                 return
             }

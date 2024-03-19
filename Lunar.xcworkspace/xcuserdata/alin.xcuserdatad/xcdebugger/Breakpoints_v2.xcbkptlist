@@ -3,4 +3,84 @@
    uuid = "A71689F0-05ED-400C-9A39-47EC0A36555F"
    type = "0"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "E0138929-3B4D-4B29-97E5-A5E4DED4B9EE"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Lunar/Data/Pro.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "680"
+            endingLineNumber = "680"
+            landmarkName = "restoreColorSyncSettings(reapplyGammaFor:)"
+            landmarkType = "9">
+            <Locations>
+               <Location
+                  uuid = "E0138929-3B4D-4B29-97E5-A5E4DED4B9EE - ff149cde5f151e52"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Lunar.restoreColorSyncSettings(reapplyGammaFor: Swift.Optional&lt;Swift.Array&lt;Lunar.Display&gt;&gt;) -&gt; Swift.Bool"
+                  moduleName = "Lunar"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/alin/Projects/LunarPro/Lunar/Data/Pro.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "679"
+                  endingLineNumber = "679"
+                  offsetFromSymbolStart = "112">
+               </Location>
+               <Location
+                  uuid = "E0138929-3B4D-4B29-97E5-A5E4DED4B9EE - c833213ed60f6666"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #2 () -&gt; Swift.Bool in Lunar.restoreColorSyncSettings(reapplyGammaFor: Swift.Optional&lt;Swift.Array&lt;Lunar.Display&gt;&gt;) -&gt; Swift.Bool"
+                  moduleName = "Lunar"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/alin/Projects/LunarPro/Lunar/Data/Pro.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "680"
+                  endingLineNumber = "680"
+                  offsetFromSymbolStart = "128">
+               </Location>
+               <Location
+                  uuid = "E0138929-3B4D-4B29-97E5-A5E4DED4B9EE - ff149cde5f151e33"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Lunar.restoreColorSyncSettings(reapplyGammaFor: Swift.Optional&lt;Swift.Array&lt;Lunar.Display&gt;&gt;) -&gt; Swift.Bool"
+                  moduleName = "Lunar"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/alin/Projects/LunarPro/Lunar/Data/Pro.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "680"
+                  endingLineNumber = "680"
+                  offsetFromSymbolStart = "392">
+               </Location>
+               <Location
+                  uuid = "E0138929-3B4D-4B29-97E5-A5E4DED4B9EE - c833213ed60f6645"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #2 () -&gt; Swift.Bool in Lunar.restoreColorSyncSettings(reapplyGammaFor: Swift.Optional&lt;Swift.Array&lt;Lunar.Display&gt;&gt;) -&gt; Swift.Bool"
+                  moduleName = "Lunar"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/alin/Projects/LunarPro/Lunar/Data/Pro.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "681"
+                  endingLineNumber = "681"
+                  offsetFromSymbolStart = "48">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

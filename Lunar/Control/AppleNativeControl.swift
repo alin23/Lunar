@@ -71,7 +71,11 @@ final class AppleNativeControl: Control {
             let currentBrightness = CoreDisplay_Display_GetUserBrightness(display.id)
             let brightnessToSet = currentBrightness < 0.5 ? currentBrightness + 0.01 : currentBrightness - 0.01
             CoreDisplay_Display_SetUserBrightness(display.id, brightnessToSet)
-            DisplayServicesBrightnessChanged(display.id, brightnessToSet)
+            if #available(macOS 14.0, *) {
+                // not needed
+            } else {
+                DisplayServicesBrightnessChanged(display.id, brightnessToSet)
+            }
 
             let newBrightness = CoreDisplay_Display_GetUserBrightness(display.id)
 
@@ -80,7 +84,11 @@ final class AppleNativeControl: Control {
             }
 
             CoreDisplay_Display_SetUserBrightness(display.id, currentBrightness)
-            DisplayServicesBrightnessChanged(display.id, currentBrightness)
+            if #available(macOS 14.0, *) {
+                // not needed
+            } else {
+                DisplayServicesBrightnessChanged(display.id, currentBrightness)
+            }
             self.method = method
             return true
         case .displayServices:
@@ -143,9 +151,17 @@ final class AppleNativeControl: Control {
             CoreDisplay_Display_SetUserBrightness(display.id, br)
         case .displayServices:
             success = DisplayServicesSetBrightness(display.id, br.f) == KERN_SUCCESS
+            if success, br == 1.0 {
+                DisplayServicesSetLinearBrightness(display.id, br.f)
+            }
+            updateNits()
         }
 
-        DisplayServicesBrightnessChanged(display.id, br)
+        if #available(macOS 14.0, *) {
+            // not needed
+        } else {
+            DisplayServicesBrightnessChanged(display.id, br)
+        }
         display.lastNativeBrightness = br
         return success
     }
@@ -198,6 +214,36 @@ final class AppleNativeControl: Control {
         return control.resetColors()
     }
 
+    func updateNits() {
+        #if arch(arm64)
+            guard let display, let maxNits = display.possibleMaxNits else { return }
+
+            var brightness: Float = 0.0
+            DisplayServicesGetLinearBrightness(display.id, &brightness)
+            let nits = maxNits * brightness.d
+            display.nits = nits
+
+            if let osd = display.osdWindowController?.window as? OSDWindow,
+               let osdAlpha = osd.contentView?.superview?.alphaValue,
+               osdAlpha == 1, display.osdState.text.contains("nits")
+            {
+                display.userNits = nits
+                display.softwareOSDTask = nil
+                display.osdState.text = "\(nits.str(decimals: 0)) nits"
+                osd.show(verticalOffset: 100)
+            } else if CachedDefaults[.hideOSD], timeSince(DC.lastTimeBrightnessKeyPressed) < 1 {
+                display.userNits = nits
+            }
+
+            if DC.supportsXDRContrast, timeSince(lastXDRContrastResetTime) > 3 {
+                let xdrContrast = display.computeXDRContrast(xdrBrightness: nits.f.capped(between: 600, and: 1600), xdrContrastFactor: CachedDefaults[.xdrContrastFactor] + 0.3, minBrightness: 600, maxBrightness: 1600, gamma: 2.2)
+                if xdrContrast != DC.xdrContrast {
+                    DC.setXDRContrast(xdrContrast)
+                }
+            }
+        #endif
+    }
+
     func setBrightness(
         _ brightness: Brightness,
         oldValue: Brightness? = nil,
@@ -236,7 +282,11 @@ final class AppleNativeControl: Control {
                     display.shouldStopBrightnessTransition = false
 
                     DisplayServicesSetBrightnessSmooth(id, br.f - oldBrFloat)
-                    DisplayServicesBrightnessChanged(id, br)
+                    if #available(macOS 14.0, *) {
+                        // not needed
+                    } else {
+                        DisplayServicesBrightnessChanged(id, br)
+                    }
 
                     for _ in stride(from: 0, through: 0.5, by: 0.01) {
                         Thread.sleep(forTimeInterval: 0.01)
@@ -247,7 +297,16 @@ final class AppleNativeControl: Control {
                         }
                     }
                     DisplayServicesSetBrightness(id, br.f)
-                    DisplayServicesBrightnessChanged(id, br)
+                    if br == 1.0 {
+                        DisplayServicesSetLinearBrightness(id, br.f)
+                    }
+                    updateNits()
+
+                    if #available(macOS 14.0, *) {
+                        // not needed
+                    } else {
+                        DisplayServicesBrightnessChanged(id, br)
+                    }
                     display.inSmoothTransition = false
 
                     return

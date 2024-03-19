@@ -696,36 +696,15 @@ struct BrightnessOSDView: View {
                     .foregroundColor(.primary.opacity(0.75))
             }
 
-            ZStack {
-                Path { path in
-                    path.move(to: CGPoint(x: 0.0, y: 0))
-                    path.addLine(to: CGPoint(x: 161, y: 0))
-                }
-                .stroke(style: StrokeStyle(lineWidth: 8))
-                .foregroundColor(Color.black)
-
-                Path { path in
-                    path.move(to: CGPoint(x: 1, y: 0))
-                    path.addLine(to: CGPoint(x: value, y: 0))
-                }
-                .stroke(.black, style: StrokeStyle(lineWidth: 6, dash: [9, 1]))
-                .blendMode(.destinationOut)
-
-                if let color = osd.color ?? (colorScheme == .dark ? .primary.opacity(0.75) : nil) {
-                    color
-                        .clipShape(
-                            Path { path in
-                                path.move(to: CGPoint(x: 1, y: 0))
-                                path.addLine(to: CGPoint(x: value, y: 0))
-                            }
-                            .stroke(style: StrokeStyle(lineWidth: 6, dash: [9, 1]))
-                        )
-                        .shadow(color: osd.glowRadius == 0 ? .clear : (osd.color ?? .clear), radius: osd.value.cg * osd.glowRadius, x: 0, y: 0)
-                        .animation(.easeOut(duration: 0.15), value: osd.value)
-                }
+            if osd.locked {
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 24, weight: .medium, design: .rounded))
+                    .foregroundColor(.secondary)
+                    .offset(y: NATIVE_OSD_WIDTH * 0.4)
+            } else {
+                chiclets
+                    .offset(y: NATIVE_OSD_WIDTH * 0.78)
             }
-            .compositingGroup()
-            .offset(y: NATIVE_OSD_WIDTH * 0.78)
         }
         .padding(.horizontal, 20)
         .padding(.bottom, 40)
@@ -733,16 +712,52 @@ struct BrightnessOSDView: View {
         .background(
             VisualEffectBlur(material: .osd, blendingMode: .behindWindow, state: .active)
                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .frame(width: NATIVE_OSD_WIDTH, height: NATIVE_OSD_WIDTH, alignment: .center)
+                .fixedSize()
         )
         .frame(width: NATIVE_OSD_WIDTH, height: NATIVE_OSD_WIDTH, alignment: .center)
         .fixedSize()
         .padding(.horizontal, 100)
+    }
+
+    var chiclets: some View {
+        ZStack {
+            Path { path in
+                path.move(to: CGPoint(x: 0.0, y: 0))
+                path.addLine(to: CGPoint(x: 161, y: 0))
+            }
+            .stroke(style: StrokeStyle(lineWidth: 8))
+            .foregroundColor(Color.black)
+
+            Path { path in
+                path.move(to: CGPoint(x: 1, y: 0))
+                path.addLine(to: CGPoint(x: value, y: 0))
+            }
+            .stroke(.black, style: StrokeStyle(lineWidth: 6, dash: [9, 1]))
+            .blendMode(.destinationOut)
+
+            if let color = osd.color ?? (colorScheme == .dark ? .primary.opacity(0.75) : nil) {
+                color
+                    .clipShape(
+                        Path { path in
+                            path.move(to: CGPoint(x: 1, y: 0))
+                            path.addLine(to: CGPoint(x: value, y: 0))
+                        }
+                        .stroke(style: StrokeStyle(lineWidth: 6, dash: [9, 1]))
+                    )
+                    .shadow(color: osd.glowRadius == 0 ? .clear : (osd.color ?? .clear), radius: osd.value.cg * osd.glowRadius, x: 0, y: 0)
+                    .animation(.easeOut(duration: 0.15), value: osd.value)
+            }
+        }
+        .compositingGroup()
     }
 }
 
 #Preview {
     let osdState = OSDState()
     osdState.value = 0.5
+    osdState.locked = true
+    osdState.text = "320 nits"
     osdState.tip = Text("\(Image(systemName: "sun.max.fill")) Double press Brightness Up to unlock 1600 nits")
     return BrightnessOSDView(osd: osdState).padding()
 }
@@ -851,6 +866,7 @@ final class OSDState: ObservableObject {
     @Published var color: Color? = nil
     @Published var glowRadius: CGFloat = 5
     @Published var tip: Text? = nil
+    @Published var locked = false
 }
 
 extension Display {
@@ -863,7 +879,7 @@ extension Display {
         }
     }
 
-    func showSoftwareOSD(image: String, value: Float, text: String, color: Color?, glowRadius: CGFloat = 5) {
+    func showSoftwareOSD(image: String, value: Float, text: String, color: Color?, glowRadius: CGFloat = 5, locked: Bool = false) {
         guard !isAllDisplays, !isForTesting, !CachedDefaults[.hideOSD] else { return }
         softwareOSDTask = mainAsync { [weak self] in
             guard let self else { return }
@@ -873,6 +889,7 @@ extension Display {
             osdState.text = text
             osdState.color = color
             osdState.glowRadius = glowRadius
+            osdState.locked = locked
 
             if osdWindowController == nil {
                 let view = BrightnessOSDView(osd: osdState)

@@ -705,7 +705,7 @@ struct Lunar: ParsableCommand {
                 switch method {
                 case .GetLinearBrightness:
                     cliPrint(resultString(DisplayServicesGetLinearBrightness(id, &brightness)))
-                    cliPrint(value)
+                    cliPrint(brightness)
                 case .SetLinearBrightness:
                     cliPrint("Setting LinearBrightness to \(brightness) for ID: \(id)")
                     cliPrint(resultString(DisplayServicesSetLinearBrightness(id, brightness)))
@@ -1654,7 +1654,7 @@ struct Lunar: ParsableCommand {
                     if isServer {
                         display.resetDefaultGamma()
                     } else {
-                        restoreColorSyncSettings()
+                        restoreColorSyncSettings(reapplyGammaFor: display.otherDisplays.filter(\.gammaSetAPICalled))
                     }
                     cliPrint("Resetting gamma table for \(display)\n")
                     printTable()
@@ -2141,8 +2141,8 @@ private func setupNetworkControls(displays: [Display], waitms: Int = 2000) {
     }
 
     DispatchQueue.global().async {
-        //  print("Starting setupNetworkControls")
-//          defer { print("Finished setupNetworkControls")}
+//         print("\(Date()) Starting setupNetworkControls")
+//         defer { print("\(Date()) Finished setupNetworkControls") }
 
         NetworkControl.browser = CiaoBrowser()
         NetworkControl.listenForDDCUtilControllers()
@@ -2753,8 +2753,8 @@ final class LunarServer {
         }
 
         DispatchQueue.global(qos: .default).async { [weak self, socket] in
-            //  print("Starting addNewConnection")
-//              defer { print("Finished addNewConnection")}
+//             print("\(Date()) Starting addNewConnection")
+//             defer { print("\(Date()) Finished addNewConnection") }
 
             var shouldKeepRunning = true
             var readData = Data(capacity: Self.bufferSize)

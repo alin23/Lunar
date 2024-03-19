@@ -21,6 +21,10 @@ import SwiftDate
 import SwiftUI
 import SwiftyJSON
 
+func IOServiceLocation(_ service: io_service_t) -> String? {
+    IORegistryEntryCopyPath(service, kIOServicePlane)?.takeRetainedValue() as? String
+}
+
 func IOServiceFirstMatchingWhere(_ matching: CFDictionary, where predicate: (io_service_t) -> Bool) -> io_service_t? {
     var ioIterator = io_iterator_t()
 
@@ -323,6 +327,12 @@ func IOServiceFirstMatchingWhere(_ matching: CFDictionary, where predicate: (io_
         func matchingScore(for display: Display, in _: [CGDirectDisplayID]? = nil) -> Int {
             var score = 0
 
+            if let location = (display.infoDictionary["IODisplayLocation"] as? String) ?? (displayInfoDictionary(display.id)?["IODisplayLocation"] as? String), let ioDisplayLocation = IOServiceLocation(clcd2Service),
+               location == ioDisplayLocation
+            {
+                score += 100
+            }
+
             if let edidUUID {
                 let uuids = display.possibleEDIDUUIDs()
                 if uuids.isEmpty {
@@ -475,7 +485,7 @@ final class DisplayController: ObservableObject {
     var _activeDisplaysLock = NSRecursiveLock()
     var _activeDisplays: [CGDirectDisplayID: Display] = [:]
     var activeDisplaysByReadableID: [String: Display] = [:]
-    var lastNonManualAdaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode()
+    var lastNonManualAdaptiveMode: AdaptiveMode = SyncMode.shared
     var lastModeWasAuto: Bool = !CachedDefaults[.overrideAdaptiveMode]
 
     var onAdapt: ((Any) -> Void)?
@@ -740,7 +750,7 @@ final class DisplayController: ObservableObject {
         }
     }
 
-    @Published var adaptiveMode: AdaptiveMode = DisplayController.getAdaptiveMode() {
+    @Published var adaptiveMode: AdaptiveMode = Defaults[.adaptiveBrightnessMode].mode {
         didSet {
             withoutApply {
                 adaptiveModeKey = adaptiveMode.key
@@ -764,7 +774,7 @@ final class DisplayController: ObservableObject {
         }
     }
 
-    @Published var adaptiveModeKey: AdaptiveModeKey = DisplayController.getAdaptiveMode().key {
+    @Published var adaptiveModeKey: AdaptiveModeKey = Defaults[.adaptiveBrightnessMode] {
         didSet {
             if adaptiveModeKey != oldValue {
                 for d in activeDisplayList {
@@ -1477,7 +1487,7 @@ final class DisplayController: ObservableObject {
         }
 
         if AppDelegate.hdrWorkaround {
-            restoreColorSyncSettings()
+            AppDelegate.fixHDRNow()
         }
 
         DisplayController.panelManager = MPDisplayMgr.shared() ?? MPDisplayMgr()
@@ -1958,9 +1968,9 @@ final class DisplayController: ObservableObject {
         //     return externalActiveDisplays.first
         // #endif
 
-        guard let audioDevice = simplyCA?.defaultOutputDevice,
-              !audioDevice.canSetVirtualMainVolume(scope: .output),
-              volumeHotkeysEnabled
+        guard volumeHotkeysEnabled,
+              let audioDevice = simplyCA?.defaultOutputDevice,
+              !audioDevice.canSetVirtualMainVolume(scope: .output)
         else {
             return nil
         }
@@ -2743,7 +2753,7 @@ final class DisplayController: ObservableObject {
                 return
             }
             if display.isBuiltin {
-                guard builtinDisplay || currentDisplay || sourceDisplay || mainDisplay else { return }
+                guard display.presetSupportsBrightnessControl, builtinDisplay || currentDisplay || sourceDisplay || mainDisplay else { return }
             }
 
             var value = getFilledChicletValue(display.brightness.floatValue, offset: offset.f).i

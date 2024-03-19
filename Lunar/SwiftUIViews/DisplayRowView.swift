@@ -516,15 +516,46 @@ struct DisplayRowView: View {
                     .padding(.vertical, 3)
                 }
             } else {
-                sliders
-                adaptiveState
-                volumeSlider
-                if xdrSelectorShown { sdrXdrSelector }
-                appPresetAdaptivePaused
+                if display.presetSupportsBrightnessControl {
+                    sliders
+                    adaptiveState
+                    volumeSlider
+                    if xdrSelectorShown { sdrXdrSelector }
+                    appPresetAdaptivePaused
+                } else {
+                    lockedPresetView
+                }
             }
         }.onHover { h in withAnimation { hovering = h } }
     }
 
+    @ViewBuilder var lockedPresetView: some View {
+        Text("Brightness locked by preset").font(.system(size: 10, weight: .semibold, design: .rounded))
+        if let name = display.referencePreset?.presetName {
+            Menu(name) {
+                SwiftUI.Button("Unlock \"\(name)\"") {
+                    display.panel?.unlockActivePreset()
+                }
+                Divider()
+
+                let presets = display.panelPresets.filter(\.isValid)
+                let groups = Set(presets.map(\.presetGroup)).sorted()
+                ForEach(groups, id: \.self) { group in
+                    Section(header: Text("\(MPDisplayPreset.groupName(group)) Presets")) {
+                        ForEach(presets.filter { $0.presetGroup == group }, id: \.presetIndex) { preset in
+                            SwiftUI.Button(preset.presetName) {
+                                display.panel?.activatePreset(preset)
+                            }
+                        }
+                    }
+                }
+            }
+            .font(.system(size: 9, weight: .medium, design: .rounded))
+            .menuStyle(.borderlessButton)
+            .modifier(RoundBG(radius: 5, color: .invertedSemiOpaque, shadowSize: 0))
+            .fixedSize(horizontal: true, vertical: false)
+        }
+    }
     @ViewBuilder var adaptiveState: some View {
         let systemAdaptive = display.systemAdaptiveBrightness
         let key = DC.adaptiveModeKey

@@ -2655,7 +2655,7 @@ struct SetPanelPresetIntent: AppIntent {
                 maxBrightness: maxBrightness.d.capped(between: minBrightness.d, and: 500).i
             ) else {
                 if display.fullRange { display.fullRange = false }
-                panel.setActivePreset(preset)
+                panel.activatePreset(preset)
                 return
             }
         }
@@ -2679,19 +2679,6 @@ extension MPDisplayPreset {
 
         return PanelPreset(screen: screen, id: (screen.id << 32) + presetIndex.i, title: presetName, subtitle: presetDescription)
     }
-
-    static func groupName(_ group: Int64) -> String {
-        switch group {
-        case 1:
-            "Default"
-        case 2:
-            "Reference"
-        default:
-            "Custom"
-        }
-    }
-
-    var groupName: String { Self.groupName(presetGroup) }
 }
 
 @available(iOS 16, macOS 13, *)
@@ -2702,7 +2689,7 @@ struct PanelPreset: AppEntity {
                 identifiers.compactMap { id -> PanelPreset? in
                     let screenID = CGDirectDisplayID(id >> 32)
                     guard let display = DC.activeDisplays[screenID],
-                          let panel = display.panel
+                          let panel = display.panel, panel.hasPresets
                     else {
                         return nil
                     }
@@ -2728,8 +2715,8 @@ struct PanelPreset: AppEntity {
                         .filter { $0.panel?.hasPresets ?? false }
                         .map { d in
                             d.panel?.buildPresetsList()
-                            let modes = Set(d.panelPresets.filter(\.isValid).map(\.presetGroup)).sorted()
-                            return modes.map { p in (d, p) }
+                            let groups = Set(d.panelPresets.filter(\.isValid).map(\.presetGroup)).sorted()
+                            return groups.map { p in (d, p) }
                         }.joined()
                 )
 
@@ -2925,14 +2912,23 @@ struct MakeMonitorMainIntent: AppIntent {
         )
 
     static var parameterSummary: some ParameterSummary {
-        Summary("Set main screen to \(\.$screen)")
+        Summary("Set main screen to \(\.$screen)") {
+            \.$skipMissingScreen
+        }
     }
 
     @Parameter(title: "Screen", optionsProvider: ScreenQuery(single: true, noDefault: true))
     var screen: Screen
 
+    @Parameter(title: "Skip action if screen is missing")
+    var skipMissingScreen: Bool
+
     @MainActor
     func perform() async throws -> some IntentResult {
+        if (screen.serial + screen.name).isEmpty, skipMissingScreen {
+            return .result()
+        }
+
         guard let mainDisplay = DC.mainDisplay, mainDisplay.id != screen.id else {
             return .result()
         }

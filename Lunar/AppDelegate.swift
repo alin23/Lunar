@@ -50,8 +50,8 @@ extension CLLocationManager {
 func withTimeout<T>(_ timeout: DateComponents, name: String, _ block: @escaping () throws -> T, onTimeout: (() -> Void)? = nil) -> T? {
     var value: T?
     let workItem = DispatchWorkItem(name: name) {
-        //  print("Starting \(name)")
-//          defer { print("Finished \(name)")}
+//         print("\(Date()) Starting \(name)")
+//         defer { print("\(Date()) Finished \(name)") }
         do {
             value = try block()
         } catch {
@@ -77,7 +77,7 @@ var brightnessTransition = BrightnessTransition.instant
 let SCREEN_WAKE_ADAPTER_TASK_KEY = "screenWakeAdapter"
 let CONTACT_URL = "https://lunar.fyi/contact".asURL()!
 var startTime = Date()
-var wakeTime = startTime
+var wakeTime = Date.distantPast
 
 let kAppleInterfaceThemeChangedNotification = "AppleInterfaceThemeChangedNotification"
 let kAppleInterfaceStyle = "AppleInterfaceStyle"
@@ -1267,7 +1267,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             DC.activeDisplayList
                 .filter { d in
                     !DC.screensSleeping && timeSince(wakeTime) > 5 && !d.isForTesting && !d.settingGamma && !d.blackOutEnabled &&
-                        (d.hasSoftwareControl || CachedDefaults[.hdrWorkaround] || d.enhanced || d.subzero || d.applyGamma) &&
+                        d.supportsGamma && d.gammaSetAPICalled &&
+                        (d.hasSoftwareControl || d.enhanced || d.subzero || d.applyGamma) &&
                         GammaTable(for: d.id, allowZero: true).isZero
                 }
                 .forEach { d in
@@ -1285,7 +1286,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                             info: """
                             Because of a macOS bug in the **Gamma API**, your screen might have gone blank.
 
-                            Lunar will now try to minimise future Gamma changes by disabling the **HDR compatibility workaround**.
+                            Lunar will now try to minimise future Gamma changes.
 
                             If the screen doesn't come back on by itself, you can try one of the following:
 
@@ -1307,7 +1308,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                             .warning(
                                 "Applying last gamma tables didn't work for display \(d.description)!\nTrying to reset ColorSync settings"
                             )
-                        restoreColorSyncSettings()
+                        restoreColorSyncSettings(reapplyGammaFor: d.otherDisplays.filter(\.gammaSetAPICalled))
                     }
                 }
         }
@@ -1315,6 +1316,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         CGDisplayRegisterReconfigurationCallback({ displayID, flags, _ in
             guard !flags.isSubset(of: [.beginConfigurationFlag, .desktopShapeChangedFlag, .movedFlag, .setMainFlag]) else {
                 log.debug("Skipping CGDisplayRegisterReconfigurationCallback flags [\(flags)] for display ID \(displayID)")
+                if flags.contains(.setMainFlag), let d = DC.activeDisplays[displayID] {
+                    d.withoutApply {
+                        d.main = true
+                    }
+                    d.otherDisplays.forEach { $0.main = false }
+                }
                 return
             }
 
@@ -1365,9 +1372,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                             mainAsyncAfter(ms: 10) { DC.dis(displayID, display: d, force: true) }
                         } else {
                             d.lastConnectionTime = Date()
-                            mainAsyncAfter(ms: 1000) {
-                                DC.activeDisplays[displayID]?.refetchPanelProps()
-                            }
+                            DC.activeDisplays[displayID]?.refetchPanelProps()
                         }
                         return
                     }
@@ -1442,10 +1447,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
         NotificationCenter.default
             .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
+            .throttle(for: .milliseconds(200), scheduler: RunLoop.main, latest: true)
             .sink { _ in
                 lastColorSyncReset = Date()
                 for d in DC.activeDisplayList {
                     d.hdrOn = d.potentialEDR > 2 && d.edr > 1
+
+                    let referenceEDR = d.referenceEDR
+                    let potentialEDR = d.potentialEDR
+                    debug("referenceEDR: \(referenceEDR) lastReferenceEDR: \(d.lastReferenceEDR)")
+                    if d.lastReferenceEDR != referenceEDR || d.lastPotentialEDR != potentialEDR {
+                        d.refetchPanelProps()
+                    }
+                    d.lastPotentialEDR = potentialEDR
+                    d.lastReferenceEDR = referenceEDR
                 }
                 #if DEBUG
                     if let d = NSScreen.main {
@@ -2066,7 +2081,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             guard signal == SIGINT else { exit(0) }
 
             for display in DC.displays.values {
-                if display.gammaChanged {
+                if display.gammaChanged, display.gammaSetAPICalled {
                     display.resetGamma()
                 }
 
