@@ -1,12 +1,18 @@
+# 6.7.3
+## Hotfix
+
+- Ensure UI is not instantiated until the user opens it
+    - Fixes too much energy usage on some systems
+
 # 6.7.2
-### Features
+## Features
 
 - Allow setting main monitor using the CLI. Example: `lunar displays LG main true`
 - Show when brightness is locked by the reference preset in the UI
 
 ![brightness locked by preset](https://files.lunar.fyi/brightness-locked-by-preset.png)
 
-### Improvements
+## Improvements
 
 - More accurate nits readings for Apple displays
 - Precise nits-based Sync Mode even when HDR content is visible
