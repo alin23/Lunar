@@ -1,3 +1,33 @@
+# 6.7.2
+### Features
+
+- Allow setting main monitor using the CLI. Example: `lunar displays LG main true`
+- Show when brightness is locked by the reference preset in the UI
+
+![brightness locked by preset](https://files.lunar.fyi/brightness-locked-by-preset.png)
+
+### Improvements
+
+- More accurate nits readings for Apple displays
+- Precise nits-based Sync Mode even when HDR content is visible
+- Improved detection of virtual displays
+- Improved DDC-to-monitor matching by using the hardware port where possible
+- More responsive Full Range switching in cases where the system generates a lot of logs
+- Allow skipping missing displays when using the "Set Monitor as Main" shortcut
+
+## Fixes
+
+- Prepare for upcoming macOS 15
+- Don't use Gamma APIs unless absolutely necessary to avoid unwanted HDR clipping
+- Fix app presets taking too long to apply
+- Fix possible crash when fetching reference presets on external monitors
+- Fix system lag when CoreAudio devices take too long to respond
+
+# 6.7.1
+## Hotfix
+
+- Fix crash on launch if Auto Mode was previously enabled
+
 # 6.7.0
 ## Features
 
