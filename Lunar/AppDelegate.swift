@@ -2315,6 +2315,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         if handleCLI() {
             return
         }
+        Defaults[.menuBarClosed] = true
         restartOnCrash()
 
         initCacheTransitionLogging()

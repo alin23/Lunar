@@ -3,6 +3,14 @@
    version = "1.0">
    <ContextStates>
       <ContextState
+         contextName = "closure #1 in closure #1 in QuickActionsMenuView.header.getter:QuickActionsMenuView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "menuBarClosed">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "HotKeyCenter.sendPressedKeyboardEvent(_:):HotKeyCenter.swift">
          <PersistentStrings>
             <PersistentString

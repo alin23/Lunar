@@ -2351,7 +2351,10 @@ final class DisplayController: ObservableObject {
     }
 
     func cleanup() {
-//        deletePID()
+        if isServer {
+            Defaults[.menuBarClosed] = true
+        }
+
         guard !restarting else {
             print("Restarting")
             return
