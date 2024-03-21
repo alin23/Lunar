@@ -4,28 +4,30 @@ import SwiftUI
 struct DisplayContextMenu: View {
     @ObservedObject var display: Display
 
-    @ViewBuilder var resolutionMenu: some View {
-        if let panel = display.panel, panel.modes.count > 1 {
-            let modes = panel.groupedModes
-            let refreshRates: [RefreshRate] = Array(modes.keys.map { $0 }.sorted().reversed())
+    // @ViewBuilder var resolutionMenu: some View {
+    //     if let panel = display.panel, panel.modes.count > 1 {
+    //         let modes = panel.groupedModes
+    //         let refreshRates: [RefreshRate] = Array(modes.keys.map { $0 }.sorted().reversed())
 
-            Menu("Resolution") {
-                ForEach(refreshRates) { refreshRate in
-                    Menu(refreshRate.description) {
-                        let keys = modes[refreshRate]!.keys
-                        let tags = [MPDisplayMode.Tag.hidpi, .lodpi, .unsafe].filter { keys.contains($0) }
-                        ForEach(tags) { tag in
-                            resolutionPicker(modes: modes[refreshRate]![tag]!, tag: tag)
-                        }
-                    }
-                }
-            }.onAppear {
-                if display.observableResolution == nil {
-                    display.observableResolution = panel.currentMode
-                }
-            }
-        }
-    }
+    //         Menu("Resolution") {
+    //             ForEach(refreshRates) { refreshRate in
+    //                 Menu(refreshRate.description) {
+    //                     let keys = modes[refreshRate]!.keys
+    //                     let tags = [MPDisplayMode.Tag.hidpi, .lodpi, .unsafe].filter { keys.contains($0) }
+    //                     ForEach(tags) { tag in
+    //                         resolutionPicker(modes: modes[refreshRate]![tag]!, tag: tag)
+    //                     }
+    //                 }
+    //             }
+    //         }.onAppear {
+    //             if display.observableResolution == nil {
+    //                 display.withoutApply {
+    //                     display.observableResolution = panel.currentMode
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
     #if arch(arm64)
         var nightShiftOverrideBinding: Binding<Bool> {
@@ -82,13 +84,13 @@ struct DisplayContextMenu: View {
 //        resolutionMenu
     }
 
-    @ViewBuilder func resolutionPicker(modes: [MPDisplayMode], tag: MPDisplayMode.Tag) -> some View {
-        Picker(tag.rawValue, selection: $display.observableResolution) {
-            ForEach(modes, id: \.modeNumber) { mode in
-                Text(mode.swiftUIString).tag(mode as MPDisplayMode?)
-            }
-        }
-    }
+    // @ViewBuilder func resolutionPicker(modes: [MPDisplayMode], tag: MPDisplayMode.Tag) -> some View {
+    //     Picker(tag.rawValue, selection: $display.observableResolution) {
+    //         ForEach(modes, id: \.modeNumber) { mode in
+    //             Text(mode.swiftUIString).tag(mode as MPDisplayMode?)
+    //         }
+    //     }
+    // }
 }
 
 struct DisplayRowView: View {

@@ -216,29 +216,31 @@ final class AppleNativeControl: Control {
 
     func updateNits() {
         #if arch(arm64)
-            guard let display, let maxNits = display.possibleMaxNits else { return }
+            mainAsync { [self] in
+                guard let display, let maxNits = display.possibleMaxNits else { return }
 
-            var brightness: Float = 0.0
-            DisplayServicesGetLinearBrightness(display.id, &brightness)
-            let nits = maxNits * brightness.d
-            display.nits = nits
+                var brightness: Float = 0.0
+                DisplayServicesGetLinearBrightness(display.id, &brightness)
+                let nits = maxNits * brightness.d
+                display.nits = nits
 
-            if let osd = display.osdWindowController?.window as? OSDWindow,
-               let osdAlpha = osd.contentView?.superview?.alphaValue,
-               osdAlpha == 1, display.osdState.text.contains("nits")
-            {
-                display.userNits = nits
-                display.softwareOSDTask = nil
-                display.osdState.text = "\(nits.str(decimals: 0)) nits"
-                osd.show(verticalOffset: 100)
-            } else if CachedDefaults[.hideOSD], timeSince(DC.lastTimeBrightnessKeyPressed) < 1 {
-                display.userNits = nits
-            }
+                if let osd = display.osdWindowController?.window as? OSDWindow,
+                   let osdAlpha = osd.contentView?.superview?.alphaValue,
+                   osdAlpha == 1, display.osdState.text.contains("nits")
+                {
+                    display.userNits = nits
+                    display.softwareOSDTask = nil
+                    display.osdState.text = "\(nits.str(decimals: 0)) nits"
+                    osd.show(verticalOffset: 100)
+                } else if CachedDefaults[.hideOSD], timeSince(DC.lastTimeBrightnessKeyPressed) < 1 {
+                    display.userNits = nits
+                }
 
-            if DC.supportsXDRContrast, timeSince(lastXDRContrastResetTime) > 3 {
-                let xdrContrast = display.computeXDRContrast(xdrBrightness: nits.f.capped(between: 600, and: 1600), xdrContrastFactor: CachedDefaults[.xdrContrastFactor] + 0.3, minBrightness: 600, maxBrightness: 1600, gamma: 2.2)
-                if xdrContrast != DC.xdrContrast {
-                    DC.setXDRContrast(xdrContrast)
+                if DC.supportsXDRContrast, timeSince(lastXDRContrastResetTime) > 3 {
+                    let xdrContrast = display.computeXDRContrast(xdrBrightness: nits.f.capped(between: 600, and: 1600), xdrContrastFactor: CachedDefaults[.xdrContrastFactor] + 0.3, minBrightness: 600, maxBrightness: 1600, gamma: 2.2)
+                    if xdrContrast != DC.xdrContrast {
+                        DC.setXDRContrast(xdrContrast)
+                    }
                 }
             }
         #endif

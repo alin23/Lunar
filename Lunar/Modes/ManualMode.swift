@@ -69,7 +69,7 @@ final class ManualMode: AdaptiveMode {
                 display.systemAdaptiveBrightness = false
             }
         } else if let lastAppPreset {
-            if display.hasAmbientLightAdaptiveBrightness, !display.systemAdaptiveBrightness {
+            if display.hasAmbientLightAdaptiveBrightness, !display.cachedSystemAdaptiveBrightness {
                 display.systemAdaptiveBrightness = true
             }
             if lastAppPreset.reapplyPreviousBrightness {
@@ -83,6 +83,7 @@ final class ManualMode: AdaptiveMode {
                 }
                 (brightness, contrast) = (br.i, cr.i)
             }
+            display.appPreset = nil
         }
 
         display.withForce(force || display.force) {

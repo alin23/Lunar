@@ -436,7 +436,7 @@
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>11</integer>
+			<integer>17</integer>
 		</dict>
 		<key>Playground (Playground) 10.xcscheme</key>
 		<dict>
@@ -513,7 +513,7 @@
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>12</integer>
+			<integer>18</integer>
 		</dict>
 		<key>Playground (Playground) 20.xcscheme</key>
 		<dict>
@@ -597,21 +597,21 @@
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>196</integer>
+			<integer>193</integer>
 		</dict>
 		<key>Playground (Playground) 31.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>197</integer>
+			<integer>194</integer>
 		</dict>
 		<key>Playground (Playground) 32.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>198</integer>
+			<integer>195</integer>
 		</dict>
 		<key>Playground (Playground) 33.xcscheme</key>
 		<dict>
@@ -828,7 +828,7 @@
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>10</integer>
+			<integer>13</integer>
 		</dict>
 		<key>PlaygroundChart (Playground) 1.xcscheme</key>
 		<dict>
@@ -996,21 +996,21 @@
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>199</integer>
+			<integer>184</integer>
 		</dict>
 		<key>PlaygroundChart (Playground) 31.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>200</integer>
+			<integer>188</integer>
 		</dict>
 		<key>PlaygroundChart (Playground) 32.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>201</integer>
+			<integer>189</integer>
 		</dict>
 		<key>PlaygroundChart (Playground) 33.xcscheme</key>
 		<dict>
@@ -1395,21 +1395,21 @@
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>188</integer>
+			<integer>181</integer>
 		</dict>
 		<key>Surge (Playground) 31.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>189</integer>
+			<integer>182</integer>
 		</dict>
 		<key>Surge (Playground) 32.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>190</integer>
+			<integer>183</integer>
 		</dict>
 		<key>Surge (Playground) 33.xcscheme</key>
 		<dict>
@@ -1633,7 +1633,7 @@
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>17</integer>
+			<integer>11</integer>
 		</dict>
 		<key>SwiftDate (Playground) 10.xcscheme</key>
 		<dict>
@@ -1710,7 +1710,7 @@
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>18</integer>
+			<integer>12</integer>
 		</dict>
 		<key>SwiftDate (Playground) 20.xcscheme</key>
 		<dict>
@@ -1794,21 +1794,21 @@
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>193</integer>
+			<integer>196</integer>
 		</dict>
 		<key>SwiftDate (Playground) 31.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>194</integer>
+			<integer>197</integer>
 		</dict>
 		<key>SwiftDate (Playground) 32.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>195</integer>
+			<integer>198</integer>
 		</dict>
 		<key>SwiftDate (Playground) 33.xcscheme</key>
 		<dict>
@@ -2025,7 +2025,7 @@
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>13</integer>
+			<integer>10</integer>
 		</dict>
 		<key>SwiftyMarkdown (Playground) 1.xcscheme</key>
 		<dict>
@@ -2193,7 +2193,7 @@
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>184</integer>
+			<integer>190</integer>
 		</dict>
 		<key>SwiftyMarkdown (Playground) 31.xcscheme</key>
 		<dict>

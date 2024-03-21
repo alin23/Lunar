@@ -1986,8 +1986,12 @@ final class DisplayController: ObservableObject {
             log.info("Audio Display UID \(activeDisplayList.map { ($0.name, $0.audioIdentifier ?? "nil") })")
         }
 
-        let audioDeviceName = withTimeout(5.seconds, name: "getCurrentAudioDisplay") { audioDevice.name }
-        guard let audioDeviceName, !audioDeviceName.isEmpty else { return nil }
+        var audioDeviceName: String? = nil
+        let result = asyncNow(timeout: 5.seconds, threaded: true) { audioDeviceName = audioDevice.name }
+//        let audioDeviceName = withTimeout(5.seconds, name: "getCurrentAudioDisplay") { audioDevice.name }
+        guard result == .success, let audioDeviceName, !audioDeviceName.isEmpty else {
+            return nil
+        }
 
         guard let name = activeDisplayList.map(\.name).fuzzyFind(audioDeviceName)
         else {
@@ -2036,18 +2040,9 @@ final class DisplayController: ObservableObject {
         guard proactive, !display.enhanced, let exceptions = runningAppExceptions, !exceptions.isEmpty,
               let screen = display.nsScreen
         else {
-//            #if DEBUG
-//                log.debug("!exceptions: \(runningAppExceptions ?? [])")
-//                log.debug("!screen: \(display.nsScreen?.description ?? "")")
-//                log.debug("!xdr: \(display.enhanced)")
-//            #endif
             mainAsync { display.appPreset = nil }
             return nil
         }
-//        #if DEBUG
-//            log.debug("exceptions: \(exceptions)")
-//            log.debug("screen: \(screen)")
-//        #endif
 
         if activeDisplays.count == 1, let app = runningAppExceptions.first,
            app.runningApps?.first?.windows(appException: app) == nil
@@ -2056,7 +2051,10 @@ final class DisplayController: ObservableObject {
             mainAsync { display.appPreset = app }
 
             if adaptiveModeKey == .manual || app.useStaticValuesInAdaptiveModes {
-                guard !display.isBuiltin || app.applyBuiltin else { return nil }
+                guard !display.isBuiltin || app.applyBuiltin else {
+                    mainAsync { display.appPreset = nil }
+                    return nil
+                }
                 let (br, cr) = manualAppBrightnessContrast(for: display, app: app)
 
                 return (br.i, cr.i, app.useStaticValuesInAdaptiveModes)
@@ -2068,7 +2066,10 @@ final class DisplayController: ObservableObject {
         if let app = activeWindow(on: screen)?.appException {
             mainAsync { display.appPreset = app }
             if adaptiveModeKey == .manual || app.useStaticValuesInAdaptiveModes {
-                guard !display.isBuiltin || app.applyBuiltin else { return nil }
+                guard !display.isBuiltin || app.applyBuiltin else {
+                    mainAsync { display.appPreset = nil }
+                    return nil
+                }
                 let (br, cr) = manualAppBrightnessContrast(for: display, app: app)
 
                 return (br.i, cr.i, app.useStaticValuesInAdaptiveModes)
@@ -2097,7 +2098,10 @@ final class DisplayController: ObservableObject {
         mainAsync { display.appPreset = app }
 
         if adaptiveModeKey == .manual || app.useStaticValuesInAdaptiveModes {
-            guard !display.isBuiltin || app.applyBuiltin else { return nil }
+            guard !display.isBuiltin || app.applyBuiltin else {
+                mainAsync { display.appPreset = nil }
+                return nil
+            }
             let (br, cr) = manualAppBrightnessContrast(for: display, app: app)
 
             return (br.i, cr.i, app.useStaticValuesInAdaptiveModes)
@@ -2578,7 +2582,7 @@ final class DisplayController: ObservableObject {
         adaptBrightness()
 
         NSWorkspace.shared.publisher(for: \.runningApplications, options: [.new])
-            .debounce(for: .seconds(1), scheduler: RunLoop.main)
+            .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
             .sink { [self] change in
                 let identifiers = change.compactMap(\.bundleIdentifier)
 
@@ -2592,15 +2596,18 @@ final class DisplayController: ObservableObject {
                     adaptBrightness()
                     return
                 }
-                let adaptiveDisplays = activeDisplayList.filter(\.adaptive)
-                let nonAdaptiveDisplays = activeDisplayList.filter { !$0.adaptive && !$0.blackOutEnabled && !$0.enhanced }
-                adaptBrightness(for: adaptiveDisplays)
-
-                for display in nonAdaptiveDisplays {
-                    ManualMode.specific.withForce {
-                        ManualMode.specific.adapt(display)
+//                let nonAdaptiveDisplays = activeDisplayList.filter { !$0.adaptive && !$0.blackOutEnabled && !$0.enhanced }
+                adaptBrightness(
+                    for: activeDisplayList.filter { d in
+                        d.adaptive || (d.isBuiltin && runningAppExceptions.contains(where: \.applyBuiltin))
                     }
-                }
+                )
+
+//                for display in nonAdaptiveDisplays {
+//                    ManualMode.specific.withForce {
+//                        ManualMode.specific.adapt(display)
+//                    }
+//                }
             }
             .store(in: &observers)
 
@@ -2634,21 +2641,48 @@ final class DisplayController: ObservableObject {
     }
 
     func adaptBrightness(for display: Display, force: Bool = false) {
-        guard adaptiveMode.available, !screensSleeping, !locked || allowAdjustmentsWhileLocked, DDC.shouldWait else { return }
+        guard adaptiveMode.available, !screensSleeping, !locked || allowAdjustmentsWhileLocked, !DDC.shouldWait else {
+            let reason = if screensSleeping {
+                "screensSleeping"
+            } else if locked {
+                "locked"
+            } else if DDC.shouldWait {
+                "DDC.shouldWait"
+            } else {
+                "adaptiveMode \(adaptiveMode) not available"
+            }
+            debug("Not adapting brightness for \(display). Reason: \(reason)")
+            return
+        }
         adaptiveMode.withForce(force || display.force) {
             self.adaptiveMode.adapt(display)
         }
     }
 
     func adaptBrightness(for displays: [Display]? = nil, force: Bool = false) {
-        guard adaptiveMode.available, !screensSleeping, !locked || allowAdjustmentsWhileLocked, DDC.shouldWait else { return }
-        for display in (displays ?? activeDisplayList).filter({ !$0.blackOutEnabled }) {
+        guard adaptiveMode.available, !screensSleeping, !locked || allowAdjustmentsWhileLocked, !DDC.shouldWait else {
+            let reason = if screensSleeping {
+                "screensSleeping"
+            } else if locked {
+                "locked"
+            } else if DDC.shouldWait {
+                "DDC.shouldWait"
+            } else {
+                "adaptiveMode \(adaptiveMode) not available"
+            }
+            debug("Not adapting brightness for displays \(displays ?? []). Reason: \(reason)")
+            return
+        }
+
+        let displays = (displays ?? activeDisplayList).filter { !$0.blackOutEnabled && !$0.enhanced }
+        if adaptiveMode.key == .sync, displays.count == 1, displays[0].isActiveSyncSource, runningAppExceptions.isEmpty || runningAppExceptions[0].useStaticValuesInAdaptiveModes {
+            ManualMode.specific.withForce {
+                ManualMode.specific.adapt(displays[0])
+            }
+        }
+
+        for display in displays {
             adaptiveMode.withForce(force || display.force) {
-                guard !display.enhanced else {
-                    display.brightness = display.brightness
-                    display.softwareBrightness = display.softwareBrightness
-                    return
-                }
                 self.adaptiveMode.adapt(display)
             }
         }

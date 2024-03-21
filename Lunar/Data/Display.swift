@@ -2001,20 +2001,20 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-    @Published var observableResolution: MPDisplayMode? = nil {
-        didSet {
-            guard apply else { return }
-            panelMode = observableResolution
-        }
-    }
+    // @Published var observableResolution: MPDisplayMode? = nil {
+    //     didSet {
+    //         guard apply else { return }
+    //         panelMode = observableResolution
+    //     }
+    // }
 
     @objc dynamic lazy var panelMode: MPDisplayMode? = panel?.currentMode {
         didSet {
             guard DDC.apply, modeChangeAsk, let window = appDelegate!.windowController?.window else { return }
 
-            withoutApply {
-                observableResolution = panelMode
-            }
+//            withoutApply {
+//                observableResolution = panelMode
+//            }
 
             modeNumber = panelMode?.modeNumber ?? -1
             if modeNumber != -1 {
