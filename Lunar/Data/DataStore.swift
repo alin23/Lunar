@@ -81,6 +81,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .showVolumeSlider,
     .showRawValues,
     .showNitsText,
+    .showNitsOSD,
     .showStandardPresets,
     .showCustomPresets,
     .showXDRSelector,
@@ -208,7 +209,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
 
 // MARK: - DDCSleepFactor
 
-enum DDCSleepFactor: UInt8, DefaultsSerializable {
+enum DDCSleepFactor: UInt8, Defaults.Serializable {
     case short = 0
     case medium = 1
     case long = 2
@@ -216,7 +217,7 @@ enum DDCSleepFactor: UInt8, DefaultsSerializable {
 
 // MARK: - UpdateChannel
 
-enum UpdateChannel: UInt8, DefaultsSerializable {
+enum UpdateChannel: UInt8, Defaults.Serializable {
     case release = 0
     case beta = 1
 }
@@ -507,7 +508,7 @@ final class DataStore: NSObject {
 
 //
 //
-// extension Defaults.AnyKey: Hashable {
+// extension Defaults._AnyKey: Hashable {
 //    func hash(into hasher: inout Hasher) {
 //        hasher.combine(name)
 //    }
@@ -588,7 +589,7 @@ final class ThreadSafeDictionary<V: Hashable, T>: Collection {
 // MARK: - CachedDefaults
 
 enum CachedDefaults {
-    static var crumbKeys: Set<Defaults.AnyKey> = [
+    static var crumbKeys: Set<Defaults._AnyKey> = [
         .adaptiveBrightnessMode,
         .astronomicalTwilightBegin,
         .astronomicalTwilightEnd,
@@ -658,11 +659,11 @@ enum CachedDefaults {
         }
     }
 
-    static func reset(_ keys: Defaults.AnyKey...) {
+    static func reset(_ keys: Defaults._AnyKey...) {
         reset(keys)
     }
 
-    static func reset(_ keys: [Defaults.AnyKey]) {
+    static func reset(_ keys: [Defaults._AnyKey]) {
         lock.around {
             Defaults.reset(keys)
             for key in keys {
@@ -756,6 +757,7 @@ func initCache() {
     cacheKey(.mergeBrightnessContrast)
     cacheKey(.enableBlackOutKillSwitch)
     cacheKey(.enableSentry)
+    cacheKey(.showNitsOSD)
     cacheKey(.paddleConsent)
     cacheKey(.presets)
     cacheKey(.showVolumeSlider)

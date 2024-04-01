@@ -3786,7 +3786,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         panel.buildPresetsList()
         panelPresets = panel.presets
         referencePreset = panel.activePreset
-        supportsFullRangeXDR = getSupportsFullRangeXDR()
+
+        if !supportsFullRangeXDR {
+            supportsFullRangeXDR = getSupportsFullRangeXDR()
+        } else if isBuiltin, !DC.builtinSupportsFullRangeXDR {
+            DC.builtinSupportsFullRangeXDR = true
+        }
         presetSupportsBrightnessControl = panel.supportsBrightnessControl
         if let preset = panel.activePreset {
             setMaxNits(from: preset)
@@ -3984,7 +3989,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     #endif
 
-    enum ConnectionType: String, DefaultsSerializable, Codable {
+    enum ConnectionType: String, Defaults.Serializable, Codable {
         case displayport
         case usbc
         case dvi
@@ -4835,7 +4840,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         guard active else { return }
         log.verbose("Resetting software dimming")
         log.traceCalls()
-        if gammaSetAPICalled {
+        if gammaSetAPICalled || applyGamma || applyTemporaryGamma {
             resetGamma()
         }
         shadeWindowController?.close()

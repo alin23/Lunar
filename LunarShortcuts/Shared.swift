@@ -140,6 +140,7 @@ extension Defaults.Keys {
 
     static let keyboardBacklightOffBlackout = Key<Bool>("keyboardBacklightOffBlackout", default: true)
 
+    static let dcpMatchingIODisplayLocation = Key<Bool>("dcpMatchingIODisplayLocation", default: false)
     static let xdrWarningShown = Key<Bool>("xdrWarningShown", default: false)
     static let xdrTipShown = Key<Bool>("xdrTipShown", default: false)
     static let fullRangeTipShown = Key<Bool>("fullRangeTipShown", default: false)
@@ -154,6 +155,7 @@ extension Defaults.Keys {
     static let menuBarClosed = Key<Bool>("menuBarClosed", default: true)
     static let showVolumeSlider = Key<Bool>("showVolumeSlider", default: true)
     static let showRawValues = Key<Bool>("showRawValues", default: false)
+    static let showNitsOSD = Key<Bool>("showNitsOSD", default: false)
     static let showNitsText = Key<Bool>("showNitsText", default: true)
     static let showStandardPresets = Key<Bool>("showStandardPresets", default: true)
     static let showCustomPresets = Key<Bool>("showCustomPresets", default: true)

@@ -13,7 +13,6 @@ import Combine
 import Compression
 import CoreLocation
 import Defaults
-import FuzzyMatcher
 import LetsMove
 import Magnet
 import MediaKeyTap
@@ -70,9 +69,7 @@ func withTimeout<T>(_ timeout: DateComponents, name: String, _ block: @escaping 
 }
 
 let fm = FileManager()
-let simplyCA: SimplyCoreAudio? = withTimeout(5.seconds, name: "simplyCA") {
-    SimplyCoreAudio()
-}
+let simplyCA: SimplyCoreAudio? = SimplyCoreAudio()
 var brightnessTransition = BrightnessTransition.instant
 let SCREEN_WAKE_ADAPTER_TASK_KEY = "screenWakeAdapter"
 let CONTACT_URL = "https://lunar.fyi/contact".asURL()!
@@ -1550,7 +1547,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         unlockPublisher
             .debounce(for: .milliseconds(200), scheduler: RunLoop.main)
             .sink { _ in
-                wakeTime = Date()
+                // wakeTime = Date()
                 guard !DC.screensSleeping else { return }
                 reapplyAfterWake()
             }
@@ -1571,7 +1568,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 log.info(notif.name.rawValue)
                 switch notif.name {
                 case NSWorkspace.sessionDidBecomeActiveNotification:
-                    wakeTime = Date()
+                    // wakeTime = Date()
                     DC.loggedOut = false
                     log.info("SESSION: Log in")
                 case NSWorkspace.sessionDidResignActiveNotification:
@@ -1613,7 +1610,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 case NSWorkspace.screensDidWakeNotification where !DC.loggedOut,
                      NSWorkspace.sessionDidBecomeActiveNotification:
                     log.debug("SESSION: Screen wake")
-                    wakeTime = Date()
+                    // wakeTime = Date()
                     DC.screensSleeping = false
                     DC.retryAutoBlackoutLater()
 
@@ -2293,6 +2290,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     }
 
     func applicationDidFinishLaunching(_: Notification) {
+        print(SentryCrashExceptionApplication.self)
+
         initDDCLogging()
         guard !SWIFTUI_PREVIEW else {
             DC.displays = DC.getDisplaysLock.around {

@@ -61,7 +61,7 @@ final class EnvState: ObservableObject {
     @Published var recording = false
 }
 
-enum OptionsTab: String, DefaultsSerializable {
+enum OptionsTab: String, Defaults.Serializable {
     case layout
     case advanced
     case hdr

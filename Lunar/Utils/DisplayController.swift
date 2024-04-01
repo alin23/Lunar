@@ -13,13 +13,22 @@ import Combine
 import CoreLocation
 import Defaults
 import Foundation
-import FuzzyMatcher
 import MediaKeyTap
 import Sentry
 import Surge
 import SwiftDate
 import SwiftUI
 import SwiftyJSON
+
+#if canImport(FuzzyMatcher)
+    import FuzzyMatcher
+#else
+    extension [String] {
+        func fuzzyFind(_ pattern: String) -> String? {
+            self.first
+        }
+    }
+#endif
 
 func IOServiceLocation(_ service: io_service_t) -> String? {
     IORegistryEntryCopyPath(service, kIOServicePlane)?.takeRetainedValue() as? String
@@ -327,10 +336,11 @@ func IOServiceFirstMatchingWhere(_ matching: CFDictionary, where predicate: (io_
         func matchingScore(for display: Display, in _: [CGDirectDisplayID]? = nil) -> Int {
             var score = 0
 
-            if let location = (display.infoDictionary["IODisplayLocation"] as? String) ?? (displayInfoDictionary(display.id)?["IODisplayLocation"] as? String), let ioDisplayLocation = IOServiceLocation(clcd2Service),
-               location == ioDisplayLocation
+            if DC.dcpMatchingIODisplayLocation, let location = (display.infoDictionary["IODisplayLocation"] as? String)
+                ?? (displayInfoDictionary(display.id)?["IODisplayLocation"] as? String),
+                let ioDisplayLocation = IOServiceLocation(clcd2Service), location == ioDisplayLocation
             {
-                score += 100
+                score += 5
             }
 
             if let edidUUID {
@@ -498,7 +508,7 @@ final class DisplayController: ObservableObject {
 
     var observers: Set<AnyCancellable> = []
 
-    lazy var currentAudioDisplay: Display? = getCurrentAudioDisplay()
+    lazy var currentAudioDisplay: Display? = getCurrentAudioDisplay(initial: true)
 
     let SCREENCAPTURE_WATCHER_TASK_KEY = "screencaptureWatcherTask"
     let MODE_WATCHER_TASK_KEY = "modeWatcherTask"
@@ -522,6 +532,9 @@ final class DisplayController: ObservableObject {
     var cachedOnlineDisplayIDs: Set<CGDirectDisplayID> = Set(NSScreen.onlineDisplayIDs)
 
     @Setting(.allowAdjustmentsWhileLocked) var allowAdjustmentsWhileLocked: Bool
+    @Setting(.showNitsOSD) var showNitsOSD: Bool
+    @Setting(.dcpMatchingIODisplayLocation) var dcpMatchingIODisplayLocation: Bool
+
     @Atomic var locked = false {
         didSet {
             log.debug("Screen \(locked ? "locked" : "unlocked")")
@@ -1417,6 +1430,8 @@ final class DisplayController: ObservableObject {
 
     @Atomic var displayLinkRunning = isDisplayLinkRunning()
 
+    @Atomic var builtinSupportsFullRangeXDR = false
+
     var targetDisplays: [Display] {
         activeDisplayList.filter { !$0.isSource }
     }
@@ -1963,10 +1978,10 @@ final class DisplayController: ObservableObject {
         apply = true
     }
 
-    func getCurrentAudioDisplay() -> Display? {
-        // #if DEBUG
-        //     return externalActiveDisplays.first
-        // #endif
+    func getCurrentAudioDisplay(initial: Bool = false) -> Display? {
+        guard !screensSleeping else {
+            return initial ? nil : self.currentAudioDisplay
+        }
 
         guard volumeHotkeysEnabled,
               let audioDevice = simplyCA?.defaultOutputDevice,
@@ -1986,15 +2001,12 @@ final class DisplayController: ObservableObject {
             log.info("Audio Display UID \(activeDisplayList.map { ($0.name, $0.audioIdentifier ?? "nil") })")
         }
 
-        var audioDeviceName: String? = nil
-        let result = asyncNow(timeout: 5.seconds, threaded: true) { audioDeviceName = audioDevice.name }
-//        let audioDeviceName = withTimeout(5.seconds, name: "getCurrentAudioDisplay") { audioDevice.name }
-        guard result == .success, let audioDeviceName, !audioDeviceName.isEmpty else {
+        let audioDeviceName = audioDevice.name
+        guard !audioDeviceName.isEmpty else {
             return nil
         }
 
-        guard let name = activeDisplayList.map(\.name).fuzzyFind(audioDeviceName)
-        else {
+        guard let name = activeDisplayList.map(\.name).fuzzyFind(audioDeviceName) else {
             return mainExternalOrCGMainDisplay
         }
 

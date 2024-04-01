@@ -22,6 +22,7 @@ struct AdvancedSettingsView: View {
     @Default(.waitAfterWakeSeconds) var waitAfterWakeSeconds
     @Default(.delayDDCAfterWake) var delayDDCAfterWake
 
+    @Default(.dcpMatchingIODisplayLocation) var dcpMatchingIODisplayLocation
     @Default(.autoRestartOnFailedDDC) var autoRestartOnFailedDDC
     @Default(.autoRestartOnFailedDDCSooner) var autoRestartOnFailedDDCSooner
     @Default(.sleepInClamshellMode) var sleepInClamshellMode
@@ -209,6 +210,16 @@ struct AdvancedSettingsView: View {
                                     \(dc.displaysWithXDRInUse.map { "• \($0.name)" }.joined(separator: "\n"))
                                     """
                             )
+                            """
+                        )
+                        SettingsToggle(
+                            text: "Match DDC port based on the IOKit position", setting: $dcpMatchingIODisplayLocation,
+                            help: """
+                            If you're having trouble with DDC commands not working on some displays, or if commands
+                            are going to the wrong monitor, enabling this option might help.
+
+                            This will try to match the DDC port based on the IODisplayLocation property of each display,
+                            instead of relying on EDID heuristics.
                             """
                         )
                         if dc.activeDisplayList.contains(where: \.hasDDC) {

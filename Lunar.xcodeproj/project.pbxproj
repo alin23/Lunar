@@ -42,6 +42,7 @@
 		C714C998280572920061588E /* ProViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C714C997280572920061588E /* ProViews.swift */; };
 		C714C99B2805BDEA0061588E /* SkyLight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C714C99A2805BDEA0061588E /* SkyLight.framework */; };
 		C714C99E2809B4FB0061588E /* ScrollViewIfNeeded.swift in Sources */ = {isa = PBXBuildFile; fileRef = C714C99D2809B4FB0061588E /* ScrollViewIfNeeded.swift */; };
+		C7160EC02BBACBDF000F83F2 /* FuzzyMatcher in Frameworks */ = {isa = PBXBuildFile; productRef = C7160EBF2BBACBDF000F83F2 /* FuzzyMatcher */; };
 		C71F8DB126542E1000C4648A /* GammaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71F8DB026542E1000C4648A /* GammaViewController.swift */; };
 		C71F8DBA265640C400C4648A /* DDCCTLControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71F8DB9265640C400C4648A /* DDCCTLControl.swift */; };
 		C722FB9F271AC83200ED4C94 /* Slider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C722FB9C271AC83200ED4C94 /* Slider.swift */; };
@@ -140,7 +141,6 @@
 		C7A6A08927BF8F5D008E52E0 /* Schedule.xib in Resources */ = {isa = PBXBuildFile; fileRef = C7AF321C26F62F5C00AC14AF /* Schedule.xib */; };
 		C7A7C248259391C200745637 /* HotkeyPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A7C247259391C200745637 /* HotkeyPopoverController.swift */; };
 		C7A7C24A2593B5EA00745637 /* HotkeyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A7C2492593B5EA00745637 /* HotkeyButton.swift */; };
-		C7A7F2542913ECCA00CD450C /* FuzzyMatcher in Frameworks */ = {isa = PBXBuildFile; productRef = C7A7F2532913ECCA00CD450C /* FuzzyMatcher */; };
 		C7A82D9F2618E1B9004146A8 /* InstallOutputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A82D9E2618E1B9004146A8 /* InstallOutputViewController.swift */; };
 		C7A82DB7261B779E004146A8 /* SettingsPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A82DB5261B779E004146A8 /* SettingsPopoverController.swift */; };
 		C7A82DC3261DF513004146A8 /* Pro.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A82DC2261DF513004146A8 /* Pro.swift */; };
@@ -461,7 +461,6 @@
 				C705A04D268BA02E001ABBA9 /* AXSwift in Frameworks */,
 				C7138D962634B02900406EE3 /* Paddle.framework in Frameworks */,
 				C7E80E352637060F004718A4 /* libcrypto.a in Frameworks */,
-				C7A7F2542913ECCA00CD450C /* FuzzyMatcher in Frameworks */,
 				C78BD04A259B33D500FC823F /* Path in Frameworks */,
 				C74F8DC425EB94660077DF27 /* DisplayServices.framework in Frameworks */,
 				C7E80E3A2637060F004718A4 /* libssh2.a in Frameworks */,
@@ -479,6 +478,7 @@
 				C7E896DD2652C37E0079A328 /* CoreBrightness.framework in Frameworks */,
 				C701A23F2546C8BF004747B5 /* MediaKeyTap in Frameworks */,
 				C7B5E8592548B3F900530B47 /* Defaults in Frameworks */,
+				C7160EC02BBACBDF000F83F2 /* FuzzyMatcher in Frameworks */,
 				C7138D8D2634AF0500406EE3 /* KeyHolder in Frameworks */,
 				C714C99B2805BDEA0061588E /* SkyLight.framework in Frameworks */,
 				C73B9A0D25FB9AD7003184FC /* Glob in Frameworks */,
@@ -922,9 +922,9 @@
 				C77B176827BE430200B957D1 /* SimplyCoreAudio */,
 				C799C2F427BF67C4003A2FB9 /* Socket */,
 				C7BD5F84287B44130077CCB7 /* Charts */,
-				C7A7F2532913ECCA00CD450C /* FuzzyMatcher */,
 				C70A793C2AB471F900289426 /* SwiftUIIntrospect */,
 				C744D07B2B434605003D77DE /* Sentry */,
+				C7160EBF2BBACBDF000F83F2 /* FuzzyMatcher */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -984,8 +984,8 @@
 				C799C2F327BF67C4003A2FB9 /* XCRemoteSwiftPackageReference "BlueSocket" */,
 				C77C77562812AA80006326BE /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
 				C7BD5F83287B44130077CCB7 /* XCRemoteSwiftPackageReference "Charts" */,
-				C7A7F2522913ECCA00CD450C /* XCRemoteSwiftPackageReference "FuzzyMatcher" */,
 				C744D07A2B434605003D77DE /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
+				C7160EBE2BBACBDF000F83F2 /* XCRemoteSwiftPackageReference "FuzzyMatcher" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -1340,7 +1340,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 6.7.3;
+				CURRENT_PROJECT_VERSION = 6.7.4;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1372,7 +1372,7 @@
 				);
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 6.7.3;
+				MARKETING_VERSION = 6.7.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1405,7 +1405,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 6.7.3;
+				CURRENT_PROJECT_VERSION = 6.7.4;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = RDDXV84A73;
@@ -1436,7 +1436,7 @@
 				);
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 6.7.3;
+				MARKETING_VERSION = 6.7.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1528,6 +1528,14 @@
 				kind = branch;
 			};
 		};
+		C7160EBE2BBACBDF000F83F2 /* XCRemoteSwiftPackageReference "FuzzyMatcher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/alin23/FuzzyMatcher";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		C73B9A0B25FB9AD7003184FC /* XCRemoteSwiftPackageReference "Glob" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Bouke/Glob";
@@ -1557,7 +1565,7 @@
 			repositoryURL = "https://github.com/getsentry/sentry-cocoa";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 8.17.2;
+				minimumVersion = 8.22.4;
 			};
 		};
 		C77AB65A269A032E0046BA78 /* XCRemoteSwiftPackageReference "Magnet" */ = {
@@ -1600,20 +1608,12 @@
 				kind = branch;
 			};
 		};
-		C7A7F2522913ECCA00CD450C /* XCRemoteSwiftPackageReference "FuzzyMatcher" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/alin23/FuzzyMatcher";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
 		C7B5E8572548B3F900530B47 /* XCRemoteSwiftPackageReference "Defaults" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/Defaults";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 6.2.1;
+				minimumVersion = 7.0.0;
 			};
 		};
 		C7B5E85B2548B5AC00530B47 /* XCRemoteSwiftPackageReference "AnyCodable" */ = {
@@ -1710,6 +1710,11 @@
 			package = C7138D8B2634AF0500406EE3 /* XCRemoteSwiftPackageReference "KeyHolder" */;
 			productName = KeyHolder;
 		};
+		C7160EBF2BBACBDF000F83F2 /* FuzzyMatcher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7160EBE2BBACBDF000F83F2 /* XCRemoteSwiftPackageReference "FuzzyMatcher" */;
+			productName = FuzzyMatcher;
+		};
 		C73B9A0C25FB9AD7003184FC /* Glob */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C73B9A0B25FB9AD7003184FC /* XCRemoteSwiftPackageReference "Glob" */;
@@ -1749,11 +1754,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C799C2F327BF67C4003A2FB9 /* XCRemoteSwiftPackageReference "BlueSocket" */;
 			productName = Socket;
-		};
-		C7A7F2532913ECCA00CD450C /* FuzzyMatcher */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C7A7F2522913ECCA00CD450C /* XCRemoteSwiftPackageReference "FuzzyMatcher" */;
-			productName = FuzzyMatcher;
 		};
 		C7B5E8582548B3F900530B47 /* Defaults */ = {
 			isa = XCSwiftPackageProductDependency;

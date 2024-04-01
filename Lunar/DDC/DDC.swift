@@ -11,7 +11,6 @@ import Cocoa
 import Combine
 import CoreGraphics
 import Foundation
-import FuzzyMatcher
 import Regex
 
 let MAX_REQUESTS = 10
@@ -886,7 +885,7 @@ enum DDC {
     static var delayDDCAfterWake: Bool = CachedDefaults[.delayDDCAfterWake]
 
     static var shouldWait: Bool {
-        delayDDCAfterWake && waitAfterWakeSeconds > 0 && wakeTime != startTime && timeSince(wakeTime) > waitAfterWakeSeconds.d
+        delayDDCAfterWake && waitAfterWakeSeconds > 0 && wakeTime != Date.distantPast && timeSince(wakeTime) > waitAfterWakeSeconds.d
     }
 
     @discardableResult
@@ -1025,7 +1024,7 @@ enum DDC {
         }
 
         #if DEBUG
-            return displayIDs
+//            return displayIDs
             if !displayIDs.isEmpty {
                 // displayIDs.append(TEST_DISPLAY_PERSISTENT_ID)
                 return displayIDs

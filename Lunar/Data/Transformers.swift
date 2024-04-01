@@ -64,7 +64,7 @@ final class IntBoolTransformer: ValueTransformer {
 
 // MARK: - ColorScheme
 
-enum ColorScheme: Int, DefaultsSerializable {
+enum ColorScheme: Int, Defaults.Serializable {
     case system
     case light
     case dark

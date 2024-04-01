@@ -51,8 +51,8 @@
         "repositoryURL": "https://github.com/sindresorhus/Defaults",
         "state": {
           "branch": null,
-          "revision": "981ccb0a01c54abbe3c12ccb8226108527bbf115",
-          "version": "6.3.0"
+          "revision": "3efef5a28ebdbbe922d4a2049493733ed14475a6",
+          "version": "7.3.1"
         }
       },
       {
@@ -60,7 +60,7 @@
         "repositoryURL": "https://github.com/alin23/FuzzyMatcher",
         "state": {
           "branch": "main",
-          "revision": "b97b7b900faf2a3881b5536be0f50b5c904c2798",
+          "revision": "6c7628a46a566d64d6b7d79068c95bf80c8a6bd6",
           "version": null
         }
       },
@@ -87,7 +87,7 @@
         "repositoryURL": "https://github.com/alin23/Magnet",
         "state": {
           "branch": "dev",
-          "revision": "fda73dc564372e98b5e5e6f5452a19f6b92a0382",
+          "revision": "a21e6c4fd0fdb0244009e7c1fce64b31a01c39ca",
           "version": null
         }
       },
@@ -96,8 +96,8 @@
         "repositoryURL": "https://github.com/mxcl/Path.swift",
         "state": {
           "branch": null,
-          "revision": "9c6f807b0a76be0e27aecc908bc6f173400d839e",
-          "version": "1.4.0"
+          "revision": "8e355c28e9393c42e58b18c54cace2c42c98a616",
+          "version": "1.4.1"
         }
       },
       {
@@ -123,8 +123,8 @@
         "repositoryURL": "https://github.com/getsentry/sentry-cocoa",
         "state": {
           "branch": null,
-          "revision": "f5dafd7449be2f1778f2ddb87d57347b96461003",
-          "version": "8.17.2"
+          "revision": "bf7bdd75e25556d0f97ad54fb804b4287863e106",
+          "version": "8.22.4"
         }
       },
       {
@@ -132,7 +132,7 @@
         "repositoryURL": "https://github.com/rnine/SimplyCoreAudio",
         "state": {
           "branch": "develop",
-          "revision": "35cc0e6eac5c2ee5049431f4238b0e333cf79869",
+          "revision": "b5430564b1d55adab3c331fb7574445a84bd4ceb",
           "version": null
         }
       },
@@ -150,8 +150,8 @@
         "repositoryURL": "https://github.com/apple/swift-algorithms",
         "state": {
           "branch": null,
-          "revision": "b14b7f4c528c942f121c8b860b9410b2bf57825e",
-          "version": "1.0.0"
+          "revision": "f6919dfc309e7f1b56224378b11e28bab5bccc42",
+          "version": "1.2.0"
         }
       },
       {
@@ -159,8 +159,8 @@
         "repositoryURL": "https://github.com/apple/swift-argument-parser",
         "state": {
           "branch": null,
-          "revision": "fee6933f37fde9a5e12a1e4aeaa93fe60116ff2a",
-          "version": "1.2.2"
+          "revision": "46989693916f56d1186bd59ac15124caef896560",
+          "version": "1.3.1"
         }
       },
       {
@@ -168,8 +168,8 @@
         "repositoryURL": "https://github.com/apple/swift-atomics.git",
         "state": {
           "branch": null,
-          "revision": "6c89474e62719ddcc1e9614989fff2f68208fe10",
-          "version": "1.1.0"
+          "revision": "cd142fd2f64be2100422d658e7411e39489da985",
+          "version": "1.2.0"
         }
       },
       {
@@ -183,7 +183,7 @@
       },
       {
         "package": "swift-numerics",
-        "repositoryURL": "https://github.com/apple/swift-numerics",
+        "repositoryURL": "https://github.com/apple/swift-numerics.git",
         "state": {
           "branch": null,
           "revision": "0a5bc04095a675662cf24757cc0640aa2204253b",
@@ -204,8 +204,8 @@
         "repositoryURL": "https://github.com/siteline/SwiftUI-Introspect",
         "state": {
           "branch": null,
-          "revision": "3ba734dd20faada0e3234b68e78db97005315f0e",
-          "version": "1.0.0"
+          "revision": "0cd2a5a5895306bc21d54a2254302d24a9a571e4",
+          "version": "1.1.3"
         }
       },
       {
@@ -222,8 +222,8 @@
         "repositoryURL": "https://github.com/SwiftyJSON/SwiftyJSON",
         "state": {
           "branch": null,
-          "revision": "b3dcd7dbd0d488e1a7077cb33b00f2083e382f07",
-          "version": "5.0.1"
+          "revision": "af76cf3ef710b6ca5f8c05f3a31307d44a3c5828",
+          "version": "5.0.2"
         }
       },
       {

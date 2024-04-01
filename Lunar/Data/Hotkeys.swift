@@ -877,12 +877,12 @@ enum Hotkey {
             return
         }
         #if arch(arm64)
-            if osdImage == .brightness {
+            if osdImage == .brightness, DC.showNitsOSD || display.fullRange, display.possibleMaxNits != nil, let nits = display.nits {
                 display.fullRangeUserBrightness = value.d.map(from: (0, 100), to: (0, 1))
                 display.showSoftwareOSD(
                     image: "sun.max",
                     value: value.f / 100,
-                    text: display.possibleMaxNits != nil && display.nits != nil ? "\(display.nits!.str(decimals: 0)) nits" : "",
+                    text: "\(nits.str(decimals: 0)) nits",
                     color: nil,
                     locked: !display.presetSupportsBrightnessControl
                 )
@@ -911,7 +911,7 @@ enum Hotkey {
 
         let locked = (display.control is DDCControl && (DDC.skipWritingPropertyById[display.id]?.contains(controlID) ?? false))
             || display.noControls
-            || (display.lockedBrightness && display.hasDDC && osdImage == .brightness)
+            || (osdImage == .brightness && ((display.lockedBrightness && display.hasDDC) || !display.presetSupportsBrightnessControl))
         let mirroredID = CGDisplayMirrorsDisplay(display.id)
         let osdID = (mirroredID != kCGNullDirectDisplay && mirroredID != UINT32_MAX) ? mirroredID : display.id
 
