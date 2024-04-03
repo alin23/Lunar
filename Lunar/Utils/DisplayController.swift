@@ -2001,8 +2001,12 @@ final class DisplayController: ObservableObject {
             log.info("Audio Display UID \(activeDisplayList.map { ($0.name, $0.audioIdentifier ?? "nil") })")
         }
 
-        let audioDeviceName = audioDevice.name
-        guard !audioDeviceName.isEmpty else {
+        let audioDeviceName = withTimeout(3.seconds, name: "CoreAudio") { audioDevice.name } onTimeout: {
+            if Defaults[.autoRestartOnCoreAudioHang] {
+                restart()
+            }
+        }
+        guard let audioDeviceName, !audioDeviceName.isEmpty else {
             return nil
         }
 

@@ -226,13 +226,13 @@ final class AppleNativeControl: Control {
 
                 if let osd = display.osdWindowController?.window as? OSDWindow,
                    let osdAlpha = osd.contentView?.superview?.alphaValue,
-                   osdAlpha == 1, display.osdState.text.contains("nits")
+                   osdAlpha == 1, display.osdState.text.contains("nits"), display.userNits != nits
                 {
                     display.userNits = nits
                     display.softwareOSDTask = nil
                     display.osdState.text = "\(nits.str(decimals: 0)) nits"
                     osd.show(verticalOffset: 100)
-                } else if CachedDefaults[.hideOSD], timeSince(DC.lastTimeBrightnessKeyPressed) < 1 {
+                } else if CachedDefaults[.hideOSD], timeSince(DC.lastTimeBrightnessKeyPressed) < 1, display.userNits != nits {
                     display.userNits = nits
                 }
 

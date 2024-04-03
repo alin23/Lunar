@@ -652,6 +652,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
         setupHotkeys()
         guard active else { return }
+        setup()
 
         if let dict = displayInfoDictionary(id) {
             infoDictionary = dict
@@ -736,6 +737,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         enabledControls[.gamma] = !isSmartBuiltin
 
         guard active else { return }
+
+        setup()
 
         if let dict = displayInfoDictionary(id) {
             infoDictionary = dict
@@ -2254,29 +2257,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-    lazy var nsScreen: NSScreen? = {
-        NotificationCenter.default
-            .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
-            .debounce(for: .seconds(2), scheduler: RunLoop.main)
-            .sink { [weak self] _ in
-                guard let self else { return }
-                if let infoDict = displayInfoDictionary(id) {
-                    infoDictionary = infoDict
-                }
-                nsScreen = getScreen()
-                screenFetcher = Repeater(every: 2, times: 5, name: "screen-\(serial)") { [weak self] in
-                    guard let self else { return }
-                    nsScreen = getScreen()
-                }
-            }
-            .store(in: &observers)
-
-        return getScreen()
-    }() {
+    lazy var nsScreen: NSScreen? = getScreen() {
         didSet {
-            self.setNotchState()
+            setNotchState()
             mainAsync {
                 self.supportsEnhance = self.getSupportsEnhance()
+                if let osd = self.osdWindowController?.window as? OSDWindow {
+                    osd.show(verticalOffset: 100)
+                }
             }
         }
     }
@@ -3792,6 +3780,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         } else if isBuiltin, !DC.builtinSupportsFullRangeXDR {
             DC.builtinSupportsFullRangeXDR = true
         }
+
+        if supportsFullRangeXDR, getSupportsFullRangeXDR() {
+            withoutApply {
+                fullRange = panel.xdrEnabled
+            }
+        }
+
         presetSupportsBrightnessControl = panel.supportsBrightnessControl
         if let preset = panel.activePreset {
             setMaxNits(from: preset)
@@ -3806,7 +3801,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             #else
                 canRotate = panel?.canChangeOrientation() ?? false
             #endif
-            fullRange = panel?.xdrEnabled ?? false
 
             isSidecar = DDC.isSidecarDisplay(id, name: edidName)
             isAirplay = DDC.isAirplayDisplay(id, name: edidName)
@@ -5168,6 +5162,24 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 self.i2cDetectionTask = nil
             }
         }
+    }
+
+    func setup() {
+        NotificationCenter.default
+            .publisher(for: NSApplication.didChangeScreenParametersNotification, object: nil)
+            .debounce(for: .seconds(1), scheduler: RunLoop.main)
+            .sink { [weak self] _ in
+                guard let self else { return }
+                if let infoDict = displayInfoDictionary(id) {
+                    infoDictionary = infoDict
+                }
+                nsScreen = getScreen()
+                screenFetcher = Repeater(every: 2, times: 5, name: "screen-\(serial)") { [weak self] in
+                    guard let self else { return }
+                    nsScreen = getScreen()
+                }
+            }
+            .store(in: &observers)
     }
 
     func setupHotkeys() {
