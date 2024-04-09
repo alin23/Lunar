@@ -1,3 +1,44 @@
+# 6.7.5
+## Features
+
+- **Smoother Sync Mode** brightness adaptation
+
+## Fixes
+
+- Fix printing `SentryCrashExceptionApplication` by mistake in the CLI output
+- Fix nits OSD not appearing where it should after resolution change
+- Ensure **Full Range** remains enabled even when the system reports an incomplete status
+
+## Improvements
+
+- Add hidden setting `syncModeBrightnessKeyPressedExpireSeconds`
+
+Showing OSD on target monitors in Sync Mode requires only taking into account the changes that happen within a waiting period after the brightness key press.
+
+That period was previously 0.5 seconds, which was now increased to 1 second and made configurable via the `syncModeBrightnessKeyPressedExpireSeconds` hidden setting. Some systems take longer to propagate the brightness change events and this setting should help with that.
+
+- Optimise code path leading from the Sync source brightness change to the Sync target brightness adaptation
+- More intuitive nits range calculation in Sync Mode
+
+<video width=370 height=306 controls src="https://files.lunar.fyi/nits-range-intuitive-change-h264.mp4" title="nits range UI"></video>
+
+# 6.7.4
+## Fixes
+
+- Fix color adjustments not being applied anymore on some screens
+- Don't show nits values by default in the OSD since it can cause it to not appear on some screens
+- Revert the max DDC brightness for LED Cinema and Thunderbolt displays back to 100 instead of 255
+- Make DCP matching on `IODisplayLocation` optional to avoid DDC not working with some displays
+- Fix **Full Range** toggle disappearing sometimes after a display connection
+- Fix volume hotkeys not working anymore if CoreAudio times out
+
+## Improvements
+
+- Move the CoreAudio device fetching back to main thread where if it stalls, it will restart the app automatically
+- Allow hiding the nits value from the brightness OSD
+
+![show nits osd setting](https://files.lunar.fyi/show-nits-osd-setting.png)
+
 # 6.7.3
 ## Hotfix
 
