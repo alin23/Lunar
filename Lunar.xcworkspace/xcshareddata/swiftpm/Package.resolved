@@ -60,7 +60,7 @@
         "repositoryURL": "https://github.com/alin23/FuzzyMatcher",
         "state": {
           "branch": "main",
-          "revision": "d9d9a666bcb77b1c78fe119714faddcd788d11d1",
+          "revision": "6c7628a46a566d64d6b7d79068c95bf80c8a6bd6",
           "version": null
         }
       },
@@ -123,8 +123,8 @@
         "repositoryURL": "https://github.com/getsentry/sentry-cocoa",
         "state": {
           "branch": null,
-          "revision": "bf7bdd75e25556d0f97ad54fb804b4287863e106",
-          "version": "8.22.4"
+          "revision": "937dce13c2600cc42112c480d04f84899e08e9cc",
+          "version": "8.23.0"
         }
       },
       {

@@ -3544,10 +3544,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 }
 
                 let id = CGDirectDisplayID(UInt(bitPattern: observer))
-                guard let display = DC.activeDisplays[id], !display.inSmoothTransition, !display.isBuiltin || !DC.lidClosed else {
-                    let reason = if DC.activeDisplays[id] == nil {
-                        "display not found"
-                    } else if DC.activeDisplays[id]?.inSmoothTransition ?? false {
+                guard let display = DC.activeDisplays[id] else {
+                    let reason = "display not found"
+                    DS_LOGGER.debug("Ignoring brightness change notification. Reason: \(reason, privacy: .public)")
+                    return
+                }
+
+                guard !display.inSmoothTransition, !display.isBuiltin || !DC.lidClosed else {
+                    let reason = if DC.activeDisplays[id]?.inSmoothTransition ?? false {
                         "in smooth transition"
                     } else if DC.activeDisplays[id]?.isBuiltin ?? false {
                         "lid closed"
@@ -3930,6 +3934,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         lazy var userMaxNits: Double? = getUserMaxNits() {
             didSet {
                 debug("\(self.name) Max Nits: \((self.userMaxNits ?? self.maxNits).str(decimals: 2))")
+                recomputeNitsMapping()
+            }
+        }
+
+        lazy var userMinNits: Double? = getUserMinNits() {
+            didSet {
+                debug("\(self.name) Min Nits: \((self.userMinNits ?? self.minNits).str(decimals: 2))")
                 recomputeNitsMapping()
             }
         }

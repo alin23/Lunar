@@ -37,7 +37,7 @@
 
         var body: some View {
             if syncMode, SyncMode.isUsingNits() {
-                let nits = placeholder == "min" ? display.minNits : display.maxNits
+                let nits = placeholder == "min" ? (display.userMinNits ?? display.minNits) : (display.userMaxNits ?? display.maxNits)
                 let disabled = display.isNative && (placeholder == "max" || display.isActiveSyncSource)
                 SwiftUI.Button(action: { editing = true }) {
                     VStack(spacing: -3) {

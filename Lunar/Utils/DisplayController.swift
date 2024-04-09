@@ -534,6 +534,7 @@ final class DisplayController: ObservableObject {
     @Setting(.allowAdjustmentsWhileLocked) var allowAdjustmentsWhileLocked: Bool
     @Setting(.showNitsOSD) var showNitsOSD: Bool
     @Setting(.dcpMatchingIODisplayLocation) var dcpMatchingIODisplayLocation: Bool
+    @Setting(.syncModeBrightnessKeyPressedExpireSeconds) var syncModeBrightnessKeyPressedExpireSeconds: Double
 
     @Atomic var locked = false {
         didSet {

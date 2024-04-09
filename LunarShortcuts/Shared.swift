@@ -238,6 +238,7 @@ extension Defaults.Keys {
     static let waitAfterWakeSeconds = Key<Int>("waitAfterWakeSeconds", default: 30)
     static let delayDDCAfterWake = Key<Bool>("delayDDCAfterWake", default: false)
     static let wakeReapplyTries = Key<Int>("wakeReapplyTries", default: 5)
+    static let syncModeBrightnessKeyPressedExpireSeconds = Key<Double>("syncModeBrightnessKeyPressedExpireSeconds", default: 1.0)
 
     static let sunrise = Key<String?>("sunrise", default: nil)
     static let sunset = Key<String?>("sunset", default: nil)

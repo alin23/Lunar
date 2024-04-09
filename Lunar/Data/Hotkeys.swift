@@ -1014,7 +1014,7 @@ extension AppDelegate: MediaKeyTapDelegate {
 
         switch mediaKey {
         case .brightnessUp where contrast:
-            DC.pressedContrastKey.true(for: 0.5)
+            DC.pressedContrastKey.true(for: DC.syncModeBrightnessKeyPressedExpireSeconds)
             increaseContrast(
                 by: value,
                 currentDisplay: currentDisplay,
@@ -1023,7 +1023,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                 nonMainDisplays: nonMainDisplays
             )
         case .brightnessUp where allDisplays:
-            DC.pressedBrightnessKey.true(for: 0.5)
+            DC.pressedBrightnessKey.true(for: DC.syncModeBrightnessKeyPressedExpireSeconds)
             if timeSince(DC.lastTimeBrightnessUpKeyPressed) < 0.2 {
                 DC.doublePressedBrightnessUpKey.true(for: 0.2)
             }
@@ -1033,7 +1033,7 @@ extension AppDelegate: MediaKeyTapDelegate {
             }
             increaseBrightness(by: value)
         case .brightnessUp:
-            DC.pressedBrightnessKey.true(for: 0.5)
+            DC.pressedBrightnessKey.true(for: DC.syncModeBrightnessKeyPressedExpireSeconds)
             if timeSince(DC.lastTimeBrightnessUpKeyPressed) < 0.2 {
                 DC.doublePressedBrightnessUpKey.true(for: 0.2)
             }
@@ -1046,7 +1046,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                 nonMainDisplays: nonMainDisplays
             )
         case .brightnessDown where contrast:
-            DC.pressedContrastKey.true(for: 0.5)
+            DC.pressedContrastKey.true(for: DC.syncModeBrightnessKeyPressedExpireSeconds)
             decreaseContrast(
                 by: value,
                 currentDisplay: currentDisplay,
@@ -1055,7 +1055,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                 nonMainDisplays: nonMainDisplays
             )
         case .brightnessDown where allDisplays:
-            DC.pressedBrightnessKey.true(for: 0.5)
+            DC.pressedBrightnessKey.true(for: DC.syncModeBrightnessKeyPressedExpireSeconds)
             if timeSince(DC.lastTimeBrightnessDownKeyPressed) < 0.2 {
                 DC.doublePressedBrightnessDownKey.true(for: 0.2)
             }
@@ -1065,7 +1065,7 @@ extension AppDelegate: MediaKeyTapDelegate {
             }
             decreaseBrightness(by: value)
         case .brightnessDown:
-            DC.pressedBrightnessKey.true(for: 0.5)
+            DC.pressedBrightnessKey.true(for: DC.syncModeBrightnessKeyPressedExpireSeconds)
             if timeSince(DC.lastTimeBrightnessDownKeyPressed) < 0.2 {
                 DC.doublePressedBrightnessDownKey.true(for: 0.2)
             }
@@ -1143,10 +1143,10 @@ extension AppDelegate: MediaKeyTapDelegate {
     ) -> CGEvent? {
         let lidOpened = !lidClosed
 
-        log.info("\(action) (lidClosed: \(lidClosed))")
-
         switch action {
         case .all:
+            log.info("Handling brightness key for `.all` (lidClosed: \(lidClosed))")
+
             if CachedDefaults[.workaroundBuiltinDisplay], lidOpened, let builtin = DC.builtinDisplay, builtin.active {
                 log.info("Adjusting external displays and then forwarding media key to system")
                 adjust(mediaKey, by: offset, contrast: contrast, allDisplays: true)
@@ -1166,12 +1166,17 @@ extension AppDelegate: MediaKeyTapDelegate {
             }
             adjust(mediaKey, by: offset, contrast: contrast, builtinDisplay: true, allDisplays: true)
         case .external:
+            log.info("Handling brightness key for `.external` (lidClosed: \(lidClosed))")
             adjust(mediaKey, by: offset, contrast: contrast, allDisplays: true)
         case .main:
+            log.info("Handling brightness key for `.main` (lidClosed: \(lidClosed))")
             adjust(mediaKey, by: offset, contrast: contrast, mainDisplay: true)
         case .nonMain:
+            log.info("Handling brightness key for `.nonMain` (lidClosed: \(lidClosed))")
             adjust(mediaKey, by: offset, contrast: contrast, nonMainDisplays: true)
         case .cursor:
+            log.info("Handling brightness key for `.cursor` (lidClosed: \(lidClosed))")
+
             if CachedDefaults[.workaroundBuiltinDisplay], !contrast, let cursor = DC.cursorDisplay, cursor.isBuiltin {
                 event.flags = event.flags.subtracting([.maskShift, .maskAlternate, .maskCommand, .maskControl])
                 if offset == 1 {
@@ -1182,6 +1187,8 @@ extension AppDelegate: MediaKeyTapDelegate {
             }
             adjust(mediaKey, by: offset, contrast: contrast, currentDisplay: true)
         case .builtin:
+            log.info("Handling brightness key for `.builtin` (lidClosed: \(lidClosed))")
+
             if CachedDefaults[.workaroundBuiltinDisplay], !contrast, lidOpened {
                 event.flags = event.flags.subtracting([.maskShift, .maskAlternate, .maskCommand, .maskControl])
                 if offset == 1 {
@@ -1192,6 +1199,8 @@ extension AppDelegate: MediaKeyTapDelegate {
             }
             adjust(mediaKey, by: offset, contrast: contrast, currentDisplay: lidClosed, builtinDisplay: lidOpened)
         case .source:
+            log.info("Handling brightness key for `.source` (lidClosed: \(lidClosed))")
+
             if CachedDefaults[.workaroundBuiltinDisplay], !contrast, DC.sourceDisplay.isBuiltin {
                 event.flags = event.flags.subtracting([.maskShift, .maskAlternate, .maskCommand, .maskControl])
                 if offset == 1 {

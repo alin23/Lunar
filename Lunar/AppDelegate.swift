@@ -354,6 +354,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     let APP_DIR = ((try? p("/Applications")?.realpath()) ?? p("/Applications"))?.components ?? ["Applications"]
     let SVAPP_DIR = ((try? p("/System/Volumes/Data/Applications")?.realpath()) ?? p("/System/Volumes/Data/Applications"))?.components ?? ["System", "Volumes", "Data", "Applications"]
 
+    @Atomic var showBrightnessMenuBarChanged = true
+
+    var sentryCrashExceptionApplicationType: AnyClass?
+
     @Atomic @objc dynamic var cleaningMode = false {
         didSet {
             log.debug("Cleaning Mode: \(cleaningMode)")
@@ -1084,7 +1088,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             mainAsync {
                 self.statusItemButtonController?.frame = button.frame
             }
-        } else if let button = statusItem.button {
+        } else if showBrightnessMenuBarChanged, let button = statusItem.button {
+            showBrightnessMenuBarChanged = false
             button.attributedTitle = "".attributedString
             button.imagePosition = .imageOnly
             mainAsync {
@@ -1841,6 +1846,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             .merge(with: showOnlyExternalBrightnessMenuBarPublisher)
             .debounce(for: .milliseconds(100), scheduler: RunLoop.main)
             .sink { [self] change in
+                showBrightnessMenuBarChanged = true
                 if change.newValue {
                     statusItem.button?.imagePosition = .imageLeading
                 } else {
@@ -2290,7 +2296,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     }
 
     func applicationDidFinishLaunching(_: Notification) {
-        print(SentryCrashExceptionApplication.self)
+        if isServer {
+            sentryCrashExceptionApplicationType = SentryCrashExceptionApplication.self
+        }
 
         initDDCLogging()
         guard !SWIFTUI_PREVIEW else {

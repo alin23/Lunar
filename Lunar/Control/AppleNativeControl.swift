@@ -35,6 +35,8 @@ final class AppleNativeControl: Control {
 
     var smoothTransitionTask: DispatchWorkItem?
 
+    var nitsUpdateRepeater: Repeater? = nil
+
     var isSoftware: Bool { false }
     var isDDC: Bool { true }
 
@@ -290,19 +292,20 @@ final class AppleNativeControl: Control {
                         DisplayServicesBrightnessChanged(id, br)
                     }
 
-                    for _ in stride(from: 0, through: 0.5, by: 0.01) {
-                        Thread.sleep(forTimeInterval: 0.01)
-                        guard !display.shouldStopBrightnessTransition else {
-                            log.debug("Stopping smooth transition on brightness=\(brightness) using \(self) for \(display)")
-                            display.lastWrittenBrightness = getBrightness() ?? display.lastWrittenBrightness
-                            return
-                        }
-                    }
+//                    for _ in stride(from: 0, through: 0.5, by: 0.01) {
+//                        Thread.sleep(forTimeInterval: 0.01)
+//                        guard !display.shouldStopBrightnessTransition else {
+//                            log.debug("Stopping smooth transition on brightness=\(brightness) using \(self) for \(display)")
+//                            display.lastWrittenBrightness = getBrightness() ?? display.lastWrittenBrightness
+//                            return
+//                        }
+//                    }
                     DisplayServicesSetBrightness(id, br.f)
                     if br == 1.0 {
                         DisplayServicesSetLinearBrightness(id, br.f)
                     }
-                    updateNits()
+                    display.lastWrittenBrightness = getBrightness() ?? display.lastWrittenBrightness
+                    updateNitsWithRetry()
 
                     if #available(macOS 14.0, *) {
                         // not needed
@@ -359,6 +362,12 @@ final class AppleNativeControl: Control {
         #endif
         onChange?(brightness)
         return writeBrightness(brightness)
+    }
+    func updateNitsWithRetry() {
+        nitsUpdateRepeater = Repeater(every: 0.05, times: 10) { [weak self] in
+            guard let self else { return }
+            updateNits()
+        }
     }
 
     func setContrast(

@@ -3,4 +3,118 @@
    uuid = "A71689F0-05ED-400C-9A39-47EC0A36555F"
    type = "0"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "F3C88688-5651-42FD-990B-ECD95250D747"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Lunar/Modes/SyncMode.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "898"
+            endingLineNumber = "898"
+            landmarkName = "getUserMinNits(mapping:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "F3C88688-5651-42FD-990B-ECD95250D747 - f6c5d1ba221c505f"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Lunar.Display.getUserMinNits(mapping: Swift.Optional&lt;Swift.Array&lt;Lunar.AutoLearnMapping&gt;&gt;) -&gt; Swift.Optional&lt;Swift.Double&gt;"
+                  moduleName = "Lunar"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/alin/Projects/LunarPro/Lunar/Modes/SyncMode.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "898"
+                  endingLineNumber = "898"
+                  offsetFromSymbolStart = "204">
+               </Location>
+               <Location
+                  uuid = "F3C88688-5651-42FD-990B-ECD95250D747 - f6c5d1ba221c505f"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Lunar.Display.getUserMinNits(mapping: Swift.Optional&lt;Swift.Array&lt;Lunar.AutoLearnMapping&gt;&gt;) -&gt; Swift.Optional&lt;Swift.Double&gt;"
+                  moduleName = "Lunar"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/alin/Projects/LunarPro/Lunar/Modes/SyncMode.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "898"
+                  endingLineNumber = "898"
+                  offsetFromSymbolStart = "196">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "01254373-620C-428A-B763-B776CB274522"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Lunar/Modes/SyncMode.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "148"
+            endingLineNumber = "148"
+            landmarkName = "observeBrightness(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "763B523E-3601-4BD9-BC45-6C8D581F8782"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Lunar/Control/AppleNativeControl.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "220"
+            endingLineNumber = "220"
+            landmarkName = "updateNits()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "763B523E-3601-4BD9-BC45-6C8D581F8782 - 72d04a774dff3a45"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () -&gt; () in Lunar.AppleNativeControl.updateNits() -&gt; ()"
+                  moduleName = "Lunar"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/alin/Projects/LunarPro/Lunar/Control/AppleNativeControl.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "220"
+                  endingLineNumber = "220"
+                  offsetFromSymbolStart = "280">
+               </Location>
+               <Location
+                  uuid = "763B523E-3601-4BD9-BC45-6C8D581F8782 - 72d04a774dff3a45"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () -&gt; () in Lunar.AppleNativeControl.updateNits() -&gt; ()"
+                  moduleName = "Lunar"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/alin/Projects/LunarPro/Lunar/Control/AppleNativeControl.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "220"
+                  endingLineNumber = "220"
+                  offsetFromSymbolStart = "2872">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>
