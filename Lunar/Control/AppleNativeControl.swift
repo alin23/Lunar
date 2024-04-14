@@ -37,6 +37,8 @@ final class AppleNativeControl: Control {
 
     var nitsUpdateRepeater: Repeater? = nil
 
+    var smoothTransitionWatcher: Repeater?
+
     var isSoftware: Bool { false }
     var isDDC: Bool { true }
 
@@ -219,7 +221,9 @@ final class AppleNativeControl: Control {
     func updateNits() {
         #if arch(arm64)
             mainAsync { [self] in
-                guard let display, let maxNits = display.possibleMaxNits else { return }
+                guard let display, let maxNits = display.possibleMaxNits else {
+                    return
+                }
 
                 var brightness: Float = 0.0
                 DisplayServicesGetLinearBrightness(display.id, &brightness)
@@ -292,27 +296,29 @@ final class AppleNativeControl: Control {
                         DisplayServicesBrightnessChanged(id, br)
                     }
 
-//                    for _ in stride(from: 0, through: 0.5, by: 0.01) {
-//                        Thread.sleep(forTimeInterval: 0.01)
-//                        guard !display.shouldStopBrightnessTransition else {
-//                            log.debug("Stopping smooth transition on brightness=\(brightness) using \(self) for \(display)")
-//                            display.lastWrittenBrightness = getBrightness() ?? display.lastWrittenBrightness
-//                            return
-//                        }
-//                    }
-                    DisplayServicesSetBrightness(id, br.f)
-                    if br == 1.0 {
-                        DisplayServicesSetLinearBrightness(id, br.f)
-                    }
-                    display.lastWrittenBrightness = getBrightness() ?? display.lastWrittenBrightness
                     updateNitsWithRetry()
+                    smoothTransitionWatcher = Repeater(every: 0.01, times: 50, name: "smoothTransitionWatcherAppleNative", onFinish: {
+                        DisplayServicesSetBrightness(id, br.f)
+                        if br == 1.0 {
+                            DisplayServicesSetLinearBrightness(id, br.f)
+                        }
+                        display.lastWrittenBrightness = self.getBrightness() ?? display.lastWrittenBrightness
 
-                    if #available(macOS 14.0, *) {
-                        // not needed
-                    } else {
-                        DisplayServicesBrightnessChanged(id, br)
+                        if #available(macOS 14.0, *) {
+                            // not needed
+                        } else {
+                            DisplayServicesBrightnessChanged(id, br)
+                        }
+                        display.inSmoothTransition = false
+                    }, onCancel: {
+                        display.lastWrittenBrightness = self.getBrightness() ?? display.lastWrittenBrightness
+                    }) {
+                        guard display.shouldStopBrightnessTransition else {
+                            return
+                        }
+                        log.debug("Stopping smooth transition on brightness=\(brightness) using \(self) for \(display)")
+                        display.lastWrittenBrightness = self.getBrightness() ?? display.lastWrittenBrightness
                     }
-                    display.inSmoothTransition = false
 
                     return
                 }
@@ -364,7 +370,7 @@ final class AppleNativeControl: Control {
         return writeBrightness(brightness)
     }
     func updateNitsWithRetry() {
-        nitsUpdateRepeater = Repeater(every: 0.05, times: 10) { [weak self] in
+        nitsUpdateRepeater = Repeater(every: 0.05, times: 10, name: "nitsUpdater") { [weak self] in
             guard let self else { return }
             updateNits()
         }

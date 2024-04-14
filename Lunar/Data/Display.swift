@@ -3953,6 +3953,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     return
                 }
 
+//                if !hdrOn {
+//                    possibleMaxNits = maxNits
+//                }
+                if let possibleMaxNits, possibleMaxNits > 0, let control = control as? AppleNativeControl {
+                    control.updateNits()
+//                    var br = Float(0); DisplayServicesGetLinearBrightness(1, &br); print("DisplayServicesGetLinearBrightness: \(br)\nMax Nits: \(maxNits)\nPossible Max Nits: \(possibleMaxNits)\nNits: \(nits ?? 0)\n")
+                }
+
                 if maxNits != oldValue, !isActiveSyncSource {
                     nitsRecomputePublisher.send(true)
                 }
