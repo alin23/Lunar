@@ -1,3 +1,9 @@
+# 6.7.6
+## Fixes
+
+- Fix flickering in smooth transitions when holding the brightness keys
+- Fix nits value not updating all the time
+
 # 6.7.5
 ## Features
 
