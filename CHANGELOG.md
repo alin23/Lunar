@@ -1,3 +1,8 @@
+# 6.7.7
+## Fixes
+
+- Fix nits OSD appearing erroneously when HDR state is being changed
+
 # 6.7.6
 ## Fixes
 
