@@ -2260,9 +2260,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     lazy var nsScreen: NSScreen? = getScreen() {
         didSet {
             setNotchState()
+            let shouldShowOSD = nsScreen?.visibleFrame != oldValue?.visibleFrame && (osdWindowController?.window as? OSDWindow)?.contentView?.superview?.alphaValue == 1
             mainAsync {
                 self.supportsEnhance = self.getSupportsEnhance()
-                if let osd = self.osdWindowController?.window as? OSDWindow {
+                if shouldShowOSD, let osd = self.osdWindowController?.window as? OSDWindow {
                     osd.show(verticalOffset: 100)
                 }
             }

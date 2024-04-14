@@ -1024,7 +1024,7 @@ enum DDC {
         }
 
         #if DEBUG
-//            return displayIDs
+            return displayIDs
             if !displayIDs.isEmpty {
                 // displayIDs.append(TEST_DISPLAY_PERSISTENT_ID)
                 return displayIDs
