@@ -1,3 +1,10 @@
+# 6.7.8
+## Fixes
+
+- Move max DDC brightness back to `255` for Cinema and Thunderbolt displays
+- Fix brightness being sent to the monitor continuously in Sensor Mode, even if the value hasn't changed
+- Ensure the Sensor Mode *Lux update interval* is correctly used with wireless sensors
+
 # 6.7.7
 ## Fixes
 
