@@ -1784,7 +1784,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 }
             }
 
-            guard applyDisplayServices, DDC.apply, !lockedBrightness || hasSoftwareControl, force || brightness != oldValue else {
+            guard applyDisplayServices, DDC.apply, !lockedBrightness || hasSoftwareControl, force || brightness.uint16Value != oldValue.uint16Value else {
                 log.verbose(
                     "Won't apply brightness to \(description)",
                     context: [
@@ -1805,6 +1805,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             guard !isForTesting else { return }
+
             var brightness = cap(brightness.uint16Value, minVal: minBrightness.uint16Value, maxVal: maxBrightness.uint16Value)
             var oldBrightness = cap(oldValue.uint16Value, minVal: minBrightness.uint16Value, maxVal: maxBrightness.uint16Value)
 
@@ -1877,7 +1878,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             guard !isBuiltin else { return }
-            guard DDC.apply, !lockedContrast || DC.calibrating, force || contrast != oldValue else {
+            guard DDC.apply, !lockedContrast || DC.calibrating, force || contrast.uint16Value != oldValue.uint16Value else {
                 log.verbose(
                     "Won't apply contrast to \(description)",
                     context: [
@@ -1897,6 +1898,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             guard !isForTesting else { return }
+
             var contrast = cap(contrast.uint16Value, minVal: minContrast.uint16Value, maxVal: maxContrast.uint16Value)
             var oldContrast = cap(oldValue.uint16Value, minVal: minContrast.uint16Value, maxVal: maxContrast.uint16Value)
 
