@@ -1433,6 +1433,11 @@ final class DisplayController: ObservableObject {
 
     @Atomic var builtinSupportsFullRangeXDR = false
 
+    @Atomic var volumeKeysDisabledTemporarily = false {
+        didSet {
+            appDelegate.startOrRestartMediaKeyTap(volumeKeysEnabled: volumeKeysDisabledTemporarily && Defaults[.volumeKeysEnabled])
+        }
+    }
     var targetDisplays: [Display] {
         activeDisplayList.filter { !$0.isSource }
     }

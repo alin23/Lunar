@@ -285,6 +285,7 @@ extension Defaults.Keys {
     static let autoRestartOnFailedDDC = Key<Bool>("autoRestartOnFailedDDC", default: false)
     static let autoRestartOnFailedDDCSooner = Key<Bool>("autoRestartOnFailedDDCSooner", default: false)
     static let autoRestartOnCoreAudioHang = Key<Bool>("autoRestartOnCoreAudioHang", default: false)
+    static let disableVolumeKeysOnSleep = Key<Bool>("disableVolumeKeysOnSleep", default: false)
     static let sleepInClamshellMode = Key<Bool>("sleepInClamshellMode", default: false)
     static let disableCliffDetection = Key<Bool>("disableCliffDetection", default: false)
     static let jitterBrightnessOnWake = Key<Bool>("jitterBrightnessOnWake", default: false)

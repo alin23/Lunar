@@ -973,7 +973,7 @@ extension AppDelegate: MediaKeyTapDelegate {
                     }
                 }
 
-                if volumeKeysEnabled ?? CachedDefaults[.volumeKeysEnabled], audioDeviceCantSetVolume == true {
+                if volumeKeysEnabled ?? CachedDefaults[.volumeKeysEnabled], !DC.volumeKeysDisabledTemporarily, audioDeviceCantSetVolume == true {
                     mediaKeyTapAudio.restart()
                 } else {
                     mediaKeyTapAudio.stop()

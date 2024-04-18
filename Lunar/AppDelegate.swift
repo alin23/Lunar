@@ -1591,6 +1591,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 log.info(notif.name.rawValue)
                 switch notif.name {
                 case NSWorkspace.screensDidSleepNotification:
+                    if Defaults[.disableVolumeKeysOnSleep], Defaults[.volumeKeysEnabled] {
+                        log.debug("Disabling volume keys")
+                        DC.volumeKeysDisabledTemporarily = true
+                    }
                     DC.screensSleeping = true
                     DC.resetDisplayListTask?.cancel()
                     for display in DC.activeDisplayList {
@@ -1618,6 +1622,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                     // wakeTime = Date()
                     DC.screensSleeping = false
                     DC.retryAutoBlackoutLater()
+
+                    if Defaults[.disableVolumeKeysOnSleep], Defaults[.volumeKeysEnabled] {
+                        log.debug("Re-enabling volume keys")
+                        DC.volumeKeysDisabledTemporarily = false
+                    }
 
                     if CachedDefaults[.refreshValues] {
                         self.startValuesReaderThread()
