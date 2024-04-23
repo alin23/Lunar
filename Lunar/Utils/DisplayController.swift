@@ -1435,7 +1435,7 @@ final class DisplayController: ObservableObject {
 
     @Atomic var volumeKeysDisabledTemporarily = false {
         didSet {
-            appDelegate.startOrRestartMediaKeyTap(volumeKeysEnabled: volumeKeysDisabledTemporarily && Defaults[.volumeKeysEnabled])
+            appDelegate!.startOrRestartMediaKeyTap(volumeKeysEnabled: volumeKeysDisabledTemporarily && Defaults[.volumeKeysEnabled])
         }
     }
     var targetDisplays: [Display] {

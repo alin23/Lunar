@@ -118,14 +118,14 @@ final class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
         }
 
         if mode == .location {
-            if let lm = appDelegate?.locationManager, let auth = lm.auth, auth == .denied || auth == .notDetermined || auth == .restricted {
+            if CachedDefaults[.manualLocation] {
+                menuItem.toolTip =
+                    "Lunar is using the manually configured coordinates in Display Settings -> Configuration"
+                menuItem.attributedTitle = enabledString(menuItem, reason: "manual coordinates")
+            } else if let lm = appDelegate?.locationManager, let auth = lm.auth, auth == .denied || auth == .notDetermined || auth == .restricted {
                 menuItem.toolTip =
                     "Location can't be requested.\nCheck if Lunar has access to Location Services in System Preferences -> Security & Privacy"
                 menuItem.attributedTitle = enabledString(menuItem, reason: "missing permissions")
-            } else if CachedDefaults[.manualLocation] {
-                menuItem.toolTip =
-                    "Location can't be requested.\nLunar is using the manually configured coordinates in Display Settings -> Configuration"
-                menuItem.attributedTitle = enabledString(menuItem, reason: "manual coordinates")
             } else {
                 menuItem.toolTip = nil
                 menuItem.attributedTitle = enabledString(menuItem)

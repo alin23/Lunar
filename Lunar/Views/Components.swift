@@ -513,7 +513,7 @@ struct Dropdown<T: Nameable>: NSViewRepresentable {
         button.select(menu.items.first(where: { $0.title == selection.name }) ?? context.coordinator.defaultMenuItem)
         context.coordinator.observer = button.selectedTitlePublisher.sink { inputName in
             guard let inputName else { return }
-            selection = content.first(where: { $0.name == inputName }) ?? selection
+            selection = content.first(where: { $0.name == inputName.split(separator: "\t").first?.s ?? inputName }) ?? selection
         }
 
         button.width = width

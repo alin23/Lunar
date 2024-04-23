@@ -21,6 +21,7 @@ struct AdvancedSettingsView: View {
     @Default(.gammaDisabledCompletely) var gammaDisabledCompletely
     @Default(.waitAfterWakeSeconds) var waitAfterWakeSeconds
     @Default(.delayDDCAfterWake) var delayDDCAfterWake
+    @Default(.disableVolumeKeysOnSleep) var disableVolumeKeysOnSleep
 
     @Default(.dcpMatchingIODisplayLocation) var dcpMatchingIODisplayLocation
     @Default(.autoRestartOnFailedDDC) var autoRestartOnFailedDDC
@@ -260,6 +261,17 @@ struct AdvancedSettingsView: View {
                                 • DDC responsiveness checker
                                 • Re-applying color gain on wake
                                 • Re-applying brightness/contrast on wake
+                                """
+                            )
+                            SettingsToggle(
+                                text: "Disable volume keys on display sleep", setting: $disableVolumeKeysOnSleep,
+                                help: """
+                                Experimental: for people running into macOS bugs where there's system lag
+                                on display wake, this could be a safe measure to ensure CoreAudio doesn't
+                                hang when Lunar tries to lookup the monitor output device.
+
+                                The volume keys handler will seamlessly disable itself on sleep
+                                and re-enable itself on wake.
                                 """
                             )
                             HStack {

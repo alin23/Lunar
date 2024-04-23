@@ -1827,7 +1827,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 withoutApply { subzero = false }
             }
 
-            if DDC.applyLimits, maxDDCBrightness.uint16Value != 100 || minDDCBrightness.uint16Value != 0, !hasSoftwareControl {
+            if DDC.applyLimits, maxDDCBrightness.uint16Value != 100 || minDDCBrightness.uint16Value != 0, control is DDCControl || control is NetworkControl {
                 oldBrightness = oldBrightness.d.map(from: (0, 100), to: (minDDCBrightness.doubleValue, maxDDCBrightness.doubleValue)).rounded().u16
                 brightness = brightness.d.map(from: (0, 100), to: (minDDCBrightness.doubleValue, maxDDCBrightness.doubleValue)).rounded().u16
             }
@@ -3478,7 +3478,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     var limitedBrightness: UInt16 {
-        guard maxDDCBrightness.uint16Value != 100 || minDDCBrightness.uint16Value != 0 else {
+        guard control is DDCControl || control is NetworkControl, maxDDCBrightness.uint16Value != 100 || minDDCBrightness.uint16Value != 0 else {
             return brightness.uint16Value
         }
         return brightness.doubleValue.map(from: (0, 100), to: (minDDCBrightness.doubleValue, maxDDCBrightness.doubleValue)).rounded().u16
