@@ -1,3 +1,14 @@
+# 6.7.9
+## Improvements
+
+- Disable volume keys handler on sleep and re-enable on wake to prevent CoreAudio from hanging and cause system lag
+- Speed up CLI startup time
+
+## Fixes
+
+- Fix a long-standing issue where **LED Cinema** and **Thunderbolt** displays would overflow the brightness value, causing the display to go dark at specific brightness levels (`39` and `78`)
+- Fix Location Mode not being selectable when using manual coordinates
+
 # 6.7.8
 ## Fixes
 
