@@ -99,6 +99,17 @@ That period was previously 0.5 seconds, which was now increased to 1 second and 
 - Fix possible crash when fetching reference presets on external monitors
 - Fix system lag when CoreAudio devices take too long to respond
 
+# 6.7.10
+## Improvements
+
+- Shave off another 250 milliseconds from the CLI startup time
+
+## Fixes
+
+- Fix menu appearing on the main display instead of the one where the icon was clicked, on fullscreen apps
+- Fix positioning of the new "Disable volume keys on display sleep" setting
+- Fix resolution being changed erroneously
+
 # 6.7.1
 ## Hotfix
 
