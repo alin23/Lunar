@@ -43,7 +43,7 @@ final class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObje
 
     var position: CGPoint? {
         guard let statusButton, let menuBarIconPosition = statusButton.window?.convertPoint(toScreen: statusButton.frame.origin),
-              let screen = NSScreen.main, let menuWindow
+              let screen = NSScreen.cursor, let menuWindow
         else {
             return nil
         }
@@ -132,7 +132,7 @@ final class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObje
     }
 
     func repositionWindow(animate: Bool = false) {
-        guard let menuWindow, let screen = NSScreen.main, let appd = appDelegate else { return }
+        guard let menuWindow, let screen = NSScreen.cursor, let appd = appDelegate else { return }
         displayHideTask?.cancel()
         displayHideTask = nil
         guard let position else {

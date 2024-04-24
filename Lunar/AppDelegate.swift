@@ -2339,7 +2339,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
         startTime = Date()
         lastBlackOutToggleDate = Date()
-        Defaults[.secondPhase] = initSecondPhase()
+        Defaults[.secondPhase] = decode(display: 1)
         #if arch(arm64)
             if #available(macOS 13, *) {
                 if restarted {

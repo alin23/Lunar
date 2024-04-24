@@ -10514,14 +10514,14 @@ settings for this monitor.</string>
         <namedColor name="Field BG no color">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.035000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
-        <namedColor name="MauveGray">
-            <color red="0.49399998784065247" green="0.46599999070167542" blue="0.49399998784065247" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
         <namedColor name="Inverted">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="Lunar Yellow">
             <color red="1" green="0.83499997854232788" blue="0.52499997615814209" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="MauveGray">
+            <color red="0.49399998784065247" green="0.46599999070167542" blue="0.49399998784065247" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="Notch">
             <color red="0.15000000596046448" green="0.13500000536441803" blue="0.15399999916553497" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>

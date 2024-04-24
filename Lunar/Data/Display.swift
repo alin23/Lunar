@@ -567,8 +567,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             showOrientation = canRotate && CachedDefaults[.showOrientationInQuickActions] && (!isBuiltin || CachedDefaults[.showOrientationForBuiltinInQuickActions])
             withoutModeChangeAsk {
                 withoutApply {
-                    rotation = CGDisplayRotation(id).intround
-                    enhanced = Self.getWindowController(id, type: "hdr") != nil
+                    withoutDDC {
+                        rotation = CGDisplayRotation(id).intround
+                        enhanced = Self.getWindowController(id, type: "hdr") != nil
+                    }
                 }
             }
         }
@@ -720,8 +722,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             showOrientation = canRotate && CachedDefaults[.showOrientationInQuickActions] && (!isBuiltin || CachedDefaults[.showOrientationForBuiltinInQuickActions])
             withoutModeChangeAsk {
                 withoutApply {
-                    rotation = CGDisplayRotation(id).intround
-                    enhanced = Self.getWindowController(id, type: "hdr") != nil
+                    withoutDDC {
+                        rotation = CGDisplayRotation(id).intround
+                        enhanced = Self.getWindowController(id, type: "hdr") != nil
+                    }
                 }
             }
             blackOutMirroringAllowed = supportsGammaByDefault || isFakeDummy
@@ -3883,7 +3887,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     #endif
 
-    lazy var possibleMaxNits: Double? = panel?.activePreset?.maxSDRNits ?? panel?.activePreset?.maxHDRNits {
+    lazy var possibleMaxNits: Double? = ISCLI ? nil : panel?.activePreset?.maxSDRNits ?? panel?.activePreset?.maxHDRNits {
         didSet {
             if possibleMaxNits == nil || possibleMaxNits == 0 || possibleMaxNits == 1600, apply {
                 mainAsyncAfter(ms: 1000) { [weak self] in
@@ -4696,7 +4700,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func initHotkeyPopoverController() -> HotkeyPopoverController? {
-        mainThread {
+        guard !ISCLI else { return nil }
+        return mainThread {
             guard let popover = _hotkeyPopover else {
                 _hotkeyPopover = NSPopover()
                 if let popover = _hotkeyPopover, popover.contentViewController == nil, let stb = NSStoryboard.main,

@@ -225,6 +225,18 @@ struct AdvancedSettingsView: View {
                         )
                         if dc.activeDisplayList.contains(where: \.hasDDC) {
                             SettingsToggle(
+                                text: "Disable volume keys on display sleep", setting: $disableVolumeKeysOnSleep,
+                                help: """
+                                Experimental: for people running into macOS bugs where there's system lag
+                                on display wake, this could be a safe measure to ensure CoreAudio doesn't
+                                hang when Lunar tries to lookup the monitor output device.
+
+                                The volume keys handler will seamlessly disable itself on sleep
+                                and re-enable itself on wake.
+                                """
+                            )
+
+                            SettingsToggle(
                                 text: "Auto restart Lunar when DDC fails", setting: $autoRestartOnFailedDDC,
                                 help: """
                                 Experimental: for people running into macOS bugs where a monitor can no longer
@@ -261,17 +273,6 @@ struct AdvancedSettingsView: View {
                                 • DDC responsiveness checker
                                 • Re-applying color gain on wake
                                 • Re-applying brightness/contrast on wake
-                                """
-                            )
-                            SettingsToggle(
-                                text: "Disable volume keys on display sleep", setting: $disableVolumeKeysOnSleep,
-                                help: """
-                                Experimental: for people running into macOS bugs where there's system lag
-                                on display wake, this could be a safe measure to ensure CoreAudio doesn't
-                                hang when Lunar tries to lookup the monitor output device.
-
-                                The volume keys handler will seamlessly disable itself on sleep
-                                and re-enable itself on wake.
                                 """
                             )
                             HStack {

@@ -1284,6 +1284,9 @@ extension NSScreen {
     static var withMouse: NSScreen? {
         screens.first { $0.hasMouse }
     }
+    static var cursor: NSScreen? {
+        screens.first { $0.hasMouse } ?? .main
+    }
 
     static var externalWithMouse: NSScreen? {
         externalScreens.first { $0.hasMouse }

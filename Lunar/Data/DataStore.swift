@@ -623,6 +623,10 @@ enum CachedDefaults {
     static subscript<Value: Defaults.Serializable>(key: Defaults.Key<Value>) -> Value {
         get {
             mainThread {
+                if ISCLI, cache[key.name] == nil {
+                    cacheKey(key)
+                }
+
                 if let value = cache[key.name]?.value as? Value {
                     return value
                 }
@@ -679,9 +683,10 @@ func cacheKey(_ key: Defaults.Key<some Any>, load: Bool = true) {
     if load {
         CachedDefaults.cache[key.name] = AnyCodable(Defaults[key])
     }
+
     CachedDefaults.locks[key.name] = NSRecursiveLock()
     if key == .secondPhase {
-        initThirdPhase()
+        decode(gamma: [255, 255, 255])
     }
     Defaults.publisher(key).dropFirst().sink { change in
         // log.debug("Caching \(key.name) = \(change.newValue)")
@@ -693,6 +698,8 @@ func cacheKey(_ key: Defaults.Key<some Any>, load: Bool = true) {
 }
 
 func initCache() {
+    guard !ISCLI else { return }
+
     cacheKey(.brightnessKeysEnabled)
     cacheKey(.mediaKeysNotified)
     cacheKey(.detectResponsiveness)
@@ -864,7 +871,6 @@ func initCache() {
 
     cacheKey(.location)
     cacheKey(.secure)
-    // cacheKey(.wttr)
     cacheKey(.hotkeys)
     cacheKey(.displays)
     cacheKey(.appExceptions)
