@@ -3143,7 +3143,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 //    }
 
     var isInMirrorSet: Bool {
-        CGDisplayIsInMirrorSet(id) != 0
+        CGDisplayIsInMirrorSet(id) != 0 && DC.cachedOnlineDisplayIDs.count > 1
     }
 
     lazy var panel: MPDisplay? = DisplayController.panel(with: id) {
