@@ -99,6 +99,11 @@ That period was previously 0.5 seconds, which was now increased to 1 second and 
 - Fix possible crash when fetching reference presets on external monitors
 - Fix system lag when CoreAudio devices take too long to respond
 
+# 6.7.11
+## Fixes
+
+- Fix **Sync Mode** not using nits on MacBook Air and iMac (Apple Silicon only)
+
 # 6.7.10
 ## Improvements
 
