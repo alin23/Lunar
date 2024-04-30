@@ -3960,6 +3960,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     return
                 }
 
+                if let panel, !panel.hasPresets {
+                    possibleMaxNits = maxNits
+                }
+
 //                if !hdrOn {
 //                    possibleMaxNits = maxNits
 //                }
