@@ -1357,7 +1357,7 @@ struct Lunar: ParsableCommand {
         var read = false
 
         @Flag(help: "Controls to try for getting/setting display properties. Default: CoreDisplay, DDC, Network")
-        var controls: [DisplayControl] = [.appleNative, .ddc, .network]
+        var controls: [DisplayControl] = []
 
         @Argument(
             help: "Display serial or name (without spaces) or one of the following"
@@ -1392,7 +1392,7 @@ struct Lunar: ParsableCommand {
                         property: property,
                         value: value,
                         json: json,
-                        controls: controls,
+                        controls: controls.isEmpty ? nil : controls,
                         read: read,
                         systemInfo: systemInfo,
                         panelData: panelData,
@@ -1459,7 +1459,7 @@ struct Lunar: ParsableCommand {
         var read = false
 
         @Flag(help: "Controls to try for getting/setting display properties. Default: CoreDisplay, DDC, Network")
-        var controls: [DisplayControl] = [.appleNative, .ddc, .network]
+        var controls: [DisplayControl] = []
 
         @Argument(
             help: "Display property to get. Common properties: (\(Display.CodingKeys.settableCommon.filter { !$0.isHidden }.map(\.rawValue).joined(separator: ", ")))"
@@ -1480,7 +1480,7 @@ struct Lunar: ParsableCommand {
                 .bestGuess,
                 displays: DC.activeDisplayList,
                 property: property,
-                controls: controls,
+                controls: controls.isEmpty ? nil : controls,
                 read: read
             )
             return cliExit(0)
@@ -1501,7 +1501,7 @@ struct Lunar: ParsableCommand {
         var read = false
 
         @Flag(help: "Controls to try for getting/setting display properties. Default: CoreDisplay, DDC, Network")
-        var controls: [DisplayControl] = [.appleNative, .ddc, .network]
+        var controls: [DisplayControl] = []
 
         @Option(name: .shortAndLong, help: "How many milliseconds to wait for network controls to be ready")
         var waitms = 1000
@@ -1540,7 +1540,7 @@ struct Lunar: ParsableCommand {
                 displays: DC.activeDisplayList,
                 property: property,
                 value: value,
-                controls: controls,
+                controls: controls.isEmpty ? nil : controls,
                 read: read
             )
             return cliExit(0)
@@ -2255,7 +2255,7 @@ private func handleDisplays(
     property: Display.CodingKeys? = nil,
     value: String? = nil,
     json: Bool = false,
-    controls: [DisplayControl] = [.appleNative, .ddc, .network, .gamma],
+    controls: [DisplayControl]? = nil,
     read: Bool = false,
     systemInfo: Bool = false,
     panelData: Bool = false,
@@ -2303,20 +2303,24 @@ private func handleDisplays(
             }
 
             let oldEnabledControls = display.enabledControls
-            display.enabledControls = [
-                .network: controls.contains(.network),
-                .appleNative: controls.contains(.appleNative),
-                .ddc: controls.contains(.ddc),
-                .gamma: controls.contains(.gamma),
-            ]
+            if let controls {
+                display.enabledControls = [
+                    .network: controls.contains(.network),
+                    .appleNative: controls.contains(.appleNative),
+                    .ddc: controls.contains(.ddc),
+                    .gamma: controls.contains(.gamma),
+                ]
+            }
             defer {
-                display.enabledControls = oldEnabledControls
+                if controls != nil {
+                    display.enabledControls = oldEnabledControls
+                }
             }
             display.control = display.getBestControl()
             if Display.CodingKeys.settableWithControl.contains(property), !display.enabledControls[.gamma]!,
                display.hasSoftwareControl
             {
-                throw LunarCommandError.controlNotAvailable(controls.map(\.str).joined(separator: ", "))
+                throw LunarCommandError.controlNotAvailable((controls ?? []).map(\.str).joined(separator: ", "))
             }
 
             guard let propertyValue = display.dictionary?[property.rawValue] else {

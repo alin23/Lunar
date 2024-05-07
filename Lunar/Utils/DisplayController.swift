@@ -2066,6 +2066,7 @@ final class DisplayController: ObservableObject {
             return nil
         }
 
+        // Single monitor setup
         if activeDisplays.count == 1, let app = runningAppExceptions.first,
            app.runningApps?.first?.windows(appException: app) == nil
         {
@@ -2085,6 +2086,8 @@ final class DisplayController: ObservableObject {
             return (app.brightness.i, app.contrast.i, app.useStaticValuesInAdaptiveModes)
         }
 
+        // Multiple monitor setup, when the focused app has a window on the current screen
+        // regardless if that window is focused or not
         if let app = activeWindow(on: screen)?.appException {
             mainAsync { display.appPreset = app }
             if adaptiveModeKey == .manual || app.useStaticValuesInAdaptiveModes {
