@@ -99,6 +99,16 @@ That period was previously 0.5 seconds, which was now increased to 1 second and 
 - Fix possible crash when fetching reference presets on external monitors
 - Fix system lag when CoreAudio devices take too long to respond
 
+# 6.7.12
+## Improvements
+
+- Improve **Auto Blackout** by ignoring displays with empty or incomplete `name
+- Print CLI location and restart shell after installation
+
+## Fixes
+
+- Fix **Software Dimming** not being applied instantly when using the `lunar displays` CLI
+
 # 6.7.11
 ## Fixes
 
