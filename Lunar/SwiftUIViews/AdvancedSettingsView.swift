@@ -165,7 +165,7 @@ struct AdvancedSettingsView: View {
                     }
                     if dc.activeDisplayList.contains(where: { $0.control is NetworkControl }) {
                         SettingsToggle(
-                            text: "Disable Network Controller video ", setting: $disableControllerVideo,
+                            text: "Disable Network Controller video", setting: $disableControllerVideo,
                             help: """
                             When using "Network Control" with a Raspberry Pi, it might be
                             helpful to disable the Pi desktop if you don't need it.

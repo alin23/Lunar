@@ -466,6 +466,7 @@ struct DisplayRowView: View {
                     .font(.system(size: 22, weight: .black))
                     .padding(6)
                     .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.bg.warm.opacity(colorScheme == .dark ? 0.5 : 0.2)))
+                    .contextMenu { DisplayContextMenu(display: display) }
 
                 PowerOffButtonView(display: display)
                     .offset(y: -8)
@@ -474,6 +475,7 @@ struct DisplayRowView: View {
         } else {
             Text(display.name ?! "Unknown")
                 .font(.system(size: 22, weight: .black))
+                .contextMenu { DisplayContextMenu(display: display) }
         }
     }
 

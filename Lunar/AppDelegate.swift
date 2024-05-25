@@ -2263,7 +2263,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
         do {
             try installCLIBinary()
-            print("Lunar CLI installed")
+            let cliBinDirTilde = CLI_BIN_DIR.replacingOccurrences(of: NSHomeDirectory(), with: "~")
+            print("Lunar CLI installed at \("\(cliBinDirTilde)".yellow().bold())/\("lunar".green().bold())")
+            let shellConfigFile = if let shell = ProcessInfo.processInfo.environment["SHELL"] {
+                if shell.contains("bash") {
+                    BASHRC
+                } else if shell.contains("fish") {
+                    FISHRC
+                } else {
+                    ZSHRC
+                }
+            } else {
+                ZSHRC
+            }
+            print("\(cliBinDirTilde.yellow().bold()) added to PATH inside \(shellConfigFile.replacingOccurrences(of: NSHomeDirectory(), with: "~").blue().bold())")
+
+            if String.isColorizationEnabled, let shell = ProcessInfo.processInfo.environment["SHELL"] {
+                do {
+                    try exec(arg0: shell, args: [])
+                } catch {
+                    log.error("Failed to restart shell \(shell): \(error)")
+                }
+            }
         } catch let error as InstallCLIError {
             print(error.message)
             print(error.info)

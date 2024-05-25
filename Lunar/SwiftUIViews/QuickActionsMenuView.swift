@@ -341,12 +341,10 @@ struct QuickActionsMenuView: View {
 
             if let d = cursorDisplay, !SWIFTUI_PREVIEW {
                 DisplayRowView(display: d).padding(.bottom)
-                    .contextMenu { DisplayContextMenu(display: d) }
             }
 
             ForEach(displays) { d in
                 DisplayRowView(display: d).padding(.bottom)
-                    .contextMenu { DisplayContextMenu(display: d) }
             }
 
             #if arch(arm64)

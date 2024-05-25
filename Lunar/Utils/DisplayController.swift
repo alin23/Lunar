@@ -2230,7 +2230,18 @@ final class DisplayController: ObservableObject {
                 self.sentryDataTask = mainAsyncAfter(ms: 5000) {
                     self.addSentryData()
                 }
-                self.handleAutoBlackOut(activeNewDisplays: activeNewDisplays, activeOldDisplays: activeOldDisplays, autoBlackOut: autoBlackOut)
+                let isValidDisplay: (Display) -> Bool = { d in
+                    #if arch(arm64)
+                        return d.id < 50 && !d.edidName.isEmpty && d.edidName != "Unknown Display"
+                    #else
+                        return !d.edidName.isEmpty && d.edidName != "Unknown Display"
+                    #endif
+                }
+                self.handleAutoBlackOut(
+                    activeNewDisplays: activeNewDisplays.filter(isValidDisplay),
+                    activeOldDisplays: activeOldDisplays.filter(isValidDisplay),
+                    autoBlackOut: autoBlackOut
+                )
             }
 
             if CachedDefaults[.autoXdrSensor] {

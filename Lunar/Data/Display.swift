@@ -5211,6 +5211,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 }
             }
             .store(in: &observers)
+        #if DEBUG
+            if isTestID(id), name.contains("DELL") {
+                audioIdentifier = "~:AMS2_Aggregate:0"
+            }
+        #endif
     }
 
     func setupHotkeys() {
