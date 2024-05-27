@@ -1016,7 +1016,7 @@ enum DDC {
     ) -> [CGDirectDisplayID] {
         var displayIDs = NSScreen.onlineDisplayIDs.filter { id in
             let name = Display.printableName(id)
-            return !isBuiltinDisplay(id) &&
+            return !isBuiltinDisplay(id) && name != "Unknown Display" &&
                 (includeVirtual || !isVirtualDisplay(id, name: name)) &&
                 (includeProjector || !isProjectorDisplay(id, name: name)) &&
                 (includeDummy || !isDummyDisplay(id, name: name)) &&
