@@ -732,12 +732,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         maxDDCBrightness = defaultMaxDDCBrightness.ns
-        if isLEDCinema() {
+        if isLEDCinema {
             maxDDCVolume = 255
         }
 
         useOverlay = !supportsGammaByDefault
-        enabledControls[.ddc] = !isTV && !isStudioDisplay()
+        enabledControls[.ddc] = !isTV && !isStudioDisplay
         enabledControls[.gamma] = !isSmartBuiltin
 
         guard active else { return }
@@ -1352,8 +1352,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     lazy var isVirtual: Bool = DDC.isVirtualDisplay(id, name: edidName)
     lazy var isProjector: Bool = DDC.isProjectorDisplay(id, name: edidName)
 
-    @objc dynamic lazy var supportsGamma: Bool = supportsGammaByDefault && !useOverlay
-    @objc dynamic lazy var supportsGammaByDefault: Bool = !isSidecar && !isAirplay && !isVirtual && !isProjector && !isLunaDisplay()
+    @objc dynamic lazy var supportsGamma: Bool = supportsGammaByDefault && !useOverlay && !NSWorkspace.shared.accessibilityDisplayShouldInvertColors
+    @objc dynamic lazy var supportsGammaByDefault: Bool = !isSidecar && !isAirplay && !isVirtual && !isProjector && !isLunaDisplay
 
     @objc dynamic lazy var panelModeTitles: [NSAttributedString] = panelModes.map(\.attributedString)
     @objc dynamic lazy var panelModes: [MPDisplayMode] = getPanelModes()
@@ -2667,8 +2667,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             if apply {
                 withoutApply { dimmingMode = useOverlay ? .overlay : .gamma }
             }
-            supportsGammaByDefault = !isSidecar && !isAirplay && !isVirtual && !isProjector && !isLunaDisplay()
-            supportsGamma = supportsGammaByDefault && !useOverlay
+            supportsGammaByDefault = !isSidecar && !isAirplay && !isVirtual && !isProjector && !isLunaDisplay
+            supportsGamma = supportsGammaByDefault && !useOverlay && !NSWorkspace.shared.accessibilityDisplayShouldInvertColors
             guard initialised else { return }
 
             save()
@@ -3817,8 +3817,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             isAirplay = DDC.isAirplayDisplay(id, name: edidName)
             isVirtual = DDC.isVirtualDisplay(id, name: edidName)
             isProjector = DDC.isProjectorDisplay(id, name: edidName)
-            supportsGamma = supportsGammaByDefault && !useOverlay
-            supportsGammaByDefault = !isSidecar && !isAirplay && !isVirtual && !isProjector && !isLunaDisplay()
+            supportsGamma = supportsGammaByDefault && !useOverlay && !NSWorkspace.shared.accessibilityDisplayShouldInvertColors
+            supportsGammaByDefault = !isSidecar && !isAirplay && !isVirtual && !isProjector && !isLunaDisplay
             refetchPanelPresetProps()
         }
     }
@@ -4171,19 +4171,19 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         if panel?.isAppleProDisplay ?? false {
             return 2
         }
-        if isProDisplayXDR() {
+        if isProDisplayXDR {
             return 3
         }
-        if isStudioDisplay() {
+        if isStudioDisplay {
             return 4
         }
-        if isUltraFine() {
+        if isUltraFine {
             return 5
         }
-        if isThunderbolt() {
+        if isThunderbolt {
             return 6
         }
-        if isLEDCinema() {
+        if isLEDCinema {
             return 7
         }
         return 100
@@ -4209,6 +4209,38 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Atomic var gammaSetAPICalled = false
 
     @Published @objc dynamic var panelPresets: [MPDisplayPreset] = []
+
+    lazy var isProDisplayXDR: Bool =
+        edidName.contains(PRO_DISPLAY_XDR_NAME)
+
+    lazy var isLunaDisplay: Bool =
+        edidName.contains(LUNA_DISPLAY_NAME)
+
+    lazy var isStudioDisplay: Bool =
+        edidName.contains(STUDIO_DISPLAY_NAME)
+
+    lazy var isUltraFine: Bool =
+        edidName.contains(ULTRAFINE_NAME) && canChangeBrightnessDS
+
+    lazy var isThunderbolt: Bool =
+        edidName.contains(THUNDERBOLT_NAME)
+
+    lazy var isLEDCinema: Bool =
+        edidName.contains(LED_CINEMA_NAME)
+
+    lazy var isCinema: Bool =
+        edidName == CINEMA_NAME || edidName == CINEMA_HD_NAME
+
+    lazy var isCinemaHD: Bool =
+        edidName == CINEMA_HD_NAME
+
+    lazy var isColorLCD: Bool =
+        edidName.contains(COLOR_LCD_NAME)
+
+    lazy var isAppleDisplay: Bool =
+        isStudioDisplay || isUltraFine || isThunderbolt || isLEDCinema || isCinema || isAppleVendorID
+
+    lazy var isAppleVendorID: Bool = ((infoDictionary["DisplayVendorID"] as? Int) ?? CGDisplayVendorNumber(id).i) == APPLE_DISPLAY_VENDOR_ID
 
     @Published @objc dynamic var isSource: Bool {
         didSet {
@@ -4829,7 +4861,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     w.contentView?.wantsLayer = true
 
                     w.contentView?.alphaValue = 0.0
-                    w.contentView?.bg = NSColor.black
+                    w.contentView?.bg = NSWorkspace.shared.accessibilityDisplayShouldInvertColors ? NSColor.white : NSColor.black
                     w.contentView?.setNeedsDisplay(w.frame)
                 }
             }
@@ -4935,7 +4967,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             "neverFallbackControl": neverFallbackControl,
             "alwaysUseNetworkControl": alwaysUseNetworkControl,
             "neverUseNetworkControl": neverUseNetworkControl,
-            "isAppleDisplay": isAppleDisplay(),
+            "isAppleDisplay": isAppleDisplay,
             "isSource": isSource,
             "showVolumeOSD": showVolumeOSD,
             "forceDDC": forceDDC,
@@ -5211,6 +5243,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 }
             }
             .store(in: &observers)
+        NSWorkspace.shared.notificationCenter
+            .publisher(for: NSWorkspace.accessibilityDisplayOptionsDidChangeNotification)
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.supportsGamma = supportsGammaByDefault && !useOverlay && !NSWorkspace.shared.accessibilityDisplayShouldInvertColors
+            }
+            .store(in: &observers)
         #if DEBUG
             if isTestID(id), name.contains("DELL") {
                 audioIdentifier = "~:AMS2_Aggregate:0"
@@ -5283,7 +5322,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         minDDCVolume = 0.ns
         maxDDCBrightness = defaultMaxDDCBrightness.ns
 
-        if isLEDCinema() {
+        if isLEDCinema {
             maxDDCVolume = 255
         }
 
@@ -5625,51 +5664,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         dict["possibleMaxDDCContrast"] = maxCR
-    }
-
-    func isProDisplayXDR() -> Bool {
-        edidName.contains(PRO_DISPLAY_XDR_NAME)
-    }
-
-    func isLunaDisplay() -> Bool {
-        edidName.contains(LUNA_DISPLAY_NAME)
-    }
-
-    func isStudioDisplay() -> Bool {
-        edidName.contains(STUDIO_DISPLAY_NAME)
-    }
-
-    func isUltraFine() -> Bool {
-        edidName.contains(ULTRAFINE_NAME) && canChangeBrightnessDS
-    }
-
-    func isThunderbolt() -> Bool {
-        edidName.contains(THUNDERBOLT_NAME)
-    }
-
-    func isLEDCinema() -> Bool {
-        edidName.contains(LED_CINEMA_NAME)
-    }
-
-    func isCinema() -> Bool {
-        edidName == CINEMA_NAME || edidName == CINEMA_HD_NAME
-    }
-
-    func isCinemaHD() -> Bool {
-        edidName == CINEMA_HD_NAME
-    }
-
-    func isColorLCD() -> Bool {
-        edidName.contains(COLOR_LCD_NAME)
-    }
-
-    func isAppleDisplay() -> Bool {
-        isStudioDisplay() || isUltraFine() || isThunderbolt() || isLEDCinema() || isCinema() || isAppleVendorID()
-    }
-
-    func isAppleVendorID() -> Bool {
-        guard let vendorID = infoDictionary["DisplayVendorID"] as? Int else { return false }
-        return vendorID == APPLE_DISPLAY_VENDOR_ID
     }
 
     func checkSlowWrite(elapsedNS: UInt64) {
@@ -6291,7 +6285,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func reset(resetControl: Bool = true) {
         maxDDCBrightness = defaultMaxDDCBrightness.ns
-        if isLEDCinema() {
+        if isLEDCinema {
             maxDDCVolume = 255.ns
         } else {
             maxDDCVolume = 100.ns
@@ -6321,7 +6315,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         enabledControls = [
             .network: true,
             .appleNative: true,
-            .ddc: !isTV && !isStudioDisplay(),
+            .ddc: !isTV && !isStudioDisplay,
             .gamma: !DDC.isSmartBuiltinDisplay(id),
         ]
 

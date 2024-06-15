@@ -54,10 +54,10 @@ dev: install-deps install-hooks codegen
 
 .PHONY: release upload build sentry pkg dmg pack appcast
 upload: ReleaseNotes/release.css
-	rsync -avz Releases/*.delta darkwoods:/static/Lunar/deltas/ || true
-	rsync -avzP Releases/*.dmg darkwoods:/static/Lunar/releases/
-	rsync -avz Releases/*.html ReleaseNotes/*.css darkwoods:/static/Lunar/ReleaseNotes/
-	rsync -avzP Releases/appcast*.xml darkwoods:/static/Lunar/
+	rsync -avz Releases/*.delta hetzner:/static/Lunar/deltas/ || true
+	rsync -avzP Releases/*.dmg hetzner:/static/Lunar/releases/
+	rsync -avz Releases/*.html ReleaseNotes/*.css hetzner:/static/Lunar/ReleaseNotes/
+	rsync -avzP Releases/appcast*.xml hetzner:/static/Lunar/
 	cfcli -d lunar.fyi purge
 	op run -- $(MAKE) sentry
 

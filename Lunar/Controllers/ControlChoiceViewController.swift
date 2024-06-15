@@ -1090,7 +1090,7 @@ final class ControlChoiceViewController: NSViewController {
             result = testControl(appleNativeControl, for: d)
             setDisplayProgress(0.25, controlStep: 0.25)
 
-            if !result.write.brightness, d.isLEDCinema() || d.isCinema() {
+            if !result.write.brightness, d.isLEDCinema || d.isCinema {
                 var nextStep = true
                 askQuestion(
                     "On Cinema displays, you need to plug in the USB cable to get brightness controls\nYou can try that now and retry the test, or continue to the next step",

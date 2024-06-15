@@ -722,7 +722,7 @@ final class DisplayController: ObservableObject {
     var externalDisplaysForTest: [Display] {
         activeDisplayList
             .filter { d in
-                !d.isBuiltin && !d.isSidecar && !d.isAirplay && !d.isLunaDisplay()
+                !d.isBuiltin && !d.isSidecar && !d.isAirplay && !d.isLunaDisplay
             }
     }
 
@@ -2371,7 +2371,7 @@ final class DisplayController: ObservableObject {
 
     func shouldPromptAboutFallback(_ display: Display) -> Bool {
         guard !display.neverFallbackControl, !display.isBuiltin, !AppleNativeControl.isAvailable(for: display),
-              !display.isAppleDisplay() else { return false }
+              !display.isAppleDisplay else { return false }
 
         if !SyncMode.possibleClamshellModeSoon, !screensSleeping, !locked,
            let screen = display.nsScreen, !screen.visibleFrame.isEmpty, timeSince(display.lastConnectionTime) > 10,
@@ -2534,19 +2534,19 @@ final class DisplayController: ObservableObject {
 
             for display in activeDisplayList {
                 display.addSentryData()
-                if display.isUltraFine() {
+                if display.isUltraFine {
                     scope.setTag(value: "true", key: "ultrafine")
                     continue
                 }
-                if display.isThunderbolt() {
+                if display.isThunderbolt {
                     scope.setTag(value: "true", key: "thunderbolt")
                     continue
                 }
-                if display.isLEDCinema() {
+                if display.isLEDCinema {
                     scope.setTag(value: "true", key: "ledcinema")
                     continue
                 }
-                if display.isCinema() {
+                if display.isCinema {
                     scope.setTag(value: "true", key: "cinema")
                     continue
                 }
