@@ -51,7 +51,7 @@ final class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObje
         let width = MENU_WIDTH / 2 + OPTIONS_MENU_WIDTH / 2 + (CachedDefaults[.showOptionsMenu] ? MENU_HORIZONTAL_PADDING * 2 : 0)
         var middle = CGPoint(
             x: menuBarIconPosition.x - width,
-            y: screen.visibleFrame.maxY - (menuWindow.frame.height + 1)
+            y: screen.frame.maxY - display_manager_menu_bar_rect(screen.displayID ?? DC.cursorDisplay?.id ?? CGMainDisplayID()).height - (menuWindow.frame.height + 1)
         )
 
         let fullWidth = MENU_WIDTH + OPTIONS_MENU_WIDTH / 2 + (CachedDefaults[.showOptionsMenu] ? MENU_HORIZONTAL_PADDING * 2 : 0) + 12

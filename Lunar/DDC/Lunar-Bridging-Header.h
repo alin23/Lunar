@@ -93,3 +93,24 @@ IOHIDEventRef IOHIDServiceClientCopyEvent(IOHIDServiceClientRef, int64_t, int32_
 double IOHIDEventGetFloatValue(IOHIDEventRef, int32_t);
 
 IOHIDServiceClientRef ALCALSCopyALSServiceClient(void);
+
+extern CGError SLSGetDisplayMenubarHeight(uint32_t did, uint32_t *height);
+
+CGRect display_manager_menu_bar_rect(uint32_t did)
+{
+    CGRect bounds = {};
+
+    uint32_t height = 0;
+    SLSGetDisplayMenubarHeight(did, &height);
+
+    bounds = CGDisplayBounds(did);
+    bounds.size.height = height;
+
+    //
+    // NOTE(koekeishiya): Height needs to be offset by 1 because that is the actual
+    // position on the screen that windows can be positioned at..
+    //
+
+    bounds.size.height += 1;
+    return bounds;
+}
