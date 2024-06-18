@@ -99,10 +99,25 @@ That period was previously 0.5 seconds, which was now increased to 1 second and 
 - Fix possible crash when fetching reference presets on external monitors
 - Fix system lag when CoreAudio devices take too long to respond
 
+# 6.7.13
+## Features
+
+- Allow HDR monitors to use the superior **Apple Native** brightness control instead of **DDC** on macOS Sequoia
+
+## Fixes
+
+- Ignore displays named **"Unknown Display"** which may appear when the monitor's connection is not ready for DDC
+
+## Improvements
+
+- Ensure Software Dimming does dim the screen instead of whiten it when Invert Colors is enabled in Accessibility settings
+    - *This will force a white Overlay instead of Gamma dimming since gamma tables can't be inverted in a precise enough way*
+- Make sure menu does not end up behind the menu bar when that is set to autohide
+
 # 6.7.12
 ## Improvements
 
-- Improve **Auto Blackout** by ignoring displays with empty or incomplete `name
+- Improve **Auto Blackout** by ignoring displays with empty or incomplete name
 - Print CLI location and restart shell after installation
 
 ## Fixes
