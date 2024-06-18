@@ -46,9 +46,9 @@ final class AppleNativeControl: Control {
         guard display.active else { return false }
         guard let enabledForDisplay = display.enabledControls[.appleNative], enabledForDisplay else { return false }
         #if DEBUG
-            return (display.isForTesting || display.canChangeBrightnessDS) && (display.isBuiltin || display.isAppleDisplay)
+            return display.isForTesting || display.canChangeBrightnessDS
         #else
-            return display.canChangeBrightnessDS && (display.isBuiltin || display.isAppleDisplay)
+            return display.canChangeBrightnessDS
         #endif
         // return (
         //     display.isAppleDisplay() ||
