@@ -4817,13 +4817,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func reapplySoftwareControl() {
-        guard hasSoftwareControl else {
+        guard hasSoftwareControl || softwareBrightness < 1 else {
             resetSoftwareControl()
             return
         }
+
         if supportsGamma {
             reapplyGamma()
-        } else if !supportsGammaByDefault, hasSoftwareControl {
+        } else if !supportsGammaByDefault || softwareBrightness < 1 {
             shade(amount: 1.0 - preciseBrightness, transition: brightnessTransition)
         }
     }
@@ -5243,13 +5244,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 }
             }
             .store(in: &observers)
-        NSWorkspace.shared.notificationCenter
-            .publisher(for: NSWorkspace.accessibilityDisplayOptionsDidChangeNotification)
-            .sink { [weak self] _ in
-                guard let self else { return }
-                self.supportsGamma = supportsGammaByDefault && !useOverlay && !NSWorkspace.shared.accessibilityDisplayShouldInvertColors
-            }
-            .store(in: &observers)
+
         #if DEBUG
             if isTestID(id), name.contains("DELL") {
                 audioIdentifier = "~:AMS2_Aggregate:0"

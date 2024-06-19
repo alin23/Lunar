@@ -1477,6 +1477,33 @@ final class DisplayController: ObservableObject {
         }
     }
 
+    var invertColors = NSWorkspace.shared.accessibilityDisplayShouldInvertColors {
+        didSet {
+            guard invertColors != oldValue else { return }
+            log.debug("Invert Colors: \(invertColors)")
+
+            if invertColors, activeDisplayList.contains(where: \.gammaSetAPICalled) {
+                restoreColorSyncSettings(reapplyGammaFor: [], force: true)
+                for d in activeDisplayList where d.gammaSetAPICalled {
+                    d.lastGammaTable = nil
+                    d.lastGammaBrightness = 100
+                }
+            }
+
+            for d in activeDisplayList {
+                d.supportsGamma = d.supportsGammaByDefault && !d.useOverlay && !invertColors
+            }
+            for d in activeDisplayList where d.hasSoftwareControl || d.softwareBrightness != 1 {
+                if let w = d.shadeWindowController?.window {
+                    w.contentView?.bg = invertColors ? NSColor.white : NSColor.black
+                    w.contentView?.setNeedsDisplay(w.frame)
+                }
+
+                d.softwareBrightness = Float(d.softwareBrightness)
+            }
+        }
+    }
+
     static func getDisplays(
         includeVirtual: Bool = true,
         includeAirplay: Bool = false,
@@ -1699,6 +1726,14 @@ final class DisplayController: ObservableObject {
             self.modeWatcherTask = nil
             self.screencaptureWatcherTask = nil
         }.store(in: &observers)
+
+        NSWorkspace.shared.notificationCenter
+            .publisher(for: NSWorkspace.accessibilityDisplayOptionsDidChangeNotification)
+            .debounce(for: .milliseconds(200), scheduler: RunLoop.main)
+            .sink { _ in
+                self.invertColors = NSWorkspace.shared.accessibilityDisplayShouldInvertColors
+            }
+            .store(in: &observers)
 
         #if arch(arm64)
             if #available(macOS 13, *), Sysctl.isMacBook {
@@ -2524,7 +2559,6 @@ final class DisplayController: ObservableObject {
             }
         }
     }
-
     func addSentryData() {
         guard CachedDefaults[.enableSentry] else { return }
         SentrySDK.configureScope { [self] scope in
