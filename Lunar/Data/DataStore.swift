@@ -43,6 +43,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .oldReapplyValuesAfterWake,
     .oldBrightnessTransition,
     .oldDetectResponsiveness,
+    .ignoreDisplaysWithMissingMetadata,
 
     .adaptiveBrightnessMode,
     .colorScheme,

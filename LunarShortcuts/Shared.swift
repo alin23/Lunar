@@ -279,6 +279,7 @@ extension Defaults.Keys {
     static let apiKey = Key<String>("apiKey", default: "")
     static let listenForRemoteCommands = Key<Bool>("listenForRemoteCommands", default: false)
     static let neverAskAboutXDR = Key<Bool>("neverAskAboutXDR", default: false)
+    static let ignoreDisplaysWithMissingMetadata = Key<Bool>("ignoreDisplaysWithMissingMetadata", default: true)
 
     static let autoRestartOnCrash = Key<Bool>("autoRestartOnCrash", default: true)
     static let autoRestartOnHang = Key<Bool>("autoRestartOnHang", default: true)

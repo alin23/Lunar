@@ -531,6 +531,7 @@ final class DisplayController: ObservableObject {
 
     var cachedOnlineDisplayIDs: Set<CGDirectDisplayID> = Set(NSScreen.onlineDisplayIDs)
 
+    @Setting(.ignoreDisplaysWithMissingMetadata) var ignoreDisplaysWithMissingMetadata: Bool
     @Setting(.allowAdjustmentsWhileLocked) var allowAdjustmentsWhileLocked: Bool
     @Setting(.showNitsOSD) var showNitsOSD: Bool
     @Setting(.dcpMatchingIODisplayLocation) var dcpMatchingIODisplayLocation: Bool
@@ -2266,6 +2267,13 @@ final class DisplayController: ObservableObject {
                     self.addSentryData()
                 }
                 let isValidDisplay: (Display) -> Bool = { d in
+                    guard self.ignoreDisplaysWithMissingMetadata else {
+                        #if arch(arm64)
+                            return d.id < 50
+                        #else
+                            return true
+                        #endif
+                    }
                     #if arch(arm64)
                         return d.id < 50 && !d.edidName.isEmpty && d.edidName != "Unknown Display"
                     #else
