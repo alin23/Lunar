@@ -1,3 +1,32 @@
+# 6.8.0
+## Features
+
+- Re-organize advanced settings
+- Isolate **App Info** UI into its own little window and hide it by default on first launch
+
+![app info separated](https://files.lunar.fyi/app-info-separated.png)
+
+## Improvements
+
+- Ask about **Full Range XDR** at onboarding and default to it for new users
+- Make HDR redraw dot less visible when using XDR Brightness
+- Allow disabling "bad display" detection through the `ignoreDisplaysWithMissingMetadata` setting:
+
+```sh
+defaults write fyi.lunar.Lunar ignoreDisplaysWithMissingMetadata false
+```
+
+Only to be used in cases where:
+
+- BlackOut wrongly reconnects the screen 5-10 seconds after disconnecting it
+- screen remains black after disabling BlackOut
+
+## Fixes
+
+- Adapt software dimming dynamically if **Invert Colors** is used often while Lunar is running *(previously it needed an app restart when changing the Invert Colors setting)*
+- Fix **Full Range XDR** for `macOS Sequoia beta 3`
+- Fix re-applying the wrong stored brightness after wake
+
 # 6.7.9
 ## Improvements
 
