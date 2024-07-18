@@ -50,11 +50,15 @@ final class OnboardWindowController: ModernWindowController, NSWindowDelegate {
         appDelegate!.screenObserver?.cancel()
         appDelegate!.screenObserver = nil
 
-        guard !clickedSkipButton else { return }
+        guard !clickedSkipButton else {
+            DC.askAboutXDR()
+            return
+        }
         skip?()
 
         guard !useOnboardingForDiagnostics else { return }
         completeOnboarding()
+        DC.askAboutXDR()
     }
 
     func completeOnboarding() {

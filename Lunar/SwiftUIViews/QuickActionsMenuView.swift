@@ -12,6 +12,7 @@ struct QuickActionsMenuView: View {
     @Default(.overrideAdaptiveMode) var overrideAdaptiveMode
     @Default(.showStandardPresets) var showStandardPresets
     @Default(.showCustomPresets) var showCustomPresets
+    @Default(.hidePresetsOnSingleDisplay) var hidePresetsOnSingleDisplay
     @Default(.showHeaderOnHover) var showHeaderOnHover
     @Default(.showFooterOnHover) var showFooterOnHover
     @Default(.showOptionsMenu) var showOptionsMenu
@@ -148,6 +149,33 @@ struct QuickActionsMenuView: View {
         }
     }
 
+    var appInfo: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Toggle("Launch at login", isOn: $startAtLogin)
+                    .toggleStyle(CheckboxToggleStyle(style: .circle))
+                    .font(.system(size: 11, weight: .medium))
+                Spacer()
+                SwiftUI.Button("Contact") { NSWorkspace.shared.open("https://lunar.fyi/contact".asURL()!) }
+                    .buttonStyle(OutlineButton(color: .white, thickness: 1, font: .system(size: 9, weight: .medium, design: .rounded)))
+                SwiftUI.Button("FAQ") { NSWorkspace.shared.open("https://lunar.fyi/faq".asURL()!) }
+                    .buttonStyle(OutlineButton(color: .white, thickness: 1, font: .system(size: 9, weight: .medium, design: .rounded)))
+            }
+            LicenseView()
+            VersionView(updater: appDelegate!.updater)
+            MenuDensityView()
+        }
+        .foregroundColor(.white)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 15)
+        .padding(.top, 10)
+        .padding(.bottom, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous).fill(Color.blackish)
+                .shadow(color: Color.blackMauve.opacity(0.5), radius: 8, x: 0, y: 6)
+        )
+    }
+
     var footer: some View {
         Group {
             let dynamicFooter = footerOpacity == 0.0 && showFooterOnHover
@@ -156,7 +184,7 @@ struct QuickActionsMenuView: View {
                     HStack {
                         Toggle(um.newVersion != nil ? "" : "App info", isOn: $showAdditionalInfo.animation(.fastSpring))
                             .toggleStyle(DetailToggleStyle(style: .circle))
-                            .foregroundColor(Color.fg.warm.opacity(hoveringAppInfoToggle ? 0.8 : 0.3))
+                            .foregroundColor(Color.fg.warm.opacity(showAdditionalInfo ? 1.0 : hoveringAppInfoToggle ? 0.8 : 0.3))
                             .font(.system(size: 10, weight: .semibold, design: .rounded))
                             .fixedSize()
                             .onHover { hovering in
@@ -196,7 +224,7 @@ struct QuickActionsMenuView: View {
                             .font(.system(size: 10, weight: .medium, design: .rounded))
                             .fixedSize()
                     }
-                    .padding(.bottom, showAdditionalInfo ? 0 : 7)
+                    .padding(.bottom, 7)
                 }
                 .padding(.horizontal, MENU_HORIZONTAL_PADDING / 2)
                 .opacity(showFooterOnHover ? footerOpacity : (hoveringFooter || !dimNonEssentialUI ? 1.0 : 0.15))
@@ -243,49 +271,26 @@ struct QuickActionsMenuView: View {
                     withAnimation(.fastTransition) { footerOpacity = 1.0 }
                 }
             }
-
-            if let appDelegate, showAdditionalInfo {
-                Divider().padding(.bottom, 5)
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack {
-                        Toggle("Launch at login", isOn: $startAtLogin)
-                            .toggleStyle(CheckboxToggleStyle(style: .circle))
-                            .foregroundColor(.fg.warm)
-                            .font(.system(size: 11, weight: .medium))
-                        Spacer()
-                        SwiftUI.Button("Contact") { NSWorkspace.shared.open("https://lunar.fyi/contact".asURL()!) }
-                            .buttonStyle(OutlineButton(thickness: 1, font: .system(size: 9, weight: .medium, design: .rounded)))
-                        SwiftUI.Button("FAQ") { NSWorkspace.shared.open("https://lunar.fyi/faq".asURL()!) }
-                            .buttonStyle(OutlineButton(thickness: 1, font: .system(size: 9, weight: .medium, design: .rounded)))
-                    }
-                    LicenseView()
-                    VersionView(updater: appDelegate.updater)
-                    MenuDensityView()
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 15)
-                .padding(.bottom, 10)
-            }
         }
         .frame(maxWidth: .infinity)
-        .onAppear {
-            if Defaults[.launchCount] == 1, !appInfoHiddenAfterLaunch {
-                appInfoHiddenAfterLaunch = true
-                additionInfoTask = mainAsyncAfter(ms: 1000) {
-                    withAnimation(.spring()) {
-                        showAdditionalInfo = true
-                    }
-                }
-            }
-            if Defaults[.launchCount] == 2, !appInfoHiddenAfterLaunch {
-                appInfoHiddenAfterLaunch = true
-                additionInfoTask = mainAsyncAfter(ms: 1000) {
-                    withAnimation(.spring()) {
-                        showAdditionalInfo = false
-                    }
-                }
-            }
-        }
+        // .onAppear {
+        //     if Defaults[.launchCount] == 1, !appInfoHiddenAfterLaunch {
+        //         appInfoHiddenAfterLaunch = true
+        //         additionInfoTask = mainAsyncAfter(ms: 1000) {
+        //             withAnimation(.spring()) {
+        //                 showAdditionalInfo = true
+        //             }
+        //         }
+        //     }
+        //     if Defaults[.launchCount] == 2, !appInfoHiddenAfterLaunch {
+        //         appInfoHiddenAfterLaunch = true
+        //         additionInfoTask = mainAsyncAfter(ms: 1000) {
+        //             withAnimation(.spring()) {
+        //                 showAdditionalInfo = false
+        //             }
+        //         }
+        //     }
+        // }
     }
 
     var header: some View {
@@ -371,7 +376,7 @@ struct QuickActionsMenuView: View {
                 UnmanagedDisplayView(display: d).padding(.vertical, 7)
             }
 
-            if showStandardPresets || showCustomPresets {
+            if showStandardPresets || showCustomPresets, !(hidePresetsOnSingleDisplay && displayCount == 1) {
                 VStack {
                     if showStandardPresets { standardPresets }
                     if showStandardPresets, showCustomPresets { Divider() }
@@ -398,58 +403,66 @@ struct QuickActionsMenuView: View {
                     .matchedGeometryEffect(id: "options-menu", in: namespace)
             }
             VStack(spacing: 5) {
-                content
-                footer
-            }
-            .frame(maxWidth: env.menuWidth, alignment: .center)
-            .scrollOnOverflow()
-            .frame(width: env.menuWidth, height: cap(env.menuHeight, minVal: 100, maxVal: env.menuMaxHeight - 50), alignment: .top)
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .padding(.top, 0)
-            .background(bg(optionsMenuOverflow: optionsMenuOverflow), alignment: .top)
-            .onAppear {
-                displayHideTask = nil
-                setup()
-            }
-            .onChange(of: menuBarClosed) { closed in
-                setup(closed)
-            }
-            .onChange(of: dc.activeDisplayList) { _ in
-                mainAsyncAfter(ms: 10) { setup() }
-            }
-            .onChange(of: dc.sourceDisplay) { _ in
-                mainAsyncAfter(ms: 10) { setup() }
-            }
-            .onChange(of: dc.possiblyDisconnectedDisplayList) { disconnected in
-                mainAsyncAfter(ms: 10) {
+                VStack(spacing: 5) {
+                    content
+                    footer
+                }
+                .frame(maxWidth: env.menuWidth, alignment: .center)
+                .scrollOnOverflow(heightOffset: showAdditionalInfo ? 250 : 0)
+                .frame(width: env.menuWidth, height: cap(env.menuHeight, minVal: 100, maxVal: env.menuMaxHeight - 50 - (showAdditionalInfo ? 250 : 0)), alignment: .top)
+                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .padding(.top, 0)
+                .background(bg(optionsMenuOverflow: optionsMenuOverflow), alignment: .top)
+                .onAppear {
+                    displayHideTask = nil
                     setup()
-                    let ids = disconnected.map(\.id)
-                    displays = displays.filter { !ids.contains($0.id) }
                 }
-            }
-            .frame(maxWidth: .infinity, alignment: .center)
-            .onTapGesture { env.recording = false }
-            .onChange(of: showStandardPresets, perform: setMenuWidth)
-            .onChange(of: showCustomPresets, perform: setMenuWidth)
-            .onChange(of: showHeaderOnHover, perform: setMenuWidth)
-            .onChange(of: showFooterOnHover, perform: setMenuWidth)
-            .onChange(of: showAdditionalInfo, perform: setMenuWidth)
-            .onChange(of: headerOpacity, perform: setMenuWidth)
-            .onChange(of: footerOpacity, perform: setMenuWidth)
-            .onChange(of: showOptionsMenu) { show in
-                guard !menuBarClosed else { return }
+                .onChange(of: menuBarClosed) { closed in
+                    setup(closed)
+                }
+                .onChange(of: dc.activeDisplayList) { _ in
+                    mainAsyncAfter(ms: 10) { setup() }
+                }
+                .onChange(of: dc.sourceDisplay) { _ in
+                    mainAsyncAfter(ms: 10) { setup() }
+                }
+                .onChange(of: dc.possiblyDisconnectedDisplayList) { disconnected in
+                    mainAsyncAfter(ms: 10) {
+                        setup()
+                        let ids = disconnected.map(\.id)
+                        displays = displays.filter { !ids.contains($0.id) }
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .center)
+                .onTapGesture { env.recording = false }
+                .onChange(of: showStandardPresets, perform: setMenuWidth)
+                .onChange(of: showCustomPresets, perform: setMenuWidth)
+                .onChange(of: showHeaderOnHover, perform: setMenuWidth)
+                .onChange(of: showFooterOnHover, perform: setMenuWidth)
+                .onChange(of: showAdditionalInfo, perform: setMenuWidth)
+                .onChange(of: headerOpacity, perform: setMenuWidth)
+                .onChange(of: footerOpacity, perform: setMenuWidth)
+                .onChange(of: showOptionsMenu) { show in
+                    guard !menuBarClosed else { return }
 
-                setMenuWidth(show)
-                if !show, let menuWindow {
-                    menuWindow.setContentSize(.zero)
+                    setMenuWidth(show)
+                    if !show, let menuWindow {
+                        menuWindow.setContentSize(.zero)
+                    }
+                    appDelegate?.statusItemButtonController?.repositionWindow()
                 }
-                appDelegate?.statusItemButtonController?.repositionWindow()
+
+                if appDelegate != nil, showAdditionalInfo {
+                    appInfo
+                        .frame(maxWidth: env.menuWidth, alignment: .center)
+                }
             }
 
             if showOptionsMenu, !optionsMenuOverflow {
                 optionsMenu.padding(.trailing, 20)
                     .matchedGeometryEffect(id: "options-menu", in: namespace)
             }
+
         }
         .frame(width: MENU_WIDTH + FULL_OPTIONS_MENU_WIDTH, height: env.menuMaxHeight, alignment: .top)
         .padding(.horizontal, showOptionsMenu ? MENU_HORIZONTAL_PADDING * 2 : 0)
@@ -504,11 +517,11 @@ struct QuickActionsMenuView: View {
 
             switch env.optionsTab {
             case .layout:
-                QuickActionsLayoutView().padding(10).foregroundColor(Color.blackMauve)
+                QuickActionsLayoutView().padding(10).foregroundColor(Color.blackMauve).font(.system(size: 12, weight: .regular))
             case .advanced:
-                AdvancedSettingsView().padding(10).foregroundColor(Color.blackMauve)
+                AdvancedSettingsView().padding(10).foregroundColor(Color.blackMauve).font(.system(size: 12, weight: .regular))
             case .hdr:
-                HDRSettingsView().padding(10).foregroundColor(Color.blackMauve)
+                HDRSettingsView().padding(10).foregroundColor(Color.blackMauve).font(.system(size: 12, weight: .regular))
             }
 
             SwiftUI.Button("Reset \(km.optionKeyPressed ? "global" : (km.commandKeyPressed ? "display-specific" : "ALL")) settings") {

@@ -193,7 +193,7 @@ struct OverflowContentViewModifier: ViewModifier {
                 GeometryReader { geom in
                     Color.clear.onAppear {
                         menuOverflowSetter = mainAsyncAfter(ms: 500) {
-                            contentOverflow = geom.size.height + MENU_VERTICAL_PADDING > env.menuMaxHeight
+                            contentOverflow = geom.size.height + heightOffset + MENU_VERTICAL_PADDING > env.menuMaxHeight
                         }
                         withAnimation(.fastSpring) {
                             env.menuHeight = geom.size.height
@@ -201,7 +201,7 @@ struct OverflowContentViewModifier: ViewModifier {
                     }
                     .onChange(of: geom.size.height) { height in
                         menuOverflowSetter = mainAsyncAfter(ms: 500) {
-                            contentOverflow = height + MENU_VERTICAL_PADDING > env.menuMaxHeight
+                            contentOverflow = height + heightOffset + MENU_VERTICAL_PADDING > env.menuMaxHeight
                         }
                         withAnimation(.fastSpring) {
                             env.menuHeight = height
@@ -217,6 +217,7 @@ struct OverflowContentViewModifier: ViewModifier {
 
     @State private var contentOverflow = false
     @State var pauseScrolling = false
+    var heightOffset: CGFloat = 0
 }
 
 var scrollWheelOriginal: Method?
@@ -273,8 +274,8 @@ extension View {
 }
 
 extension View {
-    func scrollOnOverflow() -> some View {
-        modifier(OverflowContentViewModifier())
+    func scrollOnOverflow(heightOffset: CGFloat = 0) -> some View {
+        modifier(OverflowContentViewModifier(heightOffset: heightOffset))
     }
 }
 

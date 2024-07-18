@@ -1,6 +1,16 @@
 import Defaults
 import SwiftUI
 
+struct SettingsHeader: View {
+    let text: String
+
+    var body: some View {
+        Text(text)
+            .font(.system(size: 13, weight: .semibold, design: .rounded))
+            .foregroundColor(.blackish.opacity(0.5))
+    }
+}
+
 struct AdvancedSettingsView: View {
     @ObservedObject var dc: DisplayController = DC
 
@@ -35,8 +45,10 @@ struct AdvancedSettingsView: View {
     var body: some View {
         ZStack {
             Color.clear.frame(maxWidth: .infinity, alignment: .leading)
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 5) {
                 Group {
+                    SettingsHeader(text: "BlackOut")
+
                     #if arch(arm64)
                         if #available(macOS 13, *) {
                             SettingsToggle(
@@ -98,7 +110,10 @@ struct AdvancedSettingsView: View {
                             )
                         }
                     #endif
-                    Divider()
+                    Divider().opacity(0.6).padding(.vertical, 2)
+                }
+                Group {
+                    SettingsHeader(text: "MacBook")
 
                     SettingsToggle(
                         text: "Use workaround for built-in display", setting: $workaroundBuiltinDisplay,
@@ -121,18 +136,11 @@ struct AdvancedSettingsView: View {
                             setting: $clamshellModeDetection
                         )
                     }
-                    SettingsToggle(
-                        text: "Re-apply last brightness on screen wake", setting: $reapplyValuesAfterWake,
-                        help: """
-                        On each screen wake/reconnection, Lunar will try to
-                        re-apply previous brightness and contrast 3 times.
-
-                        Disable this if system appears slow on screen wake.
-                        """
-                    )
                 }
-                Divider()
+                Divider().opacity(0.6).padding(.vertical, 2)
                 Group {
+                    SettingsHeader(text: "DDC")
+
                     SettingsToggle(
                         text: "Enable rotation hotkeys",
                         setting: $enableOrientationHotkeys,
@@ -172,15 +180,30 @@ struct AdvancedSettingsView: View {
                             """
                         )
                     }
-                    SettingsToggle(
-                        text: "Check for network light sensors periodically", setting: $sensorCheckerEnabled,
-                        help: """
-                        To enable "Sensor Mode", Lunar periodically checks if a wireless light
-                        sensor is available using local DNS requests. You can disable this if
-                        you never intend to use a wireless ambient light sensor.
-                        """
-                    )
-                    Divider()
+                    Divider().opacity(0.6).padding(.vertical, 2)
+                    Group {
+                        SettingsHeader(text: "Other")
+
+                        SettingsToggle(
+                            text: "Re-apply last brightness on screen wake", setting: $reapplyValuesAfterWake,
+                            help: """
+                            On each screen wake/reconnection, Lunar will try to
+                            re-apply previous brightness and contrast 3 times.
+
+                            Disable this if system appears slow on screen wake.
+                            """
+                        )
+
+                        SettingsToggle(
+                            text: "Check for network light sensors periodically", setting: $sensorCheckerEnabled,
+                            help: """
+                            To enable "Sensor Mode", Lunar periodically checks if a wireless light
+                            sensor is available using local DNS requests. You can disable this if
+                            you never intend to use a wireless ambient light sensor.
+                            """
+                        )
+                    }
+                    Divider().opacity(0.6).padding(.vertical, 2)
                     Group {
                         Text("EXPERIMENTAL!")
                             .foregroundColor(Color.red)

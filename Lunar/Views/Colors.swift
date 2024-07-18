@@ -65,6 +65,7 @@ public extension Color {
     static let darkGray = Color(hue: 0, saturation: 0.01, brightness: 0.32)
     static let blackGray = Color(hue: 0.03, saturation: 0.12, brightness: 0.18)
     static let lightGray = Color(hue: 0, saturation: 0.0, brightness: 0.92)
+    static let blackish = Color(hue: 0.03, saturation: 0.08, brightness: 0.12)
 
     static let warmWhite = Color(hue: 20, saturation: 0.07, brightness: 0.95)
     static let warmBlack = Color(hue: 20, saturation: 0.15, brightness: 0.18)

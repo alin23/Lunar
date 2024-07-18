@@ -141,6 +141,8 @@ extension Defaults.Keys {
     static let keyboardBacklightOffBlackout = Key<Bool>("keyboardBacklightOffBlackout", default: true)
 
     static let dcpMatchingIODisplayLocation = Key<Bool>("dcpMatchingIODisplayLocation", default: false)
+    static let newXDRMode = Key<Bool>("newXDRMode", default: false)
+    static let askedAboutXDR = Key<Bool>("askedAboutXDR", default: false)
     static let xdrWarningShown = Key<Bool>("xdrWarningShown", default: false)
     static let xdrTipShown = Key<Bool>("xdrTipShown", default: false)
     static let fullRangeTipShown = Key<Bool>("fullRangeTipShown", default: false)
@@ -159,6 +161,7 @@ extension Defaults.Keys {
     static let showNitsText = Key<Bool>("showNitsText", default: true)
     static let showStandardPresets = Key<Bool>("showStandardPresets", default: true)
     static let showCustomPresets = Key<Bool>("showCustomPresets", default: true)
+    static let hidePresetsOnSingleDisplay = Key<Bool>("hidePresetsOnSingleDisplay", default: true)
     static let showXDRSelector = Key<Bool>("showXDRSelector", default: true)
     static let showHeaderOnHover = Key<Bool>("showHeaderOnHover", default: false)
     static let showFooterOnHover = Key<Bool>("showFooterOnHover", default: false)

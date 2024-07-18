@@ -85,6 +85,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .showNitsOSD,
     .showStandardPresets,
     .showCustomPresets,
+    .hidePresetsOnSingleDisplay,
     .showXDRSelector,
     .showHeaderOnHover,
     .showFooterOnHover,
@@ -408,6 +409,7 @@ final class DataStore: NSObject {
     static func firstRun() {
         log.debug("First run")
         thisIsFirstRun = true
+        Defaults[.newXDRMode] = true
     }
 
     func displays(serials: [String]? = nil) -> [Display]? {

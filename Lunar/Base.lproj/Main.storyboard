@@ -7263,8 +7263,8 @@ when FaceLight is activated</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="⚫︎" id="7EB-Iv-y9Y">
                                     <font key="font" metaFont="system" size="6"/>
-                                    <color key="textColor" red="0.5" green="0.5" blue="0.5" alpha="1.0" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="backgroundColor" red="0.5" green="0.5" blue="0.5" alpha="1.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="textColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="backgroundColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 </textFieldCell>
                             </textField>
                         </subviews>

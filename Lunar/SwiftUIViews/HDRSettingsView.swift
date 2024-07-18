@@ -13,6 +13,7 @@ struct HDRSettingsView: View {
     @Default(.allowHDREnhanceContrast) var allowHDREnhanceContrast
 
     @Default(.fullRangeMaxOnDoublePress) var fullRangeMaxOnDoublePress
+    @Default(.newXDRMode) var newXDRMode
     @Default(.autoXdr) var autoXdr
     @Default(.autoSubzero) var autoSubzero
     @Default(.disableNightShiftXDR) var disableNightShiftXDR
@@ -24,109 +25,47 @@ struct HDRSettingsView: View {
     var body: some View {
         ZStack {
             Color.clear.frame(maxWidth: .infinity, alignment: .leading)
-            VStack(alignment: .leading) {
-                Group {
+            VStack(alignment: .leading, spacing: 5) {
+                // SettingsToggle(
+                //     text: "Run in HDR compatibility mode", setting: $hdrWorkaround,
+                //     help: """
+                //     Because of a macOS bug, any app that uses the Gamma API will break HDR.
+
+                //     This workaround tries to keep HDR working by periodically resetting Gamma changes.
+
+                //     This will stop working in the following cases:
+
+                //     • Using "Software Dimming" with the Gamma method
+                //     • Using the old "XDR Brightness" algorithm
+                //     • Using "Sub-zero dimming"
+                //     • Having the f.lux app running
+                //     • Having the Gamma Control app running
+                //     """
+                // )
+//                Divider()
+                if dc.fullRangeAPIAvailable {
                     SettingsToggle(
-                        text: "Run in HDR compatibility mode", setting: $hdrWorkaround,
+                        text: "Use new XDR algorithm for MacBook screen", setting: $newXDRMode.animation(.fastSpring),
                         help: """
-                        Because of a macOS bug, any app that uses the Gamma API will break HDR.
+                        The new algorithm (also called Full Range) uses a different approach than the
+                        one used by the old XDR algorithm, with the following key differences:
 
-                        This workaround tries to keep HDR working by periodically resetting Gamma changes.
+                          - It can be kept enabled all the time without any downsides
+                          - It doesn't clip colors in HDR content
+                          - The system adaptive brightness keeps working
+                          - There's no lag when going from SDR to XDR brightness
+                          - It doesn't interfere with Night Shift, True Tone, or third-party apps like f.lux
 
-                        This will stop working in the following cases:
-
-                        • Using "Software Dimming" with the Gamma method on any display
-                        • Having the f.lux app running
-                        • Having the Gamma Control app running
-                        • Using "XDR Brightness"
-                        • Using "Sub-zero dimming"
+                        Note: when system adaptive brightness is enabled, the system will still adapt the
+                        maximum nits of brightness based on the ambient light, but with a larger range.
+                        So you might get a max of 800 nits in a dark room and 1600 nits in sunlight.
                         """
                     )
-                    SettingsToggle(
-                        text: "Allow XDR on non-Apple HDR monitors", setting: $allowHDREnhanceBrightness.animation(.fastSpring),
-                        help: """
-                        This should work for HDR monitors that have higher brightness LEDs.
-                        Known issues: some monitors turn to grayscale/monochrome when XDR is enabled.
-
-                        In case of any issue, uncheck this and restart your computer to revert any changes.
-                        """
-                    )
-
-                    if dc.activeDisplayList.contains(where: \.supportsEnhance) {
-                        SettingsToggle(
-                            text: "Enhance contrast in XDR Brightness", setting: $xdrContrast,
-                            help: """
-                            Improve readability in sunlight by increasing XDR contrast.
-                            This option is especially useful when using apps with dark backgrounds.
-
-                            Note: works only when using a single display
-                            """
-                        )
-                        HStack {
-                            BigSurSlider(
-                                percentage: $xdrContrastFactor,
-                                image: "circle.lefthalf.filled",
-                                color: Color.lightGray,
-                                backgroundColor: Color.grayMauve.opacity(0.1),
-                                knobColor: Color.lightGray,
-                                showValue: .constant(false),
-                                disabled: !$xdrContrast
-                            )
-                            .padding(.leading)
-
-                            SwiftUI.Button("Reset") { xdrContrastFactor = 0.3 }
-                                .buttonStyle(FlatButton(
-                                    color: Color.lightGray,
-                                    textColor: Color.darkGray,
-                                    radius: 10,
-                                    verticalPadding: 3
-                                ))
-                                .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                                .disabled(!xdrContrast)
-                        }
-                        SettingsToggle(text: "Allow on non-Apple HDR monitors", setting: $allowHDREnhanceContrast.animation(.fastSpring))
-                            .padding(.leading)
-                            .disabled(!xdrContrast)
-                    }
-                    if dc.activeDisplayList.contains(where: \.supportsGammaByDefault) {
-                        SettingsToggle(
-                            text: "Enhance contrast in Sub-zero Dimming", setting: $subzeroContrast,
-                            help: """
-                            Improve readability in very low light by increasing contrast.
-                            This option is especially useful when using apps with light backgrounds.
-
-                            Note: works only when using a single display
-                            """
-                        )
-                        let binding = Binding<Float>(
-                            get: { subzeroContrastFactor / 5.0 },
-                            set: { subzeroContrastFactor = $0 * 5.0 }
-                        )
-                        HStack {
-                            BigSurSlider(
-                                percentage: binding,
-                                image: "circle.lefthalf.filled",
-                                color: Color.lightGray,
-                                backgroundColor: Color.grayMauve.opacity(0.1),
-                                knobColor: Color.lightGray,
-                                showValue: .constant(false),
-                                disabled: !$subzeroContrast
-                            )
-                            .padding(.leading)
-
-                            SwiftUI.Button("Reset") { subzeroContrastFactor = 1.75 }
-                                .buttonStyle(FlatButton(
-                                    color: Color.lightGray,
-                                    textColor: Color.darkGray,
-                                    radius: 10,
-                                    verticalPadding: 3
-                                ))
-                                .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                                .disabled(!subzeroContrast)
-                        }
-                    }
+                    Divider().opacity(0.6).padding(.vertical, 2)
+                    fullRangeSettings
                 }
-                Divider()
+                Divider().opacity(0.6).padding(.vertical, 2)
+                subzeroSettings.padding(.bottom, 2)
                 xdrSettings
                 Spacer()
                 Color.clear
@@ -134,8 +73,124 @@ struct HDRSettingsView: View {
         }
     }
 
-    var xdrSettings: some View {
-        Group {
+    @ViewBuilder var autoXDRSensorSettings: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            SettingsToggle(text: "Toggle XDR Brightness based on ambient light", setting: $autoXdrSensor)
+            Text(
+                """
+                XDR Brightness will be automatically enabled
+                when ambient light is above \(autoXdrSensorLuxThreshold.str(decimals: 0)) lux
+                """
+            )
+            .font(.system(size: 10, weight: .semibold, design: .monospaced))
+            .foregroundColor(.black.opacity(0.4))
+            .fixedSize()
+            .padding(.leading, 20)
+        }
+        HStack {
+            let luxBinding = Binding<Float>(
+                get: { powf(max(autoXdrSensorLuxThreshold - XDR_LUX_LEAST_NONZERO, 0) / XDR_MAX_LUX, 0.25) },
+                set: { autoXdrSensorLuxThreshold = powf($0, 4) * XDR_MAX_LUX + XDR_LUX_LEAST_NONZERO }
+            )
+            BigSurSlider(
+                percentage: luxBinding,
+                image: "sun.dust.fill",
+                color: Color.lightGray,
+                backgroundColor: Color.grayMauve.opacity(0.1),
+                knobColor: Color.lightGray,
+                showValue: .constant(false),
+                disabled: !$autoXdrSensor,
+                mark: .oneway { powf(max(dc.internalSensorLux - XDR_LUX_LEAST_NONZERO, 0) / XDR_MAX_LUX, 0.25) }
+            )
+            .padding(.leading)
+
+            SwiftUI.Button("Reset") { autoXdrSensorLuxThreshold = XDR_DEFAULT_LUX }
+                .buttonStyle(FlatButton(
+                    color: Color.lightGray,
+                    textColor: Color.darkGray,
+                    radius: 10,
+                    verticalPadding: 3
+                ))
+                .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                .disabled(!autoXdrSensor)
+        }
+        if autoXdrSensor {
+            (
+                Text(dc.autoXdrSensorPausedReason ?? "Current ambient light: ")
+                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                    + Text(dc.autoXdrSensorPausedReason == nil ? "\(dc.internalSensorLux.str(decimals: 0)) lux" : "")
+                    .font(.system(size: 10, weight: .heavy, design: .monospaced))
+            )
+            .foregroundColor(.black.opacity(0.4))
+            .padding(.leading, 20)
+
+            VStack(alignment: .leading, spacing: 2) {
+                SettingsToggle(text: "Show OSD when toggling XDR automatically", setting: $autoXdrSensorShowOSD.animation(.fastSpring))
+                (
+                    Text("Notifies you when XDR is activating and\n")
+                        .font(.system(size: 10, weight: .semibold, design: .monospaced).leading(.tight))
+                        + Text("allows aborting AutoXDR by pressing ")
+                        .font(.system(size: 10, weight: .semibold, design: .monospaced).leading(.tight))
+                        + Text("Esc")
+                        .font(.system(size: 10, weight: .heavy, design: .monospaced).leading(.tight))
+                )
+                .foregroundColor(.black.opacity(0.4))
+                .fixedSize()
+                .padding(.leading, 20)
+            }.padding(.leading)
+        }
+    }
+
+    @ViewBuilder var xdrContrastSettings: some View {
+        SettingsToggle(
+            text: "Enhance contrast " + (newXDRMode ? "when over 600 nits" : "in XDR Brightness"), setting: $xdrContrast,
+            help: """
+            Improve readability in sunlight by increasing XDR contrast.
+            This option is especially useful when using apps with dark backgrounds.
+
+            Note: works only when using a single display
+            """
+        )
+        HStack {
+            BigSurSlider(
+                percentage: $xdrContrastFactor,
+                image: "circle.lefthalf.filled",
+                color: Color.lightGray,
+                backgroundColor: Color.grayMauve.opacity(0.1),
+                knobColor: Color.lightGray,
+                showValue: .constant(false),
+                disabled: !$xdrContrast
+            )
+            .padding(.leading)
+
+            SwiftUI.Button("Reset") { xdrContrastFactor = 0.3 }
+                .buttonStyle(FlatButton(
+                    color: Color.lightGray,
+                    textColor: Color.darkGray,
+                    radius: 10,
+                    verticalPadding: 3
+                ))
+                .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                .disabled(!xdrContrast)
+        }
+        if !newXDRMode, xdrContrast {
+            SettingsToggle(text: "Allow on non-Apple HDR monitors", setting: $allowHDREnhanceContrast.animation(.fastSpring))
+                .padding(.leading)
+                .disabled(!xdrContrast)
+        }
+    }
+
+    @ViewBuilder var xdrSettings: some View {
+        if !newXDRMode || dc.hasDisplaysWithOnlyXdrAPIAvailable, dc.xdrAPIAvailable {
+            Divider().opacity(0.6).padding(.vertical, 2)
+            SettingsHeader(text: newXDRMode ? "Old XDR" : "XDR Brightness")
+
+            if newXDRMode {
+                Text("For external displays only")
+                    .font(.caption)
+                    .foregroundColor(.darkGray)
+                    .offset(y: -2)
+            }
             SettingsToggle(text: "Disable Night Shift and f.lux when toggling XDR", setting: $disableNightShiftXDR.animation(.fastSpring))
             SettingsToggle(
                 text: "Enable Dark Mode when enabling XDR", setting: $enableDarkModeXDR.animation(.fastSpring),
@@ -145,85 +200,105 @@ struct HDRSettingsView: View {
                 This works best in combination with the "Enhance contrast in XDR Brightness" setting.
                 """
             )
-            Divider()
-            if dc.fullRangeAPIAvailable {
-                SettingsToggle(text: "Unlock full nits range when going over 100%", setting: $fullRangeMaxOnDoublePress.animation(.fastSpring))
-            }
-            if dc.xdrAPIAvailable {
-                SettingsToggle(text: "Toggle XDR Brightness when going over 100%", setting: $autoXdr.animation(.fastSpring))
+
+            SettingsToggle(text: "Toggle XDR Brightness when going over 100%", setting: $autoXdr.animation(.fastSpring))
+
+            if !newXDRMode, Sysctl.isMacBook, dc.builtinDisplay?.supportsEnhance ?? false {
+                xdrContrastSettings.padding(.bottom, 2)
+                autoXDRSensorSettings.padding(.bottom, 2)
             }
             SettingsToggle(
-                text: "Toggle Sub-zero Dimming when going below 0%",
-                setting: $autoSubzero.animation(.fastSpring)
+                text: "Allow XDR on non-Apple HDR monitors", setting: $allowHDREnhanceBrightness.animation(.fastSpring),
+                help: """
+                This should work for HDR monitors that have higher brightness LEDs.
+                Known issues: some monitors turn to grayscale/monochrome when XDR is enabled.
+
+                In case of any issue, uncheck this and restart your computer to revert any changes.
+                """
             )
 
-            if Sysctl.isMacBook, dc.builtinDisplay?.supportsEnhance ?? false {
-                Divider().padding(.horizontal)
-                VStack(alignment: .leading, spacing: 2) {
-                    SettingsToggle(text: "Toggle XDR Brightness based on ambient light", setting: $autoXdrSensor)
-                    Text(
-                        """
-                        XDR Brightness will be automatically enabled
-                        when ambient light is above \(autoXdrSensorLuxThreshold.str(decimals: 0)) lux
-                        """
-                    )
-                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                    .foregroundColor(.black.opacity(0.4))
-                    .fixedSize()
-                    .padding(.leading, 20)
-                }
-                HStack {
-                    let luxBinding = Binding<Float>(
-                        get: { powf(max(autoXdrSensorLuxThreshold - XDR_LUX_LEAST_NONZERO, 0) / XDR_MAX_LUX, 0.25) },
-                        set: { autoXdrSensorLuxThreshold = powf($0, 4) * XDR_MAX_LUX + XDR_LUX_LEAST_NONZERO }
-                    )
-                    BigSurSlider(
-                        percentage: luxBinding,
-                        image: "sun.dust.fill",
-                        color: Color.lightGray,
-                        backgroundColor: Color.grayMauve.opacity(0.1),
-                        knobColor: Color.lightGray,
-                        showValue: .constant(false),
-                        disabled: !$autoXdrSensor,
-                        mark: .oneway { powf(max(dc.internalSensorLux - XDR_LUX_LEAST_NONZERO, 0) / XDR_MAX_LUX, 0.25) }
-                    )
-                    .padding(.leading)
+        }
+    }
+    @ViewBuilder
+    var fullRangeSettings: some View {
+        SettingsHeader(text: newXDRMode ? "XDR Brightness" : "Full Range")
 
-                    SwiftUI.Button("Reset") { autoXdrSensorLuxThreshold = XDR_DEFAULT_LUX }
-                        .buttonStyle(FlatButton(
-                            color: Color.lightGray,
-                            textColor: Color.darkGray,
-                            radius: 10,
-                            verticalPadding: 3
-                        ))
-                        .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                        .disabled(!autoXdrSensor)
-                }
-                if autoXdrSensor {
-                    (
-                        Text(dc.autoXdrSensorPausedReason ?? "Current ambient light: ")
-                            .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                            + Text(dc.autoXdrSensorPausedReason == nil ? "\(dc.internalSensorLux.str(decimals: 0)) lux" : "")
-                            .font(.system(size: 10, weight: .heavy, design: .monospaced))
-                    )
-                    .foregroundColor(.black.opacity(0.4))
-                    .padding(.leading, 20)
-                }
-                VStack(alignment: .leading, spacing: 2) {
-                    SettingsToggle(text: "Show OSD when toggling XDR automatically", setting: $autoXdrSensorShowOSD.animation(.fastSpring))
-                    (
-                        Text("Notifies you when XDR is activating and\n")
-                            .font(.system(size: 10, weight: .semibold, design: .monospaced).leading(.tight))
-                            + Text("allows aborting AutoXDR by pressing ")
-                            .font(.system(size: 10, weight: .semibold, design: .monospaced).leading(.tight))
-                            + Text("Esc")
-                            .font(.system(size: 10, weight: .heavy, design: .monospaced).leading(.tight))
-                    )
-                    .foregroundColor(.black.opacity(0.4))
-                    .fixedSize()
-                    .padding(.leading, 20)
-                }.padding(.leading)
+        SettingsToggle(
+            text: "Double press 􀆭 to force \(DC.builtinDisplay?.maxHardwareNits?.intround ?? 1600) nits max at 100%",
+            setting: $fullRangeMaxOnDoublePress.animation(.fastSpring),
+            help: """
+            Even with XDR Brightness enabled and the limits unlocked, macOS may still limit
+            the brightness range to less than 1600 nits based on the ambient light if
+            "Automatically adjust brightness" is enabled.
+
+            For example, macOS might set the limits as follows:
+              • in low to medium light (inside a house or office) -> 800 nits
+              • in medium to bright light (under a cloudy sky) -> 1200 nits
+              • in very bright light (usually in the sun) -> 1600 nits
+
+            Disabling "Automatically adjust brightness" in System Preferences > Displays will
+            disable this behavior and allow the full range to be used, but this might not be
+            ideal for most people.
+
+            This setting allows you to toggle the full range on demand by doing the following:
+
+              • on 100% brightness double press the Brightness Up key
+                  -> "Automatically adjust brightness" will be disabled
+                  -> 1600 nits will become available regardless of the ambient light
+              • if you lower the brightness back below 800 nits
+                  -> "Automatically adjust brightness" will be re-enabled
+                  -> the max brightness will be controlled by the ambient light
+            """
+        )
+        if newXDRMode, Sysctl.isMacBook, dc.builtinDisplay?.supportsFullRangeXDR ?? false {
+            xdrContrastSettings
+        }
+    }
+    @ViewBuilder
+    var subzeroSettings: some View {
+        SettingsHeader(text: "Sub-zero Dimming")
+
+        SettingsToggle(
+            text: "Toggle Sub-zero Dimming when going below 0%",
+            setting: $autoSubzero.animation(.fastSpring)
+        )
+        if dc.activeDisplayList.contains(where: \.supportsGammaByDefault) {
+            SettingsToggle(
+                text: "Enhance contrast in Sub-zero Dimming", setting: $subzeroContrast,
+                help: """
+                Improve readability in very low light by increasing contrast.
+                This option is especially useful when using apps with light backgrounds.
+
+                Note: works only when using a single display
+                """
+            )
+            let binding = Binding<Float>(
+                get: { subzeroContrastFactor / 5.0 },
+                set: { subzeroContrastFactor = $0 * 5.0 }
+            )
+            HStack {
+                BigSurSlider(
+                    percentage: binding,
+                    image: "circle.lefthalf.filled",
+                    color: Color.lightGray,
+                    backgroundColor: Color.grayMauve.opacity(0.1),
+                    knobColor: Color.lightGray,
+                    showValue: .constant(false),
+                    disabled: !$subzeroContrast
+                )
+                .padding(.leading)
+
+                SwiftUI.Button("Reset") { subzeroContrastFactor = 1.75 }
+                    .buttonStyle(FlatButton(
+                        color: Color.lightGray,
+                        textColor: Color.darkGray,
+                        radius: 10,
+                        verticalPadding: 3
+                    ))
+                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    .disabled(!subzeroContrast)
             }
         }
+
     }
 }

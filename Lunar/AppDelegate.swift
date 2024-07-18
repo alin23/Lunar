@@ -2484,6 +2484,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         NotificationCenter.default.post(name: displayListChanged, object: nil)
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "6"
         log.info("App finished launching v\(version)")
+
+        if !thisIsFirstRun {
+            DC.askAboutXDR(migration: true)
+        }
     }
 
     @IBAction func toggleCleaningMode(_: Any) {

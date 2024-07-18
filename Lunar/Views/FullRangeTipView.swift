@@ -6,12 +6,15 @@
 //  Copyright © 2022 Alin. All rights reserved.
 //
 
+import Defaults
 import Foundation
 import SwiftUI
 
 // MARK: - FullRangeTipView
 
 struct FullRangeTipView: View {
+    @Default(.newXDRMode) var newXDRMode
+
     var body: some View {
         PaddedPopoverView(background: AnyView(Color.white.brightness(0.05))) {
             Text("Full Range XDR Brightness")
@@ -20,18 +23,28 @@ struct FullRangeTipView: View {
             This option unlocks the full range of brightness so you can take advantage
             of the high power LEDs in your screen.
 
-            It uses a different approach than the one used by the **XDR** button,
-            with the following key differences:
 
-              - It doesn't clip colors in HDR content
-              - The system adaptive brightness keeps working
-              - There's no lag when going from SDR to XDR brightness
+            """ + (
+                newXDRMode
+                    ? """
+                    It can be kept on all the time without any downsides, and can be used in
+                    tandem with the system adaptive brightness, Night Shift, True Tone and even
+                    third-party apps like f.lux.
+                    """
+                    : """
+                    It uses a different approach than the one used by the **XDR** button,
+                    with the following key differences:
 
-            Downsides:
+                      - It doesn't clip colors in HDR content
+                      - The system adaptive brightness keeps working
+                      - There's no lag when going from SDR to XDR brightness
 
-              - It only works on MacBook Pro XDR screens
-              - The screen will flash one or two times when toggling it
-            """)
+                    Downsides:
+
+                      - It only works on MacBook Pro XDR screens
+                      - The screen will flash one or two times when toggling it
+                    """
+            ))
 
             Text("""
             The system will still adapt the maximum nits of brightness based on the ambient

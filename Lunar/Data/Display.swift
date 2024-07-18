@@ -3556,6 +3556,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     DS_LOGGER.debug("Ignoring brightness change notification. Reason: \(reason, privacy: .public)")
                     return
                 }
+                display.lastNativeBrightness = value
 
                 guard !display.inSmoothTransition, !display.isBuiltin || !DC.lidClosed else {
                     let reason = if DC.activeDisplays[id]?.inSmoothTransition ?? false {
@@ -3576,7 +3577,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 }
 
                 DS_LOGGER.debug("newBrightness: \(newBrightness, privacy: .public) display.isUserAdjusting: \(display.isUserAdjusting(), privacy: .public)")
-                display.lastNativeBrightness = value
+
                 display.withoutDisplayServices {
                     display.brightness = newBrightness.ns
                 }

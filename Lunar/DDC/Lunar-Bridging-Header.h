@@ -98,13 +98,15 @@ extern CGError SLSGetDisplayMenubarHeight(uint32_t did, uint32_t *height);
 
 CGRect display_manager_menu_bar_rect(uint32_t did)
 {
-    CGRect bounds = {};
+    CGRect bounds = CGDisplayBounds(did);
 
-    uint32_t height = 0;
-    SLSGetDisplayMenubarHeight(did, &height);
-
-    bounds = CGDisplayBounds(did);
-    bounds.size.height = height;
+    if (@available(macOS 12.0, *)) {
+        uint32_t height = 0;
+        SLSGetDisplayMenubarHeight(did, &height);
+        bounds.size.height = height;
+    } else {
+        bounds.size.height = 24;
+    }
 
     //
     // NOTE(koekeishiya): Height needs to be offset by 1 because that is the actual

@@ -109,6 +109,8 @@ struct DisplayRowView: View {
         @Default(.syncNits) var syncNits
     #endif
 
+    @Default(.askedAboutXDR) var askedAboutXDR
+    @Default(.newXDRMode) var newXDRMode
     @Default(.showInputInQuickActions) var showInputInQuickActions
     @Default(.showPowerInQuickActions) var showPowerInQuickActions
     @Default(.showXDRSelector) var showXDRSelector
@@ -168,6 +170,74 @@ struct DisplayRowView: View {
                     let lastDataPoint = datapointLock.around { DC.adaptiveMode.brightnessDataPoint.last }
                     display.insertBrightnessUserDataPoint(lastDataPoint, display.brightness.doubleValue, modeKey: DC.adaptiveModeKey)
                 }
+            }
+        }
+    }
+
+    @ViewBuilder var newSdrXdrSelector: some View {
+        let color = Color.bg.warm.opacity(colorScheme == .dark ? 0.8 : 0.4)
+        HStack(spacing: 2) {
+            SwiftUI.Button("SDR") {
+                guard display.enhanced || display.fullRange else { return }
+                withAnimation(.fastSpring) {
+                    if display.enhanced {
+                        display.enhanced = false
+                    }
+                    if display.fullRange {
+                        display.fullRange = false
+                    }
+                }
+            }
+            .buttonStyle(PickerButton(
+                onColor: Color.warmBlack.opacity(hoveringXDRSelector || !dimNonEssentialUI ? 1.0 : 0.2), offColor: color.opacity(0.4), enumValue: .oneway { display.enhanced || display.fullRange }, onValue: false
+            ))
+            .font(.system(size: 10, weight: display.enhanced ? .semibold : .bold, design: .monospaced))
+
+            if display.supportsFullRangeXDR {
+                SwiftUI.Button("XDR") {
+                    guard proactive else {
+                        showNeedsLunarProForFullRange = true
+                        return
+                    }
+                    guard fullRangeTipShown || askedAboutXDR else {
+                        fullRangeTipShown = true
+                        showFullRangeTip = true
+                        return
+                    }
+
+                    guard !km.controlKeyPressed else {
+                        showFullRangeTip = true
+                        return
+                    }
+
+                    if display.enhanced {
+                        display.enhanced = false
+                    }
+
+                    withAnimation(.easeInOut(duration: 0.3)) { display.fullRange.toggle() }
+                }
+                .buttonStyle(PickerButton(
+                    onColor: Color.fg.primary.opacity(hoveringXDRSelector || !dimNonEssentialUI ? 0.7 : 0.2),
+                    offColor: color.opacity(0.4), onTextColor: .bg.primary, radius: 6, enumValue: $display.fullRange, onValue: true
+                ))
+                .font(.system(size: 10, weight: display.fullRange ? .bold : .semibold, design: .rounded))
+                .popover(isPresented: $showNeedsLunarProForFullRange) { NeedsLunarProView() }
+                .popover(isPresented: $showFullRangeTip) { FullRangeTipView() }
+            }
+        }
+        .padding(2)
+        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(color))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .trim(from: 0.0, to: display.fullRange ? 1.0 : 0.0)
+                .stroke(Color.fg.primary.opacity(0.7), lineWidth: 3)
+                .scaleEffect(x: 0.98, y: 0.95, anchor: .center)
+        )
+        .padding(.bottom, 2)
+        .opacity(hoveringXDRSelector || !dimNonEssentialUI ? 1 : 0.15)
+        .onHover { hovering in
+            withAnimation(.fastTransition) {
+                hoveringXDRSelector = hovering
             }
         }
     }
@@ -524,7 +594,13 @@ struct DisplayRowView: View {
                     sliders
                     adaptiveState
                     volumeSlider
-                    if xdrSelectorShown { sdrXdrSelector }
+                    if xdrSelectorShown {
+                        if newXDRMode, display.isBuiltin, display.supportsFullRangeXDR {
+                            newSdrXdrSelector
+                        } else {
+                            sdrXdrSelector
+                        }
+                    }
                     appPresetAdaptivePaused
                 } else {
                     lockedPresetView

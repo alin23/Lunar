@@ -27,8 +27,8 @@ struct LicenseView: View {
                 .font(.system(size: 11, weight: .medium))
             Text(lunarProOnTrial ? "trial" : (lunarProActive ? "active" : "inactive"))
                 .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
+                .padding(.horizontal, 4)
+                .padding(.vertical, 1)
                 .background(
                     RoundedRectangle(cornerRadius: 5, style: .continuous)
                         .fill(lunarProOnTrial ? Color.peach : (lunarProActive ? Color.lightGreen : Color.red))
@@ -42,7 +42,7 @@ struct LicenseView: View {
                     Text("remaining")
                         .font(.system(size: 7, weight: .semibold, design: .rounded))
                 }
-                .padding(.horizontal, 6)
+                .padding(.horizontal, 4)
                 .padding(.vertical, 1)
                 .background(
                     RoundedRectangle(cornerRadius: 5, style: .continuous)
@@ -55,21 +55,21 @@ struct LicenseView: View {
             if lunarProOnTrial {
                 SwiftUI.Button("Buy") { showCheckout() }
                     .buttonStyle(FlatButton(
-                        color: Color.fg.warm.opacity(0.9),
-                        textColor: Color.inverted,
+                        color: Color.white.opacity(0.1),
+                        textColor: Color.white,
                         horizontalPadding: 6,
                         verticalPadding: 3
                     ))
                     .font(.system(size: 10, weight: .semibold))
             }
             SwiftUI.Button((lunarProActive && !lunarProOnTrial) ? "Manage" : "Activate") { showLicenseActivation() }
-                .buttonStyle(FlatButton(color: Color.fg.warm.opacity(0.9), textColor: Color.inverted, horizontalPadding: 6, verticalPadding: 3))
+                .buttonStyle(FlatButton(color: Color.white.opacity(0.1), textColor: Color.white, horizontalPadding: 6, verticalPadding: 3))
                 .font(.system(size: 10, weight: .semibold))
         }
-        .foregroundColor(Color.fg.warm.opacity(0.6))
+        .foregroundColor(Color.white.opacity(0.7))
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
-        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.fg.warm.opacity(0.03)))
+        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.red.opacity(0.03)))
         .onAppear { product = producct }
     }
 
@@ -106,8 +106,8 @@ struct VersionView: View {
 
                 SwiftUI.Button("Check for updates") { updater.checkForUpdates() }
                     .buttonStyle(FlatButton(
-                        color: Color.fg.warm.opacity(0.9),
-                        textColor: Color.inverted,
+                        color: Color.white.opacity(0.1),
+                        textColor: Color.white,
                         horizontalPadding: 6,
                         verticalPadding: 3
                     ))
@@ -127,6 +127,12 @@ struct VersionView: View {
                     updateCheckInterval = UpdateCheckInterval.daily.rawValue
                 }
                 .buttonStyle(PickerButton(
+                    color: Color.white.opacity(0.1),
+                    onColor: Color.red.opacity(0.2),
+                    offColor: Color.white.opacity(0.1),
+                    onTextColor: Color.red,
+                    offTextColor: Color.lightGray,
+
                     horizontalPadding: 6,
                     verticalPadding: 3,
                     enumValue: $updateCheckInterval,
@@ -140,6 +146,11 @@ struct VersionView: View {
                     updateCheckInterval = UpdateCheckInterval.weekly.rawValue
                 }
                 .buttonStyle(PickerButton(
+                    color: Color.white.opacity(0.1),
+                    onColor: Color.red.opacity(0.2),
+                    offColor: Color.white.opacity(0.1),
+                    onTextColor: Color.red,
+                    offTextColor: Color.lightGray,
                     horizontalPadding: 6,
                     verticalPadding: 3,
                     enumValue: $updateCheckInterval,
@@ -153,6 +164,11 @@ struct VersionView: View {
                     updateCheckInterval = UpdateCheckInterval.monthly.rawValue
                 }
                 .buttonStyle(PickerButton(
+                    color: Color.white.opacity(0.1),
+                    onColor: Color.red.opacity(0.2),
+                    offColor: Color.white.opacity(0.1),
+                    onTextColor: Color.red,
+                    offTextColor: Color.lightGray,
                     horizontalPadding: 6,
                     verticalPadding: 3,
                     enumValue: $updateCheckInterval,
@@ -169,10 +185,10 @@ struct VersionView: View {
                 .toggleStyle(CheckboxToggleStyle(style: .circle))
                 .font(.system(size: 11, weight: .medium))
         }
-        .foregroundColor(Color.fg.warm.opacity(0.6))
+        .foregroundColor(Color.white.opacity(0.7))
         .padding(.horizontal, 8)
         .padding(.vertical, 8)
-        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.fg.warm.opacity(0.03)))
+        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.red.opacity(0.03)))
     }
 
 }
@@ -190,15 +206,45 @@ struct MenuDensityView: View {
                 Spacer()
 
                 SwiftUI.Button("Clean") { menuDensity = .clean }
-                    .buttonStyle(PickerButton(horizontalPadding: 6, verticalPadding: 3, enumValue: $menuDensity, onValue: .clean))
+                    .buttonStyle(PickerButton(
+                        color: Color.white.opacity(0.1),
+                        onColor: Color.red.opacity(0.2),
+                        offColor: Color.white.opacity(0.1),
+                        onTextColor: Color.red,
+                        offTextColor: Color.lightGray,
+                        horizontalPadding: 6,
+                        verticalPadding: 3,
+                        enumValue: $menuDensity,
+                        onValue: .clean
+                    ))
                     .font(.system(size: 10, weight: .semibold))
 
                 SwiftUI.Button("Comfortable") { menuDensity = .comfortable }
-                    .buttonStyle(PickerButton(horizontalPadding: 6, verticalPadding: 3, enumValue: $menuDensity, onValue: .comfortable))
+                    .buttonStyle(PickerButton(
+                        color: Color.white.opacity(0.1),
+                        onColor: Color.red.opacity(0.2),
+                        offColor: Color.white.opacity(0.1),
+                        onTextColor: Color.red,
+                        offTextColor: Color.lightGray,
+                        horizontalPadding: 6,
+                        verticalPadding: 3,
+                        enumValue: $menuDensity,
+                        onValue: .comfortable
+                    ))
                     .font(.system(size: 10, weight: .semibold))
 
                 SwiftUI.Button("Dense") { menuDensity = .dense }
-                    .buttonStyle(PickerButton(horizontalPadding: 6, verticalPadding: 3, enumValue: $menuDensity, onValue: .dense))
+                    .buttonStyle(PickerButton(
+                        color: Color.white.opacity(0.1),
+                        onColor: Color.red.opacity(0.2),
+                        offColor: Color.white.opacity(0.1),
+                        onTextColor: Color.red,
+                        offTextColor: Color.lightGray,
+                        horizontalPadding: 6,
+                        verticalPadding: 3,
+                        enumValue: $menuDensity,
+                        onValue: .dense
+                    ))
                     .font(.system(size: 10, weight: .semibold))
             }
             HStack(spacing: 3) {
@@ -211,15 +257,15 @@ struct MenuDensityView: View {
                 }
                 .padding(.horizontal, 4)
                 .padding(.vertical, 2)
-                .background(RoundedRectangle(cornerRadius: 4, style: .continuous).fill(Color.fg.warm.opacity(0.1)))
+                .background(RoundedRectangle(cornerRadius: 4, style: .continuous).fill(Color.white.opacity(0.1)))
                 Text("for more granular settings")
                     .font(.system(size: 10, weight: .semibold, design: .rounded))
             }.opacity(0.7)
         }
-        .foregroundColor(Color.fg.warm.opacity(0.6))
+        .foregroundColor(Color.white.opacity(0.7))
         .padding(.horizontal, 8)
         .padding(.vertical, 8)
-        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.fg.warm.opacity(0.03)))
+        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.red.opacity(0.03)))
         .onChange(of: menuDensity) { density in
             let dense = density == .dense
             let comfy = density == .comfortable

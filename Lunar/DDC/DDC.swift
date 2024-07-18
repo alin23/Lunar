@@ -23,7 +23,10 @@ let DDC_MIN_REPLY_DELAY_AMD = 30_000_000
 let DDC_MIN_REPLY_DELAY_INTEL = 1
 let DDC_MIN_REPLY_DELAY_NVIDIA = 1
 
-let DUMMY_VENDOR_IDS: [UInt32] = [0xF0F0, 0x896]
+@inline(__always)
+func isDummyDisplayID(_ id: UInt32) -> Bool {
+    id == 0xF0F0 || id == 0x896
+}
 
 // MARK: - DDCReadResult
 
@@ -1024,7 +1027,7 @@ enum DDC {
         }
 
         #if DEBUG
-//            return displayIDs
+            // return displayIDs
             if !displayIDs.isEmpty {
                 // displayIDs.append(TEST_DISPLAY_PERSISTENT_ID)
                 return displayIDs
@@ -1071,7 +1074,7 @@ enum DDC {
 
         let realName = (name ?? Display.printableName(id)).lowercased()
         let vendorID = CGDisplayVendorNumber(id)
-        return (realName =~ Display.dummyNamePattern || DUMMY_VENDOR_IDS.contains(vendorID)) && vendorID != Display.Vendor.samsung.rawValue
+        return (realName =~ Display.dummyNamePattern || isDummyDisplayID(vendorID)) && vendorID != Display.Vendor.samsung.rawValue
             .u32 && realName !~ Display.notDummyNamePattern
     }
 
@@ -1082,7 +1085,7 @@ enum DDC {
 
         let realName = (name ?? Display.printableName(id)).lowercased()
         let vendorID = CGDisplayVendorNumber(id)
-        return realName =~ Display.notDummyNamePattern && DUMMY_VENDOR_IDS.contains(vendorID)
+        return realName =~ Display.notDummyNamePattern && isDummyDisplayID(vendorID)
     }
 
     static func isVirtualDisplay(_ id: CGDirectDisplayID, name: String? = nil, checkName: Bool = true) -> Bool {

@@ -531,6 +531,7 @@ final class DisplayController: ObservableObject {
 
     var cachedOnlineDisplayIDs: Set<CGDirectDisplayID> = Set(NSScreen.onlineDisplayIDs)
 
+    @Setting(.newXDRMode) var newXDRMode: Bool
     @Setting(.ignoreDisplaysWithMissingMetadata) var ignoreDisplaysWithMissingMetadata: Bool
     @Setting(.allowAdjustmentsWhileLocked) var allowAdjustmentsWhileLocked: Bool
     @Setting(.showNitsOSD) var showNitsOSD: Bool
@@ -1442,6 +1443,7 @@ final class DisplayController: ObservableObject {
     var targetDisplays: [Display] {
         activeDisplayList.filter { !$0.isSource }
     }
+
     @AtomicLock var displays: [CGDirectDisplayID: Display] = [:] {
         didSet {
             activeDisplays = displays.filter { $1.active && !$1.unmanaged }
@@ -1596,6 +1598,52 @@ final class DisplayController: ObservableObject {
         for d in displays where !d.isForTesting && !d.isAllDisplays {
             log.debug("Primary mirror for \(d): \(String(describing: d.primaryMirrorScreen))")
             log.debug("Secondary mirror for \(d): \(String(describing: d.secondaryMirrorScreenID))")
+        }
+    }
+
+    func askAboutXDR(migration: Bool = false) {
+        guard !Defaults[.askedAboutXDR], proactive,
+              let builtin = builtinDisplay, builtinSupportsFullRangeXDR || builtin.supportsFullRangeXDR,
+              !(builtin.panel?.presets.contains(where: \.isXDR) ?? false)
+        else {
+            return
+        }
+        let alert = NSAlert()
+
+        alert.messageText = migration
+            ? "New XDR Brightness algorithm available"
+            : "Do you want to unlock XDR brightness?"
+        alert
+            .informativeText = migration
+            ? """
+            An improved XDR brightness algorithm is available. This new method doesn't require switching back and forth between SDR and XDR anymore.
+            It also improves color accuracy, contrast, Sync Mode integration and adaptive brightness support.
+
+            Do you want to switch to it?
+
+            Note: the display will flash 2-3 times the first time this is activated.
+            """
+            : """
+            Your built-in display supports XDR brightness up to 1600 nits. It is currently locked at 500 nits by the system.
+
+            Do you want to unlock the full range of brightness?
+
+            Note: the display will flash 2-3 times the first time this is activated.
+            """
+        alert.addButton(withTitle: "Yes")
+        alert.addButton(withTitle: "No")
+        alert.alertStyle = .informational
+        Defaults[.askedAboutXDR] = true
+
+        let response = alert.runModal()
+        switch response {
+        case .alertFirstButtonReturn:
+            builtin.fullRange = true
+            if migration {
+                Defaults[.newXDRMode] = true
+            }
+        default:
+            break
         }
     }
 
@@ -2915,7 +2963,8 @@ final class DisplayController: ObservableObject {
 
             let ignoreHoldingKey = display.enhanced ? false : (lastBrightnessKeyEvent?.keyRepeat ?? false)
 
-            if autoXdr || display.softwareBrightness > 1.0 || display.enhanced, !ignoreHoldingKey,
+            if !(newXDRMode && display.isBuiltin),
+               autoXdr || display.softwareBrightness > 1.0 || display.enhanced, !ignoreHoldingKey,
                !display.fullRange, display.supportsEnhance, !xdrPausedBecauseOfFlux,
                (value == maxBrightness && value == oldValue && timeSince(lastTimeBrightnessUpKeyPressed) < 3) ||
                (oldValue == maxBrightness && display.softwareBrightness > Display.MIN_SOFTWARE_BRIGHTNESS),
