@@ -82,7 +82,8 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .showVolumeSlider,
     .showRawValues,
     .showNitsText,
-    .showNitsOSD,
+    .showNitsOSDExternal,
+    .showNitsOSDBuiltin,
     .showStandardPresets,
     .showCustomPresets,
     .hidePresetsOnSingleDisplay,
@@ -767,7 +768,6 @@ func initCache() {
     cacheKey(.mergeBrightnessContrast)
     cacheKey(.enableBlackOutKillSwitch)
     cacheKey(.enableSentry)
-    cacheKey(.showNitsOSD)
     cacheKey(.paddleConsent)
     cacheKey(.presets)
     cacheKey(.showVolumeSlider)

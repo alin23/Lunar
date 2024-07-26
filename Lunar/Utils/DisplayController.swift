@@ -534,7 +534,8 @@ final class DisplayController: ObservableObject {
     @Setting(.newXDRMode) var newXDRMode: Bool
     @Setting(.ignoreDisplaysWithMissingMetadata) var ignoreDisplaysWithMissingMetadata: Bool
     @Setting(.allowAdjustmentsWhileLocked) var allowAdjustmentsWhileLocked: Bool
-    @Setting(.showNitsOSD) var showNitsOSD: Bool
+    @Setting(.showNitsOSDExternal) var showNitsOSDExternal: Bool
+    @Setting(.showNitsOSDBuiltin) var showNitsOSDBuiltin: Bool
     @Setting(.dcpMatchingIODisplayLocation) var dcpMatchingIODisplayLocation: Bool
     @Setting(.syncModeBrightnessKeyPressedExpireSeconds) var syncModeBrightnessKeyPressedExpireSeconds: Double
 

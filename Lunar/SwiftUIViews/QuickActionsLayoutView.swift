@@ -9,7 +9,8 @@ struct QuickActionsLayoutView: View {
     @Default(.showVolumeSlider) var showVolumeSlider
     @Default(.showRawValues) var showRawValues
     @Default(.showNitsText) var showNitsText
-    @Default(.showNitsOSD) var showNitsOSD
+    @Default(.showNitsOSDExternal) var showNitsOSDExternal
+    @Default(.showNitsOSDBuiltin) var showNitsOSDBuiltin
     @Default(.showBrightnessMenuBar) var showBrightnessMenuBar
     @Default(.showOnlyExternalBrightnessMenuBar) var showOnlyExternalBrightnessMenuBar
     @Default(.showOrientationInQuickActions) var showOrientationInQuickActions
@@ -80,7 +81,13 @@ struct QuickActionsLayoutView: View {
                         if dc.activeDisplayList.contains(where: \.noDDCOrMergedBrightnessContrast) {
                             SettingsToggle(text: "Show nits limits when hovering on the slider", setting: $showNitsText.animation(.fastSpring))
                         }
-                        SettingsToggle(text: "Show nits value in the brightness OSD", setting: $showNitsOSD)
+
+                        if dc.externalActiveDisplays.contains(where: { $0.possibleMaxNits != nil && $0.nits != nil }) {
+                            SettingsToggle(text: "Show nits value in the brightness OSD (external monitors)", setting: $showNitsOSDExternal)
+                        }
+                        if dc.activeDisplayList.contains(where: { $0.isBuiltin != nil && $0.possibleMaxNits != nil && $0.nits != nil }) {
+                            SettingsToggle(text: "Show nits value in the brightness OSD (built-in screen)", setting: $showNitsOSDBuiltin)
+                        }
                     #endif
                     if adaptiveBrightnessMode.hasUsefulInfo {
                         SettingsToggle(text: "Show useful adaptive info near mode selector", setting: $infoMenuShown.animation(.fastSpring))

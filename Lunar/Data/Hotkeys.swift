@@ -877,7 +877,7 @@ enum Hotkey {
             return
         }
         #if arch(arm64)
-            if osdImage == .brightness, DC.showNitsOSD || display.fullRange, display.possibleMaxNits != nil, let nits = display.nits {
+            if osdImage == .brightness, display.isBuiltin ? DC.showNitsOSDBuiltin : DC.showNitsOSDExternal, display.possibleMaxNits != nil, let nits = display.nits {
                 display.fullRangeUserBrightness = value.d.map(from: (0, 100), to: (0, 1))
                 display.showSoftwareOSD(
                     image: "sun.max",
