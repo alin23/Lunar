@@ -1324,6 +1324,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                     }
                     d.otherDisplays.forEach { $0.main = false }
                 }
+                if flags.has(someOf: [.desktopShapeChangedFlag, .setMainFlag]) {
+                    DC.reconfigure()
+                }
                 return
             }
 
