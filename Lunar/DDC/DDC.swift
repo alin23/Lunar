@@ -784,12 +784,6 @@ final class IOServiceDetector {
 // MARK: - DDC
 
 enum DDC {
-    static let queueKey = DispatchSpecificKey<String>()
-    static let queue: DispatchQueue = {
-        let q = DispatchQueue(label: "DDC", qos: .userInteractive, autoreleaseFrequency: .workItem)
-        q.setSpecific(key: queueKey, value: "DDC")
-        return q
-    }()
     @Atomic static var apply = true
     @Atomic static var applyLimits = true
     static let requestDelay: useconds_t = 20000
@@ -809,17 +803,7 @@ enum DDC {
     }
 
     static func sync<T>(barrier: Bool = false, _ action: () -> T) -> T {
-        guard !Thread.isMainThread else {
-            return action()
-        }
-
-        if let q = DispatchQueue.current, q == queue {
-            return action()
-        }
-        if let q = DispatchQueue.getSpecific(key: queueKey), q == "DDC" {
-            return action()
-        }
-        return queue.sync(flags: barrier ? [.barrier] : [], execute: action)
+        mainThread(action)
     }
 
     #if arch(arm64)
@@ -865,7 +849,7 @@ enum DDC {
     static var ioRegistryTreeChanged: PassthroughSubject<Bool, Never> = {
         let p = PassthroughSubject<Bool, Never>()
 
-        p.debounce(for: .seconds(1), scheduler: queue)
+        p.debounce(for: .seconds(1), scheduler: RunLoop.main)
             .sink { _ in
                 checkDisconnectedDisplays()
                 guard !DC.screensSleeping, !DC.locked else { return }
@@ -891,16 +875,13 @@ enum DDC {
         delayDDCAfterWake && waitAfterWakeSeconds > 0 && wakeTime != Date.distantPast && timeSince(wakeTime) > waitAfterWakeSeconds.d
     }
 
+    static func async(_ action: @escaping () -> Void) {
+        mainAsync(action)
+    }
+
     @discardableResult
     static func asyncAfter(ms: Int, _ action: @escaping () -> Void) -> DispatchWorkItem {
-        let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
-
-        let workItem = DispatchWorkItem(name: "DDC Async After") {
-            action()
-        }
-        queue.asyncAfter(deadline: deadline, execute: workItem.workItem)
-
-        return workItem
+        mainAsyncAfter(ms: ms, action)
     }
 
     #if arch(arm64)
@@ -1027,7 +1008,7 @@ enum DDC {
         }
 
         #if DEBUG
-            // return displayIDs
+            return displayIDs
             if !displayIDs.isEmpty {
                 // displayIDs.append(TEST_DISPLAY_PERSISTENT_ID)
                 return displayIDs

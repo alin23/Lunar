@@ -75,11 +75,6 @@ final class AppleNativeControl: Control {
             let currentBrightness = CoreDisplay_Display_GetUserBrightness(display.id)
             let brightnessToSet = currentBrightness < 0.5 ? currentBrightness + 0.01 : currentBrightness - 0.01
             CoreDisplay_Display_SetUserBrightness(display.id, brightnessToSet)
-            if #available(macOS 14.0, *) {
-                // not needed
-            } else {
-                DisplayServicesBrightnessChanged(display.id, brightnessToSet)
-            }
 
             let newBrightness = CoreDisplay_Display_GetUserBrightness(display.id)
 
@@ -88,11 +83,6 @@ final class AppleNativeControl: Control {
             }
 
             CoreDisplay_Display_SetUserBrightness(display.id, currentBrightness)
-            if #available(macOS 14.0, *) {
-                // not needed
-            } else {
-                DisplayServicesBrightnessChanged(display.id, currentBrightness)
-            }
             self.method = method
             return true
         case .displayServices:
@@ -161,11 +151,6 @@ final class AppleNativeControl: Control {
             updateNits()
         }
 
-        if #available(macOS 14.0, *) {
-            // not needed
-        } else {
-            DisplayServicesBrightnessChanged(display.id, br)
-        }
         display.lastNativeBrightness = br
         return success
     }
@@ -290,11 +275,6 @@ final class AppleNativeControl: Control {
                     display.shouldStopBrightnessTransition = false
 
                     DisplayServicesSetBrightnessSmooth(id, br.f - oldBrFloat)
-                    if #available(macOS 14.0, *) {
-                        // not needed
-                    } else {
-                        DisplayServicesBrightnessChanged(id, br)
-                    }
 
                     updateNitsWithRetry()
                     smoothTransitionWatcher = Repeater(every: 0.01, times: 50, name: "smoothTransitionWatcherAppleNative", onFinish: {
@@ -303,12 +283,6 @@ final class AppleNativeControl: Control {
                             DisplayServicesSetLinearBrightness(id, br.f)
                         }
                         display.lastWrittenBrightness = self.getBrightness() ?? display.lastWrittenBrightness
-
-                        if #available(macOS 14.0, *) {
-                            // not needed
-                        } else {
-                            DisplayServicesBrightnessChanged(id, br)
-                        }
                         display.inSmoothTransition = false
                     }, onCancel: {
                         display.lastWrittenBrightness = self.getBrightness() ?? display.lastWrittenBrightness

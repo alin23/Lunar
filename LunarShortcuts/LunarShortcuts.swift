@@ -72,6 +72,7 @@ final class Screen: NSObject, AppEntity, ExpressibleByStringLiteral {
         supportsXDR = display.supportsEnhance
         hdr = display.hdr
         xdr = display.xdr
+        fullRange = display.fullRange
         subzero = display.subzero
         blackout = display.blackout
         facelight = display.facelight
@@ -83,6 +84,16 @@ final class Screen: NSObject, AppEntity, ExpressibleByStringLiteral {
         brightnessContrast = display.preciseBrightnessContrast
         subzeroDimming = display.subzeroDimming.d
         xdrBrightness = display.xdrBrightness.d
+        #if arch(arm64)
+            nits = display.nits ?? 0
+            maxNits = display.possibleMaxNits ?? display.maxNits
+        #else
+            nits = 0
+            maxNits = 0
+        #endif
+
+        supportsDDC = display.hasDDC
+        supportsAppleNative = display.isNative
     }
 
     static let sidecar = Screen(id: UInt32.max.u32 - 36, name: "Sidecar (most recent)", serial: "sidecar", display: nil, isDynamicFilter: true)
@@ -113,6 +124,10 @@ final class Screen: NSObject, AppEntity, ExpressibleByStringLiteral {
     @objc var subzeroDimming: Double
     @Property(title: "XDR Brightness")
     @objc var xdrBrightness: Double
+    @Property(title: "Nits (0 if unknown)")
+    @objc var nits: Double
+    @Property(title: "Max Nits (0 if unknown)")
+    @objc var maxNits: Double
 
     @Property(title: "is External")
     @objc var isExternal: Bool
@@ -129,6 +144,11 @@ final class Screen: NSObject, AppEntity, ExpressibleByStringLiteral {
     @Property(title: "Rotation")
     @objc var rotation: Int
 
+    @Property(title: "supports DDC control")
+    @objc var supportsDDC: Bool
+    @Property(title: "supports Apple Native control")
+    @objc var supportsAppleNative: Bool
+
     @Property(title: "supports HDR")
     @objc var supportsHDR: Bool
     @Property(title: "supports XDR")
@@ -137,6 +157,8 @@ final class Screen: NSObject, AppEntity, ExpressibleByStringLiteral {
     @objc var hdr: Bool
     @Property(title: "XDR enabled")
     @objc var xdr: Bool
+    @Property(title: "Full Range (new XDR) enabled")
+    @objc var fullRange: Bool
     @Property(title: "Sub-zero enabled")
     @objc var subzero: Bool
     @Property(title: "BlackOut enabled")
@@ -174,7 +196,7 @@ final class Screen: NSObject, AppEntity, ExpressibleByStringLiteral {
         guard let other = object as? Screen else {
             return false
         }
-        return id == other.id && serial == other.serial
+        return serial == other.serial
     }
 }
 
@@ -215,70 +237,83 @@ struct ScreenQuery: EntityPropertyQuery {
             LessThanComparator { NSPredicate(format: "id < %d", $0) }
         }
         Property(\.$isExternal) {
-            EqualToComparator { _ in NSPredicate(format: "isExternal = YES") }
-            NotEqualToComparator { _ in NSPredicate(format: "isExternal = NO") }
+            EqualToComparator { NSPredicate(format: "isExternal = %@", $0) }
+            NotEqualToComparator { NSPredicate(format: "isExternal != %@", $0) }
         }
         Property(\.$isBuiltin) {
-            EqualToComparator { _ in NSPredicate(format: "isBuiltin = YES") }
-            NotEqualToComparator { _ in NSPredicate(format: "isBuiltin = NO") }
+            EqualToComparator { NSPredicate(format: "isBuiltin = %@", $0) }
+            NotEqualToComparator { NSPredicate(format: "isBuiltin != %@", $0) }
         }
         Property(\.$isSidecar) {
-            EqualToComparator { _ in NSPredicate(format: "isSidecar = YES") }
-            NotEqualToComparator { _ in NSPredicate(format: "isSidecar = NO") }
+            EqualToComparator { NSPredicate(format: "isSidecar = %@", $0) }
+            NotEqualToComparator { NSPredicate(format: "isSidecar != %@", $0) }
         }
         Property(\.$isAirplay) {
-            EqualToComparator { _ in NSPredicate(format: "isAirplay = YES") }
-            NotEqualToComparator { _ in NSPredicate(format: "isAirplay = NO") }
+            EqualToComparator { NSPredicate(format: "isAirplay = %@", $0) }
+            NotEqualToComparator { NSPredicate(format: "isAirplay != %@", $0) }
         }
         Property(\.$isVirtual) {
-            EqualToComparator { _ in NSPredicate(format: "isVirtual = YES") }
-            NotEqualToComparator { _ in NSPredicate(format: "isVirtual = NO") }
+            EqualToComparator { NSPredicate(format: "isVirtual = %@", $0) }
+            NotEqualToComparator { NSPredicate(format: "isVirtual != %@", $0) }
         }
         Property(\.$isProjector) {
-            EqualToComparator { _ in NSPredicate(format: "isProjector = YES") }
-            NotEqualToComparator { _ in NSPredicate(format: "isProjector = NO") }
+            EqualToComparator { NSPredicate(format: "isProjector = %@", $0) }
+            NotEqualToComparator { NSPredicate(format: "isProjector != %@", $0) }
         }
         Property(\.$rotation) {
             EqualToComparator { NSPredicate(format: "rotation = %d", $0) }
-            NotEqualToComparator { NSPredicate(format: "rotation != %d", $0) }
+            NotEqualToComparator { NSPredicate(format: "rotation != %!d", $0) }
+        }
+
+        Property(\.$supportsDDC) {
+            EqualToComparator { NSPredicate(format: "supportsDDC = %@", $0) }
+            NotEqualToComparator { NSPredicate(format: "supportsDDC != %@", $0) }
+        }
+        Property(\.$supportsAppleNative) {
+            EqualToComparator { NSPredicate(format: "supportsAppleNative = %@", $0) }
+            NotEqualToComparator { NSPredicate(format: "supportsAppleNative != %@", $0) }
         }
 
         Property(\.$supportsHDR) {
-            EqualToComparator { _ in NSPredicate(format: "supportsHDR = YES") }
-            NotEqualToComparator { _ in NSPredicate(format: "supportsHDR = NO") }
+            EqualToComparator { NSPredicate(format: "supportsHDR = %@", $0) }
+            NotEqualToComparator { NSPredicate(format: "supportsHDR != %@", $0) }
         }
         Property(\.$supportsXDR) {
-            EqualToComparator { _ in NSPredicate(format: "supportsXDR = YES") }
-            NotEqualToComparator { _ in NSPredicate(format: "supportsXDR = NO") }
+            EqualToComparator { NSPredicate(format: "supportsXDR = %@", $0) }
+            NotEqualToComparator { NSPredicate(format: "supportsXDR != %@", $0) }
         }
         Property(\.$hdr) {
-            EqualToComparator { _ in NSPredicate(format: "hdr = YES") }
-            NotEqualToComparator { _ in NSPredicate(format: "hdr = NO") }
+            EqualToComparator { NSPredicate(format: "hdr = %@", $0) }
+            NotEqualToComparator { NSPredicate(format: "hdr != %@", $0) }
         }
         Property(\.$xdr) {
-            EqualToComparator { _ in NSPredicate(format: "xdr = YES") }
-            NotEqualToComparator { _ in NSPredicate(format: "xdr = NO") }
+            EqualToComparator { NSPredicate(format: "xdr = %@", $0) }
+            NotEqualToComparator { NSPredicate(format: "xdr != %@", $0) }
+        }
+        Property(\.$fullRange) {
+            EqualToComparator { NSPredicate(format: "fullRange = %@", $0) }
+            NotEqualToComparator { NSPredicate(format: "fullRange != %@", $0) }
         }
         Property(\.$subzero) {
-            EqualToComparator { _ in NSPredicate(format: "subzero = YES") }
-            NotEqualToComparator { _ in NSPredicate(format: "subzero = NO") }
+            EqualToComparator { NSPredicate(format: "subzero = %@", $0) }
+            NotEqualToComparator { NSPredicate(format: "subzero != %@", $0) }
         }
         Property(\.$blackout) {
-            EqualToComparator { _ in NSPredicate(format: "blackout = YES") }
-            NotEqualToComparator { _ in NSPredicate(format: "blackout = NO") }
+            EqualToComparator { NSPredicate(format: "blackout = %@", $0) }
+            NotEqualToComparator { NSPredicate(format: "blackout != %@", $0) }
         }
         Property(\.$facelight) {
-            EqualToComparator { _ in NSPredicate(format: "facelight = YES") }
-            NotEqualToComparator { _ in NSPredicate(format: "facelight = NO") }
+            EqualToComparator { NSPredicate(format: "facelight = %@", $0) }
+            NotEqualToComparator { NSPredicate(format: "facelight != %@", $0) }
         }
         Property(\.$adaptive) {
-            EqualToComparator { _ in NSPredicate(format: "adaptive = YES") }
-            NotEqualToComparator { _ in NSPredicate(format: "adaptive = NO") }
+            EqualToComparator { NSPredicate(format: "adaptive = %@", $0) }
+            NotEqualToComparator { NSPredicate(format: "adaptive != %@", $0) }
         }
 
         Property(\.$systemAdaptiveBrightness) {
-            EqualToComparator { _ in NSPredicate(format: "systemAdaptiveBrightness = YES") }
-            NotEqualToComparator { _ in NSPredicate(format: "systemAdaptiveBrightness = NO") }
+            EqualToComparator { NSPredicate(format: "systemAdaptiveBrightness = %@", $0) }
+            NotEqualToComparator { NSPredicate(format: "systemAdaptiveBrightness != %@", $0) }
         }
 
         Property(\.$brightness) {
@@ -320,6 +355,22 @@ struct ScreenQuery: EntityPropertyQuery {
             LessThanOrEqualToComparator { NSPredicate(format: "xdrBrightness <= %f", $0 / 100.0) }
             GreaterThanComparator { NSPredicate(format: "xdrBrightness > %f", $0 / 100.0) }
             LessThanComparator { NSPredicate(format: "xdrBrightness < %f", $0 / 100.0) }
+        }
+        Property(\.$nits) {
+            EqualToComparator { NSPredicate(format: "nits = %f", $0) }
+            NotEqualToComparator { NSPredicate(format: "nits != %f", $0) }
+            GreaterThanOrEqualToComparator { NSPredicate(format: "nits >= %f", $0) }
+            LessThanOrEqualToComparator { NSPredicate(format: "nits <= %f", $0) }
+            GreaterThanComparator { NSPredicate(format: "nits > %f", $0) }
+            LessThanComparator { NSPredicate(format: "nits < %f", $0) }
+        }
+        Property(\.$maxNits) {
+            EqualToComparator { NSPredicate(format: "maxNits = %f", $0) }
+            NotEqualToComparator { NSPredicate(format: "maxNits != %f", $0) }
+            GreaterThanOrEqualToComparator { NSPredicate(format: "maxNits >= %f", $0) }
+            LessThanOrEqualToComparator { NSPredicate(format: "maxNits <= %f", $0) }
+            GreaterThanComparator { NSPredicate(format: "maxNits > %f", $0) }
+            LessThanComparator { NSPredicate(format: "maxNits < %f", $0) }
         }
     }
 
@@ -738,6 +789,47 @@ struct ToggleAudioMuteIntent: AppIntent {
         try controlScreen(screen: $screen, property: .mute, value: state.rawValue, skipMissingScreen: skipMissingScreen)
         return .result(value: screen.display?.audioMuted ?? state.bool)
     }
+}
+
+@available(iOS 16, macOS 13, *)
+struct GetSensorLuxIntent: AppIntent {
+    init() {}
+
+    static var title: LocalizedStringResource = "Get Ambient Light (in lux)"
+    static var description = IntentDescription("Gets the ambient light in lux if there is an ambient light sensor available.", categoryName: "Sensors")
+
+    static var parameterSummary: some ParameterSummary {
+        Summary("Get ambient light in lux") {
+            \.$average
+            \.$skipNoReading
+        }
+    }
+
+    @Parameter(title: "Get an average of the last 15 readings")
+    var average: Bool
+
+    @Parameter(title: "Skip action if lux can't be read (return -1)")
+    var skipNoReading: Bool
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ReturnsValue<Double> {
+        let lux =
+            if SensorMode.specific.externalSensorAvailable, let lastLux = SensorMode.specific.lastAmbientLight {
+                lastLux
+            } else {
+                average ? (SensorMode.computeLuxWindowAverage() ?? -1.0) : (SensorMode.getInternalSensorLux() ?? -1.0)
+            }
+
+        if lux == -1.0 {
+            guard skipNoReading else {
+                throw IntentError.message("Couldn't read the ambient light sensor.")
+            }
+            return .result(value: -1.0)
+        }
+
+        return .result(value: lux)
+    }
+
 }
 
 @available(iOS 16, macOS 13, *)

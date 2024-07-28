@@ -85,7 +85,7 @@ struct QuickActionsLayoutView: View {
                         if dc.externalActiveDisplays.contains(where: { $0.possibleMaxNits != nil && $0.nits != nil }) {
                             SettingsToggle(text: "Show nits value in the brightness OSD (external monitors)", setting: $showNitsOSDExternal)
                         }
-                        if dc.activeDisplayList.contains(where: { $0.isBuiltin != nil && $0.possibleMaxNits != nil && $0.nits != nil }) {
+                        if dc.activeDisplayList.contains(where: { $0.isBuiltin && $0.possibleMaxNits != nil && $0.nits != nil }) {
                             SettingsToggle(text: "Show nits value in the brightness OSD (built-in screen)", setting: $showNitsOSDBuiltin)
                         }
                     #endif

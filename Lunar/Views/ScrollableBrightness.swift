@@ -105,16 +105,14 @@ final class ScrollableBrightness: NSView {
 
     func addObserver(_ display: Display) {
         display.$brightness
-            .throttle(for: .milliseconds(50), scheduler: DDC.queue, latest: true)
+            .throttle(for: .milliseconds(50), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] newBrightness in
-                mainAsync {
-                    guard let display = self?.display, display.id != GENERIC_DISPLAY_ID else { return }
-                    let minBrightness = display.minBrightness.uint16Value
-                    let maxBrightness = display.maxBrightness.uint16Value
+                guard let display = self?.display, display.id != GENERIC_DISPLAY_ID else { return }
+                let minBrightness = display.minBrightness.uint16Value
+                let maxBrightness = display.maxBrightness.uint16Value
 
-                    let newBrightness = cap(newBrightness.uint16Value, minVal: minBrightness, maxVal: maxBrightness)
-                    self?.currentValue?.stringValue = String(newBrightness)
-                }
+                let newBrightness = cap(newBrightness.uint16Value, minVal: minBrightness, maxVal: maxBrightness)
+                self?.currentValue?.stringValue = String(newBrightness)
             }.store(in: &displayObservers, for: "brightness")
         display.$minBrightness
             .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)

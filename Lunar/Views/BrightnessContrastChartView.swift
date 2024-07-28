@@ -451,7 +451,7 @@ final class BrightnessContrastChartView: LineChartView {
     }
 }
 
-extension DateInRegion: Strideable {
+extension DateInRegion: Strideable { // @retroactive Strideable {
     public func advanced(by n: Int) -> DateInRegion {
         dateByAdding(n, .minute)
     }

@@ -250,7 +250,7 @@ func swizzleScrollWheel(scrollView: AnyObject) {
 @_spi(Advanced) import SwiftUIIntrospect
 
 extension View {
-    @ViewBuilder
+    @ViewBuilder @MainActor
     func wrappedInScrollView(when condition: Bool, pauseScrolling: Bool = false) -> some View {
         if condition {
             ScrollView(.vertical, showsIndicators: false) {

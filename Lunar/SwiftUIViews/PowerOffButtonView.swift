@@ -25,7 +25,7 @@ struct PowerOffButtonView: View {
             return "Power On"
         }
 
-        if allowBlackOutOnSingleScreen, DC.activeDisplayCount == 1 {
+        if allowBlackOutOnSingleScreen, DC.connectedDisplayCount == 1 {
             if km.optionKeyPressed {
                 return display.hasDDC ? "Power Off" : "Needs DDC"
             }

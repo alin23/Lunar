@@ -78,9 +78,9 @@ let ALL_DISPLAYS: Display = {
         minContrast: 0,
         maxContrast: 100
     )
+    d.isAllDisplays = true
     d.active = false
     d.canChangeContrast = true
-    d.isAllDisplays = true
     d.enabledControls = [
         .appleNative: false,
         .ddc: false,
@@ -567,9 +567,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             showOrientation = canRotate && CachedDefaults[.showOrientationInQuickActions] && (!isBuiltin || CachedDefaults[.showOrientationForBuiltinInQuickActions])
             withoutModeChangeAsk {
                 withoutApply {
-                    withoutDDC {
-                        rotation = CGDisplayRotation(id).intround
-                        enhanced = Self.getWindowController(id, type: "hdr") != nil
+                    withoutDDC { [weak self] in
+                        self?.rotation = CGDisplayRotation(id).intround
+                        self?.enhanced = Self.getWindowController(id, type: "hdr") != nil
                     }
                 }
             }
@@ -722,9 +722,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             showOrientation = canRotate && CachedDefaults[.showOrientationInQuickActions] && (!isBuiltin || CachedDefaults[.showOrientationForBuiltinInQuickActions])
             withoutModeChangeAsk {
                 withoutApply {
-                    withoutDDC {
-                        rotation = CGDisplayRotation(id).intround
-                        enhanced = Self.getWindowController(id, type: "hdr") != nil
+                    withoutDDC { [weak self] in
+                        self?.rotation = CGDisplayRotation(id).intround
+                        self?.enhanced = Self.getWindowController(id, type: "hdr") != nil
                     }
                 }
             }
@@ -2003,9 +2003,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                     )
                 }
             }
-            withoutDDC {
-                panelMode = panel?.currentMode
-                modeNumber = panelMode?.modeNumber ?? -1
+            withoutDDC { [weak self] in
+                self?.panelMode = self?.panel?.currentMode
+                self?.modeNumber = self?.panelMode?.modeNumber ?? -1
             }
         }
     }
@@ -3001,7 +3001,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     var isWiredInWirelessSet: Bool {
-        guard DC.activeDisplayCount == 2, let other = otherDisplays.first else { return false }
+        guard DC.connectedDisplayCount == 2, let other = otherDisplays.first else { return false }
 
         return !self.isDummy && self.supportsGammaByDefault && !other.supportsGammaByDefault
     }
@@ -3017,7 +3017,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     var isInNonWirelessHardwareMirrorSet: Bool {
         guard isInMirrorSet else { return false }
-        if DC.activeDisplayCount == 2, let other = secondaryMirror,
+        if DC.connectedDisplayCount == 2, let other = secondaryMirror,
            other.supportsGammaByDefault, !self.supportsGammaByDefault, other.blackOutEnabled
         {
             return false
@@ -4450,7 +4450,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         set {
             DC.blackOut(
                 display: id, state: newValue ? .on : .off,
-                mirroringAllowed: DC.activeDisplayCount == 1 ? false : blackOutMirroringAllowed
+                mirroringAllowed: DC.connectedDisplayCount == 1 ? false : blackOutMirroringAllowed
             )
             blackOutEnabled = newValue
         }
@@ -4705,14 +4705,14 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         #if arch(arm64)
-            if DC.activeDisplayCount > 1 {
+            if DC.connectedDisplayCount > 1 {
                 let shouldDisconnect: Bool = if CachedDefaults[.newBlackOutDisconnect], !DC.displayLinkRunning, !isWiredInWirelessSet {
                     !KM.commandKeyPressed
                 } else {
                     KM.commandKeyPressed
                 }
 
-                if #available(macOS 13, *), !KM.shiftKeyPressed, !blackOutEnabled, DC.activeDisplayCount > 1, shouldDisconnect {
+                if #available(macOS 13, *), !KM.shiftKeyPressed, !blackOutEnabled, DC.connectedDisplayCount > 1, shouldDisconnect {
                     DC.dis(id)
                     return
                 }
@@ -4722,7 +4722,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         DC.blackOut(
             display: id,
             state: blackOutEnabled ? .off : .on,
-            mirroringAllowed: !KM.shiftKeyPressed && blackOutMirroringAllowed && DC.activeDisplayCount > 1
+            mirroringAllowed: !KM.shiftKeyPressed && blackOutMirroringAllowed && DC.connectedDisplayCount > 1
         )
     }
 
@@ -4800,7 +4800,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     func refreshPanel() {
         withoutModeChangeAsk {
-            withoutDDC {
+            withoutDDC { [weak self] in
+                guard let self else { return }
+
                 rotation = CGDisplayRotation(id).intround
 
                 guard let mgr = DisplayController.panelManager else { return }
@@ -6347,7 +6349,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         #endif
     }
 
-    @inline(__always) func withoutDDCLimits(_ block: () -> Void) {
+    @inline(__always) func withoutDDCLimits(_ block: @escaping () -> Void) {
         DDC.sync {
             DDC.applyLimits = false
             block()
@@ -6379,7 +6381,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         reapplyPreciseValue = true
     }
 
-    @inline(__always) func withoutDDC(_ block: () -> Void) {
+    @inline(__always) func withoutDDC(_ block: @escaping () -> Void) {
         DDC.sync {
             DDC.apply = false
             block()

@@ -881,6 +881,7 @@ final class DisplayController: ObservableObject {
         return nil
     }
 
+    var connectedDisplayCount: Int { activeDisplayList.count + unmanagedDisplays.count }
     var activeDisplayCount: Int {
         #if DEBUG
             return activeDisplayList.filter { !$0.isForTesting }.count
@@ -896,7 +897,7 @@ final class DisplayController: ObservableObject {
                 return
             }
 
-            guard activeDisplayCount == 1, let display = firstNonTestingDisplay,
+            guard connectedDisplayCount == 1, let display = firstNonTestingDisplay,
                   display.control is AppleNativeControl || CachedDefaults[.allowHDREnhanceContrast]
             else { return }
 
@@ -915,7 +916,7 @@ final class DisplayController: ObservableObject {
 
     var subzeroContrastEnabled: Bool = Defaults[.subzeroContrast] {
         didSet {
-            guard activeDisplayCount == 1, let display = firstNonTestingDisplay else { return }
+            guard connectedDisplayCount == 1, let display = firstNonTestingDisplay else { return }
 
             guard subzeroContrastEnabled, display.subzero else {
                 setXDRContrast(0.0)
@@ -1317,6 +1318,11 @@ final class DisplayController: ObservableObject {
         case disabledManually
         case enabledAutomatically
         case disabledAutomatically
+    }
+
+    enum KVO<T> {
+        case initial(T)
+        case subsequent(prior: T, new: T)
     }
 
     static var serials: [CGDirectDisplayID: String] = [:]
@@ -1937,7 +1943,7 @@ final class DisplayController: ObservableObject {
             self.xdrContrastEnabled = CachedDefaults[.xdrContrast]
         }.store(in: &observers)
         subzeroContrastFactorPublisher.sink { [self] change in
-            if activeDisplayCount == 1, let d = firstNonTestingDisplay {
+            if connectedDisplayCount == 1, let d = firstNonTestingDisplay {
                 setXDRContrast(d.computeXDRContrast(xdrBrightness: d.softwareBrightness, xdrContrastFactor: change.newValue, maxBrightness: 0.0))
             }
             subzeroContrastEnabled = CachedDefaults[.subzeroContrast]
@@ -2705,18 +2711,24 @@ final class DisplayController: ObservableObject {
             reenableAdaptiveOutOfClamshellMode()
         }
     }
-
     func listenForRunningApps() {
         let appIdentifiers = NSWorkspace.shared.runningApplications.map { app in app.bundleIdentifier }.compactMap { $0 }
         runningAppExceptions = datastore.appExceptions(identifiers: appIdentifiers) ?? []
         adaptBrightness()
 
-        NSWorkspace.shared.publisher(for: \.runningApplications, options: [.new])
+        let runningAppsObserver = NSWorkspace.shared
+            .publisher(for: \.runningApplications, options: [.new, .prior])
+            .collect(2)
+            .map { (old: $0[0], new: $0[1]) }
+
+        runningAppsObserver
             .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
             .sink { [self] change in
-                let identifiers = change.compactMap(\.bundleIdentifier)
+                let oldIdentifiers = Set(change.old.compactMap(\.bundleIdentifier))
+                let identifiers = Set(change.new.compactMap(\.bundleIdentifier))
+                guard oldIdentifiers != identifiers else { return }
 
-                runningAppExceptions = datastore.appExceptions(identifiers: Array(identifiers.uniqued())) ?? []
+                runningAppExceptions = datastore.appExceptions(identifiers: Array(identifiers)) ?? []
                 if !runningAppExceptions.isEmpty {
                     log.info("Running app presets: \(runningAppExceptions.map(\.name))")
                 }
@@ -2726,18 +2738,11 @@ final class DisplayController: ObservableObject {
                     adaptBrightness()
                     return
                 }
-//                let nonAdaptiveDisplays = activeDisplayList.filter { !$0.adaptive && !$0.blackOutEnabled && !$0.enhanced }
                 adaptBrightness(
                     for: activeDisplayList.filter { d in
                         d.adaptive || (d.isBuiltin && runningAppExceptions.contains(where: \.applyBuiltin))
                     }
                 )
-
-//                for display in nonAdaptiveDisplays {
-//                    ManualMode.specific.withForce {
-//                        ManualMode.specific.adapt(display)
-//                    }
-//                }
             }
             .store(in: &observers)
 

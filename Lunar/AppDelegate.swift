@@ -1020,6 +1020,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     }
 
     func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows _: Bool) -> Bool {
+        guard CachedDefaults[.hideMenuBarIcon] || didBecomeActiveAtLeastOnce else {
+            return true
+        }
+
         showWindow()
         NSRunningApplication.current.activate(options: .activateIgnoringOtherApps)
         return true
@@ -1460,7 +1464,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
                     let referenceEDR = d.referenceEDR
                     let potentialEDR = d.potentialEDR
-                    debug("referenceEDR: \(referenceEDR) lastReferenceEDR: \(d.lastReferenceEDR)")
+                    debug("referenceEDR: \(referenceEDR) lastReferenceEDR: \(d.lastReferenceEDR ?? -1)")
                     if d.lastReferenceEDR != referenceEDR || d.lastPotentialEDR != potentialEDR {
                         d.refetchPanelProps()
                     }
@@ -2143,9 +2147,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 do {
                     try socket.connect(to: opts.host, port: LUNAR_CLI_PORT)
                     try socket.write(from: "\(key)\(CLI_ARG_SEPARATOR)\(argString)")
+                    var statusCode: Int32 = 0
 
-                    if let response = try (socket.readString())?.trimmed, !response.isEmpty {
-                        print(response)
+                    if var response = try (socket.readString())?.trimmed {
+                        if let m = STATUS_CODE_REGEX.findFirst(in: response) {
+                            statusCode = m.group(at: 1)?.i32 ?? 0
+                            response.removeSubrange(m.range)
+                        }
+                        if !response.isEmpty {
+                            print(response)
+                        }
                     }
                     if !Set(argList).intersection(["listen", "--listen", "RegisterForBrightnessChangeNotifications", "RegisterForAmbientLightCompensationNotifications"]).isEmpty {
                         var line = try socket.readString()
@@ -2154,7 +2165,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                             line = try socket.readString()
                         }
                     }
-                    cliExit(0)
+                    cliExit(statusCode)
                 } catch {
                     print(error.localizedDescription)
                     cliExit(1)
@@ -2187,6 +2198,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
         let release = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "1"
         SentrySDK.start { options in
+            options.enableCaptureFailedRequests = false
             options.dsn = SENTRY_DSN
             options.releaseName = "v\(release)"
             options.dist = release

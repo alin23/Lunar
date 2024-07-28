@@ -228,7 +228,7 @@ enum DisplayFilter: ExpressibleByArgument, Codable, Equatable, CaseIterable {
 
 // MARK: - NSDeviceDescriptionKey + Encodable
 
-extension NSDeviceDescriptionKey: Encodable {
+extension NSDeviceDescriptionKey: Encodable { // @retroactive Encodable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try! container.encode(rawValue)
@@ -644,7 +644,6 @@ struct Lunar: ParsableCommand {
             case SetBrightnessSmooth
             case CanChangeBrightness
             case IsSmartDisplay
-            case BrightnessChanged
 
             case GetPowerMode
             case SetPowerMode
@@ -725,10 +724,6 @@ struct Lunar: ParsableCommand {
                     cliPrint(DisplayServicesCanChangeBrightness(id))
                 case .IsSmartDisplay:
                     cliPrint(DisplayServicesIsSmartDisplay(id))
-                case .BrightnessChanged:
-                    cliPrint("Sending brightness change notification")
-                    cliPrint(DisplayServicesBrightnessChanged(id, value))
-
                 case .GetPowerMode:
                     cliPrint(DisplayServicesGetPowerMode(id))
                 case .SetPowerMode:
@@ -1350,6 +1345,9 @@ struct Lunar: ParsableCommand {
         @Flag(help: "Include all resolutions for panel data in the output")
         var panelDataAllResolutions = false
 
+        @Flag(name: .shortAndLong, help: "Exit with status code 1 if no displays are found or 0 if any display matches the filter. Don't print anything")
+        var quiet = false
+
         @Flag(
             name: .shortAndLong,
             help: "If <property> is passed, try to actively read the property instead of fetching it from cache. Caution: might cause a kernel panic if DDC is too slow to respond!"
@@ -1385,6 +1383,10 @@ struct Lunar: ParsableCommand {
             let displays = (all ? DC.displayList : DC.activeDisplayList).filter { $0.id != ALL_DISPLAYS_ID }
 
             if let displayFilter = display {
+                guard !quiet else {
+                    return cliExit(getFilteredDisplays(displays: displays, filter: displayFilter).isEmpty ? 1 : 0)
+                }
+
                 do {
                     try handleDisplays(
                         displayFilter,
@@ -1401,8 +1403,13 @@ struct Lunar: ParsableCommand {
                     )
                 } catch {
                     cliPrint("\(error)")
+                    return cliExit(1)
                 }
                 return cliExit(0)
+            }
+
+            guard !quiet else {
+                return cliExit(displays.isEmpty ? 1 : 0)
             }
 
             if json {
@@ -1874,7 +1881,9 @@ struct Lunar: ParsableCommand {
                 }
 
                 guard display != .builtin else {
-                    DC.en(1)
+                    if !NSScreen.onlineDisplayIDs.contains(1) {
+                        DC.en(1)
+                    }
                     cliExit(0)
                     return
                 }
@@ -1939,7 +1948,7 @@ struct Lunar: ParsableCommand {
                 )
 
                 guard display != .all else {
-                    if DC.activeDisplayCount == 0 {
+                    if DC.connectedDisplayCount == 0 {
                         DC.en()
                     } else {
                         for id in DC.activeDisplays.keys {
@@ -2302,6 +2311,7 @@ private func handleDisplays(
                 continue
             }
 
+            // Initialize controls
             let oldEnabledControls = display.enabledControls
             if let controls {
                 display.enabledControls = [
@@ -2310,13 +2320,17 @@ private func handleDisplays(
                     .ddc: controls.contains(.ddc),
                     .gamma: controls.contains(.gamma),
                 ]
+                if isServer { display.control = display.getBestControl() }
             }
             defer {
-                if controls != nil {
+                if isServer, controls != nil {
                     display.enabledControls = oldEnabledControls
+                    display.control = display.getBestControl()
                 }
             }
-            display.control = display.getBestControl()
+            if !isServer { display.control = display.getBestControl() }
+            // End initialize controls
+
             if Display.CodingKeys.settableWithControl.contains(property), !display.enabledControls[.gamma]!,
                display.hasSoftwareControl
             {
@@ -2327,6 +2341,7 @@ private func handleDisplays(
                 throw LunarCommandError.propertyNotValid(property.rawValue)
             }
 
+            // Value setter command?
             guard var value else {
                 if !read {
                     log.debug("CLI: Fetching value for \(property.rawValue)")
@@ -2643,6 +2658,12 @@ final class LunarServer {
     func onResponse(_ response: String, socket: Socket) throws {
         let lines = response.split(separator: "\r\n")
         let serverHTTP = lines.first?.contains("HTTP") ?? false
+
+        defer {
+            serverExitCode = 0
+            serverOutput = ""
+        }
+
         do {
             var key = lines
                 .first(where: { $0.lowercased().starts(with: "authorization:") })?
@@ -2677,22 +2698,29 @@ final class LunarServer {
             try mainThreadThrows {
                 try command.run()
             }
+            let statusCode = serverExitCode == 0 ? "" : "Status-Code: \(serverExitCode)\r\n"
+
             if !serverOutput.isEmpty {
                 let jsonHeader = args.contains("--json") ? "Content-Type: application/json\r\n" : ""
                 if serverHTTP {
-                    try socket.write(from: "HTTP/1.1 200 OK\r\n\(jsonHeader)Content-Length: \(serverOutput.count)\r\n\r\n")
+                    try socket.write(from: "HTTP/1.1 200 OK\r\n\(jsonHeader)\(statusCode)Content-Length: \(serverOutput.count)\r\n\r\n")
+                    try socket.write(from: serverOutput)
+                } else {
+                    try socket.write(from: statusCode + serverOutput)
                 }
-                try socket.write(from: serverOutput)
-                serverOutput = ""
             } else if serverHTTP {
-                try socket.write(from: "HTTP/1.1 204 No Content\r\nContent-Length: 0\r\n\r\n")
+                try socket.write(from: "HTTP/1.1 204 No Content\r\n\(statusCode)Content-Length: 0\r\n\r\n")
             }
         } catch {
+            let statusCode = serverExitCode == 0 ? "" : "Status-Code: \(serverExitCode)\r\n"
             let err = Lunar.fullMessage(for: error) + "\n"
+
             if serverHTTP {
-                try socket.write(from: "HTTP/1.1 400 Bad Request\r\nContent-Length: \(err.count)\r\n\r\n")
+                try socket.write(from: "HTTP/1.1 400 Bad Request\r\n\(statusCode)Content-Length: \(err.count)\r\n\r\n")
+                try socket.write(from: err)
+            } else {
+                try socket.write(from: statusCode + err)
             }
-            try socket.write(from: err)
         }
     }
 
@@ -2863,6 +2891,7 @@ struct DisplayStateChange: Equatable {
 var isServer = false
 var isShortcut = false
 var serverOutput = ""
+var serverExitCode: Int32 = 0
 var serverHTTP = false
 func cliSleep(_ time: TimeInterval) {
     guard !isServer else { return }
@@ -2874,6 +2903,7 @@ func cliExit(_ code: Int32) {
         if serverOutput.isEmpty {
             serverOutput = "\n"
         }
+        serverExitCode = code
         return
     }
     exit(code)
@@ -2928,3 +2958,5 @@ let LUNAR_CLI_SCRIPT =
         "\(Bundle.main.bundlePath)/Contents/MacOS/Lunar" @ "$@"
     fi
     """
+
+let STATUS_CODE_REGEX = #"Status-Code:\s*(\d+)\r?\n?"#.r!

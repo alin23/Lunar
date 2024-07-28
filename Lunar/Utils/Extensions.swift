@@ -61,7 +61,6 @@ extension DispatchQueue {
             .global(qos: .utility),
             concurrentQueue,
             serialQueue,
-            DDC.queue,
             CachedDefaults.cache.accessQueue,
             serviceBrowserQueue,
             windowControllerQueue,
@@ -1364,7 +1363,7 @@ extension NSScreen {
     }
 }
 
-extension CGDisplayChangeSummaryFlags: CustomStringConvertible {
+extension CGDisplayChangeSummaryFlags: CustomStringConvertible { // @retroactive CustomStringConvertible {
     public var description: String {
         var result: [String] = []
         if contains(.addFlag) { result.append("added") }

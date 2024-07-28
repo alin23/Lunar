@@ -295,7 +295,7 @@ extension Bundle {
 
 // MARK: - SPUUpdater + ObservableObject
 
-extension SPUUpdater: ObservableObject {}
+extension SPUUpdater: ObservableObject {} // @retroactive ObservableObject {}
 
 // MARK: - DetailToggleStyle
 

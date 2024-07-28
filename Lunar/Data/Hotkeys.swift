@@ -61,7 +61,7 @@ enum HotkeyIdentifier: String, CaseIterable, Codable {
 
 // MARK: - NSEvent.ModifierFlags + Hashable
 
-extension NSEvent.ModifierFlags: Hashable {
+extension NSEvent.ModifierFlags: Hashable { // @retroactive Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(rawValue)
     }

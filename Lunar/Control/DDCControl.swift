@@ -38,32 +38,36 @@ final class DDCControl: Control, ObservableObject {
 
     lazy var brightnessPublisher: PassthroughSubject<ValueRange, Never> = {
         let p = PassthroughSubject<ValueRange, Never>()
-        p.throttle(for: .milliseconds(50), scheduler: DDC.queue, latest: true)
+        p.throttle(for: .milliseconds(50), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] range in
-                guard let self else {
-                    if let display = DC.activeDisplays[range.displayID], let control = display.control as? DDCControl {
-                        _ = control.setBrightnessDebounced(range.value, oldValue: range.oldValue, transition: range.transition)
+                DDC.async { [weak self] in
+                    guard let self else {
+                        if let display = DC.activeDisplays[range.displayID], let control = display.control as? DDCControl {
+                            _ = control.setBrightnessDebounced(range.value, oldValue: range.oldValue, transition: range.transition)
+                        }
+                        return
                     }
-                    return
-                }
 
-                _ = setBrightness(range.value, oldValue: range.oldValue, transition: range.transition, onChange: nil)
+                    _ = setBrightness(range.value, oldValue: range.oldValue, transition: range.transition, onChange: nil)
+                }
             }.store(in: &observers)
         return p
     }()
 
     lazy var contrastPublisher: PassthroughSubject<ValueRange, Never> = {
         let p = PassthroughSubject<ValueRange, Never>()
-        p.throttle(for: .milliseconds(50), scheduler: DDC.queue, latest: true)
+        p.throttle(for: .milliseconds(50), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] range in
-                guard let self else {
-                    if let display = DC.activeDisplays[range.displayID], let control = display.control as? DDCControl {
-                        _ = control.setContrastDebounced(range.value, oldValue: range.oldValue, transition: range.transition)
+                DDC.async { [weak self] in
+                    guard let self else {
+                        if let display = DC.activeDisplays[range.displayID], let control = display.control as? DDCControl {
+                            _ = control.setContrastDebounced(range.value, oldValue: range.oldValue, transition: range.transition)
+                        }
+                        return
                     }
-                    return
-                }
 
-                _ = setContrast(range.value, oldValue: range.oldValue, transition: range.transition, onChange: nil)
+                    _ = setContrast(range.value, oldValue: range.oldValue, transition: range.transition, onChange: nil)
+                }
             }.store(in: &observers)
         return p
     }()

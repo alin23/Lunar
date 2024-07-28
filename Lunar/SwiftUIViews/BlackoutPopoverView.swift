@@ -12,7 +12,7 @@ struct BlackoutPopoverView: View {
             Color.black.brightness(0.02).scaleEffect(1.5)
             VStack(alignment: .leading, spacing: 10) {
                 BlackoutPopoverHeaderView().padding(.bottom)
-                if DC.activeDisplayCount == 1 {
+                if DC.connectedDisplayCount == 1 {
                     BlackoutPopoverRowView(action: "Make screen black", hotkeyText: hotkeyText(id: .blackOut), actionInfo: "(without disabling it)")
                 } else {
                     if newBlackOutDisconnect, #available(macOS 13, *), !dc.displayLinkRunning {
