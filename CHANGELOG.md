@@ -1,3 +1,23 @@
+# 6.8.1
+## Improvements
+
+- Allow disabling the `nits` reading in the brightness OSD for the MacBook screen
+
+![disable nits osd setting](https://files.lunar.fyi/disable-nits-osd-builtin-setting.png)
+
+## Fixes
+
+- Fix overlay staying on the wrong screen after changing main display or the resolution
+- Fix `Not` conditions in Shortcuts not working correctly
+- Fix **XDR Contrast** being applied on **Unmanaged** displays erroneously *(resulting in darkening of monitors when XDR was enabled)*
+- Remove unnecessary brightness refresh when some background apps are launched/quit
+
+## Features
+
+- New **Get ambient light in lux** Shortcut action
+- Make `lunar displays` CLI faster in specific scenarios
+- Add `-q/--quiet` to `lunar displays` to quickly check if specific displays are connected or not
+
 # 6.8.0
 ## Features
 
