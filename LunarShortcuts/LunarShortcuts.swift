@@ -237,28 +237,28 @@ struct ScreenQuery: EntityPropertyQuery {
             LessThanComparator { NSPredicate(format: "id < %d", $0) }
         }
         Property(\.$isExternal) {
-            EqualToComparator { NSPredicate(format: "isExternal = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "isExternal != %@", $0) }
+            EqualToComparator { NSPredicate(format: "isExternal = %d", $0.i) }
+            NotEqualToComparator { NSPredicate(format: "isExternal != %d", $0.i) }
         }
         Property(\.$isBuiltin) {
-            EqualToComparator { NSPredicate(format: "isBuiltin = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "isBuiltin != %@", $0) }
+            EqualToComparator { NSPredicate(format: "isBuiltin = %d", $0.i) }
+            NotEqualToComparator { NSPredicate(format: "isBuiltin != %d", $0.i) }
         }
         Property(\.$isSidecar) {
-            EqualToComparator { NSPredicate(format: "isSidecar = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "isSidecar != %@", $0) }
+            EqualToComparator { NSPredicate(format: "isSidecar = %d", $0.i) }
+            NotEqualToComparator { NSPredicate(format: "isSidecar != %d", $0.i) }
         }
         Property(\.$isAirplay) {
-            EqualToComparator { NSPredicate(format: "isAirplay = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "isAirplay != %@", $0) }
+            EqualToComparator { NSPredicate(format: "isAirplay = %d", $0.i) }
+            NotEqualToComparator { NSPredicate(format: "isAirplay != %d", $0.i) }
         }
         Property(\.$isVirtual) {
-            EqualToComparator { NSPredicate(format: "isVirtual = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "isVirtual != %@", $0) }
+            EqualToComparator { NSPredicate(format: "isVirtual = %d", $0.i) }
+            NotEqualToComparator { NSPredicate(format: "isVirtual != %d", $0.i) }
         }
         Property(\.$isProjector) {
-            EqualToComparator { NSPredicate(format: "isProjector = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "isProjector != %@", $0) }
+            EqualToComparator { NSPredicate(format: "isProjector = %d", $0.i) }
+            NotEqualToComparator { NSPredicate(format: "isProjector != %d", $0.i) }
         }
         Property(\.$rotation) {
             EqualToComparator { NSPredicate(format: "rotation = %d", $0) }
@@ -266,54 +266,54 @@ struct ScreenQuery: EntityPropertyQuery {
         }
 
         Property(\.$supportsDDC) {
-            EqualToComparator { NSPredicate(format: "supportsDDC = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "supportsDDC != %@", $0) }
+            EqualToComparator { NSPredicate(format: "supportsDDC = %d", $0.i) }
+            NotEqualToComparator { NSPredicate(format: "supportsDDC != %d", $0.i) }
         }
         Property(\.$supportsAppleNative) {
-            EqualToComparator { NSPredicate(format: "supportsAppleNative = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "supportsAppleNative != %@", $0) }
+            EqualToComparator { NSPredicate(format: "supportsAppleNative = %d", $0.i) }
+            NotEqualToComparator { NSPredicate(format: "supportsAppleNative != %d", $0.i) }
         }
 
         Property(\.$supportsHDR) {
-            EqualToComparator { NSPredicate(format: "supportsHDR = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "supportsHDR != %@", $0) }
+            EqualToComparator { NSPredicate(format: "supportsHDR = %d", $0.i) }
+            NotEqualToComparator { NSPredicate(format: "supportsHDR != %d", $0.i) }
         }
         Property(\.$supportsXDR) {
-            EqualToComparator { NSPredicate(format: "supportsXDR = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "supportsXDR != %@", $0) }
+            EqualToComparator { NSPredicate(format: "supportsXDR = %d", $0.i) }
+            NotEqualToComparator { NSPredicate(format: "supportsXDR != %d", $0.i) }
         }
         Property(\.$hdr) {
-            EqualToComparator { NSPredicate(format: "hdr = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "hdr != %@", $0) }
+            EqualToComparator { NSPredicate(format: "hdr = %d", $0.i) }
+            NotEqualToComparator { NSPredicate(format: "hdr != %d", $0.i) }
         }
         Property(\.$xdr) {
-            EqualToComparator { NSPredicate(format: "xdr = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "xdr != %@", $0) }
+            EqualToComparator { NSPredicate(format: "xdr = %d", $0.i) }
+            NotEqualToComparator { NSPredicate(format: "xdr != %d", $0.i) }
         }
         Property(\.$fullRange) {
-            EqualToComparator { NSPredicate(format: "fullRange = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "fullRange != %@", $0) }
+            EqualToComparator { NSPredicate(format: "fullRange = %d", $0.i) }
+            NotEqualToComparator { NSPredicate(format: "fullRange != %d", $0.i) }
         }
         Property(\.$subzero) {
-            EqualToComparator { NSPredicate(format: "subzero = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "subzero != %@", $0) }
+            EqualToComparator { NSPredicate(format: "subzero = %d", $0.i) }
+            NotEqualToComparator { NSPredicate(format: "subzero != %d", $0.i) }
         }
         Property(\.$blackout) {
-            EqualToComparator { NSPredicate(format: "blackout = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "blackout != %@", $0) }
+            EqualToComparator { NSPredicate(format: "blackout = %d", $0.i) }
+            NotEqualToComparator { NSPredicate(format: "blackout != %d", $0.i) }
         }
         Property(\.$facelight) {
-            EqualToComparator { NSPredicate(format: "facelight = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "facelight != %@", $0) }
+            EqualToComparator { NSPredicate(format: "facelight = %d", $0.i) }
+            NotEqualToComparator { NSPredicate(format: "facelight != %d", $0.i) }
         }
         Property(\.$adaptive) {
-            EqualToComparator { NSPredicate(format: "adaptive = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "adaptive != %@", $0) }
+            EqualToComparator { NSPredicate(format: "adaptive = %d", $0.i) }
+            NotEqualToComparator { NSPredicate(format: "adaptive != %d", $0.i) }
         }
 
         Property(\.$systemAdaptiveBrightness) {
-            EqualToComparator { NSPredicate(format: "systemAdaptiveBrightness = %@", $0) }
-            NotEqualToComparator { NSPredicate(format: "systemAdaptiveBrightness != %@", $0) }
+            EqualToComparator { NSPredicate(format: "systemAdaptiveBrightness = %d", $0.i) }
+            NotEqualToComparator { NSPredicate(format: "systemAdaptiveBrightness != %d", $0.i) }
         }
 
         Property(\.$brightness) {
