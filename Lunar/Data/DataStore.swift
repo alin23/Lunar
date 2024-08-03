@@ -531,13 +531,13 @@ final class ThreadSafeDictionary<V: Hashable, T>: Collection {
         mutableDictionary = dict
     }
 
-    let accessQueue = DispatchQueue(
-        label: "Dictionary Barrier Queue",
-        attributes: .concurrent
-    )
+    // let accessQueue = DispatchQueue(
+    //     label: "Dictionary Barrier Queue",
+    //     attributes: .concurrent
+    // )
 
     var dictionary: [V: T] {
-        accessQueue.sync {
+        mainThread {
             let dict = Dictionary(uniqueKeysWithValues: mutableDictionary.map { ($0.key, $0.value) })
             return dict
         }
@@ -557,12 +557,12 @@ final class ThreadSafeDictionary<V: Hashable, T>: Collection {
 
     subscript(key: V) -> T? {
         set(newValue) {
-            accessQueue.async(flags: .barrier) { [weak self] in
-                self?.mutableDictionary[key] = newValue
+            mainAsync(flags: .barrier) {
+                self.mutableDictionary[key] = newValue
             }
         }
         get {
-            accessQueue.sync {
+            mainThread {
                 self.mutableDictionary[key]
             }
         }
@@ -570,20 +570,20 @@ final class ThreadSafeDictionary<V: Hashable, T>: Collection {
 
     // has implicity get
     subscript(index: Dictionary<V, T>.Index) -> Dictionary<V, T>.Element {
-        accessQueue.sync {
+        mainThread {
             self.mutableDictionary[index]
         }
     }
 
     func removeAll() {
-        accessQueue.async(flags: .barrier) { [weak self] in
-            self?.mutableDictionary.removeAll()
+        mainAsync(flags: .barrier) {
+            self.mutableDictionary.removeAll()
         }
     }
 
     func removeValue(forKey key: V) {
-        accessQueue.async(flags: .barrier) { [weak self] in
-            self?.mutableDictionary.removeValue(forKey: key)
+        mainAsync(flags: .barrier) {
+            self.mutableDictionary.removeValue(forKey: key)
         }
     }
 

@@ -660,6 +660,14 @@ let SERIAL_NUMBER_HASH = getSerialNumberHash() ?? generateAPIKey()
     return workItem
 }
 
+@inline(__always) func mainAsync(flags: DispatchWorkItemFlags = [], _ action: @escaping () -> Void) {
+    guard !Thread.isMainThread else {
+        action()
+        return
+    }
+    DispatchQueue.main.async(flags: flags, execute: action)
+}
+
 func stringRepresentation(forAddress address: Data) -> String? {
     address.withUnsafeBytes { pointer in
         var hostStr = [Int8](repeating: 0, count: Int(NI_MAXHOST))

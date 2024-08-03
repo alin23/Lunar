@@ -61,7 +61,6 @@ extension DispatchQueue {
             .global(qos: .utility),
             concurrentQueue,
             serialQueue,
-            CachedDefaults.cache.accessQueue,
             serviceBrowserQueue,
             windowControllerQueue,
             smoothDDCQueue,
