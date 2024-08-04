@@ -1410,7 +1410,7 @@ To bring back the screen try any one of the following:
                 return .result()
             }
 
-            DC.dis(screen.id.u32)
+            DC.dis(screen.dynamicDisplay?.id ?? screen.id.u32)
         #endif
         return .result()
     }
@@ -1474,7 +1474,7 @@ If the action fails, try any one of the following to bring back the screen:
                 DC.en(display.id)
                 return .result(value: display.serial)
             }
-            DC.en(screen.id.u32)
+            DC.en(screen.dynamicDisplay?.id ?? screen.id.u32)
             return .result(value: screen.serial)
         #endif
     }
@@ -1547,7 +1547,7 @@ If the reconnect action fails, try any one of the following to bring back the sc
                 return display.serial
             }
 
-            DC.en(screen.id.u32)
+            DC.en(screen.dynamicDisplay?.id ?? screen.id.u32)
             return screen.serial
         }
 
@@ -3021,19 +3021,18 @@ struct MakeMonitorMainIntent: AppIntent {
             return .result()
         }
 
-        guard let mainDisplay = DC.mainDisplay, mainDisplay.id != screen.id else {
+        guard let mainDisplay = DC.mainDisplay, let display = screen.dynamicDisplay, mainDisplay.id != display.id else {
             return .result()
         }
-
         try checkShortcutsLimit()
 
         Display.configure { config in
             if let mainDisplay = DC.mainDisplay, let mainDisplayBounds = mainDisplay.nsScreen?.bounds,
-               mainDisplayBounds.origin == .zero, let display = screen.dynamicDisplay, let displayBounds = display.nsScreen?.bounds
+               mainDisplayBounds.origin == .zero, let displayBounds = display.nsScreen?.bounds
             {
-                CGConfigureDisplayOrigin(config, mainDisplay.id, -displayBounds.origin.x.intround.i32, -displayBounds.origin.y.intround.i32)
+                CGConfigureDisplayOrigin(config, mainDisplay.id, -mainDisplayBounds.width.intround.i32, -displayBounds.origin.y.intround.i32)
             }
-            return CGConfigureDisplayOrigin(config, screen.id.u32, 0, 0) == .success
+            return CGConfigureDisplayOrigin(config, display.id.u32, 0, 0) == .success
         }
         return .result()
     }
