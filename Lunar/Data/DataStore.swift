@@ -538,21 +538,20 @@ final class ThreadSafeDictionary<V: Hashable, T>: Collection {
 
     var dictionary: [V: T] {
         mainThread {
-            let dict = Dictionary(uniqueKeysWithValues: mutableDictionary.map { ($0.key, $0.value) })
-            return dict
+            Dictionary(uniqueKeysWithValues: mutableDictionary.map { ($0.key, $0.value) })
         }
     }
 
     var startIndex: Dictionary<V, T>.Index {
-        mutableDictionary.startIndex
+        mainThread { mutableDictionary.startIndex }
     }
 
     var endIndex: Dictionary<V, T>.Index {
-        mutableDictionary.endIndex
+        mainThread { mutableDictionary.endIndex }
     }
 
     func index(after i: Dictionary<V, T>.Index) -> Dictionary<V, T>.Index {
-        mutableDictionary.index(after: i)
+        mainThread { mutableDictionary.index(after: i) }
     }
 
     subscript(key: V) -> T? {

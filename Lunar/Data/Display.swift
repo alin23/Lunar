@@ -1376,8 +1376,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     let DDC_BLOCKERS_TRAILER = """
     #### Other possible blockers
 
-    * The builtin `HDMI` port of the newer Mac devices
-        * If possible, use only the `Thunderbolt` ports
     * Some `HDMI-to-USB-C` Cables
         * If possible, try a `DisplayPort to USB-C` cable
     * Smart monitors
@@ -3544,13 +3542,15 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 return
             }
 
+            let obs = String(describing: observer)
+            let id = CGDirectDisplayID(UInt(bitPattern: observer))
+
             OperationQueue.main.addOperation {
-                guard let value = (userInfo as NSDictionary?)?["value"] as? Double, let observer else {
-                    DS_LOGGER.debug("Invalid brightness change notification: \(userInfo as NSDictionary?, privacy: .public) observer: \(String(describing: observer), privacy: .public)")
+                guard let value = (userInfo as NSDictionary?)?["value"] as? Double else {
+                    DS_LOGGER.debug("Invalid brightness change notification: \(userInfo as NSDictionary?, privacy: .public) observer: \(obs, privacy: .public)")
                     return
                 }
 
-                let id = CGDirectDisplayID(UInt(bitPattern: observer))
                 guard let display = DC.activeDisplays[id] else {
                     let reason = "display not found"
                     DS_LOGGER.debug("Ignoring brightness change notification. Reason: \(reason, privacy: .public)")

@@ -2937,6 +2937,7 @@ final class DisplayController: ObservableObject {
             )
 
             if display.adaptiveBrightnessEnablerTask != nil {
+                log.debug("Stopping system adaptive brightness enabler task for ID \(display.id)")
                 display.adaptiveBrightnessEnablerTask = nil
             }
 
@@ -3011,8 +3012,9 @@ final class DisplayController: ObservableObject {
                         } else {
                             display.osdState.tip = Text("\(Image(systemName: "sun.max.fill")) Double press Brightness Up to unlock \(maxNits.str(decimals: 0)) nits")
                         }
-                    } else if !display.systemAdaptiveBrightness, display.ambientLightCompensationEnabledByUser, value < maxBrightness, value < oldValue, nits < maxNits / 2 {
+                    } else if !display.systemAdaptiveBrightness, display.ambientLightCompensationEnabledByUser, value < maxBrightness, nits < maxNits / 2 {
                         let id = display.id
+                        log.debug("Re-enabling system adaptive brightness for ID \(id) in 2 seconds")
                         display.adaptiveBrightnessEnablerTask = mainAsyncAfter(ms: 2000, name: "Adaptive brightness enabler") {
                             DC.displays[id]?.systemAdaptiveBrightness = true
                         }

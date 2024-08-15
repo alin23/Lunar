@@ -1362,7 +1362,7 @@ extension NSScreen {
     }
 }
 
-extension CGDisplayChangeSummaryFlags: CustomStringConvertible { // @retroactive CustomStringConvertible {
+extension CGDisplayChangeSummaryFlags: @retroactive CustomStringConvertible {
     public var description: String {
         var result: [String] = []
         if contains(.addFlag) { result.append("added") }

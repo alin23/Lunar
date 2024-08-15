@@ -69,7 +69,7 @@ class PopoverButton<T: NSViewController>: Button {
 
 // MARK: - NSSize + Comparable
 
-extension NSSize: Comparable { // @retroactive Comparable {
+extension NSSize: @retroactive Comparable {
     var area: CGFloat { width * height }
     public static func < (lhs: CGSize, rhs: CGSize) -> Bool {
         lhs.area < rhs.area

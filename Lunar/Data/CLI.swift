@@ -228,7 +228,7 @@ enum DisplayFilter: ExpressibleByArgument, Codable, Equatable, CaseIterable {
 
 // MARK: - NSDeviceDescriptionKey + Encodable
 
-extension NSDeviceDescriptionKey: Encodable { // @retroactive Encodable {
+extension NSDeviceDescriptionKey: @retroactive Encodable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try! container.encode(rawValue)

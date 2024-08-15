@@ -192,7 +192,7 @@ typealias ErrorDictionary = [String: Int]
 
 // MARK: Error
 
-extension ErrorDictionary: Error {} // @retroactive Error {}
+extension ErrorDictionary: @retroactive Error {}
 
 // MARK: - CiaoResolver.CiaoResolverDelegate
 

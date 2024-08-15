@@ -2207,7 +2207,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 options.appHangTimeoutInterval = 10
             #else
                 options.environment = "production"
-                options.appHangTimeoutInterval = 60
+                options.appHangTimeoutInterval = 40
             #endif
             options.enableNetworkTracking = false
 
@@ -2215,7 +2215,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 options.beforeSend = { event in
                     if let exc = event.exceptions?.first, let mech = exc.mechanism, mech.type == "AppHang", let stack = exc.stacktrace {
                         log.warning("App Hanging: \(stack)")
-                        concurrentQueue.asyncAfter(ms: 5000) { restart() }
+                        concurrentQueue.asyncAfter(ms: 5000) { restart(hang: true) }
                         if event.tags == nil {
                             event.tags = ["restarted": "true"]
                         } else {
@@ -3058,7 +3058,7 @@ func resetAllSettings() {
     UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
 }
 
-func tooManyRestarts() -> Bool {
+func tooManyRestarts(hang: Bool = false) -> Bool {
     guard CommandLine.arguments.count == 2, CommandLine.arguments[1].starts(with: "restarts=") else {
         return false
     }
@@ -3067,12 +3067,12 @@ func tooManyRestarts() -> Bool {
     return restarts.filter { now - $0 < 60 }.count > 3
 }
 
-func restart() {
+func restart(hang: Bool = false) {
     restarting = true
     // check if the app was started fresh or if was restarted with arg `restarts=timestamp:timestamp:timestamp`
     // if it was restarted more than 3 times in 1 minute, exit
 
-    guard !tooManyRestarts() else {
+    guard !tooManyRestarts(hang: hang) else {
         exit(1)
     }
     guard CommandLine.arguments.count == 1 || (
