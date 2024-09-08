@@ -59,18 +59,31 @@ final class OSDWindow: NSWindow, NSWindowDelegate {
         at point: NSPoint? = nil,
         closeAfter closeMilliseconds: Int = 3050,
         fadeAfter fadeMilliseconds: Int = 2000,
-        verticalOffset: CGFloat? = nil
+        verticalOffset: CGFloat? = nil,
+        possibleWidth: CGFloat = 0
     ) {
         guard let screen = display?.nsScreen else { return }
         if let point {
-            setFrameOrigin(point)
+            setFrame(NSRect(origin: point, size: frame.size), display: true)
         } else {
             let wsize = frame.size
             let sframe = screen.frame
-            setFrameOrigin(CGPoint(
-                x: (sframe.width / 2 - wsize.width / 2) + sframe.origin.x,
+            let point = CGPoint(
+                x: (sframe.width / 2 - (wsize.width ?! possibleWidth) / 2) + sframe.origin.x,
                 y: sframe.origin.y + (verticalOffset ?? CachedDefaults[.customOSDVerticalOffset].cg)
-            ))
+            )
+            setFrame(NSRect(origin: point, size: wsize), display: wsize.width > 1)
+            if wsize.width <= 1 {
+                mainAsyncAfter(ms: 1) { [weak self] in
+                    guard let wsize = self?.frame.size else { return }
+                    let sframe = screen.frame
+                    let point = CGPoint(
+                        x: (sframe.width / 2 - wsize.width / 2) + sframe.origin.x,
+                        y: sframe.origin.y + (verticalOffset ?? CachedDefaults[.customOSDVerticalOffset].cg)
+                    )
+                    self?.setFrame(NSRect(origin: point, size: wsize), display: true)
+                }
+            }
         }
 
         contentView?.superview?.alphaValue = 1
@@ -902,7 +915,7 @@ extension Display {
 
             guard let osd = osdWindowController?.window as? OSDWindow else { return }
 
-            osd.show(verticalOffset: 100)
+            osd.show(verticalOffset: 100, possibleWidth: NATIVE_OSD_WIDTH * 2)
         }
     }
 
@@ -930,7 +943,7 @@ extension Display {
 
             guard let osd = arrangementOsdWindowController?.window as? OSDWindow else { return }
 
-            osd.show(closeAfter: 0, fadeAfter: 0, verticalOffset: 140)
+            osd.show(closeAfter: 0, fadeAfter: 0, verticalOffset: 140, possibleWidth: NATIVE_OSD_WIDTH * 2)
         }
     }
 
@@ -958,7 +971,7 @@ extension Display {
 
             guard let osd = autoOsdWindowController?.window as? OSDWindow else { return }
 
-            osd.show(closeAfter: 1000, fadeAfter: ((AUTO_OSD_DEBOUNCE_SECONDS + 0.5) * 1000).i)
+            osd.show(closeAfter: 1000, fadeAfter: ((AUTO_OSD_DEBOUNCE_SECONDS + 0.5) * 1000).i, possibleWidth: NATIVE_OSD_WIDTH * 2)
         }
     }
 

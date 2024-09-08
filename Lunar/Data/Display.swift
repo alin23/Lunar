@@ -1208,6 +1208,56 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
+    enum ConnectionType: String, Defaults.Serializable, Codable {
+        case displayport
+        case usbc
+        case dvi
+        case hdmi
+        case vga
+        case mipi
+        case unknown
+
+        static func fromTransport(_ transport: Transport?) -> ConnectionType? {
+            guard let transport else {
+                return nil
+            }
+
+            switch transport.downstream {
+            case "HDMI":
+                return .hdmi
+            case "DVI":
+                return .dvi
+            case "DP":
+                return .displayport
+            case "VGA":
+                return .vga
+            case "MIPI":
+                return .mipi
+            default:
+                return nil
+            }
+        }
+
+        static func fromTransportType(_ transportType: Int) -> ConnectionType? {
+            switch transportType {
+            case 0:
+                .displayport
+            case 1:
+                .usbc
+            case 2:
+                .dvi
+            case 3:
+                .hdmi
+            case 4:
+                .mipi
+            case 5:
+                .vga
+            default:
+                nil
+            }
+        }
+    }
+
     static let DEFAULT_SCHEDULES = [
         BrightnessSchedule(type: .disabled, hour: 0, minute: 30, brightness: 0.7, contrast: 0.65, negative: true),
         BrightnessSchedule(type: .disabled, hour: 10, minute: 20, brightness: 0.8, contrast: 0.70, negative: false),
@@ -1228,6 +1278,29 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     static let MIN_SOFTWARE_BRIGHTNESS: Float = 1.000001
     static let FILLED_CHICLET_OFFSET: Float = 1 / 16
     static let SUBZERO_FILLED_CHICLETS_THRESHOLDS: [Float] = (0 ... 16).map { FILLED_CHICLET_OFFSET * $0.f }
+
+    static var lastNativeBrightnessMapping: [String: Double] = [:]
+    static var ddcWorkingCount: [String: Int] = [:]
+    static var ddcNotWorkingCount: [String: Int] = [:]
+
+    static let LUX_TO_NITS: [Double: Double] = [
+        0: 40,
+        13: 54,
+        23: 61,
+        39: 76,
+        71: 87,
+        80: 100,
+        100: 105,
+        135: 120,
+        160: 134,
+        190: 147,
+        224: 160,
+        313: 193,
+        565: 289,
+        702: 340,
+        800: 400,
+        1000: 500,
+    ]
 
     let osdState = OSDState()
 
@@ -1366,7 +1439,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Atomic var shouldStopContrastTransition = true
     @Atomic var lastWrittenBrightness: UInt16 = 50
     @Atomic var lastWrittenContrast: UInt16 = 50
-    var lastNativeBrightness: Double? = nil
 
     let DEFAULT_DDC_BLOCKERS = """
     * Disable any **Ambient Light Sensing** feature
@@ -1576,6 +1648,261 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     var panelPropsRefetcher: Repeater?
 
     @Published var referencePreset: MPDisplayPreset?
+
+    #if arch(arm64)
+        var nitsBrightnessMapping: [AutoLearnMapping] = []
+        var nitsBrightnessMappingSaver: DispatchWorkItem? { didSet { oldValue?.cancel() } }
+
+        var nitsContrastMapping: [AutoLearnMapping] = []
+        var nitsContrastMappingSaver: DispatchWorkItem? { didSet { oldValue?.cancel() } }
+
+        lazy var brightnessSpline: ((Double) -> Double)? = computeBrightnessSpline(nitsMapping: nitsBrightnessMapping)
+        lazy var contrastSpline: ((Double) -> Double)? = computeContrastSpline(nitsMapping: nitsContrastMapping)
+
+        func saveNitsBrightnessMapping() {
+            nitsBrightnessMappingSaver = mainAsyncAfter(ms: 200) { [weak self] in
+                guard let self else { return }
+
+                save()
+                brightnessSpline = computeBrightnessSpline(nitsMapping: nitsBrightnessMapping)
+                nitsBrightnessMappingSaver = nil
+            }
+        }
+
+        func saveNitsContrastMapping() {
+            nitsContrastMappingSaver = mainAsyncAfter(ms: 200) { [weak self] in
+                guard let self else { return }
+
+                save()
+                contrastSpline = computeContrastSpline(nitsMapping: nitsContrastMapping)
+                nitsContrastMappingSaver = nil
+            }
+        }
+    #endif
+
+    #if arch(arm64)
+        var dispName = ""
+        var dcpName = ""
+        var displayProps: [String: Any]? {
+            didSet {
+                checkNitsObserver()
+            }
+        }
+
+        var ioObserver: IOServicePropertyObserver?
+
+        @Published var contrastEnhancer: Double? = nil
+        @Published var lux: Double? = nil
+
+        @Published @objc var minNits: Double = 0 {
+            didSet {
+                guard initialised else { return }
+                guard minNits < maxNits, minNits >= 0 else {
+                    minNits = minNits < 0 ? 0 : maxNits - 1
+                    return
+                }
+
+                if minNits != oldValue, !isActiveSyncSource {
+                    nitsRecomputePublisher.send(true)
+                }
+                save()
+            }
+        }
+
+        func recomputeNitsMapping() {
+            nitsToPercentageMapping = Self.LUX_TO_NITS.sorted(by: { $0.key < $1.key }).map { k, v in
+                AutoLearnMapping(source: k, target: nitsToPercentage(v, minNits: minNits, maxNits: userMaxNits ?? maxNits) * 100)
+            }
+        }
+
+        lazy var userMaxNits: Double? = getUserMaxNits() {
+            didSet {
+                debug("\(name) Max Nits: \((userMaxNits ?? maxNits).str(decimals: 2))")
+                recomputeNitsMapping()
+            }
+        }
+
+        lazy var userMinNits: Double? = getUserMinNits() {
+            didSet {
+                debug("\(name) Min Nits: \((userMinNits ?? minNits).str(decimals: 2))")
+                recomputeNitsMapping()
+            }
+        }
+
+        @Published @objc var maxNits: Double = 500 {
+            didSet {
+                guard initialised else { return }
+                guard maxNits > minNits, maxNits > 0, maxNits <= 3000 else {
+                    maxNits = maxNits > 3000 ? 3000 : oldValue
+                    return
+                }
+
+                if let panel, !panel.hasPresets {
+                    possibleMaxNits = maxNits
+                }
+
+//                if !hdrOn {
+//                    possibleMaxNits = maxNits
+//                }
+                if let possibleMaxNits, possibleMaxNits > 0, let control = control as? AppleNativeControl {
+                    control.updateNits()
+//                    var br = Float(0); DisplayServicesGetLinearBrightness(1, &br); print("DisplayServicesGetLinearBrightness: \(br)\nMax Nits: \(maxNits)\nPossible Max Nits: \(possibleMaxNits)\nNits: \(nits ?? 0)\n")
+                }
+
+                if maxNits != oldValue, !isActiveSyncSource {
+                    nitsRecomputePublisher.send(true)
+                }
+                save()
+            }
+        }
+
+        lazy var nitsRecomputePublisher = listener(in: &observers, throttle: .milliseconds(500)) { [weak self] (_: Bool) in
+            DC.computeBrightnessSplines()
+            DC.computeContrastSplines()
+            self?.recomputeNitsMapping()
+        }
+
+        lazy var nitsEditPublisher = listener(in: &observers, debounce: .milliseconds(500)) { [weak self] (_: Bool) in
+            guard let self else { return }
+
+            nitsBrightnessMapping = []
+            nitsContrastMapping = []
+            DC.computeBrightnessSplines()
+            DC.computeContrastSplines()
+            recomputeNitsMapping()
+            readapt(newValue: false, oldValue: true)
+        }
+
+        @Published var userNits: Double? = nil
+        @Published var nits: Double? = nil {
+            didSet {
+                if let nits, nits.isNaN || nits.isInfinite {
+                    self.nits = nil
+                }
+                guard isActiveSyncSource else { return }
+                Task.init {
+                    await MainActor.run { AMI.nits = nits }
+                }
+            }
+        }
+        lazy var nitsToPercentageMapping: [AutoLearnMapping] = Self.LUX_TO_NITS.sorted(by: { $0.key < $1.key }).map { k, v in
+            AutoLearnMapping(source: k, target: nitsToPercentage(v, minNits: minNits, maxNits: userMaxNits ?? maxNits) * 100)
+        }
+    #endif
+
+    @Published @objc dynamic var showOrientation = false
+
+    @Published @objc dynamic var showVolumeSlider = false
+    lazy var preciseBrightnessKey = "setPreciseBrightness-\(serial)"
+    lazy var preciseContrastKey = "setPreciseContrast-\(serial)"
+
+    @Atomic var initialised = false
+
+    var preciseContrastBeforeAppPreset = 0.5
+
+    @objc dynamic lazy var isDummy: Bool = (
+        (Self.dummyNamePattern.matches(name) || vendor.isDummy)
+            && vendor != .samsung
+            && !Self.notDummyNamePattern.matches(name)
+    )
+    @objc dynamic lazy var subzeroDimmingDisabled = isBuiltin && ((minBrightness.intValue == 0 && softwareBrightness > 0) || !presetSupportsBrightnessControl)
+
+    var scheduledContrastTask: Repeater? = nil
+
+    @Atomic var inSchedule = false
+
+    @objc dynamic lazy var otherDisplays: [Display] = DC.activeDisplayList.filter { $0.serial != serial }
+
+    @Published var userVolume = 0.5
+
+    @objc dynamic var useAlternateInputSwitching = false
+
+    lazy var syncSourcePriority: Int = {
+        if isBuiltin {
+            return 1
+        }
+        if panel?.isAppleProDisplay ?? false {
+            return 2
+        }
+        if isProDisplayXDR {
+            return 3
+        }
+        if isStudioDisplay {
+            return 4
+        }
+        if isUltraFine {
+            return 5
+        }
+        if isThunderbolt {
+            return 6
+        }
+        if isLEDCinema {
+            return 7
+        }
+        return 100
+    }()
+
+    @Published var percentage: Double? = 0.5
+
+    var previousBrightnessMapping: ExpiringOptional<[AutoLearnMapping]> = nil
+    var previousContrastMapping: ExpiringOptional<[AutoLearnMapping]> = nil
+    var previousNitsBrightnessMapping: ExpiringOptional<[AutoLearnMapping]> = nil
+    var previousNitsContrastMapping: ExpiringOptional<[AutoLearnMapping]> = nil
+
+    @Published var fullRangeBrightness = 0.5
+    @Published var fullRangeUserBrightness = 0.5
+    @Published var userContrast = 0.5
+
+    @objc dynamic var whitesLimit = 0.05
+    @objc dynamic var blacksLimit = 0.95
+
+    @Published @objc dynamic var applyTemporaryGamma = false
+
+    @Atomic var gammaGetAPICalled = false
+    @Atomic var gammaSetAPICalled = false
+
+    @Published @objc dynamic var panelPresets: [MPDisplayPreset] = []
+
+    lazy var isProDisplayXDR: Bool =
+        edidName.contains(PRO_DISPLAY_XDR_NAME)
+
+    lazy var isLunaDisplay: Bool =
+        edidName.contains(LUNA_DISPLAY_NAME)
+
+    lazy var isStudioDisplay: Bool =
+        edidName.contains(STUDIO_DISPLAY_NAME)
+
+    lazy var isUltraFine: Bool =
+        edidName.contains(ULTRAFINE_NAME) && canChangeBrightnessDS
+
+    lazy var isThunderbolt: Bool =
+        edidName.contains(THUNDERBOLT_NAME)
+
+    lazy var isLEDCinema: Bool =
+        edidName.contains(LED_CINEMA_NAME)
+
+    lazy var isCinema: Bool =
+        edidName == CINEMA_NAME || edidName == CINEMA_HD_NAME
+
+    lazy var isCinemaHD: Bool =
+        edidName == CINEMA_HD_NAME
+
+    lazy var isColorLCD: Bool =
+        edidName.contains(COLOR_LCD_NAME)
+
+    lazy var isAppleDisplay: Bool =
+        isStudioDisplay || isUltraFine || isThunderbolt || isLEDCinema || isCinema || isAppleVendorID
+
+    lazy var isAppleVendorID: Bool = ((infoDictionary["DisplayVendorID"] as? Int) ?? CGDisplayVendorNumber(id).i) == APPLE_DISPLAY_VENDOR_ID
+
+    var lastNativeBrightness: Double? {
+        get {
+            mainThread { Self.lastNativeBrightnessMapping[serial] }
+        }
+        set {
+            mainAsync { Self.lastNativeBrightnessMapping[self.serial] = newValue }
+        }
+    }
 
     @Published var presetSupportsBrightnessControl = true {
         didSet {
@@ -3508,6 +3835,255 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
+    lazy var possibleMaxNits: Double? = ISCLI ? nil : panel?.activePreset?.maxSDRNits ?? panel?.activePreset?.maxHDRNits {
+        didSet {
+            if possibleMaxNits == nil || possibleMaxNits == 0 || possibleMaxNits == 1600, apply {
+                mainAsyncAfter(ms: 1000) { [weak self] in
+                    guard let self else { return }
+                    self.withoutApply {
+                        self.possibleMaxNits = self.panel?.activePreset?.maxSDRNits ?? self.panel?.activePreset?.maxHDRNits
+                    }
+                }
+            }
+            guard let possibleMaxNits, possibleMaxNits > 0, let control = control as? AppleNativeControl else {
+                return
+            }
+            control.updateNits()
+        }
+    }
+    #if DEBUG
+        @objc dynamic var isFakeDummy: Bool { Self.notDummyNamePattern.matches(name) && vendor.isDummy }
+    #else
+        @objc dynamic lazy var isFakeDummy: Bool = (Self.notDummyNamePattern.matches(name) && vendor.isDummy)
+    #endif
+    #if arch(arm64)
+        var disconnected: Bool { DC.possiblyDisconnectedDisplays[id]?.serial == serial }
+    #else
+        var disconnected = false
+    #endif
+
+    @Published @objc dynamic var isSource: Bool {
+        didSet {
+            context = getContext()
+            DC.sourceDisplay = DC.getSourceDisplay()
+            guard Self.applySource else { return }
+            Self.applySource = false
+            defer {
+                Self.applySource = true
+            }
+
+            if isSource {
+                DC.activeDisplayList.filter { $0.id != id }.forEach { d in
+                    d.isSource = false
+                }
+            } else if let builtinDisplay = DC.builtinDisplay, builtinDisplay.serial != serial {
+                builtinDisplay.isSource = true
+            } else if let smartDisplay = DC.externalActiveDisplays.first(where: { $0.hasAmbientLightAdaptiveBrightness && $0.serial != serial }) {
+                smartDisplay.isSource = true
+            }
+
+            datastore.storeDisplays(DC.displayList)
+            SyncMode.refresh()
+            if DC.adaptiveModeKey == .sync {
+                DC.adaptiveMode.stopWatching()
+                DC.adaptiveMode.watch()
+            }
+        }
+    }
+
+    var softwareAdjustedBrightness: Int {
+        if !hasSoftwareControl, softwareBrightness < 1 {
+            return softwareBrightness.map(from: (0, 1), to: (-100, 0)).intround
+        }
+        return (preciseBrightness * 100).intround
+    }
+
+    var softwareAdjustedBrightnessIfAdaptive: Double {
+        if !hasSoftwareControl, adaptiveSubzero, softwareBrightness < 1 {
+            return softwareBrightness.map(from: (0, 1), to: (-100, 0)).d
+        }
+        return preciseBrightness * 100
+    }
+
+    var smoothGammaQueue: DispatchQueue {
+        switch control {
+        case is DDCControl:
+            smoothDDCQueue
+        case is AppleNativeControl:
+            smoothDisplayServicesQueue
+        default:
+            serialQueue
+        }
+    }
+
+    @Published @objc dynamic var preciseBrightnessContrast = 0.5 {
+        didSet {
+            checkNaN(preciseBrightnessContrast)
+
+            guard initialised, applyPreciseValue else {
+                return
+            }
+            resetScheduledTransition()
+
+            if subzero, preciseBrightnessContrast > 0 {
+                withoutApply {
+                    if subzero { subzero = false }
+                    if adaptivePaused { adaptivePaused = false }
+                }
+                if softwareBrightness != 1, softwareBrightness != -1 { softwareBrightness = 1 }
+            } else if !subzero, preciseBrightnessContrast == 0, isAllDisplays || (!hasSoftwareControl && !noControls) {
+                withoutApply { subzero = true }
+            }
+
+            let (brightness, contrast) = sliderValueToBrightnessContrast(preciseBrightnessContrast)
+            guard !isAllDisplays else {
+                mainThread {
+                    withoutReapplyPreciseValue {
+                        self.brightness = brightness.ns
+                        self.contrast = contrast.ns
+                    }
+                }
+                return
+            }
+
+            var smallDiff = abs(brightness.i - self.brightness.doubleValue.intround) < 5
+            if !lockedBrightness || hasSoftwareControl {
+                withBrightnessTransition(smallDiff && !inSmoothTransition ? .instant : brightnessTransition) {
+                    mainThread {
+                        withoutReapplyPreciseValue {
+                            self.brightness = brightness.ns
+                        }
+                        self.insertBrightnessUserDataPoint(
+                            DC.adaptiveMode.brightnessDataPoint.last,
+                            brightness.d, modeKey: DC.adaptiveModeKey
+                        )
+                    }
+                }
+            }
+
+            if !lockedContrast || DC.calibrating {
+                smallDiff = abs(contrast.i - self.contrast.doubleValue.intround) < 5
+                withBrightnessTransition(smallDiff && !inSmoothTransition ? .instant : brightnessTransition) {
+                    mainThread {
+                        withoutReapplyPreciseValue {
+                            self.contrast = contrast.ns
+                        }
+                        self.insertContrastUserDataPoint(
+                            DC.adaptiveMode.contrastDataPoint.last,
+                            contrast.d, modeKey: DC.adaptiveModeKey
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Atomic var userAdjusting = false {
+        didSet {
+            mainAsync { [weak self] in
+                if let self, !self.isUserAdjusting(), let onFinishedUserAdjusting = Self.onFinishedUserAdjusting {
+                    Self.onFinishedUserAdjusting = nil
+                    onFinishedUserAdjusting()
+                }
+            }
+        }
+    }
+
+    @objc dynamic var isTV: Bool {
+        (panel?.isTV ?? false) && edidName.contains("TV")
+    }
+
+    @objc dynamic var isLG: Bool { vendor == .lg }
+
+    var edidName: String {
+        didSet {
+            normalizedName = Self.numberNamePattern.replaceAll(in: edidName, with: "").trimmed
+        }
+    }
+
+    @Published @objc dynamic var unmanaged = false {
+        didSet {
+            guard unmanaged else {
+                DC.displays = DC.displays
+                readapt(newValue: unmanaged, oldValue: oldValue)
+                return
+            }
+
+            if xdr {
+                xdr = false
+            }
+            if subzero {
+                subzero = false
+            }
+            if facelight {
+                facelight = false
+            }
+            if blackOutEnabled {
+                resetBlackOut()
+            }
+
+            DC.displays = DC.displays
+
+            if gammaSetAPICalled {
+                resetGamma()
+            }
+            shadeWindowController?.close()
+            shadeWindowController = nil
+        }
+    }
+
+    @Published @objc dynamic var adaptiveSubzero = true {
+        didSet {
+            #if arch(arm64)
+                DC.computeBrightnessSplines()
+            #endif
+
+            resetScheduledTransition()
+            readapt(newValue: adaptiveSubzero, oldValue: oldValue)
+            if !adaptiveSubzero, DC.adaptiveModeKey != .manual, softwareBrightness < 1, softwareBrightness != -1 {
+                softwareBrightness = 1
+            }
+        }
+    }
+
+    var primaryMirrorScreen: NSScreen? {
+        getPrimaryMirrorScreen()
+    }
+
+    @objc dynamic var facelight: Bool {
+        get { faceLightEnabled }
+        set {
+            if newValue {
+                appDelegate?.enableFaceLight(display: self)
+            } else {
+                appDelegate?.disableFaceLight(displays: [self])
+                disableFaceLight()
+            }
+
+            faceLightEnabled = newValue
+        }
+    }
+
+    @objc dynamic var blackout: Bool {
+        get { blackOutEnabled }
+        set {
+            DC.blackOut(
+                display: id, state: newValue ? .on : .off,
+                mirroringAllowed: DC.connectedDisplayCount == 1 ? false : blackOutMirroringAllowed
+            )
+            blackOutEnabled = newValue
+        }
+    }
+
+    var isOnline: Bool { NSScreen.isOnline(id) }
+
+    lazy var maxEDR = computeMaxEDR() {
+        didSet {
+            xdrFilledChicletOffset = 6 / (96 * (1 / (maxSoftwareBrightness - Self.MIN_SOFTWARE_BRIGHTNESS)))
+            xdrFilledChicletsThresholds = (0 ... 16).map { Self.MIN_SOFTWARE_BRIGHTNESS + xdrFilledChicletOffset * $0.f }
+        }
+    }
+
     static func ambientLightCompensationEnabled(_ id: CGDirectDisplayID) -> Bool {
         guard !isGeneric(id), DisplayServicesHasAmbientLightCompensation(id) else { return false }
 
@@ -3770,6 +4346,50 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         manager.unlockAccess()
     }
 
+    @discardableResult
+    static func configure(_ action: (CGDisplayConfigRef) -> Bool) -> Bool {
+        var configRef: CGDisplayConfigRef?
+        var err = CGBeginDisplayConfiguration(&configRef)
+        guard err == .success, let config = configRef else {
+            log.error("Error with CGBeginDisplayConfiguration: \(err)")
+            return false
+        }
+
+        guard action(config) else {
+            _ = CGCancelDisplayConfiguration(config)
+            return false
+        }
+
+        err = CGCompleteDisplayConfiguration(config, .permanently)
+        guard err == .success else {
+            log.error("Error with CGCompleteDisplayConfiguration")
+            _ = CGCancelDisplayConfiguration(config)
+            return false
+        }
+
+        return true
+    }
+
+    static func insertElevationDataPoint(_ mapping: AutoLearnMapping, in values: [AutoLearnMapping]) -> [AutoLearnMapping]? {
+        guard let solar = LocationMode.specific.geolocation?.solar,
+              let noon = solar.solarNoonPosition?.elevation,
+              mapping.source < 0 || mapping.source > noon
+        else {
+            return nil
+        }
+
+        var values = values
+        if mapping.source < 0, mapping.target > -100 {
+            values = Display.insertDataPoint([-18: mapping.target - 0.01], in: values, cliffRatio: 3, cliffSourceDiff: 5)
+        }
+
+        if mapping.source > noon {
+            values = Display.insertDataPoint([noon: mapping.target], in: values, cliffRatio: 3, cliffSourceDiff: 5)
+        }
+
+        return values
+    }
+
     func getPanelModes() -> [MPDisplayMode] {
         guard let modes = panel?.allModes(), !modes.isEmpty else {
             return []
@@ -3857,236 +4477,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-    #if arch(arm64)
-        var nitsBrightnessMapping: [AutoLearnMapping] = []
-        var nitsBrightnessMappingSaver: DispatchWorkItem? { didSet { oldValue?.cancel() } }
-
-        var nitsContrastMapping: [AutoLearnMapping] = []
-        var nitsContrastMappingSaver: DispatchWorkItem? { didSet { oldValue?.cancel() } }
-
-        lazy var brightnessSpline: ((Double) -> Double)? = computeBrightnessSpline(nitsMapping: nitsBrightnessMapping)
-        lazy var contrastSpline: ((Double) -> Double)? = computeContrastSpline(nitsMapping: nitsContrastMapping)
-
-        func saveNitsBrightnessMapping() {
-            nitsBrightnessMappingSaver = mainAsyncAfter(ms: 200) { [weak self] in
-                guard let self else { return }
-
-                self.save()
-                self.brightnessSpline = self.computeBrightnessSpline(nitsMapping: self.nitsBrightnessMapping)
-                self.nitsBrightnessMappingSaver = nil
-            }
-        }
-
-        func saveNitsContrastMapping() {
-            nitsContrastMappingSaver = mainAsyncAfter(ms: 200) { [weak self] in
-                guard let self else { return }
-
-                self.save()
-                self.contrastSpline = self.computeContrastSpline(nitsMapping: self.nitsContrastMapping)
-                self.nitsContrastMappingSaver = nil
-            }
-        }
-    #endif
-
-    lazy var possibleMaxNits: Double? = ISCLI ? nil : panel?.activePreset?.maxSDRNits ?? panel?.activePreset?.maxHDRNits {
-        didSet {
-            if possibleMaxNits == nil || possibleMaxNits == 0 || possibleMaxNits == 1600, apply {
-                mainAsyncAfter(ms: 1000) { [weak self] in
-                    guard let self else { return }
-                    self.withoutApply {
-                        self.possibleMaxNits = self.panel?.activePreset?.maxSDRNits ?? self.panel?.activePreset?.maxHDRNits
-                    }
-                }
-            }
-            guard let possibleMaxNits, possibleMaxNits > 0, let control = control as? AppleNativeControl else {
-                return
-            }
-            control.updateNits()
-        }
-    }
-    #if arch(arm64)
-        var dispName = ""
-        var dcpName = ""
-        var displayProps: [String: Any]? {
-            didSet {
-                checkNitsObserver()
-            }
-        }
-
-        var ioObserver: IOServicePropertyObserver?
-
-        @Published var contrastEnhancer: Double? = nil
-        @Published var lux: Double? = nil
-
-        @Published @objc var minNits: Double = 0 {
-            didSet {
-                guard initialised else { return }
-                guard minNits < maxNits, minNits >= 0 else {
-                    minNits = minNits < 0 ? 0 : maxNits - 1
-                    return
-                }
-
-                if minNits != oldValue, !isActiveSyncSource {
-                    nitsRecomputePublisher.send(true)
-                }
-                save()
-            }
-        }
-
-        func recomputeNitsMapping() {
-            nitsToPercentageMapping = Self.LUX_TO_NITS.sorted(by: { $0.key < $1.key }).map { k, v in
-                AutoLearnMapping(source: k, target: nitsToPercentage(v, minNits: minNits, maxNits: userMaxNits ?? maxNits) * 100)
-            }
-        }
-
-        lazy var userMaxNits: Double? = getUserMaxNits() {
-            didSet {
-                debug("\(self.name) Max Nits: \((self.userMaxNits ?? self.maxNits).str(decimals: 2))")
-                recomputeNitsMapping()
-            }
-        }
-
-        lazy var userMinNits: Double? = getUserMinNits() {
-            didSet {
-                debug("\(self.name) Min Nits: \((self.userMinNits ?? self.minNits).str(decimals: 2))")
-                recomputeNitsMapping()
-            }
-        }
-
-        @Published @objc var maxNits: Double = 500 {
-            didSet {
-                guard initialised else { return }
-                guard maxNits > minNits, maxNits > 0, maxNits <= 3000 else {
-                    maxNits = maxNits > 3000 ? 3000 : oldValue
-                    return
-                }
-
-                if let panel, !panel.hasPresets {
-                    possibleMaxNits = maxNits
-                }
-
-//                if !hdrOn {
-//                    possibleMaxNits = maxNits
-//                }
-                if let possibleMaxNits, possibleMaxNits > 0, let control = control as? AppleNativeControl {
-                    control.updateNits()
-//                    var br = Float(0); DisplayServicesGetLinearBrightness(1, &br); print("DisplayServicesGetLinearBrightness: \(br)\nMax Nits: \(maxNits)\nPossible Max Nits: \(possibleMaxNits)\nNits: \(nits ?? 0)\n")
-                }
-
-                if maxNits != oldValue, !isActiveSyncSource {
-                    nitsRecomputePublisher.send(true)
-                }
-                save()
-            }
-        }
-
-        lazy var nitsRecomputePublisher = listener(in: &observers, throttle: .milliseconds(500)) { [weak self] (_: Bool) in
-            DC.computeBrightnessSplines()
-            DC.computeContrastSplines()
-            self?.recomputeNitsMapping()
-        }
-
-        lazy var nitsEditPublisher = listener(in: &observers, debounce: .milliseconds(500)) { [weak self] (_: Bool) in
-            guard let self else { return }
-
-            self.nitsBrightnessMapping = []
-            self.nitsContrastMapping = []
-            DC.computeBrightnessSplines()
-            DC.computeContrastSplines()
-            self.recomputeNitsMapping()
-            self.readapt(newValue: false, oldValue: true)
-        }
-
-        @Published var userNits: Double? = nil
-        @Published var nits: Double? = nil {
-            didSet {
-                if let nits, nits.isNaN || nits.isInfinite {
-                    self.nits = nil
-                }
-                guard isActiveSyncSource else { return }
-                Task.init {
-                    await MainActor.run { AMI.nits = nits }
-                }
-            }
-        }
-        lazy var nitsToPercentageMapping: [AutoLearnMapping] = Self.LUX_TO_NITS.sorted(by: { $0.key < $1.key }).map { k, v in
-            AutoLearnMapping(source: k, target: nitsToPercentage(v, minNits: minNits, maxNits: userMaxNits ?? maxNits) * 100)
-        }
-    #endif
-
-    enum ConnectionType: String, Defaults.Serializable, Codable {
-        case displayport
-        case usbc
-        case dvi
-        case hdmi
-        case vga
-        case mipi
-        case unknown
-
-        static func fromTransport(_ transport: Transport?) -> ConnectionType? {
-            guard let transport else {
-                return nil
-            }
-
-            switch transport.downstream {
-            case "HDMI":
-                return .hdmi
-            case "DVI":
-                return .dvi
-            case "DP":
-                return .displayport
-            case "VGA":
-                return .vga
-            case "MIPI":
-                return .mipi
-            default:
-                return nil
-            }
-        }
-
-        static func fromTransportType(_ transportType: Int) -> ConnectionType? {
-            switch transportType {
-            case 0:
-                .displayport
-            case 1:
-                .usbc
-            case 2:
-                .dvi
-            case 3:
-                .hdmi
-            case 4:
-                .mipi
-            case 5:
-                .vga
-            default:
-                nil
-            }
-        }
-    }
-
-    static var ddcWorkingCount: [String: Int] = [:]
-    static var ddcNotWorkingCount: [String: Int] = [:]
-
-    @Published @objc dynamic var showOrientation = false
-
-    @Published @objc dynamic var showVolumeSlider = false
-    lazy var preciseBrightnessKey = "setPreciseBrightness-\(serial)"
-    lazy var preciseContrastKey = "setPreciseContrast-\(serial)"
-
-    @Atomic var initialised = false
-
-    var preciseContrastBeforeAppPreset = 0.5
-
-    @objc dynamic lazy var isDummy: Bool = (
-        (Self.dummyNamePattern.matches(name) || vendor.isDummy)
-            && vendor != .samsung
-            && !Self.notDummyNamePattern.matches(name)
-    )
-    #if DEBUG
-        @objc dynamic var isFakeDummy: Bool { Self.notDummyNamePattern.matches(name) && vendor.isDummy }
-    #else
-        @objc dynamic lazy var isFakeDummy: Bool = (Self.notDummyNamePattern.matches(name) && vendor.isDummy)
-    #endif
     func updateCornerWindow() {
         mainThread {
             guard cornerRadius.intValue > 0, active, !isInNonWirelessHardwareMirrorSet,
@@ -4126,387 +4516,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             create(&cornerWindowControllerBottomLeft, .bottomLeft)
             create(&cornerWindowControllerBottomRight, .bottomRight)
         }
-    }
-
-    #if arch(arm64)
-        var disconnected: Bool { DC.possiblyDisconnectedDisplays[id]?.serial == serial }
-    #else
-        var disconnected = false
-    #endif
-
-    static let LUX_TO_NITS: [Double: Double] = [
-        0: 40,
-        13: 54,
-        23: 61,
-        39: 76,
-        71: 87,
-        80: 100,
-        100: 105,
-        135: 120,
-        160: 134,
-        190: 147,
-        224: 160,
-        313: 193,
-        565: 289,
-        702: 340,
-        800: 400,
-        1000: 500,
-    ]
-
-    @objc dynamic lazy var subzeroDimmingDisabled = isBuiltin && ((minBrightness.intValue == 0 && softwareBrightness > 0) || !presetSupportsBrightnessControl)
-
-    var scheduledContrastTask: Repeater? = nil
-
-    @Atomic var inSchedule = false
-
-    @objc dynamic lazy var otherDisplays: [Display] = DC.activeDisplayList.filter { $0.serial != serial }
-
-    @Published var userVolume = 0.5
-
-    @objc dynamic var useAlternateInputSwitching = false
-
-    lazy var syncSourcePriority: Int = {
-        if isBuiltin {
-            return 1
-        }
-        if panel?.isAppleProDisplay ?? false {
-            return 2
-        }
-        if isProDisplayXDR {
-            return 3
-        }
-        if isStudioDisplay {
-            return 4
-        }
-        if isUltraFine {
-            return 5
-        }
-        if isThunderbolt {
-            return 6
-        }
-        if isLEDCinema {
-            return 7
-        }
-        return 100
-    }()
-
-    @Published var percentage: Double? = 0.5
-
-    var previousBrightnessMapping: ExpiringOptional<[AutoLearnMapping]> = nil
-    var previousContrastMapping: ExpiringOptional<[AutoLearnMapping]> = nil
-    var previousNitsBrightnessMapping: ExpiringOptional<[AutoLearnMapping]> = nil
-    var previousNitsContrastMapping: ExpiringOptional<[AutoLearnMapping]> = nil
-
-    @Published var fullRangeBrightness = 0.5
-    @Published var fullRangeUserBrightness = 0.5
-    @Published var userContrast = 0.5
-
-    @objc dynamic var whitesLimit = 0.05
-    @objc dynamic var blacksLimit = 0.95
-
-    @Published @objc dynamic var applyTemporaryGamma = false
-
-    @Atomic var gammaGetAPICalled = false
-    @Atomic var gammaSetAPICalled = false
-
-    @Published @objc dynamic var panelPresets: [MPDisplayPreset] = []
-
-    lazy var isProDisplayXDR: Bool =
-        edidName.contains(PRO_DISPLAY_XDR_NAME)
-
-    lazy var isLunaDisplay: Bool =
-        edidName.contains(LUNA_DISPLAY_NAME)
-
-    lazy var isStudioDisplay: Bool =
-        edidName.contains(STUDIO_DISPLAY_NAME)
-
-    lazy var isUltraFine: Bool =
-        edidName.contains(ULTRAFINE_NAME) && canChangeBrightnessDS
-
-    lazy var isThunderbolt: Bool =
-        edidName.contains(THUNDERBOLT_NAME)
-
-    lazy var isLEDCinema: Bool =
-        edidName.contains(LED_CINEMA_NAME)
-
-    lazy var isCinema: Bool =
-        edidName == CINEMA_NAME || edidName == CINEMA_HD_NAME
-
-    lazy var isCinemaHD: Bool =
-        edidName == CINEMA_HD_NAME
-
-    lazy var isColorLCD: Bool =
-        edidName.contains(COLOR_LCD_NAME)
-
-    lazy var isAppleDisplay: Bool =
-        isStudioDisplay || isUltraFine || isThunderbolt || isLEDCinema || isCinema || isAppleVendorID
-
-    lazy var isAppleVendorID: Bool = ((infoDictionary["DisplayVendorID"] as? Int) ?? CGDisplayVendorNumber(id).i) == APPLE_DISPLAY_VENDOR_ID
-
-    @Published @objc dynamic var isSource: Bool {
-        didSet {
-            context = getContext()
-            DC.sourceDisplay = DC.getSourceDisplay()
-            guard Self.applySource else { return }
-            Self.applySource = false
-            defer {
-                Self.applySource = true
-            }
-
-            if isSource {
-                DC.activeDisplayList.filter { $0.id != id }.forEach { d in
-                    d.isSource = false
-                }
-            } else if let builtinDisplay = DC.builtinDisplay, builtinDisplay.serial != serial {
-                builtinDisplay.isSource = true
-            } else if let smartDisplay = DC.externalActiveDisplays.first(where: { $0.hasAmbientLightAdaptiveBrightness && $0.serial != serial }) {
-                smartDisplay.isSource = true
-            }
-
-            datastore.storeDisplays(DC.displayList)
-            SyncMode.refresh()
-            if DC.adaptiveModeKey == .sync {
-                DC.adaptiveMode.stopWatching()
-                DC.adaptiveMode.watch()
-            }
-        }
-    }
-
-    var softwareAdjustedBrightness: Int {
-        if !hasSoftwareControl, softwareBrightness < 1 {
-            return softwareBrightness.map(from: (0, 1), to: (-100, 0)).intround
-        }
-        return (preciseBrightness * 100).intround
-    }
-
-    var softwareAdjustedBrightnessIfAdaptive: Double {
-        if !hasSoftwareControl, adaptiveSubzero, softwareBrightness < 1 {
-            return softwareBrightness.map(from: (0, 1), to: (-100, 0)).d
-        }
-        return preciseBrightness * 100
-    }
-
-    var smoothGammaQueue: DispatchQueue {
-        switch control {
-        case is DDCControl:
-            smoothDDCQueue
-        case is AppleNativeControl:
-            smoothDisplayServicesQueue
-        default:
-            serialQueue
-        }
-    }
-
-    @Published @objc dynamic var preciseBrightnessContrast = 0.5 {
-        didSet {
-            checkNaN(preciseBrightnessContrast)
-
-            guard initialised, applyPreciseValue else {
-                return
-            }
-            resetScheduledTransition()
-
-            if subzero, preciseBrightnessContrast > 0 {
-                withoutApply {
-                    if subzero { subzero = false }
-                    if adaptivePaused { adaptivePaused = false }
-                }
-                if softwareBrightness != 1, softwareBrightness != -1 { softwareBrightness = 1 }
-            } else if !subzero, preciseBrightnessContrast == 0, isAllDisplays || (!hasSoftwareControl && !noControls) {
-                withoutApply { subzero = true }
-            }
-
-            let (brightness, contrast) = sliderValueToBrightnessContrast(preciseBrightnessContrast)
-            guard !isAllDisplays else {
-                mainThread {
-                    withoutReapplyPreciseValue {
-                        self.brightness = brightness.ns
-                        self.contrast = contrast.ns
-                    }
-                }
-                return
-            }
-
-            var smallDiff = abs(brightness.i - self.brightness.doubleValue.intround) < 5
-            if !lockedBrightness || hasSoftwareControl {
-                withBrightnessTransition(smallDiff && !inSmoothTransition ? .instant : brightnessTransition) {
-                    mainThread {
-                        withoutReapplyPreciseValue {
-                            self.brightness = brightness.ns
-                        }
-                        self.insertBrightnessUserDataPoint(
-                            DC.adaptiveMode.brightnessDataPoint.last,
-                            brightness.d, modeKey: DC.adaptiveModeKey
-                        )
-                    }
-                }
-            }
-
-            if !lockedContrast || DC.calibrating {
-                smallDiff = abs(contrast.i - self.contrast.doubleValue.intround) < 5
-                withBrightnessTransition(smallDiff && !inSmoothTransition ? .instant : brightnessTransition) {
-                    mainThread {
-                        withoutReapplyPreciseValue {
-                            self.contrast = contrast.ns
-                        }
-                        self.insertContrastUserDataPoint(
-                            DC.adaptiveMode.contrastDataPoint.last,
-                            contrast.d, modeKey: DC.adaptiveModeKey
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    @Atomic var userAdjusting = false {
-        didSet {
-            mainAsync { [weak self] in
-                if let self, !self.isUserAdjusting(), let onFinishedUserAdjusting = Self.onFinishedUserAdjusting {
-                    Self.onFinishedUserAdjusting = nil
-                    onFinishedUserAdjusting()
-                }
-            }
-        }
-    }
-
-    @objc dynamic var isTV: Bool {
-        (panel?.isTV ?? false) && edidName.contains("TV")
-    }
-
-    @objc dynamic var isLG: Bool { vendor == .lg }
-
-    var edidName: String {
-        didSet {
-            normalizedName = Self.numberNamePattern.replaceAll(in: edidName, with: "").trimmed
-        }
-    }
-
-    @Published @objc dynamic var unmanaged = false {
-        didSet {
-            guard unmanaged else {
-                DC.displays = DC.displays
-                readapt(newValue: unmanaged, oldValue: oldValue)
-                return
-            }
-
-            if xdr {
-                xdr = false
-            }
-            if subzero {
-                subzero = false
-            }
-            if facelight {
-                facelight = false
-            }
-            if blackOutEnabled {
-                resetBlackOut()
-            }
-
-            DC.displays = DC.displays
-
-            if gammaSetAPICalled {
-                resetGamma()
-            }
-            shadeWindowController?.close()
-            shadeWindowController = nil
-        }
-    }
-
-    @Published @objc dynamic var adaptiveSubzero = true {
-        didSet {
-            #if arch(arm64)
-                DC.computeBrightnessSplines()
-            #endif
-
-            resetScheduledTransition()
-            readapt(newValue: adaptiveSubzero, oldValue: oldValue)
-            if !adaptiveSubzero, DC.adaptiveModeKey != .manual, softwareBrightness < 1, softwareBrightness != -1 {
-                softwareBrightness = 1
-            }
-        }
-    }
-
-    var primaryMirrorScreen: NSScreen? {
-        getPrimaryMirrorScreen()
-    }
-
-    @objc dynamic var facelight: Bool {
-        get { faceLightEnabled }
-        set {
-            if newValue {
-                appDelegate?.enableFaceLight(display: self)
-            } else {
-                appDelegate?.disableFaceLight(displays: [self])
-                disableFaceLight()
-            }
-
-            faceLightEnabled = newValue
-        }
-    }
-
-    @objc dynamic var blackout: Bool {
-        get { blackOutEnabled }
-        set {
-            DC.blackOut(
-                display: id, state: newValue ? .on : .off,
-                mirroringAllowed: DC.connectedDisplayCount == 1 ? false : blackOutMirroringAllowed
-            )
-            blackOutEnabled = newValue
-        }
-    }
-
-    var isOnline: Bool { NSScreen.isOnline(id) }
-
-    lazy var maxEDR = computeMaxEDR() {
-        didSet {
-            xdrFilledChicletOffset = 6 / (96 * (1 / (maxSoftwareBrightness - Self.MIN_SOFTWARE_BRIGHTNESS)))
-            xdrFilledChicletsThresholds = (0 ... 16).map { Self.MIN_SOFTWARE_BRIGHTNESS + xdrFilledChicletOffset * $0.f }
-        }
-    }
-
-    @discardableResult
-    static func configure(_ action: (CGDisplayConfigRef) -> Bool) -> Bool {
-        var configRef: CGDisplayConfigRef?
-        var err = CGBeginDisplayConfiguration(&configRef)
-        guard err == .success, let config = configRef else {
-            log.error("Error with CGBeginDisplayConfiguration: \(err)")
-            return false
-        }
-
-        guard action(config) else {
-            _ = CGCancelDisplayConfiguration(config)
-            return false
-        }
-
-        err = CGCompleteDisplayConfiguration(config, .permanently)
-        guard err == .success else {
-            log.error("Error with CGCompleteDisplayConfiguration")
-            _ = CGCancelDisplayConfiguration(config)
-            return false
-        }
-
-        return true
-    }
-
-    static func insertElevationDataPoint(_ mapping: AutoLearnMapping, in values: [AutoLearnMapping]) -> [AutoLearnMapping]? {
-        guard let solar = LocationMode.specific.geolocation?.solar,
-              let noon = solar.solarNoonPosition?.elevation,
-              mapping.source < 0 || mapping.source > noon
-        else {
-            return nil
-        }
-
-        var values = values
-        if mapping.source < 0, mapping.target > -100 {
-            values = Display.insertDataPoint([-18: mapping.target - 0.01], in: values, cliffRatio: 3, cliffSourceDiff: 5)
-        }
-
-        if mapping.source > noon {
-            values = Display.insertDataPoint([noon: mapping.target], in: values, cliffRatio: 3, cliffSourceDiff: 5)
-        }
-
-        return values
     }
 
     func setNotchState() {

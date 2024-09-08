@@ -916,6 +916,7 @@ enum Hotkey {
         let osdID = (mirroredID != kCGNullDirectDisplay && mirroredID != UINT32_MAX) ? mirroredID : display.id
 
         guard !CachedDefaults[.hideOSD] else { return }
+        display.hideSoftwareOSD()
         manager.showImage(
             osdImage.rawValue,
             onDisplayID: osdID,
@@ -1241,7 +1242,6 @@ extension AppDelegate: MediaKeyTapDelegate {
                 lidClosed: lidClosed,
                 event: event
             )
-
         case []:
             log.info("\(mediaKey) + []")
             return handleBrightnessKeyAction(CachedDefaults[.brightnessKeysControl], mediaKey: mediaKey, lidClosed: lidClosed, event: event)
@@ -1254,7 +1254,6 @@ extension AppDelegate: MediaKeyTapDelegate {
                 lidClosed: lidClosed,
                 event: event
             )
-
         case [.shift] where DC.adaptiveModeKey == .sync:
             log.info("\(mediaKey) + [.shift] where DC.adaptiveModeKey == .sync")
             return handleBrightnessKeyAction(
@@ -1271,7 +1270,6 @@ extension AppDelegate: MediaKeyTapDelegate {
                 lidClosed: lidClosed,
                 event: event
             )
-
         case [.control] where DC.adaptiveModeKey == .sync:
             log.info("\(mediaKey) + [.control] where DC.adaptiveModeKey == .sync")
             return handleBrightnessKeyAction(
@@ -1288,7 +1286,6 @@ extension AppDelegate: MediaKeyTapDelegate {
                 lidClosed: lidClosed,
                 event: event
             )
-
         case [.control, .option] where DC.adaptiveModeKey == .sync:
             log.info("\(mediaKey) + [.control, .option] where DC.adaptiveModeKey == .sync")
             return handleBrightnessKeyAction(
@@ -1307,7 +1304,6 @@ extension AppDelegate: MediaKeyTapDelegate {
                 lidClosed: lidClosed,
                 event: event
             )
-
         case [.control, .shift]:
             log.info("\(mediaKey) + [.control, .shift]")
             return handleBrightnessKeyAction(

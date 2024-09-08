@@ -724,6 +724,7 @@ func serialAsyncAfter(ms: Int, _ action: DispatchWorkItem) {
 }
 
 func cancelScreenWakeAdapterTask() {
+    log.verbose("Cancelling screenWakeAdapterTask")
     appDelegate!.screenWakeAdapterTask = nil
 }
 

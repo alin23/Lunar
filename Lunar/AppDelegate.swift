@@ -1402,6 +1402,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 DC.setXDRContrast(0)
             }
 
+            if addedDisplay || removedDisplay {
+                NSWorkspace.shared.notificationCenter.post(name: NSWorkspace.screensDidWakeNotification, object: nil)
+            }
+
         }, nil)
 
         DistributedNotificationCenter
@@ -1645,7 +1649,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                     self.resetStatesPublisher.send(true)
 
                     if CachedDefaults[.reapplyValuesAfterWake] {
-                        self.screenWakeAdapterTask = Repeater(every: 2, times: CachedDefaults[.wakeReapplyTries], name: "screenWakeAdapter") {
+                        self.screenWakeAdapterTask = Repeater(every: 2, times: CachedDefaults[.wakeReapplyTries], name: SCREEN_WAKE_ADAPTER_TASK_KEY) {
                             DC.adaptBrightness(force: true)
 
                             for display in DC.activeDisplayList.filter(\.blackOutEnabled) {
@@ -1692,6 +1696,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                                     log.debug("  Writing brightness \(br) for \(display.description)")
                                     _ = control.writeBrightness(0, preciseBrightness: br)
                                 }
+                                DC.adaptBrightness(force: true)
                             }
                         }
                     }
@@ -1705,6 +1710,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                     self.valuesReaderThread = nil
                     DC.adaptiveMode.stopWatching()
                     self.server.stopAsync()
+
                 default:
                     break
                 }
