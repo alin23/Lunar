@@ -1,3 +1,18 @@
+# 6.8.2
+# Fixes
+
+- Fix crashes related to DDC resets
+- Improve stability in multi threaded code
+- Fix **"Set screen as Main"** Shortcut when used with *"screen with cursor"*
+- Make sure **System Adaptive Brightness** gets re-enabled correctly when getting below 800 nits manually
+- Move hang detection to 40s instead of 60s to avoid constant app hang restarts
+- Hide Sub-zero Dimming OSD instantly when going above 0% to avoid duplicate OSD
+
+# Improvements
+
+- Run re-adaptation routines both on wake and on monitor connect/disconnect
+
+
 # 6.8.1
 ## Improvements
 
