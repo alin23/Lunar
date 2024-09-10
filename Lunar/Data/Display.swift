@@ -1717,6 +1717,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         lazy var userMaxNits: Double? = getUserMaxNits() {
             didSet {
+                let name = name
+                let maxNits = maxNits
+                let userMaxNits = userMaxNits
                 debug("\(name) Max Nits: \((userMaxNits ?? maxNits).str(decimals: 2))")
                 recomputeNitsMapping()
             }
@@ -1724,6 +1727,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         lazy var userMinNits: Double? = getUserMinNits() {
             didSet {
+                let name = name
+                let minNits = minNits
+                let userMinNits = userMinNits
                 debug("\(name) Min Nits: \((userMinNits ?? minNits).str(decimals: 2))")
                 recomputeNitsMapping()
             }
