@@ -3,6 +3,19 @@
     <channel>
         <title>Lunar</title>
         <item>
+            <title>6.8.2</title>
+            <pubDate>Tue, 10 Sep 2024 19:38:11 +0300</pubDate>
+            <link>https://lunar.fyi/</link>
+            <sparkle:fullReleaseNotesLink>https://lunar.fyi/changelog</sparkle:fullReleaseNotesLink>
+            <sparkle:minimumAutoupdateVersion>5.0.0</sparkle:minimumAutoupdateVersion>
+            <sparkle:version>6.8.2</sparkle:version>
+            <sparkle:shortVersionString>6.8.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-6.8.2.html</sparkle:releaseNotesLink>
+            <enclosure url="https://files.lunar.fyi/releases/Lunar-6.8.2.dmg" length="28568782" type="application/octet-stream" sparkle:edSignature="hT5tfpcgH0mRBMTL4PHdZ/91DXgT1Jal8JMuUnfzWsHOWcu2TE+eqTpzhRueU6So5WRxuWvpY4TK9RWcaSBxBw=="/>
+        </item>
+
+        <item>
             <title>6.8.1</title>
             <pubDate>Tue, 30 Jul 2024 10:14:15 +0300</pubDate>
             <link>https://lunar.fyi/</link>
