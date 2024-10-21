@@ -1,3 +1,4 @@
 {
-    "workbench.sideBar.location": "right"
+    "workbench.sideBar.location": "right",
+    "makefile.configureOnOpen": false
 }

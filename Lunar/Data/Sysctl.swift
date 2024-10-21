@@ -69,6 +69,16 @@ enum Sysctl {
     static var isiMac = modelLowercased.hasPrefix("imac") || IMAC_MODELS.contains(model)
     static var isMacBook = modelLowercased.hasPrefix("macbook") || MACBOOK_MODELS.contains(model)
 
+    static var rosetta: Bool = processIsTranslated == EMULATED_EXECUTION
+    static var processIsTranslatedStr = switch processIsTranslated {
+    case NATIVE_EXECUTION:
+        "native"
+    case EMULATED_EXECUTION:
+        "rosetta"
+    default:
+        "unkown"
+    }
+
     /// e.g. "MyComputer.local" (from System Preferences -> Sharing -> Computer Name) or
     /// "My-Name-iPhone" (from Settings -> General -> About -> Name)
     static var hostName: String { try! Sysctl.string(for: [CTL_KERN, KERN_HOSTNAME]) }
@@ -118,6 +128,17 @@ enum Sysctl {
     /// e.g. "Darwin Kernel Version 15.3.0: Thu Dec 10 18:40:58 PST 2015; root:xnu-3248.30.4~1/RELEASE_X86_64" or
     /// "Darwin Kernel Version 15.0.0: Wed Dec  9 22:19:38 PST 2015; root:xnu-3248.31.3~2/RELEASE_ARM64_S8000"
     static var version: String { try! Sysctl.string(for: [CTL_KERN, KERN_VERSION]) }
+
+    #if os(macOS)
+        /// e.g. 199506 (not available on iOS)
+        static var osRev: Int32 { try! Sysctl.value(ofType: Int32.self, forKeys: [CTL_KERN, KERN_OSREV]) }
+
+        /// e.g. 2659000000 (not available on iOS)
+        static var cpuFreq: Int64 { try! Sysctl.value(ofType: Int64.self, forName: "hw.cpufrequency") }
+
+        /// e.g. 25769803776 (not available on iOS)
+        static var memSize: UInt64 { try! Sysctl.value(ofType: UInt64.self, forKeys: [CTL_HW, HW_MEMSIZE]) }
+    #endif
 
     static func batteryLevel() -> Double? {
         guard isMacBook, let snapshot = IOPSCopyPowerSourcesInfo()?.takeRetainedValue(),
@@ -242,24 +263,4 @@ enum Sysctl {
         try string(for: keys(for: name))
     }
 
-    #if os(macOS)
-        /// e.g. 199506 (not available on iOS)
-        static var osRev: Int32 { try! Sysctl.value(ofType: Int32.self, forKeys: [CTL_KERN, KERN_OSREV]) }
-
-        /// e.g. 2659000000 (not available on iOS)
-        static var cpuFreq: Int64 { try! Sysctl.value(ofType: Int64.self, forName: "hw.cpufrequency") }
-
-        /// e.g. 25769803776 (not available on iOS)
-        static var memSize: UInt64 { try! Sysctl.value(ofType: UInt64.self, forKeys: [CTL_HW, HW_MEMSIZE]) }
-    #endif
-
-    static var rosetta: Bool = processIsTranslated == EMULATED_EXECUTION
-    static var processIsTranslatedStr = switch processIsTranslated {
-    case NATIVE_EXECUTION:
-        "native"
-    case EMULATED_EXECUTION:
-        "rosetta"
-    default:
-        "unkown"
-    }
 }

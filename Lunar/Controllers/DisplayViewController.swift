@@ -1167,7 +1167,6 @@ final class DisplayViewController: NSViewController {
                     }
                     button.showPopover = true
                 }
-
             case is NetworkControl:
                 button.bg = darkMode ? blue.highlight(withLevel: 0.2) : blue.withAlphaComponent(0.9)
                 button.attributedTitle = "Network Pi".withAttribute(.textColor(.black))

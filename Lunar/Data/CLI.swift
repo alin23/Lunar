@@ -279,7 +279,6 @@ struct ForgivingEncodable: Encodable {
             try container.encode(array)
         case let array as [Any?]:
             try container.encode(array.map { ForgivingEncodable($0) })
-
         case let dictionary as [String: Any?]:
             try container.encode(
                 Dictionary(uniqueKeysWithValues: dictionary.map {
@@ -728,7 +727,6 @@ struct Lunar: ParsableCommand {
                     cliPrint(DisplayServicesGetPowerMode(id))
                 case .SetPowerMode:
                     cliPrint(resultString(DisplayServicesSetPowerMode(id, value.u8)))
-
                 case .GetBrightnessIncrement:
                     cliPrint(DisplayServicesGetBrightnessIncrement(id))
                 case .NeedsBrightnessSmoothing:
@@ -1875,12 +1873,14 @@ struct Lunar: ParsableCommand {
 
             func run() throws {
                 guard display != .all else {
+                    cliPrint("CLI: Reconnecting all displays")
                     DC.en()
                     cliExit(0)
                     return
                 }
 
                 guard display != .builtin else {
+                    cliPrint("CLI: Reconnecting builtin display")
                     if !NSScreen.onlineDisplayIDs.contains(1) {
                         DC.en(1)
                     }
@@ -1892,12 +1892,14 @@ struct Lunar: ParsableCommand {
                     guard let sdm, let connected = sdm.connectedDevices, connected.isEmpty,
                           let device = sdm.recentDevices?.first ?? sdm.devices?.first
                     else {
+                        cliPrint("CLI: No sidecar to reconnect")
                         cliExit(1)
                         return
                     }
 
                     Task.init { await sdm.connect(to: device) }
 
+                    cliPrint("CLI: Connecting sidecar \(device)")
                     cliExit(0)
                     return
                 }
@@ -1911,10 +1913,18 @@ struct Lunar: ParsableCommand {
 
                 let displays = getFilteredDisplays(displays: Array(DC.possiblyDisconnectedDisplays.values), filter: display)
                 guard !displays.isEmpty else {
-                    DC.en()
-                    throw LunarCommandError.displayNotFound(display.s)
+                    if case let .id(id) = display {
+                        cliPrint("CLI: Reconnecting \(display)")
+                        DC.en(id)
+                        cliExit(0)
+                        return
+                    } else {
+                        DC.en()
+                        throw LunarCommandError.displayNotFound(display.s)
+                    }
                 }
 
+                cliPrint("CLI: Reconnecting \(displays)")
                 for (i, display) in displays.enumerated() {
                     mainAsyncAfter(ms: i * 1000) {
                         log.info("CLI: Reconnecting \(display)")
@@ -2009,16 +2019,6 @@ struct Lunar: ParsableCommand {
 
     #endif
 
-    #if arch(arm64)
-        static let ARCH_SPECIFIC_COMMANDS: [ParsableCommand.Type] = if #available(macOS 13, *) {
-            [Disconnect.self, Connect.self, ToggleConnection.self, Nits.self]
-        } else {
-            [Nits.self]
-        }
-    #else
-        static let ARCH_SPECIFIC_COMMANDS: [ParsableCommand.Type] = []
-    #endif
-
     static let configuration = CommandConfiguration(
         abstract: "Lunar CLI.",
         subcommands: [
@@ -2048,6 +2048,16 @@ struct Lunar: ParsableCommand {
             NightMode.self,
         ] + ARCH_SPECIFIC_COMMANDS
     )
+
+    #if arch(arm64)
+        static let ARCH_SPECIFIC_COMMANDS: [ParsableCommand.Type] = if #available(macOS 13, *) {
+            [Disconnect.self, Connect.self, ToggleConnection.self, Nits.self]
+        } else {
+            [Nits.self]
+        }
+    #else
+        static let ARCH_SPECIFIC_COMMANDS: [ParsableCommand.Type] = []
+    #endif
 
     @OptionGroup var globals: GlobalOptions
 

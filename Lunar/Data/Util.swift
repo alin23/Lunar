@@ -1080,14 +1080,14 @@ func createWindow(
                 window.backgroundColor = backgroundColor
                 if stationary {
                     window.collectionBehavior = [.stationary, .canJoinAllSpaces, .ignoresCycle, .fullScreenDisallowsTiling]
-                    window.sharingType = .none
+                    window.sharingType = .readOnly
                     window.ignoresMouseEvents = true
                     window.setAccessibilityRole(.popover)
                     window.setAccessibilitySubrole(.unknown)
                 }
                 if show {
-//                    log.debug("Showing window '\(window.title)'")
                     if window.canBecomeKey {
+                        log.debug("Showing key window '\(window.title)'")
                         wc.showWindow(nil)
                     }
                     window.orderFrontRegardless()

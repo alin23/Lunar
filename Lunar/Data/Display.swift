@@ -4848,11 +4848,29 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     func shade(amount: Double, smooth: Bool = true, force: Bool = false, transition: BrightnessTransition? = nil) {
+        log.debug("Shading \(description) by \(amount)")
         guard let screen = nsScreen ?? primaryMirrorScreen, force || (
             !isInNonWirelessHardwareMirrorSet && !isIndependentDummy &&
                 timeSince(lastConnectionTime) >= 1 || onlySoftwareDimmingEnabled
         )
         else {
+            var reasons: [String] = []
+            if nsScreen == nil {
+                reasons.append("nsScreen == nil")
+            }
+            if primaryMirrorScreen == nil {
+                reasons.append("primaryMirrorScreen == nil")
+            }
+            if isInNonWirelessHardwareMirrorSet {
+                reasons.append("isInNonWirelessHardwareMirrorSet")
+            }
+            if isIndependentDummy {
+                reasons.append("isIndependentDummy")
+            }
+            if timeSince(lastConnectionTime) < 1, !onlySoftwareDimmingEnabled {
+                reasons.append("timeSince(lastConnectionTime) < 1")
+            }
+            log.debug("Ignoring shade for \(description), reasons: \(reasons.joined(separator: ", "))")
             shadeWindowController?.close()
             shadeWindowController = nil
             return
@@ -4886,8 +4904,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
             guard let w = shadeWindowController?.window else { return }
 
-            w.setFrameOrigin(CGPoint(x: screen.frame.minX, y: screen.frame.minY))
-            w.setFrame(screen.frame, display: false)
+            let frame = screen.frame
+            w.setFrameOrigin(CGPoint(x: frame.minX, y: frame.minY))
+            w.setFrame(frame, display: false)
 
             let delay = brightnessTransition == .slow ? 2.0 : 0.6
             if smooth { w.contentView?.transition(delay) }

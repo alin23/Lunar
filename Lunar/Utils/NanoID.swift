@@ -110,7 +110,6 @@ enum NanoIDAlphabet {
             chars()
         case .urlSafe:
             "\(NanoIDAlphabet.uppercasedLatinLetters.chars())\(NanoIDAlphabet.lowercasedLatinLetters.chars())\(NanoIDAlphabet.numbers.chars())~_"
-
         }
     }
 

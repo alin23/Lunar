@@ -99,7 +99,6 @@ final class ALSInstallViewController: NSViewController {
             "adafruit_funhouse_esp32s2"
         case "NodeMCU ESP32 S2":
             "nodemcu-32s2"
-
         // ESP32
         case "Adafruit HUZZAH32 Feather ESP32":
             "featheresp32"
@@ -111,7 +110,6 @@ final class ALSInstallViewController: NSViewController {
             "nodemcu-32s"
         case "Generic ESP32":
             "esp32dev"
-
         // ESP8266
         case "NodeMCU v2 (ESP8266)":
             "nodemcuv2"

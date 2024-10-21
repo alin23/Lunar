@@ -247,7 +247,6 @@ enum VideoInputSource: UInt16, Sendable, CaseIterable, Nameable, CustomStringCon
         case .thunderbolt1: "USB-C 1"
         case .thunderbolt2: "USB-C 2"
         case .thunderbolt3: "USB-C 3"
-
         case .lgSpecificDisplayPort1: "DisplayPort 1 (LG specific)"
         case .lgSpecificDisplayPort2: "DisplayPort 2 (LG specific)"
         case .lgSpecificDisplayPort3: "DisplayPort 3 (LG specific)"
@@ -260,7 +259,6 @@ enum VideoInputSource: UInt16, Sendable, CaseIterable, Nameable, CustomStringCon
         case .lgSpecificThunderbolt2: "USB-C 2 (LG specific)"
         case .lgSpecificThunderbolt3: "USB-C 3 (LG specific)"
         case .lgSpecificThunderbolt4: "USB-C 4 (LG specific)"
-
         case .unknown: "Unknown"
         case .separator: "------"
         }
@@ -798,6 +796,55 @@ enum DDC {
 
     static var lastKnownBuiltinDisplayID: CGDirectDisplayID = GENERIC_DISPLAY_ID
 
+    static var i2cControllerCache: ThreadSafeDictionary<CGDirectDisplayID, io_service_t?> = ThreadSafeDictionary()
+
+    static var serviceDetectors = [IOServiceDetector]()
+    static var observers: Set<AnyCancellable> = []
+    static var ioRegistryTreeChanged: PassthroughSubject<Bool, Never> = {
+        let p = PassthroughSubject<Bool, Never>()
+
+        p.debounce(for: .seconds(1), scheduler: RunLoop.main)
+            .sink { _ in
+                checkDisconnectedDisplays()
+                guard !DC.screensSleeping, !DC.locked else { return }
+                log.debug("ioRegistryTreeChanged")
+                IORegistryTreeChanged()
+            }
+            .store(in: &observers)
+
+        return p
+    }()
+
+    static var waitAfterWakeSeconds: Int = {
+        waitAfterWakeSecondsPublisher.debounce(for: .seconds(1), scheduler: RunLoop.main)
+            .sink { waitAfterWakeSeconds = $0.newValue }
+            .store(in: &observers)
+
+        return CachedDefaults[.waitAfterWakeSeconds]
+    }()
+
+    static var delayDDCAfterWake: Bool = CachedDefaults[.delayDDCAfterWake]
+
+    static var lidClosedObserver: IOServicePropertyObserver?
+
+    static var shouldWait: Bool {
+        delayDDCAfterWake && waitAfterWakeSeconds > 0 && wakeTime != Date.distantPast && timeSince(wakeTime) > waitAfterWakeSeconds.d
+    }
+
+    #if arch(arm64)
+        static var dcpList: [DCP] = buildDCPList() {
+            didSet {
+                dcpScores = buildDCPScoreMapping(dcpList: dcpList, displays: DC.externalHardwareActiveDisplays)
+            }
+        }
+        static var dcpScores: [DCP: [CGDirectDisplayID: Int]] = buildDCPScoreMapping(dcpList: dcpList, displays: DC.externalHardwareActiveDisplays) {
+            didSet {
+                dcpMapping = matchDisplayToDCP(dcpScores: dcpScores)
+            }
+        }
+        static var dcpMapping: [CGDirectDisplayID: DCP] = matchDisplayToDCP(dcpScores: dcpScores)
+    #endif
+
     static func extractSerialNumber(from edid: EDID, hex: Bool = false) -> String? {
         extractDescriptorText(from: edid, desType: EDIDTextType.serial, hex: hex)
     }
@@ -842,39 +889,6 @@ enum DDC {
         }
     #endif
 
-    static var i2cControllerCache: ThreadSafeDictionary<CGDirectDisplayID, io_service_t?> = ThreadSafeDictionary()
-
-    static var serviceDetectors = [IOServiceDetector]()
-    static var observers: Set<AnyCancellable> = []
-    static var ioRegistryTreeChanged: PassthroughSubject<Bool, Never> = {
-        let p = PassthroughSubject<Bool, Never>()
-
-        p.debounce(for: .seconds(1), scheduler: RunLoop.main)
-            .sink { _ in
-                checkDisconnectedDisplays()
-                guard !DC.screensSleeping, !DC.locked else { return }
-                log.debug("ioRegistryTreeChanged")
-                IORegistryTreeChanged()
-            }
-            .store(in: &observers)
-
-        return p
-    }()
-
-    static var waitAfterWakeSeconds: Int = {
-        waitAfterWakeSecondsPublisher.debounce(for: .seconds(1), scheduler: RunLoop.main)
-            .sink { waitAfterWakeSeconds = $0.newValue }
-            .store(in: &observers)
-
-        return CachedDefaults[.waitAfterWakeSeconds]
-    }()
-
-    static var delayDDCAfterWake: Bool = CachedDefaults[.delayDDCAfterWake]
-
-    static var shouldWait: Bool {
-        delayDDCAfterWake && waitAfterWakeSeconds > 0 && wakeTime != Date.distantPast && timeSince(wakeTime) > waitAfterWakeSeconds.d
-    }
-
     static func async(_ action: @escaping () -> Void) {
         mainAsync(action)
     }
@@ -883,22 +897,6 @@ enum DDC {
     static func asyncAfter(ms: Int, _ action: @escaping () -> Void) -> DispatchWorkItem {
         mainAsyncAfter(ms: ms, action)
     }
-
-    #if arch(arm64)
-        static var dcpList: [DCP] = buildDCPList() {
-            didSet {
-                dcpScores = buildDCPScoreMapping(dcpList: dcpList, displays: DC.externalHardwareActiveDisplays)
-            }
-        }
-        static var dcpScores: [DCP: [CGDirectDisplayID: Int]] = buildDCPScoreMapping(dcpList: dcpList, displays: DC.externalHardwareActiveDisplays) {
-            didSet {
-                dcpMapping = matchDisplayToDCP(dcpScores: dcpScores)
-            }
-        }
-        static var dcpMapping: [CGDirectDisplayID: DCP] = matchDisplayToDCP(dcpScores: dcpScores)
-    #endif
-
-    static var lidClosedObserver: IOServicePropertyObserver?
 
     // static var lidClosedNotifyPort: IONotificationPortRef?
     // static var lidClosedNotificationHandle: io_object_t = 0

@@ -469,10 +469,39 @@ final class DisplayController: ObservableObject {
         Self.initialized = true
     }
 
+    enum XDRState {
+        case none
+        case enabledManually
+        case disabledManually
+        case enabledAutomatically
+        case disabledAutomatically
+    }
+
+    enum KVO<T> {
+        case initial(T)
+        case subsequent(prior: T, new: T)
+    }
+
     static var panelManager: MPDisplayMgr? = MPDisplayMgr.shared() ?? MPDisplayMgr()
     static var manualModeFromSyncMode = false
 
     static var initialized = false
+
+    static var serials: [CGDirectDisplayID: String] = [:]
+
+    static var observers: Set<AnyCancellable> = []
+    static var ddcSleepFactor: DDCSleepFactor = {
+        ddcSleepFactorPublisher.sink { change in
+            DisplayController.ddcSleepFactor = change.newValue
+        }.store(in: &observers)
+        return Defaults[.ddcSleepFactor]
+    }()
+    static var disableCliffDetection: Bool = {
+        pub(.disableCliffDetection).sink { change in
+            DisplayController.disableCliffDetection = change.newValue
+        }.store(in: &observers)
+        return Defaults[.disableCliffDetection]
+    }()
 
     var doublePressedBrightnessUpKey: ExpiringBool = false
     var doublePressedBrightnessDownKey: ExpiringBool = false
@@ -538,6 +567,107 @@ final class DisplayController: ObservableObject {
     @Setting(.showNitsOSDBuiltin) var showNitsOSDBuiltin: Bool
     @Setting(.dcpMatchingIODisplayLocation) var dcpMatchingIODisplayLocation: Bool
     @Setting(.syncModeBrightnessKeyPressedExpireSeconds) var syncModeBrightnessKeyPressedExpireSeconds: Double
+
+    @Published var calibrating = false
+
+    var screencaptureIsRunning: CurrentValueSubject<Bool, Never> = .init(processIsRunning("/usr/sbin/screencapture", nil))
+
+    @Atomic var apply = true
+
+    lazy var panelRefreshPublisher: PassthroughSubject<CGDirectDisplayID, Never> = {
+        let p = PassthroughSubject<CGDirectDisplayID, Never>()
+        p.debounce(for: .seconds(2), scheduler: RunLoop.main)
+            .sink { [self] id in
+                DisplayController.panelManager = MPDisplayMgr.shared() ?? MPDisplayMgr()
+                if let display = activeDisplays[id] {
+                    display.refreshPanel()
+                }
+            }.store(in: &observers)
+        return p
+    }()
+
+    var reconfigureTask: Repeater?
+
+    lazy var autoBlackoutPublisher: PassthroughSubject<Bool, Never> = {
+        let p = PassthroughSubject<Bool, Never>()
+        p
+            .debounce(for: .seconds(AUTO_OSD_DEBOUNCE_SECONDS), scheduler: RunLoop.main)
+            .sink { shouldBlackout in
+                defer { self.autoBlackoutPending = false }
+                guard shouldBlackout, let d = self.builtinDisplay, !self.calibrating else { return }
+                lastBlackOutToggleDate = .distantPast
+                #if arch(arm64)
+                    if CachedDefaults[.newBlackOutDisconnect], !DC.displayLinkRunning, !d.isWiredInWirelessSet, #available(macOS 13, *) {
+                        self.dis(d.id)
+                    } else {
+                        self.blackOut(display: d.id, state: .on)
+                    }
+                #else
+                    self.blackOut(display: d.id, state: .on)
+                #endif
+            }.store(in: &observers)
+        return p
+    }()
+
+    var autoBlackoutPause = false
+
+    lazy var autoXdrAmbientLightPublisher: PassthroughSubject<Bool?, Never> = {
+        let p = PassthroughSubject<Bool?, Never>()
+        p
+            .debounce(for: .seconds(AUTO_OSD_DEBOUNCE_SECONDS), scheduler: RunLoop.main)
+            .sink { xdrEnabled in
+                defer {
+                    self.autoXdrPendingEnabled = false
+                    self.autoXdrPendingDisabled = false
+                }
+                guard let xdrEnabled, let d = self.builtinDisplay, !self.calibrating else { return }
+
+                d.enhanced = xdrEnabled
+                self.xdrState = xdrEnabled ? .enabledAutomatically : .disabledAutomatically
+            }.store(in: &observers)
+        return p
+    }()
+
+    var panelModesBeforeMirroring: [CGDirectDisplayID: MPDisplayMode] = [:]
+    var mirrorSetBeforeBlackout: [CGDirectDisplayID: [MPDisplay]] = [:]
+    var enabledHDRBeforeXDR: [String: Bool] = [:]
+
+    var lastXdrContrast: Float = 0.0
+    var xdrContrast: Float = 0.0
+
+    var xdrSensorTask: Repeater?
+    lazy var autoXdrSensorLuxThreshold: Float = {
+        autoXdrSensorLuxThresholdPublisher.sink { change in
+            self.autoXdrSensorLuxThreshold = change.newValue
+        }.store(in: &self.observers)
+        return CachedDefaults[.autoXdrSensorLuxThreshold]
+    }()
+
+    @Published var autoXdrSensorPausedReason: String? = nil
+    @Published var internalSensorLux: Float = 0
+
+    var xdrState: XDRState = .none
+
+    @Atomic var autoXdrTipShown = CachedDefaults[.autoXdrTipShown]
+    @Atomic var screensSleeping = false
+    @Atomic var loggedOut = false
+
+    var autoXDRCancelCount = 0
+
+    var fluxPathURL = fluxApp()?.bundleURL
+    @Atomic var usingFlux = isFluxRunning()
+    @Atomic var xdrPausedBecauseOfFlux = false
+
+    @Published var mergeBrightnessContrast = CachedDefaults[.mergeBrightnessContrast]
+
+    let kbc = KeyboardBrightnessClient()
+
+    lazy var keyboardAutoBrightnessEnabledByUser = kbc.isAutoBrightnessEnabled(forKeyboard: 1)
+    lazy var keyboardBrightnessAtStart = kbc.brightness(forKeyboard: 1)
+
+    @Atomic var displayLinkRunning = isDisplayLinkRunning()
+
+    @Atomic var builtinSupportsFullRangeXDR = false
 
     @Atomic var locked = false {
         didSet {
@@ -1022,6 +1152,78 @@ final class DisplayController: ObservableObject {
         }
     }
 
+    @Atomic var volumeKeysDisabledTemporarily = false {
+        didSet {
+            appDelegate!.startOrRestartMediaKeyTap(volumeKeysEnabled: volumeKeysDisabledTemporarily && Defaults[.volumeKeysEnabled])
+        }
+    }
+    var targetDisplays: [Display] {
+        activeDisplayList.filter { !$0.isSource }
+    }
+
+    @AtomicLock var displays: [CGDirectDisplayID: Display] = [:] {
+        didSet {
+            activeDisplays = displays.filter { $1.active && !$1.unmanaged }
+            displayList = displays.values.sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }.reversed()
+            unmanagedDisplays = displayList.filter { $0.active && $0.unmanaged }
+
+            activeDisplaysByReadableID = activeDisplayList.dict { display in (display.readableID, display) }
+            activeDisplaysBySerial = activeDisplayList.dict { display in (display.serial, display) }
+            displaysBySerial = displayList.dict { display in (display.serial, display) }
+            if CachedDefaults[.autoXdrSensor] {
+                xdrSensorTask = getSensorTask()
+            }
+            sourceDisplay = getSourceDisplay()
+        }
+    }
+    @Atomic var fluxRunning = isFluxRunning() {
+        didSet {
+            if fluxRunning, !usingFlux, let app = fluxApp() {
+                usingFlux = true
+                fluxPathURL = app.bundleURL
+            }
+        }
+    }
+
+    var resetDisplayListTask: DispatchWorkItem? {
+        didSet {
+            oldValue?.cancel()
+        }
+    }
+
+    var sentryDataTask: DispatchWorkItem? {
+        didSet {
+            oldValue?.cancel()
+        }
+    }
+
+    var invertColors = NSWorkspace.shared.accessibilityDisplayShouldInvertColors {
+        didSet {
+            guard invertColors != oldValue else { return }
+            log.debug("Invert Colors: \(invertColors)")
+
+            if invertColors, activeDisplayList.contains(where: \.gammaSetAPICalled) {
+                restoreColorSyncSettings(reapplyGammaFor: [], force: true)
+                for d in activeDisplayList where d.gammaSetAPICalled {
+                    d.lastGammaTable = nil
+                    d.lastGammaBrightness = 100
+                }
+            }
+
+            for d in activeDisplayList {
+                d.supportsGamma = d.supportsGammaByDefault && !d.useOverlay && !invertColors
+            }
+            for d in activeDisplayList where d.hasSoftwareControl || d.softwareBrightness != 1 {
+                if let w = d.shadeWindowController?.window {
+                    w.contentView?.bg = invertColors ? NSColor.white : NSColor.black
+                    w.contentView?.setNeedsDisplay(w.frame)
+                }
+
+                d.softwareBrightness = Float(d.softwareBrightness)
+            }
+        }
+    }
+
     static func tryLockManager(tries: Int = 10) -> Bool {
         for i in 1 ... tries {
             log.info("Trying to lock display manager (try: \(i))")
@@ -1187,78 +1389,6 @@ final class DisplayController: ObservableObject {
     }
 
     #if arch(arm64)
-        func display(withDispName dispName: String) -> Display? {
-            activeDisplayList.first { $0.dispName == dispName }
-        }
-    #endif
-
-    func shouldDisableNightModeBecauseOfGammaApp(name: String) -> Bool {
-        askBool(
-            message: "Exclusive Gamma API access required",
-            info: """
-            Detected another running app that uses the Gamma API: \(name).
-
-            Lunar's Night Mode needs exclusive access to the Gamma API in order to function.
-            """,
-            okButton: "Cancel",
-            cancelButton: "Quit \(name)",
-            screen: cursorDisplay?.nsScreen,
-            window: nil,
-            unique: true
-        )
-    }
-
-    func recomputeAllDisplaysBrightness(activeDisplays: [Display]) {
-        guard sourceDisplay.isAllDisplays, !screensSleeping, !locked else {
-            return
-        }
-
-        let recomputeAndAssign: (Display, Double) -> Void = { [self] display, brightness in
-            let (brightnessOffset, _, staticValues) = appBrightnessContrastOffset(for: display) ?? (0, 0, false)
-            let sourceBrightness = staticValues ? brightnessOffset.d : SyncMode.specific.invInterpolate(brightness, display: display, offset: brightnessOffset.d)
-
-//            let sourceBrightness: Double? = (-100 ... 100)
-//                .map { br -> (Double, Int) in
-//                    let newBr = SyncMode.specific.interpolate(br.d, display: display, offset: brightnessOffset.f, gamma22: false)
-//                    return (newBr, abs(brightness.i - newBr.intround))
-//                }
-//                .min(by: { $0.1 < $1.1 })?.0
-
-//            guard let sourceBrightness else { return }
-            if sourceBrightness < 0 {
-                sourceDisplay.preciseBrightnessContrast = 0
-                sourceDisplay.softwareBrightness = sourceBrightness.f.map(from: (-100, 0), to: (0, 1))
-            } else {
-                sourceDisplay.preciseBrightnessContrast = (sourceBrightness / 100)
-            }
-        }
-
-        if let d = activeDisplays.first(where: \.isBuiltin), !lidClosed, !d.systemAdaptiveBrightness, d.adaptive, let brightness = d.readBrightness() {
-            recomputeAndAssign(d, d.softwareAdjusted(brightness: brightness).d)
-        } else if let d = activeDisplays.first(where: { $0.isNative && $0.adaptive }), !d.systemAdaptiveBrightness, let brightness = d.readBrightness() {
-            recomputeAndAssign(d, d.softwareAdjusted(brightness: brightness).d)
-        } else if let d = activeDisplays.first(where: { $0.hasDDC && $0.adaptive && !$0.noControls }) ?? activeDisplays.first(where: { $0.adaptive && !$0.noControls }) {
-            recomputeAndAssign(d, d.softwareAdjustedBrightness.d)
-        } else {
-            return
-        }
-
-        for display in activeDisplays {
-            if !display.lockedBrightnessCurve {
-                display.insertBrightnessUserDataPoint(sourceDisplay.softwareAdjustedBrightness.d, display.brightness.doubleValue, modeKey: .sync)
-            }
-
-            if !display.lockedContrastCurve, !display.lockedContrast {
-                display.insertContrastUserDataPoint(sourceDisplay.preciseContrast * 100, display.contrast.doubleValue, modeKey: .sync)
-            }
-        }
-    }
-
-    func getSourceDisplay() -> Display {
-        DisplayController.getSourceDisplay(activeDisplayList)
-    }
-
-    #if arch(arm64)
         static func armDisplayService(name: String) -> io_service_t? {
             let dispService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceNameMatching(name))
             guard dispService != 0,
@@ -1291,228 +1421,6 @@ final class DisplayController: ObservableObject {
             return props
         }
     #endif
-
-    #if arch(arm64)
-        func clcd2Properties(_ dispService: io_service_t) -> [String: Any]? {
-            guard let clcd2Service = IOServiceFirstChildMatchingRecursively(dispService, names: ["AppleCLCD2", "IOMobileFramebufferShim"]) else { return nil }
-
-            var clcd2ServiceProperties: Unmanaged<CFMutableDictionary>?
-            guard IORegistryEntryCreateCFProperties(
-                clcd2Service,
-                &clcd2ServiceProperties,
-                kCFAllocatorDefault,
-                IOOptionBits()
-            ) == KERN_SUCCESS,
-                let cfProps = clcd2ServiceProperties, let displayProps = cfProps.takeRetainedValue() as? [String: Any]
-            else {
-                log.info("No display props for service \(dispService)")
-                return nil
-            }
-            return displayProps
-        }
-    #endif
-
-    enum XDRState {
-        case none
-        case enabledManually
-        case disabledManually
-        case enabledAutomatically
-        case disabledAutomatically
-    }
-
-    enum KVO<T> {
-        case initial(T)
-        case subsequent(prior: T, new: T)
-    }
-
-    static var serials: [CGDirectDisplayID: String] = [:]
-
-    static var observers: Set<AnyCancellable> = []
-    static var ddcSleepFactor: DDCSleepFactor = {
-        ddcSleepFactorPublisher.sink { change in
-            DisplayController.ddcSleepFactor = change.newValue
-        }.store(in: &observers)
-        return Defaults[.ddcSleepFactor]
-    }()
-    static var disableCliffDetection: Bool = {
-        pub(.disableCliffDetection).sink { change in
-            DisplayController.disableCliffDetection = change.newValue
-        }.store(in: &observers)
-        return Defaults[.disableCliffDetection]
-    }()
-
-    @Published var calibrating = false
-
-    var screencaptureIsRunning: CurrentValueSubject<Bool, Never> = .init(processIsRunning("/usr/sbin/screencapture", nil))
-
-    @Atomic var apply = true
-
-    lazy var panelRefreshPublisher: PassthroughSubject<CGDirectDisplayID, Never> = {
-        let p = PassthroughSubject<CGDirectDisplayID, Never>()
-        p.debounce(for: .seconds(2), scheduler: RunLoop.main)
-            .sink { [self] id in
-                DisplayController.panelManager = MPDisplayMgr.shared() ?? MPDisplayMgr()
-                if let display = activeDisplays[id] {
-                    display.refreshPanel()
-                }
-            }.store(in: &observers)
-        return p
-    }()
-
-    var reconfigureTask: Repeater?
-
-    lazy var autoBlackoutPublisher: PassthroughSubject<Bool, Never> = {
-        let p = PassthroughSubject<Bool, Never>()
-        p
-            .debounce(for: .seconds(AUTO_OSD_DEBOUNCE_SECONDS), scheduler: RunLoop.main)
-            .sink { shouldBlackout in
-                defer { self.autoBlackoutPending = false }
-                guard shouldBlackout, let d = self.builtinDisplay, !self.calibrating else { return }
-                lastBlackOutToggleDate = .distantPast
-                #if arch(arm64)
-                    if CachedDefaults[.newBlackOutDisconnect], !DC.displayLinkRunning, !d.isWiredInWirelessSet, #available(macOS 13, *) {
-                        self.dis(d.id)
-                    } else {
-                        self.blackOut(display: d.id, state: .on)
-                    }
-                #else
-                    self.blackOut(display: d.id, state: .on)
-                #endif
-            }.store(in: &observers)
-        return p
-    }()
-
-    var autoBlackoutPause = false
-
-    lazy var autoXdrAmbientLightPublisher: PassthroughSubject<Bool?, Never> = {
-        let p = PassthroughSubject<Bool?, Never>()
-        p
-            .debounce(for: .seconds(AUTO_OSD_DEBOUNCE_SECONDS), scheduler: RunLoop.main)
-            .sink { xdrEnabled in
-                defer {
-                    self.autoXdrPendingEnabled = false
-                    self.autoXdrPendingDisabled = false
-                }
-                guard let xdrEnabled, let d = self.builtinDisplay, !self.calibrating else { return }
-
-                d.enhanced = xdrEnabled
-                self.xdrState = xdrEnabled ? .enabledAutomatically : .disabledAutomatically
-            }.store(in: &observers)
-        return p
-    }()
-
-    var panelModesBeforeMirroring: [CGDirectDisplayID: MPDisplayMode] = [:]
-    var mirrorSetBeforeBlackout: [CGDirectDisplayID: [MPDisplay]] = [:]
-    var enabledHDRBeforeXDR: [String: Bool] = [:]
-
-    var lastXdrContrast: Float = 0.0
-    var xdrContrast: Float = 0.0
-
-    var xdrSensorTask: Repeater?
-    lazy var autoXdrSensorLuxThreshold: Float = {
-        autoXdrSensorLuxThresholdPublisher.sink { change in
-            self.autoXdrSensorLuxThreshold = change.newValue
-        }.store(in: &self.observers)
-        return CachedDefaults[.autoXdrSensorLuxThreshold]
-    }()
-
-    @Published var autoXdrSensorPausedReason: String? = nil
-    @Published var internalSensorLux: Float = 0
-
-    var xdrState: XDRState = .none
-
-    @Atomic var autoXdrTipShown = CachedDefaults[.autoXdrTipShown]
-    @Atomic var screensSleeping = false
-    @Atomic var loggedOut = false
-
-    var autoXDRCancelCount = 0
-
-    var fluxPathURL = fluxApp()?.bundleURL
-    @Atomic var usingFlux = isFluxRunning()
-    @Atomic var xdrPausedBecauseOfFlux = false
-
-    @Published var mergeBrightnessContrast = CachedDefaults[.mergeBrightnessContrast]
-
-    let kbc = KeyboardBrightnessClient()
-
-    lazy var keyboardAutoBrightnessEnabledByUser = kbc.isAutoBrightnessEnabled(forKeyboard: 1)
-    lazy var keyboardBrightnessAtStart = kbc.brightness(forKeyboard: 1)
-
-    @Atomic var displayLinkRunning = isDisplayLinkRunning()
-
-    @Atomic var builtinSupportsFullRangeXDR = false
-
-    @Atomic var volumeKeysDisabledTemporarily = false {
-        didSet {
-            appDelegate!.startOrRestartMediaKeyTap(volumeKeysEnabled: volumeKeysDisabledTemporarily && Defaults[.volumeKeysEnabled])
-        }
-    }
-    var targetDisplays: [Display] {
-        activeDisplayList.filter { !$0.isSource }
-    }
-
-    @AtomicLock var displays: [CGDirectDisplayID: Display] = [:] {
-        didSet {
-            activeDisplays = displays.filter { $1.active && !$1.unmanaged }
-            displayList = displays.values.sorted { (d1: Display, d2: Display) -> Bool in d1.id < d2.id }.reversed()
-            unmanagedDisplays = displayList.filter { $0.active && $0.unmanaged }
-
-            activeDisplaysByReadableID = activeDisplayList.dict { display in (display.readableID, display) }
-            activeDisplaysBySerial = activeDisplayList.dict { display in (display.serial, display) }
-            displaysBySerial = displayList.dict { display in (display.serial, display) }
-            if CachedDefaults[.autoXdrSensor] {
-                xdrSensorTask = getSensorTask()
-            }
-            sourceDisplay = getSourceDisplay()
-        }
-    }
-    @Atomic var fluxRunning = isFluxRunning() {
-        didSet {
-            if fluxRunning, !usingFlux, let app = fluxApp() {
-                usingFlux = true
-                fluxPathURL = app.bundleURL
-            }
-        }
-    }
-
-    var resetDisplayListTask: DispatchWorkItem? {
-        didSet {
-            oldValue?.cancel()
-        }
-    }
-
-    var sentryDataTask: DispatchWorkItem? {
-        didSet {
-            oldValue?.cancel()
-        }
-    }
-
-    var invertColors = NSWorkspace.shared.accessibilityDisplayShouldInvertColors {
-        didSet {
-            guard invertColors != oldValue else { return }
-            log.debug("Invert Colors: \(invertColors)")
-
-            if invertColors, activeDisplayList.contains(where: \.gammaSetAPICalled) {
-                restoreColorSyncSettings(reapplyGammaFor: [], force: true)
-                for d in activeDisplayList where d.gammaSetAPICalled {
-                    d.lastGammaTable = nil
-                    d.lastGammaBrightness = 100
-                }
-            }
-
-            for d in activeDisplayList {
-                d.supportsGamma = d.supportsGammaByDefault && !d.useOverlay && !invertColors
-            }
-            for d in activeDisplayList where d.hasSoftwareControl || d.softwareBrightness != 1 {
-                if let w = d.shadeWindowController?.window {
-                    w.contentView?.bg = invertColors ? NSColor.white : NSColor.black
-                    w.contentView?.setNeedsDisplay(w.frame)
-                }
-
-                d.softwareBrightness = Float(d.softwareBrightness)
-            }
-        }
-    }
 
     static func getDisplays(
         includeVirtual: Bool = true,
@@ -1607,6 +1515,98 @@ final class DisplayController: ObservableObject {
             log.debug("Secondary mirror for \(d): \(String(describing: d.secondaryMirrorScreenID))")
         }
     }
+
+    #if arch(arm64)
+        func display(withDispName dispName: String) -> Display? {
+            activeDisplayList.first { $0.dispName == dispName }
+        }
+    #endif
+
+    func shouldDisableNightModeBecauseOfGammaApp(name: String) -> Bool {
+        askBool(
+            message: "Exclusive Gamma API access required",
+            info: """
+            Detected another running app that uses the Gamma API: \(name).
+
+            Lunar's Night Mode needs exclusive access to the Gamma API in order to function.
+            """,
+            okButton: "Cancel",
+            cancelButton: "Quit \(name)",
+            screen: cursorDisplay?.nsScreen,
+            window: nil,
+            unique: true
+        )
+    }
+
+    func recomputeAllDisplaysBrightness(activeDisplays: [Display]) {
+        guard sourceDisplay.isAllDisplays, !screensSleeping, !locked else {
+            return
+        }
+
+        let recomputeAndAssign: (Display, Double) -> Void = { [self] display, brightness in
+            let (brightnessOffset, _, staticValues) = appBrightnessContrastOffset(for: display) ?? (0, 0, false)
+            let sourceBrightness = staticValues ? brightnessOffset.d : SyncMode.specific.invInterpolate(brightness, display: display, offset: brightnessOffset.d)
+
+//            let sourceBrightness: Double? = (-100 ... 100)
+//                .map { br -> (Double, Int) in
+//                    let newBr = SyncMode.specific.interpolate(br.d, display: display, offset: brightnessOffset.f, gamma22: false)
+//                    return (newBr, abs(brightness.i - newBr.intround))
+//                }
+//                .min(by: { $0.1 < $1.1 })?.0
+
+//            guard let sourceBrightness else { return }
+            if sourceBrightness < 0 {
+                sourceDisplay.preciseBrightnessContrast = 0
+                sourceDisplay.softwareBrightness = sourceBrightness.f.map(from: (-100, 0), to: (0, 1))
+            } else {
+                sourceDisplay.preciseBrightnessContrast = (sourceBrightness / 100)
+            }
+        }
+
+        if let d = activeDisplays.first(where: \.isBuiltin), !lidClosed, !d.systemAdaptiveBrightness, d.adaptive, let brightness = d.readBrightness() {
+            recomputeAndAssign(d, d.softwareAdjusted(brightness: brightness).d)
+        } else if let d = activeDisplays.first(where: { $0.isNative && $0.adaptive }), !d.systemAdaptiveBrightness, let brightness = d.readBrightness() {
+            recomputeAndAssign(d, d.softwareAdjusted(brightness: brightness).d)
+        } else if let d = activeDisplays.first(where: { $0.hasDDC && $0.adaptive && !$0.noControls }) ?? activeDisplays.first(where: { $0.adaptive && !$0.noControls }) {
+            recomputeAndAssign(d, d.softwareAdjustedBrightness.d)
+        } else {
+            return
+        }
+
+        for display in activeDisplays {
+            if !display.lockedBrightnessCurve {
+                display.insertBrightnessUserDataPoint(sourceDisplay.softwareAdjustedBrightness.d, display.brightness.doubleValue, modeKey: .sync)
+            }
+
+            if !display.lockedContrastCurve, !display.lockedContrast {
+                display.insertContrastUserDataPoint(sourceDisplay.preciseContrast * 100, display.contrast.doubleValue, modeKey: .sync)
+            }
+        }
+    }
+
+    func getSourceDisplay() -> Display {
+        DisplayController.getSourceDisplay(activeDisplayList)
+    }
+
+    #if arch(arm64)
+        func clcd2Properties(_ dispService: io_service_t) -> [String: Any]? {
+            guard let clcd2Service = IOServiceFirstChildMatchingRecursively(dispService, names: ["AppleCLCD2", "IOMobileFramebufferShim"]) else { return nil }
+
+            var clcd2ServiceProperties: Unmanaged<CFMutableDictionary>?
+            guard IORegistryEntryCreateCFProperties(
+                clcd2Service,
+                &clcd2ServiceProperties,
+                kCFAllocatorDefault,
+                IOOptionBits()
+            ) == KERN_SUCCESS,
+                let cfProps = clcd2ServiceProperties, let displayProps = cfProps.takeRetainedValue() as? [String: Any]
+            else {
+                log.info("No display props for service \(dispService)")
+                return nil
+            }
+            return displayProps
+        }
+    #endif
 
     func askAboutXDR(migration: Bool = false) {
         guard !Defaults[.askedAboutXDR], proactive,
@@ -1885,8 +1885,8 @@ final class DisplayController: ObservableObject {
         showTwoSchedulesPublisher.sink { [self] change in
             guard !change.newValue else { return }
 
-            displayList.forEach { d in
-                guard let schedule = d.schedules[safe: 1] else { return }
+            for d in displayList {
+                guard let schedule = d.schedules[safe: 1] else { continue }
                 d.schedules[1] = schedule.with(type: .disabled)
                 d.save()
             }
@@ -1894,8 +1894,8 @@ final class DisplayController: ObservableObject {
         showThreeSchedulesPublisher.sink { [self] change in
             guard !change.newValue else { return }
 
-            displayList.forEach { d in
-                guard let schedule = d.schedules[safe: 2] else { return }
+            for d in displayList {
+                guard let schedule = d.schedules[safe: 2] else { continue }
                 d.schedules[2] = schedule.with(type: .disabled)
                 d.save()
             }
@@ -1903,8 +1903,8 @@ final class DisplayController: ObservableObject {
         showFourSchedulesPublisher.sink { [self] change in
             guard !change.newValue else { return }
 
-            displayList.forEach { d in
-                guard let schedule = d.schedules[safe: 3] else { return }
+            for d in displayList {
+                guard let schedule = d.schedules[safe: 3] else { continue }
                 d.schedules[3] = schedule.with(type: .disabled)
                 d.save()
             }
@@ -1912,8 +1912,8 @@ final class DisplayController: ObservableObject {
         showFiveSchedulesPublisher.sink { [self] change in
             guard !change.newValue else { return }
 
-            displayList.forEach { d in
-                guard let schedule = d.schedules[safe: 4] else { return }
+            for d in displayList {
+                guard let schedule = d.schedules[safe: 4] else { continue }
                 d.schedules[4] = schedule.with(type: .disabled)
                 d.save()
             }
@@ -2408,7 +2408,17 @@ final class DisplayController: ObservableObject {
               !calibrating
         else {
             let stats =
-                "activeOldDisplays.count=\(activeOldDisplays.count) activeNewDisplays.count=\(activeNewDisplays.count) idsCount=\(idsCount) timeSinceBuiltinCameOn=\(timeSince(activeOldDisplays.first(where: { $0.isBuiltin && !$0.blackOutEnabled })?.lastConnectionTime ?? .distantPast)) builtinBlackout=\(String(describing: activeOldDisplays.first(where: \.isBuiltin)?.blackOutEnabled))"
+                """
+                activeOldDisplays.count=\(activeOldDisplays.count)
+                activeNewDisplays.count=\(activeNewDisplays.count)
+                idsCount=\(idsCount)
+                timeSinceBuiltinCameOn=\(timeSince(activeOldDisplays.first(where: { $0.isBuiltin && !$0.blackOutEnabled })?.lastConnectionTime ?? .distantPast))
+                builtinBlackout=\(String(describing: activeOldDisplays.first(where: \.isBuiltin)?.blackOutEnabled))
+                builtinCameOnRecently=\(builtinCameOnRecently)
+                onlyBuiltinWasOn=\(onlyBuiltinWasOn)
+                calibrating=\(calibrating)
+                validMonitors=\(activeNewDisplays.filter { !$0.isBuiltin && !$0.isSidecar && !$0.isAirplay })
+                """
             log.info("Not activating AutoBlackout: \(stats)")
             return
         }
@@ -2827,10 +2837,10 @@ final class DisplayController: ObservableObject {
         let manualMode = (adaptiveMode as? ManualMode) ?? ManualMode.specific
         let displays = displays ?? activeDisplayList.map { $0 }
 
-        displays.forEach { display in
+        for display in displays {
             guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin,
                   !display.lockedBrightness || display.hasSoftwareControl
-            else { return }
+            else { continue }
 
             let set = {
                 let minBr = display.minBrightness.intValue
@@ -2852,8 +2862,8 @@ final class DisplayController: ObservableObject {
         let manualMode = (adaptiveMode as? ManualMode) ?? ManualMode.specific
         let displays = displays ?? activeDisplayList.map { $0 }
 
-        displays.forEach { display in
-            guard !display.isBuiltin, !display.lockedContrast else { return }
+        for display in displays {
+            guard !display.isBuiltin, !display.lockedContrast else { continue }
 
             let set = {
                 display.contrast = manualMode.compute(
