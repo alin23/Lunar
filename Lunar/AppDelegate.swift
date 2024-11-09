@@ -32,6 +32,7 @@ import AVFoundation
 import Path
 import SwiftUI
 
+import AppIntents
 import ServiceManagement
 
 extension CLLocationManager {

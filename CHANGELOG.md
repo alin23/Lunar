@@ -1,3 +1,8 @@
+# 6.8.3
+## Fixes
+
+- Fix overlay dimming not appearing on virtual displays like **DisplayLink**
+
 # 6.8.2
 # Fixes
 
