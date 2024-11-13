@@ -3,6 +3,26 @@
     <channel>
         <title>Lunar</title>
         <item>
+            <title>6.8.5b1</title>
+            <pubDate>Wed, 13 Nov 2024 16:23:53 +0200</pubDate>
+            <link>https://lunar.fyi/</link>
+            <sparkle:fullReleaseNotesLink>https://lunar.fyi/changelog</sparkle:fullReleaseNotesLink>
+            <sparkle:channel>beta</sparkle:channel>
+            <sparkle:minimumAutoupdateVersion>5.0.0</sparkle:minimumAutoupdateVersion>
+            <sparkle:version>6.8.5b1</sparkle:version>
+            <sparkle:shortVersionString>6.8.5b1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-6.8.5b1.html</sparkle:releaseNotesLink>
+            <enclosure url="https://files.lunar.fyi/releases/Lunar-6.8.5b1.dmg" length="20997072" type="application/octet-stream" sparkle:edSignature="gb4d3mnml/6ijlc2qeHA2x/5WedxbiyCCYf76cxZlOS2A5vs/OOSrMI3s/qfA/ME+mc5YMEXc9It5WgeBQHPCg=="/>
+            <sparkle:deltas>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar6.8.5b1-6.8.4.delta" sparkle:deltaFrom="6.8.4" length="1341810" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="1842416" sparkle:deltaFromSparkleLocales="en,Base" sparkle:edSignature="GCRAKvCgzQAx7ljX8O68LdJ3fYKSGhfGTpMMrd/v1r0c6jBOPR7GeArlX0v6oRC3u/tZvqe6FMahASjkBc5LBQ=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar6.8.5b1-6.8.3.delta" sparkle:deltaFrom="6.8.3" length="1780242" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="1842416" sparkle:deltaFromSparkleLocales="en,Base" sparkle:edSignature="qT5c1qT58Y8JvNAShkINd6osOSA+ewdZ5EqDLOfFV9K/MQyDNbj9X5ohgA38XNHTf9Yb7ETSh2cEfLy6rfmCDA=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar6.8.5b1-6.8.2.delta" sparkle:deltaFrom="6.8.2" length="6847790" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="1842416" sparkle:deltaFromSparkleLocales="en,Base" sparkle:edSignature="Y3oAbp9AFpfCSYaCIJGBxNY2oc+84aFc7zSF7faYNrzPFPU8f5jnMU6OBvyNJYxfL41LLtP/ULGCLyxuXNwFCw=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar6.8.5b1-6.8.0.delta" sparkle:deltaFrom="6.8.0" length="6851818" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="1842416" sparkle:deltaFromSparkleLocales="en,Base" sparkle:edSignature="+txp73R2UAB+7sGWaF5K8/aBlPCXcM2ARPB6FagqRdY73OmbsAA4jJ3QYeU3UIs5WQ8pD2a+JtsTHgAoYnghBg=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar6.8.5b1-6.7.13.delta" sparkle:deltaFrom="6.7.13" length="9809842" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="1842416" sparkle:deltaFromSparkleLocales="en,Base" sparkle:edSignature="ODsqp+dYx4w5U4FooFTRm+gi5euHCCJ9TIOi3eZqP9wxXHvr5X0ojGioXhr9JNGhtf14WqlL8qJX98xoq95eDA=="/>
+            </sparkle:deltas>
+        </item>
+        <item>
             <title>6.8.4</title>
             <pubDate>Sat, 09 Nov 2024 12:14:47 +0200</pubDate>
             <link>https://lunar.fyi/</link>
@@ -15,8 +35,8 @@
             <enclosure url="https://files.lunar.fyi/releases/Lunar-6.8.4.dmg" length="20997218" type="application/octet-stream" sparkle:edSignature="Pcrh1vE9hWtdoKJxQXchDKdnMpQcOppMA2JtA7o+lHqWg/Wnh9vE5/H6TO30LnygsHfRhfUtYlLcAsE0PuFLAg=="/>
             <sparkle:deltas>
                 <enclosure url="https://files.lunar.fyi/deltas/Lunar6.8.4-6.8.3.delta" sparkle:deltaFrom="6.8.3" length="1471242" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="1842416" sparkle:deltaFromSparkleLocales="en,Base" sparkle:edSignature="1yaiQJJXoGtjvVKmrlA3+HeIiSEyXjjju2dCAu9tWPv9rLkk83xchZNLvXTC4jAX7lK+sPVYxdrK6UFo59MaDw=="/>
-                <enclosure url="https://files.lunar.fyi/deltas/Lunar6.8.4-6.8.2.delta" sparkle:deltaFrom="6.8.2" length="6843590" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="1842416" sparkle:deltaFromSparkleLocales="en,Base" sparkle:edSignature="14KhkV6unNgRQnQeDecmV1QCFRSGSMVGS4PkvxVW435njVJ43jUqmHPa4HHFQcDMNVQ0+rCQnmvtoys+c4RBDg=="/>
                 <enclosure url="https://files.lunar.fyi/deltas/Lunar6.8.4-6.8.0.delta" sparkle:deltaFrom="6.8.0" length="6847990" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="1842416" sparkle:deltaFromSparkleLocales="en,Base" sparkle:edSignature="aQBi4FKfMYhp7++c6zoUz7U6hRepxQPgWCe0KERGAHixyQvCRfahinrLLRbNcUWXv8tQyMnzieEtomVAWZMbAQ=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar6.8.4-6.8.2.delta" sparkle:deltaFrom="6.8.2" length="6843590" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="1842416" sparkle:deltaFromSparkleLocales="en,Base" sparkle:edSignature="14KhkV6unNgRQnQeDecmV1QCFRSGSMVGS4PkvxVW435njVJ43jUqmHPa4HHFQcDMNVQ0+rCQnmvtoys+c4RBDg=="/>
                 <enclosure url="https://files.lunar.fyi/deltas/Lunar6.8.4-6.7.13.delta" sparkle:deltaFrom="6.7.13" length="9824630" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="1842416" sparkle:deltaFromSparkleLocales="en,Base" sparkle:edSignature="4YhxTNlMd254yerpvxVn75yu0OjhI3JdD4f4NreD405S1d4f8Ysah6G+XpiP6zzQGwl7zz68Mub3rVshg4ajCA=="/>
                 <enclosure url="https://files.lunar.fyi/deltas/Lunar6.8.4-6.7.12.delta" sparkle:deltaFrom="6.7.12" length="9838614" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="1842416" sparkle:deltaFromSparkleLocales="en,Base" sparkle:edSignature="xQPTdpW1icq1Zo112VmyrgEYc1cjUZFUJkEfD6XazlR22L3vUucMr9MOv5rvX4I9HvVVjzdNTy0YZbFwvdfyBw=="/>
             </sparkle:deltas>

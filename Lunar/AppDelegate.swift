@@ -2169,6 +2169,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                         var line = try socket.readString()
                         while let currentLine = line, !currentLine.isEmpty {
                             print(currentLine.trimmed)
+                            fflush(stdout)
                             line = try socket.readString()
                         }
                     }
@@ -2609,6 +2610,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     func startReceivingSignificantLocationChanges() {
         if CachedDefaults[.manualLocation] {
             LocationMode.specific.geolocation = CachedDefaults[.location]
+            return
         }
 
         if locationManager == nil {

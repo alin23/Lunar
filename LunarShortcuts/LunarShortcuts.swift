@@ -988,8 +988,6 @@ struct ToggleFacelightIntent: AppIntent {
 
 @available(iOS 16, macOS 13, *)
 struct NightModeIntent: AppIntent {
-    init() {}
-
     // swiftformat:disable all
     static var title: LocalizedStringResource = "Night Mode"
     static var description = IntentDescription(
@@ -1000,6 +998,8 @@ This will lower the white point and increase the contrast of all screens,
 making white regions on dark backgrounds appear less bright while still
 preserving most colors.
 """, categoryName: "Toggles")
+
+    init() {}
 
     // swiftformat:enable all
     static var parameterSummary: some ParameterSummary {
@@ -1031,8 +1031,6 @@ extension UnitDuration: @unchecked Sendable {}
 
 @available(iOS 16, macOS 13, *)
 struct CleaningModeIntent: AppIntent {
-    init() {}
-
     // swiftformat:disable all
     static var title: LocalizedStringResource = "Cleaning Mode"
     static var description = IntentDescription(
@@ -1051,6 +1049,8 @@ Press the ⌘ Command key more than 8 times in a row to force deactivation of th
             Summary("Activate cleaning mode and \(\.$deactivateAutomatically)   (press the `⌘ Command` key more than 8 times in a row to deactivate)")
         })
     }
+
+    init() {}
 
     // swiftformat:enable all
 
@@ -1174,8 +1174,6 @@ func activateCleaningMode(deactivateAfter: TimeInterval? = 120, withoutSettingFl
 
 @available(iOS 16, macOS 13, *)
 struct PowerOffSoftwareIntent: AppIntent {
-    init() {}
-
     // swiftformat:disable all
     static var title: LocalizedStringResource = "Power off screen (in software)"
     static var description = IntentDescription(
@@ -1187,6 +1185,8 @@ Power off a screen by:
     - also moves windows away to other visible screens
   - spawning a background task to keep the above conditions in check
 """, categoryName: "Power")
+
+    init() {}
 
     // swiftformat:enable all
 
@@ -1286,11 +1286,11 @@ Power off a screen by:
 
 @available(iOS 16, macOS 13, *)
 struct PowerOnSoftwareIntent: AppIntent {
-    init() {}
-
     // swiftformat:disable all
     static var title: LocalizedStringResource = "Power on screen (in software)"
     static var description = IntentDescription("Power on a screen if it was previously powered off using BlackOut.", categoryName: "Power")
+
+    init() {}
 
     // swiftformat:enable all
 
@@ -1344,11 +1344,11 @@ struct PowerOnSoftwareIntent: AppIntent {
 
 @available(iOS 16, macOS 13, *)
 struct SleepMacIntent: AppIntent {
-    init() {}
-
     // swiftformat:disable all
     static var title: LocalizedStringResource = "Sleep the Mac"
     static var description = IntentDescription("Enters Sleep mode, same as clicking on Apple icon in the menu bar and clicking on 'Sleep'", categoryName: "Power")
+
+    init() {}
 
     // swiftformat:enable all
 
@@ -1368,8 +1368,6 @@ struct SleepMacIntent: AppIntent {
 
 @available(iOS 16, macOS 13, *)
 struct DisconnectScreenIntent: AppIntent {
-    init() {}
-
     // swiftformat:disable all
     static var title: LocalizedStringResource = "Disconnect screen"
     static var description = IntentDescription(
@@ -1386,6 +1384,8 @@ To bring back the screen try any one of the following:
 • Close and open the MacBook lid (for the internal screen)
 • Disconnect and reconnect the cable (for external screens)
 """, categoryName: "Connection")
+
+    init() {}
 
     // swiftformat:enable all
 
@@ -1418,8 +1418,6 @@ To bring back the screen try any one of the following:
 
 @available(iOS 16, macOS 13, *)
 struct ReconnectScreenIntent: AppIntent {
-    init() {}
-
     // swiftformat:disable all
     static var title: LocalizedStringResource = "Reconnect screen"
     static var description = IntentDescription(
@@ -1433,6 +1431,8 @@ If the action fails, try any one of the following to bring back the screen:
 • Close and open the MacBook lid (for the internal screen)
 • Disconnect and reconnect the cable (for external screens)
 """, categoryName: "Connection")
+
+    init() {}
 
     // swiftformat:enable all
 
@@ -1494,8 +1494,6 @@ func connectedScreen(_ s: Screen) async throws -> Screen? {
 
 @available(iOS 16, macOS 13, *)
 struct ToggleScreenConnectionIntent: AppIntent {
-    init() {}
-
     // swiftformat:disable all
     static var title: LocalizedStringResource = "Toggle screen connection"
     static var description = IntentDescription(
@@ -1509,6 +1507,8 @@ If the reconnect action fails, try any one of the following to bring back the sc
 • Close and open the MacBook lid (for the internal screen)
 • Disconnect and reconnect the cable (for external screens)
 """, categoryName: "Connection")
+
+    init() {}
 
     // swiftformat:enable all
 
@@ -1794,8 +1794,6 @@ struct ApplyPresetIntent: AppIntent {
 
 @available(iOS 16, macOS 13, *)
 struct PowerOffIntent: AppIntent {
-    init() {}
-
     // swiftformat:disable all
     static var title: LocalizedStringResource = "Power off screen (in hardware)"
     static var description = IntentDescription("""
@@ -1803,6 +1801,8 @@ Powers off the screen using DDC. This is equivalent to pressing the screen's phy
 
 Note: a screen can't also be powered on using this method because a powered off screen is disconnected and doesn't accept DDC commands.
 """, categoryName: "Power")
+
+    init() {}
 
     // swiftformat:enable all
 
@@ -1900,6 +1900,15 @@ struct ToggleGammaIntent: AppIntent {
 
 @available(iOS 16, macOS 13, *)
 struct SetInputIntent: AppIntent {
+    // swiftformat:disable all
+    static var title: LocalizedStringResource = "Change Video Input Source"
+    static var description = IntentDescription(
+    """
+Changes screen input to a specific value (HDMI/DP/USB-C).
+
+Note: Not all inputs are supported by all monitors, and some monitors may use non-standard input values.
+""", categoryName: "DDC")
+
     init() {}
 
     struct InputProvider: DynamicOptionsProvider {
@@ -1917,15 +1926,6 @@ struct SetInputIntent: AppIntent {
             }
         }
     }
-
-    // swiftformat:disable all
-    static var title: LocalizedStringResource = "Change Video Input Source"
-    static var description = IntentDescription(
-    """
-Changes screen input to a specific value (HDMI/DP/USB-C).
-
-Note: Not all inputs are supported by all monitors, and some monitors may use non-standard input values.
-""", categoryName: "DDC")
 
     // swiftformat:enable all
 
@@ -2005,6 +2005,15 @@ struct WriteDDCIntent: AppIntent {
 
 @available(iOS 16, macOS 13, *)
 struct ReadDDCIntent: AppIntent {
+    // swiftformat:disable all
+    static var title: LocalizedStringResource = "DDC Read Value from Screen"
+    static var description = IntentDescription(
+    """
+Sends a DDC read command to a specific screen and returns the value read.
+
+Note: DDC reads rarely work and can return wrong values.
+""", categoryName: "DDC")
+
     init() {}
 
     struct VCPProvider: DynamicOptionsProvider {
@@ -2022,15 +2031,6 @@ struct ReadDDCIntent: AppIntent {
             }
         }
     }
-
-    // swiftformat:disable all
-    static var title: LocalizedStringResource = "DDC Read Value from Screen"
-    static var description = IntentDescription(
-    """
-Sends a DDC read command to a specific screen and returns the value read.
-
-Note: DDC reads rarely work and can return wrong values.
-""", categoryName: "DDC")
 
     // swiftformat:enable all
 
@@ -2177,22 +2177,6 @@ struct ControlScreenValueBool: AppIntent {
 
 @available(iOS 16, macOS 13, *)
 struct AdjustSoftwareColorsIntent: AppIntent {
-    init() {}
-
-    static var title: LocalizedStringResource = "Adjust Colors of a Screen (in software)"
-    static var description =
-        IntentDescription(
-            "Adjusts screen colors by changing the Gamma curve for Red, Green and Blue. The adjustments stick as long as Lunar is running (not persistent), but they are re-applied when Lunar is relaunched.",
-            categoryName: "Colors"
-        )
-
-    static var parameterSummary: some ParameterSummary {
-        Summary("Adjust Gamma to（\(\.$red) Red｜\(\.$green) Green｜\(\.$blue) Blue）for \(\.$screen)")
-    }
-
-    @Parameter(title: "Screen", optionsProvider: ScreenQuery(filter: { $0.supportsGammaByDefault }))
-    var screen: Screen
-
     // swiftformat:disable all
     @Parameter(
         title: "Red",
@@ -2237,6 +2221,22 @@ The blue component of the Gamma curve
     var blue: Double
 
 
+    init() {}
+
+    static var title: LocalizedStringResource = "Adjust Colors of a Screen (in software)"
+    static var description =
+        IntentDescription(
+            "Adjusts screen colors by changing the Gamma curve for Red, Green and Blue. The adjustments stick as long as Lunar is running (not persistent), but they are re-applied when Lunar is relaunched.",
+            categoryName: "Colors"
+        )
+
+    static var parameterSummary: some ParameterSummary {
+        Summary("Adjust Gamma to（\(\.$red) Red｜\(\.$green) Green｜\(\.$blue) Blue）for \(\.$screen)")
+    }
+
+    @Parameter(title: "Screen", optionsProvider: ScreenQuery(filter: { $0.supportsGammaByDefault }))
+    var screen: Screen
+
     // swiftformat:enable all
 
     @MainActor
@@ -2255,24 +2255,6 @@ The blue component of the Gamma curve
 
 @available(iOS 16, macOS 13, *)
 struct AdjustSoftwareColorsAdvancesIntent: AppIntent {
-    init() {}
-
-    static var title: LocalizedStringResource = "Adjust Advanced Colors of a Screen (in software)"
-    static var description =
-        IntentDescription(
-            "Adjusts screen colors by changing the min, max and Gamma factor values for Red, Green and Blue. The adjustments stick as long as Lunar is running (not persistent), but they are re-applied when Lunar is relaunched.",
-            categoryName: "Colors"
-        )
-
-    static var parameterSummary: some ParameterSummary {
-        Summary(
-            "Adjust Gamma to（\(\.$minRed) Min Red｜\(\.$minGreen) Min Green｜\(\.$minBlue) Min Blue,（\(\.$maxRed) Max Red｜\(\.$maxGreen) Max Green｜\(\.$maxBlue) Max Blue）and（\(\.$redFactor) Red Factor｜\(\.$greenFactor) Green Factor｜\(\.$blueFactor) Blue Factor）for \(\.$screen)"
-        )
-    }
-
-    @Parameter(title: "Screen", optionsProvider: ScreenQuery(filter: { $0.supportsGammaByDefault }))
-    var screen: Screen
-
     // swiftformat:disable all
     @Parameter( title: "Min Red", default: 0.0, controlStyle: .field, inclusiveRange: (0.0, 0.95) )
     var minRed: Double
@@ -2301,6 +2283,24 @@ struct AdjustSoftwareColorsAdvancesIntent: AppIntent {
     @Parameter( title: "Blue Factor", default: 1.0, controlStyle: .field, inclusiveRange: (0.05, 3.0) )
     var blueFactor: Double
 
+    init() {}
+
+    static var title: LocalizedStringResource = "Adjust Advanced Colors of a Screen (in software)"
+    static var description =
+        IntentDescription(
+            "Adjusts screen colors by changing the min, max and Gamma factor values for Red, Green and Blue. The adjustments stick as long as Lunar is running (not persistent), but they are re-applied when Lunar is relaunched.",
+            categoryName: "Colors"
+        )
+
+    static var parameterSummary: some ParameterSummary {
+        Summary(
+            "Adjust Gamma to（\(\.$minRed) Min Red｜\(\.$minGreen) Min Green｜\(\.$minBlue) Min Blue,（\(\.$maxRed) Max Red｜\(\.$maxGreen) Max Green｜\(\.$maxBlue) Max Blue）and（\(\.$redFactor) Red Factor｜\(\.$greenFactor) Green Factor｜\(\.$blueFactor) Blue Factor）for \(\.$screen)"
+        )
+    }
+
+    @Parameter(title: "Screen", optionsProvider: ScreenQuery(filter: { $0.supportsGammaByDefault }))
+    var screen: Screen
+
     // swiftformat:enable all
 
     @MainActor
@@ -2325,8 +2325,6 @@ struct AdjustSoftwareColorsAdvancesIntent: AppIntent {
 
 @available(iOS 16, macOS 13, *)
 struct AdjustHardwareColorsIntent: AppIntent {
-    init() {}
-
     // swiftformat:disable all
     static var title: LocalizedStringResource = "Adjust Colors of a Screen (in hardware)"
     static var description =
@@ -2340,6 +2338,8 @@ Note: not all monitors support color gain control through DDC and value effect c
 """,
             categoryName: "Colors"
         )
+
+    init() {}
 
     // swiftformat:enable all
     static var parameterSummary: some ParameterSummary {
@@ -2414,8 +2414,6 @@ Note: not all monitors support color gain control through DDC and value effect c
 
 @available(iOS 16, macOS 13, *)
 struct ReadHardwareColorsIntent: AppIntent {
-    init() {}
-
     // swiftformat:disable all
     static var title: LocalizedStringResource = "Read Color Gain Values (in hardware)"
     static var description =
@@ -2427,6 +2425,8 @@ Note: very few monitors implement this functionality
 """,
             categoryName: "Colors"
         )
+
+    init() {}
 
     // swiftformat:enable all
     static var parameterSummary: some ParameterSummary {
@@ -3380,9 +3380,6 @@ struct HorizontalMonitorThreeLayoutIntent: AppIntent {
 
 @available(iOS 16, macOS 13, *)
 struct FixMonitorArrangementIntent: AppIntent {
-    init() {}
-
-    static var title: LocalizedStringResource = "Fix monitor arrangement"
     // swiftformat:disable all
     static var description =
         IntentDescription(
@@ -3399,6 +3396,10 @@ How it works:
 
 Press `Esc` to cancel or `Enter` to partially arrange the monitors selected so far.
 """, categoryName: "Arrangement")
+
+    init() {}
+
+    static var title: LocalizedStringResource = "Fix monitor arrangement"
 
     // swiftformat:enable all
 
