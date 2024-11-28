@@ -1,3 +1,13 @@
+# 6.8.5
+## Improvements
+
+- Return early if manual location is being used for coordinates
+- Flush stdout when using `lunar listen` CLI command
+
+## Fixes
+
+- Fix auto-learning in Location mode before sunrise and after sunset
+
 # 6.8.4
 ## Improvements
 
