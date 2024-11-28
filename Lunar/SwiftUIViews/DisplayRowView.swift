@@ -53,6 +53,19 @@ struct DisplayContextMenu: View {
         }
     #endif
 
+    // var hdrBinding: Binding<Bool> {
+    //     Binding(
+    //         get: { display.presetSupportsHDR },
+    //         set: { enable in
+    //             if enable {
+    //                 display.enablePresetHDR()
+    //             } else {
+    //                 display.disablePresetHDR()
+    //             }
+    //         }
+    //     )
+    // }
+
     var facelightBinding: Binding<Bool> {
         Binding(
             get: { display.facelight },
@@ -72,6 +85,9 @@ struct DisplayContextMenu: View {
         if display.hasAmbientLightAdaptiveBrightness {
             Toggle("System Adaptive Brightness", isOn: systemAdaptiveBrightnessBinding)
         }
+        // if display.supportsHDRDisabling {
+        //     Toggle("HDR", isOn: hdrBinding)
+        // }
 
         Divider()
 
