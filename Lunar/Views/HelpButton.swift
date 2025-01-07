@@ -106,12 +106,17 @@ final class OnboardingHelpButton: HelpButton {
 // MARK: - HelpButton
 
 class HelpButton: PopoverButton<HelpPopoverController> {
+    override var popoverKey: String {
+        "help"
+    }
+
     var link: String?
 
     @IBInspectable var helpText = ""
 
-    override var popoverKey: String {
-        "help"
+    override func mouseDown(with event: NSEvent) {
+        setParsedHelpText()
+        super.mouseDown(with: event)
     }
 
     func getParsedHelpText() -> NSAttributedString? {
@@ -137,8 +142,4 @@ class HelpButton: PopoverButton<HelpPopoverController> {
         }
     }
 
-    override func mouseDown(with event: NSEvent) {
-        setParsedHelpText()
-        super.mouseDown(with: event)
-    }
 }

@@ -182,13 +182,13 @@ struct OutlineButton: ButtonStyle {
             }
     }
 
+    @State private var multiplyColor: Color = .white
+    @State private var scale: CGFloat = 1
+
     private var color = Color.fg.warm.opacity(0.8)
     private var hoverColor: Color = .fg.warm
     private var thickness: CGFloat = 2
     private var font: Font = .body.bold()
-
-    @State private var multiplyColor: Color = .white
-    @State private var scale: CGFloat = 1
 
 }
 
@@ -356,6 +356,7 @@ struct CheckboxToggleStyle: ToggleStyle {
     }
 
     @Environment(\.isEnabled) var isEnabled
+
     let style: Style // custom param
 
     func makeBody(configuration: Configuration) -> some View {
@@ -387,9 +388,6 @@ protocol Nameable {
 // MARK: - SizedPopUpButton
 
 final class SizedPopUpButton: NSPopUpButton {
-    var width: CGFloat?
-    var height: CGFloat?
-
     override var intrinsicContentSize: NSSize {
         guard let width, let height else {
             return super.intrinsicContentSize
@@ -397,6 +395,10 @@ final class SizedPopUpButton: NSPopUpButton {
 
         return NSSize(width: width, height: height)
     }
+
+    var width: CGFloat?
+    var height: CGFloat?
+
 }
 
 // MARK: - Dropdown
@@ -430,6 +432,7 @@ struct Dropdown<T: Nameable>: NSViewRepresentable {
     @State var markdown = false
 
     @Binding var content: [T]
+
     var title: Binding<String>?
     var image: Binding<String>?
     var validate: ((NSMenuItem) -> Bool)?

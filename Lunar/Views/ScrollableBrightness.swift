@@ -103,6 +103,11 @@ final class ScrollableBrightness: NSView {
         }
     }
 
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+        setup()
+    }
+
     func addObserver(_ display: Display) {
         display.$brightness
             .throttle(for: .milliseconds(50), scheduler: RunLoop.main, latest: true)
@@ -200,8 +205,4 @@ final class ScrollableBrightness: NSView {
         currentValue?.caption = currentValue?.caption ?? currentValueCaption
     }
 
-    override func draw(_ dirtyRect: NSRect) {
-        super.draw(dirtyRect)
-        setup()
-    }
 }

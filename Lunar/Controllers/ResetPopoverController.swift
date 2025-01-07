@@ -27,6 +27,10 @@ final class ResetPopoverController: NSViewController {
 // MARK: - ResetPopoverButton
 
 final class ResetPopoverButton: PopoverButton<ResetPopoverController> {
+    override var popoverKey: String {
+        "reset"
+    }
+
     weak var displayViewController: DisplayViewController? {
         didSet {
             popoverController?.displayViewController = displayViewController
@@ -37,10 +41,6 @@ final class ResetPopoverButton: PopoverButton<ResetPopoverController> {
         didSet {
             popoverController?.display = display
         }
-    }
-
-    override var popoverKey: String {
-        "reset"
     }
 
     override func mouseDown(with event: NSEvent) {

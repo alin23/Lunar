@@ -259,6 +259,18 @@ final class SplitViewController: NSSplitViewController {
         _activeHelpButton as? HelpButton
     }
 
+    override func viewDidLoad() {
+        view.wantsLayer = true
+        view.radius = 12.0.ns
+        view.bg = white
+
+        displayPage()
+        updateHelpButton()
+        listenForAdaptiveModeChange()
+
+        super.viewDidLoad()
+    }
+
     func listenForAdaptiveModeChange() {
         overrideAdaptiveModeObserver = overrideAdaptiveModePublisher.sink { [weak self] _ in
             guard let self, let button = activeModeButton else { return }
@@ -381,15 +393,4 @@ final class SplitViewController: NSSplitViewController {
         pageControl?.appearance = NSAppearance(named: .darkAqua)
     }
 
-    override func viewDidLoad() {
-        view.wantsLayer = true
-        view.radius = 12.0.ns
-        view.bg = white
-
-        displayPage()
-        updateHelpButton()
-        listenForAdaptiveModeChange()
-
-        super.viewDidLoad()
-    }
 }

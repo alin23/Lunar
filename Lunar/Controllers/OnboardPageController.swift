@@ -121,6 +121,17 @@ final class OnboardPageController: NSPageController {
     let hotkeysChoiceViewControllerIdentifier = NSPageController.ObjectIdentifier("hotkeysChoiceViewController")
     var viewControllers: [NSPageController.ObjectIdentifier: NSViewController] = [:]
 
+    override func viewDidAppear() {
+        (view.window?.windowController as? OnboardWindowController)?.pageController = self
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setup()
+    }
+
+    override func scrollWheel(with _: NSEvent) {}
+
     func setup() {
         delegate = self
         transitionStyle = .horizontalStrip
@@ -149,16 +160,6 @@ final class OnboardPageController: NSPageController {
         view.setNeedsDisplay(view.rectForPage(selectedIndex))
     }
 
-    override func viewDidAppear() {
-        (view.window?.windowController as? OnboardWindowController)?.pageController = self
-    }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setup()
-    }
-
-    override func scrollWheel(with _: NSEvent) {}
     func select(index: Int) {
         NSAnimationContext.runAnimationGroup({ _ in animator().selectedIndex = index }) { [weak self] in
             self?.completeTransition()

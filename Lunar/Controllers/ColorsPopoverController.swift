@@ -12,14 +12,14 @@ final class ColorsPopoverController: NSViewController {
 // MARK: - ColorsButton
 
 final class ColorsButton: PopoverButton<ColorsPopoverController> {
+    override var popoverKey: String {
+        "colors"
+    }
+
     weak var display: Display? {
         didSet {
             popoverController?.display = display
         }
-    }
-
-    override var popoverKey: String {
-        "colors"
     }
 
     override func mouseDown(with event: NSEvent) {

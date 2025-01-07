@@ -460,9 +460,9 @@ struct KeyEventHandling: NSViewRepresentable {
     }
 
     final class KeyView: NSView {
-        dynamic var context: Context?
-
         override var acceptsFirstResponder: Bool { true }
+
+        dynamic var context: Context?
 
         override func keyDown(with event: NSEvent) {
             guard let context else {

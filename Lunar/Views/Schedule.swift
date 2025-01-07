@@ -117,6 +117,18 @@ final class Schedule: NSView {
         setup()
     }
 
+    override var frame: NSRect {
+        didSet { trackHover() }
+    }
+
+    override var isHidden: Bool {
+        didSet {
+            trackHover()
+            hover = false
+            fade()
+        }
+    }
+
     var sunriseOffsetHour: UInt8 = 0
     var sunriseOffsetMinute: UInt8 = 0
     var sunsetOffsetHour: UInt8 = 0
@@ -370,20 +382,31 @@ final class Schedule: NSView {
         }
     }
 
-    override var frame: NSRect {
-        didSet { trackHover() }
-    }
-
-    override var isHidden: Bool {
-        didSet {
-            trackHover()
-            hover = false
-            fade()
-        }
-    }
-
     @objc dynamic var isEnabled = true {
         didSet { fade() }
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        if isHidden || isEnabled { return }
+        hover = true
+
+        fade()
+        super.mouseEntered(with: event)
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        if isHidden || isEnabled {
+            hover = false
+            return
+        }
+        hover = false
+
+        fade()
+        super.mouseExited(with: event)
     }
 
     func withoutRemapping(_ action: () -> Void) {
@@ -519,10 +542,6 @@ final class Schedule: NSView {
         (((display?.adaptiveSubzero ?? true) ? val.map(from: (0, 1), to: (-1, 1)) : val) * 100).str(decimals: 0)
     }
 
-    override func draw(_ dirtyRect: NSRect) {
-        super.draw(dirtyRect)
-    }
-
     func fade() {
         mainThread {
             if isHidden || isEnabled {
@@ -541,22 +560,4 @@ final class Schedule: NSView {
         }
     }
 
-    override func mouseEntered(with event: NSEvent) {
-        if isHidden || isEnabled { return }
-        hover = true
-
-        fade()
-        super.mouseEntered(with: event)
-    }
-
-    override func mouseExited(with event: NSEvent) {
-        if isHidden || isEnabled {
-            hover = false
-            return
-        }
-        hover = false
-
-        fade()
-        super.mouseExited(with: event)
-    }
 }

@@ -1162,13 +1162,13 @@ final class ModePopupButton: NSPopUpButton {
 //            }.store(in: &observers)
     }
 
-    var observers: Set<AnyCancellable> = []
-
     override var menu: NSMenu? {
         didSet {
             setItemStyles()
         }
     }
+
+    var observers: Set<AnyCancellable> = []
 
     override func addItems(withTitles itemTitles: [String]) {
         super.addItems(withTitles: itemTitles)
@@ -1819,41 +1819,45 @@ extension AutoRemovingConstraintsView {
 // MARK: - AutoRemovingConstraintsButton
 
 final class AutoRemovingConstraintsButton: NSButton, AutoRemovingConstraintsView {
-    var originalConstraints: [NSLayoutConstraint] = []
-
     override var isHidden: Bool {
         didSet { autoRemoveConstraints() }
     }
+
+    var originalConstraints: [NSLayoutConstraint] = []
+
 }
 
 // MARK: - AutoRemovingConstraintsTextField
 
 final class AutoRemovingConstraintsTextField: NSTextField, AutoRemovingConstraintsView {
-    var originalConstraints: [NSLayoutConstraint] = []
-
     override var isHidden: Bool {
         didSet { autoRemoveConstraints() }
     }
+
+    var originalConstraints: [NSLayoutConstraint] = []
+
 }
 
 // MARK: - AutoRemovingConstraintsLockButton
 
 final class AutoRemovingConstraintsLockButton: LockButton, AutoRemovingConstraintsView {
-    var originalConstraints: [NSLayoutConstraint] = []
-
     override var isHidden: Bool {
         didSet { autoRemoveConstraints() }
     }
+
+    var originalConstraints: [NSLayoutConstraint] = []
+
 }
 
 // MARK: - AutoRemovingConstraintsSegmentedControl
 
 final class AutoRemovingConstraintsSegmentedControl: NSSegmentedControl, AutoRemovingConstraintsView {
-    var originalConstraints: [NSLayoutConstraint] = []
-
     override var isHidden: Bool {
         didSet { autoRemoveConstraints() }
     }
+
+    var originalConstraints: [NSLayoutConstraint] = []
+
 }
 
 // MARK: - AutoRemovingBox

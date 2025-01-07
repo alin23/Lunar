@@ -91,6 +91,17 @@ final class PopUpButton: NSPopUpButton {
         setup()
     }
 
+    override var frame: NSRect {
+        didSet {
+            radius = (frame.height / 2).ns
+            trackHover()
+        }
+    }
+
+    override var isEnabled: Bool {
+        didSet { fade() }
+    }
+
     @IBInspectable dynamic var dotColorSecondary = false
     @IBInspectable dynamic var dotColor: NSColor? = nil
 
@@ -107,13 +118,6 @@ final class PopUpButton: NSPopUpButton {
 
     @IBInspectable dynamic var padding: CGFloat = 16 {
         didSet { resizeToFitTitle() }
-    }
-
-    override var frame: NSRect {
-        didSet {
-            radius = (frame.height / 2).ns
-            trackHover()
-        }
     }
 
     @IBInspectable dynamic var verticalPadding: CGFloat = 10 {
@@ -140,10 +144,6 @@ final class PopUpButton: NSPopUpButton {
         }
     }
 
-    override var isEnabled: Bool {
-        didSet { fade() }
-    }
-
     var bgColor: NSColor {
         if !isEnabled {
             (offStateButtonColor[hoverState]![page] ?? offStateButtonColor[hoverState]![.display]!)
@@ -166,16 +166,21 @@ final class PopUpButton: NSPopUpButton {
         }
     }
 
-    func getDotColor(modeKey: AdaptiveModeKey? = nil, overrideMode: Bool? = nil) -> NSColor {
-        dotColor ?? (dotColorSecondary ? dropdownArrowSecondaryColor : dropdownArrowColor)
-    }
-
     override func mouseEntered(with _: NSEvent) {
         hover()
     }
 
     override func mouseExited(with _: NSEvent) {
         defocus()
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        resizeToFitTitle()
+        super.draw(dirtyRect)
+    }
+
+    func getDotColor(modeKey: AdaptiveModeKey? = nil, overrideMode: Bool? = nil) -> NSColor {
+        dotColor ?? (dotColorSecondary ? dropdownArrowSecondaryColor : dropdownArrowColor)
     }
 
     func setColors(fadeDuration: TimeInterval = 0.2, modeKey: AdaptiveModeKey? = nil, overrideMode: Bool? = nil) {
@@ -267,8 +272,4 @@ final class PopUpButton: NSPopUpButton {
             .store(in: &observers)
     }
 
-    override func draw(_ dirtyRect: NSRect) {
-        resizeToFitTitle()
-        super.draw(dirtyRect)
-    }
 }

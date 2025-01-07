@@ -82,6 +82,8 @@ struct VersionView: View {
         self.updater = updater
     }
 
+    @ObservedObject var updater: SPUUpdater
+
     var beta: Binding<Bool> = Binding(
         get: { Defaults[.updateChannel] != .release },
         set: { Defaults[.updateChannel] = $0 ? .beta : .release }
@@ -91,8 +93,6 @@ struct VersionView: View {
     @Default(.updateCheckInterval) var updateCheckInterval
     @Default(.updateChannel) var updateChannel
     @Default(.silentUpdate) var silentUpdate
-
-    @ObservedObject var updater: SPUUpdater
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
@@ -320,6 +320,7 @@ struct DetailToggleStyle: ToggleStyle {
     }
 
     @Environment(\.isEnabled) var isEnabled
+
     let style: Style // custom param
 
     func makeBody(configuration: Configuration) -> some View {

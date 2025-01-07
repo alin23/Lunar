@@ -248,11 +248,6 @@ class Slider: NSSlider {
         alphaValue = 0.9
     }
 
-    func setup() {
-        refusesFirstResponder = true
-        trackHover()
-    }
-
     override func scrollWheel(with event: NSEvent) {
         guard isEnabled else { return }
 
@@ -296,6 +291,12 @@ class Slider: NSSlider {
         sendAction(action, to: target)
         onSettingPercentage?(floatValue)
     }
+
+    func setup() {
+        refusesFirstResponder = true
+        trackHover()
+    }
+
 }
 
 var sliderTracking: Bool {

@@ -46,6 +46,47 @@ final class HotkeyViewController: NSViewController {
     @IBOutlet var shiftBrightnessKeysControlButton: PopUpButton?
     @IBOutlet var shiftBrightnessKeysSyncControlButton: PopUpButton?
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.wantsLayer = true
+        view.bg = hotkeysBgColor
+
+        resetButton?.page = .hotkeysReset
+        disableButton?.page = .hotkeysReset
+        disableButton?.resettingText = "Disabling"
+
+        setHotkeys()
+
+        brightnessKeysControlButton?.page = .hotkeys
+        brightnessKeysControlButton?.origin = .left
+        brightnessKeysControlButton?.fade()
+
+        ctrlBrightnessKeysControlButton?.page = .hotkeys
+        ctrlBrightnessKeysControlButton?.origin = .left
+        ctrlBrightnessKeysControlButton?.fade()
+
+        shiftBrightnessKeysControlButton?.page = .hotkeys
+        shiftBrightnessKeysControlButton?.origin = .left
+        shiftBrightnessKeysControlButton?.fade()
+
+        brightnessKeysSyncControlButton?.page = .hotkeys
+        brightnessKeysSyncControlButton?.origin = .left
+        brightnessKeysSyncControlButton?.fade()
+
+        ctrlBrightnessKeysSyncControlButton?.page = .hotkeys
+        ctrlBrightnessKeysSyncControlButton?.origin = .left
+        ctrlBrightnessKeysSyncControlButton?.fade()
+
+        shiftBrightnessKeysSyncControlButton?.page = .hotkeys
+        shiftBrightnessKeysSyncControlButton?.origin = .left
+        shiftBrightnessKeysSyncControlButton?.fade()
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        view.window?.makeFirstResponder(nil)
+        super.mouseDown(with: event)
+    }
+
     @IBAction func resetHotkeys(_: Any) {
         HotKeyCenter.shared.unregisterAll()
         CachedDefaults.reset(.hotkeys)
@@ -121,44 +162,4 @@ final class HotkeyViewController: NSViewController {
         NSWorkspace.shared.open("https://lunar.fyi/faq#hotkeys".asURL()!)
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.wantsLayer = true
-        view.bg = hotkeysBgColor
-
-        resetButton?.page = .hotkeysReset
-        disableButton?.page = .hotkeysReset
-        disableButton?.resettingText = "Disabling"
-
-        setHotkeys()
-
-        brightnessKeysControlButton?.page = .hotkeys
-        brightnessKeysControlButton?.origin = .left
-        brightnessKeysControlButton?.fade()
-
-        ctrlBrightnessKeysControlButton?.page = .hotkeys
-        ctrlBrightnessKeysControlButton?.origin = .left
-        ctrlBrightnessKeysControlButton?.fade()
-
-        shiftBrightnessKeysControlButton?.page = .hotkeys
-        shiftBrightnessKeysControlButton?.origin = .left
-        shiftBrightnessKeysControlButton?.fade()
-
-        brightnessKeysSyncControlButton?.page = .hotkeys
-        brightnessKeysSyncControlButton?.origin = .left
-        brightnessKeysSyncControlButton?.fade()
-
-        ctrlBrightnessKeysSyncControlButton?.page = .hotkeys
-        ctrlBrightnessKeysSyncControlButton?.origin = .left
-        ctrlBrightnessKeysSyncControlButton?.fade()
-
-        shiftBrightnessKeysSyncControlButton?.page = .hotkeys
-        shiftBrightnessKeysSyncControlButton?.origin = .left
-        shiftBrightnessKeysSyncControlButton?.fade()
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        view.window?.makeFirstResponder(nil)
-        super.mouseDown(with: event)
-    }
 }

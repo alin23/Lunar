@@ -173,15 +173,15 @@ final class DDCPopoverController: NSViewController {
 // MARK: - DDCButton
 
 final class DDCButton: PopoverButton<DDCPopoverController> {
+    override var popoverKey: String {
+        "ddc"
+    }
+
     weak var display: Display? {
         didSet {
             popoverController?.display = display
             popoverController?.setup()
         }
-    }
-
-    override var popoverKey: String {
-        "ddc"
     }
 
     override func mouseDown(with event: NSEvent) {

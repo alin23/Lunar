@@ -39,6 +39,18 @@ final class SettingsPopoverController: NSViewController {
         }
     }
 
+    override func viewDidAppear() {
+        resolutionsDropdown?.setItemStyles()
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        adaptiveBrightnessModePublisher.sink { [weak self] change in
+            self?.setAdaptiveNotice(mode: change.newValue)
+            self?.setAdaptiveSelectorTooltips(mode: change.newValue)
+        }.store(in: &displayObservers, for: "adaptiveBrightnessMode")
+    }
+
     func setDimmingModeSelectorTooltips() {
         guard let dimmingModeSelector, let display else {
             return
@@ -109,22 +121,15 @@ final class SettingsPopoverController: NSViewController {
         }
     }
 
-    override func viewDidAppear() {
-        resolutionsDropdown?.setItemStyles()
-    }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        adaptiveBrightnessModePublisher.sink { [weak self] change in
-            self?.setAdaptiveNotice(mode: change.newValue)
-            self?.setAdaptiveSelectorTooltips(mode: change.newValue)
-        }.store(in: &displayObservers, for: "adaptiveBrightnessMode")
-    }
 }
 
 // MARK: - SettingsButton
 
 final class SettingsButton: PopoverButton<SettingsPopoverController> {
+    override var popoverKey: String {
+        "settings"
+    }
+
     weak var displayViewController: DisplayViewController? {
         didSet {
             popoverController?.displayViewController = displayViewController
@@ -135,10 +140,6 @@ final class SettingsButton: PopoverButton<SettingsPopoverController> {
         didSet {
             popoverController?.display = display
         }
-    }
-
-    override var popoverKey: String {
-        "settings"
     }
 
     override func mouseDown(with event: NSEvent) {

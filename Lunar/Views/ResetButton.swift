@@ -10,8 +10,6 @@ import Cocoa
 import Foundation
 
 final class ResetButton: ToggleButton {
-    var resettingText = "Resetting"
-
     override var bgColor: NSColor {
         if !isEnabled {
             if highlighting { stopHighlighting() }
@@ -19,6 +17,8 @@ final class ResetButton: ToggleButton {
         }
         return super.bgColor
     }
+
+    var resettingText = "Resetting"
 
     override func mouseDown(with event: NSEvent) {
         guard isEnabled else { return }

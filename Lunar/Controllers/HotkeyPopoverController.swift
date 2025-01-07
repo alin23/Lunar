@@ -55,6 +55,22 @@ final class HotkeyPopoverController: NSViewController {
     var hotkey2: PersistentHotkey?
     var hotkey3: PersistentHotkey?
 
+    override func viewDidLoad() {
+        backingView.radius = 8.ns
+
+        if let display {
+            setup(from: display)
+        }
+
+        super.viewDidLoad()
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        onClick?()
+        view.window?.makeFirstResponder(nil)
+        super.mouseDown(with: event)
+    }
+
     @objc func handler1() {
         guard let display else { return }
         switchInput(
@@ -198,22 +214,6 @@ final class HotkeyPopoverController: NSViewController {
                 hotkeyView.endRecording()
             }
         }
-    }
-
-    override func viewDidLoad() {
-        backingView.radius = 8.ns
-
-        if let display {
-            setup(from: display)
-        }
-
-        super.viewDidLoad()
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        onClick?()
-        view.window?.makeFirstResponder(nil)
-        super.mouseDown(with: event)
     }
 
     @IBAction func selectItem(_ sender: NSPopUpButton) {

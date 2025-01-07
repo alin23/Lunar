@@ -210,8 +210,6 @@ struct BigSurSlider: View {
         self.insideText = insideText?()
     }
 
-    var insideText: AnyView?
-
     @Environment(\.colorScheme) var colorScheme
 
     @EnvironmentObject var env: EnvState
@@ -234,10 +232,12 @@ struct BigSurSlider: View {
     @Binding var disabled: Bool
     @Binding var mark: Float
 
+    @State var clickedKnob = false
+
+    var insideText: AnyView?
+
     var beforeSettingPercentage: ((Float) -> Void)?
     var onSettingPercentage: ((Float) -> Void)?
-
-    @State var clickedKnob = false
 
     var body: some View {
         GeometryReader { geometry in
@@ -1026,6 +1026,8 @@ final class PanelWindow: NSPanel {
         isMovableByWindowBackground = false
     }
 
+    override var canBecomeKey: Bool { shouldBecomeKey }
+
     var shouldBecomeKey = false {
         didSet {
             if shouldBecomeKey, !oldValue {
@@ -1034,8 +1036,6 @@ final class PanelWindow: NSPanel {
             }
         }
     }
-
-    override var canBecomeKey: Bool { shouldBecomeKey }
 
     func forceClose() {
         wc.close()

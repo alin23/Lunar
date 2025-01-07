@@ -31,6 +31,78 @@ final class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         setup()
     }
 
+//    var _stringValue: String = ""
+    override var stringValue: String {
+        didSet {
+            guard let number = NumberFormatter.shared.number(from: stringValue) else { return }
+            _floatValue = number.floatValue
+            _doubleValue = number.doubleValue
+            _integerValue = number.intValue
+        }
+    }
+
+    override var floatValue: Float {
+        get { _floatValue }
+        set {
+            _floatValue = newValue
+            _doubleValue = newValue.d
+            _integerValue = newValue.i
+            let number = newValue
+            if number <= 0.0001, number >= -0.0001 {
+                stringValue = 0.str(decimals: decimalPoints, padding: leftPadding)
+            } else {
+                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.str(decimals: decimalPoints, padding: leftPadding))"
+            }
+        }
+    }
+
+    override var doubleValue: Double {
+        get { _doubleValue }
+        set {
+            _doubleValue = newValue
+            _floatValue = newValue.f
+            _integerValue = newValue.i
+            let number = newValue
+            if number <= 0.0001, number >= -0.0001 {
+                stringValue = 0.str(decimals: decimalPoints, padding: leftPadding)
+            } else {
+                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.str(decimals: decimalPoints, padding: leftPadding))"
+            }
+        }
+    }
+
+    override var intValue: Int32 {
+        didSet {
+            integerValue = intValue.i
+        }
+    }
+
+    override var integerValue: Int {
+        get { _integerValue }
+        set {
+            _integerValue = newValue
+            _floatValue = newValue.f
+            _doubleValue = newValue.d
+            let number = newValue
+            if number == 0 {
+                stringValue = 0.str(decimals: decimalPoints, padding: leftPadding)
+            } else {
+                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.d.str(decimals: decimalPoints, padding: leftPadding))"
+            }
+        }
+    }
+
+    override var isHidden: Bool {
+        didSet { caption?.isHidden = isHidden }
+    }
+
+    override var isEnabled: Bool {
+        didSet {
+            guard bgColor.alphaComponent > 0 else { return }
+            mainThread { bg = bgColor.withAlphaComponent(isEnabled ? backgroundOpacity : 0.05) }
+        }
+    }
+
     @IBInspectable dynamic var step = 1.0
     @IBInspectable dynamic var leftPadding: UInt8 = 0
     @IBInspectable dynamic var showPlusSign = false
@@ -116,67 +188,6 @@ final class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         }
     }
 
-//    var _stringValue: String = ""
-    override var stringValue: String {
-        didSet {
-            guard let number = NumberFormatter.shared.number(from: stringValue) else { return }
-            _floatValue = number.floatValue
-            _doubleValue = number.doubleValue
-            _integerValue = number.intValue
-        }
-    }
-
-    override var floatValue: Float {
-        get { _floatValue }
-        set {
-            _floatValue = newValue
-            _doubleValue = newValue.d
-            _integerValue = newValue.i
-            let number = newValue
-            if number <= 0.0001, number >= -0.0001 {
-                stringValue = 0.str(decimals: decimalPoints, padding: leftPadding)
-            } else {
-                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.str(decimals: decimalPoints, padding: leftPadding))"
-            }
-        }
-    }
-
-    override var doubleValue: Double {
-        get { _doubleValue }
-        set {
-            _doubleValue = newValue
-            _floatValue = newValue.f
-            _integerValue = newValue.i
-            let number = newValue
-            if number <= 0.0001, number >= -0.0001 {
-                stringValue = 0.str(decimals: decimalPoints, padding: leftPadding)
-            } else {
-                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.str(decimals: decimalPoints, padding: leftPadding))"
-            }
-        }
-    }
-
-    override var intValue: Int32 {
-        didSet {
-            integerValue = intValue.i
-        }
-    }
-
-    override var integerValue: Int {
-        get { _integerValue }
-        set {
-            _integerValue = newValue
-            _floatValue = newValue.f
-            _doubleValue = newValue.d
-            let number = newValue
-            if number == 0 {
-                stringValue = 0.str(decimals: decimalPoints, padding: leftPadding)
-            } else {
-                stringValue = "\(showPlusSign && number > 0 ? "+" : "")\(number.d.str(decimals: decimalPoints, padding: leftPadding))"
-            }
-        }
-    }
-
     var editing = false {
         didSet {
             log.debug("Editing: \(editing)")
@@ -203,17 +214,6 @@ final class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         }
     }
 
-    override var isHidden: Bool {
-        didSet { caption?.isHidden = isHidden }
-    }
-
-    override var isEnabled: Bool {
-        didSet {
-            guard bgColor.alphaComponent > 0 else { return }
-            mainThread { bg = bgColor.withAlphaComponent(isEnabled ? backgroundOpacity : 0.05) }
-        }
-    }
-
     var captionHighlighterTask: DispatchWorkItem? {
         didSet { oldValue?.cancel() }
     }
@@ -226,14 +226,6 @@ final class ScrollableTextField: NSTextField, NSTextFieldDelegate {
     override func viewDidMoveToSuperview() {
         trackHover()
         setBgAlpha()
-    }
-
-    func trackHover() {
-        if let trackingArea {
-            removeTrackingArea(trackingArea)
-        }
-        trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
-        addTrackingArea(trackingArea!)
     }
 
     override func becomeFirstResponder() -> Bool {
@@ -251,40 +243,6 @@ final class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         }
         mainAsyncAfter(ms: 200) { self.lightenUp(color: self.editingTextFieldColor) }
         return success
-    }
-
-    func setup() {
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = .center
-        centerAlign = paragraphStyle
-
-        usesSingleLineMode = false
-        allowsEditingTextAttributes = true
-        textColor = textFieldColor
-        radius = 8.ns
-        delegate = self
-        focusRingType = .none
-
-        normalSize = frame.size
-        activeSize = NSSize(width: normalSize!.width, height: normalSize!.height + growPointSize)
-        trackHover()
-        setBgAlpha()
-        needsDisplay = true
-        if let font {
-            self.font = .monospacedSystemFont(
-                ofSize: font.pointSize,
-                weight: font.pointSize >= 50 ? .bold : (font.pointSize > 40 ? .bold : .heavy)
-            )
-        }
-
-        // toolTip = """
-        // Scroll to change, click to edit.
-
-        // When scrolling, you can:
-        // • Hold Command for more precise adjustments
-        // • Hold Option for faster adjustments
-        // • Hold Control for highest sensitivity possible
-        // """
     }
 
     override func cancelOperation(_: Any?) {
@@ -338,6 +296,121 @@ final class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         super.draw(dirtyRect)
     }
 
+    override func mouseEntered(with _: NSEvent) {
+        log.verbose("mouseEntered \(caption?.stringValue ?? stringValue)")
+        guard isEnabled else { return }
+        stringValue = stringValue
+
+        hover = true
+        if !editing { lightenUp(color: textFieldColorHover) }
+
+        onMouseEnter?()
+    }
+
+    override func mouseExited(with _: NSEvent) {
+        log.verbose("mouseExited \(caption?.stringValue ?? stringValue)")
+
+        guard isEnabled else { return }
+
+        finishScrolling()
+
+        hover = false
+        if !editing { darken(color: textFieldColor) }
+
+        onMouseExit?()
+    }
+
+    override func scrollWheel(with event: NSEvent) {
+        if abs(event.scrollingDeltaX) <= 3.0 {
+            if !isEnabled {
+                return
+            }
+            if event.scrollingDeltaY < 0.0 {
+                scrolledY += event.scrollingDeltaY
+                if abs(scrolledY) < scrollDeltaYThreshold {
+                    return
+                }
+
+                scrolledY = 0.0
+                disableScrollHint()
+                if !scrolling {
+                    scrolling = true
+                    if !editing { lightenUp(color: textFieldColorLight) }
+                }
+                if event.isDirectionInvertedFromDevice {
+                    increaseValue()
+                } else {
+                    decreaseValue()
+                }
+                finishScrolling(after: 2000)
+            } else if event.scrollingDeltaY > 0.0 {
+                scrolledY += event.scrollingDeltaY
+                if abs(scrolledY) < scrollDeltaYThreshold {
+                    return
+                }
+
+                scrolledY = 0.0
+                disableScrollHint()
+                if !scrolling {
+                    scrolling = true
+                    if !editing { lightenUp(color: textFieldColorLight) }
+                }
+                if event.isDirectionInvertedFromDevice {
+                    decreaseValue()
+                } else {
+                    increaseValue()
+                }
+                finishScrolling(after: 2000)
+            } else {
+                finishScrolling()
+            }
+        } else {
+            super.scrollWheel(with: event)
+        }
+    }
+
+    func trackHover() {
+        if let trackingArea {
+            removeTrackingArea(trackingArea)
+        }
+        trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
+        addTrackingArea(trackingArea!)
+    }
+
+    func setup() {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
+        centerAlign = paragraphStyle
+
+        usesSingleLineMode = false
+        allowsEditingTextAttributes = true
+        textColor = textFieldColor
+        radius = 8.ns
+        delegate = self
+        focusRingType = .none
+
+        normalSize = frame.size
+        activeSize = NSSize(width: normalSize!.width, height: normalSize!.height + growPointSize)
+        trackHover()
+        setBgAlpha()
+        needsDisplay = true
+        if let font {
+            self.font = .monospacedSystemFont(
+                ofSize: font.pointSize,
+                weight: font.pointSize >= 50 ? .bold : (font.pointSize > 40 ? .bold : .heavy)
+            )
+        }
+
+        // toolTip = """
+        // Scroll to change, click to edit.
+
+        // When scrolling, you can:
+        // • Hold Command for more precise adjustments
+        // • Hold Option for faster adjustments
+        // • Hold Control for highest sensitivity possible
+        // """
+    }
+
     func control(_: NSControl, textView _: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
         switch commandSelector {
         case #selector(insertNewline(_:)), #selector(insertTab(_:)):
@@ -368,30 +441,6 @@ final class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         default:
             return false
         }
-    }
-
-    override func mouseEntered(with _: NSEvent) {
-        log.verbose("mouseEntered \(caption?.stringValue ?? stringValue)")
-        guard isEnabled else { return }
-        stringValue = stringValue
-
-        hover = true
-        if !editing { lightenUp(color: textFieldColorHover) }
-
-        onMouseEnter?()
-    }
-
-    override func mouseExited(with _: NSEvent) {
-        log.verbose("mouseExited \(caption?.stringValue ?? stringValue)")
-
-        guard isEnabled else { return }
-
-        finishScrolling()
-
-        hover = false
-        if !editing { darken(color: textFieldColor) }
-
-        onMouseExit?()
     }
 
     func setBgAlpha() {
@@ -510,52 +559,4 @@ final class ScrollableTextField: NSTextField, NSTextFieldDelegate {
         mainAsyncAfter(ms: ms, adaptToScrollingFinished!)
     }
 
-    override func scrollWheel(with event: NSEvent) {
-        if abs(event.scrollingDeltaX) <= 3.0 {
-            if !isEnabled {
-                return
-            }
-            if event.scrollingDeltaY < 0.0 {
-                scrolledY += event.scrollingDeltaY
-                if abs(scrolledY) < scrollDeltaYThreshold {
-                    return
-                }
-
-                scrolledY = 0.0
-                disableScrollHint()
-                if !scrolling {
-                    scrolling = true
-                    if !editing { lightenUp(color: textFieldColorLight) }
-                }
-                if event.isDirectionInvertedFromDevice {
-                    increaseValue()
-                } else {
-                    decreaseValue()
-                }
-                finishScrolling(after: 2000)
-            } else if event.scrollingDeltaY > 0.0 {
-                scrolledY += event.scrollingDeltaY
-                if abs(scrolledY) < scrollDeltaYThreshold {
-                    return
-                }
-
-                scrolledY = 0.0
-                disableScrollHint()
-                if !scrolling {
-                    scrolling = true
-                    if !editing { lightenUp(color: textFieldColorLight) }
-                }
-                if event.isDirectionInvertedFromDevice {
-                    decreaseValue()
-                } else {
-                    increaseValue()
-                }
-                finishScrolling(after: 2000)
-            } else {
-                finishScrolling()
-            }
-        } else {
-            super.scrollWheel(with: event)
-        }
-    }
 }

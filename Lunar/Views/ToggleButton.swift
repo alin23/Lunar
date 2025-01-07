@@ -45,6 +45,10 @@ class ToggleButton: NSButton {
         setup()
     }
 
+    override var isEnabled: Bool {
+        didSet { fade() }
+    }
+
     var hoverState = HoverState.noHover
     weak var notice: NSTextField?
     lazy var highlighterKey = "highlighter-\(accessibilityIdentifier())"
@@ -89,10 +93,6 @@ class ToggleButton: NSButton {
         }
     }
 
-    override var isEnabled: Bool {
-        didSet { fade() }
-    }
-
     var bgColor: NSColor {
         if !isEnabled {
             if highlighting { stopHighlighting() }
@@ -113,6 +113,28 @@ class ToggleButton: NSButton {
             onStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!
         } else {
             offStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!
+        }
+    }
+
+    override func mouseEntered(with _: NSEvent) {
+        if isEnabled {
+            hover()
+        } else if highlighting {
+            stopHighlighting()
+        }
+    }
+
+    override func mouseExited(with _: NSEvent) {
+        defocus()
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+    }
+
+    override func cursorUpdate(with _: NSEvent) {
+        if isEnabled {
+            NSCursor.pointingHand.set()
         }
     }
 
@@ -168,18 +190,6 @@ class ToggleButton: NSButton {
         }
     }
 
-    override func mouseEntered(with _: NSEvent) {
-        if isEnabled {
-            hover()
-        } else if highlighting {
-            stopHighlighting()
-        }
-    }
-
-    override func mouseExited(with _: NSEvent) {
-        defocus()
-    }
-
     func setColors(fadeDuration: TimeInterval = 0.2) {
         layer?.add(fadeTransition(duration: fadeDuration), forKey: "transition")
         bg = bgColor
@@ -212,13 +222,4 @@ class ToggleButton: NSButton {
         trackHover(cursor: true)
     }
 
-    override func draw(_ dirtyRect: NSRect) {
-        super.draw(dirtyRect)
-    }
-
-    override func cursorUpdate(with _: NSEvent) {
-        if isEnabled {
-            NSCursor.pointingHand.set()
-        }
-    }
 }

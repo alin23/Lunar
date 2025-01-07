@@ -104,6 +104,11 @@ final class ScrollableContrast: NSView {
         }
     }
 
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+        setup()
+    }
+
     func addObserver(_ display: Display) {
         display.$contrast
             .throttle(for: .milliseconds(50), scheduler: RunLoop.main, latest: true)
@@ -201,8 +206,4 @@ final class ScrollableContrast: NSView {
         currentValue?.caption = currentValue?.caption ?? currentValueCaption
     }
 
-    override func draw(_ dirtyRect: NSRect) {
-        super.draw(dirtyRect)
-        setup()
-    }
 }

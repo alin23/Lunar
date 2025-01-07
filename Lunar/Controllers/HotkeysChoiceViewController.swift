@@ -13,14 +13,14 @@ import UserNotifications
 // MARK: - OnboardingDisplayCellView
 
 final class OnboardingDisplayCellView: NSTableCellView {
-    @IBOutlet var syncButton: LockButton!
-    @IBOutlet var _controlButton: NSButton!
-
     override var objectValue: Any? {
         didSet {
             setup()
         }
     }
+
+    @IBOutlet var syncButton: LockButton!
+    @IBOutlet var _controlButton: NSButton!
 
     var display: Display? { objectValue as? Display }
 

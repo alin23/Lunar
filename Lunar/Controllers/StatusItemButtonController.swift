@@ -73,6 +73,21 @@ final class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObje
         }
     }
 
+    override func rightMouseDown(with _: NSEvent) {
+        guard let button = statusButton else { return }
+        appDelegate!.menu.popUp(positioning: nil, at: NSPoint(x: 0, y: button.frame.height + 8), in: button)
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        guard event.modifierFlags.intersection([.control, .command, .shift, .option]) != [.control] else {
+            guard let button = statusButton else { return }
+            appDelegate!.menu.popUp(positioning: nil, at: NSPoint(x: 0, y: button.frame.height + 8), in: button)
+            return
+        }
+        toggleMenuBar()
+        super.mouseDown(with: event)
+    }
+
     func windowWillClose(_ notification: Notification) {
         postEndMenuTrackingNotification()
         willCloseTask = mainAsyncAfter(ms: 50) {
@@ -95,11 +110,6 @@ final class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObje
         displayHideTask?.cancel()
         displayHideTask = nil
         Defaults[.menuBarClosed] = false
-    }
-
-    override func rightMouseDown(with _: NSEvent) {
-        guard let button = statusButton else { return }
-        appDelegate!.menu.popUp(positioning: nil, at: NSPoint(x: 0, y: button.frame.height + 8), in: button)
     }
 
     func toggleMenuBar() {
@@ -151,15 +161,6 @@ final class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObje
         }
     }
 
-    override func mouseDown(with event: NSEvent) {
-        guard event.modifierFlags.intersection([.control, .command, .shift, .option]) != [.control] else {
-            guard let button = statusButton else { return }
-            appDelegate!.menu.popUp(positioning: nil, at: NSPoint(x: 0, y: button.frame.height + 8), in: button)
-            return
-        }
-        toggleMenuBar()
-        super.mouseDown(with: event)
-    }
 }
 
 /// Posting this notification causes the system Menu Bar to stay put when the cursor leaves its area while over a full screen app.

@@ -89,6 +89,14 @@ final class Box: NSBox {
         setup()
     }
 
+    override var frame: NSRect {
+        didSet { trackHover() }
+    }
+
+    override var isHidden: Bool {
+        didSet { trackHover() }
+    }
+
     var hover = false
 
     @IBInspectable var alpha: CGFloat = 0.5 {
@@ -111,21 +119,6 @@ final class Box: NSBox {
         }
     }
 
-    override var frame: NSRect {
-        didSet { trackHover() }
-    }
-
-    override var isHidden: Bool {
-        didSet { trackHover() }
-    }
-
-    func setup() {
-        bg = .clear
-        alphaValue = alpha
-
-        trackHover()
-    }
-
     override func mouseEntered(with event: NSEvent) {
         if isHidden { return }
         hover = true
@@ -143,4 +136,12 @@ final class Box: NSBox {
         alphaValue = alpha
         super.mouseExited(with: event)
     }
+
+    func setup() {
+        bg = .clear
+        alphaValue = alpha
+
+        trackHover()
+    }
+
 }

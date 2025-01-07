@@ -103,6 +103,13 @@ final class Screen: NSObject, AppEntity, ExpressibleByStringLiteral {
         TypeDisplayRepresentation(name: "Screen", numericFormat: "\(placeholder: .int) screens")
     }
 
+    override var hash: Int {
+        var h = Hasher()
+        h.combine(id)
+        h.combine(serial)
+        return h.finalize()
+    }
+
     lazy var panelModes: [PanelMode] = display?.panelModes.compactMap(\.panelMode) ?? []
 
     let isDynamicFilter: Bool
@@ -183,13 +190,6 @@ final class Screen: NSObject, AppEntity, ExpressibleByStringLiteral {
 
     var displayRepresentation: DisplayRepresentation {
         DisplayRepresentation(title: "\(name)", subtitle: isDynamicFilter ? nil : "\(serial)")
-    }
-
-    override var hash: Int {
-        var h = Hasher()
-        h.combine(id)
-        h.combine(serial)
-        return h.finalize()
     }
 
     override func isEqual(_ object: Any?) -> Bool {

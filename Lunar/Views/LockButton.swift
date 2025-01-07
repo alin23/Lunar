@@ -29,6 +29,26 @@ class LockButton: NSButton {
         setup()
     }
 
+    override var isEnabled: Bool {
+        didSet {
+            if isEnabled {
+                setAttributedTitleColor(labelOn, alternate: true)
+                setAttributedTitleColor(labelOff)
+                bg = state == .on ? bgOn : bgOff
+            } else {
+                setAttributedTitleColor(labelOn.with(alpha: -0.2), alternate: true)
+                setAttributedTitleColor(labelOff.with(alpha: -0.2))
+                bg = state == .on ? bgOn.with(alpha: -0.2) : bgOff.with(alpha: -0.2)
+            }
+        }
+    }
+
+    override var state: NSControl.StateValue {
+        didSet {
+            mainAsync { [self] in bg = state == .on ? bgOn : bgOff }
+        }
+    }
+
     lazy var frameSize = frame.size
     @IBInspectable dynamic var grayDisabledText = true
     // @IBInspectable dynamic var horizontalPadding: CGFloat = 0.2 {
@@ -85,30 +105,46 @@ class LockButton: NSButton {
         }
     }
 
-    override var isEnabled: Bool {
-        didSet {
-            if isEnabled {
-                setAttributedTitleColor(labelOn, alternate: true)
-                setAttributedTitleColor(labelOff)
-                bg = state == .on ? bgOn : bgOff
-            } else {
-                setAttributedTitleColor(labelOn.with(alpha: -0.2), alternate: true)
-                setAttributedTitleColor(labelOff.with(alpha: -0.2))
-                bg = state == .on ? bgOn.with(alpha: -0.2) : bgOff.with(alpha: -0.2)
-            }
-        }
-    }
-
-    override var state: NSControl.StateValue {
-        didSet {
-            mainAsync { [self] in bg = state == .on ? bgOn : bgOff }
-        }
-    }
-
     @IBInspectable dynamic lazy var cornerRadius: CGFloat = (frame.height / 2) {
         didSet {
             radius = min(frame.height / 2, cornerRadius).ns
         }
+    }
+
+    override func cursorUpdate(with _: NSEvent) {
+        if isEnabled {
+            NSCursor.pointingHand.set()
+        }
+    }
+
+    override func mouseEntered(with _: NSEvent) {
+        guard isEnabled else { return }
+        transition(0.2)
+
+        if state == .on {
+            bg = bgOnHover
+        } else {
+            bg = bgOffHover
+        }
+        notice?.transition(0.4)
+        notice?.alphaValue = 1.0
+    }
+
+    override func mouseExited(with _: NSEvent) {
+        guard isEnabled else { return }
+        transition(0.4)
+
+        if state == .on {
+            bg = bgOn
+        } else {
+            bg = bgOff
+        }
+        notice?.transition(0.4)
+        notice?.alphaValue = 0.0
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
     }
 
     func adaptSize() {
@@ -117,12 +153,6 @@ class LockButton: NSButton {
         let height = size.height + (size.height * verticalPadding)
         setFrameSize(NSSize(width: size.width, height: height))
         cornerRadius = min(height / 2, cornerRadius)
-    }
-
-    override func cursorUpdate(with _: NSEvent) {
-        if isEnabled {
-            NSCursor.pointingHand.set()
-        }
     }
 
     func setAttributedTitleColor(_ color: NSColor, alternate: Bool = false) {
@@ -184,35 +214,6 @@ class LockButton: NSButton {
         notice?.alphaValue = 0.0
     }
 
-    override func mouseEntered(with _: NSEvent) {
-        guard isEnabled else { return }
-        transition(0.2)
-
-        if state == .on {
-            bg = bgOnHover
-        } else {
-            bg = bgOffHover
-        }
-        notice?.transition(0.4)
-        notice?.alphaValue = 1.0
-    }
-
-    override func mouseExited(with _: NSEvent) {
-        guard isEnabled else { return }
-        transition(0.4)
-
-        if state == .on {
-            bg = bgOn
-        } else {
-            bg = bgOff
-        }
-        notice?.transition(0.4)
-        notice?.alphaValue = 0.0
-    }
-
-    override func draw(_ dirtyRect: NSRect) {
-        super.draw(dirtyRect)
-    }
 }
 
 // MARK: - EnableButton

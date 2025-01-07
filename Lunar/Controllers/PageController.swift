@@ -22,14 +22,19 @@ final class PageController: NSPageController {
         #endif
     }
 
-    let hotkeyViewControllerIdentifier = NSPageController.ObjectIdentifier("Hotkeys")
-    let settingsPageControllerIdentifier = NSPageController.ObjectIdentifier("Configuration")
-    var viewControllers: [NSPageController.ObjectIdentifier: NSViewController] = [:]
-
     override var representedObject: Any? {
         didSet {
             // Update the view, if already loaded.
         }
+    }
+
+    let hotkeyViewControllerIdentifier = NSPageController.ObjectIdentifier("Hotkeys")
+    let settingsPageControllerIdentifier = NSPageController.ObjectIdentifier("Configuration")
+    var viewControllers: [NSPageController.ObjectIdentifier: NSViewController] = [:]
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setup()
     }
 
     func select(index: Int) {
@@ -103,10 +108,6 @@ final class PageController: NSPageController {
         view.setNeedsDisplay(view.rectForPage(selectedIndex))
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setup()
-    }
 }
 
 // MARK: NSPageControllerDelegate

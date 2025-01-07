@@ -44,6 +44,122 @@ final class ModeChoiceViewController: NSViewController {
 
     var didAppear = false
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        guard !useOnboardingForDiagnostics else { return }
+
+        originalOverride = CachedDefaults[.overrideAdaptiveMode]
+        originalMode = DC.adaptiveModeKey
+        CachedDefaults[.overrideAdaptiveMode] = true
+        CachedDefaults[.adaptiveBrightnessMode] = .manual
+
+        heading.alphaValue = 0
+        subheading.alphaValue = 0
+
+        let externals = DC.externalActiveDisplays
+        let externalName = externals.count == 1 ? externals[0].name : "external monitors"
+        setupButton(
+            syncBuiltin,
+            notice: syncBuiltinNotice,
+            color: green,
+            title: markdown
+                .attributedString(
+                    from: SyncMode.specific.builtinAvailable
+                        ? "**Sync** the brightness of your\n**\(Sysctl.device)** to your **\(externalName)**"
+                        : "**Keep** your monitors in **Sync** with each other\nwhen adjusting **brightness**"
+                ),
+            enabled: true,
+            action: #selector(syncBuiltinClick)
+        )
+
+        let source = externals.first { $0.hasAmbientLightAdaptiveBrightness && AppleNativeControl.isAvailable(for: $0) }
+        let targets = externals.filter { source == nil || $0.serial != source!.serial }
+        let sourceName = source?.name ?? "Source Display"
+        let targetName = "\((targets.count == 1 && targets[0].name == sourceName) ? "other " : "")\(targets.count == 1 ? targets[0].name : "other monitors")"
+        setupButton(
+            syncSource,
+            notice: syncSourceNotice,
+            color: green,
+            title: markdown
+                .attributedString(
+                    from: "**Sync** the brightness of your\n**\(sourceName)** to your **\(targetName)**"
+                ),
+            enabled: source != nil,
+            action: #selector(syncSourceClick)
+        )
+
+        setupButton(
+            location,
+            notice: locationNotice,
+            color: lunarYellow,
+            title: markdown
+                .attributedString(
+                    from: "**Adapt** the brightness of your **\(externalName)**\nbased on **sunrise** and **sunset**"
+                ),
+            enabled: true,
+            action: #selector(locationClick)
+        )
+
+        setupButton(
+            clock,
+            notice: clockNotice,
+            color: orange,
+            title: markdown
+                .attributedString(
+                    from: "Schedule **presets** for changing the\n**brightness** at **predefined times**"
+                ),
+            enabled: true,
+            action: #selector(clockClick)
+        )
+
+        setupButton(
+            sensor,
+            notice: sensorNotice,
+            color: blue.highlight(withLevel: 0.2) ?? blue,
+            title: markdown
+                .attributedString(
+                    from: "**Adapt** screen brightness based on readings\nfrom an **ambient light sensor**"
+                ),
+            enabled: SensorMode.specific.available,
+            action: #selector(sensorClick)
+        )
+
+        setupButton(
+            manual,
+            notice: manualNotice,
+            color: red.highlight(withLevel: 0.2) ?? red,
+            title: markdown
+                .attributedString(
+                    from: "**Control** your **\(externalName)** manually\nusing brightness and volume **keys**"
+                ),
+            enabled: ManualMode.specific.available,
+            action: #selector(manualClick)
+        )
+
+        mainAsyncAfter(ms: 500) { [weak self] in
+            guard let self else { return }
+            heading.transition(0.3)
+            heading.alphaValue = 1
+        }
+        mainAsyncAfter(ms: 1000) { [weak self] in
+            guard let self else { return }
+            subheading.transition(0.8)
+            subheading.alphaValue = 1
+        }
+    }
+
+    override func viewDidAppear() {
+        guard !didAppear else { return }
+        didAppear = true
+
+        uiCrumb("Mode Choice")
+        if let wc = view.window?.windowController as? OnboardWindowController {
+            wc.setupSkipButton(skipButton) { [weak self] in
+                self?.revert()
+            }
+        }
+    }
+
     func queueChange(_ change: @escaping (() -> Void)) {
         guard let wc = view.window?.windowController as? OnboardWindowController else {
             return
@@ -220,119 +336,4 @@ final class ModeChoiceViewController: NSViewController {
         DC.enable(mode: originalMode)
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        guard !useOnboardingForDiagnostics else { return }
-
-        originalOverride = CachedDefaults[.overrideAdaptiveMode]
-        originalMode = DC.adaptiveModeKey
-        CachedDefaults[.overrideAdaptiveMode] = true
-        CachedDefaults[.adaptiveBrightnessMode] = .manual
-
-        heading.alphaValue = 0
-        subheading.alphaValue = 0
-
-        let externals = DC.externalActiveDisplays
-        let externalName = externals.count == 1 ? externals[0].name : "external monitors"
-        setupButton(
-            syncBuiltin,
-            notice: syncBuiltinNotice,
-            color: green,
-            title: markdown
-                .attributedString(
-                    from: SyncMode.specific.builtinAvailable
-                        ? "**Sync** the brightness of your\n**\(Sysctl.device)** to your **\(externalName)**"
-                        : "**Keep** your monitors in **Sync** with each other\nwhen adjusting **brightness**"
-                ),
-            enabled: true,
-            action: #selector(syncBuiltinClick)
-        )
-
-        let source = externals.first { $0.hasAmbientLightAdaptiveBrightness && AppleNativeControl.isAvailable(for: $0) }
-        let targets = externals.filter { source == nil || $0.serial != source!.serial }
-        let sourceName = source?.name ?? "Source Display"
-        let targetName = "\((targets.count == 1 && targets[0].name == sourceName) ? "other " : "")\(targets.count == 1 ? targets[0].name : "other monitors")"
-        setupButton(
-            syncSource,
-            notice: syncSourceNotice,
-            color: green,
-            title: markdown
-                .attributedString(
-                    from: "**Sync** the brightness of your\n**\(sourceName)** to your **\(targetName)**"
-                ),
-            enabled: source != nil,
-            action: #selector(syncSourceClick)
-        )
-
-        setupButton(
-            location,
-            notice: locationNotice,
-            color: lunarYellow,
-            title: markdown
-                .attributedString(
-                    from: "**Adapt** the brightness of your **\(externalName)**\nbased on **sunrise** and **sunset**"
-                ),
-            enabled: true,
-            action: #selector(locationClick)
-        )
-
-        setupButton(
-            clock,
-            notice: clockNotice,
-            color: orange,
-            title: markdown
-                .attributedString(
-                    from: "Schedule **presets** for changing the\n**brightness** at **predefined times**"
-                ),
-            enabled: true,
-            action: #selector(clockClick)
-        )
-
-        setupButton(
-            sensor,
-            notice: sensorNotice,
-            color: blue.highlight(withLevel: 0.2) ?? blue,
-            title: markdown
-                .attributedString(
-                    from: "**Adapt** screen brightness based on readings\nfrom an **ambient light sensor**"
-                ),
-            enabled: SensorMode.specific.available,
-            action: #selector(sensorClick)
-        )
-
-        setupButton(
-            manual,
-            notice: manualNotice,
-            color: red.highlight(withLevel: 0.2) ?? red,
-            title: markdown
-                .attributedString(
-                    from: "**Control** your **\(externalName)** manually\nusing brightness and volume **keys**"
-                ),
-            enabled: ManualMode.specific.available,
-            action: #selector(manualClick)
-        )
-
-        mainAsyncAfter(ms: 500) { [weak self] in
-            guard let self else { return }
-            heading.transition(0.3)
-            heading.alphaValue = 1
-        }
-        mainAsyncAfter(ms: 1000) { [weak self] in
-            guard let self else { return }
-            subheading.transition(0.8)
-            subheading.alphaValue = 1
-        }
-    }
-
-    override func viewDidAppear() {
-        guard !didAppear else { return }
-        didAppear = true
-
-        uiCrumb("Mode Choice")
-        if let wc = view.window?.windowController as? OnboardWindowController {
-            wc.setupSkipButton(skipButton) { [weak self] in
-                self?.revert()
-            }
-        }
-    }
 }

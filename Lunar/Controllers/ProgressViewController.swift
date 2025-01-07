@@ -22,10 +22,6 @@ final class ProgressViewController: NSViewController {
         }
     }
 
-    @IBAction func onDoneClicked(_: Any) {
-        view.window?.close()
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
         view.wantsLayer = true
@@ -39,4 +35,9 @@ final class ProgressViewController: NSViewController {
         doneButton?.frame = NSRect(origin: doneButton.frame.origin, size: CGSize(width: doneButton.frame.width, height: 30))
         doneButton?.attributedTitle = doneButton.title.withAttribute(.textColor(white))
     }
+
+    @IBAction func onDoneClicked(_: Any) {
+        view.window?.close()
+    }
+
 }

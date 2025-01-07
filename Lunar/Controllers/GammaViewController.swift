@@ -39,6 +39,10 @@ final class GammaViewController: NSViewController {
         mainThread { view.window?.isVisible ?? false }
     }
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+    }
+
     func change() {
         mainAsync { [weak self] in
             guard let dot = self?.dot else { return }
@@ -64,7 +68,4 @@ final class GammaViewController: NSViewController {
         }
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
 }

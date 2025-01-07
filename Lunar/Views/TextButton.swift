@@ -25,13 +25,6 @@ final class TextButton: NSButton {
     @IBInspectable var textColor = mauve.withAlphaComponent(0.4)
     @IBInspectable var hoverTextColor = white
 
-    func setTitleColor(color: NSColor) {
-        let mutableTitle = NSMutableAttributedString(attributedString: NSAttributedString(string: title))
-        mutableTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: color, range: NSMakeRange(0, mutableTitle.length))
-        mutableTitle.setAlignment(alignment, range: NSMakeRange(0, mutableTitle.length))
-        attributedTitle = mutableTitle
-    }
-
     override func mouseExited(with _: NSEvent) {
         transition(0.4)
         layer?.backgroundColor = bgColor
@@ -42,6 +35,17 @@ final class TextButton: NSButton {
         transition(0.2)
         layer?.backgroundColor = hoverBgColor
         setTitleColor(color: hoverTextColor)
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+    }
+
+    func setTitleColor(color: NSColor) {
+        let mutableTitle = NSMutableAttributedString(attributedString: NSAttributedString(string: title))
+        mutableTitle.addAttribute(NSAttributedString.Key.foregroundColor, value: color, range: NSMakeRange(0, mutableTitle.length))
+        mutableTitle.setAlignment(alignment, range: NSMakeRange(0, mutableTitle.length))
+        attributedTitle = mutableTitle
     }
 
     func setup() {
@@ -60,7 +64,4 @@ final class TextButton: NSButton {
         addTrackingArea(area)
     }
 
-    override func draw(_ dirtyRect: NSRect) {
-        super.draw(dirtyRect)
-    }
 }

@@ -160,6 +160,16 @@ final class ConfigurationViewController: NSViewController {
         }
     }
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        settingsController = parent?.parent as? SettingsPageController
+        setup()
+    }
+
+    override func wantsScrollEventsForSwipeTracking(on axis: NSEvent.GestureAxis) -> Bool {
+        axis == .horizontal
+    }
+
     func showRelevantSettings(_ adaptiveMode: AdaptiveModeKey) {
         let locationMode = adaptiveMode == .location
         let sensorMode = adaptiveMode == .sensor
@@ -422,13 +432,4 @@ final class ConfigurationViewController: NSViewController {
         listenForAdaptiveModeChange()
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        settingsController = parent?.parent as? SettingsPageController
-        setup()
-    }
-
-    override func wantsScrollEventsForSwipeTracking(on axis: NSEvent.GestureAxis) -> Bool {
-        axis == .horizontal
-    }
 }

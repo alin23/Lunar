@@ -129,13 +129,6 @@ final class MacToggle: NSView {
         didSet { backVw.bg = backColor }
     }
 
-    @inline(__always) func toggleWithoutCallback(value: Bool) {
-        let oldCallback = callback
-        callback = nil
-        isOn = value
-        callback = oldCallback
-    }
-
     override func mouseDown(with _: NSEvent) {
         guard isEnabled else { return }
         let push = Double(outlineWidth + width) - Double(height)
@@ -159,6 +152,13 @@ final class MacToggle: NSView {
         guard isEnabled else { return }
 
         isOn = !isOn
+    }
+
+    @inline(__always) func toggleWithoutCallback(value: Bool) {
+        let oldCallback = callback
+        callback = nil
+        isOn = value
+        callback = oldCallback
     }
 
     fileprivate var height: CGFloat = 26

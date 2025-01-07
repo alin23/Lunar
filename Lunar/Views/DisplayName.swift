@@ -32,22 +32,6 @@ final class DisplayName: NSTextField, NSTextFieldDelegate {
         super.draw(dirtyRect)
     }
 
-    func setup() {
-        delegate = self
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = .center
-        centerAlign = paragraphStyle
-
-        usesSingleLineMode = false
-        allowsEditingTextAttributes = false
-        wantsLayer = true
-        radius = 8.ns
-
-        trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
-        addTrackingArea(trackingArea!)
-        needsDisplay = true
-    }
-
     override func mouseEntered(with _: NSEvent) {
         if !isEnabled || !isEditable {
             return
@@ -65,16 +49,6 @@ final class DisplayName: NSTextField, NSTextFieldDelegate {
         if isEditable {
             refusesFirstResponder = false
             becomeFirstResponder()
-        }
-    }
-
-    func control(_: NSControl, textView _: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
-        switch commandSelector {
-        case #selector(insertNewline(_:)):
-            window?.makeFirstResponder(nil)
-            return true
-        default:
-            return false
         }
     }
 
@@ -103,4 +77,31 @@ final class DisplayName: NSTextField, NSTextFieldDelegate {
         }
         refusesFirstResponder = true
     }
+
+    func setup() {
+        delegate = self
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
+        centerAlign = paragraphStyle
+
+        usesSingleLineMode = false
+        allowsEditingTextAttributes = false
+        wantsLayer = true
+        radius = 8.ns
+
+        trackingArea = NSTrackingArea(rect: visibleRect, options: [.mouseEnteredAndExited, .activeInActiveApp], owner: self, userInfo: nil)
+        addTrackingArea(trackingArea!)
+        needsDisplay = true
+    }
+
+    func control(_: NSControl, textView _: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+        switch commandSelector {
+        case #selector(insertNewline(_:)):
+            window?.makeFirstResponder(nil)
+            return true
+        default:
+            return false
+        }
+    }
+
 }

@@ -29,20 +29,6 @@ final class PageNavigationControl: NSSegmentedControl {
     var standardAlpha = 0.5
     var visibleAlpha = 0.8
 
-    func setup() {
-        wantsLayer = true
-
-        alphaValue = standardAlpha
-
-        trackingArea = NSTrackingArea(
-            rect: visibleRect,
-            options: [.mouseEnteredAndExited, .activeInActiveApp],
-            owner: self,
-            userInfo: nil
-        )
-        addTrackingArea(trackingArea)
-    }
-
     override func mouseEntered(with _: NSEvent) {
         if !isEnabled { return }
 
@@ -66,4 +52,19 @@ final class PageNavigationControl: NSSegmentedControl {
 
         // Drawing code here.
     }
+
+    func setup() {
+        wantsLayer = true
+
+        alphaValue = standardAlpha
+
+        trackingArea = NSTrackingArea(
+            rect: visibleRect,
+            options: [.mouseEnteredAndExited, .activeInActiveApp],
+            owner: self,
+            userInfo: nil
+        )
+        addTrackingArea(trackingArea)
+    }
+
 }

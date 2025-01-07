@@ -88,6 +88,10 @@ let DEFAULT_APP_BRIGHTNESS_CONTRAST = 0.8
         case useStaticValuesInAdaptiveModes
     }
 
+    override var description: String {
+        "\(name)[\(identifier)]"
+    }
+
     var manualObserver: Cancellable?
     var mergeBrightnessContrastObserver: Cancellable?
     @objc dynamic lazy var hideManualValuesMerged = !showManualValues || !CachedDefaults[.mergeBrightnessContrast]
@@ -98,9 +102,6 @@ let DEFAULT_APP_BRIGHTNESS_CONTRAST = 0.8
             hideManualValuesMerged = !showManualValues || !CachedDefaults[.mergeBrightnessContrast]
             hideManualValuesNonMerged = !showManualValues || CachedDefaults[.mergeBrightnessContrast]
         }
-    }
-    override var description: String {
-        "\(name)[\(identifier)]"
     }
 
     var runningApps: [NSRunningApplication]? {

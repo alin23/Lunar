@@ -1183,7 +1183,7 @@ struct Lunar: ParsableCommand {
 
                 \("PROPERTY_NAME".magenta().bold()) \("VALUE".green().bold()) \("DISPLAY_ID".blue().bold())
 
-            \("PROPERTY_NAME".magenta().bold()) will be one of "brightness", "contrast", "volume", "mute".
+            \("PROPERTY_NAME".magenta().bold()) will be one of "brightness", "contrast", "volume", "mute", "nits".
 
             For `mute`, \("VALUE".green().bold()) will be a `true` or a `false`.
 

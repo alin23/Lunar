@@ -21,6 +21,40 @@ final class ExceptionsViewController: NSViewController, NSTableViewDelegate, NST
 
     @IBInspectable dynamic var appExceptions: [AppException] = datastore.appExceptions() ?? []
 
+    override func mouseEntered(with _: NSEvent) {
+        if let button = addAppButton {
+            button.transition(0.5)
+            button.alphaValue = 1.0
+            button.shadow = addAppButtonShadow
+        }
+    }
+
+    override func mouseExited(with _: NSEvent) {
+        if let button = addAppButton {
+            button.transition(1.0)
+            button.alphaValue = 0.8
+            button.shadow = nil
+        }
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        tableView.headerView = nil
+        initAddAppButton()
+        observer = appExceptionsPublisher.sink { [weak self] change in
+            guard let self, let newVal = change.newValue, newVal.count != self.appExceptions.count else {
+                return
+            }
+            mainAsync { [weak self] in
+                self?.setValue(datastore.appExceptions(), forKey: "appExceptions")
+            }
+        }
+    }
+
+    override func wantsScrollEventsForSwipeTracking(on axis: NSEvent.GestureAxis) -> Bool {
+        axis == .horizontal
+    }
+
     @IBAction func addAppException(_: NSButton) {
         let dialog = NSOpenPanel()
 
@@ -80,40 +114,6 @@ final class ExceptionsViewController: NSViewController, NSTableViewDelegate, NST
             )
             button.addTrackingArea(addAppButtonTrackingArea)
         }
-    }
-
-    override func mouseEntered(with _: NSEvent) {
-        if let button = addAppButton {
-            button.transition(0.5)
-            button.alphaValue = 1.0
-            button.shadow = addAppButtonShadow
-        }
-    }
-
-    override func mouseExited(with _: NSEvent) {
-        if let button = addAppButton {
-            button.transition(1.0)
-            button.alphaValue = 0.8
-            button.shadow = nil
-        }
-    }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        tableView.headerView = nil
-        initAddAppButton()
-        observer = appExceptionsPublisher.sink { [weak self] change in
-            guard let self, let newVal = change.newValue, newVal.count != self.appExceptions.count else {
-                return
-            }
-            mainAsync { [weak self] in
-                self?.setValue(datastore.appExceptions(), forKey: "appExceptions")
-            }
-        }
-    }
-
-    override func wantsScrollEventsForSwipeTracking(on axis: NSEvent.GestureAxis) -> Bool {
-        axis == .horizontal
     }
 
     @IBAction func proButtonClick(_: Any) {

@@ -1302,6 +1302,16 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         1000: 500,
     ]
 
+    override var description: String {
+        "\(name) [ID \(id)]"
+    }
+
+    override var hash: Int {
+        var hasher = Hasher()
+        hasher.combine(serial)
+        return hasher.finalize()
+    }
+
     let osdState = OSDState()
 
     lazy var xdrFilledChicletOffset = 6 / (96 * (1 / (maxSoftwareBrightness - Self.MIN_SOFTWARE_BRIGHTNESS)))
@@ -3483,16 +3493,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-    override var description: String {
-        "\(name) [ID \(id)]"
-    }
-
-    override var hash: Int {
-        var hasher = Hasher()
-        hasher.combine(serial)
-        return hasher.finalize()
-    }
-
     var id: CGDirectDisplayID {
         get { _idLock.around { _id } }
         set { _idLock.around { _id = newValue } }
@@ -4088,6 +4088,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             xdrFilledChicletOffset = 6 / (96 * (1 / (maxSoftwareBrightness - Self.MIN_SOFTWARE_BRIGHTNESS)))
             xdrFilledChicletsThresholds = (0 ... 16).map { Self.MIN_SOFTWARE_BRIGHTNESS + xdrFilledChicletOffset * $0.f }
         }
+    }
+
+    override func isEqual(_ object: Any?) -> Bool {
+        guard let other = object as? Display else {
+            return false
+        }
+        return serial == other.serial
     }
 
     static func ambientLightCompensationEnabled(_ id: CGDirectDisplayID) -> Bool {
@@ -4965,13 +4972,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         } else if applyGamma || applyTemporaryGamma, !blackOutEnabled {
             resetSoftwareControl()
         }
-    }
-
-    override func isEqual(_ object: Any?) -> Bool {
-        guard let other = object as? Display else {
-            return false
-        }
-        return serial == other.serial
     }
 
     func manageSendingValue(_ key: CodingKeys, oldValue _: Bool) {

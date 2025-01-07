@@ -19,10 +19,6 @@ final class DeleteButton: NSButton {
         setup()
     }
 
-    func setup() {
-        alphaValue = 0.0
-    }
-
     override func mouseEntered(with _: NSEvent) {
         transition(0.2)
         alphaValue = 1.0
@@ -36,4 +32,9 @@ final class DeleteButton: NSButton {
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
     }
+
+    func setup() {
+        alphaValue = 0.0
+    }
+
 }

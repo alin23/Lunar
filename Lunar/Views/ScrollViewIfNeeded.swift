@@ -58,6 +58,10 @@ struct ScrollViewIfNeeded<Content>: View where Content: View {
     /// The default is `true`.
     var showsIndicators: Bool
 
+    var activeScrollingDirections: Axis.Set {
+        axes.intersection((fitsVertically ? [] : Axis.Set.vertical).union(fitsHorizontally ? [] : Axis.Set.horizontal))
+    }
+
     var body: some View {
         GeometryReader { geometryReader in
             ScrollView(activeScrollingDirections, showsIndicators: showsIndicators) {
@@ -78,10 +82,6 @@ struct ScrollViewIfNeeded<Content>: View where Content: View {
                 fitsHorizontally = $0.width <= geometryReader.size.width
             }
         }
-    }
-
-    var activeScrollingDirections: Axis.Set {
-        axes.intersection((fitsVertically ? [] : Axis.Set.vertical).union(fitsHorizontally ? [] : Axis.Set.horizontal))
     }
 
     private struct ViewSizeKey: PreferenceKey {

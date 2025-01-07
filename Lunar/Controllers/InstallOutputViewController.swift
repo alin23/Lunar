@@ -77,6 +77,29 @@ final class InstallOutputViewController: NSViewController {
         }
     }
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        waitingIndicator.appearance = NSAppearance(named: .vibrantDark)
+        cancellingIndicator.appearance = NSAppearance(named: .vibrantDark)
+        scrollAutomaticallyCheckbox.attributedTitle = scrollAutomaticallyCheckbox.title.withAttribute(.textColor(white))
+        outputScrollView.scrollsDynamically = true
+        outputScrollView.wantsLayer = true
+        outputScrollView.appearance = NSAppearance(named: .vibrantDark)
+        outputScrollView.radius = 14.0.ns
+
+        outputScrollView.onScroll = { [weak self] event in
+            if let self, scrollAutomatically, abs(event.scrollingDeltaY) > 1 {
+                scrollAutomatically = false
+            }
+        }
+
+        if let textView = outputScrollView.documentView as? NSTextView {
+            textView.isEditable = false
+            textView.font = monospace(size: 13)
+            textView.string = "\n"
+        }
+    }
+
     func printNewHostname(new: String, old: String, textView: NSTextView) {
         if new != old {
             textView.string += "\n\nNOTE: The hostname has been changed from \(old) to \(new) to avoid name clashes\n\n"
@@ -207,26 +230,4 @@ final class InstallOutputViewController: NSViewController {
         }
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        waitingIndicator.appearance = NSAppearance(named: .vibrantDark)
-        cancellingIndicator.appearance = NSAppearance(named: .vibrantDark)
-        scrollAutomaticallyCheckbox.attributedTitle = scrollAutomaticallyCheckbox.title.withAttribute(.textColor(white))
-        outputScrollView.scrollsDynamically = true
-        outputScrollView.wantsLayer = true
-        outputScrollView.appearance = NSAppearance(named: .vibrantDark)
-        outputScrollView.radius = 14.0.ns
-
-        outputScrollView.onScroll = { [weak self] event in
-            if let self, scrollAutomatically, abs(event.scrollingDeltaY) > 1 {
-                scrollAutomatically = false
-            }
-        }
-
-        if let textView = outputScrollView.documentView as? NSTextView {
-            textView.isEditable = false
-            textView.font = monospace(size: 13)
-            textView.string = "\n"
-        }
-    }
 }

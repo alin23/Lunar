@@ -141,8 +141,6 @@ final class Solar {
     private(set) lazy var astronomicalSunsetPosition: Sun? = astronomicalSunset != nil ? computeSunPosition(date: astronomicalSunset!) : nil
     private(set) lazy var solarNoonPosition: Sun? = solarNoon != nil ? computeSunPosition(date: solarNoon!) : nil
 
-    // MARK: - functions
-
     /// Sets all of the Solar object's sunrise / sunset variables, if possible.
     /// - Note: Can return `nil` objects if sunrise / sunset does not occur on that day.
     func calculate() {

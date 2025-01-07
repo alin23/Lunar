@@ -29,6 +29,17 @@ final class PaddedButton: NSButton {
         setup()
     }
 
+    override var isEnabled: Bool {
+        didSet {
+            if isEnabled {
+                alphaValue = 1.0
+            } else {
+                alphaValue = 0.7
+            }
+            fade(resize: false)
+        }
+    }
+
     var buttonShadow: NSShadow!
     var baseFrame: NSRect!
 
@@ -43,17 +54,6 @@ final class PaddedButton: NSButton {
         }
     }
 
-    override var isEnabled: Bool {
-        didSet {
-            if isEnabled {
-                alphaValue = 1.0
-            } else {
-                alphaValue = 0.7
-            }
-            fade(resize: false)
-        }
-    }
-
     @IBInspectable var textColor: NSColor? {
         didSet {
             if let color = textColor {
@@ -61,6 +61,30 @@ final class PaddedButton: NSButton {
                 attributedTitle = attributedTitle.string.withAttribute(.textColor(color))
             }
         }
+    }
+
+    override func mouseEntered(with _: NSEvent) {
+        if isEnabled {
+            hover()
+        }
+    }
+
+    override func mouseExited(with _: NSEvent) {
+        if isEnabled {
+            defocus()
+        }
+    }
+
+    override func cursorUpdate(with _: NSEvent) {
+        if isEnabled {
+            NSCursor.pointingHand.set()
+        }
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        fade(resize: false)
+
+        super.draw(dirtyRect)
     }
 
     func setup() {
@@ -78,18 +102,6 @@ final class PaddedButton: NSButton {
         baseFrame = frame
         shadow = NO_SHADOW
         trackHover(cursor: true)
-    }
-
-    override func mouseEntered(with _: NSEvent) {
-        if isEnabled {
-            hover()
-        }
-    }
-
-    override func mouseExited(with _: NSEvent) {
-        if isEnabled {
-            defocus()
-        }
     }
 
     func setColors(fadeDuration: TimeInterval = 0.3, resize: Bool = true) {
@@ -130,15 +142,4 @@ final class PaddedButton: NSButton {
         setColors(fadeDuration: 0.2)
     }
 
-    override func cursorUpdate(with _: NSEvent) {
-        if isEnabled {
-            NSCursor.pointingHand.set()
-        }
-    }
-
-    override func draw(_ dirtyRect: NSRect) {
-        fade(resize: false)
-
-        super.draw(dirtyRect)
-    }
 }

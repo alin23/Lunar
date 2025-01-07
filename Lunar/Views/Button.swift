@@ -22,6 +22,56 @@ class Button: NSButton {
         setup()
     }
 
+    override var title: String {
+        didSet { mainAsync { [self] in
+            guard !alternateTitleWhenDisabled else {
+                attributedTitle = (isEnabled ? title : alternateTitle).withTextColor(textColor)
+                return
+            }
+            attributedTitle = title.withTextColor(textColor)
+        }}
+    }
+
+    override var alternateTitle: String {
+        didSet { mainAsync { [self] in
+            guard !alternateTitleWhenDisabled else {
+                attributedTitle = (isEnabled ? title : alternateTitle).withTextColor(textColor)
+                return
+            }
+            attributedTitle = title.withTextColor(textColor)
+        }}
+    }
+
+    override var frame: NSRect {
+        didSet { trackHover(rect: NSRect(origin: .zero, size: max(intrinsicContentSize, bounds.size)), cursor: true) }
+    }
+
+    override var isHidden: Bool {
+        didSet {
+            trackHover(rect: NSRect(origin: .zero, size: max(intrinsicContentSize, bounds.size)), cursor: true)
+            defocus()
+        }
+    }
+
+    override var isEnabled: Bool {
+        didSet {
+            guard !grayDisabledText else { return }
+            mainAsync { [self] in
+                alphaValue = isEnabled ? alpha : alpha + disabledAlphaOffset
+                if alternateTitleWhenDisabled {
+                    attributedTitle = (isEnabled ? title : alternateTitle).withTextColor(textColor)
+                }
+            }
+        }
+    }
+
+    override var intrinsicContentSize: NSSize {
+        var size = super.intrinsicContentSize
+        size.width += horizontalPadding
+        size.height += verticalPadding
+        return size
+    }
+
     @IBInspectable dynamic var grayDisabledText = true
     @IBInspectable dynamic var alternateTitleWhenDisabled = false
     var buttonShadow: NSShadow!
@@ -65,37 +115,6 @@ class Button: NSButton {
         }}
     }
 
-    override var title: String {
-        didSet { mainAsync { [self] in
-            guard !alternateTitleWhenDisabled else {
-                attributedTitle = (isEnabled ? title : alternateTitle).withTextColor(textColor)
-                return
-            }
-            attributedTitle = title.withTextColor(textColor)
-        }}
-    }
-
-    override var alternateTitle: String {
-        didSet { mainAsync { [self] in
-            guard !alternateTitleWhenDisabled else {
-                attributedTitle = (isEnabled ? title : alternateTitle).withTextColor(textColor)
-                return
-            }
-            attributedTitle = title.withTextColor(textColor)
-        }}
-    }
-
-    override var frame: NSRect {
-        didSet { trackHover(rect: NSRect(origin: .zero, size: max(intrinsicContentSize, bounds.size)), cursor: true) }
-    }
-
-    override var isHidden: Bool {
-        didSet {
-            trackHover(rect: NSRect(origin: .zero, size: max(intrinsicContentSize, bounds.size)), cursor: true)
-            defocus()
-        }
-    }
-
     @IBInspectable dynamic var disabledAlphaOffset: CGFloat = -0.3 {
         didSet {
             guard !grayDisabledText else { return }
@@ -106,25 +125,6 @@ class Button: NSButton {
                 }
             }
         }
-    }
-
-    override var isEnabled: Bool {
-        didSet {
-            guard !grayDisabledText else { return }
-            mainAsync { [self] in
-                alphaValue = isEnabled ? alpha : alpha + disabledAlphaOffset
-                if alternateTitleWhenDisabled {
-                    attributedTitle = (isEnabled ? title : alternateTitle).withTextColor(textColor)
-                }
-            }
-        }
-    }
-
-    override var intrinsicContentSize: NSSize {
-        var size = super.intrinsicContentSize
-        size.width += horizontalPadding
-        size.height += verticalPadding
-        return size
     }
 
     @IBInspectable var cornerRadius: CGFloat = -1 {
@@ -160,6 +160,39 @@ class Button: NSButton {
     }
 
     var highlighting: Bool { highligherTask != nil }
+
+    override func cursorUpdate(with _: NSEvent) {
+        if isEnabled, handCursor {
+            NSCursor.pointingHand.set()
+        }
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        onClick?()
+        super.mouseDown(with: event)
+    }
+
+    override func mouseEntered(with _: NSEvent) {
+        guard isEnabled else {
+            if highlighting {
+                stopHighlighting()
+            }
+            return
+        }
+
+        hover()
+        onMouseEnter?()
+    }
+
+    override func mouseExited(with _: NSEvent) {
+        if !isEnabled { return }
+        defocus()
+        onMouseExit?()
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+    }
 
     func highlight() {
         mainAsync { [weak self] in
@@ -250,17 +283,6 @@ class Button: NSButton {
         trackHover(rect: NSRect(origin: .zero, size: max(intrinsicContentSize, bounds.size)), cursor: true)
     }
 
-    override func cursorUpdate(with _: NSEvent) {
-        if isEnabled, handCursor {
-            NSCursor.pointingHand.set()
-        }
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        onClick?()
-        super.mouseDown(with: event)
-    }
-
     func defocus(fadeDuration: TimeInterval = 0.6) {
         hover = false
 
@@ -277,25 +299,4 @@ class Button: NSButton {
         shadow = buttonShadowHover
     }
 
-    override func mouseEntered(with _: NSEvent) {
-        guard isEnabled else {
-            if highlighting {
-                stopHighlighting()
-            }
-            return
-        }
-
-        hover()
-        onMouseEnter?()
-    }
-
-    override func mouseExited(with _: NSEvent) {
-        if !isEnabled { return }
-        defocus()
-        onMouseExit?()
-    }
-
-    override func draw(_ dirtyRect: NSRect) {
-        super.draw(dirtyRect)
-    }
 }

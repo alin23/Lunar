@@ -17,6 +17,13 @@ final class RaspberryPageController: NSPageController {
     let installOutputViewControllerIdentifier = NSPageController.ObjectIdentifier("installOutputViewController")
     var viewControllers: [NSPageController.ObjectIdentifier: NSViewController] = [:]
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setup()
+    }
+
+    override func scrollWheel(with _: NSEvent) {}
+
     func setup() {
         delegate = self
         transitionStyle = .horizontalStrip
@@ -32,12 +39,6 @@ final class RaspberryPageController: NSPageController {
         view.setNeedsDisplay(view.rectForPage(selectedIndex))
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setup()
-    }
-
-    override func scrollWheel(with _: NSEvent) {}
 }
 
 // MARK: NSPageControllerDelegate

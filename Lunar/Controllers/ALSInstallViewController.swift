@@ -168,6 +168,28 @@ final class ALSInstallViewController: NSViewController {
         }
     }
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        mainAsyncAfter(ms: 100) { [weak self] in
+            self?.devices = getDevices()
+            log.debug("Available sensor devices: \(self?.devices ?? [])")
+        }
+
+        view.wantsLayer = true
+        view.radius = 12.0.ns
+        view.bg = darkMauve
+        progressBar?.appearance = NSAppearance(named: .vibrantDark)
+
+        installButton?.bgColor = lunarYellow
+        installButton?.radius = 10.ns
+        installButton?.frame = NSRect(origin: installButton.frame.origin, size: CGSize(width: installButton.frame.width, height: 30))
+        installButton?.attributedTitle = "Start".withAttribute(.textColor(mauve))
+        operationDescription =
+            "Your WiFi credentials will be programmed into the sensor firmware so it can connect to your local network and send lux values when requested."
+                .attributedString
+    }
+
     func setPins() {
         switch boardID {
         case "sparkfun_esp32s2_thing_plus":
@@ -311,27 +333,6 @@ final class ALSInstallViewController: NSViewController {
         }
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        mainAsyncAfter(ms: 100) { [weak self] in
-            self?.devices = getDevices()
-            log.debug("Available sensor devices: \(self?.devices ?? [])")
-        }
-
-        view.wantsLayer = true
-        view.radius = 12.0.ns
-        view.bg = darkMauve
-        progressBar?.appearance = NSAppearance(named: .vibrantDark)
-
-        installButton?.bgColor = lunarYellow
-        installButton?.radius = 10.ns
-        installButton?.frame = NSRect(origin: installButton.frame.origin, size: CGSize(width: installButton.frame.width, height: 30))
-        installButton?.attributedTitle = "Start".withAttribute(.textColor(mauve))
-        operationDescription =
-            "Your WiFi credentials will be programmed into the sensor firmware so it can connect to your local network and send lux values when requested."
-                .attributedString
-    }
 }
 
 // MARK: NSControlTextEditingDelegate

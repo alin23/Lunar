@@ -26,6 +26,21 @@ final class ScrollableTextFieldCaption: NSTextField {
     var initialAlphaValue: CGFloat!
     var initialColor: NSColor!
 
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+    }
+
+    override func mouseEntered(with _: NSEvent) {
+        guard tag == 98 || tag == 99 else { return }
+        transition(0.2)
+        stringValue = "Scroll or click to edit"
+        alphaValue = 0.5
+    }
+
+    override func mouseExited(with _: NSEvent) {
+        resetText()
+    }
+
     func setup() {
         usesSingleLineMode = false
         allowsEditingTextAttributes = true
@@ -33,10 +48,6 @@ final class ScrollableTextFieldCaption: NSTextField {
         initialText = stringValue
         initialAlphaValue = alphaValue
         initialColor = textColor
-    }
-
-    override func draw(_ dirtyRect: NSRect) {
-        super.draw(dirtyRect)
     }
 
     func lightenUp(color: NSColor) {
@@ -56,14 +67,4 @@ final class ScrollableTextFieldCaption: NSTextField {
         alphaValue = initialAlphaValue
     }
 
-    override func mouseEntered(with _: NSEvent) {
-        guard tag == 98 || tag == 99 else { return }
-        transition(0.2)
-        stringValue = "Scroll or click to edit"
-        alphaValue = 0.5
-    }
-
-    override func mouseExited(with _: NSEvent) {
-        resetText()
-    }
 }

@@ -23,6 +23,9 @@ final class HotkeyView: RecordView, RecordViewDelegate {
         setup()
     }
 
+    override var frame: NSRect { didSet { trackHover() } }
+    override var bounds: NSRect { didSet { trackHover() } }
+
     var hoverState: HoverState = .noHover
 
     var hotkeyColor: [HoverState: [String: NSColor]] {
@@ -51,13 +54,37 @@ final class HotkeyView: RecordView, RecordViewDelegate {
         hotkey?.isEnabled ?? false
     }
 
-    override var frame: NSRect { didSet { trackHover() } }
-    override var bounds: NSRect { didSet { trackHover() } }
-
     override func mouseDown(with _: NSEvent) {
         log.debug("Clicked on hotkey view: \(hotkey?.identifier ?? "")")
         beginRecording()
         transition()
+    }
+
+    override func didChangeValue(forKey key: String) {
+        if key == "recording" {
+            transition()
+            if isRecording {
+                hotkey?.unregister()
+            } else if hotkeyEnabled {
+                hotkey?.register()
+            }
+        }
+    }
+
+    override func mouseEntered(with _: NSEvent) {
+        hoverState = .hover
+        transition()
+    }
+
+    override func mouseExited(with _: NSEvent) {
+        hoverState = .noHover
+        transition()
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        radius = 8.ns
+        transition()
+        super.draw(dirtyRect)
     }
 
     func recordViewShouldBeginRecording(_: RecordView) -> Bool {
@@ -160,17 +187,6 @@ final class HotkeyView: RecordView, RecordViewDelegate {
         }
     }
 
-    override func didChangeValue(forKey key: String) {
-        if key == "recording" {
-            transition()
-            if isRecording {
-                hotkey?.unregister()
-            } else if hotkeyEnabled {
-                hotkey?.register()
-            }
-        }
-    }
-
     func isHotkeyCheckboxEnabled(_ hk: PersistentHotkey) -> Bool {
         hk.isEnabled && !NSEvent.ModifierFlags(carbonModifiers: hk.modifiers).contains(.option)
     }
@@ -205,19 +221,4 @@ final class HotkeyView: RecordView, RecordViewDelegate {
         }
     }
 
-    override func mouseEntered(with _: NSEvent) {
-        hoverState = .hover
-        transition()
-    }
-
-    override func mouseExited(with _: NSEvent) {
-        hoverState = .noHover
-        transition()
-    }
-
-    override func draw(_ dirtyRect: NSRect) {
-        radius = 8.ns
-        transition()
-        super.draw(dirtyRect)
-    }
 }

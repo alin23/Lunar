@@ -39,6 +39,7 @@
         @State var possibly = false
 
         @ObservedObject var display: Display
+
         @Default(.autoBlackoutBuiltin) var autoBlackoutBuiltin
 
         var body: some View {

@@ -14,6 +14,7 @@ import Foundation
 
 final class GradientView: NSView {
     override var wantsDefaultClipping: Bool { false }
+
     @IBInspectable var firstColor: NSColor = .clear {
         didSet {
             updateView()
@@ -175,6 +176,122 @@ final class ControlChoiceViewController: NSViewController {
 
     var controlButton: HelpButton? { _controlButton as? HelpButton }
     var ddcBlockersButton: OnboardingHelpButton? { _ddcBlockersButton as? OnboardingHelpButton }
+
+    override func viewDidAppear() {
+        guard !didAppear else { return }
+        didAppear = true
+        uiCrumb("Control Tester")
+
+        cancelled = false
+        adaptiveModeDisabledByDiagnostics = false
+        if DC.adaptiveModeKey != .manual {
+            DC.disable()
+            adaptiveModeDisabledByDiagnostics = true
+        }
+
+        listenForDisplayConnections()
+
+        if let wc = view.window?.windowController as? OnboardWindowController {
+            wc.setupSkipButton(skipButton, text: useOnboardingForDiagnostics ? "Stop Diagnostics" : nil) { [weak self] in
+                self?.cancelled = true
+                for d in DC.displays.values {
+                    d.testWindowController?.close()
+                    d.testWindowController = nil
+                }
+
+                self?.wakeObserver?.cancel()
+                self?.wakeObserver = nil
+
+                self?.screenObserver?.cancel()
+                self?.screenObserver = nil
+
+                self?.semaphore.signal()
+
+                guard useOnboardingForDiagnostics else { return }
+                self?.skipButton.isEnabled = false
+                self?.skipButton.attributedTitle = "Stopping".withTextColor(.black)
+
+                mainAsyncAfter(ms: 1500) {
+                    self?.view.window?.close()
+                    if adaptiveModeDisabledByDiagnostics {
+                        DC.enable()
+                    }
+                }
+            }
+        }
+
+        OnboardPageController.task = concurrentQueue.asyncAfter(ms: 10, name: ONBOARDING_TASK_KEY) { [weak self] in
+            let displays = DC.externalDisplaysForTest
+            guard let self, !self.cancelled, !OnboardPageController.task.isCancelled, let firstDisplay = displays.first else {
+                return
+            }
+
+            mainThread {
+                self.displayName.transition(0.5, easing: .easeOutExpo)
+                self.displayName.alphaValue = 1.0
+                self.displayName.display = firstDisplay
+                self.setControl(firstDisplay.getBestControl(reapply: false).displayControl, display: firstDisplay)
+            }
+            waitForAction(
+                "Lunar will try to read and then change the monitor brightness, contrast and volume\nIf Lunar can't revert the changes, you can do that by using the monitor's physical buttons",
+                buttonColor: lunarYellow, buttonText: "Continue".withTextColor(mauve)
+            ) {}
+
+            displayProgressStep = 1.0 / displays.count.d
+            for (i, d) in displays.enumerated() {
+                testDisplay(d, index: i)
+            }
+
+            queueChange {
+                DC.externalActiveDisplays.forEach { $0.resetControl() }
+            }
+
+            mainThread {
+                for d in DC.displays.values {
+                    d.testWindowController?.close()
+                    d.testWindowController = nil
+                }
+                if useOnboardingForDiagnostics, self.cancelled { return }
+                self.next()
+            }
+        }
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        hideDisplayValues()
+        hideAction()
+        hideQuestion()
+
+        noButton.bg = red
+        noButton.attributedTitle = "No".withTextColor(white)
+        yesButton.bg = green
+        yesButton.attributedTitle = "Yes".withTextColor(white)
+
+        displayImage?.cornerRadius = 16
+        displayImage?.standColor = peach
+        displayImage?.screenColor = rouge
+
+        actionLabel.textColor = actionLabelColor
+        actionInfo.alphaValue = 0.0
+
+        volumeSlider.minValue = 0
+        volumeSlider.maxValue = 100
+        volumeSlider.isEnabled = false
+        volumeSlider.isHidden = true
+
+        if let controlButton {
+            controlButton.isEnabled = false
+            controlButton.isHidden = true
+        }
+
+        if let ddcBlockersButton {
+            ddcBlockersButton.isEnabled = false
+            ddcBlockersButton.isHidden = true
+        }
+        POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantDark)
+    }
 
     func info(_ text: String, color: NSColor) {
         mainThread {
@@ -979,86 +1096,6 @@ final class ControlChoiceViewController: NSViewController {
             }.store(in: &observers)
     }
 
-    override func viewDidAppear() {
-        guard !didAppear else { return }
-        didAppear = true
-        uiCrumb("Control Tester")
-
-        cancelled = false
-        adaptiveModeDisabledByDiagnostics = false
-        if DC.adaptiveModeKey != .manual {
-            DC.disable()
-            adaptiveModeDisabledByDiagnostics = true
-        }
-
-        listenForDisplayConnections()
-
-        if let wc = view.window?.windowController as? OnboardWindowController {
-            wc.setupSkipButton(skipButton, text: useOnboardingForDiagnostics ? "Stop Diagnostics" : nil) { [weak self] in
-                self?.cancelled = true
-                for d in DC.displays.values {
-                    d.testWindowController?.close()
-                    d.testWindowController = nil
-                }
-
-                self?.wakeObserver?.cancel()
-                self?.wakeObserver = nil
-
-                self?.screenObserver?.cancel()
-                self?.screenObserver = nil
-
-                self?.semaphore.signal()
-
-                guard useOnboardingForDiagnostics else { return }
-                self?.skipButton.isEnabled = false
-                self?.skipButton.attributedTitle = "Stopping".withTextColor(.black)
-
-                mainAsyncAfter(ms: 1500) {
-                    self?.view.window?.close()
-                    if adaptiveModeDisabledByDiagnostics {
-                        DC.enable()
-                    }
-                }
-            }
-        }
-
-        OnboardPageController.task = concurrentQueue.asyncAfter(ms: 10, name: ONBOARDING_TASK_KEY) { [weak self] in
-            let displays = DC.externalDisplaysForTest
-            guard let self, !self.cancelled, !OnboardPageController.task.isCancelled, let firstDisplay = displays.first else {
-                return
-            }
-
-            mainThread {
-                self.displayName.transition(0.5, easing: .easeOutExpo)
-                self.displayName.alphaValue = 1.0
-                self.displayName.display = firstDisplay
-                self.setControl(firstDisplay.getBestControl(reapply: false).displayControl, display: firstDisplay)
-            }
-            waitForAction(
-                "Lunar will try to read and then change the monitor brightness, contrast and volume\nIf Lunar can't revert the changes, you can do that by using the monitor's physical buttons",
-                buttonColor: lunarYellow, buttonText: "Continue".withTextColor(mauve)
-            ) {}
-
-            displayProgressStep = 1.0 / displays.count.d
-            for (i, d) in displays.enumerated() {
-                testDisplay(d, index: i)
-            }
-
-            queueChange {
-                DC.externalActiveDisplays.forEach { $0.resetControl() }
-            }
-
-            mainThread {
-                for d in DC.displays.values {
-                    d.testWindowController?.close()
-                    d.testWindowController = nil
-                }
-                if useOnboardingForDiagnostics, self.cancelled { return }
-                self.next()
-            }
-        }
-    }
-
     func testDisplay(_ d: Display, index: Int) {
         for d in DC.displays.values {
             d.testWindowController?.close()
@@ -1218,39 +1255,4 @@ final class ControlChoiceViewController: NSViewController {
         ) {}
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        hideDisplayValues()
-        hideAction()
-        hideQuestion()
-
-        noButton.bg = red
-        noButton.attributedTitle = "No".withTextColor(white)
-        yesButton.bg = green
-        yesButton.attributedTitle = "Yes".withTextColor(white)
-
-        displayImage?.cornerRadius = 16
-        displayImage?.standColor = peach
-        displayImage?.screenColor = rouge
-
-        actionLabel.textColor = actionLabelColor
-        actionInfo.alphaValue = 0.0
-
-        volumeSlider.minValue = 0
-        volumeSlider.maxValue = 100
-        volumeSlider.isEnabled = false
-        volumeSlider.isHidden = true
-
-        if let controlButton {
-            controlButton.isEnabled = false
-            controlButton.isHidden = true
-        }
-
-        if let ddcBlockersButton {
-            ddcBlockersButton.isEnabled = false
-            ddcBlockersButton.isHidden = true
-        }
-        POPOVERS["help"]!?.appearance = NSAppearance(named: .vibrantDark)
-    }
 }

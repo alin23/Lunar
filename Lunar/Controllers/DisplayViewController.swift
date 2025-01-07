@@ -547,6 +547,42 @@ final class DisplayViewController: NSViewController {
         }
     }
 
+    override func mouseDown(with ev: NSEvent) {
+        if let editor = displayName?.currentEditor() {
+            editor.selectedRange = NSMakeRange(0, 0)
+            displayName?.abortEditing()
+        }
+        super.mouseDown(with: ev)
+    }
+
+    override func viewDidAppear() {
+        if let resolutionsDropdown {
+            resolutionsDropdown.setItemStyles()
+        }
+        updateControlsButton()
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        viewID = view.accessibilityIdentifier()
+
+        if let display, display.id != GENERIC_DISPLAY_ID {
+            update()
+
+            scrollableBrightness?.label.textColor = scrollableViewLabelColor
+            scrollableContrast?.label.textColor = scrollableViewLabelColor
+
+            scrollableBrightness?.onMinValueChanged = { [weak self] (value: Int) in self?.updateDataset(minBrightness: value.u16) }
+            scrollableBrightness?.onMaxValueChanged = { [weak self] (value: Int) in self?.updateDataset(maxBrightness: value.u16) }
+            scrollableContrast?.onMinValueChanged = { [weak self] (value: Int) in self?.updateDataset(minContrast: value.u16) }
+            scrollableContrast?.onMaxValueChanged = { [weak self] (value: Int) in self?.updateDataset(maxContrast: value.u16) }
+        }
+
+        deleteEnabled = getDeleteEnabled()
+        powerOffEnabled = getPowerOffEnabled()
+        powerOffTooltip = getPowerOffTooltip()
+    }
+
     func placeAddScheduleButton() {
         guard let addScheduleButton,
               let schedule2,
@@ -605,14 +641,6 @@ final class DisplayViewController: NSViewController {
             schedule2.isEnabled = false
         }
         placeAddScheduleButton()
-    }
-
-    override func mouseDown(with ev: NSEvent) {
-        if let editor = displayName?.currentEditor() {
-            editor.selectedRange = NSMakeRange(0, 0)
-            displayName?.abortEditing()
-        }
-        super.mouseDown(with: ev)
     }
 
     func refreshView() {
@@ -1026,13 +1054,6 @@ final class DisplayViewController: NSViewController {
         listenForBrightnessContrastChange()
         updateControlsButton()
         setupProButton()
-    }
-
-    override func viewDidAppear() {
-        if let resolutionsDropdown {
-            resolutionsDropdown.setItemStyles()
-        }
-        updateControlsButton()
     }
 
     func setDisconnected() {
@@ -1648,24 +1669,4 @@ final class DisplayViewController: NSViewController {
         button.stopHighlighting()
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        viewID = view.accessibilityIdentifier()
-
-        if let display, display.id != GENERIC_DISPLAY_ID {
-            update()
-
-            scrollableBrightness?.label.textColor = scrollableViewLabelColor
-            scrollableContrast?.label.textColor = scrollableViewLabelColor
-
-            scrollableBrightness?.onMinValueChanged = { [weak self] (value: Int) in self?.updateDataset(minBrightness: value.u16) }
-            scrollableBrightness?.onMaxValueChanged = { [weak self] (value: Int) in self?.updateDataset(maxBrightness: value.u16) }
-            scrollableContrast?.onMinValueChanged = { [weak self] (value: Int) in self?.updateDataset(minContrast: value.u16) }
-            scrollableContrast?.onMaxValueChanged = { [weak self] (value: Int) in self?.updateDataset(maxContrast: value.u16) }
-        }
-
-        deleteEnabled = getDeleteEnabled()
-        powerOffEnabled = getPowerOffEnabled()
-        powerOffTooltip = getPowerOffTooltip()
-    }
 }

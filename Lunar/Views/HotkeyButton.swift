@@ -19,13 +19,24 @@ final class HotkeyButton: PopoverButton<HotkeyPopoverController> {
         #endif
     }
 
-    weak var display: Display?
-
     override var popoverController: HotkeyPopoverController? {
         guard let display else {
             return nil
         }
         return display.hotkeyPopoverController
+    }
+
+    weak var display: Display?
+
+    override func mouseDown(with event: NSEvent) {
+        onClick?()
+
+        guard let display, let popover = display._hotkeyPopover, isEnabled else { return }
+        if popover.contentViewController == nil {
+            setup(from: display)
+        }
+        handlePopoverClick(popover, with: event)
+        window?.makeFirstResponder(popoverController?.dropdown1)
     }
 
     func setup(from display: Display) {
@@ -113,14 +124,4 @@ final class HotkeyButton: PopoverButton<HotkeyPopoverController> {
         }
     }
 
-    override func mouseDown(with event: NSEvent) {
-        onClick?()
-
-        guard let display, let popover = display._hotkeyPopover, isEnabled else { return }
-        if popover.contentViewController == nil {
-            setup(from: display)
-        }
-        handlePopoverClick(popover, with: event)
-        window?.makeFirstResponder(popoverController?.dropdown1)
-    }
 }
