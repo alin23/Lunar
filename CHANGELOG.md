@@ -1,3 +1,10 @@
+# 6.8.6
+## Fixes
+
+- Fix possible hang when trying to send a brightness command to HDR monitors
+- Fix possible crash when updating to macOS Sequoia
+- Document `nits` as possible event in the `lunar listen` command
+
 # 6.8.5
 ## Improvements
 
