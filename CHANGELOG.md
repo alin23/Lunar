@@ -1,3 +1,8 @@
+# 6.8.7
+## Improvements
+
+- Compatibility with MacBook Air M4 2024
+
 # 6.8.6
 ## Fixes
 
