@@ -58,13 +58,15 @@
                     .font(.system(size: 10, weight: .semibold, design: .rounded))
 
                 if display.id == id, !display.isSidecar, !display.isAirplay {
-                    let binding = !display.isMacBook ? $display.keepDisconnected : Binding<Bool>(
-                        get: { autoBlackoutBuiltin },
-                        set: {
-                            autoBlackoutBuiltin = $0
-                            display.keepDisconnected = $0
-                        }
-                    )
+                    let binding = !display.isMacBook
+                        ? $display.keepDisconnected
+                        : Binding<Bool>(
+                            get: { autoBlackoutBuiltin },
+                            set: {
+                                autoBlackoutBuiltin = $0
+                                display.keepDisconnected = $0
+                            }
+                        )
                     VStack {
                         SettingsToggle(
                             text: "Auto Disconnect",

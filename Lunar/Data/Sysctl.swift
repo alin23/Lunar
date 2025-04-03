@@ -61,7 +61,7 @@ enum Sysctl {
 
     static var modelLowercased: String = model.lowercased()
 
-    static let MACBOOK_MODELS = [2, 5, 6, 7, 9, 10, 15].map { "Mac14,\($0)" } + [2, 3, 6, 7, 8, 9, 10, 11, 13].map { "Mac15,\($0)" } + [1, 5, 6, 7, 8].map { "Mac16,\($0)" }
+    static let MACBOOK_MODELS = [2, 5, 6, 7, 9, 10, 15].map { "Mac14,\($0)" } + [2, 3, 6, 7, 8, 9, 10, 11, 12, 13].map { "Mac15,\($0)" } + [1, 5, 6, 7, 8, 12, 13].map { "Mac16,\($0)" }
     static let MACMINI_MODELS = [3, 12].map { "Mac14,\($0)" }
     static let IMAC_MODELS = [4, 5].map { "Mac15,\($0)" }
 
