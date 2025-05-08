@@ -873,6 +873,8 @@ func listener<T>(in observers: inout Set<AnyCancellable>, throttle: RunLoop.Sche
     return subject
 }
 
+import RealModule
+
 func mainAsyncAfter(ms: Int, _ action: DispatchWorkItem) {
     let deadline = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(ms * 1_000_000))
 
@@ -886,7 +888,7 @@ extension Double {
     }
     @inline(__always) @inlinable
     func map(from: (Double, Double), to: (Double, Double), gamma: Double) -> Double {
-        lerp(pow(invlerp(self, min: from.0, max: from.1), 1.0 / gamma), min: to.0, max: to.1)
+        lerp(Double.pow(invlerp(self, min: from.0, max: from.1), 1.0 / gamma), min: to.0, max: to.1)
     }
     @inline(__always)
     func capped(between minVal: Double, and maxVal: Double) -> Double {
@@ -904,7 +906,7 @@ extension Float {
     }
     @inline(__always) @inlinable
     func map(from: (Float, Float), to: (Float, Float), gamma: Float) -> Float {
-        lerp(pow(invlerp(self, min: from.0, max: from.1), 1.0 / gamma), min: to.0, max: to.1)
+        lerp(Float.pow(invlerp(self, min: from.0, max: from.1), 1.0 / gamma), min: to.0, max: to.1)
     }
     @inline(__always) @inlinable
     func capped(between minVal: Float, and maxVal: Float) -> Float {

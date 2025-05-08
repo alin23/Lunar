@@ -2997,11 +2997,26 @@ func installCLIBinary() throws {
             continue
         }
 
-        fm.createFile(
-            atPath: config,
-            contents: (contents + PATH_EXPORT).data(using: .utf8),
-            attributes: [.posixPermissions: 0o644]
-        )
+        var isSymlink = false
+        let attrs = try? fm.attributesOfItem(atPath: config)
+        if let attrs, let fileType = attrs[.type] as? FileAttributeType, fileType == .typeSymbolicLink {
+            isSymlink = true
+        }
+
+        if !isSymlink {
+            fm.createFile(
+                atPath: config,
+                contents: (contents + PATH_EXPORT).data(using: .utf8),
+                attributes: [.posixPermissions: 0o644]
+            )
+        } else if let symlinkPath = try? fm.destinationOfSymbolicLink(atPath: config), let configURL = config.asURL() {
+            let realPath = URL(fileURLWithPath: symlinkPath, relativeTo: configURL.deletingLastPathComponent()).path
+            fm.createFile(
+                atPath: realPath,
+                contents: (contents + PATH_EXPORT).data(using: .utf8),
+                attributes: [.posixPermissions: 0o644]
+            )
+        }
     }
 
     Defaults[.cliInstalled] = true
