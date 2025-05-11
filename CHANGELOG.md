@@ -1,3 +1,9 @@
+# 6.8.8
+## Fixes
+
+- Don't show Full Range as available on Studio Displays
+- Keep shell config symlink if it already exists when installing the CLI
+
 # 6.8.7
 ## Improvements
 
