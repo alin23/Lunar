@@ -188,8 +188,9 @@ final class Schedule: NSView {
             }
 
             let br = display.adaptiveSubzero && !alreadyMapped ? newValue.map(from: (0, 1), to: (-1, 1)) : newValue
+            let cr = display.adaptiveSubzero && !alreadyMapped ? newValue.map(from: (0.5, 1), to: (0, 1)) : newValue
 
-            self.schedule = schedule.with(brightness: br, contrast: newValue)
+            self.schedule = schedule.with(brightness: br, contrast: cr)
         }
     }
 

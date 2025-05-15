@@ -2058,7 +2058,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             guard initialised, applyPreciseValue else { return }
             resetScheduledTransition()
 
-            let contrast = (cap(preciseContrast, minVal: 0.0, maxVal: 1.0).map(from: (0.0, 1.0), to: (minContrast.doubleValue / 100.0, maxContrast.doubleValue / 100.0)) * 100).intround
+            let contrast = (pow(cap(preciseContrast, minVal: 0.0, maxVal: 1.0), 0.5).map(from: (0.0, 1.0), to: (minContrast.doubleValue / 100.0, maxContrast.doubleValue / 100.0)) * 100).intround
 
             guard !isAllDisplays else {
                 mainThread {
