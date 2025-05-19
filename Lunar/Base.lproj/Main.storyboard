@@ -2444,13 +2444,6 @@ white point, using warmer colors and increasing contrast.</string>
                                         <real key="value" value="24"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.showAdvancedDisplaySettings" id="ibX-UE-wSD">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
-                                </connections>
                             </textField>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" alphaValue="0.0" tag="99" translatesAutoresizingMaskIntoConstraints="NO" id="xRc-C4-BGQ" customClass="ScrollableTextFieldCaption" customModule="Lunar" customModuleProvider="target">
                                 <rect key="frame" x="440" y="288" width="69" height="22"/>
@@ -2640,15 +2633,6 @@ CORNERS</string>
                                                     <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                 </dictionary>
                                             </binding>
-                                            <binding destination="rew-Tm-BHz" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="zTJ-I7-a0A" id="jZ4-z8-29G">
-                                                <dictionary key="options">
-                                                    <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                    <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                    <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                    <integer key="NSNullPlaceholder" value="-1"/>
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
                                         </connections>
                                     </segmentedControl>
                                 </subviews>
@@ -2787,15 +2771,6 @@ CORNERS</string>
                                             <binding destination="1Bn-Ca-ETm" name="selectedTag" keyPath="self.display.lockedContrastCurve" id="YBa-jp-CIi"/>
                                             <binding destination="rew-Tm-BHz" name="hidden" keyPath="values.curveMode" previousBinding="Apr-k7-UHI" id="Qvo-LH-dsF">
                                                 <dictionary key="options">
-                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                </dictionary>
-                                            </binding>
-                                            <binding destination="rew-Tm-BHz" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="Qvo-LH-dsF" id="fB3-Db-8eh">
-                                                <dictionary key="options">
-                                                    <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                    <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                                    <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                    <integer key="NSNullPlaceholder" value="-1"/>
                                                     <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                 </dictionary>
                                             </binding>
@@ -3232,15 +3207,6 @@ disabled</string>
                                 </textFieldCell>
                                 <connections>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.noDisplay" id="oHc-hs-F6O"/>
-                                    <binding destination="wZs-lo-pp8" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="oHc-hs-F6O" id="gP0-hx-Odv">
-                                        <dictionary key="options">
-                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                            <integer key="NSNullPlaceholder" value="-1"/>
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
                                 </connections>
                             </textField>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lXg-hV-GHy" customClass="DisplayName" customModule="Lunar" customModuleProvider="target">
@@ -3482,7 +3448,7 @@ It also makes it re-apply the brightness of the previous schedule after standby/
                                     </menu>
                                 </popUpButtonCell>
                                 <connections>
-                                    <binding destination="1Bn-Ca-ETm" name="hidden2" keyPath="self.display.isBuiltin" previousBinding="qyp-NH-cxV" id="yjV-vz-r45">
+                                    <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.isBuiltin" previousBinding="qyp-NH-cxV" id="yjV-vz-r45">
                                         <dictionary key="options">
                                             <integer key="NSMultipleValuesPlaceholder" value="-1"/>
                                             <integer key="NSNoSelectionPlaceholder" value="-1"/>
@@ -3493,11 +3459,6 @@ It also makes it re-apply the brightness of the previous schedule after standby/
                                     </binding>
                                     <binding destination="1Bn-Ca-ETm" name="selectedObject" keyPath="self.display.panelMode" previousBinding="YCF-76-hSY" id="jqB-8b-S6Y"/>
                                     <binding destination="1Bn-Ca-ETm" name="content" keyPath="self.display.panelModes" id="YCF-76-hSY"/>
-                                    <binding destination="wZs-lo-pp8" name="hidden" keyPath="values.showAdvancedDisplaySettings" id="qyp-NH-cxV">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
                                 </connections>
                             </popUpButton>
                             <button focusRingType="none" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vhk-ki-ybJ" customClass="ColorsButton" customModule="Lunar" customModuleProvider="target">
@@ -3531,15 +3492,6 @@ It also makes it re-apply the brightness of the previous schedule after standby/
                                         </dictionary>
                                     </binding>
                                     <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.supportsGammaByDefault" id="qeK-RV-cIY"/>
-                                    <binding destination="wZs-lo-pp8" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="4eO-mx-15O" id="YBW-1r-Ai8">
-                                        <dictionary key="options">
-                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                            <integer key="NSNullPlaceholder" value="-1"/>
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ssq-HP-Ivu" customClass="DDCButton" customModule="Lunar" customModuleProvider="target">
@@ -3573,15 +3525,6 @@ It also makes it re-apply the brightness of the previous schedule after standby/
                                         </dictionary>
                                     </binding>
                                     <binding destination="1Bn-Ca-ETm" name="enabled" keyPath="self.display.hasDDC" id="MNV-Mj-xeI"/>
-                                    <binding destination="wZs-lo-pp8" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="DRM-iH-KoD" id="Sd0-LM-yj6">
-                                        <dictionary key="options">
-                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                            <integer key="NSNullPlaceholder" value="-1"/>
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5Zc-wW-De5" customClass="SettingsButton" customModule="Lunar" customModuleProvider="target">
@@ -3614,15 +3557,6 @@ It also makes it re-apply the brightness of the previous schedule after standby/
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
                                         </dictionary>
                                     </binding>
-                                    <binding destination="wZs-lo-pp8" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="WwD-QX-SkP" id="mON-NI-Obw">
-                                        <dictionary key="options">
-                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                            <integer key="NSNullPlaceholder" value="-1"/>
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
                                 </connections>
                             </button>
                             <button focusRingType="none" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TJO-8a-xfO" customClass="ResetPopoverButton" customModule="Lunar" customModuleProvider="target">
@@ -3652,15 +3586,6 @@ It also makes it re-apply the brightness of the previous schedule after standby/
                                 <connections>
                                     <binding destination="1Bn-Ca-ETm" name="hidden" keyPath="self.display.active" id="YEO-Vn-fw1">
                                         <dictionary key="options">
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
-                                    <binding destination="wZs-lo-pp8" name="hidden2" keyPath="values.showAdvancedDisplaySettings" previousBinding="YEO-Vn-fw1" id="aEk-W5-xpy">
-                                        <dictionary key="options">
-                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                            <integer key="NSNullPlaceholder" value="-1"/>
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
                                         </dictionary>
                                     </binding>

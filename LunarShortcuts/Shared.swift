@@ -170,7 +170,6 @@ extension Defaults.Keys {
     static let keepOptionsMenu = Key<Bool>("keepOptionsMenu", default: false)
     static let showSliderValues = Key<Bool>("showSliderValues", default: false)
     static let showSliderValuesNits = Key<Bool>("showSliderValuesNits", default: false)
-    static let showAdvancedDisplaySettings = Key<Bool>("showAdvancedDisplaySettings", default: true)
     static let notificationsPermissionsGranted = Key<Bool>("notificationsPermissionsGranted", default: false)
     static let accessibilityPermissionsGranted = Key<Bool>("accessibilityPermissionsGranted", default: false)
     static let cliInstalled = Key<Bool>("cliInstalled", default: false)

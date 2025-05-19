@@ -93,7 +93,6 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .showOptionsMenu,
     .keepOptionsMenu,
     .showSliderValues,
-    .showAdvancedDisplaySettings,
     .notificationsPermissionsGranted,
     .accessibilityPermissionsGranted,
     .cliInstalled,
@@ -779,7 +778,6 @@ func initCache() {
     cacheKey(.showOptionsMenu)
     cacheKey(.keepOptionsMenu)
     cacheKey(.showSliderValues)
-    cacheKey(.showAdvancedDisplaySettings)
     cacheKey(.lunarProActive)
     cacheKey(.lunarProOnTrial)
     cacheKey(.lunarProAccessDialogShown)
@@ -939,7 +937,6 @@ let waitAfterWakeSecondsPublisher = pub(.waitAfterWakeSeconds)
 let delayDDCAfterWakePublisher = pub(.delayDDCAfterWake)
 let showVolumeSliderPublisher = pub(.showVolumeSlider)
 let showSliderValuesPublisher = pub(.showSliderValues)
-let showAdvancedDisplaySettingsPublisher = pub(.showAdvancedDisplaySettings)
 let lunarProActivePublisher = pub(.lunarProActive)
 let infoMenuShownPublisher = pub(.infoMenuShown)
 let showTwoSchedulesPublisher = pub(.showTwoSchedules)

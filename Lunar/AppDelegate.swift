@@ -950,9 +950,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                   let button = displayViewController.settingsButton
             else { return }
             log.debug("Clicking on Controls")
-            if !CachedDefaults[.showAdvancedDisplaySettings] {
-                CachedDefaults[.showAdvancedDisplaySettings] = true
-            }
             mainAsyncAfter(ms: 300) { button.open() }
         case .displayDDC:
             guard let display = pageController.arrangedObjects.prefix(page + 1).last as? Display,
@@ -961,9 +958,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                   let button = displayViewController.ddcButton
             else { return }
             log.debug("Clicking on DDC")
-            if !CachedDefaults[.showAdvancedDisplaySettings] {
-                CachedDefaults[.showAdvancedDisplaySettings] = true
-            }
             mainAsyncAfter(ms: 300) { button.open() }
         case .displayGamma:
             guard let display = pageController.arrangedObjects.prefix(page + 1).last as? Display,
@@ -972,9 +966,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                   let button = displayViewController.colorsButton
             else { return }
             log.debug("Clicking on Colors")
-            if !CachedDefaults[.showAdvancedDisplaySettings] {
-                CachedDefaults[.showAdvancedDisplaySettings] = true
-            }
             mainAsyncAfter(ms: 300) { button.open() }
         case .displayReset:
             guard let display = pageController.arrangedObjects.prefix(page + 1).last as? Display,
@@ -983,9 +974,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                   let button = displayViewController.resetButton
             else { return }
             log.debug("Clicking on Reset")
-            if !CachedDefaults[.showAdvancedDisplaySettings] {
-                CachedDefaults[.showAdvancedDisplaySettings] = true
-            }
             mainAsyncAfter(ms: 300) { button.open() }
         }
     }
