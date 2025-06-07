@@ -3237,9 +3237,27 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         active && ddcEnabled && (control == nil || (control is GammaControl && !(enabledControls[.gamma] ?? false)))
     }
 
+    var autoRestartOnNoControlsTask: DispatchWorkItem? {
+        didSet {
+            oldValue?.cancel()
+        }
+    }
+
     @AtomicLock var control: Control? = nil {
         didSet {
             guard !isAllDisplays else { return }
+
+            if !unmanaged, control == nil, Defaults[.autoRestartOnNoControls], !isForTesting, enabledControls.contains(where: \.value) {
+                let name = self.name
+                autoRestartOnNoControlsTask = mainAsyncAfter(ms: 3000) {
+                    log.warning("No control found for display \(name), restarting")
+                    #if !DEBUG
+                        restart()
+                    #endif
+                }
+            } else {
+                autoRestartOnNoControlsTask = nil
+            }
 
             context = getContext()
             mainAsync {

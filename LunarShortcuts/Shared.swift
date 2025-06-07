@@ -49,9 +49,7 @@ enum AdaptiveModeKey: Int, Defaults.Serializable, CaseIterable, Sendable {
     case auto = 99
 
     var usesCurve: Bool {
-        self == .location || self == .sensor || (
-            self == .sync && !SyncMode.specific.isSyncingNits
-        )
+        self == .location || self == .sensor || self == .sync
     }
     var hasUsefulInfo: Bool {
         self == .location || self == .sensor || (
@@ -287,6 +285,7 @@ extension Defaults.Keys {
     static let autoRestartOnCrash = Key<Bool>("autoRestartOnCrash", default: true)
     static let autoRestartOnHang = Key<Bool>("autoRestartOnHang", default: true)
     static let autoRestartOnFailedDDC = Key<Bool>("autoRestartOnFailedDDC", default: false)
+    static let autoRestartOnNoControls = Key<Bool>("autoRestartOnNoControls", default: false)
     static let autoRestartOnFailedDDCSooner = Key<Bool>("autoRestartOnFailedDDCSooner", default: false)
     static let autoRestartOnCoreAudioHang = Key<Bool>("autoRestartOnCoreAudioHang", default: false)
     static let disableVolumeKeysOnSleep = Key<Bool>("disableVolumeKeysOnSleep", default: false)

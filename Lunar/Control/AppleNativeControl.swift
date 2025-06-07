@@ -227,7 +227,7 @@ final class AppleNativeControl: Control {
                     display.userNits = nits
                 }
 
-                if DC.supportsXDRContrast, timeSince(lastXDRContrastResetTime) > 3 {
+                if DC.supportsXDRContrast, timeSince(lastXDRContrastResetTime) > 3, display.softwareBrightness >= 1 {
                     let xdrContrast = display.computeXDRContrast(xdrBrightness: nits.f.capped(between: 600, and: 1600), xdrContrastFactor: CachedDefaults[.xdrContrastFactor] + 0.3, minBrightness: 600, maxBrightness: 1600, gamma: 2.2)
                     if xdrContrast != DC.xdrContrast {
                         DC.setXDRContrast(xdrContrast)
