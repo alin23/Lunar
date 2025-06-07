@@ -1,3 +1,11 @@
+# 6.8.9
+## Fixes
+
+- Fix Clock Mode not applying the correct contrast value in the Merged Brightness and Contrast mode
+- Show advanced settings by default in the Display Settings window
+- Keep Enhanced Contrast applied correctly in Sub-zero Dimming after nits change events come in
+- Allow lux readings to go up to 10000 lux instead of 2000 lux
+
 # 6.8.8
 ## Fixes
 
