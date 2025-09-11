@@ -722,6 +722,9 @@ struct Mac26BrightnessOSDView: View {
             }
         }
         .tint(.primary)
+        .onChange(of: osd.value) { newValue in
+            osd.onChange?(newValue)
+        }
         .disabled(osd.locked)
     }
 
@@ -988,6 +991,7 @@ final class OSDState: ObservableObject {
     @Published var glowRadius: CGFloat = 5
     @Published var tip: Text? = nil
     @Published var locked = false
+    var onChange: ((Float) -> Void)? = nil
 }
 
 extension Display {
@@ -996,11 +1000,12 @@ extension Display {
             guard let osd = self?.osdWindowController?.window as? OSDWindow else { return }
             osd.hide()
             self?.osdState.tip = nil
+            self?.osdState.onChange = nil
             self?.osdWindowController = nil
         }
     }
 
-    func showSoftwareOSD(image: String, value: Float, text: String, color: Color?, glowRadius: CGFloat = 5, locked: Bool = false, textLeft: String = "", imageLeft: String = "clear") {
+    func showSoftwareOSD(image: String, value: Float, text: String, color: Color?, glowRadius: CGFloat = 5, locked: Bool = false, textLeft: String = "", imageLeft: String = "clear", onChange: ((Float) -> Void)? = nil) {
         guard !isAllDisplays, !isForTesting, !CachedDefaults[.hideOSD] else { return }
         softwareOSDTask = mainAsync { [weak self] in
             guard let self else { return }
@@ -1014,9 +1019,9 @@ extension Display {
 
             osdState.textLeft = textLeft
             osdState.imageLeft = imageLeft
+            osdState.onChange = onChange
 
             if osdWindowController == nil {
-                debug("Creating OSD for \(name)")
                 let ignoresMouseEvents = if #available(macOS 26, *) {
                     false
                 } else {

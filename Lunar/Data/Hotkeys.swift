@@ -871,6 +871,9 @@ enum Hotkey {
                 glowRadius: 0,
                 textLeft: display.name,
                 imageLeft: "circle.lefthalf.striped.horizontal",
+                onChange: { value in
+                    display.preciseContrast = value.d
+                }
             )
             return
         }
@@ -889,6 +892,9 @@ enum Hotkey {
                     locked: !display.presetSupportsBrightnessControl,
                     textLeft: display.name,
                     imageLeft: "sun.min.fill",
+                    onChange: { value in
+                        display.preciseBrightness = value.d
+                    }
                 )
                 return
             }
