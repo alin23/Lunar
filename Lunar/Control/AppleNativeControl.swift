@@ -222,7 +222,11 @@ final class AppleNativeControl: Control {
                     display.userNits = nits
                     display.softwareOSDTask = nil
                     display.osdState.text = "\(nits.str(decimals: 0)) nits"
-                    osd.show(verticalOffset: 100)
+                    if #available(macOS 26, *) {
+                        osd.show(at: macOS26OSDPoint(screen: display.nsScreen), possibleWidth: MAC26_OSD_WIDTH)
+                    } else {
+                        osd.show(verticalOffset: 100, possibleWidth: NATIVE_OSD_WIDTH * 2)
+                    }
                 } else if CachedDefaults[.hideOSD], timeSince(DC.lastTimeBrightnessKeyPressed) < 1, display.userNits != nits {
                     display.userNits = nits
                 }

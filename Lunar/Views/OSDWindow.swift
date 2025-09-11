@@ -5,6 +5,14 @@ import Defaults
 import Foundation
 import SwiftUI
 
+func macOS26OSDPoint(screen: NSScreen?) -> NSPoint? {
+    guard let screen else {
+        return nil
+    }
+    let frame = screen.visibleFrame
+    return NSPoint(x: frame.maxX - MAC26_OSD_WIDTH, y: frame.maxY - MAC26_OSD_HEIGHT - OSD_TIP_HEIGHT - OSD_TIP_SPACING - 10)
+}
+
 // MARK: - OSDWindow
 
 final class OSDWindow: NSWindow, NSWindowDelegate {
@@ -63,6 +71,8 @@ final class OSDWindow: NSWindow, NSWindowDelegate {
         possibleWidth: CGFloat = 0
     ) {
         guard let screen = display?.nsScreen else { return }
+//        let alreadyVisible = isVisible && contentView?.superview?.alphaValue == 1
+
         if let point {
             setFrame(NSRect(origin: point, size: frame.size), display: true)
         } else {
@@ -659,6 +669,93 @@ struct ArrangementOSDView: View {
     }
 }
 
+let OSD_TIP_HEIGHT: CGFloat = 24
+let OSD_TIP_SPACING: CGFloat = 16
+
+@available(macOS 26, *)
+struct Mac26BrightnessOSDView: View {
+    static let VERTICAL_PADDING: CGFloat = 6
+    static let HORIZONTAL_PADDING: CGFloat = 20
+
+    @Environment(\.colorScheme) var colorScheme
+
+    @ObservedObject var osd: OSDState
+
+    let STEPS: [Float] = stride(from: 0.0, through: 1.0, by: 0.0625).map { $0 }
+
+    var value: CGFloat {
+        let v = osd.value.map(from: (0, 1), to: (0, 160))
+        if v.remainderDistance(16) < 0.13 {
+            return ((v / 16).rounded() * 16).cg
+        }
+        return v.cg
+    }
+
+    var body: some View {
+        VStack(spacing: OSD_TIP_SPACING) {
+            square.animation(.fastSpring, value: osd.tip)
+                .glassEffect(.clear.interactive(), in: .rect(cornerRadius: 24, style: .continuous))
+            tip.transition(.scale.animation(.fastSpring))
+        }
+        .frame(alignment: .center)
+    }
+
+    @ViewBuilder var tip: some View {
+        (osd.tip ?? Text("TIP"))
+            .font(.system(size: 10, weight: .medium))
+            .foregroundColor(.primary)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 10)
+            .frame(height: OSD_TIP_HEIGHT)
+            .background(
+                VisualEffectBlur(material: .sidebar, blendingMode: .behindWindow, state: .active)
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            )
+            .fixedSize()
+            .opacity(osd.tip == nil ? 0 : 1)
+    }
+
+    var slider: some View {
+        SwiftUI.Slider(value: $osd.value) {} ticks: {
+            SliderTickContentForEach(STEPS, id: \.self) { value in
+                SliderTick(value)
+            }
+        }
+        .tint(.primary)
+        .disabled(osd.locked)
+    }
+
+    var square: some View {
+        VStack(alignment: .leading) {
+            HStack {
+                Text(osd.textLeft).font(.system(size: 12, weight: .medium))
+                Spacer()
+                Text(osd.text).font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .foregroundColor(osd.color ?? .secondary)
+                if osd.locked {
+                    Image(systemName: "lock.fill")
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .foregroundColor(.secondary)
+                }
+            }
+            HStack {
+                Image(systemName: osd.imageLeft)
+                    .opacity(osd.imageLeft == "clear" ? 0 : 1)
+                slider
+                Image(systemName: osd.image)
+            }
+            .font(.system(size: 13, weight: .medium, design: .rounded))
+            .foregroundColor(.primary)
+
+        }
+        .padding(.horizontal, Self.HORIZONTAL_PADDING)
+        .padding(.vertical, Self.VERTICAL_PADDING)
+        .frame(width: MAC26_OSD_WIDTH, height: MAC26_OSD_HEIGHT, alignment: .center)
+        .fixedSize()
+    }
+
+}
+
 struct BrightnessOSDView: View {
     @Environment(\.colorScheme) var colorScheme
 
@@ -673,7 +770,7 @@ struct BrightnessOSDView: View {
     }
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: OSD_TIP_SPACING) {
             square.animation(.fastSpring, value: osd.tip)
             tip.transition(.scale.animation(.fastSpring))
         }.frame(alignment: .center)
@@ -685,7 +782,7 @@ struct BrightnessOSDView: View {
             .foregroundColor(.primary)
             .multilineTextAlignment(.center)
             .padding(.horizontal, 10)
-            .frame(height: 24)
+            .frame(height: OSD_TIP_HEIGHT)
             .background(
                 VisualEffectBlur(material: .sidebar, blendingMode: .behindWindow, state: .active)
                     .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
@@ -771,8 +868,15 @@ struct BrightnessOSDView: View {
     osdState.value = 0.5
     osdState.locked = true
     osdState.text = "320 nits"
+    osdState.textLeft = "Built-in"
+    osdState.imageLeft = "sun.min.fill"
+    osdState.image = "sun.max.fill"
     osdState.tip = Text("\(Image(systemName: "sun.max.fill")) Double press Brightness Up to unlock 1600 nits")
-    return BrightnessOSDView(osd: osdState).padding()
+    if #available(macOS 26, *) {
+        return Mac26BrightnessOSDView(osd: osdState).padding()
+    } else {
+        return BrightnessOSDView(osd: osdState).padding()
+    }
 }
 
 // MARK: - AutoOSDView
@@ -868,14 +972,18 @@ struct AutoOSDView: View {
 
 let AUTO_OSD_DEBOUNCE_SECONDS = 4.0
 let NATIVE_OSD_WIDTH: CGFloat = 200
+let MAC26_OSD_WIDTH: CGFloat = 290
+let MAC26_OSD_HEIGHT: CGFloat = 62
 let OSD_WIDTH: CGFloat = 300
 
 // MARK: - OSDState
 
 final class OSDState: ObservableObject {
     @Published var image = "sun.max"
+    @Published var imageLeft = "sun.min"
     @Published var value: Float = 1.0
     @Published var text = ""
+    @Published var textLeft = ""
     @Published var color: Color? = nil
     @Published var glowRadius: CGFloat = 5
     @Published var tip: Text? = nil
@@ -892,7 +1000,7 @@ extension Display {
         }
     }
 
-    func showSoftwareOSD(image: String, value: Float, text: String, color: Color?, glowRadius: CGFloat = 5, locked: Bool = false) {
+    func showSoftwareOSD(image: String, value: Float, text: String, color: Color?, glowRadius: CGFloat = 5, locked: Bool = false, textLeft: String = "", imageLeft: String = "clear") {
         guard !isAllDisplays, !isForTesting, !CachedDefaults[.hideOSD] else { return }
         softwareOSDTask = mainAsync { [weak self] in
             guard let self else { return }
@@ -904,18 +1012,37 @@ extension Display {
             osdState.glowRadius = glowRadius
             osdState.locked = locked
 
+            osdState.textLeft = textLeft
+            osdState.imageLeft = imageLeft
+
             if osdWindowController == nil {
-                let view = BrightnessOSDView(osd: osdState)
+                debug("Creating OSD for \(name)")
+                let ignoresMouseEvents = if #available(macOS 26, *) {
+                    false
+                } else {
+                    true
+                }
+                let view = if #available(macOS 26, *) {
+                    AnyView(Mac26BrightnessOSDView(osd: osdState))
+                } else {
+                    AnyView(BrightnessOSDView(osd: osdState))
+                }
+
                 osdWindowController = OSDWindow(
-                    swiftuiView: AnyView(view),
+                    swiftuiView: view,
                     display: self,
-                    releaseWhenClosed: false
+                    releaseWhenClosed: false,
+                    ignoresMouseEvents: ignoresMouseEvents
                 ).wc
             }
 
             guard let osd = osdWindowController?.window as? OSDWindow else { return }
 
-            osd.show(verticalOffset: 100, possibleWidth: NATIVE_OSD_WIDTH * 2)
+            if #available(macOS 26, *) {
+                osd.show(at: macOS26OSDPoint(screen: nsScreen), possibleWidth: MAC26_OSD_WIDTH)
+            } else {
+                osd.show(verticalOffset: 100, possibleWidth: NATIVE_OSD_WIDTH * 2)
+            }
         }
     }
 

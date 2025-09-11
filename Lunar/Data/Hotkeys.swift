@@ -868,7 +868,9 @@ enum Hotkey {
                 value: value.f / 100,
                 text: "Contrast",
                 color: nil,
-                glowRadius: 0
+                glowRadius: 0,
+                textLeft: display.name,
+                imageLeft: "circle.lefthalf.striped.horizontal",
             )
             return
         }
@@ -880,11 +882,13 @@ enum Hotkey {
             if osdImage == .brightness, display.isBuiltin ? DC.showNitsOSDBuiltin : DC.showNitsOSDExternal, display.possibleMaxNits != nil, let nits = display.nits {
                 display.fullRangeUserBrightness = value.d.map(from: (0, 100), to: (0, 1))
                 display.showSoftwareOSD(
-                    image: "sun.max",
+                    image: MAC26 ? "sun.max.fill" : "sun.max",
                     value: value.f / 100,
                     text: "\(nits.str(decimals: 0)) nits",
                     color: nil,
-                    locked: !display.presetSupportsBrightnessControl
+                    locked: !display.presetSupportsBrightnessControl,
+                    textLeft: display.name,
+                    imageLeft: "sun.min.fill",
                 )
                 return
             }

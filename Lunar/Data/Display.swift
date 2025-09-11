@@ -2154,12 +2154,6 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             var brightness = cap(brightness.uint16Value, minVal: minBrightness.uint16Value, maxVal: maxBrightness.uint16Value)
             var oldBrightness = cap(oldValue.uint16Value, minVal: minBrightness.uint16Value, maxVal: maxBrightness.uint16Value)
 
-            if !fullRange, (brightness > minBrightness.uint16Value && brightness < maxBrightness.uint16Value) || softwareBrightness == Self
-                .MIN_SOFTWARE_BRIGHTNESS
-            {
-                hideSoftwareOSD()
-            }
-
             if brightness > minBrightness.uint16Value, softwareBrightness < 1, softwareBrightness != -1 {
                 softwareBrightness = 1
             } else if brightness < maxBrightness.uint16Value, softwareBrightness > 1 {
@@ -2608,10 +2602,15 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         didSet {
             setNotchState()
             let shouldShowOSD = nsScreen?.visibleFrame != oldValue?.visibleFrame && (osdWindowController?.window as? OSDWindow)?.contentView?.superview?.alphaValue == 1
+            let screen = nsScreen
             mainAsync {
                 self.supportsEnhance = self.getSupportsEnhance()
                 if shouldShowOSD, let osd = self.osdWindowController?.window as? OSDWindow {
-                    osd.show(verticalOffset: 100)
+                    if #available(macOS 26, *) {
+                        osd.show(at: macOS26OSDPoint(screen: screen), possibleWidth: MAC26_OSD_WIDTH)
+                    } else {
+                        osd.show(verticalOffset: 100, possibleWidth: NATIVE_OSD_WIDTH * 2)
+                    }
                 }
             }
         }
@@ -3462,6 +3461,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Published @objc dynamic var fullRange = false {
         didSet {
             guard apply, supportsFullRangeXDR else { return }
+
+            if !fullRange, oldValue, (brightness.uint16Value > minBrightness.uint16Value && brightness.uint16Value < maxBrightness.uint16Value) || softwareBrightness == Self
+                .MIN_SOFTWARE_BRIGHTNESS
+            {
+                hideSoftwareOSD()
+            }
+
             if handleFullRange(fullRange) {
                 save()
             }

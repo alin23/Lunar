@@ -3010,6 +3010,8 @@ func installCLIBinary() throws {
     Defaults[.cliInstalled] = true
 }
 
+let MAC26 = if #available(macOS 26, *) { true } else { false }
+
 func acquirePrivileges(notificationTitle: String = "Lunar is now listening for media keys", notificationBody: String? = nil) {
 //    #if DEBUG
 //        if CommandLine.arguments.contains("-NSDocumentRevisionsDebugMode") {
