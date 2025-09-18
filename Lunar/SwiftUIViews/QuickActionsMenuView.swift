@@ -576,14 +576,14 @@ struct QuickActionsMenuView: View {
 
     func setMenuWidth(_: Any) {
         #if arch(arm64)
-            withAnimation(.fastSpring) {
-                env.menuWidth = (
-                    showOptionsMenu || showStandardPresets || showCustomPresets
-                        || !showHeaderOnHover || !showFooterOnHover
-                        || showAdditionalInfo
-                        || headerOpacity > 0 || footerOpacity > 0
-                ) ? MENU_WIDTH : MENU_CLEAN_WIDTH
-            }
+            // withAnimation(.fastSpring) {
+            env.menuWidth = (
+                showOptionsMenu || showStandardPresets || showCustomPresets
+                    || !showHeaderOnHover || !showFooterOnHover
+                    || showAdditionalInfo
+                    || headerOpacity > 0 || footerOpacity > 0
+            ) ? MENU_WIDTH : MENU_CLEAN_WIDTH
+        // }
         #else
             env.menuWidth = (
                 showOptionsMenu || showStandardPresets || showCustomPresets
