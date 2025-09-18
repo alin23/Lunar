@@ -137,6 +137,10 @@ final class Box: NSBox {
         super.mouseExited(with: event)
     }
 
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+    }
+
     func setup() {
         bg = .clear
         alphaValue = alpha

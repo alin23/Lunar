@@ -35,6 +35,8 @@ import SwiftUI
 import AppIntents
 import ServiceManagement
 
+var clickedInApp = false
+
 extension CLLocationManager {
     var auth: CLAuthorizationStatus? {
         guard !Geolocation.coreLocationTimedOut else { return nil }
@@ -915,6 +917,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         log.debug("windowDidBecomeMain")
 
         guard let w = notification.object as? ModernWindow, w.isVisible, w.title == "Settings" else { return }
+
+        log.info("Showing dock icon")
+        NSApp.setActivationPolicy(.regular)
+        NSApp.activate(ignoringOtherApps: true)
 
         goToPage(ignoreUIElement: true)
         mainAsyncAfter(ms: 500) { [self] in
@@ -2038,6 +2044,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             }
             handleModifierScrollThreshold(event: event)
 
+            return event
+        }
+
+        NSEvent.addLocalMonitorForEvents(matching: [.leftMouseDown, .leftMouseUp]) { event in
+            clickedInApp = event.type == .leftMouseDown
             return event
         }
     }

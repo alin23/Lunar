@@ -103,6 +103,10 @@ final class ScrollableBrightness: NSView {
         }
     }
 
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+    }
+
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
         setup()

@@ -53,7 +53,7 @@ final class SliderCell: NSSliderCell {
 
     override func drawKnob(_ knobRect: NSRect) {
         let size = verticalPadding
-        let rect = NSRect(x: knobRect.midX - (size / 2) + 0.5, y: knobRect.midY - (size / 2) - 1.5, width: size - 1, height: size - 1)
+        let rect = NSRect(x: knobRect.midX - (size / 2) + 0.5, y: knobRect.midY - (size / 2), width: size - 1, height: size - 1)
         let value = (minValue == 0 && maxValue == 1)
             ? CGFloat(floatValue)
             : CGFloat(doubleValue.map(from: (minValue, maxValue), to: (0.0, 1.0)))
@@ -105,7 +105,7 @@ final class SliderCell: NSSliderCell {
         let imageSize = size * 0.6
         let imageRect = NSRect(
             x: knobRect.midX - (imageSize / 2),
-            y: knobRect.midY - (imageSize / 2) - 2,
+            y: knobRect.midY - (imageSize / 2),
             width: imageSize,
             height: imageSize
         )
@@ -231,6 +231,10 @@ class Slider: NSSlider {
     }
 
     var sliderCell: SliderCell { cell as! SliderCell }
+
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+    }
 
     override func mouseEntered(with _: NSEvent) {
         guard isEnabled, !isHidden else { return }

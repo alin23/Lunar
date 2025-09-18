@@ -2053,6 +2053,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     @Published @objc dynamic var preciseContrast = 0.5 {
         didSet {
+//            debug("Setting precise contrast to \(preciseContrast)")
             checkNaN(preciseContrast)
 
             guard initialised, applyPreciseValue else { return }
@@ -2072,7 +2073,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             let smallDiff = abs(contrast - self.contrast.doubleValue.intround) < 5
             withBrightnessTransition(smallDiff && !inSmoothTransition ? .instant : brightnessTransition) {
                 mainThread {
-                    self.contrast = contrast.ns
+                    withoutReapplyPreciseValue {
+                        self.contrast = contrast.ns
+                    }
                     self.insertContrastUserDataPoint(
                         DC.adaptiveMode.contrastDataPoint.last,
                         contrast.d, modeKey: DC.adaptiveModeKey
@@ -2207,11 +2210,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 userAdjusting = false
             }
 
-            mainThread {
-                withoutApplyPreciseValue {
-                    preciseContrast = contrastToSliderValue(self.contrast, merged: CachedDefaults[.mergeBrightnessContrast])
-                    if reapplyPreciseValue, lockedBrightness, !lockedContrast {
-                        preciseBrightnessContrast = contrastToSliderValue(self.contrast)
+            if reapplyPreciseValue, contrast.uint16Value != oldValue.uint16Value {
+                mainThread {
+                    withoutApplyPreciseValue {
+                        preciseContrast = contrastToSliderValue(self.contrast, merged: CachedDefaults[.mergeBrightnessContrast])
+                        if reapplyPreciseValue, lockedBrightness, !lockedContrast {
+                            preciseBrightnessContrast = contrastToSliderValue(self.contrast)
+                        }
                     }
                 }
             }

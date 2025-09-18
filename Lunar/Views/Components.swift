@@ -399,6 +399,10 @@ final class SizedPopUpButton: NSPopUpButton {
     var width: CGFloat?
     var height: CGFloat?
 
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+    }
+
 }
 
 // MARK: - Dropdown

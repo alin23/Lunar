@@ -67,6 +67,10 @@ final class InputDropdown: NSPopUpButton {
 
     var observers: Set<AnyCancellable> = []
 
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+    }
+
     func setup() {
         selectionPublisher
             .debounce(for: .milliseconds(100), scheduler: RunLoop.main)
@@ -164,6 +168,10 @@ final class PopUpButton: NSPopUpButton {
         } else {
             offStateButtonLabelColor[hoverState]![page] ?? offStateButtonLabelColor[hoverState]![.display]!
         }
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
     }
 
     override func mouseEntered(with _: NSEvent) {

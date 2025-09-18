@@ -9,6 +9,22 @@ final class ButtonCell: NSButtonCell {
     }
 }
 
+final class ClickBox: NSBox {
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+    }
+}
+
+final class ClickButton: NSButton {
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+    }
+}
+
 // MARK: - Button
 
 class Button: NSButton {

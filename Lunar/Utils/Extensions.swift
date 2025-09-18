@@ -1170,6 +1170,10 @@ final class ModePopupButton: NSPopUpButton {
 
     var observers: Set<AnyCancellable> = []
 
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+    }
+
     override func addItems(withTitles itemTitles: [String]) {
         super.addItems(withTitles: itemTitles)
 

@@ -861,11 +861,13 @@ enum Hotkey {
 
     static func showOsd(osdImage: OSDImage, value: UInt32, display: Display) {
         guard !display.isAllDisplays, !display.isForTesting else { return }
+        let percentage = value.f / 100
+
         guard osdImage != .contrast else {
             display.userContrast = value.d
             display.showSoftwareOSD(
                 image: "circle.lefthalf.filled",
-                value: value.f / 100,
+                value: percentage,
                 text: "Contrast",
                 color: nil,
                 glowRadius: 0,
@@ -886,7 +888,7 @@ enum Hotkey {
                 display.fullRangeUserBrightness = value.d.map(from: (0, 100), to: (0, 1))
                 display.showSoftwareOSD(
                     image: MAC26 ? "sun.max.fill" : "sun.max",
-                    value: value.f / 100,
+                    value: percentage,
                     text: "\(nits.str(decimals: 0)) nits",
                     color: nil,
                     locked: !display.presetSupportsBrightnessControl,
@@ -900,21 +902,33 @@ enum Hotkey {
             }
         #endif
 
-        guard let manager = OSDManager.sharedManager() as? OSDManager else {
-            log.warning("No OSDManager available")
-            return
-        }
+        var image = MAC26 ? "sun.max.fill" : "sun.max"
+        var imageLeft = "sun.min.fill"
+        var onChange: ((Float) -> Void)?
         var controlID = ControlID.BRIGHTNESS
         switch osdImage {
         case .brightness:
             controlID = .BRIGHTNESS
-            display.fullRangeUserBrightness = value.d.map(from: (0, 100), to: (0, 1))
+            display.fullRangeUserBrightness = percentage.d
+            onChange = { value in
+                display.preciseBrightness = value.d
+            }
         case .volume:
-            display.userVolume = value.d.map(from: (0, 100), to: (0, 1))
+            display.userVolume = percentage.d
             guard display.showVolumeOSD else { return }
+            image = MAC26 ? "speaker.wave.3.fill" : "speaker.3"
+            imageLeft = MAC26 ? "speaker.fill" : "speaker"
             controlID = .AUDIO_SPEAKER_VOLUME
+            onChange = { value in
+                display.preciseVolume = value.d
+            }
         case .muted:
             guard display.showVolumeOSD else { return }
+            image = MAC26 ? "speaker.slash.fill" : "speaker.slash"
+            imageLeft = MAC26 ? "speaker.fill" : "speaker"
+            onChange = { value in
+                display.preciseVolume = value.d
+            }
         default:
             return
         }
@@ -926,16 +940,34 @@ enum Hotkey {
         let osdID = (mirroredID != kCGNullDirectDisplay && mirroredID != UINT32_MAX) ? mirroredID : display.id
 
         guard !CachedDefaults[.hideOSD] else { return }
-        display.hideSoftwareOSD()
-        manager.showImage(
-            osdImage.rawValue,
-            onDisplayID: osdID,
-            priority: 0x1F4,
-            msecUntilFade: 1500,
-            filledChiclets: value.d.map(from: (0, 100), to: (0, 240)).u32,
-            totalChiclets: 240,
-            locked: locked
-        )
+
+        if #available(macOS 26, *) {
+            display.showSoftwareOSD(
+                image: image,
+                value: percentage,
+                text: "",
+                color: nil,
+                locked: locked,
+                textLeft: display.name,
+                imageLeft: imageLeft,
+                onChange: onChange
+            )
+        } else {
+            display.hideSoftwareOSD()
+            guard let manager = OSDManager.sharedManager() as? OSDManager else {
+                log.warning("No OSDManager available")
+                return
+            }
+            manager.showImage(
+                osdImage.rawValue,
+                onDisplayID: osdID,
+                priority: 0x1F4,
+                msecUntilFade: 1500,
+                filledChiclets: value.d.map(from: (0, 100), to: (0, 240)).u32,
+                totalChiclets: 240,
+                locked: locked
+            )
+        }
     }
 }
 

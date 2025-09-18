@@ -111,6 +111,10 @@ class LockButton: NSButton {
         }
     }
 
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+    }
+
     override func cursorUpdate(with _: NSEvent) {
         if isEnabled {
             NSCursor.pointingHand.set()

@@ -39,6 +39,11 @@ extension AppDelegate: NSWindowDelegate {
             return
         }
         log.debug("Got window while closing \(window.title)")
+
+        if window.title == "Settings", !CachedDefaults[.showDockIcon] {
+            log.info("Hiding dock icon")
+            NSApp.setActivationPolicy(.accessory)
+        }
         guard let view = window.contentView, !view.subviews.isEmpty, !view.subviews[0].subviews.isEmpty,
               let pageController = view.subviews[0].subviews[0].nextResponder as? PageController,
               let settingsPageController = pageController

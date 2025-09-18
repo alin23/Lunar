@@ -138,6 +138,7 @@ final class StatusItemButtonController: NSView, NSWindowDelegate, ObservableObje
         button.menu = nil
 
         menuWindow.delegate = self
+        menuWindow.becomeKey()
         repositionWindow()
     }
 

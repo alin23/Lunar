@@ -49,8 +49,10 @@ final class PageNavigationControl: NSSegmentedControl {
 
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
+    }
 
-        // Drawing code here.
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
     }
 
     func setup() {
@@ -59,7 +61,7 @@ final class PageNavigationControl: NSSegmentedControl {
         alphaValue = standardAlpha
 
         trackingArea = NSTrackingArea(
-            rect: visibleRect,
+            rect: frame,
             options: [.mouseEnteredAndExited, .activeInActiveApp],
             owner: self,
             userInfo: nil

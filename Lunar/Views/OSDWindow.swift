@@ -23,6 +23,7 @@ final class OSDWindow: NSWindow, NSWindowDelegate {
 
         self.level = level
         collectionBehavior = [.stationary, .canJoinAllSpaces, .ignoresCycle, .fullScreenDisallowsTiling]
+        shouldIgnoreMouseEvents = ignoresMouseEvents
         self.ignoresMouseEvents = ignoresMouseEvents
         setAccessibilityRole(.popover)
         setAccessibilitySubrole(.unknown)
@@ -37,8 +38,12 @@ final class OSDWindow: NSWindow, NSWindowDelegate {
         delegate = self
     }
 
+    var shouldIgnoreMouseEvents = false
+
     weak var display: Display?
     lazy var wc = NSWindowController(window: self)
+
+    var actionOnFade: (() -> Void)?
 
     var closer: DispatchWorkItem? { didSet { oldValue?.cancel() } }
     var fader: DispatchWorkItem? { didSet { oldValue?.cancel() } }
@@ -96,6 +101,7 @@ final class OSDWindow: NSWindow, NSWindowDelegate {
             }
         }
 
+        ignoresMouseEvents = shouldIgnoreMouseEvents
         contentView?.superview?.alphaValue = 1
         if canBecomeKey {
             wc.showWindow(nil)
@@ -108,8 +114,13 @@ final class OSDWindow: NSWindow, NSWindowDelegate {
         fader = nil
 
         guard closeMilliseconds > 0 else { return }
-        fader = mainAsyncAfter(ms: fadeMilliseconds) { [weak self] in
+        actionOnFade = { [weak self] in
             guard let s = self, s.isVisible else { return }
+            guard !clickedInApp else {
+                self?.fader = mainAsyncAfter(ms: fadeMilliseconds) { self?.actionOnFade?() }
+                return
+            }
+            s.ignoresMouseEvents = true
             s.contentView?.superview?.transition(1)
             s.contentView?.superview?.alphaValue = 0.01
             s.endFader = mainAsyncAfter(ms: 1000) { [weak self] in
@@ -118,6 +129,9 @@ final class OSDWindow: NSWindow, NSWindowDelegate {
             s.closer = mainAsyncAfter(ms: closeMilliseconds) { [weak self] in
                 self?.close()
             }
+        }
+        fader = mainAsyncAfter(ms: fadeMilliseconds) { [weak self] in
+            self?.actionOnFade?()
         }
     }
 
@@ -672,6 +686,78 @@ struct ArrangementOSDView: View {
 let OSD_TIP_HEIGHT: CGFloat = 24
 let OSD_TIP_SPACING: CGFloat = 16
 
+@available(macOS 26.0, *)
+struct CustomGlassEffectView<Content: View>: NSViewRepresentable {
+    init(
+        variant: Int? = nil,
+        scrimState: Int? = nil,
+        subduedState: Int? = nil,
+        interactionState: Int? = nil,
+        contentLensing: Int? = nil,
+        adaptiveAppearance: Int? = nil,
+        useReducedShadowRadius: Int? = nil,
+        style: NSGlassEffectView.Style? = nil,
+        tint: NSColor? = nil,
+        cornerRadius: CGFloat? = nil,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.variant = variant
+        self.scrimState = scrimState
+        self.subduedState = subduedState
+        self.interactionState = interactionState
+        self.contentLensing = contentLensing
+        self.adaptiveAppearance = adaptiveAppearance
+        self.useReducedShadowRadius = useReducedShadowRadius
+        self.style = style
+        self.tint = tint
+        self.cornerRadius = cornerRadius
+        self.content = content()
+    }
+
+    func makeNSView(context _: Context) -> NSView {
+        guard let nsGlassEffectViewType = NSClassFromString("NSGlassEffectView") as? NSView.Type else {
+            return NSView()
+        }
+        let nsView = nsGlassEffectViewType.init(frame: .zero)
+        configureView(nsView)
+        let hosting = NSHostingView(rootView: content)
+        hosting.translatesAutoresizingMaskIntoConstraints = false
+        nsView.setValue(hosting, forKey: "contentView")
+        return nsView
+    }
+
+    func updateNSView(_ nsView: NSView, context _: Context) {
+        if let hosting = nsView.value(forKey: "contentView") as? NSHostingView<Content> { hosting.rootView = content }
+        configureView(nsView)
+    }
+
+    func configureView(_ nsView: NSView) {
+        if let variant { nsView.setValue(variant, forKey: "_variant") }
+        if let interactionState { nsView.setValue(interactionState, forKey: "_interactionState") }
+        if let contentLensing { nsView.setValue(contentLensing, forKey: "_contentLensing") }
+        if let adaptiveAppearance { nsView.setValue(adaptiveAppearance, forKey: "_adaptiveAppearance") }
+        if let useReducedShadowRadius { nsView.setValue(useReducedShadowRadius, forKey: "_useReducedShadowRadius") }
+        if let scrimState { nsView.setValue(scrimState, forKey: "_scrimState") }
+        if let subduedState { nsView.setValue(subduedState, forKey: "_subduedState") }
+        if let style { (nsView as? NSGlassEffectView)?.style = style }
+        if let tint { nsView.setValue(tint, forKey: "tintColor") }
+        if let cornerRadius { nsView.setValue(cornerRadius, forKey: "cornerRadius") }
+    }
+
+    private let variant: Int? // 0 - 19
+    private let scrimState: Int? // Scrim overlay (0 = off, 1 = on)
+    private let subduedState: Int? // Subdued state (0 = normal, 1 = subdued)
+    private let interactionState: Int? // set to 1, combined with variant 13 allows for clear glass compositor filter
+    private let contentLensing: Int?
+    private let adaptiveAppearance: Int?
+    private let useReducedShadowRadius: Int?
+    private let style: NSGlassEffectView.Style?
+    private let tint: NSColor?
+    private let cornerRadius: CGFloat?
+    private let content: Content
+
+}
+
 @available(macOS 26, *)
 struct Mac26BrightnessOSDView: View {
     static let VERTICAL_PADDING: CGFloat = 6
@@ -693,11 +779,22 @@ struct Mac26BrightnessOSDView: View {
 
     var body: some View {
         VStack(spacing: OSD_TIP_SPACING) {
-            square.animation(.fastSpring, value: osd.tip)
-                .glassEffect(.clear.interactive(), in: .rect(cornerRadius: 24, style: .continuous))
+            CustomGlassEffectView(variant: 6, scrimState: 0, subduedState: 0, cornerRadius: 24) {
+                square.animation(.fastSpring, value: osd.tip)
+                    .frame(width: MAC26_OSD_WIDTH, height: MAC26_OSD_HEIGHT)
+            }
+            .brightness(-0.3)
+            .preferredColorScheme(.dark)
+            .background(Material.ultraThin.materialActiveAppearance(.active).opacity(0.6))
+            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
             tip.transition(.scale.animation(.fastSpring))
         }
         .frame(alignment: .center)
+        .onHover { hovering in
+            if !hovering {
+                clickedInApp = false
+            }
+        }
     }
 
     @ViewBuilder var tip: some View {
@@ -715,13 +812,16 @@ struct Mac26BrightnessOSDView: View {
             .opacity(osd.tip == nil ? 0 : 1)
     }
 
+    @State var variant = 0
+
     var slider: some View {
         SwiftUI.Slider(value: $osd.value) {} ticks: {
             SliderTickContentForEach(STEPS, id: \.self) { value in
                 SliderTick(value)
             }
         }
-        .tint(.primary)
+        .tint(.white)
+        .brightness(2.0)
         .onChange(of: osd.value) { newValue in
             osd.onChange?(newValue)
         }
@@ -733,7 +833,7 @@ struct Mac26BrightnessOSDView: View {
             HStack {
                 Text(osd.textLeft).font(.system(size: 12, weight: .medium))
                 Spacer()
-                Text(osd.text).font(.system(size: 12, weight: .medium, design: .monospaced))
+                Text(osd.text.isEmpty ? "\((osd.value * 100).intround)%" : osd.text).font(.system(size: 12, weight: .medium, design: .monospaced))
                     .foregroundColor(osd.color ?? .secondary)
                 if osd.locked {
                     Image(systemName: "lock.fill")
@@ -1167,6 +1267,10 @@ final class PanelWindow: NSPanel {
                 makeKeyAndOrderFront(nil)
             }
         }
+    }
+
+    @objc func hasActiveAppearance() -> Bool {
+        true
     }
 
     func forceClose() {
