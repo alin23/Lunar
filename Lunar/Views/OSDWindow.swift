@@ -40,6 +40,11 @@ final class OSDWindow: NSWindow, NSWindowDelegate {
 
     var shouldIgnoreMouseEvents = false
 
+    // Indicates whether the mouse cursor is currently inside this window's frame.
+    // Used to delay fading/closing while the user is interacting or simply hovering.
+    // Implemented using an NSTrackingArea attached to the content view.
+    @objc dynamic var hovering = false
+
     weak var display: Display?
     lazy var wc = NSWindowController(window: self)
 
@@ -49,10 +54,21 @@ final class OSDWindow: NSWindow, NSWindowDelegate {
     var fader: DispatchWorkItem? { didSet { oldValue?.cancel() } }
     var endFader: DispatchWorkItem? { didSet { oldValue?.cancel() } }
 
+    override func mouseEntered(with event: NSEvent) {
+        hovering = true
+        super.mouseEntered(with: event)
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        hovering = false
+        super.mouseExited(with: event)
+    }
+
     func hide() {
         fader = nil
         endFader = nil
         closer = nil
+        removeHoverTrackingArea()
 
         if let v = contentView?.superview {
             v.alphaValue = 0.0
@@ -108,6 +124,7 @@ final class OSDWindow: NSWindow, NSWindowDelegate {
             makeKeyAndOrderFront(nil)
         }
         orderFrontRegardless()
+        addHoverTrackingArea()
 
         endFader = nil
         closer = nil
@@ -116,7 +133,7 @@ final class OSDWindow: NSWindow, NSWindowDelegate {
         guard closeMilliseconds > 0 else { return }
         actionOnFade = { [weak self] in
             guard let s = self, s.isVisible else { return }
-            guard !clickedInApp else {
+            guard !s.hovering else {
                 self?.fader = mainAsyncAfter(ms: fadeMilliseconds) { self?.actionOnFade?() }
                 return
             }
@@ -133,6 +150,38 @@ final class OSDWindow: NSWindow, NSWindowDelegate {
         fader = mainAsyncAfter(ms: fadeMilliseconds) { [weak self] in
             self?.actionOnFade?()
         }
+    }
+
+    func windowWillClose(_ notification: Notification) {
+        removeHoverTrackingArea()
+    }
+
+    // Tracking area for mouse enter/exit.
+    private var hoverTrackingArea: NSTrackingArea?
+
+    // MARK: - Hover Tracking
+
+    // MARK: - Tracking Area based hover detection
+
+    private func addHoverTrackingArea() {
+        guard let view = contentView else { return }
+        removeHoverTrackingArea()
+        let opts: NSTrackingArea.Options = [
+            .mouseEnteredAndExited,
+            .activeAlways,
+            .inVisibleRect,
+        ]
+        let area = NSTrackingArea(rect: view.bounds, options: opts, owner: self, userInfo: nil)
+        view.addTrackingArea(area)
+        hoverTrackingArea = area
+    }
+
+    private func removeHoverTrackingArea() {
+        if let area = hoverTrackingArea, let view = contentView {
+            view.removeTrackingArea(area)
+        }
+        hoverTrackingArea = nil
+        hovering = false
     }
 
 }
@@ -779,7 +828,7 @@ struct Mac26BrightnessOSDView: View {
 
     var body: some View {
         VStack(spacing: OSD_TIP_SPACING) {
-            CustomGlassEffectView(variant: 6, scrimState: 0, subduedState: 0, cornerRadius: 24) {
+            CustomGlassEffectView(variant: 6, scrimState: 0, subduedState: 0, tint: osd.color?.opacity(0.2).ns ?? .clear, cornerRadius: 24) {
                 square.animation(.fastSpring, value: osd.tip)
                     .frame(width: MAC26_OSD_WIDTH, height: MAC26_OSD_HEIGHT)
             }
@@ -791,9 +840,7 @@ struct Mac26BrightnessOSDView: View {
         }
         .frame(alignment: .center)
         .onHover { hovering in
-            if !hovering {
-                clickedInApp = false
-            }
+            osd.hovering = hovering
         }
     }
 
@@ -834,7 +881,6 @@ struct Mac26BrightnessOSDView: View {
                 Text(osd.textLeft).font(.system(size: 12, weight: .medium))
                 Spacer()
                 Text(osd.text.isEmpty ? "\((osd.value * 100).intround)%" : osd.text).font(.system(size: 12, weight: .medium, design: .monospaced))
-                    .foregroundColor(osd.color ?? .secondary)
                 if osd.locked {
                     Image(systemName: "lock.fill")
                         .font(.system(size: 12, weight: .medium, design: .rounded))
@@ -1091,6 +1137,7 @@ final class OSDState: ObservableObject {
     @Published var glowRadius: CGFloat = 5
     @Published var tip: Text? = nil
     @Published var locked = false
+    @Published var hovering = false
     var onChange: ((Float) -> Void)? = nil
 }
 

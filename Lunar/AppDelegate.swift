@@ -35,8 +35,6 @@ import SwiftUI
 import AppIntents
 import ServiceManagement
 
-var clickedInApp = false
-
 extension CLLocationManager {
     var auth: CLAuthorizationStatus? {
         guard !Geolocation.coreLocationTimedOut else { return nil }
@@ -2044,11 +2042,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             }
             handleModifierScrollThreshold(event: event)
 
-            return event
-        }
-
-        NSEvent.addLocalMonitorForEvents(matching: [.leftMouseDown, .leftMouseUp]) { event in
-            clickedInApp = event.type == .leftMouseDown
             return event
         }
     }

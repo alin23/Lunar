@@ -3018,6 +3018,21 @@ final class DisplayController: ObservableObject {
                     if display.systemAdaptiveBrightness, value == maxBrightness, value == oldValue {
                         if doublePressedBrightnessUpKey.value, !ignoreHoldingKey {
                             display.osdState.tip = nil
+                            let startNits = nits
+                            let endNits = DC.builtinDisplay?.maxHardwareNits ?? 1600
+                            let duration: TimeInterval = 1.0
+                            let steps = 50
+                            let interval = duration / steps.d
+                            for i in 1 ... steps {
+                                let progress = i.d / steps.d
+                                let currentNits = Int(startNits + (Double(endNits - startNits) * progress))
+                                mainAsyncAfter(ms: (i.d * interval * 1000).intround) {
+                                    display.osdState.text = "\(currentNits) nits"
+                                }
+                            }
+                            mainAsyncAfter(ms: ((duration + 0.05) * 1000).intround) {
+                                display.osdState.text = "\(endNits.intround) nits"
+                            }
                             display.systemAdaptiveBrightness = false
                         } else {
                             display.osdState.tip = Text("\(Image(systemName: "sun.max.fill")) Double press Brightness Up to unlock \(maxNits.str(decimals: 0)) nits")
