@@ -1,3 +1,15 @@
+# 6.9.0
+## Features
+
+- Native macOS 26 OSD support
+- Allow Enhanced Contrast to work even when Overlay dimming is used
+
+
+## Fixes
+
+- Fix contrast slider moving erronously
+- Fix issue with Paddle window not being clickable
+
 # 6.8.9
 ## Fixes
 
