@@ -1,3 +1,9 @@
+# 6.9.1
+## Fixes
+
+- Make OSD text more visible on white backgrounds
+- Fix wrong brightness value in OSD on fine adjustments
+
 # 6.9.0
 ## Features
 
