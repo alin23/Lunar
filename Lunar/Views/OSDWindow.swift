@@ -833,11 +833,11 @@ struct Mac26BrightnessOSDView: View {
                     .frame(width: MAC26_OSD_WIDTH, height: MAC26_OSD_HEIGHT)
             }
             .brightness(-0.3)
-            .preferredColorScheme(.dark)
             .background(Material.ultraThin.materialActiveAppearance(.active).opacity(0.6))
             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
             tip.transition(.scale.animation(.fastSpring))
         }
+        .preferredColorScheme(.dark)
         .frame(alignment: .center)
         .onHover { hovering in
             osd.hovering = hovering
@@ -847,7 +847,7 @@ struct Mac26BrightnessOSDView: View {
     @ViewBuilder var tip: some View {
         (osd.tip ?? Text("TIP"))
             .font(.system(size: 10, weight: .medium))
-            .foregroundColor(.primary)
+            .foregroundColor(.white)
             .multilineTextAlignment(.center)
             .padding(.horizontal, 10)
             .frame(height: OSD_TIP_HEIGHT)
@@ -878,23 +878,31 @@ struct Mac26BrightnessOSDView: View {
     var square: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text(osd.textLeft).font(.system(size: 12, weight: .medium))
+                Text(osd.textLeft)
+                    .font(.system(size: 12, weight: .medium))
+                    .brightness(0.5)
                 Spacer()
-                Text(osd.text.isEmpty ? "\((osd.value * 100).intround)%" : osd.text).font(.system(size: 12, weight: .medium, design: .monospaced))
+                Text(osd.text.isEmpty ? "\((osd.value * 100).intround)%" : osd.text)
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .brightness(0.5)
                 if osd.locked {
                     Image(systemName: "lock.fill")
                         .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.white.opacity(0.8))
+                        .brightness(0.5)
                 }
             }
             HStack {
                 Image(systemName: osd.imageLeft)
                     .opacity(osd.imageLeft == "clear" ? 0 : 1)
+                    .foregroundStyle(.white.opacity(0.8))
+                    .brightness(0.5)
                 slider
                 Image(systemName: osd.image)
+                    .brightness(0.5)
             }
             .font(.system(size: 13, weight: .medium, design: .rounded))
-            .foregroundColor(.primary)
+            .foregroundStyle(.white)
 
         }
         .padding(.horizontal, Self.HORIZONTAL_PADDING)
