@@ -859,17 +859,20 @@ struct Mac26BrightnessOSDView: View {
             .opacity(osd.tip == nil ? 0 : 1)
     }
 
-    @State var variant = 0
+    @State var sliding = false
 
     var slider: some View {
         SwiftUI.Slider(value: $osd.value) {} ticks: {
             SliderTickContentForEach(STEPS, id: \.self) { value in
                 SliderTick(value)
             }
+        } onEditingChanged: { editing in
+            sliding = editing
         }
         .tint(.white)
         .brightness(2.0)
         .onChange(of: osd.value) { newValue in
+            guard sliding else { return }
             osd.onChange?(newValue)
         }
         .disabled(osd.locked)
