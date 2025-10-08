@@ -1,3 +1,17 @@
+# 6.9.2
+## Features
+
+- New [Layout Setting](https://app.lunar.fyi/layout): **Force System OSD**
+  - When enabled, the native macOS OSD will be shown instead of Lunar's custom OSD on displays supporting the *Apple Native* protocol (built-in displays and some external monitors)
+  - In macOS 26, this won't apply to external monitors that don't support the Apple Native protocol, as the native OSD doesn't work anymore there
+- Allow enabling/disabling DDC, Network, Apple Native, and Gamma control per display from the CLI
+
+Example on enabling DDC and disabling Apple Native in one go:
+
+```bash
+lunar displays ultrafine appleNativeEnabled off; lunar displays builtin ddcEnabled on
+```
+
 # 6.9.1
 ## Fixes
 
