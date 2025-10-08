@@ -939,6 +939,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case normalizedContrast
         case normalizedBrightnessContrast
 
+        case ddcEnabled
+        case networkEnabled
+        case appleNativeEnabled
+        case gammaEnabled
+
         static var needsLunarPro: Set<CodingKeys> = [
             .faceLightEnabled,
             .blackOutEnabled,
@@ -1012,6 +1017,11 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .unmanaged,
             .keepHDREnabled,
             // .keepDisconnected,
+
+            .ddcEnabled,
+            .networkEnabled,
+            .appleNativeEnabled,
+            .gammaEnabled,
         ]
 
         static var hidden: Set<CodingKeys> = [
@@ -1143,6 +1153,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             .normalizedContrast,
             .normalizedBrightnessContrast,
             .systemAdaptiveBrightness,
+            .ddcEnabled,
+            .networkEnabled,
+            .appleNativeEnabled,
+            .gammaEnabled,
         ]
 
         var isHidden: Bool {
@@ -5604,6 +5618,12 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             try container.encode(unmanaged, forKey: .unmanaged)
             try container.encode(keepDisconnected, forKey: .keepDisconnected)
             try container.encode(keepHDREnabled, forKey: .keepHDREnabled)
+
+            try container.encode(ddcEnabled, forKey: .ddcEnabled)
+            try container.encode(networkEnabled, forKey: .networkEnabled)
+            try container.encode(appleNativeEnabled, forKey: .appleNativeEnabled)
+            try container.encode(gammaEnabled, forKey: .gammaEnabled)
+
             #if arch(arm64)
                 try container.encode(maxNits, forKey: .maxNits)
                 try container.encode(minNits, forKey: .minNits)

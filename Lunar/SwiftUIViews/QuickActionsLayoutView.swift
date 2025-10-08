@@ -11,6 +11,7 @@ struct QuickActionsLayoutView: View {
     @Default(.showNitsText) var showNitsText
     @Default(.showNitsOSDExternal) var showNitsOSDExternal
     @Default(.showNitsOSDBuiltin) var showNitsOSDBuiltin
+    @Default(.forceSystemOSD) var forceSystemOSD
     @Default(.showBrightnessMenuBar) var showBrightnessMenuBar
     @Default(.showOnlyExternalBrightnessMenuBar) var showOnlyExternalBrightnessMenuBar
     @Default(.showOrientationInQuickActions) var showOrientationInQuickActions
@@ -76,17 +77,20 @@ struct QuickActionsLayoutView: View {
                 }
                 Divider().padding(.vertical, 2).opacity(0.6)
                 Group {
+                    SettingsHeader(text: "OSD")
+                    SettingsToggle(text: "Force system OSD where available", setting: $forceSystemOSD)
+                    #if arch(arm64)
+                        if dc.externalActiveDisplays.contains(where: { $0.possibleMaxNits != nil && $0.nits != nil }) {
+                            SettingsToggle(text: "Show nits value in the brightness OSD (external monitors)", setting: $showNitsOSDExternal).disabled(forceSystemOSD)
+                        }
+                        if dc.activeDisplayList.contains(where: { $0.isBuiltin && $0.possibleMaxNits != nil && $0.nits != nil }) {
+                            SettingsToggle(text: "Show nits value in the brightness OSD (built-in screen)", setting: $showNitsOSDBuiltin).disabled(forceSystemOSD)
+                        }
+                    #endif
                     SettingsHeader(text: "Info")
                     #if arch(arm64)
                         if dc.activeDisplayList.contains(where: \.noDDCOrMergedBrightnessContrast) {
                             SettingsToggle(text: "Show nits limits when hovering on the slider", setting: $showNitsText.animation(.fastSpring))
-                        }
-
-                        if dc.externalActiveDisplays.contains(where: { $0.possibleMaxNits != nil && $0.nits != nil }) {
-                            SettingsToggle(text: "Show nits value in the brightness OSD (external monitors)", setting: $showNitsOSDExternal)
-                        }
-                        if dc.activeDisplayList.contains(where: { $0.isBuiltin && $0.possibleMaxNits != nil && $0.nits != nil }) {
-                            SettingsToggle(text: "Show nits value in the brightness OSD (built-in screen)", setting: $showNitsOSDBuiltin)
                         }
                     #endif
                     if adaptiveBrightnessMode.hasUsefulInfo {

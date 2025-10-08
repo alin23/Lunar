@@ -84,6 +84,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .showNitsText,
     .showNitsOSDExternal,
     .showNitsOSDBuiltin,
+    .forceSystemOSD,
     .showStandardPresets,
     .showCustomPresets,
     .hidePresetsOnSingleDisplay,

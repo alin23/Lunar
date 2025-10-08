@@ -157,6 +157,7 @@ extension Defaults.Keys {
     static let showRawValues = Key<Bool>("showRawValues", default: false)
     static let showNitsOSDExternal = Key<Bool>("showNitsOSDExternal", default: false)
     static let showNitsOSDBuiltin = Key<Bool>("showNitsOSDBuiltin", default: true)
+    static let forceSystemOSD = Key<Bool>("forceSystemOSD", default: false)
     static let showNitsText = Key<Bool>("showNitsText", default: true)
     static let showStandardPresets = Key<Bool>("showStandardPresets", default: true)
     static let showCustomPresets = Key<Bool>("showCustomPresets", default: true)

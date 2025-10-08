@@ -884,7 +884,7 @@ enum Hotkey {
             return
         }
         #if arch(arm64)
-            if osdImage == .brightness, display.isBuiltin ? DC.showNitsOSDBuiltin : DC.showNitsOSDExternal, display.possibleMaxNits != nil, let nits = display.nits {
+            if osdImage == .brightness, display.isBuiltin ? DC.showNitsOSDBuiltin : DC.showNitsOSDExternal, display.possibleMaxNits != nil, let nits = display.nits, !DC.forceSystemOSD {
                 display.fullRangeUserBrightness = value.d.map(from: (0, 100), to: (0, 1))
                 display.showSoftwareOSD(
                     image: MAC26 ? "sun.max.fill" : "sun.max",
@@ -941,7 +941,7 @@ enum Hotkey {
 
         guard !CachedDefaults[.hideOSD] else { return }
 
-        if #available(macOS 26, *) {
+        if #available(macOS 26, *), !display.isNative || !DC.forceSystemOSD {
             display.showSoftwareOSD(
                 image: image,
                 value: percentage,

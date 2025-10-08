@@ -828,7 +828,7 @@ struct Mac26BrightnessOSDView: View {
 
     var body: some View {
         VStack(spacing: OSD_TIP_SPACING) {
-            CustomGlassEffectView(variant: 6, scrimState: 0, subduedState: 0, tint: osd.color?.opacity(0.2).ns ?? .clear, cornerRadius: 24) {
+            CustomGlassEffectView(variant: 6, scrimState: 0, subduedState: 0, tint: nil, cornerRadius: 24) {
                 square.animation(.fastSpring, value: osd.tip)
                     .frame(width: MAC26_OSD_WIDTH, height: MAC26_OSD_HEIGHT)
             }
