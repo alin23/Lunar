@@ -1,3 +1,8 @@
+# 6.9.3
+## Fixes
+
+- Fix activation when license code seats have been used up
+
 # 6.9.2
 ## Features
 
