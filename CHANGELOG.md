@@ -1,3 +1,9 @@
+# 6.9.4
+## Fixes
+
+- Fix crash on launch when checking previously disconnected displays
+- Add support for MacBook Pro M5
+
 # 6.9.3
 ## Fixes
 
