@@ -2379,7 +2379,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         #if arch(arm64)
             if #available(macOS 13, *) {
                 if restarted {
-                    DC.possiblyDisconnectedDisplays = Defaults[.possiblyDisconnectedDisplays].dict { ($0.id, $0) }
+                    DisplayController.possiblyDisconnectedDisplays = Defaults[.possiblyDisconnectedDisplays].dict { ($0.id, $0) }
                 } else {
                     log.info("Reconnecting all displays")
                     DC.en()

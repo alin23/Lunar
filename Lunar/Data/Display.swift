@@ -3527,7 +3527,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 //    }
 
     var isInMirrorSet: Bool {
-        CGDisplayIsInMirrorSet(id) != 0 && DC.cachedOnlineDisplayIDs.count > 1
+        CGDisplayIsInMirrorSet(id) != 0 && (DisplayController.initialized ? DC.cachedOnlineDisplayIDs : Set(NSScreen.onlineDisplayIDs)).count > 1
     }
 
     lazy var panel: MPDisplay? = DisplayController.panel(with: id) {
@@ -3906,7 +3906,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         @objc dynamic lazy var isFakeDummy: Bool = (Self.notDummyNamePattern.matches(name) && vendor.isDummy)
     #endif
     #if arch(arm64)
-        var disconnected: Bool { DC.possiblyDisconnectedDisplays[id]?.serial == serial }
+        var disconnected: Bool { DisplayController.possiblyDisconnectedDisplays[id]?.serial == serial }
     #else
         var disconnected = false
     #endif

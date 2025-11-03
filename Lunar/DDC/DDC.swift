@@ -927,7 +927,7 @@ enum DDC {
             guard !DC.screensSleeping else { return }
             mainAsync {
                 log.debug("checkDisconnectedDisplays")
-                DC.possiblyDisconnectedDisplays = DC.possiblyDisconnectedDisplayList.dict { d in
+                DisplayController.possiblyDisconnectedDisplays = DC.possiblyDisconnectedDisplayList.dict { d in
                     if d.isBuiltin, !DCPAVServiceExists(location: .embedded) || !NSScreen.onlineDisplayIDs.contains(1) { return (d.id, d) }
 
                     guard DDC.dcpList.contains(where: { $0.dcpName == d.dcpName }) else { return nil }

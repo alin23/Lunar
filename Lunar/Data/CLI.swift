@@ -1911,7 +1911,7 @@ struct Lunar: ParsableCommand {
                     includeDummy: CachedDefaults[.showDummyDisplays]
                 )
 
-                let displays = getFilteredDisplays(displays: Array(DC.possiblyDisconnectedDisplays.values), filter: display)
+                let displays = getFilteredDisplays(displays: Array(DisplayController.possiblyDisconnectedDisplays.values), filter: display)
                 guard !displays.isEmpty else {
                     if case let .id(id) = display {
                         cliPrint("CLI: Reconnecting \(display)")
@@ -2001,7 +2001,7 @@ struct Lunar: ParsableCommand {
                     return
                 }
 
-                let displays = getFilteredDisplays(displays: Array(DC.possiblyDisconnectedDisplays.values), filter: display)
+                let displays = getFilteredDisplays(displays: Array(DisplayController.possiblyDisconnectedDisplays.values), filter: display)
                 if displays.isEmpty {
                     DC.en()
                 } else {

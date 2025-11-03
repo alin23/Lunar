@@ -498,7 +498,7 @@ struct ScreenQuery: EntityPropertyQuery {
                 ?? (additionalScreens ?? []).first(where: { $0.id == id })
 
             #if arch(arm64)
-                return screen ?? DC.possiblyDisconnectedDisplays[id.u32]?.screen
+                return screen ?? DisplayController.possiblyDisconnectedDisplays[id.u32]?.screen
             #else
                 return screen
             #endif
@@ -1516,7 +1516,7 @@ If the reconnect action fails, try any one of the following to bring back the sc
         Summary("Toggle connected state for \(\.$screen)")
     }
 
-    @Parameter(title: "Screen", optionsProvider: ScreenQuery(single: true, additionalScreens: DC.possiblyDisconnectedDisplays.values.map(\.screen), sidecar: true))
+    @Parameter(title: "Screen", optionsProvider: ScreenQuery(single: true, additionalScreens: DisplayController.possiblyDisconnectedDisplays.values.map(\.screen), sidecar: true))
     var screen: Screen
 
     @MainActor
@@ -1542,7 +1542,7 @@ If the reconnect action fails, try any one of the following to bring back the sc
                 DC.dis(display.id)
                 return ""
             }
-            if let display = DC.possiblyDisconnectedDisplays.values.first(where: { $0.serial == screen.serial }) {
+            if let display = DisplayController.possiblyDisconnectedDisplays.values.first(where: { $0.serial == screen.serial }) {
                 DC.en(display.id)
                 return display.serial
             }

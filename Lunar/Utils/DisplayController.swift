@@ -503,6 +503,13 @@ final class DisplayController: ObservableObject {
         return Defaults[.disableCliffDetection]
     }()
 
+    static var possiblyDisconnectedDisplays: [CGDirectDisplayID: Display] = [:] {
+        didSet {
+            debug("possiblyDisconnectedDisplays: \(DisplayController.possiblyDisconnectedDisplays.keys.sorted())")
+            DC.possiblyDisconnectedDisplayList = DisplayController.possiblyDisconnectedDisplays.values.sorted(by: \.id)
+        }
+    }
+
     var doublePressedBrightnessUpKey: ExpiringBool = false
     var doublePressedBrightnessDownKey: ExpiringBool = false
     var pressedBrightnessKey: ExpiringBool = false
@@ -711,12 +718,12 @@ final class DisplayController: ObservableObject {
             #if arch(arm64)
                 mainAsync { [self] in
                     let serials = newValue.values.map(\.serial)
-                    for (id, display) in possiblyDisconnectedDisplays {
+                    for (id, display) in DisplayController.possiblyDisconnectedDisplays {
                         if serials.contains(display.serial) {
-                            possiblyDisconnectedDisplays.removeValue(forKey: id)
+                            DisplayController.possiblyDisconnectedDisplays.removeValue(forKey: id)
                         }
                     }
-                    possiblyDisconnectedDisplayList = possiblyDisconnectedDisplays.values.sorted(by: \.id)
+                    possiblyDisconnectedDisplayList = DisplayController.possiblyDisconnectedDisplays.values.sorted(by: \.id)
                 }
             #endif
 
@@ -1099,13 +1106,6 @@ final class DisplayController: ObservableObject {
                         || CachedDefaults[.hotkeys].first { $0.identifier == HotkeyIdentifier.muteAudio.rawValue }?.isEnabled ?? true
                 )
         )
-    }
-
-    var possiblyDisconnectedDisplays: [CGDirectDisplayID: Display] = [:] {
-        didSet {
-            debug("possiblyDisconnectedDisplays: \(self.possiblyDisconnectedDisplays.keys.sorted())")
-            possiblyDisconnectedDisplayList = possiblyDisconnectedDisplays.values.sorted(by: \.id)
-        }
     }
 
     @Atomic var autoBlackoutPending = false {
@@ -2035,7 +2035,7 @@ final class DisplayController: ObservableObject {
     }
 
     func retryAutoBlackoutLater() {
-        if autoBlackoutPending, let d = builtinDisplay, !d.blackOutEnabled, possiblyDisconnectedDisplays[d.id] == nil, !calibrating {
+        if autoBlackoutPending, let d = builtinDisplay, !d.blackOutEnabled, DisplayController.possiblyDisconnectedDisplays[d.id] == nil, !calibrating {
             log.info("Retrying Auto Blackout later")
             d.showAutoBlackOutOSD()
             autoBlackoutPublisher.send(true)
