@@ -558,6 +558,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 sensorBrightnessMapping = SensorMode.DEFAULT_BRIGHTNESS_MAPPING
             #endif
         }
+        adaptivePaused = try (container.decodeIfPresent(Bool.self, forKey: .adaptivePaused)) ?? false
 
         defer {
             initialised = true
@@ -943,6 +944,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         case networkEnabled
         case appleNativeEnabled
         case gammaEnabled
+        case adaptivePaused
 
         static var needsLunarPro: Set<CodingKeys> = [
             .faceLightEnabled,
@@ -976,6 +978,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         static var bool: Set<CodingKeys> = [
             .active,
             .adaptive,
+            .adaptivePaused,
             .lockedBrightness,
             .lockedContrast,
             .lockedBrightnessCurve,
@@ -1074,6 +1077,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         static var settable: Set<CodingKeys> = [
             .name,
             .adaptive,
+            .adaptivePaused,
             .defaultGammaRedMin,
             .defaultGammaRedMax,
             .defaultGammaRedValue,
@@ -3579,7 +3583,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
     }
 
-    @Published var adaptivePaused = false {
+    @Published @objc dynamic var adaptivePaused = false {
         didSet {
             readapt(newValue: adaptivePaused, oldValue: oldValue)
         }
@@ -5480,6 +5484,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
             try container.encode(active, forKey: .active)
             try container.encode(adaptive, forKey: .adaptive)
+            try container.encode(adaptivePaused, forKey: .adaptivePaused)
             try container.encode(audioMuted, forKey: .audioMuted)
             try container.encode(canChangeVolume, forKey: .canChangeVolume)
             try container.encode(brightness.uint16Value, forKey: .brightness)

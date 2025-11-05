@@ -3745,6 +3745,7 @@ struct DisplayProperty: Equatable, Hashable, AppEntity, CustomStringConvertible 
         DisplayProperty(id: .power, name: "Power"),
         DisplayProperty(id: .hdr, name: "HDR"),
         DisplayProperty(id: .adaptive, name: "Adaptive Brightness"),
+        DisplayProperty(id: .adaptivePaused, name: "Adaptive Brightness Paused"),
         DisplayProperty(id: .systemAdaptiveBrightness, name: "System Adaptive Brightness"),
     ]
     static let settingsBool: [DisplayProperty] = [
