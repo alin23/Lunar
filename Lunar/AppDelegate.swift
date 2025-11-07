@@ -2503,6 +2503,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         if !thisIsFirstRun {
             DC.askAboutXDR(migration: true)
         }
+        NotificationCenter.default.addObserver(self, selector: #selector(windowDidBecomeMainNotification), name: NSWindow.didBecomeMainNotification, object: nil)
+    }
+
+    @objc func windowDidBecomeMainNotification(_ notification: Notification) {
+        guard let window = notification.object as? NSWindow else { return }
+
+        if let paddleController = window.windowController as? PADActivateWindowController,
+           let email = paddleController.emailTxt, let licenseCode = paddleController.licenseTxt
+        {
+            email.isBordered = true
+            licenseCode.isBordered = true
+
+            email.drawsBackground = true
+            licenseCode.drawsBackground = true
+
+            email.backgroundColor = .black.withAlphaComponent(0.05)
+            licenseCode.backgroundColor = .black.withAlphaComponent(0.05)
+        }
     }
 
     @IBAction func toggleCleaningMode(_: Any) {
