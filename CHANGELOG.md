@@ -1,3 +1,12 @@
+# 6.9.5
+## Fixes
+
+- Work around macOS issue where the license code text field is not visible until clicked
+
+## Improvements
+
+- Allow pausing/unpausing adaptive brightness via a new `adaptivePaused` property using the CLI or Shortcuts
+
 # 6.9.4
 ## Fixes
 
