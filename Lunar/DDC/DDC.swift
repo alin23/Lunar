@@ -101,7 +101,7 @@ enum VideoInputSource: UInt16, Sendable, CaseIterable, Nameable, CustomStringCon
     case separator = 0x7FDF
 
     init?(stringValue: String) {
-        switch #"[^\w\s]+"#.r!.replaceAll(in: stringValue.lowercased().stripped, with: "") {
+        switch #"[^\w]+"#.r!.replaceAll(in: stringValue.lowercased().stripped, with: "") {
         case "vga", "vga1": self = .vga1
         case "vga2": self = .vga2
         case "dvi", "dvi1": self = .dvi1
@@ -122,21 +122,21 @@ enum VideoInputSource: UInt16, Sendable, CaseIterable, Nameable, CustomStringCon
         case "hdmi2": self = .hdmi2
         case "hdmi3": self = .hdmi3
         case "hdmi4": self = .hdmi4
-        case "thunderbolt", "thunderbolt2", "usbc", "usbc2": self = .thunderbolt2
-        case "thunderbolt1", "usbc1": self = .thunderbolt1
+        case "thunderbolt", "usbc", "thunderbolt1", "usbc1": self = .thunderbolt1
+        case "thunderbolt2", "usbc2": self = .thunderbolt2
         case "thunderbolt3", "usbc3": self = .thunderbolt3
-        case "lgdp", "lgminidp", "lgminidisplayport", "lgdisplayport", "lgdp1", "lgdisplayport1": self = .lgSpecificDisplayPort1
-        case "lgdp2", "lgminidp2", "lgminidisplayport2", "lgdisplayport2": self = .lgSpecificDisplayPort2
-        case "lgdp3", "lgminidp3", "lgminidisplayport3", "lgdisplayport3": self = .lgSpecificDisplayPort3
-        case "lgdp4", "lgminidp4", "lgminidisplayport4", "lgdisplayport4": self = .lgSpecificDisplayPort4
-        case "lghdmi", "lghdmi1": self = .lgSpecificHdmi1
-        case "lghdmi2": self = .lgSpecificHdmi2
-        case "lghdmi3": self = .lgSpecificHdmi3
-        case "lghdmi4": self = .lgSpecificHdmi4
-        case "lgthunderbolt2", "lgusbc2": self = .lgSpecificThunderbolt2
-        case "lgthunderbolt1", "lgusbc1", "lgusbc", "lgthunderbolt": self = .lgSpecificThunderbolt1
-        case "lgthunderbolt3", "lgusbc3": self = .lgSpecificThunderbolt3
-        case "lgthunderbolt4", "lgusbc4": self = .lgSpecificThunderbolt4
+        case "lgdp", "lgminidp", "lgminidisplayport", "lgdisplayport", "lgdp1", "lgdisplayport1", "displayport1lgspecific": self = .lgSpecificDisplayPort1
+        case "lgdp2", "lgminidp2", "lgminidisplayport2", "lgdisplayport2", "displayport2lgspecific": self = .lgSpecificDisplayPort2
+        case "lgdp3", "lgminidp3", "lgminidisplayport3", "lgdisplayport3", "displayport3lgspecific": self = .lgSpecificDisplayPort3
+        case "lgdp4", "lgminidp4", "lgminidisplayport4", "lgdisplayport4", "displayport4lgspecific": self = .lgSpecificDisplayPort4
+        case "lghdmi", "lghdmi1", "hdmi1lgspecific": self = .lgSpecificHdmi1
+        case "lghdmi2", "hdmi2lgspecific": self = .lgSpecificHdmi2
+        case "lghdmi3", "hdmi3lgspecific": self = .lgSpecificHdmi3
+        case "lghdmi4", "hdmi4lgspecific": self = .lgSpecificHdmi4
+        case "lgthunderbolt1", "lgusbc1", "lgusbc", "lgthunderbolt", "usbc1lgspecific": self = .lgSpecificThunderbolt1
+        case "lgthunderbolt2", "lgusbc2", "usbc2lgspecific": self = .lgSpecificThunderbolt2
+        case "lgthunderbolt3", "lgusbc3", "usbc3lgspecific": self = .lgSpecificThunderbolt3
+        case "lgthunderbolt4", "lgusbc4", "usbc4lgspecific": self = .lgSpecificThunderbolt4
         case "unknown": self = .unknown
         default:
             return nil
