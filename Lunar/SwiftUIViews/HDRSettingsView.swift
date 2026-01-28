@@ -43,7 +43,7 @@ struct HDRSettingsView: View {
                 //     """
                 // )
 //                Divider()
-                if dc.fullRangeAPIAvailable {
+                if dc.fullRangeAPIAvailable, !MAC26POINT3 {
                     SettingsToggle(
                         text: "Use new XDR algorithm for MacBook screen", setting: $newXDRMode.animation(.fastSpring),
                         help: """
@@ -63,8 +63,8 @@ struct HDRSettingsView: View {
                     )
                     Divider().opacity(0.6).padding(.vertical, 2)
                     fullRangeSettings
+                    Divider().opacity(0.6).padding(.vertical, 2)
                 }
-                Divider().opacity(0.6).padding(.vertical, 2)
                 subzeroSettings.padding(.bottom, 2)
                 xdrSettings
                 Spacer()
@@ -204,7 +204,9 @@ struct HDRSettingsView: View {
             SettingsToggle(text: "Toggle XDR Brightness when going over 100%", setting: $autoXdr.animation(.fastSpring))
 
             if !newXDRMode, Sysctl.isMacBook, dc.builtinDisplay?.supportsEnhance ?? false {
-                xdrContrastSettings.padding(.bottom, 2)
+                if !MAC26POINT3 {
+                    xdrContrastSettings.padding(.bottom, 2)
+                }
                 autoXDRSensorSettings.padding(.bottom, 2)
             }
             SettingsToggle(
@@ -262,7 +264,7 @@ struct HDRSettingsView: View {
             text: "Toggle Sub-zero Dimming when going below 0%",
             setting: $autoSubzero.animation(.fastSpring)
         )
-        if dc.activeDisplayList.contains(where: \.supportsGammaByDefault) {
+        if !MAC26POINT3, dc.activeDisplayList.contains(where: \.supportsGammaByDefault) {
             SettingsToggle(
                 text: "Enhance contrast in Sub-zero Dimming", setting: $subzeroContrast,
                 help: """

@@ -410,7 +410,9 @@ final class DataStore: NSObject {
     static func firstRun() {
         log.debug("First run")
         thisIsFirstRun = true
-        Defaults[.newXDRMode] = true
+        if !MAC26POINT3 {
+            Defaults[.newXDRMode] = true
+        }
     }
 
     func displays(serials: [String]? = nil) -> [Display]? {

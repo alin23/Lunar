@@ -131,9 +131,9 @@ extension Defaults.Keys {
     static let disableNightShiftXDR = Key<Bool>("disableNightShiftXDR", default: true)
     static let enableDarkModeXDR = Key<Bool>("enableDarkModeXDR", default: false)
     static let screenBlankingIssueWarningShown = Key<Bool>("screenBlankingIssueWarningShown", default: false)
-    static let xdrContrast = Key<Bool>("xdrContrast", default: true)
-    static let subzeroContrast = Key<Bool>("subzeroContrast", default: true)
-    static let xdrContrastFactor = Key<Float>("xdrContrastFactor", default: 0.3)
+    static let xdrContrast = Key<Bool>("xdrContrast", default: MAC26POINT3 ? false : true)
+    static let subzeroContrast = Key<Bool>("subzeroContrast", default: MAC26POINT3 ? false : true)
+    static let xdrContrastFactor = Key<Float>("xdrContrastFactor", default: 0.0)
     static let subzeroContrastFactor = Key<Float>("subzeroContrastFactor", default: 1.75)
 
     static let keyboardBacklightOffBlackout = Key<Bool>("keyboardBacklightOffBlackout", default: true)
@@ -149,7 +149,8 @@ extension Defaults.Keys {
     static let workaroundBuiltinDisplay = Key<Bool>("workaroundBuiltinDisplay", default: false)
     static let mergeBrightnessContrast = Key<Bool>("mergeBrightnessContrast", default: true)
     static let enableBlackOutKillSwitch = Key<Bool>("enableBlackOutKillSwitch", default: true)
-    static let enableSentry = Key<Bool>("enableSentry", default: true)
+    static let enableSentry = Key<Bool>("enableSentry", default: false)
+    static let ranSentryMigration = Key<Bool>("ranSentryMigration", default: false)
     static let paddleConsent = Key<Bool>("paddleConsent", default: false)
 
     static let menuBarClosed = Key<Bool>("menuBarClosed", default: true)

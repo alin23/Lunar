@@ -2340,6 +2340,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         }
     }
 
+    func migrations() {
+        if MAC26POINT3 {
+            Defaults[.newXDRMode] = false
+            Defaults[.xdrContrast] = false
+            Defaults[.subzeroContrast] = false
+        }
+        if !Defaults[.ranSentryMigration] {
+            Defaults[.ranSentryMigration] = true
+            Defaults[.enableSentry] = false
+        }
+    }
+
     func applicationDidFinishLaunching(_: Notification) {
         if isServer {
             sentryCrashExceptionApplicationType = SentryCrashExceptionApplication.self
@@ -2388,6 +2400,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
                 Defaults[.possiblyDisconnectedDisplays] = []
             }
         #endif
+
+        migrations()
 
         listenForRemoteCommandsPublisher
             .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
@@ -3033,6 +3047,7 @@ func installCLIBinary() throws {
 }
 
 let MAC26 = if #available(macOS 26, *) { true } else { false }
+let MAC26POINT3 = if #available(macOS 26.3, *) { true } else { false }
 
 func acquirePrivileges(notificationTitle: String = "Lunar is now listening for media keys", notificationBody: String? = nil) {
 //    #if DEBUG

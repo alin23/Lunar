@@ -1617,6 +1617,7 @@ final class DisplayController: ObservableObject {
             return
         }
         let alert = NSAlert()
+        let migration = migration && !MAC26POINT3
 
         alert.messageText = migration
             ? "New XDR Brightness algorithm available"
