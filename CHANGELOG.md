@@ -1,3 +1,19 @@
+# 6.9.6
+## Features
+
+- New app hang detection and mitigation logic
+
+## Fixes
+
+- Fallback to tone-mapping XDR logic since macOS 26.3 blocked the native XDR algorithm
+- Disable `Enhance Contrast` features since macOS 26.3 blocked them from working
+
+## Improvements
+
+- Allow passing inputs to the CLI as seen in the UI
+    - Example: `lunar set input "HDMI 1 (LG specific)"`
+- Disable error reporting by default
+
 # 6.9.5
 ## Fixes
 
