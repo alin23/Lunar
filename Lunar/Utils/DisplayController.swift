@@ -2083,7 +2083,7 @@ final class DisplayController: ObservableObject {
         }
 
         guard volumeHotkeysEnabled,
-              let audioDevice = simplyCA?.defaultOutputDevice,
+              let audioDevice = defaultAudioOutputDevice,
               !audioDevice.canSetVirtualMainVolume(scope: .output)
         else {
             return nil

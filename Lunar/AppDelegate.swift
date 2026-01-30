@@ -341,8 +341,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
     var zeroGammaChecker: Repeater?
 
-    var enableSentryObserver: Cancellable?
-
     var hdrFixer: Repeater? = AppDelegate.fixHDR()
 
     @Atomic var mediaKeyTapBrightnessStarting = false
@@ -2111,7 +2109,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
         guard let idx = CommandLine.arguments.firstIndex(of: "@") else { return false }
 
-        if isServer { configureSentry() }
+        if isServer {
+            mainActor { configureSentry() }
+        }
         asyncNow { [self] in
             #if DEBUG
                 let argList: [String] = if CommandLine.arguments.contains("-NSDocumentRevisionsDebugMode"), CommandLine.arguments.last == "YES" {
@@ -2179,74 +2179,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         }
 
         return true
-    }
-
-    func configureSentry() {
-        enableSentryObserver = enableSentryObserver ?? enableSentryPublisher
-            .debounce(for: .seconds(1), scheduler: RunLoop.main)
-            .sink { change in
-                AppDelegate.enableSentry = change.newValue
-                if change.newValue {
-                    self.configureSentry()
-                } else {
-                    SentrySDK.close()
-                }
-            }
-
-        guard AppDelegate.enableSentry else { return }
-        UserDefaults.standard.register(defaults: ["NSApplicationCrashOnExceptions": true])
-
-        let release = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "1"
-        SentrySDK.start { options in
-            options.enableCaptureFailedRequests = false
-            options.dsn = SENTRY_DSN
-            options.releaseName = "v\(release)"
-            options.dist = release
-            #if DEBUG
-                options.environment = "dev"
-                options.appHangTimeoutInterval = 10
-            #else
-                options.environment = "production"
-                options.appHangTimeoutInterval = 40
-            #endif
-            options.enableNetworkTracking = false
-
-            if Defaults[.autoRestartOnHang] {
-                options.beforeSend = { event in
-                    if let exc = event.exceptions?.first, let mech = exc.mechanism, mech.type == "AppHang", let stack = exc.stacktrace {
-                        log.warning("App Hanging: \(stack)")
-                        concurrentQueue.asyncAfter(ms: 5000) { restart(hang: true) }
-                        if event.tags == nil {
-                            event.tags = ["restarted": "true"]
-                        } else {
-                            event.tags!["restarted"] = "true"
-                        }
-                        return event
-                    }
-
-                    if event.tags == nil {
-                        event.tags = ["restarted": restarted ? "true" : "false"]
-                    } else {
-                        event.tags!["restarted"] = restarted ? "true" : "false"
-                    }
-                    return event
-                }
-            }
-        }
-
-        let user = User(userId: SERIAL_NUMBER_HASH)
-
-        if CachedDefaults[.paddleConsent] {
-            user.email = producct?.activationEmail
-        }
-
-        user.username = producct?.activationID
-        SentrySDK.configureScope { scope in
-            scope.setUser(user)
-            scope.setTag(value: DC.adaptiveModeString(), key: "adaptiveMode")
-            scope.setTag(value: DC.adaptiveModeString(last: true), key: "lastAdaptiveMode")
-            scope.setTag(value: CachedDefaults[.overrideAdaptiveMode] ? "false" : "true", key: "autoMode")
-        }
     }
 
     func initCacheTransitionLogging() {
@@ -2415,6 +2347,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         checkPermissions()
         setupValueTransformers()
         configureSentry()
+        configureAppHangDetection()
         terminateOtherLunarInstances()
         DDC.setup()
         NightShift.initialAppearance = NightShift.currentAppearance

@@ -827,6 +827,11 @@ enum DDC {
 
     static var lidClosedObserver: IOServicePropertyObserver?
 
+    // static var lidClosedNotifyPort: IONotificationPortRef?
+    // static var lidClosedNotificationHandle: io_object_t = 0
+
+    static var skipNextIORegistryChange = false
+
     static var shouldWait: Bool {
         delayDDCAfterWake && waitAfterWakeSeconds > 0 && wakeTime != Date.distantPast && timeSince(wakeTime) > waitAfterWakeSeconds.d
     }
@@ -898,10 +903,11 @@ enum DDC {
         mainAsyncAfter(ms: ms, action)
     }
 
-    // static var lidClosedNotifyPort: IONotificationPortRef?
-    // static var lidClosedNotificationHandle: io_object_t = 0
-
     static func IORegistryTreeChanged() {
+        guard !skipNextIORegistryChange else {
+            skipNextIORegistryChange = false
+            return
+        }
         #if DEBUG
             print("IORegistryTreeChanged")
         #endif
@@ -938,7 +944,7 @@ enum DDC {
                     || (!DCPAVServiceExists(location: .external) && !NSScreen.onlineDisplayIDs.contains(1))
                 {
                     log.info("Disabling AutoBlackOut (disconnect) if we're left with only the builtin screen")
-                    DC.en()
+                    DC.en(1)
                     DC.autoBlackoutPause = false
                 }
             }

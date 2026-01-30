@@ -1978,7 +1978,7 @@ struct UserValue: Codable, Defaults.Serializable {
 
 extension ThreadSafeDictionary where T == Double, V == Double {
     var userValues: [UserValue] {
-        map { k, v in UserValue(source: k, target: v) }
+        snapshot().map { k, v in UserValue(source: k, target: v) }
     }
 }
 

@@ -528,67 +528,39 @@ extension AnyCodable: Defaults.Serializable {}
 
 // MARK: - ThreadSafeDictionary
 
-final class ThreadSafeDictionary<V: Hashable, T>: Collection {
-    init(dict: [V: T] = [V: T]()) {
-        mutableDictionary = dict
-    }
-
-    // let accessQueue = DispatchQueue(
-    //     label: "Dictionary Barrier Queue",
-    //     attributes: .concurrent
-    // )
-
-    var dictionary: [V: T] {
-        mainThread {
-            Dictionary(uniqueKeysWithValues: mutableDictionary.map { ($0.key, $0.value) })
-        }
-    }
-
-    var startIndex: Dictionary<V, T>.Index {
-        mainThread { mutableDictionary.startIndex }
-    }
-
-    var endIndex: Dictionary<V, T>.Index {
-        mainThread { mutableDictionary.endIndex }
-    }
-
-    func index(after i: Dictionary<V, T>.Index) -> Dictionary<V, T>.Index {
-        mainThread { mutableDictionary.index(after: i) }
+final class ThreadSafeDictionary<V: Hashable, T> {
+    init(dict: [V: T] = [:]) {
+        storage = dict
     }
 
     subscript(key: V) -> T? {
-        set(newValue) {
-            mainAsync(flags: .barrier) {
-                self.mutableDictionary[key] = newValue
+        get { queue.sync { storage[key] } }
+        set {
+            queue.async(flags: .barrier) {
+                self.storage[key] = newValue
             }
-        }
-        get {
-            mainThread {
-                self.mutableDictionary[key]
-            }
-        }
-    }
-
-    // has implicity get
-    subscript(index: Dictionary<V, T>.Index) -> Dictionary<V, T>.Element {
-        mainThread {
-            self.mutableDictionary[index]
         }
     }
 
     func removeAll() {
-        mainAsync(flags: .barrier) {
-            self.mutableDictionary.removeAll()
+        queue.async(flags: .barrier) {
+            self.storage.removeAll()
         }
     }
 
     func removeValue(forKey key: V) {
-        mainAsync(flags: .barrier) {
-            self.mutableDictionary.removeValue(forKey: key)
+        queue.async(flags: .barrier) {
+            self.storage.removeValue(forKey: key)
         }
     }
 
-    private var mutableDictionary: [V: T]
+    func snapshot() -> [V: T] {
+        queue.sync { storage }
+    }
+
+    private var storage: [V: T]
+    private let queue = DispatchQueue(label: "ThreadSafeDictionary", attributes: .concurrent)
+
 }
 
 // MARK: - CachedDefaults

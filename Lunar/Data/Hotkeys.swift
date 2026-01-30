@@ -1009,7 +1009,7 @@ extension AppDelegate: MediaKeyTapDelegate {
             if !self.mediaKeyTapAudioStarting {
                 self.mediaKeyTapAudioStarting = true
                 lazy var audioDeviceCantSetVolume = withTimeout(3.seconds, name: "CoreAudio") {
-                    simplyCA?.defaultOutputDevice?.canSetVirtualMainVolume(scope: .output) == false
+                    defaultAudioOutputDevice?.canSetVirtualMainVolume(scope: .output) == false
                 } onTimeout: {
                     if Defaults[.autoRestartOnCoreAudioHang] {
                         restart()

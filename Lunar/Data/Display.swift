@@ -4334,7 +4334,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         let featureValue = featureValue.rounded(to: 4)
-        for (x, y) in values.dictionary {
+        for (x, y) in values.snapshot() {
             if (x < featureValue && y >= targetValue) || (x > featureValue && y <= targetValue) {
                 if logValue {
                     log.debug("Removing data point \(x) => \(y)")
@@ -4463,6 +4463,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     func refetchPanelPresetProps() {
         guard let panel, panel.hasPresets else { return }
 
+        DDC.skipNextIORegistryChange = true
         panel.buildPresetsList()
         panelPresets = panel.presets
         referencePreset = panel.activePreset
