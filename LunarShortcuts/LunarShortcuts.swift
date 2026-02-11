@@ -2704,22 +2704,22 @@ struct SetPanelPresetIntent: AppIntent {
         })
     }
 
-    @Parameter(title: "Unlock brightness control")
+    @Parameter(title: "Unlock brightness control (unavailable on macOS 26.3 and later)")
     var unlockBrightnessControl: Bool
 
-    @Parameter(title: "Unlock Adaptive Brightness")
+    @Parameter(title: "Unlock Adaptive Brightness (unavailable on macOS 26.3 and later)")
     var unlockAdaptiveBrightness: Bool
 
-    @Parameter(title: "Unlock Night Shift")
+    @Parameter(title: "Unlock Night Shift (unavailable on macOS 26.3 and later)")
     var unlockNightShift: Bool
 
-    @Parameter(title: "Unlock True Tone")
+    @Parameter(title: "Unlock True Tone (unavailable on macOS 26.3 and later)")
     var unlockTrueTone: Bool
 
-    @Parameter(title: "Min brightness (in nits)", default: 4, inclusiveRange: (1, 500))
+    @Parameter(title: "Min brightness (in nits) (unavailable on macOS 26.3 and later)", default: 4, inclusiveRange: (1, 500))
     var minBrightness: Int
 
-    @Parameter(title: "Max brightness (in nits)", default: 500, inclusiveRange: (50, 500))
+    @Parameter(title: "Max brightness (in nits) (unavailable on macOS 26.3 and later)", default: 500, inclusiveRange: (50, 500))
     var maxBrightness: Int
 
     @Parameter(title: "Screen Preset")

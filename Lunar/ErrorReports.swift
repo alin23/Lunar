@@ -1,3 +1,4 @@
+import Cocoa
 import Combine
 import Defaults
 import Sentry
@@ -32,11 +33,11 @@ private final class RepeatingHang {
 
     lazy var count: Int = RepeatingHangState.count(cause: cause, now: Date().timeIntervalSince1970)
 
-    func isCulprit() -> Bool {
-        guard let stackSymbols = Thread.callStackSymbols.first(where: { $0.contains(expectedStackFrame) }) else {
+    func isCulprit(mainThreadStack: String) -> Bool {
+        guard mainThreadStack.contains(expectedStackFrame) else {
             return false
         }
-        log.warning("Hang detected with expected stack frame '\(expectedStackFrame)': \(stackSymbols)")
+        log.warning("Hang detected with expected stack frame '\(expectedStackFrame)' in main thread sample")
         return true
     }
 
@@ -93,10 +94,11 @@ private enum RepeatingHangState {
     }
 }
 
-private let appHangStateQueue = DispatchQueue(label: "com.lunar.appHangDetection.state")
+private let appHangStateQueue = DispatchQueue(label: "fyi.lunar.appHangDetection.state")
 @MainActor private var appHangTimer: DispatchSourceTimer?
 private var lastMainThreadCheckin: TimeInterval = 0
 private var appHangTriggered = false
+private var sleeping = false
 
 @MainActor var enableSentryObserver: Cancellable?
 
@@ -171,7 +173,7 @@ private var appHangTriggered = false
         var shouldTrigger = false
 
         appHangStateQueue.sync {
-            if !appHangTriggered, now - lastMainThreadCheckin > APP_HANG_DETECTION_INTERVAL {
+            if !appHangTriggered, !sleeping, now - lastMainThreadCheckin > APP_HANG_DETECTION_INTERVAL {
                 appHangTriggered = true
                 shouldTrigger = true
             }
@@ -189,17 +191,68 @@ private var appHangTriggered = false
     }
     appHangTimer = timer
     timer.resume()
+
+    let nc = NSWorkspace.shared.notificationCenter
+    nc.addObserver(forName: NSWorkspace.willSleepNotification, object: nil, queue: nil) { _ in
+        appHangStateQueue.sync {
+            lastMainThreadCheckin = Date().timeIntervalSince1970
+            sleeping = true
+            appHangTriggered = false
+        }
+    }
+    nc.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: nil) { _ in
+        let now = Date().timeIntervalSince1970
+        appHangStateQueue.sync {
+            lastMainThreadCheckin = now
+            sleeping = false
+            appHangTriggered = false
+        }
+    }
+}
+
+private func sampleMainThread() -> String? {
+    let result = shell("/usr/bin/sample", args: ["\(getpid())", "0.001"], timeout: 5.seconds)
+    guard let output = result.o, result.success else { return nil }
+
+    var mainThreadLines: [String] = []
+    var inMainThread = false
+
+    for line in output.components(separatedBy: "\n") {
+        if line.contains("com.apple.main-thread") {
+            inMainThread = true
+            mainThreadLines.append(line)
+            continue
+        }
+
+        guard inMainThread else { continue }
+
+        let trimmed = line.trimmingCharacters(in: .whitespaces)
+        if trimmed.isEmpty || line.contains("Thread_") || trimmed.hasPrefix("Total number") || trimmed.hasPrefix("Sort by") {
+            break
+        }
+        mainThreadLines.append(line)
+    }
+
+    return mainThreadLines.isEmpty ? nil : mainThreadLines.joined(separator: "\n")
 }
 
 func onAppHangDetected() {
     log.warning("App Hanging!")
-    log.traceCalls()
+
+    let mainThreadStack = sampleMainThread()
+    if let mainThreadStack {
+        log.warning("Main thread sample:\n\(mainThreadStack)")
+    } else {
+        log.warning("Failed to sample main thread")
+    }
 
     if Defaults[.autoRestartOnHang] {
         let now = Date().timeIntervalSince1970
-        appHangStateQueue.async {
-            if let hang = RepeatingHangState.hangs.values.first(where: { $0.isCulprit() }) {
-                RepeatingHangState.record(cause: hang.cause, at: now)
+        if let mainThreadStack {
+            appHangStateQueue.async {
+                if let hang = RepeatingHangState.hangs.values.first(where: { $0.isCulprit(mainThreadStack: mainThreadStack) }) {
+                    RepeatingHangState.record(cause: hang.cause, at: now)
+                }
             }
         }
         log.warning("Auto-restarting app due to hang detection.")

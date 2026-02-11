@@ -629,10 +629,12 @@ struct DisplayRowView: View {
         Text("Brightness locked by preset").font(.system(size: 10, weight: .semibold, design: .rounded))
         if let name = display.referencePreset?.presetName {
             Menu(name) {
-                SwiftUI.Button("Unlock \"\(name)\"") {
-                    display.panel?.unlockActivePreset()
+                if !MAC26POINT3 {
+                    SwiftUI.Button("Unlock \"\(name)\"") {
+                        display.panel?.unlockActivePreset()
+                    }
+                    Divider()
                 }
-                Divider()
 
                 let presets = display.panelPresets.filter(\.isValid)
                 let groups = Set(presets.map(\.presetGroup)).sorted()
