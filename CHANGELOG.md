@@ -1,3 +1,9 @@
+# 6.9.7
+## Fixes
+
+- Remove **Unlock preset** functionality on macOS 26.3 and later since it no longer works
+- Fix hang detection not getting the right callstack
+
 # 6.9.6
 ## Features
 
