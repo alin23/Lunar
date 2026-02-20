@@ -1929,6 +1929,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
     lazy var isAppleVendorID: Bool = ((infoDictionary["DisplayVendorID"] as? Int) ?? CGDisplayVendorNumber(id).i) == APPLE_DISPLAY_VENDOR_ID
 
+    var xdrWarmupEndTime: Date? = nil
+
     var lastNativeBrightness: Double? {
         get {
             mainThread { Self.lastNativeBrightnessMapping[serial] }
@@ -3130,6 +3132,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     }
 
     var xdrSetter: DispatchWorkItem? {
+        didSet { oldValue?.cancel() }
+    }
+
+    var xdrWarmupSetter: DispatchWorkItem? {
         didSet { oldValue?.cancel() }
     }
 
