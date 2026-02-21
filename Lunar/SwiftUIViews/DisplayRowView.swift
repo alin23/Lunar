@@ -207,6 +207,12 @@ struct DisplayRowView: View {
                     beforeSettingPercentage: { _ in display.forceHideSoftwareOSD = true }
                 )
             }
+            if display.enhanced, display.xdrWarmingUp {
+                Text("Ramping up XDR Brightness")
+                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .foregroundColor(Color.xdr.opacity(0.8))
+                    .transition(.opacity.animation(.easeInOut(duration: 0.3)))
+            }
             if display.subzero {
                 BigSurSlider(
                     percentage: $display.softwareBrightness,

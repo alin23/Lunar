@@ -1952,6 +1952,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     lazy var isAppleVendorID: Bool = ((infoDictionary["DisplayVendorID"] as? Int) ?? CGDisplayVendorNumber(id).i) == APPLE_DISPLAY_VENDOR_ID
 
     var xdrWarmupEndTime: Date? = nil
+    @Published var xdrWarmingUp = false
 
     var xdrDoubleTapTipTask: DispatchWorkItem? { didSet { oldValue?.cancel() } }
 

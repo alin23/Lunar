@@ -204,12 +204,13 @@ struct HDRSettingsView: View {
 
             SettingsToggle(text: "Toggle XDR Brightness when going over 100%", setting: $autoXdr.animation(.fastSpring))
             SettingsToggle(
-                text: "Double press 󰆭 to unlock XDR from keyboard",
+                text: "Double press 􀆭 to unlock XDR from keyboard",
                 setting: $xdrDoubleTapToUnlock.animation(.fastSpring),
                 help: """
-                When enabled (default), pressing Brightness Up at 100% SDR brightness shows a tip.
-                A second press within 0.2s activates XDR. This prevents accidental XDR entry.
-                The slider 1-second debounce applies separately regardless of this setting.
+                When enabled (default), after reaching 100% SDR brightness Lunar requires a quick double tap
+                of the Brightness Up key to unlock XDR Brightness on supported displays.
+
+                This prevents accidentally enabling XDR when you just want to increase SDR brightness.
                 """
             )
 
