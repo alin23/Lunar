@@ -210,9 +210,14 @@ final class AppleNativeControl: Control {
                     return
                 }
 
-                var brightness: Float = 0.0
-                DisplayServicesGetLinearBrightness(display.id, &brightness)
-                let nits = maxNits * brightness.d
+                let nits: Double
+                if display.enhanced, let maxHardwareNits = display.maxHardwareNits {
+                    nits = display.xdrBrightness.d.map(from: (0, 1), to: (maxNits, maxHardwareNits))
+                } else {
+                    var brightness: Float = 0.0
+                    DisplayServicesGetLinearBrightness(display.id, &brightness)
+                    nits = maxNits * brightness.d
+                }
                 display.nits = nits
 
                 if let osd = display.osdWindowController?.window as? OSDWindow,
