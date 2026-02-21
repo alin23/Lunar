@@ -859,6 +859,18 @@ enum Hotkey {
         }
     }
 
+    /// Converts a macOS SDR brightness value (0.0–1.0) to approximate nits.
+    /// macOS uses a linear curve from 0 to 140 nits up to brightness=0.5,
+    /// then a logarithmic curve from 140 nits to maxNits between 0.5 and 1.0.
+    static func sdrBrightnessToNits(_ brightness: Double, maxNits: Double) -> Double {
+        guard brightness > 0 else { return 0 }
+        if brightness <= 0.5 {
+            return brightness * 2 * 140
+        }
+        let t = (brightness - 0.5) / 0.5
+        return 140 * pow(maxNits / 140, t)
+    }
+
     static func showOsd(osdImage: OSDImage, value: UInt32, display: Display) {
         guard !display.isAllDisplays, !display.isForTesting else { return }
         let percentage = value.f / 100
@@ -880,24 +892,41 @@ enum Hotkey {
             return
         }
 
-        guard !display.blackOutEnabled, osdImage != .brightness || display.softwareBrightness == 1.0 else {
+        guard !display.blackOutEnabled, osdImage != .brightness || display.softwareBrightness == 1.0 || (display.softwareBrightness == Display.MIN_SOFTWARE_BRIGHTNESS && display.enhanced) else {
             return
         }
         #if arch(arm64)
-            if osdImage == .brightness, display.isBuiltin ? DC.showNitsOSDBuiltin : DC.showNitsOSDExternal, display.possibleMaxNits != nil, let nits = display.nits, !DC.forceSystemOSD {
+            if osdImage == .brightness, display.isBuiltin ? DC.showNitsOSDBuiltin : DC.showNitsOSDExternal, let possibleMaxNits = display.possibleMaxNits, let nits = display.nits, !DC.forceSystemOSD {
                 display.fullRangeUserBrightness = value.d.map(from: (0, 100), to: (0, 1))
-                display.showSoftwareOSD(
-                    image: MAC26 ? "sun.max.fill" : "sun.max",
-                    value: percentage,
-                    text: "\(nits.str(decimals: 0)) nits",
-                    color: nil,
-                    locked: !display.presetSupportsBrightnessControl,
-                    textLeft: display.name,
-                    imageLeft: "sun.min.fill",
-                    onChange: { value in
-                        display.preciseBrightness = value.d
-                    }
-                )
+                if display.enhanced, let maxHwNits = display.maxHardwareNits {
+                    let sdrNits = sdrBrightnessToNits(display.preciseBrightness, maxNits: possibleMaxNits)
+
+                    display.showSoftwareOSD(
+                        image: MAC26 ? "sun.max.circle.fill" : "sun.max.circle",
+                        value: (sdrNits / maxHwNits).f,
+                        text: "\(sdrNits.str(decimals: 0)) nits",
+                        color: XDR_BLUE,
+                        locked: !display.presetSupportsBrightnessControl,
+                        textLeft: display.name,
+                        imageLeft: "sun.max.circle",
+                        onChange: { value in
+                            display.preciseBrightness = (value.d * maxHwNits / possibleMaxNits).capped(between: 0, and: 1)
+                        }
+                    )
+                } else {
+                    display.showSoftwareOSD(
+                        image: MAC26 ? "sun.max.fill" : "sun.max",
+                        value: percentage,
+                        text: "\(nits.str(decimals: 0)) nits",
+                        color: nil,
+                        locked: !display.presetSupportsBrightnessControl,
+                        textLeft: display.name,
+                        imageLeft: "sun.min.fill",
+                        onChange: { value in
+                            display.preciseBrightness = value.d
+                        }
+                    )
+                }
                 return
             }
         #endif
