@@ -559,6 +559,7 @@ final class DisplayController: ObservableObject {
     var autoXdrSensorShowOSD: Bool = Defaults[.autoXdrSensorShowOSD]
 
     var lastBrightnessKeyEvent: KeyEvent?
+    var lastBrightnessKeyEventResetTask: DispatchWorkItem?
 
     var displaysBySerial: [String: Display] = [:]
     var unmanagedDisplays: [Display] = []
@@ -2982,6 +2983,11 @@ final class DisplayController: ObservableObject {
 
             let ignoreHoldingKey = display.enhanced ? false : (lastBrightnessKeyEvent?.keyRepeat ?? false)
 
+            if value < maxBrightness, display.xdrDoubleTapTipTask != nil {
+                display.xdrDoubleTapTipTask = nil
+                display.osdState.tip = nil
+            }
+
             if !(newXDRMode && display.isBuiltin),
                autoXdr || display.softwareBrightness > 1.0 || display.enhanced, !ignoreHoldingKey,
                !display.fullRange, display.supportsEnhance, !xdrPausedBecauseOfFlux,
@@ -2989,6 +2995,23 @@ final class DisplayController: ObservableObject {
                (oldValue == maxBrightness && display.softwareBrightness > Display.MIN_SOFTWARE_BRIGHTNESS),
                proactive
             {
+                if !display.enhanced, display.softwareBrightness <= Display.MIN_SOFTWARE_BRIGHTNESS,
+                   CachedDefaults[.xdrDoubleTapToUnlock]
+                {
+                    if doublePressedBrightnessUpKey.value, !ignoreHoldingKey {
+                        display.xdrDoubleTapTipTask = nil
+                        display.osdState.tip = nil
+                    } else {
+                        let maxNits = Int(display.maxHardwareNits ?? 1600)
+                        display.osdState.tip = Text(
+                            "\(Image(systemName: "sun.max.fill")) Double press Brightness Up to unlock \(maxNits) nits"
+                        )
+                        display.xdrDoubleTapTipTask = mainAsyncAfter(ms: 2000) { [weak display] in
+                            display?.osdState.tip = nil
+                        }
+                        return
+                    }
+                }
                 GammaControl.fluxCheckerXDR(display: display) {
                     if !display.enhanced {
                         display.handleEnhance(true, withoutSettingBrightness: true)

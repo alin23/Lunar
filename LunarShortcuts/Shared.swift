@@ -98,6 +98,7 @@ extension Defaults.Keys {
     static let autoSubzero = Key<Bool>("autoSubzero", default: true)
 
     static let fullRangeMaxOnDoublePress = Key<Bool>("fullRangeMaxOnDoublePress", default: false)
+    static let xdrDoubleTapToUnlock = Key<Bool>("xdrDoubleTapToUnlock", default: true)
 
     static let autoXdr = Key<Bool>("autoXdr", default: true)
     static let autoXdrSensor = Key<Bool>("autoXdrSensor", default: false)

@@ -1407,6 +1407,10 @@ extension AppDelegate: MediaKeyTapDelegate {
             }
 
             DC.lastBrightnessKeyEvent = keyEvent
+            DC.lastBrightnessKeyEventResetTask?.cancel()
+            DC.lastBrightnessKeyEventResetTask = mainAsyncAfter(ms: 500) {
+                DC.lastBrightnessKeyEvent = nil
+            }
             return event
         }
 
@@ -1658,9 +1662,10 @@ extension AppDelegate: MediaKeyTapDelegate {
         if allMonitors {
             for (_, display) in DC.activeDisplays {
                 guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin else { continue }
+                guard !display.supportsEnhance else { continue }
                 Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, display: display)
             }
-        } else if let display = DC.cursorDisplay {
+        } else if let display = DC.cursorDisplay, !display.supportsEnhance {
             Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, display: display)
         }
 
@@ -1683,9 +1688,10 @@ extension AppDelegate: MediaKeyTapDelegate {
         if allMonitors {
             for (_, display) in DC.activeDisplays {
                 guard CachedDefaults[.hotkeysAffectBuiltin] || !display.isBuiltin else { continue }
+                guard !display.supportsEnhance else { continue }
                 Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, display: display)
             }
-        } else if let display = DC.cursorDisplay {
+        } else if let display = DC.cursorDisplay, !display.supportsEnhance {
             Hotkey.showOsd(osdImage: .brightness, value: display.brightness.uint32Value, display: display)
         }
 

@@ -50,6 +50,7 @@ let APP_SETTINGS: [Defaults.Keys] = [
     .autoSubzero,
     .customOSDVerticalOffset,
     .fullRangeMaxOnDoublePress,
+    .xdrDoubleTapToUnlock,
     .autoXdr,
     .autoXdrSensor,
     .autoXdrSensorShowOSD,
@@ -699,6 +700,7 @@ func initCache() {
     cacheKey(.showDisconnectedDisplays)
 
     cacheKey(.fullRangeMaxOnDoublePress)
+    cacheKey(.xdrDoubleTapToUnlock)
     cacheKey(.autoSubzero)
     cacheKey(.autoXdr)
     cacheKey(.autoXdrSensor)
@@ -891,6 +893,7 @@ let showOrientationForBuiltinInQuickActionsPublisher = pub(.showOrientationForBu
 let autoBlackoutBuiltinPublisher = pub(.autoBlackoutBuiltin)
 let autoSubzeroPublisher = pub(.autoSubzero)
 let autoXdrPublisher = pub(.autoXdr)
+let xdrDoubleTapToUnlockPublisher = pub(.xdrDoubleTapToUnlock)
 let autoXdrSensorPublisher = pub(.autoXdrSensor)
 let autoXdrSensorShowOSDPublisher = pub(.autoXdrSensorShowOSD)
 let autoXdrSensorLuxThresholdPublisher = pub(.autoXdrSensorLuxThreshold)

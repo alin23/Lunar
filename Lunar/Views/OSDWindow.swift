@@ -830,6 +830,7 @@ struct Mac26BrightnessOSDView: View {
         VStack(spacing: OSD_TIP_SPACING) {
             CustomGlassEffectView(variant: 6, scrimState: 0, subduedState: 0, tint: nil, cornerRadius: 24) {
                 square.animation(.fastSpring, value: osd.tip)
+                    .brightness(1.5)
                     .frame(width: MAC26_OSD_WIDTH, height: MAC26_OSD_HEIGHT)
             }
             .brightness(-0.3)
@@ -870,7 +871,6 @@ struct Mac26BrightnessOSDView: View {
             sliding = editing
         }
         .tint(.white)
-        .brightness(2.0)
         .onChange(of: osd.value) { newValue in
             guard sliding else { return }
             osd.onChange?(newValue)
@@ -883,26 +883,21 @@ struct Mac26BrightnessOSDView: View {
             HStack {
                 Text(osd.textLeft)
                     .font(.system(size: 12, weight: .medium))
-                    .brightness(0.5)
                 Spacer()
                 Text(osd.text.isEmpty ? "\((osd.value * 100).intround)%" : osd.text)
                     .font(.system(size: 12, weight: .medium, design: .monospaced))
-                    .brightness(0.5)
                 if osd.locked {
                     Image(systemName: "lock.fill")
                         .font(.system(size: 12, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.8))
-                        .brightness(0.5)
                 }
             }
             HStack {
                 Image(systemName: osd.imageLeft)
                     .opacity(osd.imageLeft == "clear" ? 0 : 1)
                     .foregroundStyle(.white.opacity(0.8))
-                    .brightness(0.5)
                 slider
                 Image(systemName: osd.image)
-                    .brightness(0.5)
             }
             .font(.system(size: 13, weight: .medium, design: .rounded))
             .foregroundStyle(.white)

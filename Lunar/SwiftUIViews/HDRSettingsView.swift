@@ -13,6 +13,7 @@ struct HDRSettingsView: View {
     @Default(.allowHDREnhanceContrast) var allowHDREnhanceContrast
 
     @Default(.fullRangeMaxOnDoublePress) var fullRangeMaxOnDoublePress
+    @Default(.xdrDoubleTapToUnlock) var xdrDoubleTapToUnlock
     @Default(.newXDRMode) var newXDRMode
     @Default(.autoXdr) var autoXdr
     @Default(.autoSubzero) var autoSubzero
@@ -202,6 +203,15 @@ struct HDRSettingsView: View {
             )
 
             SettingsToggle(text: "Toggle XDR Brightness when going over 100%", setting: $autoXdr.animation(.fastSpring))
+            SettingsToggle(
+                text: "Double press 󰆭 to unlock XDR from keyboard",
+                setting: $xdrDoubleTapToUnlock.animation(.fastSpring),
+                help: """
+                When enabled (default), pressing Brightness Up at 100% SDR brightness shows a tip.
+                A second press within 0.2s activates XDR. This prevents accidental XDR entry.
+                The slider 1-second debounce applies separately regardless of this setting.
+                """
+            )
 
             if !newXDRMode, Sysctl.isMacBook, dc.builtinDisplay?.supportsEnhance ?? false {
                 if !MAC26POINT3 {
