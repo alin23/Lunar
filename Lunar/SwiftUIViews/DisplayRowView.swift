@@ -80,10 +80,20 @@ struct DisplayContextMenu: View {
         )
     }
 
+    var keepAdaptiveBrightnessDisabledBinding: Binding<Bool> {
+        Binding(
+            get: { display.keepAdaptiveBrightnessDisabled },
+            set: { display.keepAdaptiveBrightnessDisabled = $0 }
+        )
+    }
+
     var body: some View {
         Toggle("FaceLight", isOn: facelightBinding)
         if display.hasAmbientLightAdaptiveBrightness {
             Toggle("System Adaptive Brightness", isOn: systemAdaptiveBrightnessBinding)
+            if display.hasAmbientLightAdaptiveBrightness {
+                Toggle("Force keep System Adaptive Brightness disabled", isOn: keepAdaptiveBrightnessDisabledBinding)
+            }
         }
         // if display.supportsHDRDisabling {
         //     Toggle("HDR", isOn: hdrBinding)
@@ -158,9 +168,35 @@ struct DisplayRowView: View {
 
     @EnvironmentObject var env: EnvState
 
+    var enhancedBrightnessBinding: Binding<Float> {
+        guard display.enhanced, let possibleMaxNits = display.possibleMaxNits,
+              let maxHwNits = display.maxHardwareNits, maxHwNits > possibleMaxNits
+        else {
+            return Binding(get: { display.preciseBrightness.f }, set: { display.preciseBrightness = $0.d })
+        }
+        return Binding(
+            get: {
+                if display.xdrBrightness > 0 {
+                    return Float(display.xdrBrightness.d.map(from: (0, 1), to: (possibleMaxNits, maxHwNits)) / maxHwNits)
+                }
+                return Float(sdrBrightnessToNits(display.preciseBrightness, maxNits: possibleMaxNits) / maxHwNits)
+            },
+            set: { value in
+                display.forceHideSoftwareOSD = true
+                let targetNits = value.d * maxHwNits
+                if targetNits <= possibleMaxNits {
+                    display.withoutApply { display.xdrBrightness = 0 }
+                    display.preciseBrightness = nitsToSdrBrightness(targetNits, maxNits: possibleMaxNits)
+                } else {
+                    display.xdrBrightness = Float(targetNits.map(from: (possibleMaxNits, maxHwNits), to: (0.0, 1.0)))
+                }
+            }
+        )
+    }
+
     var softwareSliders: some View {
         Group {
-            if display.enhanced {
+            if display.enhanced, display.possibleMaxNits == nil || display.maxHardwareNits == nil {
                 BigSurSlider(
                     percentage: $display.xdrBrightness,
                     image: "sun.max.circle.fill",
@@ -498,7 +534,7 @@ struct DisplayRowView: View {
                     }
                 #endif
                 BigSurSlider(
-                    percentage: $display.preciseBrightnessContrast.f,
+                    percentage: display.enhanced ? enhancedBrightnessBinding : $display.preciseBrightnessContrast.f,
                     image: "sun.max.fill",
                     colorBinding: .constant(Color.peach),
                     backgroundColorBinding: .constant(Color.peach.opacity(colorScheme == .dark ? 0.1 : 0.4)),
@@ -517,7 +553,7 @@ struct DisplayRowView: View {
             softwareSliders
         } else {
             BigSurSlider(
-                percentage: $display.preciseBrightness.f,
+                percentage: display.enhanced ? enhancedBrightnessBinding : $display.preciseBrightness.f,
                 image: "sun.max.fill",
                 colorBinding: .constant(Color.peach),
                 backgroundColorBinding: .constant(Color.peach.opacity(colorScheme == .dark ? 0.1 : 0.4)),
@@ -674,12 +710,13 @@ struct DisplayRowView: View {
             guard SyncMode.isUsingNits(), display.isNative, let nits = display.nits else {
                 return EmptyView().any
             }
+            let pos = display.enhanced ? enhancedBrightnessBinding.wrappedValue : display.preciseBrightness.f
             return VStack(spacing: -3) {
-                Text("\(nits.intround)")
+                Text("\(nits.intround.s)")
                 Text("nits")
             }
             .font(.system(size: 8, weight: .bold, design: .rounded).leading(.tight))
-            .foregroundColor((display.preciseBrightnessContrast < 0.25 && colorScheme == .dark) ? Color.lightGray.opacity(0.6) : Color.grayMauve.opacity(0.7))
+            .foregroundColor((pos < 0.25 && colorScheme == .dark) ? Color.lightGray.opacity(0.6) : Color.grayMauve.opacity(0.7))
             .any
         #else
             EmptyView().any

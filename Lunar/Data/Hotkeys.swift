@@ -859,18 +859,6 @@ enum Hotkey {
         }
     }
 
-    /// Converts a macOS SDR brightness value (0.0–1.0) to approximate nits.
-    /// macOS uses a linear curve from 0 to 140 nits up to brightness=0.5,
-    /// then a logarithmic curve from 140 nits to maxNits between 0.5 and 1.0.
-    static func sdrBrightnessToNits(_ brightness: Double, maxNits: Double) -> Double {
-        guard brightness > 0 else { return 0 }
-        if brightness <= 0.5 {
-            return brightness * 2 * 140
-        }
-        let t = (brightness - 0.5) / 0.5
-        return 140 * pow(maxNits / 140, t)
-    }
-
     static func showOsd(osdImage: OSDImage, value: UInt32, display: Display) {
         guard !display.isAllDisplays, !display.isForTesting else { return }
         let percentage = value.f / 100

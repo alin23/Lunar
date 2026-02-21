@@ -211,7 +211,7 @@ final class AppleNativeControl: Control {
                 }
 
                 let nits: Double
-                if display.enhanced, let maxHardwareNits = display.maxHardwareNits {
+                if display.enhanced, let maxHardwareNits = display.maxHardwareNits, display.xdrBrightness > 0 {
                     nits = display.xdrBrightness.d.map(from: (0, 1), to: (maxNits, maxHardwareNits))
                 } else {
                     var brightness: Float = 0.0

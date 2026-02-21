@@ -220,6 +220,27 @@ struct Transport: Equatable, CustomStringConvertible, Encodable {
     }
 }
 
+/// Converts a macOS SDR brightness value (0.0–1.0) to approximate nits.
+/// macOS uses a linear curve from 0 to 140 nits up to brightness=0.5,
+/// then a logarithmic curve from 140 nits to maxNits between 0.5 and 1.0.
+func sdrBrightnessToNits(_ brightness: Double, maxNits: Double) -> Double {
+    guard brightness > 0 else { return 0 }
+    if brightness <= 0.5 {
+        return brightness * 2 * 140
+    }
+    let t = (brightness - 0.5) / 0.5
+    return 140 * pow(maxNits / 140, t)
+}
+
+/// Inverse of `sdrBrightnessToNits`: converts approximate nits back to a 0.0–1.0 brightness value.
+func nitsToSdrBrightness(_ nits: Double, maxNits: Double) -> Double {
+    guard nits > 0 else { return 0 }
+    if nits <= 140 {
+        return nits / 280
+    }
+    return 0.5 + 0.5 * Foundation.log(nits / 140) / Foundation.log(maxNits / 140)
+}
+
 // MARK: - Gamma
 
 struct Gamma: Equatable {
@@ -2919,11 +2940,23 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         return false
     }
 
+    var keepAdaptiveBrightnessDisabled: Bool {
+        get { UserDefaults.standard.bool(forKey: "keepAdaptiveBrightnessDisabled-\(serial)") }
+        set {
+            objectWillChange.send()
+            UserDefaults.standard.set(newValue, forKey: "keepAdaptiveBrightnessDisabled-\(serial)")
+            updateAdaptiveBrightnessDisabler()
+        }
+    }
+
     var softwareOSDTask: DispatchWorkItem? {
         didSet { oldValue?.cancel() }
     }
     var adaptiveBrightnessEnablerTask: DispatchWorkItem? {
         didSet { oldValue?.cancel() }
+    }
+    var adaptiveBrightnessDisablerTask: Repeater? {
+        didSet { oldValue?.stop() }
     }
     var zeroGammaTask: Repeater? {
         get { Self.getThreadDictValue(id, type: "zero-gamma") as? Repeater }
@@ -3331,6 +3364,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 guard let self else { return }
                 self.activeAndResponsive = (self.active && self.responsiveDDC) || !(self.control is DDCControl)
                 self.hasNetworkControl = self.control is NetworkControl || self.alternativeControlForAppleNative is NetworkControl
+                self.updateAdaptiveBrightnessDisabler()
             }
 
             if let app = NSRunningApplication.runningApplications(withBundleIdentifier: FLUX_IDENTIFIER).first {
@@ -4457,6 +4491,20 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         }
 
         return values
+    }
+
+    func updateAdaptiveBrightnessDisabler() {
+        if keepAdaptiveBrightnessDisabled {
+            guard adaptiveBrightnessDisablerTask == nil else { return }
+            adaptiveBrightnessDisablerTask = Repeater(every: 5, name: "adaptiveBrightnessDisabler-\(serial)") { [weak self] in
+                guard let self, self.keepAdaptiveBrightnessDisabled,
+                      Self.ambientLightCompensationEnabled(self.id) else { return }
+                DisplayServicesEnableAmbientLightCompensation(self.id, false)
+                self.cachedSystemAdaptiveBrightness = false
+            }
+        } else {
+            adaptiveBrightnessDisablerTask = nil
+        }
     }
 
     func getPanelModes() -> [MPDisplayMode] {
