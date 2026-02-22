@@ -294,6 +294,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
     var wakeObserver: Cancellable?
     var screenObserver: Cancellable?
+    var activationPolicyBeforeModal: NSApplication.ActivationPolicy?
 
     lazy var updater = SPUUpdater(
         hostBundle: Bundle.main,
@@ -494,6 +495,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
         // Attach a gentle UI indicator on our window
         UM.newVersion = update.displayVersionString
+    }
+
+    func standardUserDriverWillShowModalAlert() {
+        activationPolicyBeforeModal = NSApp.activationPolicy()
+        NSApp.setActivationPolicy(.regular)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    func standardUserDriverDidShowModalAlert() {
+        if let policy = activationPolicyBeforeModal {
+            NSApp.setActivationPolicy(policy)
+            activationPolicyBeforeModal = nil
+        }
     }
 
     func standardUserDriverWillFinishUpdateSession() {

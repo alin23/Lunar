@@ -1666,8 +1666,8 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         p
             .debounce(for: .milliseconds(5000), scheduler: RunLoop.main)
             .sink { [weak self] shouldPause in
-                guard let self, shouldPause, ambientLightCompensationEnabledByUser else { return }
-                systemAdaptiveBrightness = true
+                // guard let self, shouldPause, ambientLightCompensationEnabledByUser else { return }
+                // systemAdaptiveBrightness = true
             }.store(in: &observers)
 
         return p

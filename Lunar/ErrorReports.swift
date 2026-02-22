@@ -188,6 +188,11 @@ private var sleeping = false
                 lastMainThreadCheckin = Date().timeIntervalSince1970
             }
         }
+        RunLoop.main.perform(inModes: [.modalPanel, .eventTracking, .default, .common]) {
+            appHangStateQueue.async {
+                lastMainThreadCheckin = Date().timeIntervalSince1970
+            }
+        }
     }
     appHangTimer = timer
     timer.resume()

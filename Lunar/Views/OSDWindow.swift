@@ -234,6 +234,10 @@ extension Color {
 
 // MARK: - BigSurSlider
 
+private final class BindingProxy {
+    var binding: Binding<Float> = .constant(0)
+}
+
 struct BigSurSlider: View {
     init(
         percentage: Binding<Float>,
@@ -297,7 +301,6 @@ struct BigSurSlider: View {
     @Binding var shownValue: Double?
 
     @State var scrollWheelListener: Cancellable?
-
     @State var hovering = false
     @State var enableText: String? = nil
     @State var lastCursorPosition = NSEvent.mouseLocation
@@ -313,6 +316,7 @@ struct BigSurSlider: View {
     var onSettingPercentage: ((Float) -> Void)?
 
     var body: some View {
+        let _ = { percentageProxy.binding = _percentage }()
         GeometryReader { geometry in
             let w = geometry.size.width - sliderHeight
             let cgPercentage = cap(percentage, minVal: 0, maxVal: 1).cg
@@ -439,6 +443,8 @@ struct BigSurSlider: View {
         }
     }
 
+    @State private var percentageProxy = BindingProxy()
+
     private var sliderWidth: CGFloat = 200
     private var sliderHeight: CGFloat = 22
 
@@ -464,7 +470,7 @@ struct BigSurSlider: View {
     }
 
     private func trackScrollWheel() {
-        guard scrollWheelListener == nil else { return }
+        scrollWheelListener = nil
         scrollWheelListener = NSApp.publisher(for: \.currentEvent)
             .filter { event in event?.type == .scrollWheel }
             .throttle(for: .milliseconds(20), scheduler: DispatchQueue.main, latest: true)
@@ -495,9 +501,10 @@ struct BigSurSlider: View {
                         env.draggingSlider = false
                     }
                 }
-                beforeSettingPercentage?(percentage)
-                percentage = cap(percentage - (delta / 100), minVal: 0, maxVal: 1)
-                onSettingPercentage?(percentage)
+                let current = percentageProxy.binding.wrappedValue
+                beforeSettingPercentage?(current)
+                percentageProxy.binding.wrappedValue = cap(current - (delta / 100), minVal: 0, maxVal: 1)
+                onSettingPercentage?(percentageProxy.binding.wrappedValue)
             }
     }
 }

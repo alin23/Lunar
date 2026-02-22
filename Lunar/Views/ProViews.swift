@@ -104,14 +104,17 @@ struct VersionView: View {
 
                 Spacer()
 
-                SwiftUI.Button("Check for updates") { updater.checkForUpdates() }
-                    .buttonStyle(FlatButton(
-                        color: Color.white.opacity(0.1),
-                        textColor: Color.white,
-                        horizontalPadding: 6,
-                        verticalPadding: 3
-                    ))
-                    .font(.system(size: 10, weight: .semibold))
+                SwiftUI.Button("Check for updates") {
+                    appDelegate?.statusItemButtonController?.closeMenuBar()
+                    updater.checkForUpdates()
+                }
+                .buttonStyle(FlatButton(
+                    color: Color.white.opacity(0.1),
+                    textColor: Color.white,
+                    horizontalPadding: 6,
+                    verticalPadding: 3
+                ))
+                .font(.system(size: 10, weight: .semibold))
             }
             Divider().padding(.vertical, 2).opacity(0.5)
             HStack(spacing: 2) {
