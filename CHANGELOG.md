@@ -1,3 +1,17 @@
+# 6.9.8
+## Improvements
+
+- Update Sparkle framework
+- Disable nits syncing when Sync Mode is enabled in XDR
+- Implement slow ramp up when enabling XDR to avoid washed out colors
+- Unify XDR and SDR sliders and OSD and approximate the nits value so that it appears in the XDR range as well
+- Add *"Force keep System Adaptive Brightness disabled"* to the right click menu of each display
+
+
+## Known issues
+
+- *Check for updates* dialog is unclickable for the first few seconds after the first click on it *(still investigating)*
+
 # 6.9.7
 ## Fixes
 
