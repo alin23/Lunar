@@ -1652,10 +1652,22 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     lazy var xdrDisablePublisher: PassthroughSubject<Bool, Never> = {
         let p = PassthroughSubject<Bool, Never>()
         p
-            .debounce(for: .milliseconds(5000), scheduler: RunLoop.main)
+            .debounce(for: .milliseconds(600_000), scheduler: RunLoop.main)
             .sink { [weak self] shouldDisable in
                 guard let self, shouldDisable else { return }
                 handleEnhance(false, withoutSettingBrightness: true)
+            }.store(in: &observers)
+
+        return p
+    }()
+
+    lazy var xdrPausePublisher: PassthroughSubject<Bool, Never> = {
+        let p = PassthroughSubject<Bool, Never>()
+        p
+            .debounce(for: .milliseconds(5000), scheduler: RunLoop.main)
+            .sink { [weak self] shouldPause in
+                guard let self, shouldPause, ambientLightCompensationEnabledByUser else { return }
+                systemAdaptiveBrightness = true
             }.store(in: &observers)
 
         return p
@@ -2206,7 +2218,10 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 softwareBrightness = 1
             } else if brightness < maxBrightness.uint16Value, softwareBrightness > 1 {
                 softwareBrightness = 1
-                if DC.autoXdr { xdrDisablePublisher.send(true) }
+                if DC.autoXdr {
+                    xdrPausePublisher.send(true)
+                    xdrDisablePublisher.send(true)
+                }
                 startXDRTimer()
             } else if brightness == minBrightness.uint16Value, !subzero, !hasSoftwareControl, !noControls {
                 withoutApply { subzero = true }
