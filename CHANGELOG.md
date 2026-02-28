@@ -1,3 +1,8 @@
+# 6.9.9
+## Improvements
+
+- **macOS 26.3+**: When in **Sync Mode** with **Sync Nits** enabled, entering the XDR brightness range on the source display now sets all target displays to max brightness instead of trying to map the fluctuating XDR nits values
+
 # 6.9.8
 ## Improvements
 
