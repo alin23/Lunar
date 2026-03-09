@@ -10,6 +10,7 @@ import AppIntents
 import CoreGraphics
 import Defaults
 import Foundation
+import MacModelDB
 import Socket
 
 @available(iOS 16, macOS 13, *)
@@ -460,7 +461,7 @@ struct ScreenQuery: EntityPropertyQuery {
         guard !single else {
             return (additionalScreens ?? []) + screens +
                 [DisplayFilter.cursor.screen, DisplayFilter.main.screen] +
-                ((Sysctl.isiMac || Sysctl.isMacBook) && !screens.contains(where: \.isBuiltin) ? [DisplayFilter.builtin.screen] : []) +
+                ((MacModelDB.isiMac || MacModelDB.isMacBook) && !screens.contains(where: \.isBuiltin) ? [DisplayFilter.builtin.screen] : []) +
                 (sidecar ? [.sidecar] : [])
         }
 

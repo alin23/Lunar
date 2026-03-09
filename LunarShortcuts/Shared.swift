@@ -9,6 +9,7 @@
 import CoreGraphics
 import Defaults
 import Foundation
+import MacModelDB
 
 // MARK: - BrightnessKeyAction
 
@@ -230,7 +231,7 @@ extension Defaults.Keys {
     static let sensorPollingSeconds = Key<Double>("sensorPollingSeconds", default: 1)
     static let adaptiveBrightnessMode = Key<AdaptiveModeKey>("adaptiveBrightnessMode", default: .sync)
 
-    static let hasBuiltin = Key<Bool>("hasBuiltin", default: Sysctl.isMacBook || Sysctl.isiMac)
+    static let hasBuiltin = Key<Bool>("hasBuiltin", default: MacModelDB.isMacBook || MacModelDB.isiMac)
     static let nonManualMode = Key<Bool>("nonManualMode", default: true)
     static let curveMode = Key<Bool>("curveMode", default: true)
     static let clockMode = Key<Bool>("clockMode", default: false)

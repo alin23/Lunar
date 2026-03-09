@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import MacModelDB
 import Regex
 
 let NEW_HOSTNAME_PATTERN = try! Regex(pattern: "NEW_HOSTNAME=(\\S+)", groupNames: ["hostname"])
@@ -200,7 +201,7 @@ final class InstallOutputViewController: NSViewController {
                 textView.string += "\nFound a new DDC server at \(newHostname):3485!"
                 textView
                     .string +=
-                    "\nIf this \(Sysctl.device) is connected to the same monitor as the Pi, you should receive a notification to confirm if Lunar should control the monitor through the Pi when it's available"
+                    "\nIf this \(MacModelDB.deviceName) is connected to the same monitor as the Pi, you should receive a notification to confirm if Lunar should control the monitor through the Pi when it's available"
             }
         }
     }

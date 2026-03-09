@@ -1,4 +1,5 @@
 import Defaults
+import MacModelDB
 import SwiftUI
 
 struct HDRSettingsView: View {
@@ -214,7 +215,7 @@ struct HDRSettingsView: View {
                 """
             )
 
-            if !newXDRMode, Sysctl.isMacBook, dc.builtinDisplay?.supportsEnhance ?? false {
+            if !newXDRMode, MacModelDB.isMacBook, dc.builtinDisplay?.supportsEnhance ?? false {
                 if !MAC26POINT3 {
                     xdrContrastSettings.padding(.bottom, 2)
                 }
@@ -263,7 +264,7 @@ struct HDRSettingsView: View {
                   -> the max brightness will be controlled by the ambient light
             """
         )
-        if newXDRMode, Sysctl.isMacBook, dc.builtinDisplay?.supportsFullRangeXDR ?? false {
+        if newXDRMode, MacModelDB.isMacBook, dc.builtinDisplay?.supportsFullRangeXDR ?? false {
             xdrContrastSettings
         }
     }

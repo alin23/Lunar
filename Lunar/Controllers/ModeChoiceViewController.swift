@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import MacModelDB
 import SwiftyMarkdown
 
 final class ModeChoiceViewController: NSViewController {
@@ -65,7 +66,7 @@ final class ModeChoiceViewController: NSViewController {
             title: markdown
                 .attributedString(
                     from: SyncMode.specific.builtinAvailable
-                        ? "**Sync** the brightness of your\n**\(Sysctl.device)** to your **\(externalName)**"
+                        ? "**Sync** the brightness of your\n**\(MacModelDB.deviceName)** to your **\(externalName)**"
                         : "**Keep** your monitors in **Sync** with each other\nwhen adjusting **brightness**"
                 ),
             enabled: true,

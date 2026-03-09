@@ -1,4 +1,5 @@
 import Defaults
+import MacModelDB
 import SwiftUI
 
 struct SettingsHeader: View {
@@ -75,7 +76,7 @@ struct AdvancedSettingsView: View {
                         text: "Allow BlackOut on single screen", setting: $allowBlackOutOnSingleScreen,
                         help: "Allows turning off a screen even if it's the only visible screen left"
                     )
-                    if Sysctl.isMacBook {
+                    if MacModelDB.isMacBook {
                         SettingsToggle(
                             text: "Turn off keyboard backlight in BlackOut", setting: $keyboardBacklightOffBlackout
                         )
@@ -130,7 +131,7 @@ struct AdvancedSettingsView: View {
                           • Sub-zero Dimming
                         """
                     )
-                    if Sysctl.isMacBook {
+                    if MacModelDB.isMacBook {
                         SettingsToggle(
                             text: "Toggle Manual/Sync when the lid is closed/opened",
                             setting: $clamshellModeDetection

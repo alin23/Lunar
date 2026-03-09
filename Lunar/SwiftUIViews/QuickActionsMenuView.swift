@@ -1,4 +1,5 @@
 import Defaults
+import MacModelDB
 import SwiftUI
 
 struct QuickActionsMenuView: View {
@@ -364,7 +365,7 @@ struct QuickActionsMenuView: View {
                         DisconnectedDisplayView(id: d.id, name: d.name, possibly: true, display: d).padding(.vertical, 7)
                     }
 
-                    if !menuBarClosed, Sysctl.isMacBook, !dc.lidClosed, cursorDisplay?.id != 1, !displays.contains(where: { $0.id == 1 }), !disconnectedDisplays.contains(where: { $0.id == 1 }),
+                    if !menuBarClosed, MacModelDB.isMacBook, !dc.lidClosed, cursorDisplay?.id != 1, !displays.contains(where: { $0.id == 1 }), !disconnectedDisplays.contains(where: { $0.id == 1 }),
                        !(DC.builtinDisplays.first?.unmanaged ?? false)
                     {
                         DisconnectedDisplayView(id: 1, name: "Built-in", display: dc.displays[1] ?? GENERIC_DISPLAY).padding(.vertical, 7)
@@ -648,7 +649,7 @@ struct QuickActionsMenuView: View {
 
             let disconnectedSerials = disconnectedDisplays.map(\.serial)
             possiblyDisconnectedDisplays = dc.displays.map(\.1).filter { d in
-                d.keepDisconnected && !(Sysctl.isMacBook && d.id == 1) &&
+                d.keepDisconnected && !(MacModelDB.isMacBook && d.id == 1) &&
                     dc.activeDisplaysBySerial[d.serial] == nil &&
                     !disconnectedSerials.contains(d.serial)
             }

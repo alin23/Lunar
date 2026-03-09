@@ -10,6 +10,7 @@ import Cocoa
 import Combine
 import Defaults
 import Foundation
+import MacModelDB
 import Regex
 
 let MODE_DISABLED_REASON_PATTERN = "\\sMode.*".r!
@@ -28,7 +29,7 @@ final class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
     }
 
     static var syncDisabledReason: String {
-        if Sysctl.isMacBook, DC.lidClosed {
+        if MacModelDB.isMacBook, DC.lidClosed {
             return "lid needs to be opened"
         }
         if !DC.sourceDisplay.isAllDisplays, DC.sourceDisplay.blackOutEnabled {
@@ -100,7 +101,7 @@ final class AdaptiveModeButton: NSPopUpButton, NSMenuItemValidation {
                 }
             case .sensor:
                 if proactive {
-                    menuItem.toolTip = "Disabled because there is no light sensor connected to this \(Sysctl.device)"
+                    menuItem.toolTip = "Disabled because there is no light sensor connected to this \(MacModelDB.deviceName)"
                     menuItem.attributedTitle = disabledString(menuItem, reason: "no sensor available")
                 } else {
                     menuItem.attributedTitle = proDisabledString(menuItem)

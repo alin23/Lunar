@@ -116,6 +116,7 @@
 		C78210FE2A595C69008DB106 /* tsl2591.yaml in Resources */ = {isa = PBXBuildFile; fileRef = C78210F82A595C69008DB106 /* tsl2591.yaml */; };
 		C78210FF2A595C69008DB106 /* max44009.yaml in Resources */ = {isa = PBXBuildFile; fileRef = C78210F92A595C69008DB106 /* max44009.yaml */; };
 		C784143827DDFBC400E14941 /* OSDWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C784143727DDFBC400E14941 /* OSDWindow.swift */; };
+		C788DCED2F5F615400107F11 /* MacModelDB in Frameworks */ = {isa = PBXBuildFile; productRef = C788DCEC2F5F615400107F11 /* MacModelDB */; };
 		C78A1964294E700800B0410A /* DDC2.c in Sources */ = {isa = PBXBuildFile; fileRef = C78A1963294E700800B0410A /* DDC2.c */; };
 		C78AB66720F0C73900863CB1 /* SwiftyLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78AB66620F0C73900863CB1 /* SwiftyLogger.swift */; };
 		C78BD044259B2FB100FC823F /* SensorMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78BD043259B2FB100FC823F /* SensorMode.swift */; };
@@ -217,7 +218,6 @@
 		C7E896DD2652C37E0079A328 /* CoreBrightness.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7E896DC2652C37E0079A328 /* CoreBrightness.framework */; };
 		C7EBD80829452CB50075E6FD /* LunarShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = C795103C2944E912004C6082 /* LunarShortcuts.swift */; };
 		C7ECB6722750C75C00DA212D /* LDSwiftEventSourceStatic in Frameworks */ = {isa = PBXBuildFile; productRef = C7ECB6712750C75C00DA212D /* LDSwiftEventSourceStatic */; };
-		C7EF9535243F4E2200839A62 /* Sysctl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7EF9534243F4E2200839A62 /* Sysctl.swift */; };
 		C7F48C4A2657A258000715A8 /* DataCompression in Frameworks */ = {isa = PBXBuildFile; productRef = C7F48C492657A258000715A8 /* DataCompression */; };
 		C7F99AC727175E0C00FBF192 /* SwiftyMarkdown in Frameworks */ = {isa = PBXBuildFile; productRef = C7F99AC627175E0C00FBF192 /* SwiftyMarkdown */; };
 		C7FE724F238EDFB100EBA6DA /* CoreDisplay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7CBF011238EDDFE00031E93 /* CoreDisplay.framework */; };
@@ -437,7 +437,6 @@
 		C7E896D82652C0F60079A328 /* CBBlueLightClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBBlueLightClient.h; sourceTree = "<group>"; };
 		C7E896D92652C0F60079A328 /* ExceptionCatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExceptionCatcher.h; sourceTree = "<group>"; };
 		C7E896DC2652C37E0079A328 /* CoreBrightness.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBrightness.framework; path = ../../../../../System/Library/PrivateFrameworks/CoreBrightness.framework; sourceTree = "<group>"; };
-		C7EF9534243F4E2200839A62 /* Sysctl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sysctl.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -454,6 +453,7 @@
 				C7ECB6722750C75C00DA212D /* LDSwiftEventSourceStatic in Frameworks */,
 				C7FE724F238EDFB100EBA6DA /* CoreDisplay.framework in Frameworks */,
 				C7B5E85D2548B5AC00530B47 /* AnyCodable in Frameworks */,
+				C788DCED2F5F615400107F11 /* MacModelDB in Frameworks */,
 				C7C09CD5256AC70500B4BC5B /* SwiftyAttributes in Frameworks */,
 				C77C77522811A77B006326BE /* Sparkle.framework in Frameworks */,
 				C7F99AC727175E0C00FBF192 /* SwiftyMarkdown in Frameworks */,
@@ -567,7 +567,6 @@
 				C78AB66620F0C73900863CB1 /* SwiftyLogger.swift */,
 				C7C1F7041FD635360039507C /* Moment.swift */,
 				C76A129D20D8084E005D4BE3 /* NumberFormatter.swift */,
-				C7EF9534243F4E2200839A62 /* Sysctl.swift */,
 				C7B6EA0F201B41C10090EE0E /* Theme.swift */,
 				C7AB59762396C4A80028E573 /* Transformers.swift */,
 				C7CBEFFC238E81FF00031E93 /* Util.swift */,
@@ -925,6 +924,7 @@
 				C70A793C2AB471F900289426 /* SwiftUIIntrospect */,
 				C744D07B2B434605003D77DE /* Sentry */,
 				C7160EBF2BBACBDF000F83F2 /* FuzzyMatcher */,
+				C788DCEC2F5F615400107F11 /* MacModelDB */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -986,6 +986,7 @@
 				C7BD5F83287B44130077CCB7 /* XCRemoteSwiftPackageReference "Charts" */,
 				C744D07A2B434605003D77DE /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 				C7160EBE2BBACBDF000F83F2 /* XCRemoteSwiftPackageReference "FuzzyMatcher" */,
+				C788DCEB2F5F615400107F11 /* XCRemoteSwiftPackageReference "MacModelDB" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -1063,7 +1064,6 @@
 				C7E80E2D2637060F004718A4 /* Channel.swift in Sources */,
 				C7E242652119A65B0020326C /* LockButton.swift in Sources */,
 				C72776EB201F1DE50055934F /* ExceptionsViewController.swift in Sources */,
-				C7EF9535243F4E2200839A62 /* Sysctl.swift in Sources */,
 				C7520C081FD20CC200756F82 /* DisplayController.swift in Sources */,
 				C7789AE01FF9029700D326A8 /* ScrollableContrast.swift in Sources */,
 				C70A79582AB4A11600289426 /* AdvancedSettingsView.swift in Sources */,
@@ -1320,7 +1320,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 6.9.9;
+				CURRENT_PROJECT_VERSION = 6.9.10;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
@@ -1352,7 +1352,7 @@
 				);
 				LLVM_LTO = NO;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 6.9.9;
+				MARKETING_VERSION = 6.9.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1386,7 +1386,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 6.9.9;
+				CURRENT_PROJECT_VERSION = 6.9.10;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = RDDXV84A73;
@@ -1417,7 +1417,7 @@
 				);
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 6.9.9;
+				MARKETING_VERSION = 6.9.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = fyi.lunar.Lunar;
@@ -1569,6 +1569,14 @@
 		C77C77562812AA80006326BE /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/siteline/SwiftUI-Introspect";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		C788DCEB2F5F615400107F11 /* XCRemoteSwiftPackageReference "MacModelDB" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/alin23/MacModelDB";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.0.0;
@@ -1726,6 +1734,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C77B176727BE430200B957D1 /* XCRemoteSwiftPackageReference "SimplyCoreAudio" */;
 			productName = SimplyCoreAudio;
+		};
+		C788DCEC2F5F615400107F11 /* MacModelDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C788DCEB2F5F615400107F11 /* XCRemoteSwiftPackageReference "MacModelDB" */;
+			productName = MacModelDB;
 		};
 		C78BD049259B33D500FC823F /* Path */ = {
 			isa = XCSwiftPackageProductDependency;

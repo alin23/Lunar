@@ -13,6 +13,7 @@ import Combine
 import CoreLocation
 import Defaults
 import Foundation
+import MacModelDB
 import MediaKeyTap
 import Sentry
 import Surge
@@ -695,7 +696,7 @@ final class DisplayController: ObservableObject {
     var lastTimeBrightnessKeyPressed = Date.distantPast { didSet {
         lastBrightnessKeyEvent = nil
     }}
-    @Atomic var clamshell: Bool = isLidClosed() && Sysctl.isMacBook {
+    @Atomic var clamshell: Bool = isLidClosed() && MacModelDB.isMacBook {
         didSet {
             if clamshell, CachedDefaults[.sleepInClamshellMode] {
                 log.info("Triggering Sleep because the lid was closed")
@@ -848,7 +849,7 @@ final class DisplayController: ObservableObject {
         didSet {
             guard lidClosed != oldValue else { return }
 
-            clamshell = lidClosed && Sysctl.isMacBook
+            clamshell = lidClosed && MacModelDB.isMacBook
             log.info(
                 "Lid state changed",
                 context: [
@@ -1795,7 +1796,7 @@ final class DisplayController: ObservableObject {
             .store(in: &observers)
 
         #if arch(arm64)
-            if #available(macOS 13, *), Sysctl.isMacBook {
+            if #available(macOS 13, *), MacModelDB.isMacBook {
                 autoBlackoutBuiltinPublisher
                     .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
                     .sink { [self] change in
@@ -2386,7 +2387,7 @@ final class DisplayController: ObservableObject {
             log.debug("onlineDisplayIDs: \(NSScreen.onlineDisplayIDs.map { "[name:\(NSScreen.forDisplayID($0)?.localizedName ?? "nil")] [ID:\($0)]" })")
 
             let onlineIDs = NSScreen.onlineDisplayIDs
-            if #available(macOS 13, *), !clamshell, Sysctl.isMacBook || Sysctl.isiMac,
+            if #available(macOS 13, *), !clamshell, MacModelDB.isMacBook || MacModelDB.isiMac,
                onlineIDs.count == 1, !onlineIDs.contains(1), NSScreen.screens.first?.localizedName.isEmpty ?? true
             {
                 log.info("Disabling AutoBlackOut (disconnect) if we're left with only the builtin screen")
@@ -2712,7 +2713,7 @@ final class DisplayController: ObservableObject {
             }
         }
 
-        guard Sysctl.isMacBook, CachedDefaults[.clamshellModeDetection] else {
+        guard MacModelDB.isMacBook, CachedDefaults[.clamshellModeDetection] else {
             return
         }
 

@@ -14,6 +14,7 @@ import Compression
 import CoreLocation
 import Defaults
 import LetsMove
+import MacModelDB
 import Magnet
 import MediaKeyTap
 import Paddle
@@ -3047,8 +3048,8 @@ let restarted = CommandLine.arguments[safe: 1]?.starts(with: "restarts=") ?? fal
 var restarting = false
 
 func isLidClosed() -> Bool {
-    guard !Sysctl.isiMac else { return false }
-    guard Sysctl.isMacBook else { return true }
+    guard !MacModelDB.isiMac else { return false }
+    guard MacModelDB.isMacBook else { return true }
     return IsLidClosed()
 }
 

@@ -15,6 +15,7 @@ import CoreGraphics
 import DataCompression
 import Defaults
 import Foundation
+import MacModelDB
 import Magnet
 import OSLog
 import Regex
@@ -720,7 +721,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         isSource = isSmartBuiltin
 
-        self.minBrightness = isSmartBuiltin ? (Sysctl.isMacBook ? 1 : 0) : minBrightness.ns
+        self.minBrightness = isSmartBuiltin ? (MacModelDB.isMacBook ? 1 : 0) : minBrightness.ns
         self.maxBrightness = isSmartBuiltin ? 100 : maxBrightness.ns
         self.minContrast = isSmartBuiltin || DisplayServicesCanChangeBrightness(id) ? 0 : minContrast.ns
         self.maxContrast = isSmartBuiltin || DisplayServicesCanChangeBrightness(id) ? 100 : maxContrast.ns
@@ -1694,7 +1695,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     @Atomic var lastGammaBrightness: Brightness = 100
     @Atomic var isNative = false
 
-    lazy var isMacBook: Bool = isBuiltin && Sysctl.isMacBook
+    lazy var isMacBook: Bool = isBuiltin && MacModelDB.isMacBook
     lazy var usesDDCBrightnessControl: Bool = control is DDCControl || control is NetworkControl
 
     @Published @objc dynamic var keepDisconnected = false
