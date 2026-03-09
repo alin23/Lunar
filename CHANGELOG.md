@@ -73,6 +73,16 @@ Example on enabling DDC and disabling Apple Native in one go:
 lunar displays ultrafine appleNativeEnabled off; lunar displays builtin ddcEnabled on
 ```
 
+# 6.9.10
+## Fixes
+
+- Hide raw values on non-DDC monitors
+- Restore sub-zero dimming when the app restarts on crash or hang
+
+## Improvements
+
+- Add support for M5 MacBooks and MacBook Neo
+
 # 6.9.1
 ## Fixes
 
