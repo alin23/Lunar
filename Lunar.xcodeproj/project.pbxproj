@@ -894,7 +894,6 @@
 				C7AEC7F31FD0B4350039B562 /* Resources */,
 				C7AEC7F21FD0B4350039B562 /* Frameworks */,
 				C75083582222865F0020270E /* Embed Frameworks */,
-				C750F301299E47AE0004ECEF /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -1023,28 +1022,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		C750F301299E47AE0004ECEF /* Run Script */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Run Script";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(CODESIGNING_FOLDER_PATH)/Contents/_MASReceipt/receipt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "mkdir -p \"$CODESIGNING_FOLDER_PATH/Contents/_MASReceipt\"\ntouch \"$CODESIGNING_FOLDER_PATH/Contents/_MASReceipt/receipt\"\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		C7AEC7F11FD0B4350039B562 /* Sources */ = {

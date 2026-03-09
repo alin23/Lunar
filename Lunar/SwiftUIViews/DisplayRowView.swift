@@ -443,7 +443,7 @@ struct DisplayRowView: View {
         VStack(spacing: 2) {
             let showInput = display.hasDDC && showInputInQuickActions
             let showAdditionalUI = display.showOrientation || display.appPreset != nil || display.adaptivePaused
-                || showRawValues && (display.lastRawBrightness != nil || display.lastRawContrast != nil || display.lastRawVolume != nil)
+                || showRawValues && (display.usesDDCBrightnessControl && (display.lastRawBrightness != nil || display.lastRawContrast != nil || display.lastRawVolume != nil))
                 || SWIFTUI_PREVIEW
 
             if showInput, !showAdditionalUI {
@@ -469,7 +469,7 @@ struct DisplayRowView: View {
                             }
                     }
 
-                    if showRawValues {
+                    if showRawValues, display.usesDDCBrightnessControl {
                         RawValuesView(display: display).frame(width: 220).padding(.vertical, 3)
                     }
                 }

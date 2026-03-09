@@ -689,6 +689,16 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
         if let possibleMaxNits, possibleMaxNits > 0, let control = control as? AppleNativeControl {
             control.updateNits()
         }
+
+        let name = name
+        if restarted, let sb = try container.decodeIfPresent(Float.self, forKey: .softwareBrightness), sb < 1 {
+            log.debug("Restoring software brightness \(sb) for \(name) in 3 seconds")
+            softwareBrightness = sb
+            softwareBrightnessRestorer = mainAsyncAfter(ms: 3000) { [weak self] in
+                log.debug("Applying restored software brightness \(sb) for \(name)")
+                self?.setIndependentSoftwareBrightness(sb)
+            }
+        }
     }
 
     init(
@@ -2886,6 +2896,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
             }
 
             setIndependentSoftwareBrightness(softwareBrightness, oldValue: oldValue)
+            save()
         }
     }
 
@@ -5402,18 +5413,9 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
                 }
             }
             .store(in: &observers)
-
-        #if DEBUG
-            if isTestID(id), name.contains("DELL") {
-                audioIdentifier = "~:AMS2_Aggregate:0"
-            }
-        #endif
     }
 
     func setupHotkeys() {
-        #if DEBUG
-            log.info("Trying to setup hotkeys for \(description)")
-        #endif
         guard active else { return }
 
         if let controller = hotkeyPopoverController {
@@ -6738,6 +6740,13 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
 
         return adaptive ? .lunar : .system
     }
+
+    private var softwareBrightnessRestorer: DispatchWorkItem? {
+        didSet {
+            oldValue?.cancel()
+        }
+    }
+
 }
 
 let DS_LOGGER = Logger(subsystem: "fyi.lunar.Lunar.DisplayServices", category: "default")
