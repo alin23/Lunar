@@ -1663,7 +1663,7 @@ let AUDIO_IDENTIFIER_UUID_PATTERN = "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{4})-[0
     lazy var xdrDisablePublisher: PassthroughSubject<Bool, Never> = {
         let p = PassthroughSubject<Bool, Never>()
         p
-            .debounce(for: .milliseconds(600_000), scheduler: RunLoop.main)
+            .debounce(for: .milliseconds(180_000), scheduler: RunLoop.main)
             .sink { [weak self] shouldDisable in
                 guard let self, shouldDisable else { return }
                 handleEnhance(false, withoutSettingBrightness: true)

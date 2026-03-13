@@ -1,5 +1,5 @@
 {
-  "originHash" : "66cec291a1f975924ab3721b6f83688c48dbe6a2ca945a7fc72a16a6644e26b0",
+  "originHash" : "435149211245f4824d9f225087cd780270ae83e188eacd4398189990aeb6023d",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -80,6 +80,15 @@
       "state" : {
         "branch" : "master",
         "revision" : "4cbb7eaa0b9ba245d33e9cf176f2b70c778f2784"
+      }
+    },
+    {
+      "identity" : "macmodeldb",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/alin23/MacModelDB",
+      "state" : {
+        "revision" : "7a529050731855763504809820395484669458c2",
+        "version" : "1.0.2"
       }
     },
     {
