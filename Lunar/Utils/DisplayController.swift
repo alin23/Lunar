@@ -524,6 +524,7 @@ final class DisplayController: ObservableObject {
 
     let getDisplaysLock = NSRecursiveLock()
     var disabledAdaptiveInClamshellMode = false
+    var disabledAdaptiveForBlackout = false
 
     var appObserver: NSKeyValueObservation?
     @AtomicLock var runningAppExceptions: [AppException]!
@@ -2378,7 +2379,7 @@ final class DisplayController: ObservableObject {
         if let d = activeNewDisplays.first, activeNewDisplays.count == 1, d.isBuiltin, d.blackOutEnabled, activeOldDisplays.count > 1 {
             log.info("Disabling BlackOut if we're left with only 1 screen")
             lastBlackOutToggleDate = .distantPast
-            blackOut(display: d.id, state: .off)
+            blackOut(display: d.id, state: .off, mirroringAllowed: !d.blackOutEnabledWithoutMirroring)
         }
 
         #if arch(arm64)
