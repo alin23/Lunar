@@ -1377,7 +1377,7 @@ final class DisplayController: ObservableObject {
     }
 
     static func getSourceDisplay(_ displays: [Display]? = nil) -> Display {
-        guard let displays = displays ?? CachedDefaults[.displays] else {
+        guard let displays = displays ?? CachedDefaults[.displays], !displays.isEmpty else {
             return ALL_DISPLAYS
         }
 
@@ -2379,7 +2379,26 @@ final class DisplayController: ObservableObject {
         if let d = activeNewDisplays.first, activeNewDisplays.count == 1, d.isBuiltin, d.blackOutEnabled, activeOldDisplays.count > 1 {
             log.info("Disabling BlackOut if we're left with only 1 screen")
             lastBlackOutToggleDate = .distantPast
+            let preservedAdaptiveMode = d.blackOutEnabledWithoutMirroring && CachedDefaults[.overrideAdaptiveMode] ? adaptiveModeKey : nil
             blackOut(display: d.id, state: .off, mirroringAllowed: !d.blackOutEnabledWithoutMirroring)
+            if let preservedAdaptiveMode {
+                let restoreAdaptiveMode = { [self] in
+                    guard adaptiveModeKey != preservedAdaptiveMode else { return }
+
+                    Defaults.withoutPropagation {
+                        pausedAdaptiveModeObserver = true
+                        adaptiveMode = preservedAdaptiveMode.mode
+                        CachedDefaults[.overrideAdaptiveMode] = true
+                        CachedDefaults[.adaptiveBrightnessMode] = preservedAdaptiveMode
+                        pausedAdaptiveModeObserver = false
+                    }
+                }
+
+                restoreAdaptiveMode()
+                mainAsync {
+                    restoreAdaptiveMode()
+                }
+            }
         }
 
         #if arch(arm64)

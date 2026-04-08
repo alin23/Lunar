@@ -105,8 +105,8 @@
         "repositoryURL": "https://github.com/mxcl/Path.swift",
         "state": {
           "branch": null,
-          "revision": "afe25cdba7b8f952c16bc0c4290bdeb6af61f92f",
-          "version": "1.5.0"
+          "revision": "74ec90bbe50a3376e399286fed48b60db9b91bb1",
+          "version": "1.6.0"
         }
       },
       {
@@ -132,8 +132,8 @@
         "repositoryURL": "https://github.com/getsentry/sentry-cocoa",
         "state": {
           "branch": null,
-          "revision": "05d3ce8332097ff0b2347231ac66476fd7d2f4d8",
-          "version": "9.8.0"
+          "revision": "d459ff99b1912c9603c9e607e030b4b98e2e199a",
+          "version": "9.9.0"
         }
       },
       {
