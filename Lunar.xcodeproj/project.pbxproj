@@ -1548,8 +1548,6 @@
 				kind = upToNextMajorVersion;
 				minimumVersion = 9.2.0;
 			};
-			traits = (
-			);
 		};
 		C77AB65A269A032E0046BA78 /* XCRemoteSwiftPackageReference "Magnet" */ = {
 			isa = XCRemoteSwiftPackageReference;

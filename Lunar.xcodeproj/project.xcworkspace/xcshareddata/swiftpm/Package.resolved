@@ -60,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/alin23/FuzzyMatcher",
       "state" : {
-        "branch" : "main",
-        "revision" : "6c7628a46a566d64d6b7d79068c95bf80c8a6bd6"
+        "revision" : "6e2cda30e50904bd3d11ee869d2196d865289ce4",
+        "version" : "0.1.2"
       }
     },
     {
