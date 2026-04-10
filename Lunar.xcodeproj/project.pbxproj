@@ -181,6 +181,7 @@
 		C7CBEFFD238E81FF00031E93 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CBEFFC238E81FF00031E93 /* Util.swift */; };
 		C7CC5D1629437E2C00DEA106 /* DDC2.h in Headers */ = {isa = PBXBuildFile; fileRef = C7CC5D1529437E2C00DEA106 /* DDC2.h */; };
 		C7CFF494271FF280002CB549 /* DDCPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CFF492271FF280002CB549 /* DDCPopoverController.swift */; };
+		C7D698C12F88FB7A00FAFD3A /* FuzzyMatcher in Frameworks */ = {isa = PBXBuildFile; productRef = C7D698C02F88FB7A00FAFD3A /* FuzzyMatcher */; };
 		C7DA10F7259B8979006DD876 /* Regex in Frameworks */ = {isa = PBXBuildFile; productRef = C7DA10F6259B8979006DD876 /* Regex */; };
 		C7DD622126120B7600B07B31 /* RaspberryPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD622026120B7600B07B31 /* RaspberryPageController.swift */; };
 		C7DD62292612331700B07B31 /* PaddedTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DD62282612331700B07B31 /* PaddedTextField.swift */; };
@@ -309,7 +310,6 @@
 		C7545E3125B1996300383AFB /* PopUpButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopUpButton.swift; sourceTree = "<group>"; };
 		C7574F802354691700358397 /* gencode.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = gencode.sh; path = bin/gencode.sh; sourceTree = "<group>"; };
 		C7574F812354691700358397 /* buildscript.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = buildscript.sh; path = bin/buildscript.sh; sourceTree = "<group>"; };
-		C7605FC72F7AB7040087B195 /* FuzzyMatcher */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FuzzyMatcher; path = /Users/alin/Github/alin23/FuzzyMatcher; sourceTree = "<absolute>"; };
 		C76168F929B8B79F00D0A33A /* Bridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Bridge.h; sourceTree = "<group>"; };
 		C76168FB29B8B91C00D0A33A /* SidecarCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SidecarCore.framework; path = ../../../../../System/Library/PrivateFrameworks/SidecarCore.framework; sourceTree = "<group>"; };
 		C762AAE8271F3D6200198EDA /* ColorsPopoverController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorsPopoverController.swift; sourceTree = "<group>"; };
@@ -445,6 +445,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C7D698C12F88FB7A00FAFD3A /* FuzzyMatcher in Frameworks */,
 				C799C2F527BF67C4003A2FB9 /* Socket in Frameworks */,
 				C73CC6AE24616462003B2658 /* Sauce in Frameworks */,
 				C70A793D2AB471F900289426 /* SwiftUIIntrospect in Frameworks */,
@@ -709,7 +710,6 @@
 		C7AEC7EC1FD0B4350039B562 = {
 			isa = PBXGroup;
 			children = (
-				C7605FC72F7AB7040087B195 /* FuzzyMatcher */,
 				C705A03B268B4187001ABBA9 /* Packages */,
 				C73B41F3263BE46F006F6783 /* Localization */,
 				C7574F7F235468EE00358397 /* Scripts */,
@@ -927,6 +927,7 @@
 				C744D07B2B434605003D77DE /* Sentry */,
 				C7160EBF2BBACBDF000F83F2 /* FuzzyMatcher */,
 				C788DCEC2F5F615400107F11 /* MacModelDB */,
+				C7D698C02F88FB7A00FAFD3A /* FuzzyMatcher */,
 			);
 			productName = Lunar;
 			productReference = C7AEC7F51FD0B4350039B562 /* Lunar.app */;
@@ -988,6 +989,7 @@
 				C7BD5F83287B44130077CCB7 /* XCRemoteSwiftPackageReference "Charts" */,
 				C744D07A2B434605003D77DE /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 				C788DCEB2F5F615400107F11 /* XCRemoteSwiftPackageReference "MacModelDB" */,
+				C7D698BF2F88FB7900FAFD3A /* XCRemoteSwiftPackageReference "FuzzyMatcher" */,
 			);
 			productRefGroup = C7AEC7F61FD0B4350039B562 /* Products */;
 			projectDirPath = "";
@@ -1286,8 +1288,8 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
-				DEPLOYMENT_POSTPROCESSING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEPLOYMENT_POSTPROCESSING = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1389,6 +1391,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 6.10.0;
+				DEPLOYMENT_POSTPROCESSING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = RDDXV84A73;
@@ -1400,7 +1403,7 @@
 					"$(PROJECT_DIR)/Frameworks/Sparkle",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 				);
-				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_OPTIMIZATION_LEVEL = s;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/Frameworks/Shout/Sources/CSSH/libssh2";
 				INFOPLIST_FILE = Lunar/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Lunar;
@@ -1426,10 +1429,9 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
-				SWIFT_OBJC_BRIDGING_HEADER = "Lunar/DDC/Lunar-Bridging-Header.h";
-				DEPLOYMENT_POSTPROCESSING = YES;
 				STRIP_INSTALLED_PRODUCT = YES;
 				STRIP_STYLE = "non-global";
+				SWIFT_OBJC_BRIDGING_HEADER = "Lunar/DDC/Lunar-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 				SYSTEM_FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -1546,6 +1548,8 @@
 				kind = upToNextMajorVersion;
 				minimumVersion = 9.2.0;
 			};
+			traits = (
+			);
 		};
 		C77AB65A269A032E0046BA78 /* XCRemoteSwiftPackageReference "Magnet" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -1625,6 +1629,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 5.2.0;
+			};
+		};
+		C7D698BF2F88FB7900FAFD3A /* XCRemoteSwiftPackageReference "FuzzyMatcher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/alin23/FuzzyMatcher";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.2;
 			};
 		};
 		C7DA10F5259B8979006DD876 /* XCRemoteSwiftPackageReference "Regex" */ = {
@@ -1765,6 +1777,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C7C09CD3256AC70400B4BC5B /* XCRemoteSwiftPackageReference "SwiftyAttributes" */;
 			productName = SwiftyAttributes;
+		};
+		C7D698C02F88FB7A00FAFD3A /* FuzzyMatcher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7D698BF2F88FB7900FAFD3A /* XCRemoteSwiftPackageReference "FuzzyMatcher" */;
+			productName = FuzzyMatcher;
 		};
 		C7DA10F6259B8979006DD876 /* Regex */ = {
 			isa = XCSwiftPackageProductDependency;
