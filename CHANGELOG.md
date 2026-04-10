@@ -777,6 +777,12 @@ Some LG models respond to the `3` and `4` inputs while others use the `1` and `2
 
 ![location mode missing permissions](https://files.lunar.fyi/location-mode-missing-permissions.png)
 
+# 6.10.0
+## Fixes
+
+- Re-compile with macOS 26.4 SDK to make Shortcuts appear again
+- Fix Sync Mode being re-enabled after waking from long standby when using Manual Mode with built-in display blackout
+
 # 6.1.5
 ### Features
 
