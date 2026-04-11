@@ -777,6 +777,11 @@ Some LG models respond to the `3` and `4` inputs while others use the `1` and `2
 
 ![location mode missing permissions](https://files.lunar.fyi/location-mode-missing-permissions.png)
 
+# 6.10.1
+## Fixes
+
+- Fix performance regression on app launch time
+
 # 6.10.0
 ## Fixes
 
