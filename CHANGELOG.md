@@ -777,6 +777,15 @@ Some LG models respond to the `3` and `4` inputs while others use the `1` and `2
 
 ![location mode missing permissions](https://files.lunar.fyi/location-mode-missing-permissions.png)
 
+# 6.10.2
+## Fixes
+
+- Fix Auto Mode selecting Sensor instead of Sync in specific cases
+
+## Improvements
+
+- Reduce energy impact when UI is not visible
+
 # 6.10.1
 ## Fixes
 
