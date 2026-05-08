@@ -303,7 +303,13 @@ struct QuickActionsMenuView: View {
                     UsefulInfo().fixedSize()
                 }
                 Spacer()
-                topRightButtons.fixedSize()
+                if !menuBarClosed {
+                    topRightButtons.fixedSize()
+                } else {
+                    Rectangle()
+                        .fill(.clear)
+                        .frame(width: 100, height: 24)
+                }
             }
             .padding(.horizontal, 10)
             .padding(.top, 10 * op)
@@ -406,7 +412,13 @@ struct QuickActionsMenuView: View {
             VStack(spacing: 5) {
                 VStack(spacing: 5) {
                     content
-                    footer
+                    if !menuBarClosed {
+                        footer
+                    } else {
+                        Rectangle()
+                            .fill(.clear)
+                            .frame(width: 100, height: showFooterOnHover ? 8 : 28)
+                    }
                 }
                 .frame(maxWidth: env.menuWidth, alignment: .center)
                 .scrollOnOverflow(heightOffset: showAdditionalInfo ? 250 : 0)
