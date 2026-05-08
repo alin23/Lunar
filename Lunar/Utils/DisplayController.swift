@@ -1377,7 +1377,12 @@ final class DisplayController: ObservableObject {
     }
 
     static func getSourceDisplay(_ displays: [Display]? = nil) -> Display {
-        guard let displays = displays ?? CachedDefaults[.displays], !displays.isEmpty else {
+        let displays = if displays == nil {
+            CachedDefaults[.displays]
+        } else {
+            displays
+        }
+        guard let displays, !displays.isEmpty else {
             return ALL_DISPLAYS
         }
 
