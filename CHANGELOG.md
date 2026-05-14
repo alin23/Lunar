@@ -777,6 +777,11 @@ Some LG models respond to the `3` and `4` inputs while others use the `1` and `2
 
 ![location mode missing permissions](https://files.lunar.fyi/location-mode-missing-permissions.png)
 
+# 6.10.3
+## Fixes
+
+- Sync Mode: switch from the *All Displays* placeholder to the real source as soon as it becomes available after wake (e.g. when the source display recovers from blackout/darken)
+
 # 6.10.2
 ## Fixes
 
