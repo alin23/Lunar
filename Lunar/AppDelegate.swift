@@ -1656,6 +1656,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
 
                     if CachedDefaults[.reapplyValuesAfterWake] {
                         self.screenWakeAdapterTask = Repeater(every: 2, times: CachedDefaults[.wakeReapplyTries], name: SCREEN_WAKE_ADAPTER_TASK_KEY) {
+                            if DC.adaptiveModeKey == .sync, DC.sourceDisplay.isAllDisplays {
+                                let realSource = DC.getSourceDisplay()
+                                if !realSource.isAllDisplays {
+                                    log.debug("Sync source recovered after wake: ALL_DISPLAYS -> \(realSource.description)")
+                                    DC.sourceDisplay = realSource
+                                }
+                            }
                             DC.adaptBrightness(force: true)
 
                             for display in DC.activeDisplayList.filter(\.blackOutEnabled) {

@@ -2141,6 +2141,14 @@ final class DisplayController: ObservableObject {
             adaptiveMode = mode
             CachedDefaults[.adaptiveBrightnessMode] = mode.key
         }
+
+        if mode.key == .sync, sourceDisplay.isAllDisplays {
+            let realSource = getSourceDisplay()
+            if !realSource.isAllDisplays {
+                log.debug("Sync source recovered: ALL_DISPLAYS -> \(realSource.description)")
+                sourceDisplay = realSource
+            }
+        }
     }
 
     func manualAppBrightnessContrast(for display: Display, app: AppException) -> (Brightness, Contrast) {
