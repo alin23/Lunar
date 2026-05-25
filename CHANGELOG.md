@@ -777,6 +777,11 @@ Some LG models respond to the `3` and `4` inputs while others use the `1` and `2
 
 ![location mode missing permissions](https://files.lunar.fyi/location-mode-missing-permissions.png)
 
+# 6.10.4
+## Fixes
+
+- Fix brightness OSD not appearing sometimes
+
 # 6.10.3
 ## Fixes
 
