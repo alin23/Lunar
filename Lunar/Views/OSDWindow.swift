@@ -22,7 +22,7 @@ final class OSDWindow: NSWindow, NSWindowDelegate {
         contentViewController = NSHostingController(rootView: swiftuiView)
 
         self.level = level
-        collectionBehavior = [.stationary, .canJoinAllSpaces, .ignoresCycle, .fullScreenDisallowsTiling]
+        collectionBehavior = [.stationary, .canJoinAllSpaces, .ignoresCycle, .fullScreenAuxiliary, .fullScreenDisallowsTiling]
         shouldIgnoreMouseEvents = ignoresMouseEvents
         self.ignoresMouseEvents = ignoresMouseEvents
         setAccessibilityRole(.popover)
@@ -150,6 +150,10 @@ final class OSDWindow: NSWindow, NSWindowDelegate {
         fader = mainAsyncAfter(ms: fadeMilliseconds) { [weak self] in
             self?.actionOnFade?()
         }
+    }
+
+    func isBound(to screen: NSScreen?) -> Bool {
+        self.screen?.displayID == screen?.displayID
     }
 
     func windowWillClose(_ notification: Notification) {
@@ -1180,6 +1184,11 @@ extension Display {
             osdState.textLeft = textLeft
             osdState.imageLeft = imageLeft
             osdState.onChange = onChange
+
+            if let osd = osdWindowController?.window as? OSDWindow, !osd.isBound(to: nsScreen) {
+                osd.hide()
+                osdWindowController = nil
+            }
 
             if osdWindowController == nil {
                 let ignoresMouseEvents = if #available(macOS 26, *) {
