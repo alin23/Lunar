@@ -69,30 +69,47 @@ func withTimeout<T>(_ timeout: DateComponents, name: String, _ block: @escaping 
     return value
 }
 
-/// Bundle identifiers of the Shortcuts/automation runners. When one of these re-opens or
-/// activates Lunar (e.g. while a Shortcut runs a Lunar action in the background) we must not
-/// pop the Settings window in the user's face.
-let SHORTCUT_RUNNER_BUNDLE_IDS: Set<String> = [
-    "com.apple.WorkflowKit.BackgroundShortcutRunner",
-    "com.apple.WorkflowKit.ShortcutsRunner",
-    "com.apple.shortcuts",
+/// The Apple processes a person opens an app from. A reopen sent by any other Apple process is
+/// the system reaching into Lunar: the Shortcuts runners running a Lunar action, Siri
+/// (`com.apple.Siri`, and `com.apple.campo` for Siri AI) resolving App Intents, intent
+/// extensions. None of those should put the Lunar window in front of the user.
+let USER_LAUNCHER_BUNDLE_IDS: Set<String> = [
+    "com.apple.dock",
+    "com.apple.finder",
+    "com.apple.Spotlight",
+    "com.apple.apps.launcher",
+    "com.apple.Terminal",
 ]
 
-/// The bundle identifier of the process that sent the AppleEvent currently being handled
-/// (reopen/open/activate), or nil if it can't be determined.
-func currentAppleEventSenderBundleID() -> String? {
-    guard let event = NSAppleEventManager.shared().currentAppleEvent,
-          let pidDescriptor = event.attributeDescriptor(forKeyword: keyAddressAttr)?
-          .coerce(toDescriptorType: typeKernelProcessID)
-    else { return nil }
+/// The process that sent the AppleEvent currently being handled (reopen/open/activate).
+/// `bundleID` is nil for daemons and command line tools, which `path` still identifies.
+func currentAppleEventSender() -> (pid: pid_t, bundleID: String?, path: String?)? {
+    guard let event = NSAppleEventManager.shared().currentAppleEvent else { return nil }
 
-    let data = pidDescriptor.data
-    guard data.count == MemoryLayout<pid_t>.size else { return nil }
+    for keyword in [AEKeyword(keySenderPIDAttr), AEKeyword(keyAddressAttr)] {
+        guard let data = event.attributeDescriptor(forKeyword: keyword)?.coerce(toDescriptorType: typeKernelProcessID)?.data,
+              data.count == MemoryLayout<pid_t>.size
+        else { continue }
+        let pid = data.withUnsafeBytes { $0.load(as: pid_t.self) }
+        guard pid > 0 else { continue }
 
-    let pid = data.withUnsafeBytes { $0.load(as: pid_t.self) }
-    guard pid > 0 else { return nil }
+        var buffer = [CChar](repeating: 0, count: Int(MAXPATHLEN) * 4)
+        let path = proc_pidpath(pid, &buffer, UInt32(buffer.count)) > 0 ? String(cString: buffer) : nil
+        return (pid, NSRunningApplication(processIdentifier: pid)?.bundleIdentifier, path)
+    }
+    return nil
+}
 
-    return NSRunningApplication(processIdentifier: pid)?.bundleIdentifier
+/// Whether the AppleEvent being handled came from the system rather than from someone opening
+/// Lunar. An unknown sender counts as a person, so a launcher Lunar has never heard of still
+/// opens the window.
+func appleEventSentBySystem() -> Bool {
+    guard let sender = currentAppleEventSender() else { return false }
+    if let bundleID = sender.bundleID {
+        return bundleID.hasPrefix("com.apple.") && !USER_LAUNCHER_BUNDLE_IDS.contains(bundleID)
+    }
+    guard let path = sender.path, path != "/usr/bin/open" else { return false }
+    return ["/System/", "/usr/libexec/", "/usr/sbin/"].contains { path.hasPrefix($0) }
 }
 
 let fm = FileManager()
@@ -1050,18 +1067,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
         }
     }
 
-    /// True when the AppleEvent currently being handled (e.g. a reopen/activate) was sent by
-    /// one of the Shortcuts/automation runners. Those launch Lunar in the background to run an
-    /// action and should never surface the app window.
-    func reopenTriggeredByShortcutRunner() -> Bool {
-        guard let sender = currentAppleEventSenderBundleID() else { return false }
-        return SHORTCUT_RUNNER_BUNDLE_IDS.contains(sender)
+    /// True when the AppleEvent currently being handled (a reopen or activate) was sent by the
+    /// system rather than by someone opening Lunar (see `appleEventSentBySystem`). Logs the
+    /// sender either way, so a new system agent that reopens Lunar shows up by name.
+    func reopenTriggeredBySystem() -> Bool {
+        let sender = currentAppleEventSender()
+        let bySystem = appleEventSentBySystem()
+        log.info("Reopen from \(sender?.bundleID ?? sender?.path ?? "unknown sender") (pid \(sender?.pid ?? 0)): \(bySystem ? "system, window stays closed" : "user")")
+        return bySystem
     }
 
     func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows _: Bool) -> Bool {
-        // Running a Shortcut that uses a Lunar action re-opens the app through
-        // com.apple.WorkflowKit.BackgroundShortcutRunner. Don't pop the window for that.
-        if reopenTriggeredByShortcutRunner() {
+        // Siri resolving App Intents and the Shortcuts runners running a Lunar action both
+        // re-open the app. Don't pop the window for those.
+        if reopenTriggeredBySystem() {
             return true
         }
 
@@ -1075,7 +1094,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     }
 
     func applicationDidBecomeActive(_: Notification) {
-        if didBecomeActiveAtLeastOnce, CachedDefaults[.hideMenuBarIcon], !reopenTriggeredByShortcutRunner() {
+        if didBecomeActiveAtLeastOnce, CachedDefaults[.hideMenuBarIcon], !reopenTriggeredBySystem() {
             showWindow()
         }
         didBecomeActiveAtLeastOnce = true
