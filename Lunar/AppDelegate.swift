@@ -2153,6 +2153,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
             if NSApp.window(withWindowNumber: event.windowNumber) != nil {
                 return
             }
+            // That includes clicks on our own status item. Closing here would race the status
+            // button's mouseDown toggle: the toggle then finds the menu already closed and
+            // immediately reopens it, making the icon unable to ever close the menu.
+            if let statusWindow = appDelegate?.statusItemButtonController?.statusButton?.window,
+               NSMouseInRect(NSEvent.mouseLocation, statusWindow.frame, false)
+            {
+                return
+            }
             menuWindow.forceClose()
         }
     }
