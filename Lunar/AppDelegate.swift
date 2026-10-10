@@ -2127,8 +2127,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CLLocationManagerDeleg
     }
 
     func addGlobalMouseDownMonitor() {
-        NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]) { _ in
+        NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]) { event in
             guard let menuWindow, menuWindow.isVisible, !DC.calibrating else { return }
+            // Newer macOS also routes clicks on our own windows through global monitors,
+            // so only a click that went to another app closes the menu
+            if NSApp.window(withWindowNumber: event.windowNumber) != nil {
+                return
+            }
             menuWindow.forceClose()
         }
     }
