@@ -777,6 +777,14 @@ Some LG models respond to the `3` and `4` inputs while others use the `1` and `2
 
 ![location mode missing permissions](https://files.lunar.fyi/location-mode-missing-permissions.png)
 
+# 6.11.1
+## Fixes
+
+- Clicks reach the display settings again on macOS 27
+- The menu bar icon closes the Lunar menu again on macOS 27, and clicks inside the menu no longer close it
+- The Lunar window no longer opens by itself when Siri or another system agent activates Lunar
+- Activating a licence that has reached its activation limit frees the oldest activation in more cases, instead of failing with a generic error
+
 # 6.11.0
 ## Fixes
 
@@ -788,6 +796,8 @@ Some LG models respond to the `3` and `4` inputs while others use the `1` and `2
 - Lunar now requires macOS 12 or newer
 
 **Note:** this will most likely be the last v6 release. **Lunar v7** is a rewrite of the whole brightness control engine and UI that will be released in September-October, dropping support for Intel and macOS versions older than 14.0 to get rid of legacy workarounds and hacks that accumulated over the past 7 years.
+
+**Lunar v7 will be a free upgrade and will not require any additional payment for people who already bought Lunar Pro.**
 
 # 6.10.4
 ## Fixes
