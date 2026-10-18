@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5AEBECE2708F497955A702D9 /* ActivationDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81D40BB89ABE3EE8CD4532D1 /* ActivationDiagnostics.swift */; };
+		80351EBE81336CE245AC1FA6 /* required.h in Headers */ = {isa = PBXBuildFile; fileRef = 2994F758DA4A18AAD717A9F3 /* required.h */; };
 		C701A23F2546C8BF004747B5 /* MediaKeyTap in Frameworks */ = {isa = PBXBuildFile; productRef = C701A23E2546C8BF004747B5 /* MediaKeyTap */; };
 		C7045DAA24407CBC002289E5 /* Surge in Frameworks */ = {isa = PBXBuildFile; productRef = C7045DA924407CBC002289E5 /* Surge */; };
 		C7045DB82440DEEE002289E5 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = C7045DB72440DEEE002289E5 /* SwiftyJSON */; };
@@ -239,6 +241,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2994F758DA4A18AAD717A9F3 /* required.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = required.h; sourceTree = "<group>"; };
+		81D40BB89ABE3EE8CD4532D1 /* ActivationDiagnostics.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ActivationDiagnostics.swift; sourceTree = "<group>"; };
 		C70A793F2AB4A11600289426 /* ManageButtonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManageButtonView.swift; sourceTree = "<group>"; };
 		C70A79402AB4A11600289426 /* NitsTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NitsTextField.swift; sourceTree = "<group>"; };
 		C70A79412AB4A11600289426 /* TextInputView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextInputView.swift; sourceTree = "<group>"; };
@@ -570,6 +574,7 @@
 				C7A82DC2261DF513004146A8 /* Pro.swift */,
 				C740A1F3262490E1004BC1C7 /* CLI.swift */,
 				C7714B0527E8F11C002E0B2E /* Presets.swift */,
+				81D40BB89ABE3EE8CD4532D1 /* ActivationDiagnostics.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -749,6 +754,7 @@
 				C790D4BC259B9DC100868689 /* Utils */,
 				C77CC75A1FEDB367009AA718 /* Views */,
 				C73A4E6129C5EAFC006A22F3 /* Localizable.stringsdict */,
+				2994F758DA4A18AAD717A9F3 /* required.h */,
 			);
 			path = Lunar;
 			sourceTree = "<group>";
@@ -874,6 +880,7 @@
 				C7E80E372637060F004718A4 /* libssh2.h in Headers */,
 				C7E80E382637060F004718A4 /* libssh2_publickey.h in Headers */,
 				C7E896DB2652C0F60079A328 /* ExceptionCatcher.h in Headers */,
+				80351EBE81336CE245AC1FA6 /* required.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -967,7 +974,7 @@
 				C7B5E8572548B3F900530B47 /* XCRemoteSwiftPackageReference "Defaults" */,
 				C7B5E85B2548B5AC00530B47 /* XCRemoteSwiftPackageReference "AnyCodable" */,
 				C7C09CD3256AC70400B4BC5B /* XCRemoteSwiftPackageReference "SwiftyAttributes" */,
-				C78BD048259B33D500FC823F /* XCRemoteSwiftPackageReference "Path" */,
+				C78BD048259B33D500FC823F /* XCRemoteSwiftPackageReference "Path.swift" */,
 				C7DA10F5259B8979006DD876 /* XCRemoteSwiftPackageReference "Regex" */,
 				C73B9A0B25FB9AD7003184FC /* XCRemoteSwiftPackageReference "Glob" */,
 				C740A1F626249176004BC1C7 /* XCRemoteSwiftPackageReference "swift-argument-parser" */,
@@ -1168,6 +1175,7 @@
 				C7A22756281C19D1005F2351 /* XDRTipView.swift in Sources */,
 				C7C1F7051FD635360039507C /* Moment.swift in Sources */,
 				C7AF321B26F62D3B00AC14AF /* Schedule.swift in Sources */,
+				5AEBECE2708F497955A702D9 /* ActivationDiagnostics.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1540,7 +1548,7 @@
 			repositoryURL = "https://github.com/getsentry/sentry-cocoa";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 9.16.0;
+				minimumVersion = 9.30.1;
 			};
 		};
 		C77AB65A269A032E0046BA78 /* XCRemoteSwiftPackageReference "Magnet" */ = {
@@ -1575,7 +1583,7 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		C78BD048259B33D500FC823F /* XCRemoteSwiftPackageReference "Path" */ = {
+		C78BD048259B33D500FC823F /* XCRemoteSwiftPackageReference "Path.swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mxcl/Path.swift";
 			requirement = {
@@ -1742,7 +1750,7 @@
 		};
 		C78BD049259B33D500FC823F /* Path */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = C78BD048259B33D500FC823F /* XCRemoteSwiftPackageReference "Path" */;
+			package = C78BD048259B33D500FC823F /* XCRemoteSwiftPackageReference "Path.swift" */;
 			productName = Path;
 		};
 		C799C2F427BF67C4003A2FB9 /* Socket */ = {

@@ -59,4 +59,6 @@ old_updates
 .ruby-lsp
 Retired.swift
 Lunar/required.swift
+Lunar/required.h
 release
+Lunar/Data/ActivationDiagnostics.swift
