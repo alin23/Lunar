@@ -3,6 +3,23 @@
     <channel>
         <title>Lunar</title>
         <item>
+            <title>6.11.3</title>
+            <pubDate>Sun, 25 Oct 2026 19:20:15 +0200</pubDate>
+            <link>https://lunar.fyi/</link>
+            <sparkle:fullReleaseNotesLink>https://lunar.fyi/changelog</sparkle:fullReleaseNotesLink>
+            <sparkle:minimumAutoupdateVersion>5.0.0</sparkle:minimumAutoupdateVersion>
+            <sparkle:version>6.11.3</sparkle:version>
+            <sparkle:shortVersionString>6.11.3</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>12.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://files.lunar.fyi/ReleaseNotes/Lunar-6.11.3.html</sparkle:releaseNotesLink>
+            <enclosure url="https://files.lunar.fyi/releases/Lunar-6.11.3.dmg" length="16186116" type="application/octet-stream" sparkle:edSignature="A9eqnuJyopNvXgskAwA0GKi00W7dBlARQOJraG7cylno+xGZYQCWcsY6ulGFZCIWeMaaofyo842PDbYxR+sjBg=="/>
+            <sparkle:deltas>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar6.11.3-6.11.2.delta" sparkle:deltaFrom="6.11.2" length="1800654" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977808" sparkle:deltaFromSparkleLocales="Base" sparkle:edSignature="us2JzZTbEBjYAM1rrqF6STD6HvU9ieHtTYpIbW1vRBEiEgEVqDQARhxM8lA5P2R80x3450sNWVZ8SyfKfzQ9DA=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar6.11.3-6.11.1.delta" sparkle:deltaFrom="6.11.1" length="3582702" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977808" sparkle:deltaFromSparkleLocales="Base" sparkle:edSignature="9tTQdqdB4qLQTmMNaM6kRczc1PGFEgf15mA8LkoDfyIqMcGbfwJRw1SNG0+abofzt+nhUTn7HaNYvwMjjrpQDQ=="/>
+                <enclosure url="https://files.lunar.fyi/deltas/Lunar6.11.3-6.11.0.delta" sparkle:deltaFrom="6.11.0" length="3635602" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977808" sparkle:deltaFromSparkleLocales="Base" sparkle:edSignature="jJrKtRyvEV2aCN24EhByNYZvzItWGoeR3PbXf4p5PjkDVWBPBUrL7P+vRbah1t/48sPkqBpkYFAPqzLdDaTnBg=="/>
+            </sparkle:deltas>
+        </item>
+        <item>
             <title>6.11.2</title>
             <pubDate>Sun, 18 Oct 2026 18:22:07 +0300</pubDate>
             <link>https://lunar.fyi/</link>
